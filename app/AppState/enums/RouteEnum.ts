@@ -8,6 +8,7 @@ export enum RouteEnum {
   History = 'History',
   Send = 'Send',
   Receive = 'Receive',
+  Claim = 'Claim',
   Messages = 'Messages',
   ValueTransferDetailStack = 'ValueTransferDetailStack',
   ConfirmStack = 'ConfirmStack',

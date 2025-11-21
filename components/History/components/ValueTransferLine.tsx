@@ -88,8 +88,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     vt.confirmations >= 0 &&
     vt.confirmations < GlobalConst.minConfirmations
       ? colors.primaryDisabled
-      : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
-      ? colors.primary
       : colors.text;
 
   const icon =
@@ -316,7 +314,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
               <View style={{ display: 'flex' }}>
                 <FontAwesomeIcon
-                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
                   size={30}
                   icon={icon}
                   color={

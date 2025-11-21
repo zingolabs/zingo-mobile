@@ -2,9 +2,7 @@
 import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
-  ScrollView,
   RefreshControl,
-  TouchableOpacity,
   ActivityIndicator,
   Dimensions,
   Platform,
@@ -17,7 +15,6 @@ import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
-  FilterEnum,
   GlobalConst,
   RouteEnum,
   ScreenEnum,
@@ -86,7 +83,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     translate,
     valueTransfers,
     language,
-    setBackgroundError,
     addLastSnackbar,
     indexerServer,
     doRefresh,
@@ -106,7 +102,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const scrollViewRef = useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(null);
 
@@ -192,8 +187,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
       return [] as ValueTransferType[];
     }
     // strictly show VT's with some amount on funds.
-    return valueTransfers.filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true));
-  }, [valueTransfers, filter]);
+    return valueTransfers;
+  }, [valueTransfers]);
 
   useEffect(() => {
     Utils.setMomentLocale(language)
@@ -307,18 +302,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     });
   };
 
-  /*
-  const setMessagesAddressModalShow = (vt: ValueTransferType) => {
-    navigation.navigate(RouteEnum.MessagesAddress, {
-      setScrollToBottom: setScrollToBottom,
-      scrollToBottom: scrollToBottom,
-      address: Utils.messagesAddress(vt),
-      sendTransaction: sendTransaction,
-      setServerOption: setServerOption,
-    });
-  };
-  */
-
   const rowRenderer = (type: string | number, data: ValueTransferType, index: number) => {
     let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
 
@@ -366,77 +349,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           setShieldingAmount={setShieldingAmount}
           setScrollToTop={setScrollToTop}
           setScrollToBottom={setScrollToBottom}
-          setBackgroundError={setBackgroundError /* context */}
         />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            marginHorizontal: 5,
-            marginBottom: 2,
-          }}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              width: '100%',
-              marginTop: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                setFilter(FilterEnum.all);
-                setLoading(true);
-                setShowFooter(false);
-              }}>
-              <View
-                style={{
-                  backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  marginRight: 10,
-                }}>
-                <FadeText
-                  style={{
-                    color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
-                    fontWeight: 'bold',
-                  }}>
-                  {translate('messages.filter-all') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setFilter(FilterEnum.withFunds);
-                setLoading(true);
-                setShowFooter(false);
-              }}>
-              <View
-                style={{
-                  backgroundColor: filter === FilterEnum.withFunds ? colors.primary : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor: filter === FilterEnum.withFunds ? colors.primary : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                }}>
-                <FadeText
-                  style={{
-                    color: filter === FilterEnum.withFunds ? colors.sideMenuBackground : colors.zingo,
-                    fontWeight: 'bold',
-                  }}>
-                  {translate('history.filter-withfunds') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
         {loading ? (
           <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
         ) : (

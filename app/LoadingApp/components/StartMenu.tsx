@@ -75,6 +75,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               borderWidth: 1,
               padding: 10,
               margin: 10,
+              backgroundColor: colors.background,
             }}>
               <TouchableOpacity onPress={() => {
                 clear();

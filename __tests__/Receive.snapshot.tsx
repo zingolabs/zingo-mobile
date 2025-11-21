@@ -42,7 +42,6 @@ describe('Component Receive - test', () => {
       <ContextAppLoadedProvider value={state}>
         <Receive {...props}
           toggleMenuDrawer={onFunction} 
-          alone={false} 
           setSecurityOption={onFunction} 
         />
       </ContextAppLoadedProvider>,

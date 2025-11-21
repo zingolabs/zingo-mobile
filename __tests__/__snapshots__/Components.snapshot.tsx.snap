@@ -243,13 +243,26 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
     <View
       style={
         {
-          "alignItems": "flex-end",
+          "alignItems": "baseline",
           "flexDirection": "row",
           "margin": 0,
           "padding": 0,
         }
       }
     >
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+            "fontWeight": "700",
+            "margin": 0,
+            "padding": 0,
+          }
+        }
+      >
+         -.-----
+      </Text>
       <RNSVGSvgView
         align="xMidYMid"
         bbHeight={20}
@@ -328,19 +341,6 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
           />
         </RNSVGGroup>
       </RNSVGSvgView>
-      <Text
-        style={
-          {
-            "color": "red",
-            "fontSize": 20,
-            "fontWeight": "700",
-            "margin": 0,
-            "padding": 0,
-          }
-        }
-      >
-         -.----
-      </Text>
     </View>
   </View>
 </View>
@@ -393,13 +393,27 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
     <View
       style={
         {
-          "alignItems": "flex-end",
+          "alignItems": "baseline",
           "flexDirection": "row",
           "margin": 0,
           "padding": 0,
         }
       }
     >
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+            "fontWeight": "700",
+            "margin": 0,
+            "padding": 0,
+          }
+        }
+        testID="undefined.big-part"
+      >
+        1.12346
+      </Text>
       <RNSVGSvgView
         align="xMidYMid"
         bbHeight={20}
@@ -478,34 +492,6 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
           />
         </RNSVGGroup>
       </RNSVGSvgView>
-      <Text
-        style={
-          {
-            "color": "red",
-            "fontSize": 20,
-            "fontWeight": "700",
-            "margin": 0,
-            "padding": 0,
-          }
-        }
-        testID="undefined.big-part"
-      >
-         1.1234
-      </Text>
-      <Text
-        style={
-          {
-            "color": "red",
-            "fontSize": 14,
-            "margin": 0,
-            "marginBottom": 1.3333333333333333,
-            "padding": 0,
-          }
-        }
-        testID="undefined.small-part"
-      >
-        5678
-      </Text>
     </View>
   </View>
 </View>

@@ -47,7 +47,8 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail {...props_0} />
       </ContextAppLoadedProvider>,
     ).toJSON();
-    const num = screen.getAllByText('0.1234');
+    // rounded
+    const num = screen.getAllByText('0.12346');
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
     screen.getByText('hola & hello');
@@ -62,7 +63,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail {...props_1} />
       </ContextAppLoadedProvider>,
     );
-    const num = screen.getAllByText('0.0000');
+    const num = screen.getAllByText('0');
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
     screen.getByText('orchard memo\nsapling memo');
@@ -75,7 +76,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail {...props_2} />
       </ContextAppLoadedProvider>,
     );
-    const num = screen.getAllByText('0.0000');
+    const num = screen.getAllByText('0');
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
   });
@@ -87,7 +88,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail {...props_3} />
       </ContextAppLoadedProvider>,
     );
-    const num = screen.getAllByText('0.7765');
+    const num = screen.getAllByText('0.77654');
     expect(num.length).toBe(2);
     screen.getByText('hola & hello');
     const txt = screen.queryByText('hola & hello\nhello & hola');

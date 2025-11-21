@@ -107,6 +107,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 placeholderTextColor={colors.placeholder}
                 style={{
                   flexGrow: 1,
+                  flexShrink: 1,
                   color: colors.text,
                   fontWeight: '600',
                   fontSize: 18,

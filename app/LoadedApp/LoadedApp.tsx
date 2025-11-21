@@ -1,7 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
-  View,
   Alert,
   I18nManager,
   EmitterSubscription,
@@ -9,11 +7,7 @@ import {
   NativeEventSubscription,
   Linking,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
-import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft, faComments } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -80,10 +74,7 @@ import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressA
 import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfov10';
 
 import History from '../../components/History';
-import Send from '../../components/Send';
-import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
-import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
 import { ToastProvider } from 'react-native-toastier';
@@ -98,6 +89,8 @@ import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Send from '../../components/Send';
+import Receive from '../../components/Receive';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -106,7 +99,6 @@ const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
 const Pools = React.lazy(() => import('../../components/Pools'));
 const Insight = React.lazy(() => import('../../components/Insight'));
-const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
 const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
 
 const en = require('../translations/en.json');
@@ -115,7 +107,6 @@ const pt = require('../translations/pt.json');
 const ru = require('../translations/ru.json');
 const tr = require('../translations/tr.json');
 
-const Tab = createBottomTabNavigator<AppDrawerParamList>();
 const Stack = createNativeStackNavigator<AppDrawerParamList>();
 
 // for testing
@@ -346,26 +337,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   }
 }
 
-type LoadingProps = {
-  backgroundColor: string;
-  spinColor: string;
-};
-
-const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
-  return (
-    <View
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: backgroundColor,
-        height: '100%',
-      }}>
-      <ActivityIndicator size="large" color={spinColor} />
-    </View>
-  );
-};
-
 type LoadedAppClassProps = {
   navigationApp: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
@@ -393,13 +364,6 @@ type LoadedAppClassProps = {
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
-
-const TabPressable: React.FC<BottomTabBarButtonProps & { colors: ThemeType }> = ({ colors, ...props }) => {
-  return <PlatformPressable {...props} android_ripple={{ color: colors.primary }} />;
-};
-
-const renderTabPressable = (colors: ThemeType) => (props: BottomTabBarButtonProps) =>
-  <TabPressable {...props} colors={colors} />;
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClassState> {
   rpc: RPC;
@@ -1617,17 +1581,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   render() {
     const {
       snackbars,
-      mode,
-      valueTransfersTotal,
-      readOnly,
-      totalBalance,
-      translate,
       scrollToTop,
-      addresses,
-      somePending,
-      selectIndexerServer,
     } = this.state;
-    const { colors } = this.props.theme;
 
     const context = {
       //context
@@ -1681,41 +1636,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       performanceLevel: this.state.performanceLevel,
     };
 
-    const fnTabBarIcon = (route: { name: string; key: string }, focused: boolean) => {
-      var iconName;
-
-      if (route.name === RouteEnum.History) {
-        iconName = faClockRotateLeft;
-      } else if (route.name === RouteEnum.Send) {
-        if (
-          mode === ModeEnum.basic &&
-          !!totalBalance &&
-          (
-            (totalBalance.totalOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === 0) ||
-            (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0) ||
-            (totalBalance.totalTransparentBalance > 0 && totalBalance.confirmedTransparentBalance === 0)
-          ) &&
-          somePending
-        ) {
-          iconName = faRefresh;
-        } else {
-          iconName = faPaperPlane;
-        }
-      } else if (route.name === RouteEnum.Receive) {
-        iconName = faDownload;
-      } else if (route.name === RouteEnum.Messages) {
-        iconName = faComments;
-      } else {
-        iconName = faCog;
-      }
-
-      return (
-        <View>
-          <FontAwesomeIcon size={25} icon={iconName} color={focused ? colors.background : colors.money} />
-        </View>
-      );
-    };
-
     //console.log('render LoadedAppClass - 3');
     //console.log('vt', valueTransfers);
     //console.log('ad', addresses);
@@ -1731,128 +1651,44 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
-            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnum.HomeStack} screenName={this.screenName}>
-              <Drawer.Screen name={RouteEnum.HomeStack}>
+            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnum.History} screenName={this.screenName}>
+              <Drawer.Screen name={RouteEnum.History}>
                 {props => {
                   useEffect(() => {
                     this.setNavigationHome(props.navigation);
                   });
                   return (
-                  <>
-                    {mode === ModeEnum.advanced ||
-                    (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
-                    (!readOnly && !!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ? (
-                      <Tab.Navigator
-                        detachInactiveScreens={true}
-                        initialRouteName={RouteEnum.History}
-                        screenOptions={({ route }: { route: { name: string; key: string } }) => ({
-                          tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-                          tabBarIconStyle: {
-                            alignSelf: 'center',
-                            marginBottom: 2,
-                          },
-                          tabBarLabel: route.name === RouteEnum.History
-                            ? (translate('loadedapp.history-menu') as string)
-                            : route.name === RouteEnum.Send
-                              ? (translate('loadedapp.send-menu') as string)
-                              : route.name === RouteEnum.Receive
-                                ? (translate('loadedapp.receive-menu') as string)
-                                : route.name === RouteEnum.Messages
-                                  ? (translate('loadedapp.messages-menu') as string)
-                                  : '',
-                          tabBarLabelPosition: 'below-icon',
-                          tabBarLabelStyle: {
-                            alignSelf: 'center',
-                            fontSize: 14,
-                          },
-                          tabBarItemStyle: {
-                            height: 60,
-                          },
-                          tabBarActiveTintColor: colors.background,
-                          tabBarActiveBackgroundColor: colors.primaryDisabled,
-                          tabBarInactiveTintColor: colors.money,
-                          tabBarInactiveBackgroundColor: colors.sideMenuBackground,
-                          tabBarStyle: {
-                            borderTopWidth: 1,
-                            height: 60,
-                          },
-                          headerShown: false,
-                          tabBarButton: renderTabPressable(colors),
-                        })}>
-                        <Tab.Screen name={RouteEnum.History}>
-                          {propsTab => (
-                            <History {...propsTab}
-                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                              setShieldingAmount={this.setShieldingAmount /* header */}
-                              setScrollToTop={this.setScrollToTop /* header & history */}
-                              scrollToTop={scrollToTop /* history */}
-                              setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                            />
-                          )}
-                        </Tab.Screen>
-                        {!readOnly &&
-                          selectIndexerServer !== SelectServerEnum.offline &&
-                          (mode === ModeEnum.advanced ||
-                            (!!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ||
-                            (!!totalBalance &&
-                              (
-                                (totalBalance.totalOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === 0) ||
-                                (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0)
-                              ) &&
-                              somePending)) && (
-                            <Tab.Screen name={RouteEnum.Send}>
-                              {propsTab => (
-                                <Send {...propsTab}
-                                  toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                                  setShieldingAmount={this.setShieldingAmount /* header */}
-                                  setScrollToTop={this.setScrollToTop /* header & send */}
-                                  setScrollToBottom={this.setScrollToBottom /* header & send */}
-                                  sendTransaction={this.sendTransaction /* send */}
-                                  setServerOption={this.setServerOption /* send */}
-                                  clearToAddr={this.clearToAddr /* send */}
-                                  setSecurityOption={this.setSecurityOption /* send */}
-                                />
-                              )}
-                            </Tab.Screen>
-                          )}
-                        <Tab.Screen name={RouteEnum.Receive}>
-                          {propsTab => (
-                            <Receive {...propsTab}
-                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                              alone={false /* receive */}
-                              setSecurityOption={this.setSecurityOption}
-                            />
-                          )}
-                        </Tab.Screen>
-                      </Tab.Navigator>
-                    ) : (
-                      <>
-                        {addresses === null ? (
-                          <Loading backgroundColor={colors.background} spinColor={colors.primary} />
-                        ) : (
-                          <Tab.Navigator
-                            initialRouteName={RouteEnum.Receive}
-                            screenOptions={{
-                              tabBarStyle: {
-                                display: 'none',
-                              },
-                              headerShown: false,
-                            }}>
-                            <Tab.Screen name={RouteEnum.Receive}>
-                              {propsTab => (
-                                <Receive {...propsTab}
-                                  toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                                  alone={true /* receive */}
-                                  setSecurityOption={this.setSecurityOption}
-                                />
-                              )}
-                            </Tab.Screen>
-                          </Tab.Navigator>
-                        )}
-                      </>
-                    )}
-                  </>
-                );}}
+                    <History {...props}
+                      toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
+                      setShieldingAmount={this.setShieldingAmount /* header */}
+                      setScrollToTop={this.setScrollToTop /* header & history */}
+                      scrollToTop={scrollToTop /* history */}
+                      setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                    />
+                  );
+                }}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Send}>
+                {props => (
+                  <Send {...props}
+                    toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
+                    setShieldingAmount={this.setShieldingAmount /* header */}
+                    setScrollToTop={this.setScrollToTop /* header & send */}
+                    setScrollToBottom={this.setScrollToBottom /* header & send */}
+                    sendTransaction={this.sendTransaction /* send */}
+                    setServerOption={this.setServerOption /* send */}
+                    clearToAddr={this.clearToAddr /* send */}
+                    setSecurityOption={this.setSecurityOption /* send */}
+                  />
+                )}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Receive}>
+                {props => (
+                  <Receive {...props}
+                    toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
+                    setSecurityOption={this.setSecurityOption}
+                  />
+                )}
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.Settings}>
                 {props => 
@@ -1885,44 +1721,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
                     </Stack.Navigator>
                   );
-                }}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Ufvk}>
-                {props => {
-                  const action = !!props.route.params && props.route.params.action !== undefined ? props.route.params.action : UfvkActionEnum.view;
-                  if (action === UfvkActionEnum.view ) {
-                    return (
-                      <ShowUfvk {...props}
-                        onClickOK={() => {}}
-                        onClickCancel={() => {}}
-                      />
-                    );
-                  } else if (action === UfvkActionEnum.change) {
-                    return (
-                      <ShowUfvk {...props}
-                        onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
-                        onClickCancel={() => {}}
-                      />
-                    );
-                  } else if (action === UfvkActionEnum.backup) {
-                    return (
-                      <ShowUfvk {...props}
-                        onClickOK={async () => await this.onClickOKRestoreBackup()}
-                        onClickCancel={() => {}}
-                      />
-                    );
-                  } else if (action === UfvkActionEnum.server) {
-                    return (
-                      <ShowUfvk {...props}
-                        onClickOK={async () => await this.onClickOKServerWallet()}
-                        onClickCancel={async () => {
-                          // restart all the tasks again, nothing happen.
-                          await this.rpc.clearTimers();
-                          await this.rpc.configure();
-                        }}
-                      />
-                    );
-                  }
                 }}
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.Seed}>

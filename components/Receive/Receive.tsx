@@ -1,14 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Dimensions, Keyboard, View } from 'react-native';
+import { Dimensions, Keyboard, ScrollView, TouchableOpacity, View } from 'react-native';
 import { TabView, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '../Components/SingleAddress';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import Header from '../Header';
 
 import {
   AddressKindEnum,
@@ -24,27 +23,30 @@ import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from './components/ExpandedAddress';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import RegText from '../Components/RegText';
+import FadeText from '../Components/FadeText';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
   toggleMenuDrawer: () => void;
-  alone: boolean;
   setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
   // side menu
-  toggleMenuDrawer,
   // balance
   // privacy
   // shielding
   // for receive
-  alone,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const { 
     translate, 
@@ -56,6 +58,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     addLastSnackbar,
   } = context;
   const { colors } = useTheme() as ThemeType;
+  const { clear } = useToast();
   const screenName = ScreenEnum.Receive;
 
   const [index, setIndex] = useState<number>(0);
@@ -71,6 +74,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [heightLayout, setHeightLayout] = useState<number>(10);
+
+  const insets = useSafeAreaInsets();
 
   const snapPoints = useMemo(() => {
     let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
@@ -143,8 +148,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         ) || [];
       setUAddr(uAdd as UnifiedAddressClass[]);
       setTAddr(tAdd as TransparentAddressClass[]);
-      setUAddrIndex(uAdd.length > 0 ? uAdd.length - 1 : 0);
-      setTAddrIndex(tAdd.length > 0 ? tAdd.length - 1 : 0);
+      // the first address of the list
+      setUAddrIndex(0);
+      setTAddrIndex(0);
     }
   }, [addresses]);
 
@@ -230,7 +236,33 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         break;
       }
     }
-    return <>{component}</>;
+    return (
+      <>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom + 8,
+            paddingHorizontal: 16,
+          }}>
+          <View
+            style={{
+              flexGrow: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              
+            <RegText color={colors.text} style={{ fontSize: 25 }}>Receive</RegText>
+
+            <FadeText style={{ marginBottom: 20, marginTop: 5 }}>texto</FadeText>
+
+            {component}
+            
+          </View>
+        </ScrollView>
+      </>
+    );
   };
 
   const renderTabBarPage: (
@@ -239,25 +271,35 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     },
   ) => ReactNode = () => {
     return (
-      <View
-        accessible={true}
-        accessibilityLabel={translate('receive.title-acc') as string}
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          width: '100%',
-        }}>
-        <Header
-          title={
-            alone
-              ? (translate('receive.title-basic-alone') as string)
-              : (translate('receive.title-address') as string)
-          }
-          screenName={screenName}
-          toggleMenuDrawer={toggleMenuDrawer}
-          noBalance={true}
-          noPrivacy={true}
-        />
+      <View style={{
+        position: 'absolute',
+        width: 75,
+        top: 10,
+        left: 10,
+        zIndex: 999,
+      }}>
+        <View
+          style={{
+            borderRadius: 25,
+            borderColor: colors.text,
+            borderWidth: 1,
+            padding: 10,
+            margin: 10,
+            backgroundColor: colors.background,
+          }}>
+            <TouchableOpacity onPress={() => {
+              clear();
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
+            }}>
+              <FontAwesomeIcon
+                size={30}
+                icon={faChevronLeft}
+                color={colors.text}
+              />
+            </TouchableOpacity>
+        </View>
       </View>
     );
   };

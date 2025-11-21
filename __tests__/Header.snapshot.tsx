@@ -49,7 +49,6 @@ describe('Component Header - test', () => {
           screenName={ScreenEnum.History}
           testID="valuetransfer text"
           toggleMenuDrawer={onFunction}
-          setBackgroundError={onFunction}
           addLastSnackbar={onFunction}
           setShieldingAmount={onFunction}
         />

@@ -178,6 +178,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
               borderWidth: 1,
               padding: 10,
               margin: 10,
+              backgroundColor: colors.background,
             }}>
               <TouchableOpacity onPress={() => {
                 clear();
@@ -236,6 +237,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                   multiline
                   style={{
                     flexGrow: 1,
+                    flexShrink: 1,
                     color: colors.text,
                     fontWeight: '600',
                     fontSize: 16,
@@ -246,6 +248,11 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                   }}
                   value={seedText}
                   onChangeText={setSeedText}
+                  editable={!actionButtonsDisabled}
+                  keyboardType="default"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  returnKeyType="done"
                 />
                 {!!seedText && (
                   <TouchableOpacity 
@@ -304,6 +311,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                             }}
                             style={{
                               flexGrow: 1,
+                              flexShrink: 1,
                               color: colors.text,
                               fontWeight: '600',
                               fontSize: 15,
@@ -373,6 +381,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                 placeholderTextColor={colors.placeholder}
                 style={{
                   flexGrow: 1,
+                  flexShrink: 1,
                   color: colors.text,
                   fontWeight: '600',
                   fontSize: 18,
@@ -386,7 +395,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                 }}
                 editable={!actionButtonsDisabled}
                 maxLength={100}
-                keyboardType="url"
+                keyboardType="numeric"
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="done"

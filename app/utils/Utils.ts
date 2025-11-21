@@ -43,33 +43,21 @@ export default class Utils {
 
     const { decimalSeparator } = getNumberFormatSettings();
 
-    const intPart = parseInt(Utils.parseNumberFloatToStringLocale(zecValue, 8), 10);
-    let bigPart = Utils.parseNumberFloatToStringLocale(zecValue, 8);
-    let smallPart = '';
-    let decimalPart = '';
+    let bigPart = Utils.parseNumberFloatToStringLocale(zecValue, 5);
 
-    if (bigPart.indexOf(`${decimalSeparator}`) >= 0) {
-      decimalPart = bigPart.substr(bigPart.indexOf(`${decimalSeparator}`) + 1);
-      if (decimalPart.length > 4) {
-        smallPart = decimalPart.substr(4);
-        decimalPart = decimalPart.substr(0, decimalPart.length - smallPart.length);
-
-        // Pad the small part with trailing 0s
-        while (smallPart.length < 4) {
-          smallPart += '0';
-        }
+    // remove the `0` at the end.
+    while (true) {
+      if (bigPart[bigPart.length - 1] === '0') {
+        bigPart = bigPart.slice(0, bigPart.length - 1);
+      } else if (bigPart[bigPart.length - 1] === `${decimalSeparator}`) {
+        bigPart = bigPart.slice(0, bigPart.length - 1);
+        break;
       } else {
-        while (decimalPart.length < 4) {
-          decimalPart += '0';
-        }
-        smallPart = '0000';
+        break;
       }
-    } else {
-      decimalPart = '0000';
-      smallPart = '0000';
     }
 
-    return { bigPart: intPart + decimalSeparator + decimalPart, smallPart };
+    return { bigPart: bigPart, smallPart: '' };
   }
 
   static splitStringIntoChunks(s: string, numChunks: number): string[] {

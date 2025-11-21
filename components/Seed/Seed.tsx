@@ -224,7 +224,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           netInfo={netInfo}
           mode={mode}
           privacy={privacy}
-          receivedLegend={action === SeedActionEnum.view ? !basicFirstViewSeed : false}
           closeScreen={onClickCancelHide}
         />
         <ScrollView

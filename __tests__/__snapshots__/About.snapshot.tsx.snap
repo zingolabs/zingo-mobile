@@ -37,35 +37,340 @@ exports[`Component About - test About - snapshot 1`] = `
         <View
           style={
             {
+              "borderRadius": 3,
+              "display": "flex",
+              "height": 5,
+              "justifyContent": "flex-start",
+              "marginTop": 10,
+              "width": "30%",
+            }
+          }
+        />
+        <View
+          style={
+            {
               "alignItems": "center",
               "display": "flex",
               "flexDirection": "row",
               "flexWrap": "wrap",
               "justifyContent": "center",
               "marginHorizontal": 5,
-              "marginTop": 12,
+              "marginTop": 0,
             }
           }
         />
-      </View>
-      <View
-        style={
-          {
-            "left": 0,
-            "padding": 11.5,
-            "position": "absolute",
-          }
-        }
-      >
         <View
           style={
             {
               "alignItems": "center",
+              "display": "flex",
               "flexDirection": "row",
-              "height": 40,
+              "flexWrap": "wrap",
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
-        />
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "display": "flex",
+                "flexWrap": "wrap",
+                "justifyContent": "center",
+              }
+            }
+          >
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                  "opacity": 1,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": undefined,
+                    "borderRadius": 35,
+                    "margin": 10,
+                    "padding": 20,
+                  }
+                }
+              >
+                <
+                  color="#c3c3c3"
+                  icon={
+                    {
+                      "icon": [
+                        384,
+                        512,
+                        [
+                          8593,
+                        ],
+                        "f062",
+                        "M214.6 17.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 117.3 160 488c0 17.7 14.3 32 32 32s32-14.3 32-32l0-370.7 105.4 105.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                      ],
+                      "iconName": "arrow-up",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={30}
+                  style={
+                    {
+                      "transform": [
+                        {
+                          "rotate": "45deg",
+                        },
+                      ],
+                    }
+                  }
+                />
+              </View>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                Send
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "display": "flex",
+                "flexWrap": "wrap",
+                "justifyContent": "center",
+              }
+            }
+          >
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                  "opacity": 1,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": undefined,
+                    "borderRadius": 35,
+                    "margin": 10,
+                    "padding": 20,
+                  }
+                }
+              >
+                <
+                  color="#c3c3c3"
+                  icon={
+                    {
+                      "icon": [
+                        384,
+                        512,
+                        [
+                          8595,
+                        ],
+                        "f063",
+                        "M169.4 502.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 402.7 224 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 370.7-105.4-105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
+                      ],
+                      "iconName": "arrow-down",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={30}
+                  style={
+                    {
+                      "transform": [
+                        {
+                          "rotate": "45deg",
+                        },
+                      ],
+                    }
+                  }
+                />
+              </View>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                Receive
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "display": "flex",
+                "flexWrap": "wrap",
+                "justifyContent": "center",
+              }
+            }
+          >
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                  "opacity": 1,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": undefined,
+                    "borderRadius": 35,
+                    "margin": 10,
+                    "padding": 20,
+                  }
+                }
+              >
+                <
+                  color="#c3c3c3"
+                  icon={
+                    {
+                      "icon": [
+                        512,
+                        512,
+                        [],
+                        "e005",
+                        "M192 64c0-17.7 14.3-32 32-32s32 14.3 32 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-96 0 0 64 18.7 0c8.5 0 16.6 3.4 22.6 9.4l22.6 22.6 32 0c88.4 0 160 71.6 160 160 0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32s-14.3-32-32-32l-36.1 0c-20.2 29-53.9 48-91.9 48s-71.7-19-91.9-48L32 352c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l96 0 22.6-22.6c6-6 14.1-9.4 22.6-9.4l18.7 0 0-64-96 0c-17.7 0-32-14.3-32-32S78.3 64 96 64l96 0z",
+                      ],
+                      "iconName": "faucet",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={30}
+                />
+              </View>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                Claim
+              </Text>
+            </View>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "left": 0,
+              "padding": 11.5,
+              "position": "absolute",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "height": 40,
+              }
+            }
+          />
+        </View>
       </View>
       <View
         style={
@@ -73,37 +378,6 @@ exports[`Component About - test About - snapshot 1`] = `
             "padding": 13,
             "position": "absolute",
             "right": 0,
-          }
-        }
-      >
-        <Image
-          source={
-            {
-              "testUri": "../../../assets/img/logobig-zingo.png",
-            }
-          }
-          style={
-            {
-              "borderRadius": 10,
-              "height": 38,
-              "resizeMode": "contain",
-              "width": 38,
-            }
-          }
-        />
-      </View>
-    </View>
-    <View>
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "row",
-            "flexWrap": "wrap",
-            "justifyContent": "space-between",
-            "marginVertical": 5,
-            "width": "100%",
           }
         }
       >
@@ -137,67 +411,34 @@ exports[`Component About - test About - snapshot 1`] = `
           onStartShouldSetResponder={[Function]}
           style={
             {
+              "marginRight": 5,
               "opacity": 1,
             }
           }
+          testID="header.drawmenu"
         >
           <
-            color="#18bd18"
+            color="#ffffff"
             icon={
               {
                 "icon": [
-                  320,
+                  512,
                   512,
                   [
-                    9001,
+                    9881,
+                    "cog",
                   ],
-                  "f053",
-                  "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
+                  "f013",
+                  "M195.1 9.5C198.1-5.3 211.2-16 226.4-16l59.8 0c15.2 0 28.3 10.7 31.3 25.5L332 79.5c14.1 6 27.3 13.7 39.3 22.8l67.8-22.5c14.4-4.8 30.2 1.2 37.8 14.4l29.9 51.8c7.6 13.2 4.9 29.8-6.5 39.9L447 233.3c.9 7.4 1.3 15 1.3 22.7s-.5 15.3-1.3 22.7l53.4 47.5c11.4 10.1 14 26.8 6.5 39.9l-29.9 51.8c-7.6 13.1-23.4 19.2-37.8 14.4l-67.8-22.5c-12.1 9.1-25.3 16.7-39.3 22.8l-14.4 69.9c-3.1 14.9-16.2 25.5-31.3 25.5l-59.8 0c-15.2 0-28.3-10.7-31.3-25.5l-14.4-69.9c-14.1-6-27.2-13.7-39.3-22.8L73.5 432.3c-14.4 4.8-30.2-1.2-37.8-14.4L5.8 366.1c-7.6-13.2-4.9-29.8 6.5-39.9l53.4-47.5c-.9-7.4-1.3-15-1.3-22.7s.5-15.3 1.3-22.7L12.3 185.8c-11.4-10.1-14-26.8-6.5-39.9L35.7 94.1c7.6-13.2 23.4-19.2 37.8-14.4l67.8 22.5c12.1-9.1 25.3-16.7 39.3-22.8L195.1 9.5zM256.3 336a80 80 0 1 0 -.6-160 80 80 0 1 0 .6 160z",
                 ],
-                "iconName": "chevron-left",
+                "iconName": "gear",
                 "prefix": "fas",
               }
             }
-            size={30}
-            style={
-              {
-                "marginHorizontal": 10,
-              }
-            }
+            size={35}
           />
         </View>
-        <Text
-          style={
-            {
-              "color": "#ffffff",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-              "paddingHorizontal": 5,
-            }
-          }
-        >
-          text translated text translated
-        </Text>
-        <View
-          style={
-            {
-              "height": 30,
-              "marginHorizontal": 10,
-              "width": 30,
-            }
-          }
-        />
       </View>
-      <View
-        style={
-          {
-            "backgroundColor": "#18bd18",
-            "height": 1,
-            "width": "100%",
-          }
-        }
-      />
     </View>
     <RCTScrollView
       contentContainerStyle={

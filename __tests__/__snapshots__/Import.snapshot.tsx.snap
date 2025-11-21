@@ -40,6 +40,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       <View
         style={
           {
+            "backgroundColor": "#011401",
             "borderColor": "#c3c3c3",
             "borderRadius": 25,
             "borderWidth": 1,
@@ -170,15 +171,21 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             }
           >
             <TextInput
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={true}
+              keyboardType="default"
               multiline={true}
               onChangeText={[Function]}
               placeholder="Paste your seed phrase (24 words)"
               placeholderTextColor="#888888"
+              returnKeyType="done"
               style={
                 {
                   "backgroundColor": "transparent",
                   "color": "#c3c3c3",
                   "flexGrow": 1,
+                  "flexShrink": 1,
                   "fontSize": 16,
                   "fontWeight": "600",
                   "marginHorizontal": 5,
@@ -188,78 +195,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
               }
               testID="import.seedufvkinput"
               value=""
-            />
-          </View>
-          <View
-            style={
-              {
-                "marginTop": 10,
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "flexDirection": "row",
-                  "gap": 8,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "flexDirection": "row",
-                  "gap": 8,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "flexDirection": "row",
-                  "gap": 8,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "flexDirection": "row",
-                  "gap": 8,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "flexDirection": "row",
-                  "gap": 8,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "flexDirection": "row",
-                  "gap": 8,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "flexDirection": "row",
-                  "gap": 8,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "flexDirection": "row",
-                  "gap": 8,
-                }
-              }
             />
           </View>
           <Text
@@ -300,7 +235,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
               autoCapitalize="none"
               autoCorrect={false}
               editable={true}
-              keyboardType="url"
+              keyboardType="numeric"
               maxLength={100}
               onChangeText={[Function]}
               placeholder="0"
@@ -311,6 +246,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                   "backgroundColor": "transparent",
                   "color": "#c3c3c3",
                   "flexGrow": 1,
+                  "flexShrink": 1,
                   "fontSize": 18,
                   "fontWeight": "600",
                   "marginLeft": 5,
