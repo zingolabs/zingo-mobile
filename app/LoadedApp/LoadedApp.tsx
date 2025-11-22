@@ -1,7 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
-  View,
   Alert,
   I18nManager,
   EmitterSubscription,
@@ -9,14 +7,9 @@ import {
   NativeEventSubscription,
   Linking,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
-import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft, faComments } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
-import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 import { LoadingAppNavigationState, AppDrawerParamList } from '../types';
@@ -80,10 +73,6 @@ import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressA
 import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfov10';
 
 import History from '../../components/History';
-import Send from '../../components/Send';
-import Receive from '../../components/Receive';
-import Settings from '../../components/Settings';
-import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
 import { ToastProvider } from 'react-native-toastier';
@@ -98,6 +87,11 @@ import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Send from '../../components/Send';
+import Receive from '../../components/Receive';
+import { Settings, SettingsMenu } from '../../components/Settings';
+import Claim from '../../components/Claim';
+import Staking from '../../components/Staking';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -106,7 +100,6 @@ const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
 const Pools = React.lazy(() => import('../../components/Pools'));
 const Insight = React.lazy(() => import('../../components/Insight'));
-const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
 const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
 
 const en = require('../translations/en.json');
@@ -115,7 +108,6 @@ const pt = require('../translations/pt.json');
 const ru = require('../translations/ru.json');
 const tr = require('../translations/tr.json');
 
-const Tab = createBottomTabNavigator<AppDrawerParamList>();
 const Stack = createNativeStackNavigator<AppDrawerParamList>();
 
 // for testing
@@ -124,7 +116,6 @@ const Stack = createNativeStackNavigator<AppDrawerParamList>();
 type LoadedAppProps = {
   navigation: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = {
@@ -137,12 +128,10 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [loading, setLoading] = useState<boolean>(true);
 
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
-  const [lightWalletServer, setLightWalletServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [selectLightWalletServer, setSelectLightWalletServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
-  const [validatorServer, setValidatorServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [selectValidatorServer, setSelectValidatorServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
-  const [sendAll, setSendAll] = useState<boolean>(false);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency); // by default none because of cTAZ
+  const [indexerServer, setIndexerServer] = useState<ServerType>(SERVER_DEFAULT_0);
+  const [selectIndexerServer, setSelectIndexerServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
+  const [sendAll, setSendAll] = useState<boolean>(true);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
@@ -157,9 +146,8 @@ export default function LoadedApp(props: LoadedAppProps) {
     changeWalletScreen: false,
     restoreWalletBackupScreen: false,
   });
-  const [rescanMenu, setRescanMenu] = useState<boolean>(false);
-  // by default the App store the seed phrase & birthday on KeyChain/KeyStore (Device).
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(true);
+  const [rescanMenu, setRescanMenu] = useState<boolean>(true);
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [zenniesDonationAddress, setZenniesDonationAddress] = useState<string>('');
   const file = useMemo(
@@ -187,7 +175,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
-      const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
+      // only en
+      //const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
+
+      const { languageTag, isRTL } = { languageTag: LanguageEnum.en, isRTL: false };
 
       // update layout direction
       I18nManager.forceRTL(isRTL);
@@ -208,10 +199,8 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
         setMode(settings.mode);
-        props.toggleTheme(settings.mode);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-        props.toggleTheme(mode);
       }
 
       if (
@@ -246,36 +235,20 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
       }
       // lightwallet server
-      if (settings.lightWalletserver) {
-        setLightWalletServer(settings.lightWalletserver);
+      if (settings.indexerServer) {
+        setIndexerServer(settings.indexerServer);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, lightWalletServer);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, indexerServer);
       }
       if (
-        settings.selectLightWalletServer === SelectServerEnum.auto ||
-        settings.selectLightWalletServer === SelectServerEnum.custom ||
-        settings.selectLightWalletServer === SelectServerEnum.list ||
-        settings.selectLightWalletServer === SelectServerEnum.offline
+        settings.selectIndexerServer === SelectServerEnum.auto ||
+        settings.selectIndexerServer === SelectServerEnum.custom ||
+        settings.selectIndexerServer === SelectServerEnum.list ||
+        settings.selectIndexerServer === SelectServerEnum.offline
       ) {
-        setSelectLightWalletServer(settings.selectLightWalletServer);
+        setSelectIndexerServer(settings.selectIndexerServer);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, selectLightWalletServer);
-      }
-      // validator server
-      if (settings.validatorServer) {
-        setValidatorServer(settings.validatorServer);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.validatorServer, validatorServer);
-      }
-      if (
-        settings.selectValidatorServer === SelectServerEnum.auto ||
-        settings.selectValidatorServer === SelectServerEnum.custom ||
-        settings.selectValidatorServer === SelectServerEnum.list ||
-        settings.selectValidatorServer === SelectServerEnum.offline
-      ) {
-        setSelectValidatorServer(settings.selectValidatorServer);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectValidatorServer, selectValidatorServer);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, selectIndexerServer);
       }
       if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
@@ -322,7 +295,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       const backgroundJson = await BackgroundFileImpl.readBackground();
       setBackground(backgroundJson);
 
-      const zenniesAddress = await Utils.getZenniesDonationAddress(lightWalletServer.chainName);
+      const zenniesAddress = await Utils.getZenniesDonationAddress(indexerServer.chainName);
       setZenniesDonationAddress(zenniesAddress);
 
       setLoading(false);
@@ -334,7 +307,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   if (loading) {
     return (
-      <Launching translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />
+      <Launching empty={false} translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />
     );
   } else {
     return (
@@ -345,10 +318,8 @@ export default function LoadedApp(props: LoadedAppProps) {
         translate={translate}
         language={language}
         currency={currency}
-        lightWalletserver={lightWalletServer}
-        selectLightWalletServer={selectLightWalletServer}
-        validatorServer={validatorServer}
-        selectValidatorServer={selectValidatorServer}
+        indexerServer={indexerServer}
+        selectIndexerServer={selectIndexerServer}
         sendAll={sendAll}
         donation={donation}
         privacy={privacy}
@@ -369,38 +340,15 @@ export default function LoadedApp(props: LoadedAppProps) {
   }
 }
 
-type LoadingProps = {
-  backgroundColor: string;
-  spinColor: string;
-};
-
-const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
-  return (
-    <View
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: backgroundColor,
-        height: '100%',
-      }}>
-      <ActivityIndicator size="large" color={spinColor} />
-    </View>
-  );
-};
-
 type LoadedAppClassProps = {
   navigationApp: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: ThemeType;
   language: LanguageEnum;
   currency: CurrencyEnum;
-  lightWalletserver: ServerType;
-  selectLightWalletServer: SelectServerEnum;
-  validatorServer: ServerType;
-  selectValidatorServer: SelectServerEnum;
+  indexerServer: ServerType;
+  selectIndexerServer: SelectServerEnum;
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
@@ -419,13 +367,6 @@ type LoadedAppClassProps = {
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
-
-const TabPressable: React.FC<BottomTabBarButtonProps & { colors: ThemeType }> = ({ colors, ...props }) => {
-  return <PlatformPressable {...props} android_ripple={{ color: colors.primary }} />;
-};
-
-const renderTabPressable = (colors: ThemeType) => (props: BottomTabBarButtonProps) =>
-  <TabPressable {...props} colors={colors} />;
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClassState> {
   rpc: RPC;
@@ -478,10 +419,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setPrivacyOption: this.setPrivacyOption,
 
       // context settings
-      lightWalletserver: props.lightWalletserver,
-      selectLightWalletServer: props.selectLightWalletServer,
-      validatorServer: props.validatorServer,
-      selectValidatorServer: props.selectValidatorServer,
+      indexerServer: props.indexerServer,
+      selectIndexerServer: props.selectIndexerServer,
       currency: props.currency,
       language: props.language,
       sendAll: props.sendAll,
@@ -496,8 +435,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       // state
       navigationHome: null,
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
-      newLightWalletServer: {} as ServerType,
-      newSelectLightWalletServer: null,
+      newIndexerServer: {} as ServerType,
+      newSelectIndexerServer: null,
       scrollToTop: false,
       scrollToBottom: false,
       isSeedViewModalOpen: false,
@@ -516,7 +455,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setWallet,
       this.setLastError,
       props.readOnly,
-      props.lightWalletserver,
+      props.indexerServer,
       props.performanceLevel,
     );
 
@@ -661,9 +600,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (initialUrl !== null) {
       this.readUrl(initialUrl);
 
-      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.Send,
-      });
+      this.state.navigationHome?.navigate(RouteEnum.Send);
     }
 
     this.linking = Linking.addEventListener(EventListenerEnum.url, async ({ url }) => {
@@ -672,9 +609,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.readUrl(url);
       }
 
-      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.Send,
-      });
+      this.state.navigationHome?.navigate(RouteEnum.Send);
     });
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: NetInfoState) => {
@@ -726,7 +661,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
-      const { error, target } = await parseZcashURI(url, this.state.translate, this.state.lightWalletserver);
+      const { error, target } = await parseZcashURI(url, this.state.translate, this.state.indexerServer);
       //console.log(targets);
 
       if (target) {
@@ -1038,14 +973,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           newInfo.currencyName = this.state.info.currencyName;
         } else {
           newInfo.currencyName =
-            this.state.lightWalletserver.chainName === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ;
+            this.state.indexerServer.chainName === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.cTAZ;
         }
       }
       if (!newInfo.chainName) {
-        newInfo.chainName = this.state.lightWalletserver.chainName;
+        newInfo.chainName = this.state.indexerServer.chainName;
       }
       if (!newInfo.serverUri) {
-        newInfo.serverUri = this.state.lightWalletserver.uri;
+        newInfo.serverUri = this.state.indexerServer.uri;
       }
       //const start = Date.now();
       this.setState({ info: newInfo });
@@ -1066,8 +1001,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   sendTransaction = async (sendPageState: SendPageStateClass): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { lightWalletserver, donation, defaultUnifiedAddress } = this.state;
-      const sendJson = await Utils.getSendManyJSON(sendPageState, defaultUnifiedAddress, lightWalletserver, donation);
+      const { indexerServer, donation, defaultUnifiedAddress } = this.state;
+      const sendJson = await Utils.getSendManyJSON(sendPageState, defaultUnifiedAddress, indexerServer, donation);
       //const start = Date.now();
       const txid = await this.rpc.sendTransaction(sendJson);
       //console.log('&&&&&&&&&&&&&& send tx', Date.now() - start);
@@ -1110,6 +1045,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // Depending on the menu item, open the appropriate screen
     if (item === MenuItemEnum.About) {
       this.state.navigationHome?.navigate(RouteEnum.About);
+      return;
+    } else if (item === MenuItemEnum.Settings) {
+      this.state.navigationHome?.navigate(RouteEnum.Settings);
       return;
     } else if (item === MenuItemEnum.Rescan) {
       this.state.navigationHome?.navigate(RouteEnum.Rescan);
@@ -1197,7 +1135,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       let update = false;
       if (
         this.state.sendPageState.toaddr.to &&
-        this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.lightWalletserver.chainName))
+        this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.indexerServer.chainName))
       ) {
         await ShowAddressAlertAsync(this.state.translate)
           .then(async () => {
@@ -1214,7 +1152,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         let uriToAddr: ToAddrClass = new ToAddrClass(0);
         const to = new ToAddrClass(0);
 
-        to.to = await Utils.getNymDonationAddress(this.state.lightWalletserver.chainName);
+        to.to = await Utils.getNymDonationAddress(this.state.indexerServer.chainName);
         to.amount = Utils.getNymDonationAmount();
         to.memo = Utils.getNymDonationMemo(this.state.translate);
         to.includeUAMemo = true;
@@ -1225,9 +1163,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
         this.setSendPageState(newSendPageState);
       }
-      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.Send,
-      });
+      this.state.navigationHome?.navigate(RouteEnum.Send);
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
       await sendEmail(this.state.translate, this.state.zingolibVersion);
@@ -1276,11 +1212,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 screenName: [this.screenName],
               });
             }
-            await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, value);
-            await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, selectServer);
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, value);
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, selectServer);
             this.setState({
-              lightWalletserver: value,
-              selectLightWalletServer: selectServer,
+              indexerServer: value,
+              selectIndexerServer: selectServer,
             });
             // the server is changed, the App needs to restart the timeout tasks from the beginning
             await this.rpc.clearTimers();
@@ -1327,14 +1263,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       // we need to restore the old server because the new one doesn't have the seed of the current wallet.
       const oldSettings = await SettingsFileImpl.readSettings();
-      await RPCModule.changeServerProcess(oldSettings.lightWalletserver.uri);
+      await RPCModule.changeServerProcess(oldSettings.indexerServer.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.setState({
-        newLightWalletServer: value as ServerType,
-        newSelectLightWalletServer: selectServer,
-        lightWalletserver: oldSettings.lightWalletserver,
-        selectLightWalletServer: oldSettings.selectLightWalletServer,
+        newIndexerServer: value as ServerType,
+        newSelectIndexerServer: selectServer,
+        indexerServer: oldSettings.indexerServer,
+        selectIndexerServer: oldSettings.selectIndexerServer,
       });
     }
   };
@@ -1401,7 +1337,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       mode: value as ModeEnum,
     });
     // this function change the Theme in the App component.
-    this.props.toggleTheme(value as ModeEnum);
   };
 
   setSecurityOption = async (value: SecurityType): Promise<void> => {
@@ -1412,9 +1347,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setSelectServerOption = async (value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, value);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, value);
     this.setState({
-      selectLightWalletServer: value as SelectServerEnum,
+      selectIndexerServer: value as SelectServerEnum,
     });
   };
 
@@ -1473,12 +1408,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
-    const { lightWalletserver } = this.state;
+    const { indexerServer } = this.state;
 
     // if the App is working with a test server
     // no need to do backups of the wallets.
     let resultStr = '';
-    if (lightWalletserver.chainName === ChainNameEnum.mainChainName) {
+    if (indexerServer.chainName === ChainNameEnum.mainChainName) {
       // backup
       resultStr = (await this.rpc.changeWallet()) as string;
     } else {
@@ -1532,10 +1467,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   onClickOKServerWallet = async () => {
-    if (this.state.newLightWalletServer && this.state.newSelectLightWalletServer) {
-      const beforeServer = this.state.lightWalletserver;
+    if (this.state.newIndexerServer && this.state.newSelectIndexerServer) {
+      const beforeServer = this.state.indexerServer;
 
-      const resultStrServerPromise = await RPCModule.changeServerProcess(this.state.newLightWalletServer.uri);
+      const resultStrServerPromise = await RPCModule.changeServerProcess(this.state.newIndexerServer.uri);
       const timeoutServerPromise = new Promise((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 30 seconds'));
@@ -1556,13 +1491,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         //console.log(`change server ok ${value}`);
       }
 
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, this.state.newLightWalletServer);
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, this.state.newSelectLightWalletServer);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, this.state.newIndexerServer);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, this.state.newSelectIndexerServer);
       this.setState({
-        lightWalletserver: this.state.newLightWalletServer,
-        selectLightWalletServer: this.state.selectLightWalletServer,
-        newLightWalletServer: {} as ServerType,
-        newSelectLightWalletServer: null,
+        indexerServer: this.state.newIndexerServer,
+        selectIndexerServer: this.state.selectIndexerServer,
+        newIndexerServer: {} as ServerType,
+        newSelectIndexerServer: null,
       });
 
       await this.rpc.fetchInfoAndServerHeight();
@@ -1646,17 +1581,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   render() {
     const {
       snackbars,
-      mode,
-      valueTransfersTotal,
-      readOnly,
-      totalBalance,
-      translate,
       scrollToTop,
-      addresses,
-      somePending,
-      selectLightWalletServer,
     } = this.state;
-    const { colors } = this.props.theme;
 
     const context = {
       //context
@@ -1696,10 +1622,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setPrivacyOption: this.setPrivacyOption,
 
       // context settings
-      lightWalletserver: this.state.lightWalletserver,
-      selectLightWalletServer: this.state.selectLightWalletServer,
-      validatorServer: this.state.validatorServer,
-      selectValidatorServer: this.state.selectValidatorServer,
+      indexerServer: this.state.indexerServer,
+      selectIndexerServer: this.state.selectIndexerServer,
       currency: this.state.currency,
       language: this.state.language,
       sendAll: this.state.sendAll,
@@ -1710,41 +1634,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
-    };
-
-    const fnTabBarIcon = (route: { name: string; key: string }, focused: boolean) => {
-      var iconName;
-
-      if (route.name === RouteEnum.History) {
-        iconName = faClockRotateLeft;
-      } else if (route.name === RouteEnum.Send) {
-        if (
-          mode === ModeEnum.basic &&
-          !!totalBalance &&
-          (
-            (totalBalance.totalOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === 0) ||
-            (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0) ||
-            (totalBalance.totalTransparentBalance > 0 && totalBalance.confirmedTransparentBalance === 0)
-          ) &&
-          somePending
-        ) {
-          iconName = faRefresh;
-        } else {
-          iconName = faPaperPlane;
-        }
-      } else if (route.name === RouteEnum.Receive) {
-        iconName = faDownload;
-      } else if (route.name === RouteEnum.Messages) {
-        iconName = faComments;
-      } else {
-        iconName = faCog;
-      }
-
-      return (
-        <View>
-          <FontAwesomeIcon size={25} icon={iconName} color={focused ? colors.background : colors.money} />
-        </View>
-      );
     };
 
     //console.log('render LoadedAppClass - 3');
@@ -1762,128 +1651,44 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
-            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnum.HomeStack} screenName={this.screenName}>
-              <Drawer.Screen name={RouteEnum.HomeStack}>
+            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnum.History} screenName={this.screenName}>
+              <Drawer.Screen name={RouteEnum.History}>
                 {props => {
                   useEffect(() => {
                     this.setNavigationHome(props.navigation);
                   });
                   return (
-                  <>
-                    {mode === ModeEnum.advanced ||
-                    (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
-                    (!readOnly && !!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ? (
-                      <Tab.Navigator
-                        detachInactiveScreens={true}
-                        initialRouteName={RouteEnum.History}
-                        screenOptions={({ route }: { route: { name: string; key: string } }) => ({
-                          tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-                          tabBarIconStyle: {
-                            alignSelf: 'center',
-                            marginBottom: 2,
-                          },
-                          tabBarLabel: route.name === RouteEnum.History
-                            ? (translate('loadedapp.history-menu') as string)
-                            : route.name === RouteEnum.Send
-                              ? (translate('loadedapp.send-menu') as string)
-                              : route.name === RouteEnum.Receive
-                                ? (translate('loadedapp.receive-menu') as string)
-                                : route.name === RouteEnum.Messages
-                                  ? (translate('loadedapp.messages-menu') as string)
-                                  : '',
-                          tabBarLabelPosition: 'below-icon',
-                          tabBarLabelStyle: {
-                            alignSelf: 'center',
-                            fontSize: 14,
-                          },
-                          tabBarItemStyle: {
-                            height: 60,
-                          },
-                          tabBarActiveTintColor: colors.background,
-                          tabBarActiveBackgroundColor: colors.primaryDisabled,
-                          tabBarInactiveTintColor: colors.money,
-                          tabBarInactiveBackgroundColor: colors.sideMenuBackground,
-                          tabBarStyle: {
-                            borderTopWidth: 1,
-                            height: 60,
-                          },
-                          headerShown: false,
-                          tabBarButton: renderTabPressable(colors),
-                        })}>
-                        <Tab.Screen name={RouteEnum.History}>
-                          {propsTab => (
-                            <History {...propsTab}
-                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                              setShieldingAmount={this.setShieldingAmount /* header */}
-                              setScrollToTop={this.setScrollToTop /* header & history */}
-                              scrollToTop={scrollToTop /* history */}
-                              setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                            />
-                          )}
-                        </Tab.Screen>
-                        {!readOnly &&
-                          selectLightWalletServer !== SelectServerEnum.offline &&
-                          (mode === ModeEnum.advanced ||
-                            (!!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ||
-                            (!!totalBalance &&
-                              (
-                                (totalBalance.totalOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === 0) ||
-                                (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0)
-                              ) &&
-                              somePending)) && (
-                            <Tab.Screen name={RouteEnum.Send}>
-                              {propsTab => (
-                                <Send {...propsTab}
-                                  toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                                  setShieldingAmount={this.setShieldingAmount /* header */}
-                                  setScrollToTop={this.setScrollToTop /* header & send */}
-                                  setScrollToBottom={this.setScrollToBottom /* header & send */}
-                                  sendTransaction={this.sendTransaction /* send */}
-                                  setServerOption={this.setServerOption /* send */}
-                                  clearToAddr={this.clearToAddr /* send */}
-                                  setSecurityOption={this.setSecurityOption /* send */}
-                                />
-                              )}
-                            </Tab.Screen>
-                          )}
-                        <Tab.Screen name={RouteEnum.Receive}>
-                          {propsTab => (
-                            <Receive {...propsTab}
-                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                              alone={false /* receive */}
-                              setSecurityOption={this.setSecurityOption}
-                            />
-                          )}
-                        </Tab.Screen>
-                      </Tab.Navigator>
-                    ) : (
-                      <>
-                        {addresses === null ? (
-                          <Loading backgroundColor={colors.background} spinColor={colors.primary} />
-                        ) : (
-                          <Tab.Navigator
-                            initialRouteName={RouteEnum.Receive}
-                            screenOptions={{
-                              tabBarStyle: {
-                                display: 'none',
-                              },
-                              headerShown: false,
-                            }}>
-                            <Tab.Screen name={RouteEnum.Receive}>
-                              {propsTab => (
-                                <Receive {...propsTab}
-                                  toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                                  alone={true /* receive */}
-                                  setSecurityOption={this.setSecurityOption}
-                                />
-                              )}
-                            </Tab.Screen>
-                          </Tab.Navigator>
-                        )}
-                      </>
-                    )}
-                  </>
-                );}}
+                    <History {...props}
+                      toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
+                      setShieldingAmount={this.setShieldingAmount /* header */}
+                      setScrollToTop={this.setScrollToTop /* header & history */}
+                      scrollToTop={scrollToTop /* history */}
+                      setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                    />
+                  );
+                }}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Send}>
+                {props => (
+                  <Send {...props}
+                    toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
+                    setShieldingAmount={this.setShieldingAmount /* header */}
+                    setScrollToTop={this.setScrollToTop /* header & send */}
+                    setScrollToBottom={this.setScrollToBottom /* header & send */}
+                    sendTransaction={this.sendTransaction /* send */}
+                    setServerOption={this.setServerOption /* send */}
+                    clearToAddr={this.clearToAddr /* send */}
+                    setSecurityOption={this.setSecurityOption /* send */}
+                  />
+                )}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Receive}>
+                {props => (
+                  <Receive {...props}
+                    toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
+                    setSecurityOption={this.setSecurityOption}
+                  />
+                )}
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.Settings}>
                 {props => 
@@ -1903,6 +1708,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   />
                 }
               </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.SettingsMenu}>
+                {props => <SettingsMenu {...props} navigateToLoadingApp={this.navigateToLoadingApp} />}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Claim} component={Claim} />
+              <Drawer.Screen name={RouteEnum.Staking} component={Staking} />
               <Drawer.Screen name={RouteEnum.About} component={About} />
               <Drawer.Screen name={RouteEnum.Rescan}>
                 {props => <Rescan {...props} doRescan={this.doRescan} />}
@@ -1916,44 +1726,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
                     </Stack.Navigator>
                   );
-                }}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Ufvk}>
-                {props => {
-                  const action = !!props.route.params && props.route.params.action !== undefined ? props.route.params.action : UfvkActionEnum.view;
-                  if (action === UfvkActionEnum.view ) {
-                    return (
-                      <ShowUfvk {...props}
-                        onClickOK={() => {}}
-                        onClickCancel={() => {}}
-                      />
-                    );
-                  } else if (action === UfvkActionEnum.change) {
-                    return (
-                      <ShowUfvk {...props}
-                        onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
-                        onClickCancel={() => {}}
-                      />
-                    );
-                  } else if (action === UfvkActionEnum.backup) {
-                    return (
-                      <ShowUfvk {...props}
-                        onClickOK={async () => await this.onClickOKRestoreBackup()}
-                        onClickCancel={() => {}}
-                      />
-                    );
-                  } else if (action === UfvkActionEnum.server) {
-                    return (
-                      <ShowUfvk {...props}
-                        onClickOK={async () => await this.onClickOKServerWallet()}
-                        onClickCancel={async () => {
-                          // restart all the tasks again, nothing happen.
-                          await this.rpc.clearTimers();
-                          await this.rpc.configure();
-                        }}
-                      />
-                    );
-                  }
                 }}
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.Seed}>

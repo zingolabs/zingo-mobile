@@ -38,7 +38,6 @@ export type LoadedAppNavigationState = {
  */
 export type AppDrawerParamList = {
   // Drawer no params
-  [RouteEnum.HomeStack]: undefined;
   [RouteEnum.History]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
@@ -47,7 +46,10 @@ export type AppDrawerParamList = {
   [RouteEnum.ConfirmStack]: undefined;
   [RouteEnum.InsightStack]: undefined;
   [RouteEnum.Settings]: undefined;
+  [RouteEnum.SettingsMenu]: undefined;
+  [RouteEnum.Claim]: undefined;
   [RouteEnum.About]: undefined;
+  [RouteEnum.Staking]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Info]: undefined;
   [RouteEnum.Insight]: undefined;

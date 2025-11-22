@@ -198,7 +198,7 @@ jobs:
       - name: Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
           cache-workspaces: rust -> rust/target
 
       - name: Install nextest
@@ -258,6 +258,11 @@ jobs:
           docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
           docker rm "$cid"
 
+      - name: binaries env var
+        run: |
+          TEST_BINARIES_DIR="$(pwd)/rust/test_binaries/bins"
+          echo "TEST_BINARIES_DIR=$TEST_BINARIES_DIR" >> "$GITHUB_ENV"
+
       - name: Run Build
         working-directory: android
         run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
@@ -276,6 +281,9 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
+      - name: rust default nightly
+        run: rustup default nightly
+
       - name: Run Android Integration Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -287,6 +295,8 @@ jobs:
           disable-animations: true
           script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
           working-directory: ./rust
+        env:
+          TEST_BINARIES_DIR: ${{ env.TEST_BINARIES_DIR }}
 
       - name: Upload test reports
         if: ${{ always() && !cancelled() }}

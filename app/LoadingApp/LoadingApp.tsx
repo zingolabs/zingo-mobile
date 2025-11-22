@@ -12,7 +12,6 @@ import {
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
-import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
 
@@ -68,7 +67,7 @@ import {
 } from '../recoveryWalletInfov10';
 
 // no lazy load because slowing down screens.
-import ImportUfvk from './components/ImportUfvk';
+import Import from './components/Import';
 import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
@@ -77,6 +76,7 @@ import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
+import Servers from './components/Servers';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -90,7 +90,6 @@ const tr = require('../translations/tr.json');
 type LoadingAppProps = {
   navigation: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = {
@@ -104,11 +103,9 @@ export default function LoadingApp(props: LoadingAppProps) {
 
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency); // by default none because of cTAZ
-  const [lightWalletServer, setLightWalletServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [selectLightWalletServer, setSelectLightWalletServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
-  const [validatorServer, setValidatorServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [selectValidatorServer, setSelectValidatorServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
-  const [sendAll, setSendAll] = useState<boolean>(false);
+  const [indexerServer, setIndexerServer] = useState<ServerType>(SERVER_DEFAULT_0);
+  const [selectIndexerServer, setSelectIndexerServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
+  const [sendAll, setSendAll] = useState<boolean>(true);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
@@ -124,9 +121,8 @@ export default function LoadingApp(props: LoadingAppProps) {
     changeWalletScreen: false,
     restoreWalletBackupScreen: false,
   });
-  const [rescanMenu, setRescanMenu] = useState<boolean>(false);
-  // by default the App store the seed phrase & birthday on KeyChain/KeyStore (Device).
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(true);
+  const [rescanMenu, setRescanMenu] = useState<boolean>(true);
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const file = useMemo(
     () => ({
@@ -147,7 +143,10 @@ export default function LoadingApp(props: LoadingAppProps) {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
-      const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
+      // only en
+      //const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
+
+      const { languageTag, isRTL } = { languageTag: LanguageEnum.en, isRTL: false };
 
       // update layout direction
       I18nManager.forceRTL(isRTL);
@@ -168,10 +167,8 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
         setMode(settings.mode);
-        props.toggleTheme(settings.mode);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-        props.toggleTheme(mode);
       }
 
       if (
@@ -208,37 +205,21 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
       }
       // lightwallet server
-      if (settings.lightWalletserver) {
-        setLightWalletServer(settings.lightWalletserver);
+      if (settings.indexerServer) {
+        setIndexerServer(settings.indexerServer);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, lightWalletServer);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, indexerServer);
       }
       // using only custom & offline.
       if (
-        settings.selectLightWalletServer === SelectServerEnum.auto ||
-        settings.selectLightWalletServer === SelectServerEnum.custom ||
-        settings.selectLightWalletServer === SelectServerEnum.list ||
-        settings.selectLightWalletServer === SelectServerEnum.offline
+        settings.selectIndexerServer === SelectServerEnum.auto ||
+        settings.selectIndexerServer === SelectServerEnum.custom ||
+        settings.selectIndexerServer === SelectServerEnum.list ||
+        settings.selectIndexerServer === SelectServerEnum.offline
       ) {
-        setSelectLightWalletServer(settings.selectLightWalletServer);
+        setSelectIndexerServer(settings.selectIndexerServer);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, selectLightWalletServer);
-      }
-      // validator server
-      if (settings.validatorServer) {
-        setValidatorServer(settings.validatorServer);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.validatorServer, validatorServer);
-      }
-      if (
-        settings.selectValidatorServer === SelectServerEnum.auto ||
-        settings.selectValidatorServer === SelectServerEnum.custom ||
-        settings.selectValidatorServer === SelectServerEnum.list ||
-        settings.selectValidatorServer === SelectServerEnum.offline
-      ) {
-        setSelectValidatorServer(settings.selectValidatorServer);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectValidatorServer, selectValidatorServer);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, selectIndexerServer);
       }
       if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
@@ -296,7 +277,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   //console.log('render loadingApp - 2', translate('version'));
 
   if (loading) {
-    return <Launching translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />;
+    return <Launching empty={true} translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />;
   } else {
     return (
       <LoadingAppClass
@@ -306,10 +287,8 @@ export default function LoadingApp(props: LoadingAppProps) {
         translate={translate}
         language={language}
         currency={currency}
-        lightWalletserver={lightWalletServer}
-        selectLightWalletserver={selectLightWalletServer}
-        validatorServer={validatorServer}
-        selectLightWalletServer={selectLightWalletServer}
+        indexerServer={indexerServer}
+        selectIndexerServer={selectIndexerServer}
         sendAll={sendAll}
         donation={donation}
         privacy={privacy}
@@ -328,15 +307,12 @@ export default function LoadingApp(props: LoadingAppProps) {
 type LoadingAppClassProps = {
   navigationApp: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: ThemeType;
   language: LanguageEnum;
   currency: CurrencyEnum;
-  lightWalletserver: ServerType;
-  selectLightWalletserver: SelectServerEnum;
-  validatorServer: ServerType;
-  selectLightWalletServer: SelectServerEnum;
+  indexerServer: ServerType;
+  selectIndexerServer: SelectServerEnum;
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
@@ -380,10 +356,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       setPrivacyOption: this.setPrivacyOption,
 
       // context settings
-      lightWalletserver: props.lightWalletserver,
-      selectLightWalletServer: props.selectLightWalletserver,
-      validatorServer: props.validatorServer,
-      selectValidatorServer: props.selectLightWalletServer,
+      indexerServer: props.indexerServer,
+      selectIndexerServer: props.selectIndexerServer,
       currency: props.currency,
       language: props.language,
       sendAll: props.sendAll,
@@ -400,10 +374,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       screen: !!props.route.params && props.route.params.screen !== undefined ? props.route.params.screen : 0,
       actionButtonsDisabled: false,
       walletExists: false,
-      customServerShow: false,
-      customServerUri: '',
-      customServerChainName: ChainNameEnum.mainChainName,
-      customServerOffline: false,
       biometricsFailed:
         !!props.route.params && props.route.params.biometricsFailed !== undefined ? props.route.params.biometricsFailed : false,
       startingApp:
@@ -471,30 +441,17 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     const has = await hasRecoveryWalletInfo();
     this.setState({ hasRecoveryWalletInfoSaved: has });
 
-    // First, if it's server automatic
-    // here I need to check the servers and select the best one
-    // likely only when the user install or update the new version with this feature or
-    // select automatic in settings.
-    if (this.state.selectLightWalletServer === SelectServerEnum.auto) {
-      if (netInfoState.isConnected) {
-        setTimeout(() => {
-          this.addLastSnackbar({
-            message: this.state.translate('loadedapp.selectingserver') as string,
-            duration: SnackbarDurationEnum.longer,
-            screenName: [this.screenName],
-          });
-        }, 10);
-        // not a different one, can be the same.
-        const someServerIsWorking = await this.selectTheBestServer(false);
-        console.log('some server is working?', someServerIsWorking);
-      } else {
-        // if NO internet then I have to chose a server (the first one)
-        const s: ServerType = SERVER_DEFAULT_0;
-        this.setState({
-          lightWalletserver: s,
-        });
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, s);
-      }
+    // First, check servers (only indexer server)
+    // valid scenarios:
+    // 1. server with uri & select server custom
+    // 2. server with no uri & select server offline
+    if ((!this.state.indexerServer.uri && this.state.selectIndexerServer === SelectServerEnum.custom) || 
+        (this.state.screen === 0.5 && !this.state.startingApp)) {
+      this.setState({
+        screen: 0.5,
+        actionButtonsDisabled: false,
+      });
+      return;
     }
 
     // Second, check if a wallet exists. Do it async so the basic screen has time to render
@@ -506,8 +463,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     if (exists && exists !== GlobalConst.false) {
       this.setState({ walletExists: true });
       let result: string = await RPCModule.loadExistingWallet(
-        this.state.lightWalletserver.uri,
-        this.state.lightWalletserver.chainName,
+        this.state.indexerServer.uri,
+        this.state.indexerServer.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
@@ -627,14 +584,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         } else {
           // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
           // no seed screen.
-          if (!netInfoState.isConnected || this.state.selectLightWalletServer === SelectServerEnum.offline) {
+          if (!netInfoState.isConnected || this.state.selectIndexerServer === SelectServerEnum.offline) {
             this.setState({
               screen: 1,
               walletExists: false,
               actionButtonsDisabled: false,
             });
           } else {
-            await this.createNewWallet(false);
+            await this.createNewWallet();
             this.setState({ actionButtonsDisabled: false });
             this.navigateToLoadedApp(false, true, true, true, this.state.firstLaunchingMessage);
             //console.log('navigate to LoadedApp');
@@ -700,21 +657,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           //actionButtonsDisabled: true,
         });
         if (isConnected !== state.isConnected) {
-          if (!state.isConnected) {
-            //console.log('EVENT Loading: No internet connection.');
-            this.setState({
-              customServerShow: false,
-            });
-          } else {
-            //console.log('EVENT Loading: YESSSSS internet connection.');
-            // if it is offline & there is no wallet file
-            // the screen is going to be empty
-            // show the custom server component
-            if (this.state.selectLightWalletServer === SelectServerEnum.offline && !this.state.walletExists) {
-              this.setState({
-                customServerShow: true,
-              });
-            }
+          if (state.isConnected) {
             if (screen !== 0) {
               this.setState({
                 screen: screen === 3 ? 3 : screen !== 0 ? 1 : 0,
@@ -724,15 +667,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         }
       }
     });
-
-    // if it is offline & there is no wallet file
-    // the screen is going to be empty
-    // show the custom server component
-    if (netInfoState.isConnected && this.state.selectLightWalletServer === SelectServerEnum.offline && !this.state.walletExists) {
-      this.setState({
-        customServerShow: true,
-      });
-    }
   };
 
   componentWillUnmount = () => {
@@ -744,7 +678,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   selectTheBestServer = async (aDifferentOne: boolean): Promise<boolean> => {
     // avoiding obsolete ones
     let someServerIsWorking: boolean = true;
-    const actualServer = this.state.lightWalletserver;
+    const actualServer = this.state.indexerServer;
     const server = await selectingServer(
       serverUris(this.state.translate).filter(
         (s: ServerUrisType) => !s.obsolete && s.uri !== (aDifferentOne ? actualServer.uri : ''),
@@ -763,11 +697,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     //console.log(server);
     console.log(fasterServer);
     this.setState({
-      lightWalletserver: fasterServer,
-      selectLightWalletServer: SelectServerEnum.list,
+      indexerServer: fasterServer,
+      selectIndexerServer: SelectServerEnum.list,
     });
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, fasterServer);
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, SelectServerEnum.list);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, fasterServer);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.list);
     // message with the result only for advanced users
     if (this.state.mode === ModeEnum.advanced && someServerIsWorking) {
       if (isEqual(actualServer, fasterServer)) {
@@ -785,6 +719,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       }
     }
     return someServerIsWorking;
+  };
+
+  openServers = () => {
+    this.setState({
+      screen: 0.5,
+      actionButtonsDisabled: false,
+    });
   };
 
   checkServer: (s: ServerType) => Promise<boolean> = async (server: ServerType) => {
@@ -807,7 +748,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   walletErrorHandle = async (result: string, title: string, screen: number, start: boolean) => {
     // first check the actual server
     // if the server is not working properly sometimes can take more than one minute to fail.
-    if (start && this.state.netInfo.isConnected && this.state.selectLightWalletServer !== SelectServerEnum.offline) {
+    if (start && this.state.netInfo.isConnected && this.state.selectIndexerServer !== SelectServerEnum.offline) {
       this.addLastSnackbar({
         message: this.state.translate('restarting') as string,
         duration: SnackbarDurationEnum.long,
@@ -816,7 +757,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
     // if no internet connection -> show the error.
     // if Offline mode -> show the error.
-    if (!this.state.netInfo.isConnected || this.state.selectLightWalletServer === SelectServerEnum.offline) {
+    if (!this.state.netInfo.isConnected || this.state.selectIndexerServer === SelectServerEnum.offline) {
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -830,7 +771,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       );
       this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
     } else {
-      const workingServer = await this.checkServer(this.state.lightWalletserver);
+      const workingServer = await this.checkServer(this.state.indexerServer);
       if (workingServer) {
         // the server is working -> this error is something not related with the server availability
         createAlert(
@@ -924,76 +865,68 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ background: backgroundJson });
   };
 
-  setCustomServerUri = (customServerUri: string) => {
+  setIndexerServerUri = async (indexerServerUri: string) => {
+    const NewIndexerServer: ServerType = { uri: indexerServerUri, chainName: this.state.indexerServer.chainName };
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, NewIndexerServer);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.custom);
     this.setState({
-      customServerUri,
+      indexerServer: NewIndexerServer,
     });
   };
-
-  setCustomServerShow = (customServerShow: boolean) => {
-    this.setState({
-      customServerShow,
+  
+  closeServers = () => {
+    // the app can have a wallet file already...
+    this.setState({ 
+      screen: 0,
     });
+    this.componentDidMount();
   };
 
-  usingCustomServer = async () => {
-    if (!this.state.customServerUri && !this.state.customServerOffline) {
-      return;
+  checkIndexerServer = async () => {
+    if (!this.state.indexerServer.uri) {
+      return null;
     }
     this.setState({ actionButtonsDisabled: true });
-    if (this.state.customServerOffline) {
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, {
-        uri: '',
-        chainName: this.state.lightWalletserver.chainName,
-      });
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, SelectServerEnum.offline);
-      this.setState({
-        selectLightWalletServer: SelectServerEnum.offline,
-        lightWalletserver: { uri: '', chainName: this.state.lightWalletserver.chainName },
-        customServerShow: false,
-        customServerUri: '',
-        customServerChainName: this.state.lightWalletserver.chainName,
-        customServerOffline: false,
-      });
-    } else {
-      const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
-      const chainName = this.state.customServerChainName;
-      if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
-        this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
-        this.setState({ actionButtonsDisabled: false });
-        return;
-      }
-
-      this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: [this.screenName] });
-
-      const cs = {
-        uri: uri,
-        chainName: chainName,
-        region: '',
-        default: false,
-        latency: null,
-        obsolete: false,
-      } as ServerUrisType;
-      const serverChecked = await selectingServer([cs]);
-      if (serverChecked && serverChecked.latency) {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, { uri, chainName });
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, SelectServerEnum.custom);
-        this.setState({
-          selectLightWalletServer: SelectServerEnum.custom,
-          lightWalletserver: { uri, chainName },
-          customServerShow: false,
-          customServerUri: '',
-          customServerChainName: this.state.lightWalletserver.chainName,
-          customServerOffline: false,
-        });
-      } else {
-        this.addLastSnackbar({
-          message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
-          screenName: [this.screenName],
-        });
-      }
+    const uri: string = parseServerURI(this.state.indexerServer.uri, this.state.translate);
+    const chainName = this.state.indexerServer.chainName;
+    if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
+      this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
+      this.setState({ actionButtonsDisabled: false });
+      return false;
     }
-    this.setState({ actionButtonsDisabled: false });
+
+    this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: [this.screenName] });
+
+    const cs = {
+      uri: uri,
+      chainName: chainName,
+      region: '',
+      default: false,
+      latency: null,
+      obsolete: false,
+    } as ServerUrisType;
+    const serverChecked = await selectingServer([cs]);
+    if (serverChecked && serverChecked.latency) {
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, { uri, chainName });
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.custom);
+      this.setState({
+        selectIndexerServer: SelectServerEnum.custom,
+        indexerServer: { uri, chainName },
+      });
+      this.setState({ 
+        actionButtonsDisabled: false
+      });
+      return true;
+    } else {
+      this.addLastSnackbar({
+        message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
+        screenName: [this.screenName],
+      });
+      this.setState({ 
+        actionButtonsDisabled: false
+      });
+      return false;
+    }
   };
 
   navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean, firstLaunchingMessage: LaunchingModeEnum) => {
@@ -1008,15 +941,15 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     });
   };
 
-  createNewWallet = async (goSeedScreen: boolean = true): Promise<void> => {
-    if (!this.state.netInfo.isConnected || this.state.selectLightWalletServer === SelectServerEnum.offline) {
+  createNewWallet = async (): Promise<void> => {
+    if (!this.state.netInfo.isConnected || this.state.selectIndexerServer === SelectServerEnum.offline) {
       this.addLastSnackbar({ message: this.state.translate('loadedapp.connection-error') as string, screenName: [this.screenName] });
       return;
     }
     this.setState({ actionButtonsDisabled: true });
     let seed: string = await RPCModule.createNewWallet(
-      this.state.lightWalletserver.uri,
-      this.state.lightWalletserver.chainName,
+      this.state.indexerServer.uri,
+      this.state.indexerServer.chainName,
       this.state.performanceLevel,
       GlobalConst.minConfirmations.toString(),
     );
@@ -1064,17 +997,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           await removeRecoveryWalletInfo();
         }
       }
-      // basic mode -> same screen.
-      this.setState(state => ({
+      this.setState({
         wallet,
-        screen: goSeedScreen ? 2 : state.screen,
         actionButtonsDisabled: false,
         walletExists: true,
-      }));
+      });
       // creating tor cliente if needed
       if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
         await RPCModule.createTorClientProcess();
       }
+      this.navigateToLoadedApp(false, true, true, true, this.state.firstLaunchingMessage);
     } else {
       this.walletErrorHandle(seed, this.state.translate('loadingapp.creatingwallet-label') as string, 1, false);
     }
@@ -1101,9 +1033,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
     if (
       (seedUfvk.toLowerCase().startsWith(GlobalConst.uview) &&
-        this.state.lightWalletserver.chainName !== ChainNameEnum.mainChainName) ||
+        this.state.indexerServer.chainName !== ChainNameEnum.mainChainName) ||
       (seedUfvk.toLowerCase().startsWith(GlobalConst.utestview) &&
-        this.state.lightWalletserver.chainName === ChainNameEnum.mainChainName)
+        this.state.indexerServer.chainName === ChainNameEnum.mainChainName)
     ) {
       createAlert(
         this.setBackgroundError,
@@ -1142,8 +1074,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       result = await RPCModule.restoreWalletFromSeed(
         seedUfvk.toLowerCase(),
         walletBirthday || '0',
-        this.state.lightWalletserver.uri,
-        this.state.lightWalletserver.chainName,
+        this.state.indexerServer.uri,
+        this.state.indexerServer.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
@@ -1151,8 +1083,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       result = await RPCModule.restoreWalletFromUfvk(
         seedUfvk.toLowerCase(),
         walletBirthday || '0',
-        this.state.lightWalletserver.uri,
-        this.state.lightWalletserver.chainName,
+        this.state.indexerServer.uri,
+        this.state.indexerServer.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
@@ -1275,18 +1207,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ backgroundError: { title, error } });
   };
 
-  customServer = () => {
-    this.setState({ customServerShow: true });
-  };
-
-  onPressServerChainName = (chain: ChainNameEnum) => {
-    this.setState({ customServerChainName: chain });
-  };
-
-  onPressServerOffline = (value: boolean) => {
-    this.setState({ customServerOffline: value });
-  };
-
   addLastSnackbar = (snackbar: SnackbarType) => {
     const newSnackbars = this.state.snackbars;
     // if the last one is the same don't do anything.
@@ -1303,10 +1223,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ snackbars: newSnackbars });
   };
 
-  changeMode = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
+  changeMode = async (mode: ModeEnum) => {
     this.setState({ mode, screen: 0 });
     await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-    this.props.toggleTheme(mode);
     // if the user selects advanced mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen
     // the result will be the same -> create a new wallet.
@@ -1392,15 +1311,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       wallet,
       actionButtonsDisabled,
       walletExists,
-      customServerShow,
-      customServerUri,
-      customServerChainName,
-      customServerOffline,
       snackbars,
       firstLaunchingMessage,
       biometricsFailed,
       translate,
-      hasRecoveryWalletInfoSaved,
       readOnly,
       orchardPool,
       saplingPool,
@@ -1429,10 +1343,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       setPrivacyOption: this.setPrivacyOption,
 
       // settings
-      lightWalletserver: this.state.lightWalletserver,
-      selectLightWalletServer: this.state.selectLightWalletServer,
-      validatorServer: this.state.validatorServer,
-      selectValidatorServer: this.state.selectValidatorServer,
+      indexerServer: this.state.indexerServer,
+      selectIndexerServer: this.state.selectIndexerServer,
       currency: this.state.currency,
       language: this.state.language,
       sendAll: this.state.sendAll,
@@ -1456,6 +1368,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         <ContextAppLoadingProvider value={context}>
           {screen === 0 && (
             <Launching
+              empty={true}
               translate={translate}
               firstLaunchingMessage={firstLaunchingMessage}
               biometricsFailed={biometricsFailed}
@@ -1464,26 +1377,22 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               }}
             />
           )}
+          {screen === 0.5 && (
+            <Servers
+              actionButtonsDisabled={actionButtonsDisabled}
+              setIndexerServerUri={this.setIndexerServerUri}
+              checkIndexerServer={this.checkIndexerServer}
+              closeServers={this.closeServers}
+            />
+          )}
           {screen === 1 && (
             <StartMenu
               actionButtonsDisabled={actionButtonsDisabled}
-              hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
-              recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
-              changeMode={this.changeMode}
-              customServer={this.customServer}
-              customServerShow={customServerShow}
-              customServerOffline={customServerOffline}
-              onPressServerOffline={this.onPressServerOffline}
-              customServerChainName={customServerChainName}
-              onPressServerChainName={this.onPressServerChainName}
-              customServerUri={customServerUri}
-              setCustomServerUri={this.setCustomServerUri}
-              usingCustomServer={this.usingCustomServer}
-              setCustomServerShow={this.setCustomServerShow}
               walletExists={walletExists}
               openCurrentWallet={this.openCurrentWallet}
               createNewWallet={this.createNewWallet}
               getwalletToRestore={this.getwalletToRestore}
+              openServers={this.openServers}
             />
           )}
           {screen === 2 && wallet && (
@@ -1503,7 +1412,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               transparent={true}
               visible={screen === 3}
               onRequestClose={() => this.setState({ screen: 1 })}>
-              <ImportUfvk
+              <Import
+                actionButtonsDisabled={actionButtonsDisabled}
                 onClickOK={(s: string, b: number) => this.doRestore(s, b)}
                 onClickCancel={() => this.setState({ screen: 1 })}
               />

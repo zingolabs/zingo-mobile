@@ -6,13 +6,13 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Settings from '../components/Settings';
+import { Settings } from '../components/Settings';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { LanguageEnum, CurrencyEnum, RouteEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { mockLightWalletServer } from '../__mocks__/dataMocks/mockServers';
+import { mockIndexerServer } from '../__mocks__/dataMocks/mockServers';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -34,7 +34,7 @@ describe('Component Settings - test', () => {
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
-  state.lightWalletserver = mockLightWalletServer;
+  state.indexerServer = mockIndexerServer;
   state.currency = CurrencyEnum.USDCurrency;
   state.language = LanguageEnum.en;
   state.sendAll = false;

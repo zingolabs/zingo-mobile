@@ -60,7 +60,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
           paddingVertical: 10,
         },
         messageStyle: {
-          color: colors.money,
+          color: colors.background,
           fontSize: 15,
           padding: 0,
           margin: 0,
@@ -73,7 +73,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
         },
         contentContainerStyle: {
           flex: 0.999,
-          backgroundColor: colors.secondaryDisabled,
+          backgroundColor: colors.secondary,
           marginBottom: 100,
           padding: 0,
           paddingLeft: 20,
@@ -82,8 +82,8 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       });
     }
   }, [
-    colors.money,
-    colors.secondaryDisabled,
+    colors.background,
+    colors.secondary,
     snackbarsFiltered,
     snackbarsFiltered.length,
     duration,

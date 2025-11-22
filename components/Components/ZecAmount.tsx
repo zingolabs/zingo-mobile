@@ -76,10 +76,34 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
           testID={testID}
           style={{
             flexDirection: 'row',
-            alignItems: 'flex-end',
+            alignItems: 'baseline',
             margin: 0,
             padding: 0,
           }}>
+          {privacyHigh ? (
+            <Text
+              style={{
+                fontSize: size,
+                fontWeight: '700',
+                color,
+                margin: 0,
+                padding: 0,
+              }}>
+              {' -' + decimalSeparator + '-----'}
+            </Text>
+          ) : (
+            <Text
+              testID={`${testID}.big-part`}
+              style={{
+                fontSize: size,
+                fontWeight: '700',
+                color,
+                margin: 0,
+                padding: 0,
+              }}>
+              {splits.bigPart}
+            </Text>
+          )}
           {!!currencyName && currencyName === CurrencyNameEnum.ZEC ? (
             <SvgXml
               width={size * 2 * (smallPrefix ? 0.7 : 1)}
@@ -101,44 +125,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 margin: 0,
                 padding: 0,
               }}>
-              {currencyName ? currencyName : '---'}
-            </Text>
-          )}
-          {privacyHigh ? (
-            <Text
-              style={{
-                fontSize: size,
-                fontWeight: '700',
-                color,
-                margin: 0,
-                padding: 0,
-              }}>
-              {' -' + decimalSeparator + '----'}
-            </Text>
-          ) : (
-            <Text
-              testID={`${testID}.big-part`}
-              style={{
-                fontSize: size,
-                fontWeight: '700',
-                color,
-                margin: 0,
-                padding: 0,
-              }}>
-              {' ' + splits.bigPart}
-            </Text>
-          )}
-          {splits.smallPart !== '0000' && !privacyHigh && (
-            <Text
-              testID={`${testID}.small-part`}
-              style={{
-                fontSize: size * 0.7,
-                color,
-                margin: 0,
-                padding: 0,
-                marginBottom: Platform.OS === GlobalConst.platformOSandroid ? size / 10 : size / 15,
-              }}>
-              {splits.smallPart}
+              {' ' + (currencyName ? currencyName : '---')}
             </Text>
           )}
         </View>

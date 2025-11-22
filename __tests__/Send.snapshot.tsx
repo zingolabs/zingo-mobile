@@ -49,7 +49,7 @@ describe('Component Send - test', () => {
     // privacy normal
     state.privacy = false;
     // mode basic
-    state.mode = ModeEnum.basic;
+    state.mode = ModeEnum.advanced;
     const props = makeDrawerProps();
     const send = render(
       <ContextAppLoadedProvider value={state}>

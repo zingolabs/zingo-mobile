@@ -3169,7 +3169,7 @@ version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f8ce05b56f3cbc65ec7d0908adb308ed91281e022f61c8c3a0c9388b5380b17"
 dependencies = [
- "bindgen 0.72.1",
+ "bindgen 0.69.5",
  "cc",
  "thiserror 2.0.17",
  "tracing",
@@ -8493,9 +8493,9 @@ dependencies = [
 
 [[package]]
 name = "zebra-chain"
-version = "3.0.0"
+version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "66e10d4094ae02f982e254ec4fee0802c62540b5b366d994608f732f1fe5834b"
+checksum = "ac69ccae2b1fdafbd0a2b020079ccdfffce6c00b3189f32dd002f6965853af96"
 dependencies = [
  "bech32",
  "bitflags 2.10.0",
@@ -8867,7 +8867,6 @@ dependencies = [
  "zcash_proofs",
  "zcash_protocol",
  "zcash_transparent",
- "zebra-chain",
  "zingo_common_components",
  "zingolib",
 ]

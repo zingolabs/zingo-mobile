@@ -2,9 +2,7 @@
 import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
-  ScrollView,
   RefreshControl,
-  TouchableOpacity,
   ActivityIndicator,
   Dimensions,
   Platform,
@@ -13,11 +11,10 @@ import {
 import moment from 'moment';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
-  FilterEnum,
   GlobalConst,
   RouteEnum,
   ScreenEnum,
@@ -41,6 +38,7 @@ import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { Swipeable } from 'react-native-gesture-handler';
+import { faHome } from '@fortawesome/free-regular-svg-icons';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -86,9 +84,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
     translate,
     valueTransfers,
     language,
-    setBackgroundError,
     addLastSnackbar,
-    lightWalletserver,
+    indexerServer,
     doRefresh,
     zenniesDonationAddress,
     snackbars,
@@ -106,7 +103,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const scrollViewRef = useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(null);
 
@@ -192,8 +188,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
       return [] as ValueTransferType[];
     }
     // strictly show VT's with some amount on funds.
-    return valueTransfers.filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true));
-  }, [valueTransfers, filter]);
+    return valueTransfers;
+  }, [valueTransfers]);
 
   useEffect(() => {
     Utils.setMomentLocale(language)
@@ -211,7 +207,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setLoading(false);
       }, 500);
     }
-  }, [fetchValueTransfersFiltered, numVt, valueTransfers, lightWalletserver.chainName]);
+  }, [fetchValueTransfersFiltered, numVt, valueTransfers, indexerServer.chainName]);
 
   useEffect(() => {
     setLoadMoreButton(numVt < valueTransfersFiltered.length);
@@ -307,18 +303,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     });
   };
 
-  /*
-  const setMessagesAddressModalShow = (vt: ValueTransferType) => {
-    navigation.navigate(RouteEnum.MessagesAddress, {
-      setScrollToBottom: setScrollToBottom,
-      scrollToBottom: scrollToBottom,
-      address: Utils.messagesAddress(vt),
-      sendTransaction: sendTransaction,
-      setServerOption: setServerOption,
-    });
-  };
-  */
-
   const rowRenderer = (type: string | number, data: ValueTransferType, index: number) => {
     let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
 
@@ -338,6 +322,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
         closeOtherSwipeables={() => closeAllSwipeables(index)}
       />
     );
+  };
+
+  const goStaking = () => {
+    navigation.navigate(RouteEnum.Staking);
   };
 
   //console.log('render History - 4', valueTransfersSliced.length);
@@ -366,77 +354,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           setShieldingAmount={setShieldingAmount}
           setScrollToTop={setScrollToTop}
           setScrollToBottom={setScrollToBottom}
-          setBackgroundError={setBackgroundError /* context */}
         />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            marginHorizontal: 5,
-            marginBottom: 2,
-          }}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              width: '100%',
-              marginTop: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                setFilter(FilterEnum.all);
-                setLoading(true);
-                setShowFooter(false);
-              }}>
-              <View
-                style={{
-                  backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  marginRight: 10,
-                }}>
-                <FadeText
-                  style={{
-                    color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
-                    fontWeight: 'bold',
-                  }}>
-                  {translate('messages.filter-all') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setFilter(FilterEnum.withFunds);
-                setLoading(true);
-                setShowFooter(false);
-              }}>
-              <View
-                style={{
-                  backgroundColor: filter === FilterEnum.withFunds ? colors.primary : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor: filter === FilterEnum.withFunds ? colors.primary : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                }}>
-                <FadeText
-                  style={{
-                    color: filter === FilterEnum.withFunds ? colors.sideMenuBackground : colors.zingo,
-                    fontWeight: 'bold',
-                  }}>
-                  {translate('history.filter-withfunds') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
         {loading ? (
           <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
         ) : (
@@ -480,8 +398,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'flex-start',
-                              marginTop: 20,
-                              marginBottom: 60,
+                              marginTop: 5,
+                              marginBottom: 100,
                             }}>
                             <Button
                               type={ButtonTypeEnum.Secondary}
@@ -494,16 +412,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             {!!valueTransfersSliced && !!valueTransfersSliced.length && (
                               <View
                                 style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'flex-start',
-                                  marginTop: 20,
-                                  marginBottom: 60,
-                                }}>
-                                <FadeText style={{ color: colors.primary }}>
-                                  {translate('history.end') as string}
-                                </FadeText>
-                              </View>
+                                  marginBottom: 90,
+                                }} />
                             )}
                           </>
                         )}
@@ -550,6 +460,59 @@ const History: React.FunctionComponent<HistoryProps> = ({
             )}
           </>
         )}
+        <View 
+          style={{
+            position: 'absolute',
+            bottom: 30,
+            flexDirection: 'row',
+            alignSelf: 'center',
+            gap: 10,
+        }}>
+          <Pressable
+            onPress={() => {}}
+            disabled={true}
+            style={({ pressed }) => ({
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingHorizontal: 25,
+              paddingVertical: 10,
+              backgroundColor: colors.sideMenuBackground,
+              borderRadius: 50,
+              transform: [{ scale: pressed ? 0.9 : 1 }],
+              borderWidth: 1,
+              borderColor: colors.zingo,
+            })}>
+            <FontAwesomeIcon
+              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+              size={20}
+              icon={faHome}
+              color={colors.primary}
+            />
+            <FadeText style={{ color: colors.primary, fontSize: 12, opacity: 1 }}>Home</FadeText>
+          </Pressable>
+          <Pressable
+            onPress={goStaking}
+            disabled={false}
+            style={({ pressed }) => ({
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingHorizontal: 25,
+              paddingVertical: 10,
+              backgroundColor: colors.sideMenuBackground,
+              borderRadius: 50,
+              transform: [{ scale: pressed ? 0.9 : 1 }],
+              borderWidth: 1,
+              borderColor: colors.zingo,
+            })}>
+            <FontAwesomeIcon
+              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+              size={20}
+              icon={faLayerGroup}
+              color={colors.zingo}
+            />
+            <FadeText style={{ color: colors.zingo, fontSize: 12, opacity: 1 }}>Staking</FadeText>
+          </Pressable>
+        </View>
       </View>
     </ToastProvider>
   );

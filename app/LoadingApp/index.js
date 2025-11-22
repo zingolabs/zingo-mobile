@@ -1,6 +1,6 @@
 import LoadingApp from './LoadingApp';
 import { LoadingAppClass } from './LoadingApp';
 import Launching from './components/Launching';
-import ImportUfvk from './components/ImportUfvk';
+import Import from './components/Import';
 
-export { LoadingApp, LoadingAppClass, Launching, ImportUfvk };
+export { LoadingApp, LoadingAppClass, Launching, Import };

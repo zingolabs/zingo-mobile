@@ -2,9 +2,10 @@ export enum ScreenEnum {
   // App
   //
   LoadingApp = 'LoadingApp',
+  Servers = 'Servers',
   // Launching
-  // StartMenu
-  ImportUfvk = 'ImportUfvk',
+  StartMenu = 'StartMenu',
+  Import = 'Import',
   ScannerUfvk = 'ScannerUfvk',
   //
   LoadedApp = 'LoadedApp',
@@ -19,6 +20,7 @@ export enum ScreenEnum {
   ContactList = 'ContactList',
   MessagesList = 'MessagesList',
   Settings = 'Settings',
+  SettingsMenu = 'SettingsMenu',
   // Drawer
   About = 'About',
   Info = 'Info',

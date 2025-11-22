@@ -29,8 +29,6 @@ zcash_proofs = { version = "0.26" }
 zcash_protocol = { version = "0.7" }
 zcash_transparent = { version = "0.6" }
 
-zebra-chain = { version = "3.0" }
-
 zingo_common_components = { git = "https://github.com/zingolabs/zingo-common.git", branch = "dev" }
 
 http = "1"

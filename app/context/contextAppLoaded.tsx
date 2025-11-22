@@ -36,10 +36,8 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   info: {} as InfoType,
   wallet: {} as WalletType,
   defaultUnifiedAddress: '',
-  lightWalletserver: {} as ServerType,
-  selectLightWalletServer: SelectServerEnum.custom,
-  validatorServer: {} as ServerType,
-  selectValidatorServer: SelectServerEnum.custom,
+  indexerServer: {} as ServerType,
+  selectIndexerServer: SelectServerEnum.custom,
   currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {

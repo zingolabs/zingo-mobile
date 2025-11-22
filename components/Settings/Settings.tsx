@@ -12,7 +12,7 @@ import {
 
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { IconDefinition, faDotCircle } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faChevronLeft, faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
 import RegText from '../Components/RegText';
@@ -23,7 +23,6 @@ import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 
-import Header from '../Header';
 import {
   LanguageEnum,
   SecurityType,
@@ -49,6 +48,7 @@ import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevel
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type SettingsProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Settings> & {
   setServerOption: (
@@ -88,12 +88,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setRescanMenuOption,
   setRecoveryWalletInfoOnDeviceOption,
   setPerformanceLevelOption,
-  toggleMenuDrawer,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
-    lightWalletserver: lightWalletserverContext,
+    indexerServer: indexerServerContext,
     currency: currencyContext,
     language: languageContext,
     sendAll: sendAllContext,
@@ -103,7 +102,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     netInfo,
     addLastSnackbar,
     security: securityContext,
-    selectLightWalletServer: selectLightWalletServerContext,
+    selectIndexerServer: selectIndexerServerContext,
     rescanMenu: rescanMenuContext,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
@@ -197,7 +196,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [restoreWalletBackupScreen, setRestoreWalletBackupScreen] = useState<boolean>(
     securityContext.restoreWalletBackupScreen,
   );
-  const [selectServer, setSelectServer] = useState<SelectServerEnum>(selectLightWalletServerContext);
+  const [selectServer, setSelectServer] = useState<SelectServerEnum>(selectIndexerServerContext);
   const [rescanMenu, setRescanMenu] = useState<boolean>(rescanMenuContext);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(
     recoveryWalletInfoOnDeviceContext,
@@ -213,6 +212,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [hasRecoveryWalletInfoSaved, setHasRecoveryWalletInfoSaved] = useState<boolean>(false);
   const [storageRecoveryWalletInfo, setStorageRecoveryWalletInfo] = useState<string>('');
   const [showDeveloperOptions, setShowDeveloperOptions] = useState<boolean>(false);
+  const [kbOpen, setKbOpen] = React.useState(false);
+
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
+    const s2 = Keyboard.addListener('keyboardDidHide', () => setKbOpen(false));
+    return () => { s1.remove(); s2.remove(); };
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -224,36 +232,36 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }, [translate]);
 
   const setServer = () => {
-    if (selectLightWalletServerContext === SelectServerEnum.auto) {
+    if (selectIndexerServerContext === SelectServerEnum.auto) {
       setAutoIcon(faDotCircle); // ->
       setListIcon(farCircle);
       setCustomIcon(farCircle);
       setOfflineIcon(farCircle);
-      setAutoServerUri(lightWalletserverContext.uri);
-      setAutoServerChainName(lightWalletserverContext.chainName);
-    } else if (selectLightWalletServerContext === SelectServerEnum.list) {
+      setAutoServerUri(indexerServerContext.uri);
+      setAutoServerChainName(indexerServerContext.chainName);
+    } else if (selectIndexerServerContext === SelectServerEnum.list) {
       setAutoIcon(farCircle);
       setListIcon(faDotCircle); // ->
       setCustomIcon(farCircle);
       setOfflineIcon(farCircle);
-      setListServerUri(lightWalletserverContext.uri);
-      setListServerChainName(lightWalletserverContext.chainName);
+      setListServerUri(indexerServerContext.uri);
+      setListServerChainName(indexerServerContext.chainName);
       // I have to update them in auto as well
       // with the same server
-      setAutoServerUri(lightWalletserverContext.uri);
-      setAutoServerChainName(lightWalletserverContext.chainName);
-    } else if (selectLightWalletServerContext === SelectServerEnum.custom) {
+      setAutoServerUri(indexerServerContext.uri);
+      setAutoServerChainName(indexerServerContext.chainName);
+    } else if (selectIndexerServerContext === SelectServerEnum.custom) {
       setAutoIcon(farCircle);
       setListIcon(farCircle);
       setCustomIcon(faDotCircle); // ->
       setOfflineIcon(farCircle);
-      setCustomServerUri(lightWalletserverContext.uri);
-      setCustomServerChainName(lightWalletserverContext.chainName);
+      setCustomServerUri(indexerServerContext.uri);
+      setCustomServerChainName(indexerServerContext.chainName);
       // I have to update them in auto as well
       // with the first of the list
       setAutoServerUri(serverUris(translate).filter((s: ServerUrisType) => s.chainName === ChainNameEnum.testChainName)[0].uri);
       setAutoServerChainName(serverUris(translate).filter((s: ServerUrisType) => s.chainName === ChainNameEnum.testChainName)[0].chainName);
-    } else if (selectLightWalletServerContext === SelectServerEnum.offline) {
+    } else if (selectIndexerServerContext === SelectServerEnum.offline) {
       setAutoIcon(farCircle);
       setListIcon(farCircle);
       setCustomIcon(farCircle);
@@ -311,8 +319,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       chainNameParsed = ChainNameEnum.mainChainName;
     }
     if (
-      lightWalletserverContext.uri === serverUriParsed &&
-      lightWalletserverContext.chainName === chainNameParsed &&
+      indexerServerContext.uri === serverUriParsed &&
+      indexerServerContext.chainName === chainNameParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
@@ -320,7 +328,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       privacyContext === privacy &&
       modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
-      selectLightWalletServerContext === selectServer &&
+      selectIndexerServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel
@@ -355,11 +363,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevelContext,
     securityContext,
     selectServer,
-    selectLightWalletServerContext,
+    selectIndexerServerContext,
     sendAll,
     sendAllContext,
-    lightWalletserverContext.chainName,
-    lightWalletserverContext.uri,
+    indexerServerContext.chainName,
+    indexerServerContext.uri,
     securityObject,
   ]);
 
@@ -380,10 +388,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       chainNameParsed = ChainNameEnum.mainChainName;
     }
     let sameServerChainName = true;
-    const chainName = lightWalletserverContext.chainName;
+    const chainName = indexerServerContext.chainName;
     if (
-      lightWalletserverContext.uri === serverUriParsed &&
-      lightWalletserverContext.chainName === chainNameParsed &&
+      indexerServerContext.uri === serverUriParsed &&
+      indexerServerContext.chainName === chainNameParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
@@ -391,7 +399,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       privacyContext === privacy &&
       modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
-      selectLightWalletServerContext === selectServer &&
+      selectIndexerServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel
@@ -408,7 +416,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (lightWalletserverContext.uri !== serverUriParsed && selectServer !== SelectServerEnum.offline) {
+    if (indexerServerContext.uri !== serverUriParsed && selectServer !== SelectServerEnum.offline) {
       const resultUri = parseServerURI(serverUriParsed, translate);
       if (resultUri && resultUri.toLowerCase().startsWith(GlobalConst.error)) {
         addLastSnackbar({ message: translate('settings.isuri') as string, screenName: [screenName] });
@@ -433,7 +441,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     if (
-      (lightWalletserverContext.uri !== serverUriParsed || selectLightWalletServerContext !== selectServer) &&
+      (indexerServerContext.uri !== serverUriParsed || selectIndexerServerContext !== selectServer) &&
       !serverUriParsed &&
       selectServer !== SelectServerEnum.offline
     ) {
@@ -441,12 +449,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (lightWalletserverContext.uri !== serverUriParsed || lightWalletserverContext.chainName !== chainNameParsed) {
+    if (indexerServerContext.uri !== serverUriParsed || indexerServerContext.chainName !== chainNameParsed) {
       // if the user is changing -> to Offline mode.
       // doesn't matter is the device have or not internet connection.
       if (
         !netInfo.isConnected &&
-        !(selectLightWalletServerContext !== SelectServerEnum.offline && selectServer === SelectServerEnum.offline)
+        !(selectIndexerServerContext !== SelectServerEnum.offline && selectServer === SelectServerEnum.offline)
       ) {
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
         return;
@@ -455,7 +463,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (serverUriParsed) {
         addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string, screenName: [screenName] });
       }
-      const { result, timeout, newChainName } = await checkServerURI(serverUriParsed, lightWalletserverContext.uri);
+      const { result, timeout, newChainName } = await checkServerURI(serverUriParsed, indexerServerContext.uri);
       if (!result) {
         // if the server checking takes more then 30 seconds.
         if (timeout === true) {
@@ -468,7 +476,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        setServerOption(lightWalletserverContext, selectLightWalletServerContext, false, sameServerChainName);
+        setServerOption(indexerServerContext, selectIndexerServerContext, false, sameServerChainName);
         setDisabled(false);
         return;
       } else {
@@ -509,7 +517,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
-    if (lightWalletserverContext.uri !== serverUriParsed || lightWalletserverContext.chainName !== chainNameParsed) {
+    if (indexerServerContext.uri !== serverUriParsed || indexerServerContext.chainName !== chainNameParsed) {
       if (languageContext !== language) {
         await setLanguageOption(language, false);
       }
@@ -521,7 +529,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       );
       ms = 1500;
     } else {
-      if (selectLightWalletServerContext !== selectServer) {
+      if (selectIndexerServerContext !== selectServer) {
         await setSelectServerOption(selectServer);
       }
       if (languageContext !== language) {
@@ -545,7 +553,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setPrivacy(privacyContext);
       setSendAll(sendAllContext);
       setRescanMenu(rescanMenuContext);
-      setSelectServer(selectLightWalletServerContext);
+      setSelectServer(selectIndexerServerContext);
       setServer();
       setStartApp(securityContext.startApp);
       setForegroundApp(securityContext.foregroundApp);
@@ -558,7 +566,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
       setPerformanceLevel(performanceLevelContext);
     }
-    navigation.navigate(RouteEnum.HomeStack);
+    navigation.navigate(RouteEnum.History);
   };
 
   const optionsRadio = (
@@ -657,40 +665,61 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       />
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
-        style={{
-          flex: 1,
+        style={{ 
+          flex: 1, 
           backgroundColor: colors.background,
         }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0}
       >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: colors.background,
-          }}>
-          <Header
-            title={translate('settings.title') as string}
-            screenName={screenName}
-            noBalance={true}
-            noSyncingStatus={true}
-            toggleMenuDrawer={toggleMenuDrawer}
-            noPrivacy={true}
-            closeScreen={() => {
-              if (!disabled) {
-                navigateToHome(true);
-              }
-            }}
-          />
-          <ScrollView
-            keyboardShouldPersistTaps="handled"
-            testID="settings.scroll-view"
-            style={{ height: '80%', maxHeight: '80%' }}
-            contentContainerStyle={{
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              justifyContent: 'flex-start',
+
+        <View style={{
+          position: 'absolute',
+          width: 75,
+          top: 10,
+          left: 10,
+          zIndex: 999,
+        }}>
+          <View
+            style={{
+              borderRadius: 25,
+              borderColor: colors.text,
+              borderWidth: 1,
+              padding: 10,
+              margin: 10,
+              backgroundColor: colors.background,
             }}>
+              <TouchableOpacity onPress={() => {
+                if (!disabled) {
+                  navigateToHome(true);
+                }
+              }}>
+                <FontAwesomeIcon
+                  size={30}
+                  icon={faChevronLeft}
+                  color={colors.text}
+                />
+              </TouchableOpacity>
+          </View>
+        </View>
+
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingTop: insets.top + 8,
+            paddingBottom: insets.bottom + 8,
+            paddingHorizontal: 16,
+        }}>
+          <View
+            style={{
+              flexGrow: 1,
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+          }}>
+
+            <RegText color={colors.text} style={{ fontSize: 25, alignSelf: 'center' }}>Settings</RegText>
+
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.mode-title') as string}</BoldText>
             </View>
@@ -1149,29 +1178,29 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 )}
               </>
             )}
-          </ScrollView>
-          <View
-            style={{
-              flexGrow: 1,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginVertical: 5,
-            }}>
-            <Button
-              testID="settings.button.save"
-              disabled={disabled || disabledButton}
-              type={ButtonTypeEnum.Primary}
-              title={translate('settings.save') as string}
-              onPress={() => {
-                // waiting while closing the keyboard, just in case.
-                setTimeout(async () => {
-                  await saveSettings();
-                  Keyboard.dismiss();
-                }, 100);
-              }}
-            />
           </View>
+        </ScrollView>
+        <View
+          style={{
+            marginTop: 'auto',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: 10,
+            paddingBottom: 20,
+          }}>
+          <Button
+            testID="settings.button.save"
+            disabled={disabled || disabledButton}
+            type={ButtonTypeEnum.Primary}
+            title={translate('settings.save') as string}
+            onPress={() => {
+              // waiting while closing the keyboard, just in case.
+              setTimeout(async () => {
+                await saveSettings();
+                Keyboard.dismiss();
+              }, 100);
+            }}
+          />
         </View>
       </KeyboardAvoidingView>
     </ToastProvider>

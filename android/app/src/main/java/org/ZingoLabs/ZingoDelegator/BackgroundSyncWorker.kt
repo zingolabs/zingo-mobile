@@ -267,14 +267,14 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
     private fun loadWalletFile() {
         // I have to init from wallet file in order to do the sync
-        // and I need to read the settings.json to find the lightWalletServer & chain type
+        // and I need to read the settings.json to find the indexerServer & chain type
         context.openFileInput("settings.json")?.use { file: FileInputStream ->
             val settingsBytes = file.readBytes()
             file.close()
             val settingsString = settingsBytes.toString(Charsets.UTF_8)
             val jsonObject = JSONObject(settingsString)
-            val serveruri = jsonObject.getJSONObject("lightWalletServer").getString("uri")
-            val chainhint = jsonObject.getJSONObject("lightWalletServer").getString("chainName")
+            val serveruri = jsonObject.getJSONObject("indexerServer").getString("uri")
+            val chainhint = jsonObject.getJSONObject("indexerServer").getString("chainName")
             Log.i(
                 "SCHEDULED_TASK_RUN",
                 "Opening the wallet file - No App active - serveruri: $serveruri chain: $chainhint"

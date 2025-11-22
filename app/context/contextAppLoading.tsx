@@ -20,10 +20,8 @@ import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
   wallet: {} as WalletType,
-  lightWalletserver: {} as ServerType,
-  selectLightWalletServer: SelectServerEnum.custom,
-  validatorServer: {} as ServerType,
-  selectValidatorServer: SelectServerEnum.custom,
+  indexerServer: {} as ServerType,
+  selectIndexerServer: SelectServerEnum.custom,
   currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {

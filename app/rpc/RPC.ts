@@ -73,7 +73,7 @@ export default class RPC {
   timers: NodeJS.Timeout[];
 
   readOnly: boolean;
-  lightWalletserver: ServerType;
+  indexerServer: ServerType;
   performanceLevel: RPCPerformanceLevelEnum;
 
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
@@ -91,7 +91,7 @@ export default class RPC {
     fnSetWallet: (wallet: WalletType) => void,
     fnSetLastError: (error: string) => void,
     readOnly: boolean,
-    lightWalletserver: ServerType,
+    indexerServer: ServerType,
     performanceLevel: RPCPerformanceLevelEnum,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -128,7 +128,7 @@ export default class RPC {
     this.timers = [];
 
     this.readOnly = readOnly;
-    this.lightWalletserver = lightWalletserver;
+    this.indexerServer = indexerServer;
     this.performanceLevel = performanceLevel;
 
   }
@@ -136,11 +136,12 @@ export default class RPC {
   static async rpcGetZecPrice(withTOR: boolean): Promise<{price: number, error: string}> {
     try {
       // create the tor client if needed
-      const result: string = await RPCModule.createTorClientProcess();
-      if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Create Tor client error: ${result}`);
+      if (withTOR) {
+        const result: string = await RPCModule.createTorClientProcess();
+        if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Create Tor client error: ${result}`);
+        }
       }
-
       // values:
       // 0   - initial/default value
       // -1  - error in zingolib.
@@ -708,7 +709,7 @@ export default class RPC {
         version: `${infoJSON.vendor}/${infoJSON.git_commit ? infoJSON.git_commit.substring(0, 6) : ''}/${
           infoJSON.version
         }`,
-        currencyName: infoJSON.chain_name === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ,
+        currencyName: infoJSON.chain_name === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.cTAZ,
       };
 
       this.fnSetInfo(info);
@@ -1063,7 +1064,7 @@ export default class RPC {
       this.fetchTandZandOValueTransfersLock = true;
       // first to get the last server block.
       const start = Date.now();
-      const heightStr: string = await RPCModule.getLatestBlockServerInfo(this.lightWalletserver.uri);
+      const heightStr: string = await RPCModule.getLatestBlockServerInfo(this.indexerServer.uri);
       if (Date.now() - start > 4000) {
         console.log('=========================================== > server height - ', Date.now() - start);
       }

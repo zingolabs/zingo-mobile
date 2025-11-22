@@ -71,7 +71,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     info,
     showSwipeableIcons,
     readOnly,
-    selectLightWalletServer,
+    selectIndexerServer,
     setSendPageState,
   } = context;
   const { colors } = useTheme()  as ThemeType;
@@ -88,8 +88,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     vt.confirmations >= 0 &&
     vt.confirmations < GlobalConst.minConfirmations
       ? colors.primaryDisabled
-      : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
-      ? colors.primary
       : colors.text;
 
   const icon =
@@ -207,7 +205,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faFileLines} color={colors.money} />
               </TouchableOpacity>
             </View>
-            {!!vt.address && !readOnly && selectLightWalletServer !== SelectServerEnum.offline && !addressProtected && (
+            {!!vt.address && !readOnly && selectIndexerServer !== SelectServerEnum.offline && !addressProtected && (
               <View
                 style={{
                   width: 67,
@@ -221,9 +219,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    navigation.navigate(RouteEnum.HomeStack, {
-                      screen: RouteEnum.Send,
-                    });
+                    navigation.navigate(RouteEnum.Send);
                     closeAllSwipeables();
                   }}>
                   <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
@@ -316,7 +312,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
               <View style={{ display: 'flex' }}>
                 <FontAwesomeIcon
-                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
                   size={30}
                   icon={icon}
                   color={

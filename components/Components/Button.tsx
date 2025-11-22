@@ -37,20 +37,22 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     type === ButtonTypeEnum.Primary
       ? {
           backgroundColor: disabled ? colors.primaryDisabled : colors.primary,
-          borderColor: disabled ? colors.primaryDisabled : colors.primary,
-          borderWidth: 2,
+          borderColor: disabled ? colors.primaryDisabled : colors.text,
+          borderWidth: 1,
           width: twoButtons ? '40%' : '80%',
         }
       : type === ButtonTypeEnum.Secondary
       ? {
-          backgroundColor: disabled ? colors.secondaryDisabled : colors.background,
-          borderColor: disabled ? colors.primaryDisabled : colors.primary,
-          borderWidth: 2,
+          backgroundColor: disabled ? colors.secondaryDisabled : colors.secondary,
+          borderColor: disabled ? colors.primaryDisabled : colors.text,
+          borderWidth: 1,
           width: twoButtons ? '40%' : '80%',
         }
       : type === ButtonTypeEnum.Tertiary
       ? {
-          backgroundColor: colors.tertiary,
+          backgroundColor: disabled ? colors.secondaryDisabled : colors.background,
+          borderColor: disabled ? colors.primaryDisabled : colors.primary,
+          borderWidth: 1,
           width: twoButtons ? '40%' : '80%',
         }
       : type === ButtonTypeEnum.Ghost
@@ -60,7 +62,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         }
       : {
           // error
-          backgroundColor: colors.primary,
+          backgroundColor: colors.danger.primary,
           width: twoButtons ? '40%' : '80%',
         };
 
@@ -68,7 +70,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     padding: 0,
     paddingLeft: 20,
     paddingRight: 20,
-    borderRadius: 10,
+    borderRadius: 25,
     maxWidth: '90%',
     minWidth: '30%',
     minHeight: 48,
@@ -79,11 +81,11 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   const styleText: TextStyle =
     type === ButtonTypeEnum.Primary
       ? {
-          color: colors.background,
+          color: colors.text,
         }
       : type === ButtonTypeEnum.Secondary
       ? {
-          color: disabled ? colors.primaryDisabled : colors.primary,
+          color: colors.text,
         }
       : type === ButtonTypeEnum.Tertiary
       ? {
@@ -92,22 +94,16 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       : type === ButtonTypeEnum.Ghost
       ? {
           color: colors.text,
-          textTransform: 'lowercase',
         }
       : {
           // error
-          color: colors.background,
+          color: colors.danger.primary,
         };
   const styleTextCommon: TextStyle = {
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    fontSize: 16,
+    fontWeight: 'normal',
+    fontSize: 18,
     textAlign: 'center',
   };
-
-  //if (type === ButtonTypeEnum.Tertiary) {
-  //  console.log(styleText, styleTextCommon);
-  //}
 
   return (
     <TouchableOpacity

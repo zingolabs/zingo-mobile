@@ -20,12 +20,14 @@ import {
   ScreenEnum,
   RouteEnum,
 } from '../../app/AppState';
-import Header from '../Header';
 import Utils from '../../app/utils';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
 type TextsType = {
   new: string[];
@@ -54,20 +56,20 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const {
     wallet,
     translate,
-    lightWalletserver,
-    netInfo,
+    indexerServer,
     privacy,
     mode,
     addLastSnackbar,
     snackbars,
     removeFirstSnackbar,
-    setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   // when this screen is open from LoadingApp (new wallet)
   // is using the standard modal from react-native
   const { clear } = useToast();
   const screenName = ScreenEnum.Seed;
+
+  const insets = useSafeAreaInsets();
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -145,7 +147,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         : action === SeedActionEnum.server
         ? (translate('seed.server-warning') as string)
         : '') +
-        (lightWalletserver.chainName !== ChainNameEnum.mainChainName &&
+        (indexerServer.chainName !== ChainNameEnum.mainChainName &&
         (action === SeedActionEnum.change || action === SeedActionEnum.server)
           ? '\n' + (translate('seed.mainnet-warning') as string)
           : ''),
@@ -184,9 +186,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       setBasicFirstViewSeed(true);
       keepAwake && keepAwake(false);
       // redirect to history screen
-      navigation.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.History,
-      });
+      navigation.navigate(RouteEnum.History);
     } else {
       if (navigation.canGoBack()) {
         navigation.goBack();
@@ -206,35 +206,51 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         screenName={screenName}
       />
 
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}>
-        <Header
-          title={translate('seed.title') + ' (' + translate(`seed.${action}`) + ')'}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noUfvkIcon={true}
-          setPrivacyOption={setPrivacyOption}
-          addLastSnackbar={addLastSnackbar}
-          translate={translate}
-          netInfo={netInfo}
-          mode={mode}
-          privacy={privacy}
-          receivedLegend={action === SeedActionEnum.view ? !basicFirstViewSeed : false}
-          closeScreen={onClickCancelHide}
-        />
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          style={{ height: '80%', maxHeight: '80%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
+      <View style={{
+        position: 'absolute',
+        width: 75,
+        top: 10,
+        left: 10,
+        zIndex: 999,
+      }}>
+        <View
+          style={{
+            borderRadius: 25,
+            borderColor: colors.text,
+            borderWidth: 1,
+            padding: 10,
+            margin: 10,
+            backgroundColor: colors.background,
           }}>
+            <TouchableOpacity onPress={() => {
+              onClickCancelHide();
+            }}>
+              <FontAwesomeIcon
+                size={30}
+                icon={faChevronLeft}
+                color={colors.text}
+              />
+            </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 8,
+          paddingHorizontal: 16,
+      }}>
+        <View
+          style={{
+            flexGrow: 1,
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+        }}>
+
+          <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>Wallet Seed Phrase</RegText>
+
           <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
             {action === SeedActionEnum.backup || action === SeedActionEnum.change || action === SeedActionEnum.server
               ? (translate(`seed.text-readonly-${action}`) as string)
@@ -307,7 +323,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             </View>
           </View>
 
-          <View style={{ marginTop: 10, alignItems: 'center' }}>
+          <View style={{ marginTop: 10, alignItems: 'center', alignSelf: 'center' }}>
             <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-readonly') as string}</FadeText>
             <TouchableOpacity
               onPress={() => {
@@ -334,42 +350,42 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             </TouchableOpacity>
           </View>
           <View style={{ marginBottom: 30 }} />
-        </ScrollView>
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-          }}>
-          <Button
-            testID="seed.button.ok"
-            type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
-            style={{
-              backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
-            }}
-            title={
-              mode === ModeEnum.basic
-                ? !basicFirstViewSeed
-                  ? (translate('seed.showtransactions') as string)
-                  : (translate('cancel') as string)
-                : !!texts && !!texts[action]
-                ? texts[action][times]
-                : ''
-            }
-            onPress={async () => {
-              if (!seedPhrase) {
-                return;
-              }
-              if (times === 0) {
-                onClickOKHide(seedPhrase, Number(birthdayNumber));
-              } else if (times === 1) {
-                onPressOK();
-              }
-            }}
-          />
         </View>
+      </ScrollView>
+      <View
+        style={{
+          marginTop: 'auto',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingTop: 10,
+          paddingBottom: 20,
+        }}>
+        <Button
+          testID="seed.button.ok"
+          type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
+          style={{
+            backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
+          }}
+          title={
+            mode === ModeEnum.basic
+              ? !basicFirstViewSeed
+                ? (translate('seed.showtransactions') as string)
+                : (translate('cancel') as string)
+              : !!texts && !!texts[action]
+              ? texts[action][times]
+              : ''
+          }
+          onPress={async () => {
+            if (!seedPhrase) {
+              return;
+            }
+            if (times === 0) {
+              onClickOKHide(seedPhrase, Number(birthdayNumber));
+            } else if (times === 1) {
+              onPressOK();
+            }
+          }}
+        />
       </View>
     </ToastProvider>
   );

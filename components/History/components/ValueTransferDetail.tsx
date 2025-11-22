@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Linking, Text, Alert } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Linking, Text, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
@@ -27,13 +27,12 @@ import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
 import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
-import Header from '../../Header';
 import BoldText from '../../Components/BoldText';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import AddressItem from '../../Components/AddressItem';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
-import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { faTriangleExclamation, faChevronDown, faChevronUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -41,6 +40,7 @@ import Button from '../../Components/Button';
 import RPCModule from '../../../app/RPCModule';
 import { createAlert } from '../../../app/createAlert';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
@@ -57,7 +57,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     language,
     privacy,
     addLastSnackbar,
-    lightWalletserver,
+    indexerServer,
     currency,
     addresses,
     zenniesDonationAddress,
@@ -65,13 +65,14 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     removeFirstSnackbar,
     setBackgroundError,
     netInfo,
-    selectLightWalletServer,
+    selectIndexerServer,
     readOnly,
-    setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.ValueTransferDetail;
+
+  const insets = useSafeAreaInsets();
 
   const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(!!route.params && route.params.vt !== undefined ? route.params.vt : {} as ValueTransferType);
   const [valueTransferIndex, setValueTransferIndex] = useState<number>(!!route.params && route.params.index !== undefined ? route.params.index : 0);
@@ -112,8 +113,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       valueTransfer.confirmations >= 0 &&
       valueTransfer.confirmations < GlobalConst.minConfirmations
         ? colors.primaryDisabled
-        : valueTransfer.kind === ValueTransferKindEnum.Received || valueTransfer.kind === ValueTransferKindEnum.Shield
-        ? colors.primary
         : colors.text;
     setSpendColor(spendCo);
   }, [colors.primary, colors.primaryDisabled, colors.text, valueTransfer.confirmations, valueTransfer.kind]);
@@ -130,7 +129,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       return;
     }
 
-    const url = Utils.getBlockExplorerTxIDURL(txid, lightWalletserver.chainName);
+    const url = Utils.getBlockExplorerTxIDURL(txid, indexerServer.chainName);
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
@@ -178,7 +177,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
-    if (!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || selectIndexerServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
@@ -219,9 +218,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       }
     }
     // change to the history screen, just in case.
-    navigation.navigate(RouteEnum.HomeStack, {
-      screen: RouteEnum.History,
-    });
+    navigation.navigate(RouteEnum.History);
   };
 
   const actionOnPress = (action: TransactionActionEnum) => {
@@ -251,27 +248,46 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         screenName={screenName}
       />
 
-      <View
-        style={{
-          flex: 1,
+      <KeyboardAvoidingView
+        style={{ 
+          flex: 1, 
           backgroundColor: colors.background,
+        }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
+      >
+
+        <View style={{
+          position: 'absolute',
+          width: 75,
+          top: 10,
+          left: 10,
+          zIndex: 999,
         }}>
-        <Header
-          title={translate('history.details') as string}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noUfvkIcon={true}
-          setPrivacyOption={setPrivacyOption}
-          addLastSnackbar={addLastSnackbar}
-          closeScreen={() => {
-            clear();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
-        />
+          <View
+            style={{
+              borderRadius: 25,
+              borderColor: colors.text,
+              borderWidth: 1,
+              padding: 10,
+              margin: 10,
+              backgroundColor: colors.background,
+            }}>
+              <TouchableOpacity onPress={() => {
+                clear();
+                if (navigation.canGoBack()) {
+                  navigation.goBack();
+                }
+              }}>
+                <FontAwesomeIcon
+                  size={30}
+                  icon={faChevronLeft}
+                  color={colors.text}
+                />
+              </TouchableOpacity>
+          </View>
+        </View>
+
         {showNavigator && (
           <View
             style={{
@@ -279,7 +295,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               justifyContent: 'flex-end',
               alignItems: 'center',
               marginRight: 30,
-              marginTop: 5,
+              marginTop: 20,
             }}>
             <TouchableOpacity
               onPress={() => moveValueTransferDetail(valueTransferIndex, -1)}
@@ -305,18 +321,17 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           </View>
         )}
         <ScrollView
-          showsVerticalScrollIndicator={true}
-          persistentScrollbar={true}
-          indicatorStyle={'white'}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-          }}>
+            flexGrow: 1,
+            paddingTop: insets.top + 8,
+            paddingBottom: insets.bottom + 8,
+            paddingHorizontal: 16,
+        }}>
           <View
             style={{
-              display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               margin: 25,
               marginTop: showNavigator ? 5 : 25,
               padding: 10,
@@ -516,7 +531,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 {expandTxid && !!valueTransfer.txid && (
                   <>
                     <RegText>{valueTransfer.txid}</RegText>
-                    {lightWalletserver.chainName !== ChainNameEnum.regtestChainName && (
+                    {indexerServer.chainName !== ChainNameEnum.regtestChainName && (
                       <TouchableOpacity onPress={() => handleTxIDClick(valueTransfer.txid)}>
                         <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                           {translate('history.viewexplorer') as string}
@@ -618,7 +633,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             )}
           </View>
         </ScrollView>
-      </View>
+      </KeyboardAvoidingView>
     </ToastProvider>
   );
 };

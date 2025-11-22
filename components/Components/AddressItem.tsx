@@ -48,7 +48,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     readOnly,
     mode,
     totalBalance,
-    selectLightWalletServer,
+    selectIndexerServer,
     setSendPageState,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -123,7 +123,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           {withSendIcon &&
             !addressProtected &&
             !readOnly &&
-            selectLightWalletServer !== SelectServerEnum.offline &&
+            selectIndexerServer !== SelectServerEnum.offline &&
             !(
               mode === ModeEnum.basic &&
               totalBalance &&
@@ -137,9 +137,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                   const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                   sendPageState.toaddr.to = address;
                   setSendPageState(sendPageState);
-                  navigation.navigate(RouteEnum.HomeStack, {
-                    screen: RouteEnum.Send,
-                  });
+                  navigation.navigate(RouteEnum.Send);
                 }}>
                 <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />
               </TouchableOpacity>
