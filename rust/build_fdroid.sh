@@ -184,10 +184,10 @@ mkdir -p /opt/jniLibs/x86 \
     && mkdir -p /opt/jniLibs/x86_64 \
     && mkdir -p /opt/jniLibs/kotlin
 
-cp ../target/x86_64-linux-android/release/libzingo.so /opt/jniLibs/x86_64/libuniffi_zingo.so
-cp ../target/i686-linux-android/release/libzingo.so /opt/jniLibs/x86/libuniffi_zingo.so
-cp ../target/armv7-linux-androideabi/release/libzingo.so /opt/jniLibs/armeabi-v7a/libuniffi_zingo.so
-cp ../target/aarch64-linux-android/release/libzingo.so /opt/jniLibs/arm64-v8a/libuniffi_zingo.so
+cp ../target/x86_64-linux-android/release/libzingo.so /opt/jniLibs/x86_64/libzingo.so
+cp ../target/i686-linux-android/release/libzingo.so /opt/jniLibs/x86/libzingo.so
+cp ../target/armv7-linux-androideabi/release/libzingo.so /opt/jniLibs/armeabi-v7a/libzingo.so
+cp ../target/aarch64-linux-android/release/libzingo.so /opt/jniLibs/arm64-v8a/libzingo.so
 cp ./src/uniffi/zingo/zingo.kt /opt/jniLibs/kotlin/zingo.kt
 
 yes | rustup self uninstall

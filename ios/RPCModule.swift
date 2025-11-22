@@ -198,7 +198,7 @@ class RPCModule: NSObject {
         NSLog("[Native] file size: \(size) bytes")
         if size > 0 {
           // check if the content is correct. Stored Encoded.
-          let correct = checkB64(datab64: walletEncodedString)
+          let correct = checkB64(base64Data: walletEncodedString)
           if correct == "true" {
             try self.saveWalletFile(walletEncodedString)
           } else {
@@ -232,7 +232,7 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String
   ) throws -> String {
-    let seed = try initNew(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initNew(serverUri: serveruri, chainHint: chainhint, performanceLevel: performancelevel, minConfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -271,7 +271,7 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String
   ) throws -> String {
-    let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serverUri: serveruri, chainHint: chainhint, performanceLevel: performancelevel, minConfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -312,7 +312,7 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String
   ) throws -> String {
-    let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, serverUri: serveruri, chainHint: chainhint, performanceLevel: performancelevel, minConfirmations: UInt32(minconfirmations) ?? 0)
     let ufvkStr = String(ufvk)
     if !ufvkStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -351,7 +351,7 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String
   ) throws -> String {
-    let seed = try initFromB64(datab64: try self.readWalletUtf8String(), serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initFromB64(base64Data: try self.readWalletUtf8String(), serverUri: serveruri, chainHint: chainhint, performanceLevel: performancelevel, minConfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
     return seedStr
   }
@@ -385,7 +385,7 @@ class RPCModule: NSObject {
       let backupEncodedData = try self.readWalletBackup()
       let walletEncodedData = try self.readWalletUtf8String()
       // check if the content is correct. Stored Encoded.
-      let correct = checkB64(datab64: backupEncodedData)
+      let correct = checkB64(base64Data: backupEncodedData)
       if correct == "true" {
         try self.saveWalletFile(backupEncodedData)
         try self.saveWalletBackupFile(walletEncodedData)
@@ -468,7 +468,7 @@ class RPCModule: NSObject {
     if let serveruri = dict["serveruri"] as? String,
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       do {
-        let resp = try getLatestBlockServer(serveruri: serveruri)
+        let resp = try getLatestBlockServer(serverUri: serveruri)
         let respStr = String(resp)
         DispatchQueue.main.async {
           resolve(respStr)
@@ -914,7 +914,7 @@ class RPCModule: NSObject {
       if let serveruri = dict["serveruri"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
-          let resp = try changeServer(serveruri: serveruri)
+          let resp = try changeServer(serverUri: serveruri)
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -1489,7 +1489,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   func fnCreateTorClientProcess(_ dict: [AnyHashable: Any]) throws {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
-          let resp = try createTorClient(datadir: try getDocumentsDirectory())
+          let resp = try createTorClient(dataDir: try getDocumentsDirectory())
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -1763,7 +1763,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let minconfirmations = dict["minconfirmations"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
-          let resp = try setConfigWalletToProd(performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+          let resp = try setConfigWalletToProd(performanceLevel: performancelevel, minConfirmations: UInt32(minconfirmations) ?? 0)
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)

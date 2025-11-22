@@ -19,12 +19,12 @@ export AR_aarch64_apple_ios_sim="${AR_SIMULATOR}"
 # export AR_x86_64_apple_ios="${AR_SIMULATOR}"
 
 cd ../lib
-cargo run --release --features="uniffi/cli" --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ./Generated
 cargo build --release --target aarch64-apple-ios-sim
+cargo run --release --features="uniffi/cli" --bin uniffi-bindgen -- generate --library ../target/aarch64-apple-ios-sim/release/libzingo.dylib --language swift --out-dir ./Generated
 cargo lipo --release --targets aarch64-apple-ios-sim
 
 cp ./Generated/zingo.swift ../../ios
 cp ./Generated/zingoFFI.h ../../ios
 cp ./Generated/zingoFFI.modulemap ../../ios
 
-cp ../target/universal/release/libzingo.a ../../ios/libuniffi_zingo.a
+cp ../target/universal/release/libzingo.a ../../ios/libzingo.a

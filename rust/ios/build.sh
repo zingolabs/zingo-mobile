@@ -11,4 +11,4 @@ cp ./Generated/zingo.swift ../../ios
 cp ./Generated/zingoFFI.h ../../ios
 cp ./Generated/zingoFFI.modulemap ../../ios
 
-cp ../target/universal/release/libzingo.a ../../ios/libuniffi_zingo.a
+cp ../target/universal/release/libzingo.a ../../ios/libzingo.a

@@ -174,13 +174,13 @@ jobs:
 
       - name: Rename the rust lib for uniffi compatibility
         working-directory: ./rust/target/${{ env.TARGET }}/release
-        run: mv ./libzingo.so ./libuniffi_zingo.so
+        run: mv ./libzingo.so ./libzingo.so
 
       - name: Upload native rust
         uses: actions/upload-artifact@v4
         with:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
+          path: rust/target/${{ env.TARGET }}/release/libzingo.so
 
   cache-native-android-uniffi:
     name: Cache native rust
