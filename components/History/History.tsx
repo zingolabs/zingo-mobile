@@ -11,7 +11,7 @@ import {
 import moment from 'moment';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
@@ -38,6 +38,7 @@ import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { Swipeable } from 'react-native-gesture-handler';
+import { faHome } from '@fortawesome/free-regular-svg-icons';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -323,6 +324,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
     );
   };
 
+  const goStaking = () => {
+    navigation.navigate(RouteEnum.Staking);
+  };
+
   //console.log('render History - 4', valueTransfersSliced.length);
   //console.log(valueTransfersSliced[0]);
 
@@ -461,6 +466,61 @@ const History: React.FunctionComponent<HistoryProps> = ({
                 />
               </Pressable>
             )}
+            <View 
+              style={{
+                position: 'absolute',
+                bottom: 30,
+                flexDirection: 'row',
+                alignSelf: 'center',
+                gap: 10,
+            }}>
+              <Pressable
+                onPress={() => {}}
+                disabled={true}
+                style={({ pressed }) => ({
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingHorizontal: 25,
+                  paddingVertical: 10,
+                  backgroundColor: colors.sideMenuBackground,
+                  borderRadius: 50,
+                  transform: [{ scale: pressed ? 0.9 : 1 }],
+                  borderWidth: 1,
+                  borderColor: colors.zingo,
+                  opacity: isScrollingToTop ? 0.5 : 1,
+                })}>
+                <FontAwesomeIcon
+                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                  size={20}
+                  icon={faHome}
+                  color={colors.primary}
+                />
+                <FadeText style={{ color: colors.primary, fontSize: 12, opacity: 1 }}>Home</FadeText>
+              </Pressable>
+                <Pressable
+                onPress={goStaking}
+                disabled={false}
+                style={({ pressed }) => ({
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingHorizontal: 25,
+                  paddingVertical: 10,
+                  backgroundColor: colors.sideMenuBackground,
+                  borderRadius: 50,
+                  transform: [{ scale: pressed ? 0.9 : 1 }],
+                  borderWidth: 1,
+                  borderColor: colors.zingo,
+                  opacity: isScrollingToTop ? 0.5 : 1,
+                })}>
+                <FontAwesomeIcon
+                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                  size={20}
+                  icon={faLayerGroup}
+                  color={colors.zingo}
+                />
+                <FadeText style={{ color: colors.zingo, fontSize: 12, opacity: 1 }}>Staking</FadeText>
+              </Pressable>
+            </View>
           </>
         )}
       </View>

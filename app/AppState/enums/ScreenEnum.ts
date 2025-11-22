@@ -20,6 +20,7 @@ export enum ScreenEnum {
   ContactList = 'ContactList',
   MessagesList = 'MessagesList',
   Settings = 'Settings',
+  SettingsMenu = 'SettingsMenu',
   // Drawer
   About = 'About',
   Info = 'Info',

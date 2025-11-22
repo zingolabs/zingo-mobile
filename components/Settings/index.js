@@ -1,3 +1,4 @@
 import Settings from './Settings';
+import SettingsMenu from './SettingsMenu';
 
-export default Settings;
+export { Settings, SettingsMenu };

@@ -4,37 +4,37 @@ import { View, ScrollView, TouchableOpacity } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
-import FadeText from '../Components/FadeText';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList, LoadingAppNavigationState, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import DetailLine from '../Components/DetailLine';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
-import { RouteEnum, ScreenEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum, ScreenEnum, SeedActionEnum } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import RegText from '../Components/RegText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Button from '../Components/Button';
 
-type AboutProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.About>;
+type SettingsMenuProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.SettingsMenu> & {
+  navigateToLoadingApp: (state: LoadingAppNavigationState) => Promise<void>;
+};
 
-const About: React.FunctionComponent<AboutProps> = ({
+const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
+  navigateToLoadingApp,
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { zingolibVersion, translate, snackbars, removeFirstSnackbar } = context;
+  const { snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
-  const screenName = ScreenEnum.About;
+  const screenName = ScreenEnum.SettingsMenu;
 
   const insets = useSafeAreaInsets();
 
-  const arrayTxtObject = translate('about.copyright');
-  let arrayTxt: string[] = [];
-  if (typeof arrayTxtObject === 'object') {
-    arrayTxt = arrayTxtObject as string[];
-  }
+  const restoreWallet = () => {
+
+  };
 
   return (
     <ToastProvider>
@@ -90,21 +90,40 @@ const About: React.FunctionComponent<AboutProps> = ({
             justifyContent: 'center',
         }}>
 
-          <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>About</RegText>
+          <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>Settings</RegText>
 
-          <FadeText style={{ marginTop: 20 }}>{arrayTxt[0]}</FadeText>
-          <DetailLine label={translate('info.zingolib') as string} value={zingolibVersion} screenName={screenName} />
-          <View style={{ marginTop: 20 }}>
-            {arrayTxt.map((txt: string, ind: number) => (
-              <View key={txt.substring(0, 10)}>
-                {ind !== 0 && <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>}
-              </View>
-            ))}
+          <View style={{ borderRadius: 50, backgroundColor: colors.secondary, width: '100%', marginTop: 20 }}>
+            <View style={{ flexDirection: 'row', margin: 30 }}>
+              <TouchableOpacity 
+                onPress={() => navigation?.navigate(RouteEnum.Seed, { action: SeedActionEnum.view })}>
+                <RegText>Seed Phrase</RegText>
+              </TouchableOpacity>
+            </View>
+            <View style={{ height: 1, backgroundColor: colors.zingo }} />
+            <View style={{ flexDirection: 'row', margin: 30 }}>
+              <TouchableOpacity onPress={() => navigateToLoadingApp({ screen: 0.5, startingApp: false })}>
+                <RegText>Server</RegText>
+              </TouchableOpacity>
+            </View>
+            <View style={{ height: 1, backgroundColor: colors.zingo }} />
+            <View style={{ flexDirection: 'row', margin: 30 }}>
+              <RegText>Debug Information</RegText>
+            </View>
           </View>
         </View>
       </ScrollView>
+      <View
+        style={{
+          marginTop: 'auto',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingTop: 10,
+          paddingBottom: 20,
+        }}>
+        <Button type={ButtonTypeEnum.Primary} title={'Restore wallet'} onPress={restoreWallet} />
+      </View>
     </ToastProvider>
   );
 };
 
-export default About;
+export default SettingsMenu;

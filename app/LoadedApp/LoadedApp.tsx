@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
-import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 import { LoadingAppNavigationState, AppDrawerParamList } from '../types';
@@ -74,7 +73,6 @@ import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressA
 import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfov10';
 
 import History from '../../components/History';
-import Settings from '../../components/Settings';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
 import { ToastProvider } from 'react-native-toastier';
@@ -91,6 +89,9 @@ import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Send from '../../components/Send';
 import Receive from '../../components/Receive';
+import { Settings, SettingsMenu } from '../../components/Settings';
+import Claim from '../../components/Claim';
+import Staking from '../../components/Staking';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -127,10 +128,10 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [loading, setLoading] = useState<boolean>(true);
 
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency); // by default none because of cTAZ
   const [indexerServer, setIndexerServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [selectIndexerServer, setSelectIndexerServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
-  const [sendAll, setSendAll] = useState<boolean>(false);
+  const [sendAll, setSendAll] = useState<boolean>(true);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
@@ -145,9 +146,8 @@ export default function LoadedApp(props: LoadedAppProps) {
     changeWalletScreen: false,
     restoreWalletBackupScreen: false,
   });
-  const [rescanMenu, setRescanMenu] = useState<boolean>(false);
-  // by default the App store the seed phrase & birthday on KeyChain/KeyStore (Device).
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(true);
+  const [rescanMenu, setRescanMenu] = useState<boolean>(true);
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [zenniesDonationAddress, setZenniesDonationAddress] = useState<string>('');
   const file = useMemo(
@@ -175,7 +175,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
-      const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
+      // only en
+      //const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
+
+      const { languageTag, isRTL } = { languageTag: LanguageEnum.en, isRTL: false };
 
       // update layout direction
       I18nManager.forceRTL(isRTL);
@@ -597,9 +600,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (initialUrl !== null) {
       this.readUrl(initialUrl);
 
-      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.Send,
-      });
+      this.state.navigationHome?.navigate(RouteEnum.Send);
     }
 
     this.linking = Linking.addEventListener(EventListenerEnum.url, async ({ url }) => {
@@ -608,9 +609,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.readUrl(url);
       }
 
-      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.Send,
-      });
+      this.state.navigationHome?.navigate(RouteEnum.Send);
     });
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: NetInfoState) => {
@@ -1047,6 +1046,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (item === MenuItemEnum.About) {
       this.state.navigationHome?.navigate(RouteEnum.About);
       return;
+    } else if (item === MenuItemEnum.Settings) {
+      this.state.navigationHome?.navigate(RouteEnum.Settings);
+      return;
     } else if (item === MenuItemEnum.Rescan) {
       this.state.navigationHome?.navigate(RouteEnum.Rescan);
       return;
@@ -1161,9 +1163,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
         this.setSendPageState(newSendPageState);
       }
-      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.Send,
-      });
+      this.state.navigationHome?.navigate(RouteEnum.Send);
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
       await sendEmail(this.state.translate, this.state.zingolibVersion);
@@ -1708,6 +1708,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   />
                 }
               </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.SettingsMenu}>
+                {props => <SettingsMenu {...props} navigateToLoadingApp={this.navigateToLoadingApp} />}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Claim} component={Claim} />
+              <Drawer.Screen name={RouteEnum.Staking} component={Staking} />
               <Drawer.Screen name={RouteEnum.About} component={About} />
               <Drawer.Screen name={RouteEnum.Rescan}>
                 {props => <Rescan {...props} doRescan={this.doRescan} />}

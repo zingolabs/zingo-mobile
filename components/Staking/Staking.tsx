@@ -4,10 +4,8 @@ import { View, ScrollView, TouchableOpacity } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
-import FadeText from '../Components/FadeText';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import DetailLine from '../Components/DetailLine';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';
@@ -17,24 +15,18 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import RegText from '../Components/RegText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type AboutProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.About>;
+type StakingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Staking>;
 
-const About: React.FunctionComponent<AboutProps> = ({
+const Staking: React.FunctionComponent<StakingProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { zingolibVersion, translate, snackbars, removeFirstSnackbar } = context;
+  const { snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.About;
 
   const insets = useSafeAreaInsets();
-
-  const arrayTxtObject = translate('about.copyright');
-  let arrayTxt: string[] = [];
-  if (typeof arrayTxtObject === 'object') {
-    arrayTxt = arrayTxtObject as string[];
-  }
 
   return (
     <ToastProvider>
@@ -90,21 +82,12 @@ const About: React.FunctionComponent<AboutProps> = ({
             justifyContent: 'center',
         }}>
 
-          <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>About</RegText>
+          <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>Staking</RegText>
 
-          <FadeText style={{ marginTop: 20 }}>{arrayTxt[0]}</FadeText>
-          <DetailLine label={translate('info.zingolib') as string} value={zingolibVersion} screenName={screenName} />
-          <View style={{ marginTop: 20 }}>
-            {arrayTxt.map((txt: string, ind: number) => (
-              <View key={txt.substring(0, 10)}>
-                {ind !== 0 && <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>}
-              </View>
-            ))}
-          </View>
         </View>
       </ScrollView>
     </ToastProvider>
   );
 };
 
-export default About;
+export default Staking;

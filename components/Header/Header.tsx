@@ -227,7 +227,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               marginTop: 10,
               borderRadius: 3,
             }}>
-            {netInfo.isConnected && !syncInProgress && (
+            {netInfo.isConnected && !(percentageOutputsScanned === 0) && (
               <>
                 <View
                   style={{
@@ -248,7 +248,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 />
               </>
             )}
-            {netInfo.isConnected && syncInProgress && (
+            {netInfo.isConnected && percentageOutputsScanned === 0 && (
               <View
                 style={{
                   height: 5,
@@ -572,7 +572,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
                 }
               } else {
-                navigation.navigate(RouteEnum.Settings);
+                navigation.navigate(RouteEnum.SettingsMenu);
               }
             }}>
             <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />

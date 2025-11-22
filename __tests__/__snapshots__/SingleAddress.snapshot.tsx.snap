@@ -27,6 +27,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
         style={
           {
             "backgroundColor": "#c3c3c3",
+            "borderRadius": 15,
             "marginHorizontal": 20,
             "marginTop": 20,
             "padding": 10,

@@ -94,13 +94,17 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
             {translate('loadedapp.about') as string}
           </RegText>
 
+          <RegText testID="menu.settings" onPress={() => onItemSelectedWrapper(MenuItemEnum.Settings)} style={item}>
+            {translate('loadedapp.settings') as string}
+          </RegText>
+
           {mode !== ModeEnum.basic && selectIndexerServer !== SelectServerEnum.offline && (
             <RegText testID="menu.info" onPress={() => onItemSelectedWrapper(MenuItemEnum.Info)} style={item}>
               {translate('loadedapp.info') as string}
             </RegText>
           )}
 
-          {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal === 0) && (
+          {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal === 0) && false && (
             <RegText
               testID="menu.walletseedufvk"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.WalletSeedUfvk)}
@@ -121,7 +125,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
             </RegText>
           )}
 
-          {mode !== ModeEnum.basic && selectIndexerServer !== SelectServerEnum.offline && (
+          {mode !== ModeEnum.basic && selectIndexerServer !== SelectServerEnum.offline && false && (
             <RegText
               testID="menu.syncreport"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.SyncReport)}
@@ -139,12 +143,6 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
             </RegText>
           )}
 
-          {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal === 0) && (
-            <RegText testID="menu.insight" onPress={() => onItemSelectedWrapper(MenuItemEnum.Insight)} style={item}>
-              {translate('loadedapp.insight') as string}
-            </RegText>
-          )}
-
           {mode !== ModeEnum.basic && netInfo.isConnected && selectIndexerServer !== SelectServerEnum.offline && (
             <RegText
               testID="menu.changewallet"
@@ -154,7 +152,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
             </RegText>
           )}
 
-          {mode !== ModeEnum.basic && (
+          {mode !== ModeEnum.basic && false && (
             <RegText
               testID="menu.restorebackupwallet"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.RestoreWalletBackup)}
@@ -174,7 +172,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
                 {translate('loadedapp.loadwalletfromseed-basic') as string}
               </RegText>
             )}
-          {mode === ModeEnum.basic && !readOnly && selectIndexerServer !== SelectServerEnum.offline && (
+          {mode === ModeEnum.basic && !readOnly && selectIndexerServer !== SelectServerEnum.offline && false && (
             <RegText
               testID="menu.tipzingolabs"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.TipZingoLabs)}
@@ -182,7 +180,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
               {translate('loadedapp.tipzingolabs-basic') as string}
             </RegText>
           )}
-          {mode !== ModeEnum.basic && !readOnly && selectIndexerServer !== SelectServerEnum.offline && (
+          {mode !== ModeEnum.basic && !readOnly && selectIndexerServer !== SelectServerEnum.offline && false && (
             <RegText
               testID="menu.votefornym"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.VoteForNym)}

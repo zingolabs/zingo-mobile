@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { View, ScrollView, ActivityIndicator, Platform, TouchableOpacity } from 'react-native';
 
 import FadeText from '../../Components/FadeText';
 import BoldText from '../../Components/BoldText';
@@ -10,7 +10,6 @@ import CurrencyAmount from '../../Components/CurrencyAmount';
 import Button from '../../Components/Button';
 import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
-import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
 import simpleBiometrics from '../../../app/simpleBiometrics';
 
@@ -31,6 +30,9 @@ import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
 type ConfirmProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Confirm>;
 
@@ -58,6 +60,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.Confirm;
+
+  const insets = useSafeAreaInsets();
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
@@ -280,37 +284,54 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         screenName={screenName}
       />
 
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}>
-        <Header
-          title={translate('send.confirm-title') as string}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-          closeScreen={() => {
-            clear();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
-        />
-        <ScrollView
-          showsVerticalScrollIndicator={true}
-          persistentScrollbar={true}
-          indicatorStyle={'white'}
-          testID="send.confirm.scroll-view"
-          style={{ height: '80%', maxHeight: '80%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
+      <View style={{
+        position: 'absolute',
+        width: 75,
+        top: 10,
+        left: 10,
+        zIndex: 999,
+      }}>
+        <View
+          style={{
+            borderRadius: 25,
+            borderColor: colors.text,
+            borderWidth: 1,
+            padding: 10,
+            margin: 10,
+            backgroundColor: colors.background,
           }}>
+            <TouchableOpacity onPress={() => {
+              clear();
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
+            }}>
+              <FontAwesomeIcon
+                size={30}
+                icon={faChevronLeft}
+                color={colors.text}
+              />
+            </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 8,
+          paddingHorizontal: 16,
+      }}>
+        <View
+          style={{
+            flexGrow: 1,
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+        }}>
+
+          <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>Confirm Send</RegText>
+
           <View
             style={{
               display: 'flex',
@@ -420,24 +441,21 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             );
           })}
           <View style={{ marginBottom: 30 }} />
-        </ScrollView>
-
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-          }}>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-            <Button
-              type={ButtonTypeEnum.Primary}
-              title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
-              onPress={async () => await confirmSendBiometrics()}
-            />
-          </View>
         </View>
+      </ScrollView>
+      <View
+        style={{
+          marginTop: 'auto',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingTop: 10,
+          paddingBottom: 20,
+        }}>
+        <Button
+          type={ButtonTypeEnum.Primary}
+          title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
+          onPress={async () => await confirmSendBiometrics()}
+        />
       </View>
     </ToastProvider>
   );

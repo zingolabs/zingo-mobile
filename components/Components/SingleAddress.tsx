@@ -152,7 +152,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               </View>
             )}
 
-            <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text }}>
+            <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text, borderRadius: 15 }}>
               <QRCode
                 value={address ? address.address : ''}
                 size={200}

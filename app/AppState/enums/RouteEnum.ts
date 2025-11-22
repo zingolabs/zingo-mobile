@@ -3,8 +3,10 @@ export enum RouteEnum {
   LoadingApp = 'LoadingApp',
   LoadedApp = 'LoadedApp',
 
+  Servers = 'Servers',
+  Staking = 'Staking',
+
   // Drawer no params
-  HomeStack = 'HomeStack',
   History = 'History',
   Send = 'Send',
   Receive = 'Receive',
@@ -14,6 +16,7 @@ export enum RouteEnum {
   ConfirmStack = 'ConfirmStack',
   InsightStack = 'InsightStack',
   Settings = 'Settings',
+  SettingsMenu = 'SettingsMenu',
   About = 'About',
   Rescan = 'Rescan',
   Info = 'Info',

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -8,13 +8,15 @@ import DetailLine from '../Components/DetailLine';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
-import Header from '../Header';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import RegText from '../Components/RegText';
 import { ChainNameEnum, CurrencyEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type InfoProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Info>;
 
@@ -36,6 +38,8 @@ const Info: React.FunctionComponent<InfoProps> = ({
   const { clear } = useToast();
   const screenName = ScreenEnum.Info;
 
+  const insets = useSafeAreaInsets();
+
   return (
     <ToastProvider>
       <Snackbars
@@ -44,34 +48,55 @@ const Info: React.FunctionComponent<InfoProps> = ({
         screenName={screenName}
       />
 
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}>
-        <Header
-          title={translate('info.title') as string}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-          closeScreen={() => {
-            clear();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
-        />
-        <ScrollView
-          style={{ maxHeight: '90%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
+      <View style={{
+        position: 'absolute',
+        width: 75,
+        top: 10,
+        left: 10,
+        zIndex: 999,
+      }}>
+        <View
+          style={{
+            borderRadius: 25,
+            borderColor: colors.text,
+            borderWidth: 1,
+            padding: 10,
+            margin: 10,
+            backgroundColor: colors.background,
           }}>
-          <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
+            <TouchableOpacity onPress={() => {
+              clear();
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
+            }}>
+              <FontAwesomeIcon
+                size={30}
+                icon={faChevronLeft}
+                color={colors.text}
+              />
+            </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 8,
+          paddingHorizontal: 16,
+      }}>
+        <View
+          style={{
+            flexGrow: 1,
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+        }}>
+
+          <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>Server Info</RegText>
+
+          <View style={{ display: 'flex', margin: 20 }}>
             <DetailLine
               label={translate('info.version') as string}
               value={translate('zingodelegator') + ' ' + translate('version')}
@@ -116,8 +141,8 @@ const Info: React.FunctionComponent<InfoProps> = ({
               </View>
             )}
           </View>
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
     </ToastProvider>
   );
 };

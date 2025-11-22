@@ -219,9 +219,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    navigation.navigate(RouteEnum.HomeStack, {
-                      screen: RouteEnum.Send,
-                    });
+                    navigation.navigate(RouteEnum.Send);
                     closeAllSwipeables();
                   }}>
                   <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />

@@ -12,7 +12,6 @@ import {
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
-import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
 
@@ -106,7 +105,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency); // by default none because of cTAZ
   const [indexerServer, setIndexerServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [selectIndexerServer, setSelectIndexerServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
-  const [sendAll, setSendAll] = useState<boolean>(false);
+  const [sendAll, setSendAll] = useState<boolean>(true);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
@@ -122,9 +121,8 @@ export default function LoadingApp(props: LoadingAppProps) {
     changeWalletScreen: false,
     restoreWalletBackupScreen: false,
   });
-  const [rescanMenu, setRescanMenu] = useState<boolean>(false);
-  // by default the App store the seed phrase & birthday on KeyChain/KeyStore (Device).
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(true);
+  const [rescanMenu, setRescanMenu] = useState<boolean>(true);
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const file = useMemo(
     () => ({
@@ -145,7 +143,10 @@ export default function LoadingApp(props: LoadingAppProps) {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
-      const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
+      // only en
+      //const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
+
+      const { languageTag, isRTL } = { languageTag: LanguageEnum.en, isRTL: false };
 
       // update layout direction
       I18nManager.forceRTL(isRTL);
@@ -440,11 +441,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     const has = await hasRecoveryWalletInfo();
     this.setState({ hasRecoveryWalletInfoSaved: has });
 
-    // First, check servers (lightwallet & validator)
+    // First, check servers (only indexer server)
     // valid scenarios:
     // 1. server with uri & select server custom
     // 2. server with no uri & select server offline
-    if (!this.state.indexerServer.uri && this.state.selectIndexerServer === SelectServerEnum.custom) {
+    if ((!this.state.indexerServer.uri && this.state.selectIndexerServer === SelectServerEnum.custom) || 
+        (this.state.screen === 0.5 && !this.state.startingApp)) {
       this.setState({
         screen: 0.5,
         actionButtonsDisabled: false,
@@ -873,9 +875,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   };
   
   closeServers = () => {
+    // the app can have a wallet file already...
     this.setState({ 
-      screen: 1,
+      screen: 0,
     });
+    this.componentDidMount();
   };
 
   checkIndexerServer = async () => {

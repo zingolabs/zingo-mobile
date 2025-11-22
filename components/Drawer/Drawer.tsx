@@ -40,6 +40,7 @@ function Drawer({ onMenuItemSelected, screenName, initialRouteName, children }: 
       screenOptions={{
         headerShown: false,
         drawerType: 'slide',
+        swipeEnabled: false,
       }}>
       {children}
     </SideBar.Navigator>

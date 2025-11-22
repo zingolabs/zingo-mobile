@@ -651,9 +651,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       // the app send successfully on the first attemp.
 
-      navigation.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.History,
-      });
+      navigation.navigate(RouteEnum.History);
       return;
     } catch (err1) {
       error = err1 as string;
@@ -704,9 +702,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           );
           // the app send successfully on the second attemp.
 
-          navigation.navigate(RouteEnum.HomeStack, {
-            screen: RouteEnum.History,
-          });
+          navigation.navigate(RouteEnum.History);
           return;
         } catch (err2) {
           error = err2 as string;
@@ -733,9 +729,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
     }, 1 * 1000);
 
-    navigation.navigate(RouteEnum.HomeStack, {
-      screen: RouteEnum.History,
-    });
+    navigation.navigate(RouteEnum.History);
   };
 
   const interceptCustomError = (error: string) => {

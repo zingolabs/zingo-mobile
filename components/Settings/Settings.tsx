@@ -12,7 +12,7 @@ import {
 
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { IconDefinition, faDotCircle } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faChevronLeft, faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
 import RegText from '../Components/RegText';
@@ -23,7 +23,6 @@ import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 
-import Header from '../Header';
 import {
   LanguageEnum,
   SecurityType,
@@ -49,6 +48,7 @@ import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevel
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type SettingsProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Settings> & {
   setServerOption: (
@@ -88,7 +88,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setRescanMenuOption,
   setRecoveryWalletInfoOnDeviceOption,
   setPerformanceLevelOption,
-  toggleMenuDrawer,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -213,6 +212,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [hasRecoveryWalletInfoSaved, setHasRecoveryWalletInfoSaved] = useState<boolean>(false);
   const [storageRecoveryWalletInfo, setStorageRecoveryWalletInfo] = useState<string>('');
   const [showDeveloperOptions, setShowDeveloperOptions] = useState<boolean>(false);
+  const [kbOpen, setKbOpen] = React.useState(false);
+
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
+    const s2 = Keyboard.addListener('keyboardDidHide', () => setKbOpen(false));
+    return () => { s1.remove(); s2.remove(); };
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -558,7 +566,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
       setPerformanceLevel(performanceLevelContext);
     }
-    navigation.navigate(RouteEnum.HomeStack);
+    navigation.navigate(RouteEnum.History);
   };
 
   const optionsRadio = (
@@ -657,40 +665,61 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       />
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
-        style={{
-          flex: 1,
+        style={{ 
+          flex: 1, 
           backgroundColor: colors.background,
         }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0}
       >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: colors.background,
-          }}>
-          <Header
-            title={translate('settings.title') as string}
-            screenName={screenName}
-            noBalance={true}
-            noSyncingStatus={true}
-            toggleMenuDrawer={toggleMenuDrawer}
-            noPrivacy={true}
-            closeScreen={() => {
-              if (!disabled) {
-                navigateToHome(true);
-              }
-            }}
-          />
-          <ScrollView
-            keyboardShouldPersistTaps="handled"
-            testID="settings.scroll-view"
-            style={{ height: '80%', maxHeight: '80%' }}
-            contentContainerStyle={{
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              justifyContent: 'flex-start',
+
+        <View style={{
+          position: 'absolute',
+          width: 75,
+          top: 10,
+          left: 10,
+          zIndex: 999,
+        }}>
+          <View
+            style={{
+              borderRadius: 25,
+              borderColor: colors.text,
+              borderWidth: 1,
+              padding: 10,
+              margin: 10,
+              backgroundColor: colors.background,
             }}>
+              <TouchableOpacity onPress={() => {
+                if (!disabled) {
+                  navigateToHome(true);
+                }
+              }}>
+                <FontAwesomeIcon
+                  size={30}
+                  icon={faChevronLeft}
+                  color={colors.text}
+                />
+              </TouchableOpacity>
+          </View>
+        </View>
+
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingTop: insets.top + 8,
+            paddingBottom: insets.bottom + 8,
+            paddingHorizontal: 16,
+        }}>
+          <View
+            style={{
+              flexGrow: 1,
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+          }}>
+
+            <RegText color={colors.text} style={{ fontSize: 25, alignSelf: 'center' }}>Settings</RegText>
+
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.mode-title') as string}</BoldText>
             </View>
@@ -1149,29 +1178,29 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 )}
               </>
             )}
-          </ScrollView>
-          <View
-            style={{
-              flexGrow: 1,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginVertical: 5,
-            }}>
-            <Button
-              testID="settings.button.save"
-              disabled={disabled || disabledButton}
-              type={ButtonTypeEnum.Primary}
-              title={translate('settings.save') as string}
-              onPress={() => {
-                // waiting while closing the keyboard, just in case.
-                setTimeout(async () => {
-                  await saveSettings();
-                  Keyboard.dismiss();
-                }, 100);
-              }}
-            />
           </View>
+        </ScrollView>
+        <View
+          style={{
+            marginTop: 'auto',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: 10,
+            paddingBottom: 20,
+          }}>
+          <Button
+            testID="settings.button.save"
+            disabled={disabled || disabledButton}
+            type={ButtonTypeEnum.Primary}
+            title={translate('settings.save') as string}
+            onPress={() => {
+              // waiting while closing the keyboard, just in case.
+              setTimeout(async () => {
+                await saveSettings();
+                Keyboard.dismiss();
+              }, 100);
+            }}
+          />
         </View>
       </KeyboardAvoidingView>
     </ToastProvider>
