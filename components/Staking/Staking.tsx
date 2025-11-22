@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -11,9 +11,10 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faHome, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import RegText from '../Components/RegText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FadeText from '../Components/FadeText';
 
 type StakingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Staking>;
 
@@ -27,6 +28,10 @@ const Staking: React.FunctionComponent<StakingProps> = ({
   const screenName = ScreenEnum.About;
 
   const insets = useSafeAreaInsets();
+
+  const goHome = () => {
+    navigation.navigate(RouteEnum.History);
+  };
 
   return (
     <ToastProvider>
@@ -86,6 +91,59 @@ const Staking: React.FunctionComponent<StakingProps> = ({
 
         </View>
       </ScrollView>
+      <View 
+        style={{
+          position: 'absolute',
+          bottom: 30,
+          flexDirection: 'row',
+          alignSelf: 'center',
+          gap: 10,
+      }}>
+        <Pressable
+          onPress={goHome}
+          disabled={false}
+          style={({ pressed }) => ({
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 25,
+            paddingVertical: 10,
+            backgroundColor: colors.secondary,
+            borderRadius: 50,
+            transform: [{ scale: pressed ? 0.9 : 1 }],
+            borderWidth: 1,
+            borderColor: colors.zingo,
+          })}>
+          <FontAwesomeIcon
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+            size={20}
+            icon={faHome}
+            color={colors.zingo}
+          />
+          <FadeText style={{ color: colors.zingo, fontSize: 12, opacity: 1 }}>Home</FadeText>
+        </Pressable>
+        <Pressable
+          onPress={() => {}}
+          disabled={true}
+          style={({ pressed }) => ({
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 25,
+            paddingVertical: 10,
+            backgroundColor: colors.secondary,
+            borderRadius: 50,
+            transform: [{ scale: pressed ? 0.9 : 1 }],
+            borderWidth: 1,
+            borderColor: colors.zingo,
+          })}>
+          <FontAwesomeIcon
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+            size={20}
+            icon={faLayerGroup}
+            color={colors.primary}
+          />
+          <FadeText style={{ color: colors.primary, fontSize: 12, opacity: 1 }}>Staking</FadeText>
+        </Pressable>
+      </View>
     </ToastProvider>
   );
 };

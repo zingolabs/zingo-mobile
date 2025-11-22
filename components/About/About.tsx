@@ -93,6 +93,7 @@ const About: React.FunctionComponent<AboutProps> = ({
           <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>About</RegText>
 
           <FadeText style={{ marginTop: 20 }}>{arrayTxt[0]}</FadeText>
+          <DetailLine label={'Zingo Delegator Version'} value={translate('version') as string} screenName={screenName} />
           <DetailLine label={translate('info.zingolib') as string} value={zingolibVersion} screenName={screenName} />
           <View style={{ marginTop: 20 }}>
             {arrayTxt.map((txt: string, ind: number) => (

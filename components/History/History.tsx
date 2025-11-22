@@ -398,8 +398,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'flex-start',
-                              marginTop: 20,
-                              marginBottom: 60,
+                              marginTop: 5,
+                              marginBottom: 100,
                             }}>
                             <Button
                               type={ButtonTypeEnum.Secondary}
@@ -412,16 +412,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             {!!valueTransfersSliced && !!valueTransfersSliced.length && (
                               <View
                                 style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'flex-start',
-                                  marginTop: 20,
-                                  marginBottom: 60,
-                                }}>
-                                <FadeText style={{ color: colors.primary }}>
-                                  {translate('history.end') as string}
-                                </FadeText>
-                              </View>
+                                  marginBottom: 90,
+                                }} />
                             )}
                           </>
                         )}
@@ -466,63 +458,61 @@ const History: React.FunctionComponent<HistoryProps> = ({
                 />
               </Pressable>
             )}
-            <View 
-              style={{
-                position: 'absolute',
-                bottom: 30,
-                flexDirection: 'row',
-                alignSelf: 'center',
-                gap: 10,
-            }}>
-              <Pressable
-                onPress={() => {}}
-                disabled={true}
-                style={({ pressed }) => ({
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  paddingHorizontal: 25,
-                  paddingVertical: 10,
-                  backgroundColor: colors.sideMenuBackground,
-                  borderRadius: 50,
-                  transform: [{ scale: pressed ? 0.9 : 1 }],
-                  borderWidth: 1,
-                  borderColor: colors.zingo,
-                  opacity: isScrollingToTop ? 0.5 : 1,
-                })}>
-                <FontAwesomeIcon
-                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={20}
-                  icon={faHome}
-                  color={colors.primary}
-                />
-                <FadeText style={{ color: colors.primary, fontSize: 12, opacity: 1 }}>Home</FadeText>
-              </Pressable>
-                <Pressable
-                onPress={goStaking}
-                disabled={false}
-                style={({ pressed }) => ({
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  paddingHorizontal: 25,
-                  paddingVertical: 10,
-                  backgroundColor: colors.sideMenuBackground,
-                  borderRadius: 50,
-                  transform: [{ scale: pressed ? 0.9 : 1 }],
-                  borderWidth: 1,
-                  borderColor: colors.zingo,
-                  opacity: isScrollingToTop ? 0.5 : 1,
-                })}>
-                <FontAwesomeIcon
-                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={20}
-                  icon={faLayerGroup}
-                  color={colors.zingo}
-                />
-                <FadeText style={{ color: colors.zingo, fontSize: 12, opacity: 1 }}>Staking</FadeText>
-              </Pressable>
-            </View>
           </>
         )}
+        <View 
+          style={{
+            position: 'absolute',
+            bottom: 30,
+            flexDirection: 'row',
+            alignSelf: 'center',
+            gap: 10,
+        }}>
+          <Pressable
+            onPress={() => {}}
+            disabled={true}
+            style={({ pressed }) => ({
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingHorizontal: 25,
+              paddingVertical: 10,
+              backgroundColor: colors.sideMenuBackground,
+              borderRadius: 50,
+              transform: [{ scale: pressed ? 0.9 : 1 }],
+              borderWidth: 1,
+              borderColor: colors.zingo,
+            })}>
+            <FontAwesomeIcon
+              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+              size={20}
+              icon={faHome}
+              color={colors.primary}
+            />
+            <FadeText style={{ color: colors.primary, fontSize: 12, opacity: 1 }}>Home</FadeText>
+          </Pressable>
+          <Pressable
+            onPress={goStaking}
+            disabled={false}
+            style={({ pressed }) => ({
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingHorizontal: 25,
+              paddingVertical: 10,
+              backgroundColor: colors.sideMenuBackground,
+              borderRadius: 50,
+              transform: [{ scale: pressed ? 0.9 : 1 }],
+              borderWidth: 1,
+              borderColor: colors.zingo,
+            })}>
+            <FontAwesomeIcon
+              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+              size={20}
+              icon={faLayerGroup}
+              color={colors.zingo}
+            />
+            <FadeText style={{ color: colors.zingo, fontSize: 12, opacity: 1 }}>Staking</FadeText>
+          </Pressable>
+        </View>
       </View>
     </ToastProvider>
   );
