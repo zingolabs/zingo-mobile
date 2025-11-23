@@ -45,10 +45,4 @@ jobs:
 
       - name: Create cache key
         id: create-cache-key
-        run: |
-          echo "cache-key=${{ hashFiles(
-            'rust/**/Cargo.toml',
-            'rust/**/Cargo.lock',
-            'rust/**/*.rs',
-            'rust/cargo_version.txt'
-          ) }}" >> $GITHUB_OUTPUT
+        run: echo "cache-key=${{ hashFiles('rust/Cargo.lock', 'rust/cargo_version.txt') }}" >> $GITHUB_OUTPUT
