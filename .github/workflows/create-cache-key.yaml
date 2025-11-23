@@ -37,8 +37,11 @@ jobs:
           cd rust
           sudo cargo update -p zingolib -p regchest_utils --aggressive
 
+      - name: Setting cargo
+        run: rustup default stable
+
       - name: Store Cargo version
-        run: sudo echo $(cargo --version) >> rust/cargo_version.txt
+        run: echo $(cargo --version) >> rust/cargo_version.txt
 
       - name: Create cache key
         id: create-cache-key
