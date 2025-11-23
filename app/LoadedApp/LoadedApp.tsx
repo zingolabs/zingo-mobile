@@ -137,7 +137,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [security, setSecurity] = useState<SecurityType>({
-    startApp: true, // activate only this
+    startApp: false,
     foregroundApp: false,
     sendConfirm: false,
     seedUfvkScreen: false,
