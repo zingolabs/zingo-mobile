@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { View, ScrollView } from 'react-native';
+import { View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ToastProvider } from 'react-native-toastier';
 
 import { createNativeBottomTabNavigator } from '@bottom-tabs/react-navigation';
@@ -12,6 +11,7 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import { RouteEnum } from '../../app/AppState';
+import LiquidPrimaryButton from './LiquidPrimaryButton';
 
 type StakingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Staking>;
 
@@ -25,34 +25,29 @@ const Tab = createNativeBottomTabNavigator<StakingTabParamList>();
 const StakingScreen: React.FC<StakingProps> = () => {
   const { colors } = useTheme() as ThemeType;
 
-  const insets = useSafeAreaInsets();
-
   return (
     <>
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
+      <View
+        style={{
           flexGrow: 1,
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom,
-          paddingHorizontal: 16,
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        <View
-          style={{
-            flexGrow: 1,
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-          }}
+        <RegText
+          color={colors.text}
+          style={{ fontSize: 30, alignSelf: 'center', marginBottom: 20 }}
         >
-          <RegText
-            color={colors.text}
-            style={{ fontSize: 30, alignSelf: 'center' }}
-          >
-            Staking
-          </RegText>
-        </View>
-      </ScrollView>
+          Staking
+        </RegText>
+        <LiquidPrimaryButton
+          title="Accept"
+          tintColor={colors.primary}
+          onPress={() => {
+            console.log('hey');
+          }}
+        />
+      </View>
     </>
   );
 };
@@ -86,12 +81,16 @@ const StakingTabs: React.FC<StakingProps> = props => {
           component={StakingHomeTab}
           options={{
             title: 'Home',
+            tabBarIcon: () => ({ sfSymbol: 'house' }),
+            tabBarActiveTintColor: colors.primary,
           }}
         />
         <Tab.Screen
           name="Staking"
           options={{
             title: 'Staking',
+            tabBarIcon: () => ({ sfSymbol: 'square.stack.3d.up.fill' }),
+            tabBarActiveTintColor: colors.primary,
           }}
         >
           {() => <StakingScreen {...props} />}
