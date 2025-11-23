@@ -41,8 +41,10 @@ jobs:
         run: rustup default stable
 
       - name: Store Cargo version
-        run: echo $(cargo --version) >> rust/cargo_version.txt
+        working-directory: rust
+        run: echo $(cargo --version) >> cargo_version.txt
 
       - name: Create cache key
+        working-directory: rust
         id: create-cache-key
-        run: echo "cache-key=${{ hashFiles('rust/Cargo.lock', 'rust/cargo_version.txt') }}" >> $GITHUB_OUTPUT
+        run: echo "cache-key=${{ hashFiles('Cargo.lock', 'cargo_version.txt') }}" >> $GITHUB_OUTPUT
