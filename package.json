@@ -20,6 +20,8 @@
     "cargo:clean": "cd rust && cargo clean && cd .."
   },
   "dependencies": {
+    "@bottom-tabs/react-navigation": "^1.0.2",
+    "@callstack/liquid-glass": "^0.6.0",
     "@fortawesome/fontawesome-svg-core": "^7.0.1",
     "@fortawesome/free-regular-svg-icons": "^7.0.1",
     "@fortawesome/free-solid-svg-icons": "^7.0.1",
@@ -47,6 +49,7 @@
     "react": "19.1.0",
     "react-native": "0.81.4",
     "react-native-biometrics": "^3.0.1",
+    "react-native-bottom-tabs": "^1.0.2",
     "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-context-menu-view": "^1.20.0",
     "react-native-device-info": "^14.1.1",
