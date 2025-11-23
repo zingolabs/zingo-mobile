@@ -56,7 +56,7 @@ class MainApplication : Application(), ReactApplication {
         }
 
         init {
-            System.loadLibrary("uniffi_zingo")
+            System.loadLibrary("zingo")
         }
     }
 }

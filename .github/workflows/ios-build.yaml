@@ -81,7 +81,7 @@ jobs:
         working-directory: rust/lib
         run: |
           sudo cargo run --features=uniffi/cli --release --bin uniffi-bindgen \
-          generate ./src/zingo.udl --language swift \
+          generate --library ../target/aarch64-apple-ios-sim/release/libzingo.dylib --language swift \
           --out-dir ./Generated
 
       - name: Install Cargo Lipo

@@ -586,7 +586,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZingoDelegator/ZingoDelegator.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEPLOYMENT_POSTPROCESSING = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				INFOPLIST_FILE = ZingoDelegator/Info.plist;
@@ -628,7 +628,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZingoDelegator/ZingoDelegator.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEPLOYMENT_POSTPROCESSING = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				INFOPLIST_FILE = ZingoDelegator/Info.plist;
