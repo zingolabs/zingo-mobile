@@ -81,7 +81,7 @@ jobs:
         working-directory: rust/lib
         run: |
           sudo cargo run --features=uniffi/cli --release --bin uniffi-bindgen \
-          generate ./src/zingo.udl --language swift \
+          generate --library ../target/aarch64-apple-ios-sim/release/libzingo.dylib --language swift \
           --out-dir ./Generated
 
       - name: Install Cargo Lipo
@@ -112,7 +112,7 @@ jobs:
       - name: Copy libraries to ios folder
         working-directory: rust/lib
         run: |
-          sudo cp ../target/universal/release/libzingo.a ./Generated/libuniffi_zingo.a
+          sudo cp ../target/universal/release/libzingo.a ./Generated/libzingo.a
 
       - name: Upload native rust
         uses: actions/upload-artifact@v4
@@ -145,4 +145,3 @@ jobs:
         with:
           path: rust/lib/Generated
           key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
-

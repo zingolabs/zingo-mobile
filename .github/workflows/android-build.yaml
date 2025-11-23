@@ -108,7 +108,7 @@ jobs:
         working-directory: ./rust/lib
         run: |
           cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
-          generate ./src/zingo.udl --language kotlin \
+          generate --library ../target/aarch64-apple-ios-sim/release/libzingo.dylib --language kotlin \
           --out-dir ../../android/app/build/generated/source/uniffi/release/java
 
       - name: Upload kotlin uniffi
@@ -174,13 +174,13 @@ jobs:
 
       - name: Rename the rust lib for uniffi compatibility
         working-directory: ./rust/target/${{ env.TARGET }}/release
-        run: mv ./libzingo.so ./libuniffi_zingo.so
+        run: mv ./libzingo.so ./libzingo.so
 
       - name: Upload native rust
         uses: actions/upload-artifact@v4
         with:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
+          path: rust/target/${{ env.TARGET }}/release/libzingo.so
 
   cache-native-android-uniffi:
     name: Cache native rust

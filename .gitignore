@@ -26,7 +26,7 @@ ios/vendor/
 # Exclude compiled libs
 android/app/src/main/jniLibs
 android/app/release/
-ios/libuniffi_zingo.a
+ios/libzingo.a
 ios/zingo.swift
 ios/zingoFFI.h
 ios/zingoFFI.modulemap

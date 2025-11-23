@@ -12,13 +12,9 @@ RUN apt update \
     pkg-config libssl-dev ca-certificates
 
 # TODO: use cargo chef
+RUN cargo install cargo-binstall
 
 WORKDIR /opt/zingo/rust/lib/
-
-# Copy just the lib crate to avoid docker cache invalidation
-COPY lib/ ./
-
-COPY Cargo.lock ./Cargo.lock
 
 ENV CARGO_TARGET_DIR=/opt/zingo/rust/target
 
@@ -28,13 +24,22 @@ RUN rustup target add aarch64-apple-ios x86_64-apple-ios \
     aarch64-linux-android armv7-linux-androideabi \
     i686-linux-android x86_64-linux-android
     
-RUN cargo run --release --features uniffi/cli --bin uniffi-bindgen -- \
-    generate ./src/zingo.udl --language kotlin --out-dir ./src
+RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
 
-RUN cargo install --version 4.0.1 cargo-ndk
-RUN cargo install sccache
+RUN cargo binstall --version 4.0.1 cargo-ndk
+RUN cargo binstall sccache
 
 ENV PATH="/root/.cargo/bin:/usr/local/cargo/bin:${PATH}"
+
+# Copy just the lib crate to avoid docker cache invalidation
+COPY lib/ ./
+
+COPY Cargo.lock ./Cargo.lock
+
+RUN cargo build --release
+
+RUN cargo run --release --features uniffi/cli --bin uniffi-bindgen -- \
+    generate --library ../target/release/libzingo.so --language kotlin --out-dir ./src
 
 ENV RUSTC_WRAPPER=sccache
 ENV SCCACHE_DIR=/sccache
@@ -54,7 +59,7 @@ ENV CFLAGS_aarch64_linux_android="-mno-outline-atomics"
 ENV CXXFLAGS_aarch64_linux_android="-mno-outline-atomics"
 
 # Install the bindgen CLI binary that aws-lc-sys expects to exec.
-RUN cargo install --locked bindgen-cli
+RUN cargo binstall --locked bindgen-cli
 
 RUN cargo ndk \
   -t aarch64-linux-android \
