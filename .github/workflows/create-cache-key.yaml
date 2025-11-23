@@ -44,6 +44,12 @@ jobs:
         working-directory: rust
         run: echo $(cargo --version) >> cargo_version.txt
 
+      - name: Debug
+        working-directory: rust
+        run: |
+          pwd
+          ls -la
+
       - name: Create cache key
         working-directory: rust
         id: create-cache-key
