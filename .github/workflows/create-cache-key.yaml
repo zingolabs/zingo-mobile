@@ -15,7 +15,7 @@ jobs:
     name: Create cache key
     runs-on: macos-15
     env:
-      RUSTUP_HOME: /root/.rustup
+      RUSTUP_HOME: ${{ github.workspace }}/.rustup
     outputs:
       cache-key: ${{ steps.create-cache-key.outputs.cache-key }}
     steps:
