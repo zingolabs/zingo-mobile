@@ -3,6 +3,7 @@
 set -euo pipefail
 
 cd ../lib
+cargo build --release
 cargo run --features="uniffi/cli" --release --bin uniffi-bindgen generate --library ../target/aarch64-apple-ios-sim/release/libzingo.dylib --language swift --out-dir ./Generated
 cargo build --release --target aarch64-apple-ios --target x86_64-apple-ios
 cargo lipo --release --targets aarch64-apple-ios x86_64-apple-ios

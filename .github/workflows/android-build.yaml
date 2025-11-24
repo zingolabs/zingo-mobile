@@ -104,6 +104,9 @@ jobs:
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli
 
+      - name: Cargo build release
+        run: cargo build --release
+
       - name: Cargo uniffi kotlin
         working-directory: ./rust/lib
         run: |
