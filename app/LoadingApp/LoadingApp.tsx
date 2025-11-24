@@ -354,6 +354,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       removeFirstSnackbar: this.removeFirstSnackbar,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
+      fromSettings: false,
 
       // context settings
       indexerServer: props.indexerServer,
@@ -444,12 +445,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     // First, check servers (only indexer server)
     // valid scenarios:
     // 1. server with uri & select server custom
-    // 2. server with no uri & select server offline
+    // 2. called from settings
     if ((!this.state.indexerServer.uri && this.state.selectIndexerServer === SelectServerEnum.custom) || 
         (this.state.screen === 0.5 && !this.state.startingApp)) {
       this.setState({
         screen: 0.5,
         actionButtonsDisabled: false,
+        fromSettings: this.state.screen === 0.5 && !this.state.startingApp ? true : false,
       });
       return;
     }
@@ -1319,6 +1321,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       orchardPool,
       saplingPool,
       transparentPool,
+      fromSettings,
     } = this.state;
 
     //console.log('render loadingAppClass - 3', this.state.privacy);
@@ -1383,6 +1386,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               setIndexerServerUri={this.setIndexerServerUri}
               checkIndexerServer={this.checkIndexerServer}
               closeServers={this.closeServers}
+              fromSettings={fromSettings}
             />
           )}
           {screen === 1 && (
