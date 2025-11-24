@@ -10,7 +10,7 @@ export enum RouteEnum {
   History = 'History',
   Send = 'Send',
   Receive = 'Receive',
-  Claim = 'Claim',
+  Faucet = 'Faucet',
   Messages = 'Messages',
   ValueTransferDetailStack = 'ValueTransferDetailStack',
   ConfirmStack = 'ConfirmStack',

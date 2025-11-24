@@ -83,7 +83,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     lastError,
   } = context;
 
-  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
+  let translate: (key: string) => TranslateType,
+    netInfo: NetInfoType,
+    mode: ModeEnum,
+    privacy: boolean;
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -109,7 +112,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const opacityValue = useRef(new Animated.Value(1)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
-  const [percentageOutputsScanned, setPercentageOutputsScanned] = useState<number>(0);
+  const [percentageOutputsScanned, setPercentageOutputsScanned] =
+    useState<number>(0);
   const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
 
   useEffect(() => {
@@ -125,20 +129,30 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     } else {
       // avoiding 0.00 or 100%, minimum 0.01, maximun 99.99
       setPercentageOutputsScanned(
-        syncingStatus.percentage_total_outputs_scanned && syncingStatus.percentage_total_outputs_scanned < 0.01
+        syncingStatus.percentage_total_outputs_scanned &&
+          syncingStatus.percentage_total_outputs_scanned < 0.01
           ? 0.01
-          : syncingStatus.percentage_total_outputs_scanned && syncingStatus.percentage_total_outputs_scanned > 99.99
+          : syncingStatus.percentage_total_outputs_scanned &&
+              syncingStatus.percentage_total_outputs_scanned > 99.99
             ? 99.99
-            : Number(syncingStatus.percentage_total_outputs_scanned?.toFixed(2).replace(/\.?0+$/, '')),
+            : Number(
+                syncingStatus.percentage_total_outputs_scanned
+                  ?.toFixed(2)
+                  .replace(/\.?0+$/, ''),
+              ),
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
-        syncingStatus.scan_ranges.length > 0 &&
-        !!syncingStatus.percentage_total_outputs_scanned &&
-        syncingStatus.percentage_total_outputs_scanned < 100,
+          syncingStatus.scan_ranges.length > 0 &&
+          !!syncingStatus.percentage_total_outputs_scanned &&
+          syncingStatus.percentage_total_outputs_scanned < 100,
       );
     }
-  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
+  }, [
+    syncingStatus,
+    syncingStatus.percentage_total_outputs_scanned,
+    syncingStatus.scan_ranges,
+  ]);
 
   useEffect(() => {
     // Inicializa la animación solo una vez
@@ -179,8 +193,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncInProgress, noSyncingStatus]);
 
-  console.log('Render header', percentageOutputsScanned);
-
   return (
     <>
       <View>
@@ -193,8 +205,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             backgroundColor: colors.card,
             paddingTop: 10,
             minHeight: !noDrawMenu ? 60 : 25,
-          }}>
-
+          }}
+        >
           {!noBalance && (
             <View
               style={{
@@ -202,16 +214,19 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: 0,
-              }}>
+              }}
+            >
               <ZecAmount
                 currencyName={info.currencyName}
                 color={colors.text}
                 size={36}
-                amtZec={totalBalance
-                  ? totalBalance.totalOrchardBalance +
-                    totalBalance.totalSaplingBalance +
-                    totalBalance.totalTransparentBalance
-                  : 0}
+                amtZec={
+                  totalBalance
+                    ? totalBalance.totalOrchardBalance +
+                      totalBalance.totalSaplingBalance +
+                      totalBalance.totalTransparentBalance
+                    : 0
+                }
                 privacy={privacy}
                 smallPrefix={true}
               />
@@ -226,7 +241,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               height: 5,
               marginTop: 10,
               borderRadius: 3,
-            }}>
+            }}
+          >
             {netInfo.isConnected && !(percentageOutputsScanned === 0) && (
               <>
                 <View
@@ -259,7 +275,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               />
             )}
           </View>
-          
+
           <View
             style={{
               display: 'flex',
@@ -269,136 +285,165 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               flexWrap: 'wrap',
               marginTop: 0,
               marginHorizontal: 5,
-            }}>
-            {!noSyncingStatus && selectIndexerServer !== SelectServerEnum.offline && (
-              <View style={{ minHeight: 29, flexDirection: 'row' }}>
-                {netInfo.isConnected && !(percentageOutputsScanned === 0) ? (
-                  <>
-                    {!syncInProgress && (
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          margin: 0,
-                          marginHorizontal: 2.5,
-                          padding: 1,
-                          minWidth: 25,
-                          minHeight: 25,
-                        }}>
+            }}
+          >
+            {!noSyncingStatus &&
+              selectIndexerServer !== SelectServerEnum.offline && (
+                <View style={{ minHeight: 29, flexDirection: 'row' }}>
+                  {netInfo.isConnected && !(percentageOutputsScanned === 0) ? (
+                    <>
+                      {!syncInProgress && (
                         <View
-                          testID="header.checkicon"
                           style={{
-                            flexDirection: 'row',
-                            justifyContent: 'center',
                             alignItems: 'center',
-                            padding: 3,
-                          }}>
-                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{translate('synced') as string}</FadeText>
-                        </View>
-                      </View>
-                    )}
-                    {syncInProgress && (
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          margin: 0,
-                          marginHorizontal: 2.5,
-                          padding: 1,
-                          minWidth: 25,
-                          minHeight: 25,
-                        }}>
-                        <Animated.View
-                          style={{
-                            opacity: opacityValue,
-                            flexDirection: 'row',
                             justifyContent: 'center',
-                            alignItems: 'center',
-                            padding: 3,
-                          }}>
-                          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{translate('syncing') as string}</FadeText>
-                            {percentageOutputsScanned > 0 && (
-                              <>
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}
-                                </FadeText>
-                              </>
-                            )}
-                          </View>
-                        </Animated.View>
-                      </View>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {netInfo.isConnected && (
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          margin: 0,
-                          marginHorizontal: 2.5,
-                          padding: 1,
-                          minWidth: 25,
-                          minHeight: 25,
-                        }}>
-                        <TouchableOpacity onPress={() => {
-                            navigation.navigate(RouteEnum.SyncReport);
+                            margin: 0,
+                            marginHorizontal: 2.5,
+                            padding: 1,
+                            minWidth: 25,
+                            minHeight: 25,
                           }}
                         >
                           <View
-                            testID="header.wifiicon"
+                            testID="header.checkicon"
                             style={{
                               flexDirection: 'row',
                               justifyContent: 'center',
                               alignItems: 'center',
                               padding: 3,
-                            }}>
+                            }}
+                          >
                             <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
-                              {translate('connecting') as string}
+                              {translate('synced') as string}
                             </FadeText>
                           </View>
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                  </>
-                )}
-                {(!netInfo.isConnected ||
-                  netInfo.type === NetInfoStateType.cellular ||
-                  netInfo.isConnectionExpensive) && false && (
-                  <View
-                    style={{
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: 0,
-                      marginHorizontal: 2.5,
-                      padding: 0,
-                      minWidth: 25,
-                      minHeight: 25,
-                    }}>
-                    {mode === ModeEnum.basic ? (
-                      <FontAwesomeIcon
-                        icon={faCloudDownload}
-                        color={!netInfo.isConnected ? 'red' : 'yellow'}
-                        size={20}
-                      />
-                    ) : (
-                      <TouchableOpacity onPress={() => {
-                          navigation.navigate(RouteEnum.SyncReport);
+                        </View>
+                      )}
+                      {syncInProgress && (
+                        <View
+                          style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: 0,
+                            marginHorizontal: 2.5,
+                            padding: 1,
+                            minWidth: 25,
+                            minHeight: 25,
+                          }}
+                        >
+                          <Animated.View
+                            style={{
+                              opacity: opacityValue,
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              padding: 3,
+                            }}
+                          >
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                                {translate('syncing') as string}
+                              </FadeText>
+                              {percentageOutputsScanned > 0 && (
+                                <>
+                                  <FadeText
+                                    style={{ fontSize: 10, marginLeft: 2 }}
+                                  >
+                                    {' - '}
+                                  </FadeText>
+                                  <FadeText
+                                    style={{ fontSize: 10, marginLeft: 2 }}
+                                  >
+                                    {` ${percentageOutputsScanned}%`}
+                                  </FadeText>
+                                </>
+                              )}
+                            </View>
+                          </Animated.View>
+                        </View>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {netInfo.isConnected && (
+                        <View
+                          style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: 0,
+                            marginHorizontal: 2.5,
+                            padding: 1,
+                            minWidth: 25,
+                            minHeight: 25,
+                          }}
+                        >
+                          <TouchableOpacity
+                            onPress={() => {
+                              navigation.navigate(RouteEnum.SyncReport);
+                            }}
+                          >
+                            <View
+                              testID="header.wifiicon"
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                padding: 3,
+                              }}
+                            >
+                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                                {translate('connecting') as string}
+                              </FadeText>
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    </>
+                  )}
+                  {(!netInfo.isConnected ||
+                    netInfo.type === NetInfoStateType.cellular ||
+                    netInfo.isConnectionExpensive) &&
+                    false && (
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          margin: 0,
+                          marginHorizontal: 2.5,
+                          padding: 0,
+                          minWidth: 25,
+                          minHeight: 25,
                         }}
                       >
-                        <FontAwesomeIcon
-                          icon={faCloudDownload}
-                          color={!netInfo.isConnected ? 'red' : 'yellow'}
-                          size={20}
-                        />
-                      </TouchableOpacity>
+                        {mode === ModeEnum.basic ? (
+                          <FontAwesomeIcon
+                            icon={faCloudDownload}
+                            color={!netInfo.isConnected ? 'red' : 'yellow'}
+                            size={20}
+                          />
+                        ) : (
+                          <TouchableOpacity
+                            onPress={() => {
+                              navigation.navigate(RouteEnum.SyncReport);
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={faCloudDownload}
+                              color={!netInfo.isConnected ? 'red' : 'yellow'}
+                              size={20}
+                            />
+                          </TouchableOpacity>
+                        )}
+                      </View>
                     )}
-                  </View>
-                )}
-              </View>
-            )}
+                </View>
+              )}
             {selectIndexerServer === SelectServerEnum.offline && (
               <View
                 style={{
@@ -413,7 +458,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   borderRadius: 10,
                   minWidth: 25,
                   minHeight: 25,
-                }}>
+                }}
+              >
                 <View
                   testID="header.offlineicon"
                   style={{
@@ -421,7 +467,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     justifyContent: 'center',
                     alignItems: 'center',
                     paddingHorizontal: 3,
-                  }}>
+                  }}
+                >
                   <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                     {translate('settings.server-offline') as string}
                   </FadeText>
@@ -438,26 +485,30 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               justifyContent: 'center',
               flexWrap: 'wrap',
               marginTop: 10,
-          }}>
+            }}
+          >
             <View
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-            }}>
-              <TouchableOpacity 
+              }}
+            >
+              <TouchableOpacity
                 style={{ justifyContent: 'center', alignItems: 'center' }}
                 onPress={() => {
                   navigation.navigate(RouteEnum.Send);
-              }}>
+                }}
+              >
                 <View
                   style={{
                     borderRadius: 35,
                     backgroundColor: colors.secondary,
                     padding: 20,
                     margin: 10,
-                }}>
+                  }}
+                >
                   <FontAwesomeIcon
                     size={30}
                     icon={faArrowUp}
@@ -475,19 +526,22 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-            }}>
-              <TouchableOpacity 
+              }}
+            >
+              <TouchableOpacity
                 style={{ justifyContent: 'center', alignItems: 'center' }}
                 onPress={() => {
                   navigation.navigate(RouteEnum.Receive);
-              }}>
+                }}
+              >
                 <View
                   style={{
                     borderRadius: 35,
                     backgroundColor: colors.secondary,
                     padding: 20,
                     margin: 10,
-                }}>
+                  }}
+                >
                   <FontAwesomeIcon
                     size={30}
                     icon={faArrowDown}
@@ -505,26 +559,29 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-            }}>
-              <TouchableOpacity 
+              }}
+            >
+              <TouchableOpacity
                 style={{ justifyContent: 'center', alignItems: 'center' }}
                 onPress={() => {
-                  navigation.navigate(RouteEnum.Claim);
-              }}>
+                  navigation.navigate(RouteEnum.Faucet);
+                }}
+              >
                 <View
                   style={{
                     borderRadius: 35,
                     backgroundColor: colors.secondary,
                     padding: 20,
                     margin: 10,
-                }}>
+                  }}
+                >
                   <FontAwesomeIcon
                     size={30}
                     icon={faFaucet}
                     color={colors.text}
                   />
                 </View>
-                <FadeText>Claim</FadeText>
+                <FadeText>Faucet</FadeText>
               </TouchableOpacity>
             </View>
           </View>
@@ -534,16 +591,24 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               padding: 11.5,
               position: 'absolute',
               left: 0,
-            }}>
-            <View style={{ alignItems: 'center', flexDirection: 'row', height: 40 }}>
+            }}
+          >
+            <View
+              style={{ alignItems: 'center', flexDirection: 'row', height: 40 }}
+            >
               {!noDrawMenu && (
                 <TouchableOpacity
                   style={{ marginRight: 5 }}
                   testID="header.drawmenu"
                   accessible={true}
                   accessibilityLabel={translate('menudrawer-acc') as string}
-                  onPress={toggleMenuDrawer}>
-                  <FontAwesomeIcon icon={faBars} size={40} color={colors.background} />
+                  onPress={toggleMenuDrawer}
+                >
+                  <FontAwesomeIcon
+                    icon={faBars}
+                    size={40}
+                    color={colors.background}
+                  />
                 </TouchableOpacity>
               )}
             </View>
@@ -555,29 +620,47 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             padding: 13,
             position: 'absolute',
             right: 0,
-        }}>
+          }}
+        >
           <TouchableOpacity
             style={{ marginRight: 5 }}
             testID="header.drawmenu"
             onPress={async () => {
-              const resultBio = security.settingsScreen ? await simpleBiometrics({ translate: translate }) : true;
-              // can be:
-              // - true      -> the user do pass the authentication
-              // - false     -> the user do NOT pass the authentication
-              // - undefined -> no biometric authentication available -> Passcode.
-              //console.log('BIOMETRIC --------> ', resultBio);
+              const resultBio = security.settingsScreen
+                ? await simpleBiometrics({ translate })
+                : true;
+
               if (resultBio === false) {
-                // snack with Error & closing the menu.
                 if (addLastSnackbar) {
-                  addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
+                  addLastSnackbar({
+                    message: translate('biometrics-error') as string,
+                    screenName: [screenName],
+                  });
                 }
-              } else {
-                navigation.navigate(RouteEnum.SettingsMenu);
+                return;
               }
-            }}>
+
+              // Go to the parent (InnerStack) and navigate there
+              const parentNav = navigation.getParent();
+
+              if (parentNav) {
+                parentNav.navigate(RouteEnum.Settings);
+              } else {
+                // Fallback if for some reason there is no parent
+                navigation.navigate(RouteEnum.Settings);
+              }
+            }}
+          >
             <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
           </TouchableOpacity>
-          {!!lastError && <FontAwesomeIcon style={{ alignSelf: 'flex-end' }} icon={faGear} size={5} color={colors.warning.primary} />}
+          {!!lastError && (
+            <FontAwesomeIcon
+              style={{ alignSelf: 'flex-end' }}
+              icon={faGear}
+              size={5}
+              color={colors.warning.primary}
+            />
+          )}
         </View>
       </View>
     </>

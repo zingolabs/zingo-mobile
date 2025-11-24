@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   View,
   RefreshControl,
@@ -11,7 +18,7 @@ import {
 import moment from 'moment';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
@@ -28,17 +35,21 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
-import Header from '../Header';
 import Utils from '../../app/utils';
-import { DataProvider, RecyclerListView, LayoutProvider, RecyclerListViewProps } from 'recyclerlistview';
+import {
+  DataProvider,
+  RecyclerListView,
+  LayoutProvider,
+  RecyclerListViewProps,
+} from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { isEqual } from 'lodash';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
-import { ToastProvider } from 'react-native-toastier';
-import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import WalletSummaryHeader from './components/WalletSummaryHeader';
+import QuickActionsRow from './components/QuickActionsRow';
+import SettingsButton from './components/SettingsButton';
 import { Swipeable } from 'react-native-gesture-handler';
-import { faHome } from '@fortawesome/free-regular-svg-icons';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -47,7 +58,7 @@ const ViewTypes = {
   WITHOUT_MONTH_REFRESH: 3,
 };
 
-type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> &  {
+type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> & {
   // side menu
   toggleMenuDrawer: () => void;
   // privacy
@@ -69,11 +80,8 @@ type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> &  
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
-  toggleMenuDrawer,
-  setShieldingAmount,
   setScrollToTop,
   scrollToTop,
-  setScrollToBottom,
   //scrollToBottom,
   //sendTransaction,
   //setServerOption,
@@ -84,27 +92,30 @@ const History: React.FunctionComponent<HistoryProps> = ({
     translate,
     valueTransfers,
     language,
-    addLastSnackbar,
     indexerServer,
     doRefresh,
     zenniesDonationAddress,
-    snackbars,
-    removeFirstSnackbar,
-    setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.History;
 
   const [numVt, setNumVt] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
-  const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>([]);
-  const [valueTransfersFiltered, setValueTransfersFiltered] = useState<ValueTransferType[]>([]);
+  const [valueTransfersSliced, setValueTransfersSliced] = useState<
+    ValueTransferType[]
+  >([]);
+  const [valueTransfersFiltered, setValueTransfersFiltered] = useState<
+    ValueTransferType[]
+  >([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [showFooter, setShowFooter] = useState<boolean>(false);
-  const scrollViewRef = useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(null);
+  const scrollViewRef =
+    useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(
+      null,
+    );
 
   const swipeablesRef = new Map<number, Swipeable>();
 
@@ -115,7 +126,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const closeAllSwipeables = (exceptKey?: number) => {
     swipeablesRef.forEach((ref, k) => {
       if (k !== exceptKey) {
-        // soporta ambas APIs según versión
         ref.close();
       }
     });
@@ -129,18 +139,24 @@ const History: React.FunctionComponent<HistoryProps> = ({
           const data = valueTransfersSliced[index];
 
           if (index === 0) {
-            if (data.confirmations === 0 ) {
+            if (data.confirmations === 0) {
               return ViewTypes.WITH_MONTH_REFRESH;
             } else {
               return ViewTypes.WITH_MONTH;
             }
           }
 
-          let lasttxmonth = lastData && lastData.time ? moment(lastData.time * 1000).format('MMM YYYY') : '--- ----';
-          let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
+          let lasttxmonth =
+            lastData && lastData.time
+              ? moment(lastData.time * 1000).format('MMM YYYY')
+              : '--- ----';
+          let txmonth =
+            data && data.time
+              ? moment(data.time * 1000).format('MMM YYYY')
+              : '--- ----';
 
           if (txmonth !== lasttxmonth) {
-            if (data.confirmations === 0 ) {
+            if (data.confirmations === 0) {
               return ViewTypes.WITH_MONTH_REFRESH;
             } else {
               return ViewTypes.WITH_MONTH;
@@ -157,19 +173,23 @@ const History: React.FunctionComponent<HistoryProps> = ({
           if (type === ViewTypes.WITHOUT_MONTH) {
             // two lines
             dim.width = Dimensions.get('window').width;
-            dim.height = Platform.OS === GlobalConst.platformOSandroid ? 70 : 60;
+            dim.height =
+              Platform.OS === GlobalConst.platformOSandroid ? 70 : 60;
           } else if (type === ViewTypes.WITHOUT_MONTH_REFRESH) {
             // three lines
             dim.width = Dimensions.get('window').width;
-            dim.height = (Platform.OS === GlobalConst.platformOSandroid ? 70 : 55) + 15;
+            dim.height =
+              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 55) + 15;
           } else if (type === ViewTypes.WITH_MONTH) {
             // two lines with month
             dim.width = Dimensions.get('window').width;
-            dim.height = Platform.OS === GlobalConst.platformOSandroid ? 105 : 90;
+            dim.height =
+              Platform.OS === GlobalConst.platformOSandroid ? 105 : 90;
           } else if (type === ViewTypes.WITH_MONTH_REFRESH) {
             // three lines with month
             dim.width = Dimensions.get('window').width;
-            dim.height = (Platform.OS === GlobalConst.platformOSandroid ? 105 : 85) + 15;
+            dim.height =
+              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 85) + 15;
           }
         },
       ),
@@ -177,7 +197,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
   );
 
   const _dataProvider = useMemo(
-    () => new DataProvider((r1: ValueTransferType, r2: ValueTransferType) => !isEqual(r1, r2)),
+    () =>
+      new DataProvider(
+        (r1: ValueTransferType, r2: ValueTransferType) => !isEqual(r1, r2),
+      ),
     [],
   );
 
@@ -192,7 +215,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   }, [valueTransfers]);
 
   useEffect(() => {
-    Utils.setMomentLocale(language)
+    Utils.setMomentLocale(language);
   }, [language]);
 
   useEffect(() => {
@@ -207,7 +230,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setLoading(false);
       }, 500);
     }
-  }, [fetchValueTransfersFiltered, numVt, valueTransfers, indexerServer.chainName]);
+  }, [
+    fetchValueTransfersFiltered,
+    numVt,
+    valueTransfers,
+    indexerServer.chainName,
+  ]);
 
   useEffect(() => {
     setLoadMoreButton(numVt < valueTransfersFiltered.length);
@@ -291,29 +319,46 @@ const History: React.FunctionComponent<HistoryProps> = ({
     [isScrollingToTop],
   );
 
-  const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
+  const setValueTransferDetailModalShow = (
+    index: number,
+    vt: ValueTransferType,
+  ) => {
     navigation.navigate(RouteEnum.ValueTransferDetailStack, {
       screen: RouteEnum.ValueTransferDetail,
-      params: { 
-        index: index, 
+      params: {
+        index: index,
         vt: vt,
         valueTransfersSliced: valueTransfersSliced,
-        totalLength: valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0
-      }
+        totalLength:
+          valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0,
+      },
     });
   };
 
-  const rowRenderer = (type: string | number, data: ValueTransferType, index: number) => {
-    let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
+  const rowRenderer = (
+    type: string | number,
+    data: ValueTransferType,
+    index: number,
+  ) => {
+    let txmonth =
+      data && data.time
+        ? moment(data.time * 1000).format('MMM YYYY')
+        : '--- ----';
 
     return (
       <ValueTransferLine
         index={index}
         vt={data}
-        month={type === ViewTypes.WITH_MONTH || type === ViewTypes.WITH_MONTH_REFRESH ? txmonth : ''}
+        month={
+          type === ViewTypes.WITH_MONTH || type === ViewTypes.WITH_MONTH_REFRESH
+            ? txmonth
+            : ''
+        }
         setValueTransferDetailModalShow={setValueTransferDetailModalShow}
         nextLineWithSameTxid={
-          index >= valueTransfersSliced.length - 1 ? false : valueTransfersSliced[index + 1].txid === data.txid
+          index >= valueTransfersSliced.length - 1
+            ? false
+            : valueTransfersSliced[index + 1].txid === data.txid
         }
         addressProtected={data.address === zenniesDonationAddress}
         screenName={screenName}
@@ -324,197 +369,155 @@ const History: React.FunctionComponent<HistoryProps> = ({
     );
   };
 
-  const goStaking = () => {
-    navigation.navigate(RouteEnum.Staking);
-  };
-
-  //console.log('render History - 4', valueTransfersSliced.length);
-  //console.log(valueTransfersSliced[0]);
-
   return (
-    <ToastProvider>
-      <Snackbars snackbars={snackbars} removeFirstSnackbar={removeFirstSnackbar} screenName={screenName} />
-
+    <View
+      accessible={true}
+      accessibilityLabel={translate('history.title-acc') as string}
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-start',
+        width: '100%',
+        height: '100%',
+      }}
+    >
       <View
-        accessible={true}
-        accessibilityLabel={translate('history.title-acc') as string}
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          width: '100%',
-          height: '100%',
-        }}>
-        <Header
-          testID="valuetransfer text"
-          title={translate('history.title') as string}
-          toggleMenuDrawer={toggleMenuDrawer}
-          setPrivacyOption={setPrivacyOption}
-          addLastSnackbar={addLastSnackbar /* context */}
-          screenName={screenName}
-          setShieldingAmount={setShieldingAmount}
-          setScrollToTop={setScrollToTop}
-          setScrollToBottom={setScrollToBottom}
+          backgroundColor: colors.card,
+          paddingTop: 10,
+          paddingBottom: 10,
+        }}
+      >
+        <WalletSummaryHeader />
+
+        <View
+          style={{
+            position: 'absolute',
+            right: 10,
+            top: 10,
+          }}
+        >
+          <SettingsButton screenName={screenName} />
+        </View>
+
+        <QuickActionsRow />
+      </View>
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+          style={{ marginVertical: 20 }}
         />
-        {loading ? (
-          <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
-        ) : (
-          <>
-            {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
-              <RecyclerListView
-                ref={scrollViewRef}
-                renderAheadOffset={500}
-                scrollViewProps={{
-                  refreshControl: (
-                    <RefreshControl
-                      refreshing={false}
-                      onRefresh={() => doRefresh(screenName)}
-                      tintColor={colors.text}
-                      title={translate('history.refreshing') as string}
-                    />
-                  ),
-                  style: {
-                    flexGrow: 1,
-                    marginTop: 10,
-                    width: '100%',
-                  },
-                }}
-                onScroll={handleScroll}
-                scrollThrottle={100}
-                layoutProvider={layoutProvider}
-                dataProvider={dataProvider}
-                rowRenderer={rowRenderer}
-                onEndReachedThreshold={0.75}
-                onEndReached={() => {
-                  setShowFooter(true);
-                }}
-                disableRecycling={true}
-                renderFooter={() => (
-                  <>
-                    {showFooter ? (
-                      <>
-                        {loadMoreButton ? (
-                          <View
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'flex-start',
-                              marginTop: 5,
-                              marginBottom: 100,
-                            }}>
-                            <Button
-                              type={ButtonTypeEnum.Secondary}
-                              title={translate('history.loadmore') as string}
-                              onPress={loadMoreClicked}
-                            />
-                          </View>
-                        ) : (
-                          <>
-                            {!!valueTransfersSliced && !!valueTransfersSliced.length && (
+      ) : (
+        <>
+          {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
+            <RecyclerListView
+              ref={scrollViewRef}
+              renderAheadOffset={500}
+              scrollViewProps={{
+                refreshControl: (
+                  <RefreshControl
+                    refreshing={false}
+                    onRefresh={() => doRefresh(screenName)}
+                    tintColor={colors.text}
+                    title={translate('history.refreshing') as string}
+                  />
+                ),
+                style: {
+                  flexGrow: 1,
+                  marginTop: 10,
+                  width: '100%',
+                },
+              }}
+              onScroll={handleScroll}
+              scrollThrottle={100}
+              layoutProvider={layoutProvider}
+              dataProvider={dataProvider}
+              rowRenderer={rowRenderer}
+              onEndReachedThreshold={0.75}
+              onEndReached={() => {
+                setShowFooter(true);
+              }}
+              disableRecycling={true}
+              renderFooter={() => (
+                <>
+                  {showFooter ? (
+                    <>
+                      {loadMoreButton ? (
+                        <View
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            marginTop: 5,
+                            marginBottom: 100,
+                          }}
+                        >
+                          <Button
+                            type={ButtonTypeEnum.Secondary}
+                            title={translate('history.loadmore') as string}
+                            onPress={loadMoreClicked}
+                          />
+                        </View>
+                      ) : (
+                        <>
+                          {!!valueTransfersSliced &&
+                            !!valueTransfersSliced.length && (
                               <View
                                 style={{
                                   marginBottom: 90,
-                                }} />
+                                }}
+                              />
                             )}
-                          </>
-                        )}
-                      </>
-                    ) : null}
-                  </>
-                )}
+                        </>
+                      )}
+                    </>
+                  ) : null}
+                </>
+              )}
+            />
+          ) : (
+            <View
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 30,
+              }}
+            >
+              <FadeText style={{ color: colors.primary }}>
+                {translate('history.empty') as string}
+              </FadeText>
+            </View>
+          )}
+          {!isAtTop && (
+            <Pressable
+              onPress={handleScrollToTop}
+              disabled={isScrollingToTop}
+              style={({ pressed }) => ({
+                position: 'absolute',
+                bottom: 30,
+                right: 10,
+                paddingHorizontal: 5,
+                paddingVertical: 10,
+                backgroundColor: colors.sideMenuBackground,
+                borderRadius: 50,
+                transform: [{ scale: pressed ? 0.9 : 1 }],
+                borderWidth: 1,
+                borderColor: colors.zingo,
+                opacity: isScrollingToTop ? 0.5 : 1,
+              })}
+            >
+              <FontAwesomeIcon
+                style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                size={16}
+                icon={faAngleUp}
+                color={colors.zingo}
               />
-            ) : (
-              <View
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: 30,
-                }}>
-                <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
-              </View>
-            )}
-            {!isAtTop && (
-              <Pressable
-                onPress={handleScrollToTop}
-                disabled={isScrollingToTop}
-                style={({ pressed }) => ({
-                  position: 'absolute',
-                  bottom: 30,
-                  right: 10,
-                  paddingHorizontal: 5,
-                  paddingVertical: 10,
-                  backgroundColor: colors.sideMenuBackground,
-                  borderRadius: 50,
-                  transform: [{ scale: pressed ? 0.9 : 1 }],
-                  borderWidth: 1,
-                  borderColor: colors.zingo,
-                  opacity: isScrollingToTop ? 0.5 : 1,
-                })}>
-                <FontAwesomeIcon
-                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={20}
-                  icon={faAngleUp}
-                  color={colors.zingo}
-                />
-              </Pressable>
-            )}
-          </>
-        )}
-        <View 
-          style={{
-            position: 'absolute',
-            bottom: 30,
-            flexDirection: 'row',
-            alignSelf: 'center',
-            gap: 10,
-        }}>
-          <Pressable
-            onPress={() => {}}
-            disabled={true}
-            style={({ pressed }) => ({
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingHorizontal: 25,
-              paddingVertical: 10,
-              backgroundColor: colors.sideMenuBackground,
-              borderRadius: 50,
-              transform: [{ scale: pressed ? 0.9 : 1 }],
-              borderWidth: 1,
-              borderColor: colors.zingo,
-            })}>
-            <FontAwesomeIcon
-              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-              size={20}
-              icon={faHome}
-              color={colors.primary}
-            />
-            <FadeText style={{ color: colors.primary, fontSize: 12, opacity: 1 }}>Home</FadeText>
-          </Pressable>
-          <Pressable
-            onPress={goStaking}
-            disabled={false}
-            style={({ pressed }) => ({
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingHorizontal: 25,
-              paddingVertical: 10,
-              backgroundColor: colors.sideMenuBackground,
-              borderRadius: 50,
-              transform: [{ scale: pressed ? 0.9 : 1 }],
-              borderWidth: 1,
-              borderColor: colors.zingo,
-            })}>
-            <FontAwesomeIcon
-              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-              size={20}
-              icon={faLayerGroup}
-              color={colors.zingo}
-            />
-            <FadeText style={{ color: colors.zingo, fontSize: 12, opacity: 1 }}>Staking</FadeText>
-          </Pressable>
-        </View>
-      </View>
-    </ToastProvider>
+            </Pressable>
+          )}
+        </>
+      )}
+    </View>
   );
 };
 
