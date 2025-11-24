@@ -2,24 +2,20 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faFaucet,
-  faPaperPlane,
-  faAngleDown,
-} from '@fortawesome/free-solid-svg-icons';
 
 import { ThemeType } from '../../../app/types';
 import { RouteEnum } from '../../../app/AppState';
 import FadeText from '../../Components/FadeText';
+import PaperPlane from '../../../assets/icons/paper-plane.svg';
+import QrCode from '../../../assets/icons/qr.svg';
+import FaucetIcon from '../../../assets/icons/faucet.svg';
 
 const ActionButton = ({
   icon,
   label,
-  colors,
   onPress,
 }: {
-  icon: any;
+  icon: React.ReactNode;
   label: string;
   colors: ThemeType;
   onPress: () => void;
@@ -34,18 +30,22 @@ const ActionButton = ({
     }}
   >
     <TouchableOpacity
-      style={{ justifyContent: 'center', alignItems: 'center' }}
+      style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
       onPress={onPress}
     >
       <View
         style={{
           borderRadius: 35,
-          backgroundColor: colors.secondary,
+          backgroundColor: '#1C78D24D',
           padding: 20,
           margin: 10,
         }}
       >
-        <FontAwesomeIcon size={30} icon={icon} color={colors.text} />
+        {/* <FontAwesomeIcon size={30} icon={icon} color={colors.text} /> */}
+        {icon}
       </View>
       <FadeText>{label}</FadeText>
     </TouchableOpacity>
@@ -69,19 +69,19 @@ const QuickActionsRow: React.FC = () => {
     >
       <ActionButton
         colors={colors}
-        icon={faPaperPlane}
+        icon={<PaperPlane width={30} height={30} />}
         label={'Send'}
         onPress={() => navigation.navigate(RouteEnum.Send)}
       />
       <ActionButton
         colors={colors}
-        icon={faAngleDown}
+        icon={<QrCode width={30} height={30} />}
         label={'Receive'}
         onPress={() => navigation.navigate(RouteEnum.Receive)}
       />
       <ActionButton
         colors={colors}
-        icon={faFaucet}
+        icon={<FaucetIcon width={30} height={30} color={'#8FBFFA'} />}
         label={'Faucet'}
         onPress={() => navigation.navigate(RouteEnum.Faucet)}
       />
