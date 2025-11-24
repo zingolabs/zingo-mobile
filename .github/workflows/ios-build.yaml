@@ -77,8 +77,11 @@ jobs:
       - name: Install protoc
         run: brew install protobuf
 
-      - name: cargo install target
-        run: rustup target add aarch64-apple-ios-sim
+      - name: Install Cargo Lipo
+        run: sudo cargo install cargo-lipo
+
+      - name: Install rust Target
+        run: sudo rustup target add aarch64-apple-ios-sim
 
       - name: cargo build release
         working-directory: rust/lib
@@ -90,12 +93,6 @@ jobs:
           sudo cargo run --features=uniffi/cli --release --bin uniffi-bindgen \
           generate --library ../target/aarch64-apple-ios-sim/release/libzingo.dylib --language swift \
           --out-dir ./Generated
-
-      - name: Install Cargo Lipo
-        run: sudo cargo install cargo-lipo
-
-      - name: Install rust Target
-        run: sudo rustup target add aarch64-apple-ios-sim
 
       # this issue is solved in bindgen 0.70
       # But we have a dependency that are using a incompatible version 0.69.
