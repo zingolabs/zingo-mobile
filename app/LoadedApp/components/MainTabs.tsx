@@ -32,6 +32,7 @@ export const MainTabs: React.FC<MainTabsProps> = ({
       screenOptions={{
         tabBarActiveTintColor: colors.zingo,
       }}
+      tabBarStyle={{ backgroundColor: colors.background }}
     >
       <Tab.Screen
         name={RouteEnum.History}

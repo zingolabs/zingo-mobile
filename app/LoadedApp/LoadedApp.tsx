@@ -148,7 +148,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     dateEnd: 0,
   });
   const [security, setSecurity] = useState<SecurityType>({
-    startApp: false,
+    startApp: true,
     foregroundApp: false,
     sendConfirm: false,
     seedUfvkScreen: false,
@@ -1904,20 +1904,7 @@ export class LoadedAppClass extends Component<
                 {props => (
                   <SettingsMenu
                     {...props}
-                    setServerOption={this.setServerOption}
-                    setCurrencyOption={this.setCurrencyOption}
-                    setLanguageOption={this.setLanguageOption}
-                    setSendAllOption={this.setSendAllOption}
-                    setDonationOption={this.setDonationOption}
-                    setModeOption={this.setModeOption}
-                    setSecurityOption={this.setSecurityOption}
-                    setSelectServerOption={this.setSelectServerOption}
-                    setRescanMenuOption={this.setRescanMenuOption}
-                    setRecoveryWalletInfoOnDeviceOption={
-                      this.setRecoveryWalletInfoOnDeviceOption
-                    }
-                    setPerformanceLevelOption={this.setPerformanceLevelOption}
-                    toggleMenuDrawer={() => props.navigation.goBack()}
+                    navigateToLoadingApp={this.navigateToLoadingApp} // TODO: This breaks native transitions
                   />
                 )}
               </InnerStack.Screen>
@@ -1928,31 +1915,12 @@ export class LoadedAppClass extends Component<
                     toggleMenuDrawer={function (): void {
                       throw new Error('Function not implemented.');
                     }}
-                    setShieldingAmount={function (value: number): void {
-                      throw new Error('Function not implemented.');
-                    }}
-                    setScrollToTop={function (value: boolean): void {
-                      throw new Error('Function not implemented.');
-                    }}
-                    setScrollToBottom={function (value: boolean): void {
-                      throw new Error('Function not implemented.');
-                    }}
-                    setServerOption={function (
-                      value: ServerType,
-                      selectServer: SelectServerEnum,
-                      toast: boolean,
-                      sameServerChainName: boolean,
-                    ): Promise<void> {
-                      throw new Error('Function not implemented.');
-                    }}
-                    clearToAddr={function (): void {
-                      throw new Error('Function not implemented.');
-                    }}
-                    setSecurityOption={function (
-                      s: SecurityType,
-                    ): Promise<void> {
-                      throw new Error('Function not implemented.');
-                    }}
+                    setShieldingAmount={this.setShieldingAmount}
+                    setScrollToTop={this.setScrollToTop}
+                    setScrollToBottom={this.setScrollToBottom}
+                    setServerOption={this.setServerOption}
+                    clearToAddr={this.clearToAddr}
+                    setSecurityOption={this.setSecurityOption}
                     {...props}
                     sendTransaction={this.sendTransaction}
                   />
@@ -1965,11 +1933,7 @@ export class LoadedAppClass extends Component<
                     toggleMenuDrawer={function (): void {
                       throw new Error('Function not implemented.');
                     }}
-                    setSecurityOption={function (
-                      s: SecurityType,
-                    ): Promise<void> {
-                      throw new Error('Function not implemented.');
-                    }}
+                    setSecurityOption={this.setSecurityOption}
                     {...props}
                   />
                 )}

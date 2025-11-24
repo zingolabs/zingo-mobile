@@ -44,7 +44,6 @@ const ActionButton = ({
           margin: 10,
         }}
       >
-        {/* <FontAwesomeIcon size={30} icon={icon} color={colors.text} /> */}
         {icon}
       </View>
       <FadeText>{label}</FadeText>

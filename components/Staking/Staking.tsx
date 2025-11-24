@@ -17,8 +17,6 @@ type StakingTabParamList = {
   Staking: undefined;
 };
 
-const Tab = createNativeBottomTabNavigator<StakingTabParamList>();
-
 const StakingScreen: React.FC<StakingProps> = () => {
   const { colors } = useTheme() as unknown as ThemeType;
 
