@@ -105,6 +105,7 @@ jobs:
         run: cargo install --force --locked bindgen-cli
 
       - name: Cargo build release
+        working-directory: ./rust/lib
         run: cargo build --release
 
       - name: Cargo uniffi kotlin
