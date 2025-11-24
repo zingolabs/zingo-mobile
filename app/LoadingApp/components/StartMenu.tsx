@@ -180,9 +180,15 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             paddingBottom: 20,
           }}>
 
-            <FadeText style={{ fontSize: 15, marginBottom: 10 }}>
-              {`Connected to: ${indexerServer.uri}`}
-            </FadeText>
+            {!!indexerServer.uri && (
+              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 5 }}>
+                <View style={{ backgroundColor: '#0E9634', height: 17, width: 17, borderRadius: 8.5, marginTop: -8 }} />
+                <FadeText style={{ fontSize: 15, marginBottom: 10 }}>
+                  {`Connected to: ${indexerServer.uri}`}
+                </FadeText>
+            </View>
+
+            )}
 
             {walletExists && (
               <>
@@ -220,18 +226,9 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             )}
 
             <Button
-              testID="loadingapp.restorewalletseedufvk"
-              type={ButtonTypeEnum.Secondary}
-              title={translate('loadingapp.restorewalletseedufvk') as string}
-              disabled={actionButtonsDisabled}
-              onPress={() => getwalletToRestore()}
-              style={{ marginBottom: 10 }}
-            />
-
-            <Button
               testID="loadingapp.createnewwallet"
               type={ButtonTypeEnum.Primary}
-              title={translate('loadingapp.createnewwallet') as string}
+              title={'Create new wallet'}
               disabled={actionButtonsDisabled}
               onPress={() => {
                 if (walletExists) {
@@ -252,6 +249,15 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 }
               }}
               style={{ marginBottom: 10, marginTop: 10 }}
+            />
+
+            <Button
+              testID="loadingapp.restorewalletseedufvk"
+              type={ButtonTypeEnum.Secondary}
+              title={'Import wallet'}
+              disabled={actionButtonsDisabled}
+              onPress={() => getwalletToRestore()}
+              style={{ marginBottom: 10 }}
             />
 
         </View>
