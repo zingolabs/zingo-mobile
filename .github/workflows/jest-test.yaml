@@ -6,7 +6,7 @@ on:
 jobs:
   jest-test:
     name: Jest test
-    runs-on: macos-15
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5

@@ -13,9 +13,9 @@ env:
 jobs:
   create-cache-key:
     name: Create cache key
-    runs-on: macos-15
+    runs-on: ubuntu-24.04
     env:
-      RUSTUP_HOME: ${{ github.workspace }}/.rustup
+      RUSTUP_HOME: /root/.rustup
     outputs:
       cache-key: ${{ steps.create-cache-key.outputs.cache-key }}
     steps:
@@ -32,10 +32,10 @@ jobs:
         if: ${{ contains(github.repository, 'zingolib') }}
         run: |
           echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
-          sudo sed -i '' "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
+          sed -i '' "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
           if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
           cd rust
-          sudo cargo update -p zingolib -p regchest_utils --aggressive
+          cargo update -p zingolib -p regchest_utils --aggressive
 
       - name: Setting cargo
         run: rustup default stable
