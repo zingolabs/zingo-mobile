@@ -14,6 +14,8 @@ jobs:
   create-cache-key:
     name: Create cache key
     runs-on: ubuntu-24.04
+    container:
+      image: zingodevops/android_builder:017
     env:
       RUSTUP_HOME: /root/.rustup
     outputs:
@@ -43,12 +45,6 @@ jobs:
       - name: Store Cargo version
         working-directory: rust
         run: echo $(cargo --version) >> cargo_version.txt
-
-      - name: Debug
-        working-directory: rust
-        run: |
-          pwd
-          ls -la
 
       - name: Create cache key
         working-directory: rust
