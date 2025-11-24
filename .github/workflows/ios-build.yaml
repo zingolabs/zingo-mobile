@@ -77,7 +77,7 @@ jobs:
       - name: Install protoc
         run: brew install protobuf
 
-      - name: Cargo build release
+      - name: cargo build --release --target aarch64-apple-ios-sim
         working-directory: rust/lib
         run: sudo cargo build --release
 
@@ -92,7 +92,7 @@ jobs:
         run: sudo cargo install cargo-lipo
 
       - name: Install rust Target
-        run: sudo rustup target add aarch64-apple-ios-sim x86_64-apple-ios
+        run: sudo rustup target add aarch64-apple-ios-sim
 
       # this issue is solved in bindgen 0.70
       # But we have a dependency that are using a incompatible version 0.69.
@@ -111,7 +111,7 @@ jobs:
       - name: Cargo lipo universal library
         working-directory: rust/lib
         run: |
-          sudo cargo lipo --release --targets aarch64-apple-ios-sim x86_64-apple-ios
+          sudo cargo lipo --release --targets aarch64-apple-ios-sim
 
       - name: Copy libraries to ios folder
         working-directory: rust/lib
