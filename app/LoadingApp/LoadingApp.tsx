@@ -112,7 +112,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<LaunchingModeEnum>(LaunchingModeEnum.opening);
   const [security, setSecurity] = useState<SecurityType>({
-    startApp: true, // activate only this
+    startApp: false,
     foregroundApp: false,
     sendConfirm: false,
     seedUfvkScreen: false,

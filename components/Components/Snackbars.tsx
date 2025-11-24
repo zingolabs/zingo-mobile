@@ -73,7 +73,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
         },
         contentContainerStyle: {
           flex: 0.999,
-          backgroundColor: colors.secondary,
+          backgroundColor: colors.zingo,
           marginBottom: 100,
           padding: 0,
           paddingLeft: 20,
@@ -83,7 +83,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     }
   }, [
     colors.background,
-    colors.secondary,
+    colors.zingo,
     snackbarsFiltered,
     snackbarsFiltered.length,
     duration,

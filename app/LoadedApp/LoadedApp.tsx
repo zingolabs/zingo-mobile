@@ -160,7 +160,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     dateEnd: 0,
   });
   const [security, setSecurity] = useState<SecurityType>({
-    startApp: true, // activate only this
+    startApp: false,
     foregroundApp: false,
     sendConfirm: false,
     seedUfvkScreen: false,
