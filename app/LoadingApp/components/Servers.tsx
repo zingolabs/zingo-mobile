@@ -15,6 +15,8 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 import Snackbars from '../../../components/Components/Snackbars';
 import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faCheck, faWarning } from '@fortawesome/free-solid-svg-icons';
 
 type ServersProps = {
   actionButtonsDisabled: boolean;
@@ -36,11 +38,12 @@ const Servers: React.FunctionComponent<ServersProps> = ({
   const screenName = ScreenEnum.Servers;
 
   const [connected, setConnected] = useState<boolean | null>(null);
+  const [borderColor, setBorderColor] = useState<string>('transparent');
   const [kbOpen, setKbOpen] = React.useState(false);
 
   const insets = useSafeAreaInsets();
 
-  const maxW = 520; //tablets -> landscape.
+  const maxW = 520; //tablets -> landscape. 
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -83,13 +86,13 @@ const Servers: React.FunctionComponent<ServersProps> = ({
 
             <RegText color={colors.text} style={{ fontSize: 25 }}>Indexer Server</RegText>
 
-            <FadeText style={{ marginBottom: 20, marginTop: 5 }}>texto</FadeText>
+            <FadeText style={{ marginBottom: 20, marginTop: 5 }}>Server URL</FadeText>
 
             <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
-                borderColor: colors.border,
+                borderColor: borderColor,
                 borderWidth: 1,
                 borderRadius: 25,
                 marginBottom: 10,
@@ -118,6 +121,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 value={indexerServer.uri}
                 onChangeText={(text) => {
                   setConnected(null);
+                  setBorderColor(colors.primary);
                   setIndexerServerUri(text);
                 }}
                 editable={!actionButtonsDisabled}
@@ -126,9 +130,23 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="done"
+                onFocus={() => {
+                  if (connected === null) {
+                    setBorderColor(colors.primary);
+                  }
+                }}
+                onBlur={() => {
+                  if (connected === null) {
+                    setBorderColor('transparent');
+                  }
+                }}
               />
               {!!indexerServer.uri && (
-                <TouchableOpacity disabled={actionButtonsDisabled} onPress={() => setIndexerServerUri('')}>
+                <TouchableOpacity disabled={actionButtonsDisabled} onPress={() => {
+                  setIndexerServerUri('');
+                  setBorderColor('transparent');
+                  setConnected(null);
+                }}>
                   <View 
                     style={{
                       justifyContent: 'center',
@@ -145,41 +163,40 @@ const Servers: React.FunctionComponent<ServersProps> = ({
               )}
             </View>
 
-            <TouchableOpacity
+            <View
               style={{
-                marginTop: 20,
-                padding: 0,
-                paddingLeft: 20,
-                paddingRight: 20,
-                borderRadius: 25,
-                borderWidth: 1,
-                backgroundColor: actionButtonsDisabled ? '#767680' : connected === null ? '#2C2C2E' : connected ? '#0E9634' : '#610102',
-              }}
-              disabled={actionButtonsDisabled}
-              onPress={async () => {
-                const _connected = await checkIndexerServer();
-                setConnected(_connected);
-                Keyboard.dismiss();
-            }}>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  marginBottom: 4,
-                  minWidth: 48,
-                  minHeight: 48,
-                }}>
-                {actionButtonsDisabled && (
-                  <ActivityIndicator size="small" color={colors.text} style={{ marginRight: 20 }} />
-                )}
-                <RegText>
-                  {actionButtonsDisabled ? 'Testing...' : connected === null ? 'Test Connection' : connected ? 'Connected' : 'Error'}
-                </RegText>
-              </View>
-            </TouchableOpacity>
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignSelf: 'flex-start',
+                margin: 0,
+                marginBottom: 4,
+                minWidth: 48,
+                minHeight: 48,
+                gap: 10,
+                marginLeft: 20,
+              }}>
+              {actionButtonsDisabled && (
+                <ActivityIndicator size="small" color={colors.text} />
+              )}
+              {connected !== null && connected && (
+                <FontAwesomeIcon
+                  size={20}
+                  icon={faCheck}
+                  color={borderColor}
+                />                
+              )}
+              {connected !== null && !connected && (
+                <FontAwesomeIcon
+                  size={20}
+                  icon={faWarning}
+                  color={borderColor}
+                />                
+              )}
+              <RegText color={actionButtonsDisabled ? colors.text : borderColor}>
+                {actionButtonsDisabled ? 'Connecting...' : connected === null ? '' : connected ? 'Connected' : 'Could not connect to indexer'}
+              </RegText>
+            </View>
 
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && false && (
               <>
@@ -226,22 +243,47 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             justifyContent: 'center',
             paddingTop: 10,
             paddingBottom: 20,
-          }}>
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('continue') as string}
-            disabled={actionButtonsDisabled}
-            onPress={() => {
-              clear();
-              closeServers();
-              Keyboard.dismiss();
-            }}
-            style={{ 
-              marginBottom: 4,
-              maxWidth: maxW,
-            }}
-            twoButtons={false}
-          />
+        }}>
+          {connected ? (
+            <Button
+              type={ButtonTypeEnum.Primary}
+              title={translate('continue') as string}
+              disabled={actionButtonsDisabled || !indexerServer.uri}
+              onPress={() => {
+                Keyboard.dismiss();
+                clear();
+                closeServers();
+              }}
+              style={{ 
+                marginBottom: 4,
+                maxWidth: maxW,
+              }}
+              twoButtons={false}
+            />
+          ) : (
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={connected === null ? 'Test Connection' : 'Retry'}
+              disabled={actionButtonsDisabled || !indexerServer.uri}
+              onPress={async () => {
+                setConnected(null);
+                setBorderColor('transparent')
+                const _connected = await checkIndexerServer();
+                setConnected(_connected);
+                if (_connected) {
+                  setBorderColor('#0E9634');
+                } else {
+                  setBorderColor('#ff383c');
+                }
+                Keyboard.dismiss();
+              }}
+              style={{ 
+                marginBottom: 4,
+                maxWidth: maxW,
+              }}
+              twoButtons={false}
+            />
+          )}
         </View>
       </KeyboardAvoidingView>
     </ToastProvider>
