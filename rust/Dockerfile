@@ -20,8 +20,7 @@ ENV CARGO_TARGET_DIR=/opt/zingo/rust/target
 
 RUN rustup default nightly
 
-RUN rustup target add aarch64-apple-ios x86_64-apple-ios \
-    aarch64-linux-android armv7-linux-androideabi \
+RUN aarch64-linux-android armv7-linux-androideabi \
     i686-linux-android x86_64-linux-android
     
 RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
