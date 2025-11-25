@@ -31,7 +31,6 @@
     "@react-native-clipboard/clipboard": "^1.16.3",
     "@react-native-community/netinfo": "github:j-piasecki/react-native-netinfo#@jpiasecki/new-arch",
     "@react-native-picker/picker": "^2.11.2",
-    "@react-navigation/bottom-tabs": "^7.4.7",
     "@react-navigation/drawer": "^7.5.8",
     "@react-navigation/elements": "^2.6.4",
     "@react-navigation/native": "^7.1.17",
