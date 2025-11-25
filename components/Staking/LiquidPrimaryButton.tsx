@@ -8,13 +8,15 @@ import {
   TextStyle,
   ColorValue,
   TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import {
   LiquidGlassView,
   isLiquidGlassSupported,
 } from '@callstack/liquid-glass';
-import { ThemeType } from '../../app/types';
+import { ThemeType } from '../../app/types/ThemeType';
+import NativePrimaryFallback from './NativePrimaryFallback';
 
 type Props = {
   title: string;
@@ -33,11 +35,28 @@ const LiquidPrimaryButton: React.FC<Props> = ({
   textStyle,
   tintColor,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme() as unknown as ThemeType;
   const [, setPressed] = useState(false);
 
-  const primary = tintColor ?? colors.zingo ?? colors.primary ?? '#4f8cff';
+  const primary =
+    (tintColor as string | undefined) ??
+    colors.zingo ??
+    colors.primary ??
+    '#4f8cff';
 
+  if (!isLiquidGlassSupported) {
+    return (
+      <View style={style}>
+        <NativePrimaryFallback
+          title={title}
+          onPress={onPress}
+          disabled={disabled}
+        />
+      </View>
+    );
+  }
+
+  // Liquid glass
   return (
     <TouchableWithoutFeedback
       onPress={onPress}
@@ -50,12 +69,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
         effect="clear"
         colorScheme="system"
         tintColor={primary}
-        style={[
-          styles.glass,
-          style,
-          !isLiquidGlassSupported && styles.fallback,
-          disabled && styles.disabled,
-        ]}
+        style={[styles.glass, style, disabled && styles.disabled]}
       >
         <Text style={[styles.text, textStyle]}>{title}</Text>
       </LiquidGlassView>
@@ -78,7 +92,7 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
   },
   fallback: {
-    backgroundColor: 'rgba(255,255,255,0.22)',
+    backgroundColor: '#4f8cff',
   },
   disabled: {
     opacity: 0.5,
@@ -87,6 +101,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: 'white',
+  },
+  iosButtonContainer: {
+    minWidth: 160,
+    alignSelf: 'center',
   },
 });
 
