@@ -884,17 +884,17 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.componentDidMount();
   };
 
-  checkIndexerServer = async () => {
-    if (!this.state.indexerServer.uri) {
-      return null;
+  checkIndexerServer = async (indexerServerUri: string) => {
+    if (!indexerServerUri) {
+      return { result: false, indexerServerUriParsed: indexerServerUri };
     }
     this.setState({ actionButtonsDisabled: true });
-    const uri: string = parseServerURI(this.state.indexerServer.uri, this.state.translate);
+    const uri: string = parseServerURI(indexerServerUri, this.state.translate);
     const chainName = this.state.indexerServer.chainName;
     if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
       this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
       this.setState({ actionButtonsDisabled: false });
-      return false;
+      return { result: false, indexerServerUriParsed: indexerServerUri };
     }
 
     this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: [this.screenName] });
@@ -909,16 +909,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     } as ServerUrisType;
     const serverChecked = await selectingServer([cs]);
     if (serverChecked && serverChecked.latency) {
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, { uri, chainName });
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.custom);
-      this.setState({
-        selectIndexerServer: SelectServerEnum.custom,
-        indexerServer: { uri, chainName },
-      });
       this.setState({ 
         actionButtonsDisabled: false
       });
-      return true;
+      return { result: true, indexerServerUriParsed: uri };
     } else {
       this.addLastSnackbar({
         message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
@@ -927,7 +921,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       this.setState({ 
         actionButtonsDisabled: false
       });
-      return false;
+      return { result: false, indexerServerUriParsed: indexerServerUri };
     }
   };
 
