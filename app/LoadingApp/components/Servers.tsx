@@ -21,7 +21,7 @@ import { faCheck, faChevronLeft, faWarning } from '@fortawesome/free-solid-svg-i
 type ServersProps = {
   actionButtonsDisabled: boolean;
   setIndexerServerUri: (v: string) => Promise<void>;
-  checkIndexerServer: () => Promise<boolean | null>;
+  checkIndexerServer: (indexerServerUri: string) => Promise<{ result: boolean, indexerServerUriParsed: string }>;
   closeServers: () => void;
   fromSettings: boolean;
 };
@@ -34,14 +34,15 @@ const Servers: React.FunctionComponent<ServersProps> = ({
   fromSettings,
 }) => {
   const context = useContext(ContextAppLoading);
-  const { netInfo, translate, snackbars, removeFirstSnackbar, indexerServer } = context;
+  const { netInfo, translate, snackbars, removeFirstSnackbar, indexerServer: indexerServerContext } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.Servers;
 
   const [connected, setConnected] = useState<boolean | null>(null);
   const [borderColor, setBorderColor] = useState<string>('transparent');
-  const [kbOpen, setKbOpen] = React.useState(false);
+  const [kbOpen, setKbOpen] = useState(false);
+  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(indexerServerContext.uri);
 
   const insets = useSafeAreaInsets();
 
@@ -148,11 +149,11 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                   marginLeft: 5,
                   backgroundColor: 'transparent',
                 }}
-                value={indexerServer.uri}
+                value={indexerServerUriLocal}
                 onChangeText={(text) => {
                   setConnected(null);
                   setBorderColor(colors.primary);
-                  setIndexerServerUri(text);
+                  setIndexerServerUriLocal(text);
                 }}
                 editable={!actionButtonsDisabled}
                 maxLength={100}
@@ -171,9 +172,9 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                   }
                 }}
               />
-              {!!indexerServer.uri && (
+              {!!indexerServerUriLocal && (
                 <TouchableOpacity disabled={actionButtonsDisabled} onPress={() => {
-                  setIndexerServerUri('');
+                  setIndexerServerUriLocal('');
                   setBorderColor('transparent');
                   setConnected(null);
                 }}>
@@ -278,10 +279,11 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             <Button
               type={ButtonTypeEnum.Primary}
               title={translate('continue') as string}
-              disabled={actionButtonsDisabled || !indexerServer.uri}
+              disabled={actionButtonsDisabled || !indexerServerUriLocal}
               onPress={() => {
                 Keyboard.dismiss();
                 clear();
+                setIndexerServerUri(indexerServerUriLocal);
                 closeServers();
               }}
               style={{ 
@@ -294,12 +296,13 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             <Button
               type={ButtonTypeEnum.Secondary}
               title={connected === null ? 'Test Connection' : 'Retry'}
-              disabled={actionButtonsDisabled || !indexerServer.uri}
+              disabled={actionButtonsDisabled || !indexerServerUriLocal}
               onPress={async () => {
                 setConnected(null);
                 setBorderColor('transparent')
-                const _connected = await checkIndexerServer();
+                const {result: _connected, indexerServerUriParsed: _indexerServerUri } = await checkIndexerServer(indexerServerUriLocal);
                 setConnected(_connected);
+                setIndexerServerUriLocal(_indexerServerUri);
                 if (_connected) {
                   setBorderColor('#0E9634');
                 } else {
