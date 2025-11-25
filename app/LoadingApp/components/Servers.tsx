@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ActivityIndicator, ScrollView, TextInput, Keyboard, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { View, ActivityIndicator, TextInput, Keyboard, KeyboardAvoidingView, Platform, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -16,13 +16,14 @@ import Snackbars from '../../../components/Components/Snackbars';
 import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faChevronLeft, faWarning } from '@fortawesome/free-solid-svg-icons';
 
 type ServersProps = {
   actionButtonsDisabled: boolean;
   setIndexerServerUri: (v: string) => Promise<void>;
-  checkIndexerServer: () => Promise<boolean | null>;
+  checkIndexerServer: (indexerServerUri: string) => Promise<{ result: boolean, indexerServerUriParsed: string }>;
   closeServers: () => void;
+  fromSettings: boolean;
 };
 
 const Servers: React.FunctionComponent<ServersProps> = ({
@@ -30,16 +31,18 @@ const Servers: React.FunctionComponent<ServersProps> = ({
   setIndexerServerUri,
   checkIndexerServer,
   closeServers,
+  fromSettings,
 }) => {
   const context = useContext(ContextAppLoading);
-  const { netInfo, translate, snackbars, removeFirstSnackbar, indexerServer } = context;
+  const { netInfo, translate, snackbars, removeFirstSnackbar, indexerServer: indexerServerContext } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.Servers;
 
   const [connected, setConnected] = useState<boolean | null>(null);
   const [borderColor, setBorderColor] = useState<string>('transparent');
-  const [kbOpen, setKbOpen] = React.useState(false);
+  const [kbOpen, setKbOpen] = useState(false);
+  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(indexerServerContext.uri);
 
   const insets = useSafeAreaInsets();
 
@@ -69,20 +72,48 @@ const Servers: React.FunctionComponent<ServersProps> = ({
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0}
       >
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom + 8,
-            paddingHorizontal: 16,
-          }}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+
           <View
             style={{
               flexGrow: 1,
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
+              paddingTop: insets.top,
+              paddingBottom: insets.bottom + 8,
+              paddingHorizontal: 16,
+          }}>
+
+            {fromSettings && (
+              <View style={{
+                position: 'absolute',
+                width: 75,
+                top: 10,
+                left: 10,
+                zIndex: 999,
+              }}>
+                <View
+                  style={{
+                    borderRadius: 25,
+                    borderColor: colors.text,
+                    borderWidth: 1,
+                    padding: 10,
+                    margin: 10,
+                    backgroundColor: colors.background,
+                  }}>
+                    <TouchableOpacity onPress={() => {
+                      clear();
+                      closeServers();
+                    }}>
+                      <FontAwesomeIcon
+                        size={30}
+                        icon={faChevronLeft}
+                        color={colors.text}
+                      />
+                    </TouchableOpacity>
+                </View>
+              </View>
+            )}
 
             <RegText color={colors.text} style={{ fontSize: 25 }}>Indexer Server</RegText>
 
@@ -118,11 +149,11 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                   marginLeft: 5,
                   backgroundColor: 'transparent',
                 }}
-                value={indexerServer.uri}
+                value={indexerServerUriLocal}
                 onChangeText={(text) => {
                   setConnected(null);
                   setBorderColor(colors.primary);
-                  setIndexerServerUri(text);
+                  setIndexerServerUriLocal(text);
                 }}
                 editable={!actionButtonsDisabled}
                 maxLength={100}
@@ -141,9 +172,9 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                   }
                 }}
               />
-              {!!indexerServer.uri && (
+              {!!indexerServerUriLocal && (
                 <TouchableOpacity disabled={actionButtonsDisabled} onPress={() => {
-                  setIndexerServerUri('');
+                  setIndexerServerUriLocal('');
                   setBorderColor('transparent');
                   setConnected(null);
                 }}>
@@ -235,7 +266,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             )}
 
           </View>
-        </ScrollView>
+        </TouchableWithoutFeedback>
         <View
           style={{
             marginTop: 'auto',
@@ -248,10 +279,11 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             <Button
               type={ButtonTypeEnum.Primary}
               title={translate('continue') as string}
-              disabled={actionButtonsDisabled || !indexerServer.uri}
+              disabled={actionButtonsDisabled || !indexerServerUriLocal}
               onPress={() => {
                 Keyboard.dismiss();
                 clear();
+                setIndexerServerUri(indexerServerUriLocal);
                 closeServers();
               }}
               style={{ 
@@ -264,12 +296,13 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             <Button
               type={ButtonTypeEnum.Secondary}
               title={connected === null ? 'Test Connection' : 'Retry'}
-              disabled={actionButtonsDisabled || !indexerServer.uri}
+              disabled={actionButtonsDisabled || !indexerServerUriLocal}
               onPress={async () => {
                 setConnected(null);
                 setBorderColor('transparent')
-                const _connected = await checkIndexerServer();
+                const {result: _connected, indexerServerUriParsed: _indexerServerUri } = await checkIndexerServer(indexerServerUriLocal);
                 setConnected(_connected);
+                setIndexerServerUriLocal(_indexerServerUri);
                 if (_connected) {
                   setBorderColor('#0E9634');
                 } else {

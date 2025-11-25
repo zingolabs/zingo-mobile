@@ -354,6 +354,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       removeFirstSnackbar: this.removeFirstSnackbar,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
+      fromSettings: false,
 
       // context settings
       indexerServer: props.indexerServer,
@@ -444,12 +445,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     // First, check servers (only indexer server)
     // valid scenarios:
     // 1. server with uri & select server custom
-    // 2. server with no uri & select server offline
+    // 2. called from settings
     if ((!this.state.indexerServer.uri && this.state.selectIndexerServer === SelectServerEnum.custom) || 
         (this.state.screen === 0.5 && !this.state.startingApp)) {
       this.setState({
         screen: 0.5,
         actionButtonsDisabled: false,
+        fromSettings: this.state.screen === 0.5 && !this.state.startingApp ? true : false,
       });
       return;
     }
@@ -882,17 +884,17 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.componentDidMount();
   };
 
-  checkIndexerServer = async () => {
-    if (!this.state.indexerServer.uri) {
-      return null;
+  checkIndexerServer = async (indexerServerUri: string) => {
+    if (!indexerServerUri) {
+      return { result: false, indexerServerUriParsed: indexerServerUri };
     }
     this.setState({ actionButtonsDisabled: true });
-    const uri: string = parseServerURI(this.state.indexerServer.uri, this.state.translate);
+    const uri: string = parseServerURI(indexerServerUri, this.state.translate);
     const chainName = this.state.indexerServer.chainName;
     if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
       this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
       this.setState({ actionButtonsDisabled: false });
-      return false;
+      return { result: false, indexerServerUriParsed: indexerServerUri };
     }
 
     this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: [this.screenName] });
@@ -907,16 +909,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     } as ServerUrisType;
     const serverChecked = await selectingServer([cs]);
     if (serverChecked && serverChecked.latency) {
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, { uri, chainName });
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.custom);
-      this.setState({
-        selectIndexerServer: SelectServerEnum.custom,
-        indexerServer: { uri, chainName },
-      });
       this.setState({ 
         actionButtonsDisabled: false
       });
-      return true;
+      return { result: true, indexerServerUriParsed: uri };
     } else {
       this.addLastSnackbar({
         message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
@@ -925,7 +921,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       this.setState({ 
         actionButtonsDisabled: false
       });
-      return false;
+      return { result: false, indexerServerUriParsed: indexerServerUri };
     }
   };
 
@@ -1319,6 +1315,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       orchardPool,
       saplingPool,
       transparentPool,
+      fromSettings,
     } = this.state;
 
     //console.log('render loadingAppClass - 3', this.state.privacy);
@@ -1383,6 +1380,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               setIndexerServerUri={this.setIndexerServerUri}
               checkIndexerServer={this.checkIndexerServer}
               closeServers={this.closeServers}
+              fromSettings={fromSettings}
             />
           )}
           {screen === 1 && (
