@@ -4,14 +4,23 @@ import { View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
-import { AppDrawerParamList, ThemeType } from '../../app/types';
 import RegText from '../Components/RegText';
 import { RouteEnum } from '../../app/AppState';
+import { AppDrawerParamList } from '../../app/types';
+import { ThemeType } from '../../app/types/ThemeType';
+import { createNativeBottomTabNavigator } from '@bottom-tabs/react-navigation';
 
 type StakingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Staking>;
 
-export const StakingScreen: React.FC<StakingProps> = () => {
-  const { colors } = useTheme() as ThemeType;
+type StakingTabParamList = {
+  Home: undefined;
+  Staking: undefined;
+};
+
+const Tab = createNativeBottomTabNavigator<StakingTabParamList>();
+
+const StakingScreen: React.FC<StakingProps> = () => {
+  const { colors } = useTheme() as unknown as ThemeType;
 
   return (
     <>

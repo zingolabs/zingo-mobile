@@ -1,7 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { createNavigationContainerRef, DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import {
+  createNavigationContainerRef,
+  DefaultTheme,
+  NavigationContainer,
+} from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
@@ -11,7 +15,9 @@ import { RouteEnum } from './app/AppState';
 
 import { BackHandler, LogBox, StatusBar } from 'react-native';
 
-LogBox.ignoreLogs(['[Reanimated] Reduced motion setting is enabled on this device.']);
+LogBox.ignoreLogs([
+  '[Reanimated] Reduced motion setting is enabled on this device.',
+]);
 
 const zingoTheme: ThemeType = {
   ...DefaultTheme,
@@ -76,10 +82,12 @@ const App: React.FunctionComponent = () => {
           style={{
             flex: 1,
             backgroundColor: zingoTheme.colors.background,
-          }}>
+          }}
+        >
           <Stack.Navigator
             initialRouteName={RouteEnum.LoadingApp}
-            screenOptions={{ headerShown: false, animation: 'none' }}>
+            screenOptions={{ headerShown: false, animation: 'none' }}
+          >
             <Stack.Screen name={RouteEnum.LoadingApp}>
               {props => <LoadingApp {...props} />}
             </Stack.Screen>
