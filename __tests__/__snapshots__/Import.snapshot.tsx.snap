@@ -110,7 +110,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         {
           "flexGrow": 1,
           "paddingBottom": NaN,
-          "paddingHorizontal": 16,
+          "paddingHorizontal": 10,
           "paddingTop": undefined,
         }
       }
@@ -142,13 +142,13 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
-                "marginBottom": 20,
+                "marginBottom": 15,
                 "marginTop": 5,
                 "opacity": 0.65,
               }
             }
           >
-            texto
+            Enter your recovery phrase
           </Text>
           <View
             style={

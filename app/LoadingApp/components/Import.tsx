@@ -199,7 +199,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
             flexGrow: 1,
             paddingTop: insets.top,
             paddingBottom: insets.bottom + 8,
-            paddingHorizontal: 16,
+            paddingHorizontal: 10,
           }}>
           <View
             style={{
@@ -210,7 +210,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
               
             <RegText color={colors.text} style={{ fontSize: 25 }}>Import wallet</RegText>
 
-            <FadeText style={{ marginBottom: 20, marginTop: 5 }}>texto</FadeText>
+            <FadeText style={{ marginBottom: 15, marginTop: 5 }}>Enter your recovery phrase</FadeText>
 
             {seedTextVisible && (
               <View

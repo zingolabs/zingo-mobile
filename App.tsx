@@ -28,11 +28,11 @@ const zingoTheme: ThemeType = {
     border: '#b4b4b4',
     primary: '#1c78d2',
     primaryDisabled: '#b4b4b4',
-    secondary: '#1a1a1b',
+    secondary: '#1e1e1e',
     secondaryDisabled: '#b4b4b4',
     text: '#ffffff',
     zingo: '#b4b4b4',
-    placeholder: '#292929',
+    placeholder: 'rgba(235, 235, 245, 0.3)',
     money: '#b4b4b4',
     syncing: '#ebff5a', // yellow
     notification: '',

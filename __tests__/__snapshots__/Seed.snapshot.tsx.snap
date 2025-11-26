@@ -1205,7 +1205,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
                   }
                 }
               >
-                Claim
+                Faucet
               </Text>
             </View>
           </View>

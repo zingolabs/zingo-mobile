@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Linking, Text, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Linking, Text, KeyboardAvoidingView, Platform } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
@@ -13,10 +13,7 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
   GlobalConst,
-  ButtonTypeEnum,
-  SelectServerEnum,
   RouteEnum,
-  TransactionActionEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
   ScreenEnum,
@@ -36,9 +33,6 @@ import { faTriangleExclamation, faChevronDown, faChevronUp, faChevronLeft } from
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
-import Button from '../../Components/Button';
-import RPCModule from '../../../app/RPCModule';
-import { createAlert } from '../../../app/createAlert';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // this is for https. (primary)
@@ -63,10 +57,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     zenniesDonationAddress,
     snackbars,
     removeFirstSnackbar,
-    setBackgroundError,
-    netInfo,
-    selectIndexerServer,
-    readOnly,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
@@ -171,66 +161,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       setValueTransfer(valueTransfersSliced[newIndex]);
       setValueTransferIndex(newIndex);
     }
-  };
-
-  const runAction = async (action: TransactionActionEnum) => {
-    if (!setBackgroundError || !addLastSnackbar) {
-      return;
-    }
-    if (!netInfo.isConnected || selectIndexerServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
-      return;
-    }
-
-    // not use await here.
-    navigation.navigate(RouteEnum.Computing);
-
-    let actionStr: string;
-    if (action === TransactionActionEnum.resend) {
-      actionStr = await RPCModule.resendTransactionProcess(valueTransfer.txid);
-    } else {
-      actionStr = await RPCModule.removeTransactionProcess(valueTransfer.txid);
-    }
-
-    //console.log(actionStr);
-
-    if (actionStr) {
-      if (actionStr.toLowerCase().startsWith(GlobalConst.error)) {
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          [screenName],
-          translate(`history.${action}-title`) as string,
-          `${translate(`history.${action}-error`)} ${actionStr}`,
-          true,
-          translate,
-        );
-      } else {
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          [screenName],
-          translate(`history.${action}-title`) as string,
-          `${translate(`history.${action}-message`)} ${actionStr}`,
-          true,
-          translate,
-        );
-      }
-    }
-    // change to the history screen, just in case.
-    navigation.navigate(RouteEnum.History);
-  };
-
-  const actionOnPress = (action: TransactionActionEnum) => {
-    Alert.alert(
-      translate(`history.${action}-title`) as string,
-      translate(`history.${action}-alert`) as string,
-      [
-        { text: translate('confirm') as string, onPress: () => runAction(action) },
-        { text: translate('cancel') as string, style: 'cancel' },
-      ],
-      { cancelable: false },
-    );
   };
 
   //console.log('render History Detail', valueTransferIndex, valueTransfer);
@@ -384,46 +314,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
                 valueTransfer.status === RPCValueTransfersStatusEnum.mempool) && (
                 <>
-                  <View
-                    style={{
-                      flexGrow: 1,
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginBottom: 10,
-                    }}>
-                    {(valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
-                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
-                      info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks &&
-                      !readOnly && (
-                      <Button
-                        type={ButtonTypeEnum.Secondary}
-                        title={translate('history.resend') as string}
-                        style={{ marginRight: 10 }}
-                        onPress={() => {
-                          actionOnPress(TransactionActionEnum.resend);
-                        }}
-                        twoButtons={
-                          valueTransfer.kind !== ValueTransferKindEnum.Received
-                        }
-                      />
-                    )}
-                    {valueTransfer.kind !== ValueTransferKindEnum.Received && (
-                      <Button
-                        type={ButtonTypeEnum.Primary}
-                        title={translate('history.remove') as string}
-                        onPress={() => {
-                          actionOnPress(TransactionActionEnum.remove);
-                        }}
-                        twoButtons={
-                          (valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
-                          valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
-                          info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks &&
-                          !readOnly
-                        }
-                      />
-                    )}
-                  </View>
                   {valueTransfer.kind !== ValueTransferKindEnum.Received && (
                     <View
                       style={{

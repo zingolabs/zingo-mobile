@@ -6,6 +6,8 @@ export enum RouteEnum {
   Servers = 'Servers',
   Staking = 'Staking',
 
+  MainTabs = 'MainTabs',
+
   // Drawer no params
   History = 'History',
   Send = 'Send',
@@ -22,6 +24,8 @@ export enum RouteEnum {
   Info = 'Info',
   Insight = 'Insight',
   Computing = 'Computing',
+  ComputingOK = 'ComputingOK',
+  ComputingError = 'ComputingError',
   SyncReport = 'SyncReport',
   Pools = 'Pools',
   ContactList = 'ContactList',
