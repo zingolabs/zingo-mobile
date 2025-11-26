@@ -36,14 +36,13 @@ import {
   ChainNameEnum,
   ButtonTypeEnum,
   GlobalConst,
-  ServerUrisType,
   ServerType,
   SelectServerEnum,
   RouteEnum,
   SecurityType,
   ScreenEnum,
 } from '../../app/AppState';
-import { parseZcashURI, serverUris } from '../../app/uris';
+import { parseZcashURI } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
@@ -51,7 +50,6 @@ import { ContextAppLoaded } from '../../app/context';
 import { createAlert } from '../../app/createAlert';
 import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
 import { sendEmail } from '../../app/sendEmail';
-import selectingServer from '../../app/selectingServer';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
@@ -83,7 +81,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   clearToAddr,
   setScrollToTop,
   setScrollToBottom,
-  setServerOption,
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
@@ -774,7 +771,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       // the app send successfully on the first attemp.
 
-      navigation.navigate(RouteEnum.MainTabs, { screen: RouteEnum.History });
+      navigation.navigate(RouteEnum.ComputingOK, { txid });
       return;
     } catch (err1) {
       error = err1 as string;
@@ -784,59 +781,34 @@ const Send: React.FunctionComponent<SendProps> = ({
       // in this point the App is failing, there is two possibilities:
       // 1. Server Error
       // 2. Another type of Error
-      // here is worth it to try again with the best working server...
-      // if the user selected a `custom` server, then we cannot change it.
-      if (!customError && selectIndexerServer !== SelectServerEnum.custom) {
-        // try send again with a working server
-        const serverChecked = await selectingServer(
-          serverUris(translate).filter((s: ServerUrisType) => !s.obsolete),
+      // here is worth it to try again...
+      try {
+        const txid = await sendTransaction(sendPageStatePar);
+
+        // Clear the fields
+        clearState();
+
+        // scroll to top in history, just in case.
+        setScrollToTop(true);
+        setScrollToBottom(true);
+
+        createAlert(
+          setBackgroundError,
+          addLastSnackbar,
+          [screenName, ScreenEnum.History],
+          translate('send.confirm-title') as string,
+          `${translate('send.Broadcast')} ${txid}`,
+          true,
+          translate,
         );
-        let fasterServer: ServerType = {} as ServerType;
-        if (serverChecked && serverChecked.latency) {
-          fasterServer = {
-            uri: serverChecked.uri,
-            chainName: serverChecked.chainName,
-          };
-        } else {
-          fasterServer = indexerServer;
-          // likely here there is a internet conection problem
-          // all of the servers return an error because they are unreachable probably.
-          // the 30 seconds timout was fired.
-        }
-        console.log(serverChecked);
-        console.log(fasterServer);
-        if (fasterServer.uri !== indexerServer.uri) {
-          setServerOption(fasterServer, selectIndexerServer, false, true);
-        }
+        // the app send successfully on the second attemp.
 
-        try {
-          const txid = await sendTransaction(sendPageStatePar);
+        navigation.navigate(RouteEnum.ComputingOK, { txid });
+        return;
+      } catch (err2) {
+        error = err2 as string;
 
-          // Clear the fields
-          clearState();
-
-          // scroll to top in history, just in case.
-          setScrollToTop(true);
-          setScrollToBottom(true);
-
-          createAlert(
-            setBackgroundError,
-            addLastSnackbar,
-            [screenName, ScreenEnum.History],
-            translate('send.confirm-title') as string,
-            `${translate('send.Broadcast')} ${txid}`,
-            true,
-            translate,
-          );
-          // the app send successfully on the second attemp.
-
-          navigation.navigate(RouteEnum.MainTabs, { screen: RouteEnum.History });
-          return;
-        } catch (err2) {
-          error = err2 as string;
-
-          customError = interceptCustomError(error);
-        }
+        customError = interceptCustomError(error);
       }
     }
 
@@ -857,7 +829,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
     }, 1 * 1000);
 
-    navigation.navigate(RouteEnum.MainTabs, { screen: RouteEnum.History });
+    navigation.navigate(RouteEnum.ComputingOK, { error: `${customError ? customError : error}` });
   };
 
   const interceptCustomError = (error: string) => {

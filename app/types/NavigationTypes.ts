@@ -80,6 +80,8 @@ export type AppDrawerParamList = {
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
   [RouteEnum.Seed]: SeedNavigationState | undefined;
   [RouteEnum.Computing]: ComputingNavigationState | undefined;
+  [RouteEnum.ComputingOK]: ComputingOKNavigationState | undefined;
+  [RouteEnum.ComputingError]: ComputingErrorNavigationState | undefined;
 
 };
 
@@ -149,4 +151,12 @@ export type SeedNavigationState = {
 
 export type ComputingNavigationState = {
   sendPageStatePar: SendPageStateClass;
+};
+
+export type ComputingOKNavigationState = {
+  txid: string;
+};
+
+export type ComputingErrorNavigationState = {
+  error: string;
 };

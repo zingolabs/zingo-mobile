@@ -13,9 +13,9 @@ import ZecAmount from '../../../components/Components/ZecAmount';
 import { ContextAppLoaded } from '../../context';
 
 
-type ComputingTxContentProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Computing>;
+type ComputingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Computing>;
 
-const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
+const Computing: React.FunctionComponent<ComputingProps> = ({
   route,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -59,7 +59,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
                 margin: 10,
               }}
             >
-              {<PaperPlane width={40} height={40} />}
+              <PaperPlane width={40} height={40} />
             </View>
           </View>
           <RegText style={{ fontSize: 30, alignSelf: 'center' }}>Sending</RegText>
@@ -91,4 +91,4 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   );
 };
 
-export default ComputingTxContent;
+export default Computing;

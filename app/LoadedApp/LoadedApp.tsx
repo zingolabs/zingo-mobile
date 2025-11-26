@@ -94,10 +94,12 @@ import Receive from '../../components/Receive';
 import { SettingsMenu } from '../../components/Settings';
 import Faucet from '../../components/Faucet';
 import { MainTabs } from './components/MainTabs';
-import ComputingTxContent from './components/ComputingTxContent';
+import Computing from './components/Computing';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
 import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import Seed from '../../components/Seed';
+import ComputingOK from './components/ComputingOK';
+import ComputingError from './components/ComputingError';
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();
 
@@ -108,6 +110,8 @@ type InnerStackParamList = {
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Faucet]: undefined;
   [RouteEnum.Computing]: undefined;
+  [RouteEnum.ComputingOK]: undefined;
+  [RouteEnum.ComputingError]: undefined;
   [RouteEnum.ValueTransferDetail]: undefined;
   [RouteEnum.ScannerAddress]: undefined;
   [RouteEnum.Seed]: undefined;
@@ -1953,7 +1957,15 @@ export class LoadedAppClass extends Component<
               </InnerStack.Screen>
 
               <InnerStack.Screen name={RouteEnum.Computing}>
-                {props => <ComputingTxContent {...props} />}
+                {props => <Computing {...props} />}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.ComputingOK}>
+                {props => <ComputingOK {...props} />}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.ComputingError}>
+                {props => <ComputingError {...props} />}
               </InnerStack.Screen>
 
               <InnerStack.Screen name={RouteEnum.ValueTransferDetail}>

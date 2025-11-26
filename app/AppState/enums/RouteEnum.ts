@@ -24,6 +24,8 @@ export enum RouteEnum {
   Info = 'Info',
   Insight = 'Insight',
   Computing = 'Computing',
+  ComputingOK = 'ComputingOK',
+  ComputingError = 'ComputingError',
   SyncReport = 'SyncReport',
   Pools = 'Pools',
   ContactList = 'ContactList',
