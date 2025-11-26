@@ -12,7 +12,7 @@ import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import { LoadingAppNavigationState, AppDrawerParamList } from '../types';
+import { LoadingAppNavigationState } from '../types';
 import NetInfo, {
   NetInfoSubscription,
   NetInfoState,
@@ -81,45 +81,35 @@ import {
   removeRecoveryWalletInfo,
 } from '../recoveryWalletInfov10';
 
-import History from '../../components/History';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import Drawer from '../../components/Drawer';
 import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
-import { AddressList } from '../../components/AddressList';
-import ScannerAddress from '../../components/Send/components/ScannerAddress';
-import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
-import Memo from '../../components/Memo';
-import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Send from '../../components/Send';
 import Receive from '../../components/Receive';
-import { Settings, SettingsMenu } from '../../components/Settings';
-import Claim from '../../components/Claim';
-import Staking from '../../components/Staking';
+import { SettingsMenu } from '../../components/Settings';
+import Faucet from '../../components/Faucet';
+import { MainTabs } from './components/MainTabs';
 
-const About = React.lazy(() => import('../../components/About'));
-const Seed = React.lazy(() => import('../../components/Seed'));
-const Info = React.lazy(() => import('../../components/Info'));
-const SyncReport = React.lazy(() => import('../../components/SyncReport'));
-const Rescan = React.lazy(() => import('../../components/Rescan'));
-const Pools = React.lazy(() => import('../../components/Pools'));
-const Insight = React.lazy(() => import('../../components/Insight'));
-const ComputingTxContent = React.lazy(
-  () => import('./components/ComputingTxContent'),
-);
+const InnerStack = createNativeStackNavigator<InnerStackParamList>();
+
+type InnerStackParamList = {
+  MainTabs: undefined;
+  [RouteEnum.SettingsMenu]: undefined;
+  [RouteEnum.Send]: undefined;
+  [RouteEnum.Receive]: undefined;
+  [RouteEnum.Faucet]: undefined;
+};
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
 const pt = require('../translations/pt.json');
 const ru = require('../translations/ru.json');
 const tr = require('../translations/tr.json');
-
-const Stack = createNativeStackNavigator<AppDrawerParamList>();
 
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -142,9 +132,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [loading, setLoading] = useState<boolean>(true);
 
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(
-    CurrencyEnum.noCurrency,
-  ); // by default none because of cTAZ
+
   const [indexerServer, setIndexerServer] =
     useState<ServerType>(SERVER_DEFAULT_0);
   const [selectIndexerServer, setSelectIndexerServer] =
@@ -282,18 +270,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
         //console.log('apploaded NO settings', languageTag);
       }
-      if (
-        settings.currency === CurrencyEnum.noCurrency ||
-        settings.currency === CurrencyEnum.USDCurrency ||
-        settings.currency === CurrencyEnum.USDTORCurrency
-      ) {
-        setCurrency(settings.currency);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.currency,
-          currency,
-        );
-      }
+
       // lightwallet server
       if (settings.indexerServer) {
         setIndexerServer(settings.indexerServer);
@@ -408,7 +385,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         theme={theme}
         translate={translate}
         language={language}
-        currency={currency}
+        currency={CurrencyEnum.noCurrency}
         indexerServer={indexerServer}
         selectIndexerServer={selectIndexerServer}
         sendAll={sendAll}
@@ -1245,7 +1222,7 @@ export class LoadedAppClass extends Component<
       this.state.navigationHome?.navigate(RouteEnum.About);
       return;
     } else if (item === MenuItemEnum.Settings) {
-      this.state.navigationHome?.navigate(RouteEnum.Settings);
+      this.state.navigationHome?.navigate(RouteEnum.SettingsMenu);
       return;
     } else if (item === MenuItemEnum.Rescan) {
       this.state.navigationHome?.navigate(RouteEnum.Rescan);
@@ -1896,11 +1873,6 @@ export class LoadedAppClass extends Component<
       performanceLevel: this.state.performanceLevel,
     };
 
-    //console.log('render LoadedAppClass - 3');
-    //console.log('vt', valueTransfers);
-    //console.log('ad', addresses);
-    //console.log('ba', totalBalance);
-
     return (
       <ToastProvider>
         <Snackbars
@@ -1911,234 +1883,66 @@ export class LoadedAppClass extends Component<
 
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
-            <Drawer
-              onMenuItemSelected={this.onMenuItemSelected}
-              initialRouteName={RouteEnum.History}
-              screenName={this.screenName}
+            <InnerStack.Navigator
+              screenOptions={{
+                headerShown: false,
+                animation: 'simple_push',
+              }}
             >
-              <Drawer.Screen name={RouteEnum.History}>
-                {props => {
-                  useEffect(() => {
-                    this.setNavigationHome(props.navigation);
-                  });
-                  return (
-                    <History
-                      {...props}
-                      toggleMenuDrawer={
-                        () => props.navigation.toggleDrawer() /* header */
-                      }
-                      setShieldingAmount={this.setShieldingAmount /* header */}
-                      setScrollToTop={
-                        this.setScrollToTop /* header & history */
-                      }
-                      scrollToTop={scrollToTop /* history */}
-                      setScrollToBottom={
-                        this.setScrollToBottom /* header & messages */
-                      }
-                    />
-                  );
-                }}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Send}>
-                {props => (
-                  <Send
-                    {...props}
-                    toggleMenuDrawer={
-                      () => props.navigation.toggleDrawer() /* header */
-                    }
-                    setShieldingAmount={this.setShieldingAmount /* header */}
-                    setScrollToTop={this.setScrollToTop /* header & send */}
-                    setScrollToBottom={
-                      this.setScrollToBottom /* header & send */
-                    }
-                    sendTransaction={this.sendTransaction /* send */}
-                    setServerOption={this.setServerOption /* send */}
-                    clearToAddr={this.clearToAddr /* send */}
-                    setSecurityOption={this.setSecurityOption /* send */}
+              <InnerStack.Screen name="MainTabs">
+                {() => (
+                  <MainTabs
+                    scrollToTop={scrollToTop}
+                    setScrollToTop={this.setScrollToTop}
+                    setScrollToBottom={this.setScrollToBottom}
+                    setShieldingAmount={this.setShieldingAmount}
                   />
                 )}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Receive}>
-                {props => (
-                  <Receive
-                    {...props}
-                    toggleMenuDrawer={
-                      () => props.navigation.toggleDrawer() /* header */
-                    }
-                    setSecurityOption={this.setSecurityOption}
-                  />
-                )}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Settings}>
-                {props => (
-                  <Settings
-                    {...props}
-                    setServerOption={this.setServerOption}
-                    setCurrencyOption={this.setCurrencyOption}
-                    setLanguageOption={this.setLanguageOption}
-                    setSendAllOption={this.setSendAllOption}
-                    setDonationOption={this.setDonationOption}
-                    setModeOption={this.setModeOption}
-                    setSecurityOption={this.setSecurityOption}
-                    setSelectServerOption={this.setSelectServerOption}
-                    setRescanMenuOption={this.setRescanMenuOption}
-                    setRecoveryWalletInfoOnDeviceOption={
-                      this.setRecoveryWalletInfoOnDeviceOption
-                    }
-                    setPerformanceLevelOption={this.setPerformanceLevelOption}
-                    toggleMenuDrawer={
-                      () => props.navigation.toggleDrawer() /* header */
-                    }
-                  />
-                )}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.SettingsMenu}>
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.SettingsMenu}>
                 {props => (
                   <SettingsMenu
                     {...props}
-                    navigateToLoadingApp={this.navigateToLoadingApp}
+                    navigateToLoadingApp={this.navigateToLoadingApp} // TODO: This breaks native transitions
                   />
                 )}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Claim} component={Claim} />
-              <Drawer.Screen name={RouteEnum.Staking} component={Staking} />
-              <Drawer.Screen name={RouteEnum.About} component={About} />
-              <Drawer.Screen name={RouteEnum.Rescan}>
-                {props => <Rescan {...props} doRescan={this.doRescan} />}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Info} component={Info} />
-              <Drawer.Screen name={RouteEnum.InsightStack}>
-                {() => {
-                  return (
-                    <Stack.Navigator
-                      initialRouteName={RouteEnum.Insight}
-                      screenOptions={{ headerShown: false, animation: 'none' }}
-                    >
-                      <Stack.Screen
-                        name={RouteEnum.Insight}
-                        component={Insight}
-                      />
-                      <Stack.Screen
-                        name={RouteEnum.ScannerAddress}
-                        component={ScannerAddress}
-                      />
-                    </Stack.Navigator>
-                  );
-                }}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Seed}>
-                {props => {
-                  const action =
-                    !!props.route.params &&
-                    props.route.params.action !== undefined
-                      ? props.route.params.action
-                      : SeedActionEnum.view;
-                  if (action === SeedActionEnum.view) {
-                    return (
-                      <Seed
-                        {...props}
-                        onClickOK={() => {}}
-                        onClickCancel={() => {}}
-                        keepAwake={this.keepAwake}
-                        setIsSeedViewModalOpen={this.setIsSeedViewModalOpen}
-                      />
-                    );
-                  } else if (action === SeedActionEnum.change) {
-                    return (
-                      <Seed
-                        {...props}
-                        onClickOK={async () =>
-                          await this.onClickOKChangeWallet({
-                            startingApp: false,
-                          })
-                        }
-                        onClickCancel={() => {}}
-                      />
-                    );
-                  } else if (action === SeedActionEnum.backup) {
-                    return (
-                      <Seed
-                        {...props}
-                        onClickOK={async () =>
-                          await this.onClickOKRestoreBackup()
-                        }
-                        onClickCancel={() => {}}
-                      />
-                    );
-                  } else if (action === SeedActionEnum.server) {
-                    return (
-                      <Seed
-                        {...props}
-                        onClickOK={async () =>
-                          await this.onClickOKServerWallet()
-                        }
-                        onClickCancel={async () => {
-                          // restart all the tasks again, nothing happen.
-                          await this.rpc.clearTimers();
-                          await this.rpc.configure();
-                        }}
-                      />
-                    );
-                  }
-                }}
-              </Drawer.Screen>
-              <Drawer.Screen
-                name={RouteEnum.SyncReport}
-                component={SyncReport}
-              />
-              <Drawer.Screen name={RouteEnum.Pools} component={Pools} />
-              <Drawer.Screen name={RouteEnum.ValueTransferDetailStack}>
-                {() => {
-                  return (
-                    <Stack.Navigator
-                      initialRouteName={RouteEnum.ValueTransferDetail}
-                      screenOptions={{ headerShown: false, animation: 'none' }}
-                    >
-                      <Stack.Screen
-                        name={RouteEnum.ValueTransferDetail}
-                        component={ValueTransferDetail}
-                      />
-                      <Stack.Screen
-                        name={RouteEnum.ScannerAddress}
-                        component={ScannerAddress}
-                      />
-                    </Stack.Navigator>
-                  );
-                }}
-              </Drawer.Screen>
-              <Drawer.Screen
-                name={RouteEnum.AddressList}
-                component={AddressList}
-              />
-              <Drawer.Screen
-                name={RouteEnum.ScannerAddress}
-                component={ScannerAddress}
-              />
-              <Drawer.Screen name={RouteEnum.Memo} component={Memo} />
-              <Drawer.Screen name={RouteEnum.ConfirmStack}>
-                {() => {
-                  return (
-                    <Stack.Navigator
-                      initialRouteName={RouteEnum.Confirm}
-                      screenOptions={{ headerShown: false, animation: 'none' }}
-                    >
-                      <Stack.Screen
-                        name={RouteEnum.Confirm}
-                        component={Confirm}
-                      />
-                      <Stack.Screen
-                        name={RouteEnum.ScannerAddress}
-                        component={ScannerAddress}
-                      />
-                    </Stack.Navigator>
-                  );
-                }}
-              </Drawer.Screen>
-              <Drawer.Screen
-                name={RouteEnum.Computing}
-                component={ComputingTxContent}
-              />
-            </Drawer>
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.Send}>
+                {props => (
+                  <Send
+                    toggleMenuDrawer={function (): void {
+                      throw new Error('Function not implemented.');
+                    }}
+                    setShieldingAmount={this.setShieldingAmount}
+                    setScrollToTop={this.setScrollToTop}
+                    setScrollToBottom={this.setScrollToBottom}
+                    setServerOption={this.setServerOption}
+                    clearToAddr={this.clearToAddr}
+                    setSecurityOption={this.setSecurityOption}
+                    {...props}
+                    sendTransaction={this.sendTransaction}
+                  />
+                )}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.Receive}>
+                {props => (
+                  <Receive
+                    toggleMenuDrawer={function (): void {
+                      throw new Error('Function not implemented.');
+                    }}
+                    setSecurityOption={this.setSecurityOption}
+                    {...props}
+                  />
+                )}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.Faucet}>
+                {props => <Faucet {...props} />}
+              </InnerStack.Screen>
+            </InnerStack.Navigator>
           </GestureHandlerRootView>
         </ContextAppLoadedProvider>
       </ToastProvider>

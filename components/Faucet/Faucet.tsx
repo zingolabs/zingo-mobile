@@ -15,14 +15,12 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import RegText from '../Components/RegText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type ClaimProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Claim>;
+type FaucetProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Faucet>;
 
-const Claim: React.FunctionComponent<ClaimProps> = ({
-  navigation,
-}) => {
+const Faucet: React.FunctionComponent<FaucetProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const { snackbars, removeFirstSnackbar } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.About;
 
@@ -36,13 +34,15 @@ const Claim: React.FunctionComponent<ClaimProps> = ({
         screenName={screenName}
       />
 
-      <View style={{
-        position: 'absolute',
-        width: 75,
-        top: 10,
-        left: 10,
-        zIndex: 999,
-      }}>
+      <View
+        style={{
+          position: 'absolute',
+          width: 75,
+          top: 10,
+          left: 10,
+          zIndex: 999,
+        }}
+      >
         <View
           style={{
             borderRadius: 25,
@@ -51,19 +51,22 @@ const Claim: React.FunctionComponent<ClaimProps> = ({
             padding: 10,
             margin: 10,
             backgroundColor: colors.background,
-          }}>
-            <TouchableOpacity onPress={() => {
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
               clear();
               if (navigation.canGoBack()) {
                 navigation.goBack();
               }
-            }}>
-              <FontAwesomeIcon
-                size={30}
-                icon={faChevronLeft}
-                color={colors.text}
-              />
-            </TouchableOpacity>
+            }}
+          >
+            <FontAwesomeIcon
+              size={30}
+              icon={faChevronLeft}
+              color={colors.text}
+            />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -74,20 +77,25 @@ const Claim: React.FunctionComponent<ClaimProps> = ({
           paddingTop: insets.top + 8,
           paddingBottom: insets.bottom + 8,
           paddingHorizontal: 16,
-      }}>
+        }}
+      >
         <View
           style={{
             flexGrow: 1,
             alignItems: 'flex-start',
             justifyContent: 'center',
-        }}>
-
-          <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>Claim</RegText>
-
+          }}
+        >
+          <RegText
+            color={colors.text}
+            style={{ fontSize: 30, alignSelf: 'center' }}
+          >
+            Faucet
+          </RegText>
         </View>
       </ScrollView>
     </ToastProvider>
   );
 };
 
-export default Claim;
+export default Faucet;

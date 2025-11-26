@@ -1,4 +1,14 @@
-import { AddressKindEnum, LaunchingModeEnum, RouteEnum, SeedActionEnum, SelectServerEnum, SendPageStateClass, ServerType, UfvkActionEnum, ValueTransferType } from '../AppState';
+import {
+  AddressKindEnum,
+  LaunchingModeEnum,
+  RouteEnum,
+  SeedActionEnum,
+  SelectServerEnum,
+  SendPageStateClass,
+  ServerType,
+  UfvkActionEnum,
+  ValueTransferType,
+} from '../AppState';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 
 /**
@@ -47,7 +57,7 @@ export type AppDrawerParamList = {
   [RouteEnum.InsightStack]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.SettingsMenu]: undefined;
-  [RouteEnum.Claim]: undefined;
+  [RouteEnum.Faucet]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.Staking]: undefined;
   [RouteEnum.Rescan]: undefined;
@@ -61,7 +71,9 @@ export type AppDrawerParamList = {
   // Drawer with params
   [RouteEnum.AddressList]: AddressListNavigationState | undefined;
   [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
-  [RouteEnum.ValueTransferDetail]: ValueTransferDetailNavigationState | undefined;
+  [RouteEnum.ValueTransferDetail]:
+    | ValueTransferDetailNavigationState
+    | undefined;
   [RouteEnum.MessagesAddress]: MessagesAddressNavigationState | undefined;
   [RouteEnum.MessagesAll]: MessagesAllNavigationState | undefined;
   [RouteEnum.Memo]: MemoNavigationState | undefined;
