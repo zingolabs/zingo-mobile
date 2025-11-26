@@ -28,6 +28,9 @@ function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Hist
     },
   };
 }
+jest.mock('../assets/icons/paper-plane.svg', () => 'PaperPlane');
+jest.mock('../assets/icons/qr.svg', () => 'QrCode');
+jest.mock('../assets/icons/faucet.svg', () => 'FaucetIcon');
 // test suite
 describe('Component History - test', () => {
   //snapshot test

@@ -63,7 +63,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Info]: undefined;
   [RouteEnum.Insight]: undefined;
-  [RouteEnum.Computing]: undefined;
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
   [RouteEnum.ContactList]: undefined;
@@ -80,6 +79,8 @@ export type AppDrawerParamList = {
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
   [RouteEnum.Seed]: SeedNavigationState | undefined;
+  [RouteEnum.Computing]: ComputingNavigationState | undefined;
+
 };
 
 export type AddressListNavigationState = {
@@ -144,4 +145,8 @@ export type UfvkNavigationState = {
 
 export type SeedNavigationState = {
   action: SeedActionEnum;
+};
+
+export type ComputingNavigationState = {
+  sendPageStatePar: SendPageStateClass;
 };

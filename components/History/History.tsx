@@ -323,15 +323,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
     index: number,
     vt: ValueTransferType,
   ) => {
-    navigation.navigate(RouteEnum.ValueTransferDetailStack, {
-      screen: RouteEnum.ValueTransferDetail,
-      params: {
-        index: index,
-        vt: vt,
-        valueTransfersSliced: valueTransfersSliced,
-        totalLength:
-          valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0,
-      },
+    navigation.navigate(RouteEnum.ValueTransferDetail, {
+      index: index,
+      vt: vt,
+      valueTransfersSliced: valueTransfersSliced,
+      totalLength:
+        valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0,
     });
   };
 

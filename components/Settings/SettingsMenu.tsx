@@ -18,10 +18,12 @@ import Button from '../Components/Button';
 
 type SettingsMenuProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.SettingsMenu> & {
   navigateToLoadingApp: (state: LoadingAppNavigationState) => Promise<void>;
+  onClickOKChangeWallet: (state: LoadingAppNavigationState) => Promise<void>;
 };
 
 const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
   navigateToLoadingApp,
+  onClickOKChangeWallet,
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -33,7 +35,7 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
   const insets = useSafeAreaInsets();
 
   const restoreWallet = () => {
-
+    onClickOKChangeWallet({ screen: 3, startingApp: false });
   };
 
   return (
@@ -120,7 +122,7 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
           paddingTop: 10,
           paddingBottom: 20,
         }}>
-        <Button type={ButtonTypeEnum.Primary} title={'Restore wallet'} onPress={restoreWallet} />
+        <Button type={ButtonTypeEnum.Primary} title={'Switch to different wallet'} onPress={restoreWallet} />
       </View>
     </ToastProvider>
   );

@@ -6,6 +6,8 @@ export enum RouteEnum {
   Servers = 'Servers',
   Staking = 'Staking',
 
+  MainTabs = 'MainTabs',
+
   // Drawer no params
   History = 'History',
   Send = 'Send',

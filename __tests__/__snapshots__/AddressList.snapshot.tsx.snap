@@ -347,7 +347,7 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
                   }
                 }
               >
-                Claim
+                Faucet
               </Text>
             </View>
           </View>
@@ -823,7 +823,7 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
                   }
                 }
               >
-                Claim
+                Faucet
               </Text>
             </View>
           </View>

@@ -94,15 +94,23 @@ import Receive from '../../components/Receive';
 import { SettingsMenu } from '../../components/Settings';
 import Faucet from '../../components/Faucet';
 import { MainTabs } from './components/MainTabs';
+import ComputingTxContent from './components/ComputingTxContent';
+import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
+import ScannerAddress from '../../components/Send/components/ScannerAddress';
+import Seed from '../../components/Seed';
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();
 
 type InnerStackParamList = {
-  MainTabs: undefined;
+  [RouteEnum.MainTabs]: undefined;
   [RouteEnum.SettingsMenu]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Faucet]: undefined;
+  [RouteEnum.Computing]: undefined;
+  [RouteEnum.ValueTransferDetail]: undefined;
+  [RouteEnum.ScannerAddress]: undefined;
+  [RouteEnum.Seed]: undefined;
 };
 
 const en = require('../translations/en.json');
@@ -1889,7 +1897,7 @@ export class LoadedAppClass extends Component<
                 animation: 'simple_push',
               }}
             >
-              <InnerStack.Screen name="MainTabs">
+              <InnerStack.Screen name={RouteEnum.MainTabs}>
                 {() => (
                   <MainTabs
                     scrollToTop={scrollToTop}
@@ -1904,7 +1912,8 @@ export class LoadedAppClass extends Component<
                 {props => (
                   <SettingsMenu
                     {...props}
-                    navigateToLoadingApp={this.navigateToLoadingApp} // TODO: This breaks native transitions
+                    navigateToLoadingApp={this.navigateToLoadingApp}
+                    onClickOKChangeWallet={this.onClickOKChangeWallet}
                   />
                 )}
               </InnerStack.Screen>
@@ -1941,6 +1950,22 @@ export class LoadedAppClass extends Component<
 
               <InnerStack.Screen name={RouteEnum.Faucet}>
                 {props => <Faucet {...props} />}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.Computing}>
+                {props => <ComputingTxContent {...props} />}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.ValueTransferDetail}>
+                {props => <ValueTransferDetail {...props} />}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.ScannerAddress}>
+                {props => <ScannerAddress {...props} />}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.Seed}>
+                {props => <Seed {...props} />}
               </InnerStack.Screen>
             </InnerStack.Navigator>
           </GestureHandlerRootView>

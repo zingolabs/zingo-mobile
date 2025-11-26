@@ -5,16 +5,24 @@ import { useTheme } from '@react-navigation/native';
 
 import RegText from '../../../components/Components/RegText';
 import { AppDrawerParamList, ThemeType } from '../../types';
-import { ContextAppLoaded } from '../../context';
-import { RouteEnum } from '../../AppState';
+import { RouteEnum, SendPageStateClass } from '../../AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import PaperPlane from '../../../assets/icons/paper-plane.svg';
+import Utils from '../../utils';
+import ZecAmount from '../../../components/Components/ZecAmount';
+import { ContextAppLoaded } from '../../context';
+
 
 type ComputingTxContentProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Computing>;
 
-const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({}) => {
+const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
+  route,
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { info, privacy } = context;
   const { colors } = useTheme() as ThemeType;
+
+  const sendPageStatePar = !!route.params && route.params.sendPageStatePar !== undefined ? route.params.sendPageStatePar : {} as SendPageStateClass;
 
   return (
     <View
@@ -27,10 +35,57 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({}
           flexGrow: 1,
           justifyContent: 'center',
           alignItems: 'center',
-        }}>
-        <RegText>{translate('loadedapp.computingtx') as string}</RegText>
-        <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
-        <RegText>{translate('wait') as string}</RegText>
+      }}>
+        <View 
+          style={{
+            backgroundColor: colors.secondary,
+            padding: 50,
+            width: '90%',
+            borderRadius: 50,
+          }}
+        >
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginHorizontal: 8,
+            }}
+          >
+            <View
+              style={{
+                borderRadius: 45,
+                backgroundColor: '#1C78D24D',
+                padding: 20,
+                margin: 10,
+              }}
+            >
+              {<PaperPlane width={40} height={40} />}
+            </View>
+          </View>
+          <RegText style={{ fontSize: 30, alignSelf: 'center' }}>Sending</RegText>
+          <ActivityIndicator size="large" color={colors.text} style={{ marginVertical: 20 }} />
+        </View>
+        <View 
+          style={{
+            marginTop: 20,
+            backgroundColor: colors.secondary,
+            padding: 50,
+            width: '90%',
+            borderRadius: 20,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <ZecAmount
+            currencyName={info.currencyName}
+            color={colors.text}
+            size={20}
+            amtZec={Utils.parseStringLocaleToNumberFloat(sendPageStatePar.toaddr.amount)}
+            privacy={privacy}
+            style={{ fontWeight: '900', marginBottom: 20 }}
+          />
+          <RegText>{`To: ${Utils.trimToSmall(sendPageStatePar.toaddr.to, 10)}`}</RegText>
+        </View>
       </View>
     </View>
   );

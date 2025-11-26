@@ -39,8 +39,8 @@ type TextsType = {
 };
 
 type SeedProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
-  onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
-  onClickCancel: () => void;
+  onClickOK?: (seedPhrase: string, birthdayNumber: number) => void;
+  onClickCancel?: () => void;
   keepAwake?: (v: boolean) => void;
   setIsSeedViewModalOpen?: (v: boolean) => void;
 };
@@ -165,13 +165,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   };
 
   const onClickCancelHide = () => {
-    onClickCancel();
+    onClickCancel && onClickCancel();
     clear();
     hiding();
   };
 
   const onClickOKHide = (seedPhraseParm: string, birthdayNumberParm: number) => {
-    onClickOK(seedPhraseParm, birthdayNumberParm);
+    onClickOK && onClickOK(seedPhraseParm, birthdayNumberParm);
     clear();
     hiding();
   };
@@ -186,7 +186,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       setBasicFirstViewSeed(true);
       keepAwake && keepAwake(false);
       // redirect to history screen
-      navigation.navigate(RouteEnum.History);
+      navigation.navigate(RouteEnum.MainTabs, { screen: RouteEnum.History });
     } else {
       if (navigation.canGoBack()) {
         navigation.goBack();

@@ -281,10 +281,13 @@ const Servers: React.FunctionComponent<ServersProps> = ({
               title={translate('continue') as string}
               disabled={actionButtonsDisabled || !indexerServerUriLocal}
               onPress={() => {
+                setIndexerServerUri(indexerServerUriLocal);
                 Keyboard.dismiss();
                 clear();
-                setIndexerServerUri(indexerServerUriLocal);
-                closeServers();
+                // the App needs some time to store data.
+                setTimeout(() => {
+                  closeServers();
+                }, 100);
               }}
               style={{ 
                 marginBottom: 4,

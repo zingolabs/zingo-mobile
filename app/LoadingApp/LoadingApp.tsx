@@ -869,11 +869,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
   setIndexerServerUri = async (indexerServerUri: string) => {
     const NewIndexerServer: ServerType = { uri: indexerServerUri, chainName: this.state.indexerServer.chainName };
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, NewIndexerServer);
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.custom);
     this.setState({
       indexerServer: NewIndexerServer,
     });
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, NewIndexerServer);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.custom);
   };
   
   closeServers = () => {

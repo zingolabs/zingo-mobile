@@ -361,7 +361,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
                     }
                   }
                 >
-                  Claim
+                  Faucet
                 </Text>
               </View>
             </View>
