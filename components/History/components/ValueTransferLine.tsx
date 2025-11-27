@@ -31,9 +31,9 @@ import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 
 import { ContextAppLoaded } from '../../../app/context';
-import AddressItem from '../../Components/AddressItem';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import Utils from '../../../app/utils';
+import RegText from '../../Components/RegText';
 //import Utils from '../../../app/utils';
 
 type ValueTransferLineProps = {
@@ -57,7 +57,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   nextLineWithSameTxid,
   //setMessagesAddressModalShow,
   addressProtected,
-  screenName,
   registerSwipeable,
   closeAllSwipeables,
   closeOtherSwipeables,
@@ -327,7 +326,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 {!!vt.address &&
                   (vt.confirmations < 0 || vt.confirmations >= GlobalConst.minConfirmations) && (
                   <View>
-                    <AddressItem address={vt.address} screenName={screenName} oneLine={true} />
+                    <RegText>{Utils.trimToSmall(vt.address, 10)}</RegText>
                   </View>
                 )}
                 <View
@@ -388,7 +387,13 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 size={18}
                 currencyName={info.currencyName}
                 color={amountColor}
-                amtZec={vt.amount}
+                amtZec={vt.kind === ValueTransferKindEnum.Received ||
+                        vt.kind === ValueTransferKindEnum.Shield
+                          ? vt.amount
+                          : (Number(Utils.splitZecAmountIntoBigSmall(vt.amount).bigPart) === 0
+                            ? vt.amount 
+                            : vt.amount * (-1))
+                        }
                 privacy={privacy}
               />
             </View>
