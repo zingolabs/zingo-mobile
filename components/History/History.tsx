@@ -54,8 +54,8 @@ import { Swipeable } from 'react-native-gesture-handler';
 const ViewTypes = {
   WITH_MONTH: 0,
   WITHOUT_MONTH: 1,
-  WITH_MONTH_REFRESH: 2,
-  WITHOUT_MONTH_REFRESH: 3,
+  WITH_MONTH_ADDRESS: 2,
+  WITHOUT_MONTH_ADDRESS: 3,
 };
 
 type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> & {
@@ -139,8 +139,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
           const data = valueTransfersSliced[index];
 
           if (index === 0) {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITH_MONTH_REFRESH;
+            if (data.address) {
+              return ViewTypes.WITH_MONTH_ADDRESS;
             } else {
               return ViewTypes.WITH_MONTH;
             }
@@ -156,14 +156,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
               : '--- ----';
 
           if (txmonth !== lasttxmonth) {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITH_MONTH_REFRESH;
+            if (data.address) {
+              return ViewTypes.WITH_MONTH_ADDRESS;
             } else {
               return ViewTypes.WITH_MONTH;
             }
           } else {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITHOUT_MONTH_REFRESH;
+            if (data.address) {
+              return ViewTypes.WITHOUT_MONTH_ADDRESS;
             } else {
               return ViewTypes.WITHOUT_MONTH;
             }
@@ -174,22 +174,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
             // two lines
             dim.width = Dimensions.get('window').width;
             dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 70 : 60;
-          } else if (type === ViewTypes.WITHOUT_MONTH_REFRESH) {
-            // three lines
+              (Platform.OS === GlobalConst.platformOSandroid ? 65 : 55);
+          } else if (type === ViewTypes.WITHOUT_MONTH_ADDRESS) {
+            // three lines 
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 55) + 15;
+              (Platform.OS === GlobalConst.platformOSandroid ? 65 : 55) + 25;
           } else if (type === ViewTypes.WITH_MONTH) {
             // two lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 105 : 90;
-          } else if (type === ViewTypes.WITH_MONTH_REFRESH) {
+              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 90) + 45;
+          } else if (type === ViewTypes.WITH_MONTH_ADDRESS) {
             // three lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 85) + 15;
+              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 90) + 45 + 25;
           }
         },
       ),
@@ -347,7 +347,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         index={index}
         vt={data}
         month={
-          type === ViewTypes.WITH_MONTH || type === ViewTypes.WITH_MONTH_REFRESH
+          type === ViewTypes.WITH_MONTH || type === ViewTypes.WITH_MONTH_ADDRESS
             ? txmonth
             : ''
         }
