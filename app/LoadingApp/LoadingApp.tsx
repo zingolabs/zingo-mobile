@@ -682,7 +682,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     let someServerIsWorking: boolean = true;
     const actualServer = this.state.indexerServer;
     const server = await selectingServer(
-      serverUris(this.state.translate).filter(
+      serverUris().filter(
         (s: ServerUrisType) => !s.obsolete && s.uri !== (aDifferentOne ? actualServer.uri : ''),
       ),
     );

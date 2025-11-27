@@ -327,7 +327,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
                   }
                 }
               >
-                https://testnet.zec.rocks:443
+                http://45.76.30.90:18233
               </Text>
             </View>
           </View>
