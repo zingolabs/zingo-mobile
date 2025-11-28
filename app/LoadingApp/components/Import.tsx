@@ -302,7 +302,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                             minHeight: 48,
                             alignItems: 'center',
                             paddingHorizontal: 15,
-                            paddingVertical: 2,
+                            paddingVertical: 0,
                           }}>
                           <FadeText>{`${index + 1}`}.</FadeText>
                           <TextInput
