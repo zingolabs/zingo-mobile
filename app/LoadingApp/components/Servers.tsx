@@ -27,10 +27,11 @@ import { serverUris } from '../../uris';
 import RNPickerSelect from 'react-native-picker-select';
 import {
   faCheck,
-  faChevronDown,
   faChevronLeft,
   faWarning,
 } from '@fortawesome/free-solid-svg-icons';
+import ChevronDown from '../../../assets/icons/chevron-down.svg';
+import XIcon from '../../../assets/icons/x.svg';
 import LiquidPrimaryButton from '../../../components/Staking/LiquidPrimaryButton';
 
 type ServersProps = {
@@ -252,11 +253,11 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                   }
                 }}
               >
-                <FontAwesomeIcon
-                  size={30}
-                  icon={faChevronDown}
-                  color={colors.text}
+                <ChevronDown
+                  width={30}
+                  height={30}
                   style={{ marginHorizontal: 15 }}
+                  color={colors.text}
                 />
               </RNPickerSelect>
             </View>
@@ -282,9 +283,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                     padding: 0,
                   }}
                 >
-                  <RegText style={{ color: colors.background, marginTop: -3 }}>
-                    x
-                  </RegText>
+                  <XIcon width={20} height={20} />
                 </View>
               </TouchableOpacity>
             )}
