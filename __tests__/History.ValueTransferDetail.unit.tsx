@@ -48,12 +48,9 @@ describe('Component History ValueTransferDetail - test', () => {
       </ContextAppLoadedProvider>,
     ).toJSON();
     // rounded
-    const num = screen.getAllByText('0.12346');
-    expect(num.length).toBe(2);
+    const num = screen.getAllByText('-0.12346');
+    expect(num.length).toBe(1);
     screen.getByText('0.0001');
-    screen.getByText('hola & hello');
-    const txt = screen.queryByText('hola & hello\nhello & hola');
-    expect(txt).toBe(null);
   });
 
   const props_1 = makeDrawerProps(1);
@@ -64,9 +61,8 @@ describe('Component History ValueTransferDetail - test', () => {
       </ContextAppLoadedProvider>,
     );
     const num = screen.getAllByText('0');
-    expect(num.length).toBe(2);
+    expect(num.length).toBe(1);
     screen.getByText('0.0001');
-    screen.getByText('orchard memo\nsapling memo');
   });
 
   const props_2 = makeDrawerProps(2);
@@ -77,7 +73,7 @@ describe('Component History ValueTransferDetail - test', () => {
       </ContextAppLoadedProvider>,
     );
     const num = screen.getAllByText('0');
-    expect(num.length).toBe(2);
+    expect(num.length).toBe(1);
     screen.getByText('0.0001');
   });
 
@@ -89,10 +85,7 @@ describe('Component History ValueTransferDetail - test', () => {
       </ContextAppLoadedProvider>,
     );
     const num = screen.getAllByText('0.77654');
-    expect(num.length).toBe(2);
-    screen.getByText('hola & hello');
-    const txt = screen.queryByText('hola & hello\nhello & hola');
-    expect(txt).toBe(null);
+    expect(num.length).toBe(1);
   });
 
   const props_4 = makeDrawerProps(4);
@@ -103,7 +96,7 @@ describe('Component History ValueTransferDetail - test', () => {
       </ContextAppLoadedProvider>,
     );
     const num = screen.getAllByText('0.0009');
-    expect(num.length).toBe(2);
+    expect(num.length).toBe(1);
     screen.getByText('0.0001');
   });
 
@@ -114,8 +107,8 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail {...props_5} />
       </ContextAppLoadedProvider>,
     );
-    const num = screen.getAllByText('0.0009');
-    expect(num.length).toBe(2);
+    const num = screen.getAllByText('-0.0009');
+    expect(num.length).toBe(1);
     screen.getByText('0.0001');
   });
 });

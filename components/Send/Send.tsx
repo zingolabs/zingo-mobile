@@ -1424,7 +1424,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     borderWidth: 1,
                     borderRadius: 25,
                     marginBottom: 10,
-                    backgroundColor: colors.secondary,
+                    backgroundColor: colors.background,
                     width: '100%',
                     maxWidth: maxW,
                     minWidth: '50%',

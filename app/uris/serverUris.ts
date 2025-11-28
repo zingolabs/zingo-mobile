@@ -1,161 +1,23 @@
-import { ServerUrisType, TranslateType, ChainNameEnum } from '../AppState';
+import { ServerUrisType, ChainNameEnum } from '../AppState';
 
-const serverUris = (translate: (key: string) => TranslateType | void): ServerUrisType[] => {
+const serverUris = (): ServerUrisType[] => {
   return [
-    // default servers (3)
+    // default servers (2)
     {
-      uri: 'https://zec.rocks:443', // this will be the default server.
-      region: translate('settings.usa') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: true,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://lwd1.zcash-infra.com:9067',
-      region: translate('settings.usa') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: true,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://testnet.zec.rocks:443', // this will be the default server in Testnet.
-      region: 'USA' as string,
+      uri: 'http://45.76.30.90:18233',
+      region: 'CrossLink Workshop 1',
       chainName: ChainNameEnum.testChainName,
       default: true,
       latency: null,
       obsolete: false,
     },
-    // new servers (not default) (11)
     {
-      uri: 'https://na.zec.rocks:443',
-      region: translate('settings.na') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://sa.zec.rocks:443',
-      region: translate('settings.sa') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://eu.zec.rocks:443',
-      region: translate('settings.ea') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://ap.zec.rocks:443',
-      region: translate('settings.ao') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://lwd2.zcash-infra.com:9067',
-      region: translate('settings.hk') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://lwd3.zcash-infra.com:9067',
-      region: translate('settings.usa') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://lwd4.zcash-infra.com:9067',
-      region: translate('settings.canada') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://lwd5.zcash-infra.com:9067',
-      region: translate('settings.france') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://lwd6.zcash-infra.com:9067',
-      region: translate('settings.usa') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://lwd7.zcash-infra.com:9067',
-      region: translate('settings.netherlands') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    {
-      uri: 'https://lwd8.zcash-infra.com:9067',
-      region: translate('settings.uk') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-    },
-    // obsolete servers (5)
-    {
-      uri: 'https://mainnet.lightwalletd.com:9067',
-      region: translate('settings.na') as string,
-      chainName: ChainNameEnum.mainChainName,
+      uri: 'http://70.34.201.202:18233',
+      region: 'CrossLink Workshop 2',
+      chainName: ChainNameEnum.testChainName,
       default: true,
       latency: null,
-      obsolete: true,
-    },
-    {
-      uri: 'https://na.lightwalletd.com:443',
-      region: translate('settings.na') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: true,
-    },
-    {
-      uri: 'https://sa.lightwalletd.com:443',
-      region: translate('settings.sa') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: true,
-    },
-    {
-      uri: 'https://eu.lightwalletd.com:443',
-      region: translate('settings.ea') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: true,
-    },
-    {
-      uri: 'https://ai.lightwalletd.com:443',
-      region: translate('settings.ao') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: true,
+      obsolete: false,
     },
   ];
 };
