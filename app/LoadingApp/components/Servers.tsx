@@ -218,6 +218,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
               }}
             >
               <RNPickerSelect
+                darkTheme
                 style={{
                   modalViewBottom: {
                     minHeight: 300,
@@ -226,7 +227,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 pickerProps={{
                   mode: 'dialog',
                   itemStyle: {
-                    color: colors.background,
+                    color: colors.zingo,
                   },
                 }}
                 fixAndroidTouchableBug={true}
