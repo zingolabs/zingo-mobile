@@ -24,7 +24,7 @@ type Props = {
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
-  tintColor?: ColorValue; // optional override
+  tintColor?: ColorValue;
 };
 
 const LiquidPrimaryButton: React.FC<Props> = ({
@@ -38,11 +38,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   const [, setPressed] = useState(false);
 
-  const primary =
-    (tintColor as string | undefined) ??
-    colors.zingo ??
-    colors.primary ??
-    '#4f8cff';
+  const primary = disabled ? 'transparent' : (tintColor ?? colors.primary);
 
   if (!isLiquidGlassSupported) {
     return (
@@ -56,16 +52,18 @@ const LiquidPrimaryButton: React.FC<Props> = ({
     );
   }
 
-  // Liquid glass
   return (
     <TouchableWithoutFeedback
       onPress={onPress}
       disabled={disabled}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
     >
       <LiquidGlassView
-        interactive
+        key={disabled ? 'glass-disabled' : 'glass-enabled'}
+        interactive={!disabled}
         effect="clear"
         colorScheme="system"
         tintColor={primary}
@@ -93,6 +91,7 @@ const styles = StyleSheet.create({
   },
   fallback: {
     backgroundColor: '#4f8cff',
+    alignSelf: 'stretch',
   },
   disabled: {
     opacity: 0.5,
