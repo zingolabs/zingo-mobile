@@ -174,7 +174,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             // two lines
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 65 : 55);
+              (Platform.OS === GlobalConst.platformOSandroid ? 65 : 60);
           } else if (type === ViewTypes.WITHOUT_MONTH_ADDRESS) {
             // three lines 
             dim.width = Dimensions.get('window').width;

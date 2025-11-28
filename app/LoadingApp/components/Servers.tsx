@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { act, useContext, useEffect, useState } from 'react';
 import { View, ActivityIndicator, TextInput, Keyboard, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -138,7 +138,6 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 paddingVertical: 7,
               }}>
 
-
               <TextInput
                 placeholder={GlobalConst.serverPlaceHolder}
                 placeholderTextColor={colors.placeholder}
@@ -176,46 +175,49 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 }}
               />
 
-              <RNPickerSelect
-                style={{
-                  modalViewBottom: {
-                    minHeight: 300,
-                  },
-                }}
-                pickerProps={{
-                  mode: 'dialog',
-                  itemStyle: {
-                    color: colors.background,
-                  },
-                }}
-                fixAndroidTouchableBug={true}
-                value={indexerServerUriLocal}
-                items={[
-                  { label: serverUris()[0].uri, value: serverUris()[0].uri },
-                  { label: serverUris()[1].uri, value: serverUris()[1].uri },
-                ]}
-                placeholder={{
-                  label: translate(
-                    'settings.select-placeholder',
-                  ) as string,
-                  value: null,
-                  color: colors.primary,
-                }}
-                useNativeAndroidPickerStyle={false}
-                onValueChange={(itemValue: string) => {
-                  if (itemValue) {
-                    Keyboard.dismiss();
-                    setConnected(null);
-                    setBorderColor(colors.primary);
-                    setIndexerServerUriLocal(itemValue);
-                  }
-                }}
-              >
-                <View>
-                  <FontAwesomeIcon size={30} icon={faChevronDown} color={colors.text} style={{ marginRight: 15 }} />
-                </View>
-              </RNPickerSelect>
-
+              <View style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <RNPickerSelect
+                  style={{
+                    modalViewBottom: {
+                      minHeight: 300,
+                    },
+                  }}
+                  pickerProps={{
+                    mode: 'dialog',
+                    itemStyle: {
+                      color: colors.background,
+                    },
+                  }}
+                  fixAndroidTouchableBug={true}
+                  value={indexerServerUriLocal}
+                  items={[
+                    { label: serverUris()[0].uri, value: serverUris()[0].uri },
+                    { label: serverUris()[1].uri, value: serverUris()[1].uri },
+                  ]}
+                  placeholder={{
+                    label: translate(
+                      'settings.select-placeholder',
+                    ) as string,
+                    value: null,
+                    color: colors.primary,
+                  }}
+                  disabled={actionButtonsDisabled}
+                  useNativeAndroidPickerStyle={false}
+                  onValueChange={(itemValue: string) => {
+                    if (itemValue) {
+                      Keyboard.dismiss();
+                      setConnected(null);
+                      setBorderColor(colors.primary);
+                      setIndexerServerUriLocal(itemValue);
+                    }
+                  }}
+                >
+                  <FontAwesomeIcon size={30} icon={faChevronDown} color={colors.text} style={{ marginHorizontal: 15 }} />
+                </RNPickerSelect>
+              </View>
 
               {!!indexerServerUriLocal && (
                 <TouchableOpacity disabled={actionButtonsDisabled} onPress={() => {
