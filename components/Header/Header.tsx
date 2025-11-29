@@ -2,7 +2,6 @@
 import {
   faBars,
   faCloudDownload,
-  faGear,
   faArrowUp,
   faArrowDown,
   faFaucet,
@@ -29,6 +28,7 @@ import FadeText from '../Components/FadeText';
 import simpleBiometrics from '../../app/simpleBiometrics';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { isEqual } from 'lodash';
+import SettingsIcon from '../../assets/icons/settings.svg';
 
 type HeaderProps = {
   // general
@@ -74,14 +74,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const {
-    totalBalance,
-    info,
-    syncingStatus,
-    security,
-    selectIndexerServer,
-    lastError,
-  } = context;
+  const { totalBalance, info, syncingStatus, security, selectIndexerServer } =
+    context;
 
   let translate: (key: string) => TranslateType,
     netInfo: NetInfoType,
@@ -651,16 +645,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }
             }}
           >
-            <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
+            <SettingsIcon width={35} height={35} color={colors.border} />
           </TouchableOpacity>
-          {!!lastError && (
-            <FontAwesomeIcon
-              style={{ alignSelf: 'flex-end' }}
-              icon={faGear}
-              size={5}
-              color={colors.warning.primary}
-            />
-          )}
         </View>
       </View>
     </>

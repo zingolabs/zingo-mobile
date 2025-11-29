@@ -29,6 +29,9 @@ export enum RouteEnum {
   SyncReport = 'SyncReport',
   Pools = 'Pools',
   ContactList = 'ContactList',
+  StakingHome = 'StakingHome',
+  Stake = 'Stake',
+  Unstake = 'Unstake',
 
   // Drawer with params
   AddressList = 'AddressList',

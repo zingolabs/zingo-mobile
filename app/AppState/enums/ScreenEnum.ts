@@ -21,6 +21,7 @@ export enum ScreenEnum {
   MessagesList = 'MessagesList',
   Settings = 'Settings',
   SettingsMenu = 'SettingsMenu',
+  Staking = 'Staking',
   // Drawer
   About = 'About',
   Info = 'Info',
