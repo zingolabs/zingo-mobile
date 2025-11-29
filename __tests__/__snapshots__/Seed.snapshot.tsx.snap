@@ -96,7 +96,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       {
         "flexGrow": 1,
         "paddingBottom": NaN,
-        "paddingHorizontal": 16,
+        "paddingHorizontal": 10,
         "paddingTop": NaN,
       }
     }
@@ -106,7 +106,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       <View
         style={
           {
-            "alignItems": "flex-start",
+            "alignItems": "center",
             "flexGrow": 1,
             "justifyContent": "center",
           }
@@ -123,35 +123,250 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
             }
           }
         >
-          Wallet Seed Phrase
+          Seed Phrase
         </Text>
         <Text
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "900",
-              "marginTop": 0,
-              "opacity": 1,
-              "padding": 20,
+              "fontSize": 17,
+              "marginTop": 20,
+              "opacity": 0.65,
+              "padding": 10,
               "textAlign": "center",
             }
           }
         >
-          text translated
+          Your seed phrase is the key to your wallet. Back it up so you can restore your wallet if you lose or damage your device 
         </Text>
         <View
           style={
             {
-              "borderColor": "#c3c3c3",
-              "borderRadius": 10,
-              "borderWidth": 1,
-              "margin": 10,
-              "maxHeight": "45%",
-              "padding": 10,
+              "marginTop": 10,
             }
           }
         >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                1
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="pepe"
+              />
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                2
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="lolo"
+              />
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                3
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="titi"
+              />
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
           <View
             accessibilityState={
               {
@@ -182,91 +397,57 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
             onStartShouldSetResponder={[Function]}
             style={
               {
+                "alignSelf": "flex-end",
                 "opacity": 1,
               }
             }
           >
-            <Text
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
-                  "opacity": 1,
-                  "textAlign": "center",
-                }
-              }
-            >
-              pepe lolo titi
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <View />
             <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
+                  "alignItems": "center",
+                  "height": 30,
+                  "justifyContent": "center",
+                  "padding": 0,
+                  "width": "30%",
                 }
               }
             >
               <Text
                 style={
                   {
-                    "color": "#c3c3c3",
-                    "marginTop": 0,
-                    "minHeight": 48,
-                    "padding": 10,
-                    "textAlign": "center",
+                    "color": "#18bd18",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "opacity": 1,
                     "textDecorationLine": "underline",
+                    "textDecorationStyle": "solid",
                   }
                 }
               >
-                text translated
+                Copy
               </Text>
             </View>
-            <View />
           </View>
         </View>
         <View
           style={
             {
               "alignItems": "center",
-              "alignSelf": "center",
+              "backgroundColor": undefined,
+              "borderColor": "#ffffff",
+              "borderRadius": 25,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "justifyContent": "flex-start",
+              "marginBottom": 10,
               "marginTop": 10,
+              "maxWidth": 520,
+              "minHeight": 48,
+              "minWidth": "50%",
+              "paddingHorizontal": 25,
+              "paddingVertical": 15,
+              "width": "100%",
             }
           }
         >
@@ -274,12 +455,14 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
+                "flexGrow": 1,
+                "flexShrink": 1,
+                "fontSize": 20,
                 "opacity": 0.65,
-                "textAlign": "center",
               }
             }
           >
-            text translated
+            Birthday
           </Text>
           <View
             accessibilityState={
@@ -330,102 +513,9 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
             </Text>
           </View>
         </View>
-        <View
-          style={
-            {
-              "marginBottom": 30,
-            }
-          }
-        />
       </View>
     </View>
   </RCTScrollView>
-  <View
-    style={
-      {
-        "alignItems": "center",
-        "justifyContent": "center",
-        "marginTop": "auto",
-        "paddingBottom": 20,
-        "paddingTop": 10,
-      }
-    }
-  >
-    <View
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "#18bd18",
-          "borderColor": "#c3c3c3",
-          "borderRadius": 25,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "maxWidth": "90%",
-          "minHeight": 48,
-          "minWidth": "30%",
-          "opacity": 1,
-          "padding": 0,
-          "paddingLeft": 20,
-          "paddingRight": 20,
-          "width": "80%",
-        }
-      }
-      testID="seed.button.ok"
-    >
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "row",
-            "justifyContent": "center",
-            "margin": 0,
-            "minHeight": 48,
-            "minWidth": 48,
-            "padding": 0,
-          }
-        }
-      >
-        <Text
-          style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "normal",
-              "textAlign": "center",
-            }
-          }
-        />
-      </View>
-    </View>
-  </View>
 </View>
 `;
 
@@ -525,7 +615,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       {
         "flexGrow": 1,
         "paddingBottom": NaN,
-        "paddingHorizontal": 16,
+        "paddingHorizontal": 10,
         "paddingTop": NaN,
       }
     }
@@ -535,7 +625,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       <View
         style={
           {
-            "alignItems": "flex-start",
+            "alignItems": "center",
             "flexGrow": 1,
             "justifyContent": "center",
           }
@@ -552,35 +642,250 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
             }
           }
         >
-          Wallet Seed Phrase
+          Seed Phrase
         </Text>
         <Text
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "900",
-              "marginTop": 0,
-              "opacity": 1,
-              "padding": 20,
+              "fontSize": 17,
+              "marginTop": 20,
+              "opacity": 0.65,
+              "padding": 10,
               "textAlign": "center",
             }
           }
         >
-          text translated
+          Your seed phrase is the key to your wallet. Back it up so you can restore your wallet if you lose or damage your device 
         </Text>
         <View
           style={
             {
-              "borderColor": "#c3c3c3",
-              "borderRadius": 10,
-              "borderWidth": 1,
-              "margin": 10,
-              "maxHeight": "45%",
-              "padding": 10,
+              "marginTop": 10,
             }
           }
         >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                1
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="pepe"
+              />
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                2
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="lolo"
+              />
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                3
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="titi"
+              />
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
           <View
             accessibilityState={
               {
@@ -611,91 +916,57 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
             onStartShouldSetResponder={[Function]}
             style={
               {
+                "alignSelf": "flex-end",
                 "opacity": 1,
               }
             }
           >
-            <Text
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
-                  "opacity": 1,
-                  "textAlign": "center",
-                }
-              }
-            >
-              pepe lolo titi
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <View />
             <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
+                  "alignItems": "center",
+                  "height": 30,
+                  "justifyContent": "center",
+                  "padding": 0,
+                  "width": "30%",
                 }
               }
             >
               <Text
                 style={
                   {
-                    "color": "#c3c3c3",
-                    "marginTop": 0,
-                    "minHeight": 48,
-                    "padding": 10,
-                    "textAlign": "center",
+                    "color": "#18bd18",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "opacity": 1,
                     "textDecorationLine": "underline",
+                    "textDecorationStyle": "solid",
                   }
                 }
               >
-                text translated
+                Copy
               </Text>
             </View>
-            <View />
           </View>
         </View>
         <View
           style={
             {
               "alignItems": "center",
-              "alignSelf": "center",
+              "backgroundColor": undefined,
+              "borderColor": "#ffffff",
+              "borderRadius": 25,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "justifyContent": "flex-start",
+              "marginBottom": 10,
               "marginTop": 10,
+              "maxWidth": 520,
+              "minHeight": 48,
+              "minWidth": "50%",
+              "paddingHorizontal": 25,
+              "paddingVertical": 15,
+              "width": "100%",
             }
           }
         >
@@ -703,12 +974,14 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
+                "flexGrow": 1,
+                "flexShrink": 1,
+                "fontSize": 20,
                 "opacity": 0.65,
-                "textAlign": "center",
               }
             }
           >
-            text translated
+            Birthday
           </Text>
           <View
             accessibilityState={
@@ -759,102 +1032,9 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
             </Text>
           </View>
         </View>
-        <View
-          style={
-            {
-              "marginBottom": 30,
-            }
-          }
-        />
       </View>
     </View>
   </RCTScrollView>
-  <View
-    style={
-      {
-        "alignItems": "center",
-        "justifyContent": "center",
-        "marginTop": "auto",
-        "paddingBottom": 20,
-        "paddingTop": 10,
-      }
-    }
-  >
-    <View
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "#18bd18",
-          "borderColor": "#c3c3c3",
-          "borderRadius": 25,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "maxWidth": "90%",
-          "minHeight": 48,
-          "minWidth": "30%",
-          "opacity": 1,
-          "padding": 0,
-          "paddingLeft": 20,
-          "paddingRight": 20,
-          "width": "80%",
-        }
-      }
-      testID="seed.button.ok"
-    >
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "row",
-            "justifyContent": "center",
-            "margin": 0,
-            "minHeight": 48,
-            "minWidth": 48,
-            "padding": 0,
-          }
-        }
-      >
-        <Text
-          style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "normal",
-              "textAlign": "center",
-            }
-          }
-        />
-      </View>
-    </View>
-  </View>
 </View>
 `;
 
@@ -1713,7 +1893,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       {
         "flexGrow": 1,
         "paddingBottom": NaN,
-        "paddingHorizontal": 16,
+        "paddingHorizontal": 10,
         "paddingTop": NaN,
       }
     }
@@ -1723,7 +1903,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       <View
         style={
           {
-            "alignItems": "flex-start",
+            "alignItems": "center",
             "flexGrow": 1,
             "justifyContent": "center",
           }
@@ -1740,35 +1920,250 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
             }
           }
         >
-          Wallet Seed Phrase
+          Seed Phrase
         </Text>
         <Text
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "900",
-              "marginTop": 0,
-              "opacity": 1,
-              "padding": 20,
+              "fontSize": 17,
+              "marginTop": 20,
+              "opacity": 0.65,
+              "padding": 10,
               "textAlign": "center",
             }
           }
         >
-          text translated
+          Your seed phrase is the key to your wallet. Back it up so you can restore your wallet if you lose or damage your device 
         </Text>
         <View
           style={
             {
-              "borderColor": "#c3c3c3",
-              "borderRadius": 10,
-              "borderWidth": 1,
-              "margin": 10,
-              "maxHeight": "45%",
-              "padding": 10,
+              "marginTop": 10,
             }
           }
         >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                1
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="pepe"
+              />
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                2
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="lolo"
+              />
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                3
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="titi"
+              />
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
           <View
             accessibilityState={
               {
@@ -1799,91 +2194,57 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
             onStartShouldSetResponder={[Function]}
             style={
               {
+                "alignSelf": "flex-end",
                 "opacity": 1,
               }
             }
           >
-            <Text
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
-                  "opacity": 1,
-                  "textAlign": "center",
-                }
-              }
-            >
-              pepe lolo titi
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <View />
             <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
+                  "alignItems": "center",
+                  "height": 30,
+                  "justifyContent": "center",
+                  "padding": 0,
+                  "width": "30%",
                 }
               }
             >
               <Text
                 style={
                   {
-                    "color": "#c3c3c3",
-                    "marginTop": 0,
-                    "minHeight": 48,
-                    "padding": 10,
-                    "textAlign": "center",
+                    "color": "#18bd18",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "opacity": 1,
                     "textDecorationLine": "underline",
+                    "textDecorationStyle": "solid",
                   }
                 }
               >
-                text translated
+                Copy
               </Text>
             </View>
-            <View />
           </View>
         </View>
         <View
           style={
             {
               "alignItems": "center",
-              "alignSelf": "center",
+              "backgroundColor": undefined,
+              "borderColor": "#ffffff",
+              "borderRadius": 25,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "justifyContent": "flex-start",
+              "marginBottom": 10,
               "marginTop": 10,
+              "maxWidth": 520,
+              "minHeight": 48,
+              "minWidth": "50%",
+              "paddingHorizontal": 25,
+              "paddingVertical": 15,
+              "width": "100%",
             }
           }
         >
@@ -1891,12 +2252,14 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
+                "flexGrow": 1,
+                "flexShrink": 1,
+                "fontSize": 20,
                 "opacity": 0.65,
-                "textAlign": "center",
               }
             }
           >
-            text translated
+            Birthday
           </Text>
           <View
             accessibilityState={
@@ -1947,102 +2310,9 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
             </Text>
           </View>
         </View>
-        <View
-          style={
-            {
-              "marginBottom": 30,
-            }
-          }
-        />
       </View>
     </View>
   </RCTScrollView>
-  <View
-    style={
-      {
-        "alignItems": "center",
-        "justifyContent": "center",
-        "marginTop": "auto",
-        "paddingBottom": 20,
-        "paddingTop": 10,
-      }
-    }
-  >
-    <View
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "#18bd18",
-          "borderColor": "#c3c3c3",
-          "borderRadius": 25,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "maxWidth": "90%",
-          "minHeight": 48,
-          "minWidth": "30%",
-          "opacity": 1,
-          "padding": 0,
-          "paddingLeft": 20,
-          "paddingRight": 20,
-          "width": "80%",
-        }
-      }
-      testID="seed.button.ok"
-    >
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "row",
-            "justifyContent": "center",
-            "margin": 0,
-            "minHeight": 48,
-            "minWidth": 48,
-            "padding": 0,
-          }
-        }
-      >
-        <Text
-          style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "normal",
-              "textAlign": "center",
-            }
-          }
-        />
-      </View>
-    </View>
-  </View>
 </View>
 `;
 
@@ -2142,7 +2412,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       {
         "flexGrow": 1,
         "paddingBottom": NaN,
-        "paddingHorizontal": 16,
+        "paddingHorizontal": 10,
         "paddingTop": NaN,
       }
     }
@@ -2152,7 +2422,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       <View
         style={
           {
-            "alignItems": "flex-start",
+            "alignItems": "center",
             "flexGrow": 1,
             "justifyContent": "center",
           }
@@ -2169,35 +2439,250 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
             }
           }
         >
-          Wallet Seed Phrase
+          Seed Phrase
         </Text>
         <Text
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "900",
-              "marginTop": 0,
-              "opacity": 1,
-              "padding": 20,
+              "fontSize": 17,
+              "marginTop": 20,
+              "opacity": 0.65,
+              "padding": 10,
               "textAlign": "center",
             }
           }
         >
-          text translated
+          Your seed phrase is the key to your wallet. Back it up so you can restore your wallet if you lose or damage your device 
         </Text>
         <View
           style={
             {
-              "borderColor": "#c3c3c3",
-              "borderRadius": 10,
-              "borderWidth": 1,
-              "margin": 10,
-              "maxHeight": "45%",
-              "padding": 10,
+              "marginTop": 10,
             }
           }
         >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                1
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="pepe"
+              />
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                2
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="lolo"
+              />
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "#ffffff",
+                  "borderRadius": 25,
+                  "borderWidth": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 10,
+                  "maxWidth": 520,
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "paddingHorizontal": 15,
+                  "paddingVertical": 0,
+                  "width": "30%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                3
+                .
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={false}
+                keyboardType="default"
+                returnKeyType="done"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "fontSize": 15,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                  }
+                }
+                value="titi"
+              />
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 8,
+              }
+            }
+          />
           <View
             accessibilityState={
               {
@@ -2228,91 +2713,57 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
             onStartShouldSetResponder={[Function]}
             style={
               {
+                "alignSelf": "flex-end",
                 "opacity": 1,
               }
             }
           >
-            <Text
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
-                  "opacity": 1,
-                  "textAlign": "center",
-                }
-              }
-            >
-              pepe lolo titi
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <View />
             <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
+                  "alignItems": "center",
+                  "height": 30,
+                  "justifyContent": "center",
+                  "padding": 0,
+                  "width": "30%",
                 }
               }
             >
               <Text
                 style={
                   {
-                    "color": "#c3c3c3",
-                    "marginTop": 0,
-                    "minHeight": 48,
-                    "padding": 10,
-                    "textAlign": "center",
+                    "color": "#18bd18",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "opacity": 1,
                     "textDecorationLine": "underline",
+                    "textDecorationStyle": "solid",
                   }
                 }
               >
-                text translated
+                Copy
               </Text>
             </View>
-            <View />
           </View>
         </View>
         <View
           style={
             {
               "alignItems": "center",
-              "alignSelf": "center",
+              "backgroundColor": undefined,
+              "borderColor": "#ffffff",
+              "borderRadius": 25,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "justifyContent": "flex-start",
+              "marginBottom": 10,
               "marginTop": 10,
+              "maxWidth": 520,
+              "minHeight": 48,
+              "minWidth": "50%",
+              "paddingHorizontal": 25,
+              "paddingVertical": 15,
+              "width": "100%",
             }
           }
         >
@@ -2320,12 +2771,14 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
+                "flexGrow": 1,
+                "flexShrink": 1,
+                "fontSize": 20,
                 "opacity": 0.65,
-                "textAlign": "center",
               }
             }
           >
-            text translated
+            Birthday
           </Text>
           <View
             accessibilityState={
@@ -2376,101 +2829,8 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
             </Text>
           </View>
         </View>
-        <View
-          style={
-            {
-              "marginBottom": 30,
-            }
-          }
-        />
       </View>
     </View>
   </RCTScrollView>
-  <View
-    style={
-      {
-        "alignItems": "center",
-        "justifyContent": "center",
-        "marginTop": "auto",
-        "paddingBottom": 20,
-        "paddingTop": 10,
-      }
-    }
-  >
-    <View
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "#18bd18",
-          "borderColor": "#c3c3c3",
-          "borderRadius": 25,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "maxWidth": "90%",
-          "minHeight": 48,
-          "minWidth": "30%",
-          "opacity": 1,
-          "padding": 0,
-          "paddingLeft": 20,
-          "paddingRight": 20,
-          "width": "80%",
-        }
-      }
-      testID="seed.button.ok"
-    >
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "row",
-            "justifyContent": "center",
-            "margin": 0,
-            "minHeight": 48,
-            "minWidth": 48,
-            "padding": 0,
-          }
-        }
-      >
-        <Text
-          style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "normal",
-              "textAlign": "center",
-            }
-          }
-        />
-      </View>
-    </View>
-  </View>
 </View>
 `;
