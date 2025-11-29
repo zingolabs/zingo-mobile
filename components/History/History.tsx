@@ -50,6 +50,7 @@ import WalletSummaryHeader from './components/WalletSummaryHeader';
 import QuickActionsRow from './components/QuickActionsRow';
 import SettingsButton from './components/SettingsButton';
 import { Swipeable } from 'react-native-gesture-handler';
+import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -492,7 +493,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               disabled={isScrollingToTop}
               style={({ pressed }) => ({
                 position: 'absolute',
-                bottom: 30,
+                bottom: !isLiquidGlassSupported && Platform.OS === GlobalConst.platformOSandroid ? 30 : 45,
                 right: 10,
                 paddingHorizontal: 5,
                 paddingVertical: 10,
