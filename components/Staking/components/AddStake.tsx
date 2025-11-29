@@ -24,7 +24,7 @@ const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 type ModalState = 'idle' | 'sending' | 'success';
 
 export function AddStakeScreen() {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
 

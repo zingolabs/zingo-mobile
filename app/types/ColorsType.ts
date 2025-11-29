@@ -1,4 +1,5 @@
 export type ColorsType = {
+  secondary: string;
   background: string;
   card: string;
   border: string;
