@@ -37,34 +37,37 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     type === ButtonTypeEnum.Primary
       ? {
           backgroundColor: disabled ? colors.primaryDisabled : colors.primary,
-          borderColor: disabled ? colors.primaryDisabled : colors.text,
           borderWidth: 1,
           width: twoButtons ? '40%' : '80%',
         }
       : type === ButtonTypeEnum.Secondary
-      ? {
-          backgroundColor: disabled ? colors.secondaryDisabled : colors.secondary,
-          borderColor: disabled ? colors.primaryDisabled : colors.text,
-          borderWidth: 1,
-          width: twoButtons ? '40%' : '80%',
-        }
-      : type === ButtonTypeEnum.Tertiary
-      ? {
-          backgroundColor: disabled ? colors.secondaryDisabled : colors.background,
-          borderColor: disabled ? colors.primaryDisabled : colors.primary,
-          borderWidth: 1,
-          width: twoButtons ? '40%' : '80%',
-        }
-      : type === ButtonTypeEnum.Ghost
-      ? {
-          backgroundColor: 'transparent',
-          color: colors.money,
-        }
-      : {
-          // error
-          backgroundColor: colors.danger.primary,
-          width: twoButtons ? '40%' : '80%',
-        };
+        ? {
+            backgroundColor: disabled
+              ? colors.secondaryDisabled
+              : colors.secondary,
+            borderColor: disabled ? colors.primaryDisabled : colors.border,
+            borderWidth: 1,
+            width: twoButtons ? '40%' : '80%',
+          }
+        : type === ButtonTypeEnum.Tertiary
+          ? {
+              backgroundColor: disabled
+                ? colors.secondaryDisabled
+                : colors.background,
+              borderColor: disabled ? colors.primaryDisabled : colors.primary,
+              borderWidth: 1,
+              width: twoButtons ? '40%' : '80%',
+            }
+          : type === ButtonTypeEnum.Ghost
+            ? {
+                backgroundColor: 'transparent',
+                color: colors.money,
+              }
+            : {
+                // error
+                backgroundColor: colors.danger.primary,
+                width: twoButtons ? '40%' : '80%',
+              };
 
   const styleButtonCommon: TextStyle = {
     padding: 0,
@@ -84,21 +87,21 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           color: colors.text,
         }
       : type === ButtonTypeEnum.Secondary
-      ? {
-          color: colors.text,
-        }
-      : type === ButtonTypeEnum.Tertiary
-      ? {
-          color: colors.text,
-        }
-      : type === ButtonTypeEnum.Ghost
-      ? {
-          color: colors.text,
-        }
-      : {
-          // error
-          color: colors.danger.primary,
-        };
+        ? {
+            color: colors.text,
+          }
+        : type === ButtonTypeEnum.Tertiary
+          ? {
+              color: colors.text,
+            }
+          : type === ButtonTypeEnum.Ghost
+            ? {
+                color: colors.text,
+              }
+            : {
+                // error
+                color: colors.danger.primary,
+              };
   const styleTextCommon: TextStyle = {
     fontWeight: 'normal',
     fontSize: 18,
@@ -116,7 +119,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         ...style,
       }}
       disabled={disabled}
-      onPress={() => onPress()}>
+      onPress={() => onPress()}
+    >
       <View
         style={{
           display: 'flex',
@@ -127,13 +131,15 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           padding: 0,
           minWidth: 48,
           minHeight: 48,
-        }}>
+        }}
+      >
         <Text
           style={{
             ...styleTextCommon,
             ...styleText,
             ...textStyle,
-          }}>
+          }}
+        >
           {title}
         </Text>
       </View>

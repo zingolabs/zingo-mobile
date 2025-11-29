@@ -161,18 +161,17 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             style={{
               flexDirection: 'row',
               justifyContent: 'flex-start',
-              borderColor: borderColor,
+              borderColor: colors.zingo,
               borderWidth: 1,
-              borderRadius: 25,
+              borderRadius: 12,
               marginBottom: 10,
               backgroundColor: colors.secondary,
               width: '100%',
               maxWidth: maxW,
               minWidth: '50%',
-              minHeight: 48,
+              height: 44,
               alignItems: 'center',
-              paddingHorizontal: 25,
-              paddingVertical: 7,
+              paddingHorizontal: 16,
             }}
           >
             <TextInput
@@ -182,10 +181,10 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 flexGrow: 1,
                 flexShrink: 1,
                 color: colors.text,
-                fontWeight: '600',
-                fontSize: 18,
-                minHeight: 48,
-                marginLeft: 5,
+                fontWeight: '400',
+                fontSize: 17,
+                paddingVertical: 0,
+                marginLeft: 4,
                 backgroundColor: 'transparent',
               }}
               value={indexerServerUriLocal}
@@ -283,7 +282,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                     padding: 0,
                   }}
                 >
-                  <XIcon width={20} height={20} />
+                  <XIcon color={colors.background} width={20} height={20} />
                 </View>
               </TouchableOpacity>
             )}
@@ -392,6 +391,9 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                   closeServers();
                 }, 100);
               }}
+              style={{
+                alignSelf: 'stretch',
+              }}
             />
           ) : (
             <LiquidPrimaryButton
@@ -406,6 +408,11 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 } = await checkIndexerServer(indexerServerUriLocal);
                 setConnected(_connected);
                 setIndexerServerUriLocal(_indexerServerUri);
+                if (_connected) {
+                  setBorderColor('#0E9634');
+                } else {
+                  setBorderColor('#ff383c');
+                }
                 Keyboard.dismiss();
               }}
               style={{
