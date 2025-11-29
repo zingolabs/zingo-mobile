@@ -24,7 +24,7 @@ const SettingsButton: React.FC<SettingsButtonProps> = () => {
           navigation.navigate(RouteEnum.SettingsMenu);
         }}
       >
-        <SettingsIcon height={24} width={24} color={colors.border} />
+        <SettingsIcon height={24} width={24} color={colors.text} />
       </TouchableOpacity>
     </View>
   );
