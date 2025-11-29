@@ -103,12 +103,14 @@ import ComputingError from './components/ComputingError';
 import Staking from '../../components/Staking/Staking';
 import { AddStakeScreen } from '../../components/Staking/components/AddStake';
 import { Unstake } from '../../components/Staking/components/Unstake';
+import SettingsServers from '../../components/Settings/components/SettingsServers';
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();
 
 type InnerStackParamList = {
   [RouteEnum.MainTabs]: undefined;
   [RouteEnum.SettingsMenu]: undefined;
+  [RouteEnum.SettingsServers]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Faucet]: undefined;
@@ -1922,7 +1924,6 @@ export class LoadedAppClass extends Component<
                 {props => (
                   <SettingsMenu
                     {...props}
-                    navigateToLoadingApp={this.navigateToLoadingApp}
                     onClickOKChangeWallet={this.onClickOKChangeWallet}
                   />
                 )}
@@ -1954,6 +1955,15 @@ export class LoadedAppClass extends Component<
                     }}
                     setSecurityOption={this.setSecurityOption}
                     {...props}
+                  />
+                )}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.SettingsServers}>
+                {props => (
+                  <SettingsServers
+                    {...props}
+                    navigateToLoadingApp={this.navigateToLoadingApp}
                   />
                 )}
               </InnerStack.Screen>

@@ -8,7 +8,7 @@ import { AppDrawerParamList, LoadingAppNavigationState, ThemeType } from '../../
 import { ContextAppLoaded } from '../../app/context';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
-import { ButtonTypeEnum, RouteEnum, ScreenEnum, SeedActionEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faChevronRight, faInfo, faSeedling, faServer } from '@fortawesome/free-solid-svg-icons';
@@ -17,12 +17,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../Components/Button';
 
 type SettingsMenuProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.SettingsMenu> & {
-  navigateToLoadingApp: (state: LoadingAppNavigationState) => Promise<void>;
   onClickOKChangeWallet: (state: LoadingAppNavigationState) => Promise<void>;
 };
 
 const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
-  navigateToLoadingApp,
   onClickOKChangeWallet,
   navigation,
 }) => {
@@ -98,7 +96,7 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
             <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 20, marginHorizontal: 40, width: '80%' }}>
               <TouchableOpacity
                 style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
-                onPress={() => navigation?.navigate(RouteEnum.Seed, { action: SeedActionEnum.view })}>
+                onPress={() => navigation?.navigate(RouteEnum.Seed)}>
                 <View style={{ flexDirection: 'row', gap: 15 }}>
                   <FontAwesomeIcon
                     size={20}
@@ -118,7 +116,7 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
             <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 20, marginHorizontal: 40, width: '80%' }}>
               <TouchableOpacity
                 style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
-                onPress={() => navigateToLoadingApp({ screen: 0.5, startingApp: false })}>
+                onPress={() => navigation?.navigate(RouteEnum.SettingsServers)}>
                 <View style={{ flexDirection: 'row', gap: 15 }}>
                   <FontAwesomeIcon
                     size={20}

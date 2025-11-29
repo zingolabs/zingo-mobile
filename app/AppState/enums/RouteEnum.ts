@@ -19,6 +19,7 @@ export enum RouteEnum {
   InsightStack = 'InsightStack',
   Settings = 'Settings',
   SettingsMenu = 'SettingsMenu',
+  SettingsServers = 'SettingsServers',
   About = 'About',
   Rescan = 'Rescan',
   Info = 'Info',
