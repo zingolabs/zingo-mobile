@@ -1751,7 +1751,6 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#c3c3c3",
             "borderRadius": 25,
             "borderWidth": 1,
             "justifyContent": "center",
