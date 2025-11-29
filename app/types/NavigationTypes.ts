@@ -57,6 +57,7 @@ export type AppDrawerParamList = {
   [RouteEnum.InsightStack]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.SettingsMenu]: undefined;
+  [RouteEnum.SettingsServers]: undefined;
   [RouteEnum.Faucet]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.Staking]: undefined;

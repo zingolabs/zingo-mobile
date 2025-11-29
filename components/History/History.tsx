@@ -51,6 +51,8 @@ import QuickActionsRow from './components/QuickActionsRow';
 import SettingsButton from './components/SettingsButton';
 import { Swipeable } from 'react-native-gesture-handler';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
+import RegText from '../Components/RegText';
+import EmptyList from '../../assets/icons/empty-cardboard-box.svg'
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -474,17 +476,35 @@ const History: React.FunctionComponent<HistoryProps> = ({
               )}
             />
           ) : (
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: 30,
-              }}
-            >
-              <FadeText style={{ color: colors.primary }}>
-                {translate('history.empty') as string}
-              </FadeText>
+            <View style={{ marginHorizontal: 10 }}>
+              <View
+                style={{
+                  marginTop: 20,
+                  borderTopLeftRadius: 25,
+                  borderTopRightRadius: 25,
+                  paddingVertical: 20,
+                  paddingHorizontal: 30,
+                  backgroundColor: '#78788029',
+                }}>
+                <RegText>Activity</RegText>
+              </View>
+              <View style={{ paddingHorizontal: 5, backgroundColor: colors.secondary }}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: 50,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.zingo,
+                    borderStyle: 'solid',
+                  }}>
+                  <EmptyList width={100} height={100} color={colors.text} />
+                  <FadeText style={{ color: colors.text }}>
+                    {'There are no transactions yet.'}
+                  </FadeText>
+                </View>
+              </View>
             </View>
           )}
           {!isAtTop && (
