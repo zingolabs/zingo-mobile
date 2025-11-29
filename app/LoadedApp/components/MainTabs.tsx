@@ -4,6 +4,7 @@ import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../types/ThemeType';
 import StakingScreen from '../../../components/Staking/Staking';
 import History from '../../../components/History';
+import { Platform } from 'react-native';
 
 type MainTabParamList = {
   [RouteEnum.History]: undefined;
@@ -38,7 +39,11 @@ export const MainTabs: React.FC<MainTabsProps> = ({
         name={RouteEnum.History}
         options={{
           title: 'Home',
-          tabBarIcon: () => ({ sfSymbol: 'house' }),
+          tabBarIcon: () =>
+            Platform.select({
+              ios: { sfSymbol: 'house' },
+              android: require('../../../assets/icons/house.png'),
+          }),
           tabBarActiveTintColor: colors.primary,
         }}
       >
@@ -59,7 +64,11 @@ export const MainTabs: React.FC<MainTabsProps> = ({
         component={StakingScreen}
         options={{
           title: 'Staking',
-          tabBarIcon: () => ({ sfSymbol: 'square.stack.3d.up.fill' }),
+          tabBarIcon: () =>
+            Platform.select({
+              ios: { sfSymbol: 'square.stack.3d.up.fill' },
+              android: require('../../../assets/icons/layers.png'),
+          }),
           tabBarActiveTintColor: colors.primary,
         }}
       />
