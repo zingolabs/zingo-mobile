@@ -493,7 +493,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               disabled={isScrollingToTop}
               style={({ pressed }) => ({
                 position: 'absolute',
-                bottom: !isLiquidGlassSupported && Platform.OS === GlobalConst.platformOSandroid ? 30 : 45,
+                bottom: !isLiquidGlassSupported && Platform.OS === GlobalConst.platformOSandroid ? 30 : 60,
                 right: 10,
                 paddingHorizontal: 5,
                 paddingVertical: 10,
