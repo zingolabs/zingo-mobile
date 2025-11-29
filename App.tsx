@@ -25,7 +25,7 @@ const zingoTheme: ThemeType = {
   colors: {
     background: '#0f0f0f',
     card: '#0f0f0f',
-    border: '#b4b4b4',
+    border: '#333333ff',
     primary: '#1c78d2',
     primaryDisabled: '#b4b4b4',
     secondary: '#1e1e1e',

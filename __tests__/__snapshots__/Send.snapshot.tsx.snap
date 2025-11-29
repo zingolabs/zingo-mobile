@@ -360,7 +360,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           {
             "alignItems": "center",
             "backgroundColor": "#5a8c5a",
-            "borderColor": "#5a8c5a",
             "borderRadius": 25,
             "borderWidth": 1,
             "justifyContent": "center",
@@ -769,7 +768,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           {
             "alignItems": "center",
             "backgroundColor": "#5a8c5a",
-            "borderColor": "#5a8c5a",
             "borderRadius": 25,
             "borderWidth": 1,
             "justifyContent": "center",
