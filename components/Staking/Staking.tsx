@@ -36,14 +36,29 @@ const formatHeaderMonth = (unixSeconds: number) => {
   }); // "October 2025"
 };
 
+function Separator() {
+  const { colors } = useTheme() as unknown as ThemeType;
+
+  return (
+    <View
+      style={{
+        height: StyleSheet.hairlineWidth,
+        backgroundColor: colors.border,
+        opacity: 0.4,
+      }}
+    />
+  );
+}
+
 type StakingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Staking>;
 
 const Staking: React.FC<StakingProps> = () => {
   const screenName = ScreenEnum.Staking;
-  const { colors } = useTheme() as unknown as ThemeType;
 
   const [loading] = useState(false);
   const [movements] = useState<ValueTransferType[]>(mockMovements);
+
+  const { colors } = useTheme() as unknown as ThemeType;
 
   const hasMovements = !loading && movements.length > 0;
 
@@ -165,15 +180,7 @@ const Staking: React.FC<StakingProps> = () => {
               data={movements}
               keyExtractor={item => item.txid}
               contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
-              ItemSeparatorComponent={() => (
-                <View
-                  style={{
-                    height: StyleSheet.hairlineWidth,
-                    backgroundColor: colors.border,
-                    opacity: 0.4,
-                  }}
-                />
-              )}
+              ItemSeparatorComponent={Separator}
               renderItem={({ item }) => {
                 // negative amount => staked (tokens left wallet)
                 // positive amount => unstaked (tokens came back)
