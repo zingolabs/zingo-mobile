@@ -18,7 +18,7 @@ import RegText from '../../../components/Components/RegText';
 import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
-import { ButtonTypeEnum, ScreenEnum, SelectServerEnum } from '../../AppState';
+import { ButtonTypeEnum, GlobalConst, ScreenEnum, SelectServerEnum } from '../../AppState';
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -145,7 +145,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
   };
 
 
-  console.log('Render Import', words, buttonDisabled, rows, seedText);
+  //console.log('Render Import', words, buttonDisabled, rows, seedText);
 
   return (
     <ToastProvider>
@@ -167,7 +167,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
         <View style={{
           position: 'absolute',
           width: 75,
-          top: 10,
+          top: 10 + (Platform.OS === GlobalConst.platformOSios ? insets.top : 0),
           left: 10,
           zIndex: 999,
         }}>
