@@ -581,7 +581,7 @@ export default class RPC {
     }
 
     //console.log('SYNC STATUS', ss);
-    console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned);
+    console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned, ss.percentage_total_blocks_scanned);
 
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
@@ -589,11 +589,11 @@ export default class RPC {
     this.fnSetSyncingStatus(ss as RPCSyncStatusType);
 
     // Close the poll timer if the sync finished(checked via promise above)
+    const percentage: number = ss.percentage_total_outputs_scanned || ss.percentage_total_blocks_scanned || 0;
     const inR: boolean =
       !!ss.scan_ranges &&
       ss.scan_ranges.length > 0 &&
-      !!ss.percentage_total_outputs_scanned &&
-      ss.percentage_total_outputs_scanned < 100;
+      percentage < 100;
     if (!inR) {
       // here we can release the screen...
       this.keepAwake(false);
@@ -617,6 +617,13 @@ export default class RPC {
     if (returnPoll && returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fnSetLastError(`Error sync poll: ${returnPoll}`);
+      // This command have an error, fine. It's worthy to try running the sync process juat in case.
+      setTimeout(async () => {
+        await this.refreshSync();
+      }, 0);
+      setTimeout(async () => {
+        await this.fetchSyncStatus();
+      }, 0);
       this.fetchSyncPollLock = false;
       return;
     }
@@ -647,13 +654,6 @@ export default class RPC {
       this.fnSetLastError(`Error sync poll parse: ${error} value: ${returnPoll}`);
       this.fetchSyncPollLock = false;
       return;
-    }
-
-    if (sp.sync_complete && sp.sync_complete.percentage_total_outputs_scanned &&
-        sp.sync_complete.percentage_total_outputs_scanned >= 100) {
-      this.keepAwake(false);
-    } else {
-      this.keepAwake(true);
     }
 
     console.log('SYNC POLL', sp);

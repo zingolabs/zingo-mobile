@@ -111,11 +111,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
 
   useEffect(() => {
+    const percentage: number = syncingStatus.percentage_total_outputs_scanned || syncingStatus.percentage_total_blocks_scanned || 0;
     if (
       !syncingStatus ||
       isEqual(syncingStatus, {} as RPCSyncStatusType) ||
       (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) ||
-      syncingStatus.percentage_total_outputs_scanned === 0
+      percentage === 0
     ) {
       // if the App is waiting for the first fetching, let's put 0.
       setPercentageOutputsScanned(0);
@@ -123,14 +124,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     } else {
       // avoiding 0.00 or 100%, minimum 0.01, maximun 99.99
       setPercentageOutputsScanned(
-        syncingStatus.percentage_total_outputs_scanned &&
-          syncingStatus.percentage_total_outputs_scanned < 0.01
+        percentage &&
+          percentage < 0.01
           ? 0.01
-          : syncingStatus.percentage_total_outputs_scanned &&
-              syncingStatus.percentage_total_outputs_scanned > 99.99
+          : percentage &&
+              percentage > 99.99
             ? 99.99
             : Number(
-                syncingStatus.percentage_total_outputs_scanned
+                percentage
                   ?.toFixed(2)
                   .replace(/\.?0+$/, ''),
               ),
@@ -138,13 +139,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
           syncingStatus.scan_ranges.length > 0 &&
-          !!syncingStatus.percentage_total_outputs_scanned &&
-          syncingStatus.percentage_total_outputs_scanned < 100,
+          percentage < 100,
       );
     }
   }, [
     syncingStatus,
     syncingStatus.percentage_total_outputs_scanned,
+    syncingStatus.percentage_total_blocks_scanned,
     syncingStatus.scan_ranges,
   ]);
 

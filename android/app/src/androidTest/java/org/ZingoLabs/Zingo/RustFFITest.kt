@@ -293,7 +293,7 @@ class ExecuteSyncFromSeed {
             }
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_total_outputs_scanned >= 100.0) {
+            if (syncStatus.percentage_total_blocks_scanned >= 100.0) {
                 println("Sync completed!")
                 break
             }
@@ -344,7 +344,7 @@ class ExecuteSendFromOrchard {
             }
             syncStatusBefore = mapper.readValue(syncStatusBeforeJson)
 
-            if (syncStatusBefore.percentage_total_outputs_scanned >= 100.0) {
+            if (syncStatusBefore.percentage_total_blocks_scanned >= 100.0) {
                 println("Sync completed!")
                 break
             }
@@ -389,7 +389,7 @@ class ExecuteSendFromOrchard {
             }
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_total_outputs_scanned >= 100.0) {
+            if (syncStatus.percentage_total_blocks_scanned >= 100.0) {
                 println("Sync completed!")
                 break
             }
@@ -448,7 +448,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
             }
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_total_outputs_scanned >= 100.0) {
+            if (syncStatus.percentage_total_blocks_scanned >= 100.0) {
                 println("Sync completed!")
                 break
             }
@@ -523,7 +523,7 @@ class ExecuteSaplingBalanceFromSeed {
             }
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_total_outputs_scanned >= 100.0) {
+            if (syncStatus.percentage_total_blocks_scanned >= 100.0) {
                 println("Sync completed!")
                 break
             }
