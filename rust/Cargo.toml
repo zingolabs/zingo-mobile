@@ -11,7 +11,9 @@ zingolib = { git = "https://github.com/zingolabs/zingolib", default-features = t
     "testutils",
 ] }
 pepper-sync = { git = "https://github.com/zingolabs/zingolib", tag = "2.0.9" }
-zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", tag = "2.0.9", features = ["test_lwd_zcashd"] }
+zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", tag = "2.0.9", features = [
+    "test_lwd_zcashd",
+] }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
 zingodelegator_utils = { path = "zingodelegator_utils" }
 
@@ -54,12 +56,12 @@ thiserror = "1"
 once_cell = "1"
 
 [patch.crates-io]
-zcash_client_backend = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
-zcash_address = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
-zcash_keys = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
-zcash_primitives = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
-zcash_protocol = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
-zcash_transparent = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
+zcash_client_backend = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
+zcash_address = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
+zcash_keys = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
+zcash_primitives = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
+zcash_protocol = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
+zcash_transparent = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
 
 [profile.release]
 debug = 1

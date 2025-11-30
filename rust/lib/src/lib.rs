@@ -239,7 +239,7 @@ fn construct_uri_load_config(
 
     let chaintype = match chain_hint.as_str() {
         "main" => ChainType::Mainnet,
-        "test" => ChainType::Testnet,
+        "test" => ChainType::Testnet(for_test::all_height_one_nus()),
         "regtest" => ChainType::Regtest(for_test::all_height_one_nus()),
         _ => return Err("Error: Not a valid chain hint!".to_string()),
     };
@@ -262,7 +262,6 @@ fn construct_uri_load_config(
             min_confirmations: NonZeroU32::try_from(min_confirmations).unwrap(),
         },
         NonZeroU32::try_from(1).expect("hard-coded integer"),
-        "".to_string(),
     ) {
         Ok(c) => c,
         Err(e) => {
@@ -831,7 +830,7 @@ pub fn parse_address(address: String) -> Result<String, ZingolibError> {
             ) -> Option<(zcash_client_backend::address::Address, ChainType)> {
                 [
                     ChainType::Mainnet,
-                    ChainType::Testnet,
+                    ChainType::Testnet(for_test::all_height_one_nus()),
                     ChainType::Regtest(for_test::all_height_one_nus()),
                 ]
                 .iter()
@@ -840,7 +839,7 @@ pub fn parse_address(address: String) -> Result<String, ZingolibError> {
             if let Some((recipient_address, chain_name)) = make_decoded_chain_pair(&address) {
                 let chain_name_string = match chain_name {
                     ChainType::Mainnet => "main",
-                    ChainType::Testnet => "test",
+                    ChainType::Testnet(_) => "test",
                     ChainType::Regtest(_) => "regtest",
                 };
                 Ok(match recipient_address {
