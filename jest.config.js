@@ -6,4 +6,7 @@ module.exports = {
     '\\.[jt]sx?$': 'babel-jest',
   },
   setupFiles: ['./node_modules/react-native-gesture-handler/jestSetup.js'],
+  moduleNameMapper: {
+    '\\.svg$': '<rootDir>/__mocks__/svgMock.tsx',
+  },
 };
