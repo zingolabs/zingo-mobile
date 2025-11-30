@@ -34,16 +34,17 @@ const WalletSummaryHeader: React.FC = () => {
 
   // Compute sync percentage
   useEffect(() => {
+    const percentage: number = syncingStatus.percentage_total_outputs_scanned || syncingStatus.percentage_total_blocks_scanned || 0;
     if (
       !syncingStatus ||
       isEqual(syncingStatus, {} as RPCSyncStatusType) ||
       (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) ||
-      syncingStatus.percentage_total_outputs_scanned === 0
+      percentage === 0
     ) {
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
-      const raw = syncingStatus.percentage_total_outputs_scanned ?? 0;
+      const raw = percentage ?? 0;
       const clamped =
         raw < 0.01
           ? 0.01
