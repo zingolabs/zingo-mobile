@@ -31,7 +31,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         {
           "left": 10,
           "position": "absolute",
-          "top": 10,
+          "top": NaN,
           "width": 75,
           "zIndex": 999,
         }
@@ -302,7 +302,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#5a8c5a",
-            "borderColor": "#5a8c5a",
             "borderRadius": 25,
             "borderWidth": 1,
             "justifyContent": "center",

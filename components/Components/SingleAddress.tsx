@@ -165,21 +165,29 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 logoMargin={3}
               />
             </View>
-            <View
+
+            <View 
               style={{
+                marginTop: 40,
+                backgroundColor: colors.secondary,
+                padding: 10,
+                width: '90%',
+                borderRadius: 20,
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginVertical: 0,
-                width: '100%',
-                justifyContent: 'space-evenly',
-              }}>
+                justifyContent: 'center',
+              }}
+            >
+              <Address
+                address={address?.address ? address.address : ''}
+                style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+                onPress={() => show('EA')}
+              />
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  marginTop: 20,
-                  marginBottom: 5,
                 }}>
                 <TouchableOpacity onPress={doCopy}>
                   <View
@@ -195,11 +203,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 </TouchableOpacity>
               </View>
             </View>
-            <Address
-                address={address?.address ? address.address : ''}
-                style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
-                onPress={() => show('EA')}
-              />
           </>
         ) : (
           <View

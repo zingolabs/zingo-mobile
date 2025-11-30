@@ -50,12 +50,15 @@ import WalletSummaryHeader from './components/WalletSummaryHeader';
 import QuickActionsRow from './components/QuickActionsRow';
 import SettingsButton from './components/SettingsButton';
 import { Swipeable } from 'react-native-gesture-handler';
+import { isLiquidGlassSupported } from '@callstack/liquid-glass';
+import RegText from '../Components/RegText';
+import EmptyList from '../../assets/icons/empty-cardboard-box.svg'
 
 const ViewTypes = {
   WITH_MONTH: 0,
   WITHOUT_MONTH: 1,
-  WITH_MONTH_REFRESH: 2,
-  WITHOUT_MONTH_REFRESH: 3,
+  WITH_MONTH_ADDRESS: 2,
+  WITHOUT_MONTH_ADDRESS: 3,
 };
 
 type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> & {
@@ -139,8 +142,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
           const data = valueTransfersSliced[index];
 
           if (index === 0) {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITH_MONTH_REFRESH;
+            if (data.address) {
+              return ViewTypes.WITH_MONTH_ADDRESS;
             } else {
               return ViewTypes.WITH_MONTH;
             }
@@ -156,14 +159,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
               : '--- ----';
 
           if (txmonth !== lasttxmonth) {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITH_MONTH_REFRESH;
+            if (data.address) {
+              return ViewTypes.WITH_MONTH_ADDRESS;
             } else {
               return ViewTypes.WITH_MONTH;
             }
           } else {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITHOUT_MONTH_REFRESH;
+            if (data.address) {
+              return ViewTypes.WITHOUT_MONTH_ADDRESS;
             } else {
               return ViewTypes.WITHOUT_MONTH;
             }
@@ -174,22 +177,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
             // two lines
             dim.width = Dimensions.get('window').width;
             dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 70 : 60;
-          } else if (type === ViewTypes.WITHOUT_MONTH_REFRESH) {
-            // three lines
+              (Platform.OS === GlobalConst.platformOSandroid ? 65 : 60);
+          } else if (type === ViewTypes.WITHOUT_MONTH_ADDRESS) {
+            // three lines 
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 55) + 15;
+              (Platform.OS === GlobalConst.platformOSandroid ? 65 : 55) + 25;
           } else if (type === ViewTypes.WITH_MONTH) {
             // two lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 105 : 90;
-          } else if (type === ViewTypes.WITH_MONTH_REFRESH) {
+              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 90) + 45;
+          } else if (type === ViewTypes.WITH_MONTH_ADDRESS) {
             // three lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 85) + 15;
+              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 90) + 45 + 25;
           }
         },
       ),
@@ -347,7 +350,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         index={index}
         vt={data}
         month={
-          type === ViewTypes.WITH_MONTH || type === ViewTypes.WITH_MONTH_REFRESH
+          type === ViewTypes.WITH_MONTH || type === ViewTypes.WITH_MONTH_ADDRESS
             ? txmonth
             : ''
         }
@@ -473,17 +476,35 @@ const History: React.FunctionComponent<HistoryProps> = ({
               )}
             />
           ) : (
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: 30,
-              }}
-            >
-              <FadeText style={{ color: colors.primary }}>
-                {translate('history.empty') as string}
-              </FadeText>
+            <View style={{ marginHorizontal: 10 }}>
+              <View
+                style={{
+                  marginTop: 20,
+                  borderTopLeftRadius: 25,
+                  borderTopRightRadius: 25,
+                  paddingVertical: 20,
+                  paddingHorizontal: 30,
+                  backgroundColor: '#78788029',
+                }}>
+                <RegText>Activity</RegText>
+              </View>
+              <View style={{ paddingHorizontal: 5, backgroundColor: colors.secondary }}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: 50,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.zingo,
+                    borderStyle: 'solid',
+                  }}>
+                  <EmptyList width={100} height={100} color={colors.text} />
+                  <FadeText style={{ color: colors.text }}>
+                    {'There are no transactions yet.'}
+                  </FadeText>
+                </View>
+              </View>
             </View>
           )}
           {!isAtTop && (
@@ -492,7 +513,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               disabled={isScrollingToTop}
               style={({ pressed }) => ({
                 position: 'absolute',
-                bottom: 30,
+                bottom: !isLiquidGlassSupported && Platform.OS === GlobalConst.platformOSandroid ? 30 : 60,
                 right: 10,
                 paddingHorizontal: 5,
                 paddingVertical: 10,

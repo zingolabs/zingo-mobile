@@ -2190,7 +2190,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       }
                     }
                     testID="settings.custom-server-field"
-                    value="https://testnet.zec.rocks:443"
+                    value="http://45.76.30.90:18233"
                   />
                 </View>
                 <View
@@ -3053,7 +3053,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#c3c3c3",
             "borderRadius": 25,
             "borderWidth": 1,
             "justifyContent": "center",

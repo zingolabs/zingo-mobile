@@ -8,21 +8,19 @@ import { AppDrawerParamList, LoadingAppNavigationState, ThemeType } from '../../
 import { ContextAppLoaded } from '../../app/context';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
-import { ButtonTypeEnum, RouteEnum, ScreenEnum, SeedActionEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faInfo, faSeedling, faServer } from '@fortawesome/free-solid-svg-icons';
 import RegText from '../Components/RegText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../Components/Button';
 
 type SettingsMenuProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.SettingsMenu> & {
-  navigateToLoadingApp: (state: LoadingAppNavigationState) => Promise<void>;
   onClickOKChangeWallet: (state: LoadingAppNavigationState) => Promise<void>;
 };
 
 const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
-  navigateToLoadingApp,
   onClickOKChangeWallet,
   navigation,
 }) => {
@@ -94,22 +92,65 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
 
           <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>Settings</RegText>
 
-          <View style={{ borderRadius: 50, backgroundColor: colors.secondary, width: '100%', marginTop: 20 }}>
-            <View style={{ flexDirection: 'row', margin: 30 }}>
-              <TouchableOpacity 
-                onPress={() => navigation?.navigate(RouteEnum.Seed, { action: SeedActionEnum.view })}>
-                <RegText>Seed Phrase</RegText>
+          <View style={{ borderRadius: 26, backgroundColor: colors.secondary, width: '100%', marginTop: 20, paddingVertical: 10 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 20, marginHorizontal: 40, width: '80%' }}>
+              <TouchableOpacity
+                style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
+                onPress={() => navigation?.navigate(RouteEnum.Seed)}>
+                <View style={{ flexDirection: 'row', gap: 15 }}>
+                  <FontAwesomeIcon
+                    size={20}
+                    icon={faSeedling}
+                    color={colors.text}
+                  />
+                  <RegText>Seed Phrase</RegText>
+                </View>
+                <FontAwesomeIcon
+                  size={20}
+                  icon={faChevronRight}
+                  color={colors.text}
+                />
               </TouchableOpacity>
             </View>
             <View style={{ height: 1, backgroundColor: colors.zingo }} />
-            <View style={{ flexDirection: 'row', margin: 30 }}>
-              <TouchableOpacity onPress={() => navigateToLoadingApp({ screen: 0.5, startingApp: false })}>
-                <RegText>Server</RegText>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 20, marginHorizontal: 40, width: '80%' }}>
+              <TouchableOpacity
+                style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
+                onPress={() => navigation?.navigate(RouteEnum.SettingsServers)}>
+                <View style={{ flexDirection: 'row', gap: 15 }}>
+                  <FontAwesomeIcon
+                    size={20}
+                    icon={faServer}
+                    color={colors.text}
+                  />
+                  <RegText>Server</RegText>
+                </View>
+                <FontAwesomeIcon
+                  size={20}
+                  icon={faChevronRight}
+                  color={colors.text}
+                />
               </TouchableOpacity>
             </View>
             <View style={{ height: 1, backgroundColor: colors.zingo }} />
-            <View style={{ flexDirection: 'row', margin: 30 }}>
-              <RegText>Debug Information</RegText>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 20, marginHorizontal: 40, width: '80%' }}>
+              <TouchableOpacity
+                style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
+                onPress={() => console.log('debug info')}>
+                <View style={{ flexDirection: 'row', gap: 15 }}>
+                  <FontAwesomeIcon
+                    size={20}
+                    icon={faInfo}
+                    color={colors.text}
+                  />
+                  <RegText>Debug Information</RegText>
+                </View>
+                <FontAwesomeIcon
+                  size={20}
+                  icon={faChevronRight}
+                  color={colors.text}
+                />
+              </TouchableOpacity>
             </View>
           </View>
         </View>

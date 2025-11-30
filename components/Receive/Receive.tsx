@@ -253,9 +253,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               justifyContent: 'center',
             }}>
               
-            <RegText color={colors.text} style={{ fontSize: 25 }}>Receive</RegText>
+            <RegText color={colors.text} style={{ fontSize: 25, marginBottom: 40 }}>Receive</RegText>
 
-            <FadeText style={{ marginBottom: 20, marginTop: 5 }}>texto</FadeText>
+            {false && (
+              <FadeText style={{ marginBottom: 20, marginTop: 5 }}>texto</FadeText>
+            )}
 
             {component}
             

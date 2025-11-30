@@ -11,14 +11,14 @@ import {
   NativeSyntheticEvent,
   TextInputEndEditingEventData,
   KeyboardAvoidingView,
+  Image,
 } from 'react-native';
 import {
   faQrcode,
   faCheck,
-  faInfoCircle,
   faChevronLeft,
-  faWallet,
   faArrowDown,
+  faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -55,6 +55,7 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Wallet from '../../assets/icons/wallet.svg';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
@@ -1176,30 +1177,30 @@ const Send: React.FunctionComponent<SendProps> = ({
                     )}
 
                     <View style={{ flexDirection: 'column', justifyContent: 'flex-end' }}>
-                      <View 
-                        style={{ 
-                          flexDirection: 'row', 
-                          borderColor: colors.text,
-                          borderWidth: 1,
-                          borderRadius: 20,
-                          backgroundColor: colors.background,
-                          padding: 5,
-                          width: 'auto',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          size={20}
-                          color={colors.primary}
-                        />
-                        <RegText style={{ fontSize: 25 }}>
-                          {' ' + (info.currencyName ? info.currencyName : '---')}
-                        </RegText>
+                      <View style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                        <View 
+                          style={{ 
+                            flexDirection: 'row', 
+                            borderColor: colors.text,
+                            borderWidth: 1,
+                            borderRadius: 20,
+                            backgroundColor: colors.background,
+                            paddingHorizontal: 10,
+                            paddingVertical: 10,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Image 
+                            source={require('../../assets/icons/zcash.png')}
+                            style={{ width: 22, height: 22 }} />
+                          <RegText style={{ fontSize: 15 }}>
+                            {' ' + (info.currencyName ? info.currencyName : '---')}
+                          </RegText>
+                        </View>
                       </View>
 
-                      <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'flex-end' }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'flex-end', marginTop: 5 }}>
                         <TouchableOpacity
                           onPress={() => {
                             if (
@@ -1424,7 +1425,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     borderWidth: 1,
                     borderRadius: 25,
                     marginBottom: 10,
-                    backgroundColor: colors.secondary,
+                    backgroundColor: colors.background,
                     width: '100%',
                     maxWidth: maxW,
                     minWidth: '50%',
@@ -1432,16 +1433,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                     alignItems: 'center',
                     paddingHorizontal: 20,
                     paddingVertical: 30,
-                    gap: 20,
+                    gap: 10,
                     marginTop: -15,
                   }}
                 >
-                  <FontAwesomeIcon
-                    icon={faWallet}
-                    size={40}
-                    color={colors.primary}
-                    style={{ marginRight: 5 }}
-                  />
+                  <Wallet width={40} height={40} />
                   <RegText>{Utils.trimToSmall(addressText, 10)}</RegText>
                 </View>
               </>

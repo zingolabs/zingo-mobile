@@ -295,12 +295,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       // I have to update them in auto as well
       // with the first of the list
       setAutoServerUri(
-        serverUris(translate).filter(
+        serverUris().filter(
           (s: ServerUrisType) => s.chainName === ChainNameEnum.testChainName,
         )[0].uri,
       );
       setAutoServerChainName(
-        serverUris(translate).filter(
+        serverUris().filter(
           (s: ServerUrisType) => s.chainName === ChainNameEnum.testChainName,
         )[0].chainName,
       );
@@ -312,12 +312,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       // I have to update them in auto as well
       // with the first of the list
       setAutoServerUri(
-        serverUris(translate).filter(
+        serverUris().filter(
           (s: ServerUrisType) => s.chainName === ChainNameEnum.testChainName,
         )[0].uri,
       );
       setAutoServerChainName(
-        serverUris(translate).filter(
+        serverUris().filter(
           (s: ServerUrisType) => s.chainName === ChainNameEnum.testChainName,
         )[0].chainName,
       );
@@ -331,14 +331,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   useEffect(() => {
     // avoiding obsolete ones
-    const items = serverUris(translate)
+    const items = serverUris()
       .filter((s: ServerUrisType) => !s.obsolete)
       .map((item: ServerUrisType) => ({
         label: (item.region ? item.region + ' ' : '') + item.uri,
         value: item.uri,
       }));
     setItemsPicker(items);
-  }, [translate]);
+  }, []);
 
   const securityObject: () => SecurityType = useCallback(() => {
     return {
@@ -1141,7 +1141,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                             setListServerUri(itemValue);
                             setAutoServerUri(itemValue);
                             // avoiding obsolete ones
-                            const cnItem = serverUris(translate).find(
+                            const cnItem = serverUris().find(
                               (s: ServerUrisType) =>
                                 s.uri === itemValue && !s.obsolete,
                             );

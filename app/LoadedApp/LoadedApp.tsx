@@ -100,12 +100,17 @@ import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import Seed from '../../components/Seed';
 import ComputingOK from './components/ComputingOK';
 import ComputingError from './components/ComputingError';
+import Staking from '../../components/Staking/Staking';
+import { AddStakeScreen } from '../../components/Staking/components/AddStake';
+import { Unstake } from '../../components/Staking/components/Unstake';
+import SettingsServers from '../../components/Settings/components/SettingsServers';
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();
 
 type InnerStackParamList = {
   [RouteEnum.MainTabs]: undefined;
   [RouteEnum.SettingsMenu]: undefined;
+  [RouteEnum.SettingsServers]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Faucet]: undefined;
@@ -115,6 +120,9 @@ type InnerStackParamList = {
   [RouteEnum.ValueTransferDetail]: undefined;
   [RouteEnum.ScannerAddress]: undefined;
   [RouteEnum.Seed]: undefined;
+  [RouteEnum.StakingHome]: undefined;
+  [RouteEnum.Stake]: undefined;
+  [RouteEnum.Unstake]: undefined;
 };
 
 const en = require('../translations/en.json');
@@ -1916,7 +1924,6 @@ export class LoadedAppClass extends Component<
                 {props => (
                   <SettingsMenu
                     {...props}
-                    navigateToLoadingApp={this.navigateToLoadingApp}
                     onClickOKChangeWallet={this.onClickOKChangeWallet}
                   />
                 )}
@@ -1952,6 +1959,15 @@ export class LoadedAppClass extends Component<
                 )}
               </InnerStack.Screen>
 
+              <InnerStack.Screen name={RouteEnum.SettingsServers}>
+                {props => (
+                  <SettingsServers
+                    {...props}
+                    navigateToLoadingApp={this.navigateToLoadingApp}
+                  />
+                )}
+              </InnerStack.Screen>
+
               <InnerStack.Screen name={RouteEnum.Faucet}>
                 {props => <Faucet {...props} />}
               </InnerStack.Screen>
@@ -1978,6 +1994,18 @@ export class LoadedAppClass extends Component<
 
               <InnerStack.Screen name={RouteEnum.Seed}>
                 {props => <Seed {...props} />}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.StakingHome}>
+                {props => <Staking {...props} />}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.Stake}>
+                {props => <AddStakeScreen {...props} />}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.Unstake}>
+                {props => <Unstake {...props} />}
               </InnerStack.Screen>
             </InnerStack.Navigator>
           </GestureHandlerRootView>

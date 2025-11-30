@@ -19,6 +19,7 @@ export enum RouteEnum {
   InsightStack = 'InsightStack',
   Settings = 'Settings',
   SettingsMenu = 'SettingsMenu',
+  SettingsServers = 'SettingsServers',
   About = 'About',
   Rescan = 'Rescan',
   Info = 'Info',
@@ -29,6 +30,9 @@ export enum RouteEnum {
   SyncReport = 'SyncReport',
   Pools = 'Pools',
   ContactList = 'ContactList',
+  StakingHome = 'StakingHome',
+  Stake = 'Stake',
+  Unstake = 'Unstake',
 
   // Drawer with params
   AddressList = 'AddressList',

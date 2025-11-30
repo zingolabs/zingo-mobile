@@ -7,10 +7,11 @@ import RegText from '../../../components/Components/RegText';
 import { AppDrawerParamList, ThemeType } from '../../types';
 import { RouteEnum, SendPageStateClass } from '../../AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import PaperPlane from '../../../assets/icons/paper-plane.svg';
 import Utils from '../../utils';
 import ZecAmount from '../../../components/Components/ZecAmount';
 import { ContextAppLoaded } from '../../context';
+import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 
 type ComputingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Computing>;
@@ -53,13 +54,17 @@ const Computing: React.FunctionComponent<ComputingProps> = ({
           >
             <View
               style={{
-                borderRadius: 45,
+                borderRadius: 50,
                 backgroundColor: '#1C78D24D',
                 padding: 20,
                 margin: 10,
               }}
             >
-              <PaperPlane width={40} height={40} />
+              <FontAwesomeIcon
+                icon={faPaperPlane}
+                color='#1C78D2'
+                size={50}
+              />
             </View>
           </View>
           <RegText style={{ fontSize: 30, alignSelf: 'center' }}>Sending</RegText>
