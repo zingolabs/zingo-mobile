@@ -831,23 +831,35 @@ pub fn wallet_kind() -> Result<String, ZingolibError> {
     })
 }
 
+fn make_decoded_chain_pair(
+    address: &str,
+) -> Option<(zcash_client_backend::address::Address, ChainType)> {
+    [
+        ChainType::Mainnet,
+        ChainType::Testnet(ConfiguredActivationHeights {
+            before_overwinter: Some(1),
+            overwinter: Some(1),
+            sapling: Some(1),
+            blossom: Some(1),
+            heartwood: Some(1),
+            canopy: Some(1),
+            nu5: Some(1),
+            nu6: Some(1),
+            nu6_1: None,
+            nu7: None,
+        }),
+        ChainType::Regtest(for_test::all_height_one_nus()),
+    ]
+    .iter()
+    .find_map(|chain| Address::decode(chain, address).zip(Some(*chain)))
+}
+
 #[uniffi::export]
 pub fn parse_address(address: String) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         if address.is_empty() {
             Ok("Error: The address is empty".to_string())
         } else {
-            fn make_decoded_chain_pair(
-                address: &str,
-            ) -> Option<(zcash_client_backend::address::Address, ChainType)> {
-                [
-                    ChainType::Mainnet,
-                    ChainType::Testnet(for_test::all_height_one_nus()),
-                    ChainType::Regtest(for_test::all_height_one_nus()),
-                ]
-                .iter()
-                .find_map(|chain| Address::decode(chain, address).zip(Some(*chain)))
-            }
             if let Some((recipient_address, chain_name)) = make_decoded_chain_pair(&address) {
                 let chain_name_string = match chain_name {
                     ChainType::Mainnet => "main",
@@ -1698,4 +1710,44 @@ pub fn confirm() -> Result<String, ZingolibError> {
             Err(ZingolibError::LightclientNotInitialized)
         }
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const REGTEST_UA: &str = "uregtest1vgzs0rxfeusg0yjlsj6p7f4v37c2w3xaezunn7a08rvexwz52uurck2w8kved3jwnqsyfa5ryz3s2rp320ue92g78c4c6y8agqlcjp4h";
+
+    #[test]
+    fn make_decoded_chain_pair_selects_regtest_for_regtest_address() {
+        let result = make_decoded_chain_pair(REGTEST_UA);
+
+        match result {
+            Some((_addr, chain_type)) => {
+                assert!(
+                    matches!(chain_type, ChainType::Regtest(_)),
+                    "expected Regtest chain, got: {:?}",
+                    chain_type
+                );
+            }
+            None => panic!("make_decoded_chain_pair returned None for valid regtest UA"),
+        }
+    }
+
+    #[test]
+    fn parse_address_returns_unified_regtest_json() {
+        let json_str = parse_address(REGTEST_UA.to_string())
+            .expect("parse_address returned an error for valid regtest UA");
+
+        let value = json::parse(&json_str).expect("parse_address did not return valid JSON");
+
+        assert_eq!(value["status"], "success");
+        assert_eq!(value["chain_name"], "regtest");
+        assert_eq!(value["address_kind"], "unified");
+        assert!(value["receivers_available"].is_array());
+        assert!(
+            value["receivers_available"].len() >= 1,
+            "expected at least one receiver in receivers_available"
+        );
+    }
 }
