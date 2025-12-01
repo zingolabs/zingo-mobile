@@ -3867,7 +3867,7 @@ dependencies = [
 [[package]]
 name = "pepper-sync"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da#d382ff22963fdf2d4ed641c9886d567b32f613da"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb#4d5785ce2cc347bf5a4849ce8ceb645e18b533cb"
 dependencies = [
  "bip32",
  "byteorder",
@@ -3895,8 +3895,8 @@ dependencies = [
  "zcash_primitives 0.24.0",
  "zcash_protocol 0.6.1",
  "zcash_transparent 0.4.0",
- "zingo-memo 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da)",
- "zingo-status 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da)",
+ "zingo-memo 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb)",
+ "zingo-status 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb)",
  "zingo_netutils",
  "zip32",
 ]
@@ -9116,7 +9116,7 @@ dependencies = [
  "lazy_static",
  "log",
  "once_cell",
- "pepper-sync 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da)",
+ "pepper-sync 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb)",
  "rustls 0.23.35",
  "serde_json",
  "thiserror 1.0.69",
@@ -9133,7 +9133,7 @@ dependencies = [
  "zcash_protocol 0.6.1",
  "zcash_transparent 0.4.0",
  "zingo_common_components",
- "zingolib 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da)",
+ "zingolib 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb)",
 ]
 
 [[package]]
@@ -9151,7 +9151,7 @@ dependencies = [
 [[package]]
 name = "zingo-memo"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da#d382ff22963fdf2d4ed641c9886d567b32f613da"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb#4d5785ce2cc347bf5a4849ce8ceb645e18b533cb"
 dependencies = [
  "zcash_address 0.9.0",
  "zcash_client_backend 0.19.1",
@@ -9179,7 +9179,7 @@ dependencies = [
 [[package]]
 name = "zingo-price"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da#d382ff22963fdf2d4ed641c9886d567b32f613da"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb#4d5785ce2cc347bf5a4849ce8ceb645e18b533cb"
 dependencies = [
  "byteorder",
  "reqwest",
@@ -9204,7 +9204,7 @@ dependencies = [
 [[package]]
 name = "zingo-status"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da#d382ff22963fdf2d4ed641c9886d567b32f613da"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb#4d5785ce2cc347bf5a4849ce8ceb645e18b533cb"
 dependencies = [
  "byteorder",
  "zcash_primitives 0.24.0",
@@ -9317,7 +9317,7 @@ dependencies = [
 [[package]]
 name = "zingolib"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da#d382ff22963fdf2d4ed641c9886d567b32f613da"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb#4d5785ce2cc347bf5a4849ce8ceb645e18b533cb"
 dependencies = [
  "append-only-vec",
  "bech32",
@@ -9340,7 +9340,7 @@ dependencies = [
  "log4rs",
  "nonempty",
  "orchard",
- "pepper-sync 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da)",
+ "pepper-sync 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb)",
  "portpicker",
  "prost 0.13.5",
  "rand 0.8.5",
@@ -9371,9 +9371,9 @@ dependencies = [
  "zcash_protocol 0.6.1",
  "zcash_transparent 0.4.0",
  "zebra-chain",
- "zingo-memo 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da)",
- "zingo-price 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da)",
- "zingo-status 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=d382ff22963fdf2d4ed641c9886d567b32f613da)",
+ "zingo-memo 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb)",
+ "zingo-price 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb)",
+ "zingo-status 0.0.1 (git+https://github.com/zingolabs/zingolib-crosslink?rev=4d5785ce2cc347bf5a4849ce8ceb645e18b533cb)",
  "zingo_common_components",
  "zingo_netutils",
  "zingo_test_vectors",

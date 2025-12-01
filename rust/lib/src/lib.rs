@@ -10,6 +10,7 @@ extern crate android_logger;
 use android_logger::{Config, FilterBuilder};
 #[cfg(target_os = "android")]
 use log::Level;
+use zingolib::ConfiguredActivationHeights;
 
 use std::any::Any;
 use std::backtrace::Backtrace;
@@ -239,7 +240,18 @@ fn construct_uri_load_config(
 
     let chaintype = match chain_hint.as_str() {
         "main" => ChainType::Mainnet,
-        "test" => ChainType::Testnet(for_test::all_height_one_nus()),
+        "test" => ChainType::Testnet(ConfiguredActivationHeights {
+            before_overwinter: Some(1),
+            overwinter: Some(1),
+            sapling: Some(1),
+            blossom: Some(1),
+            heartwood: Some(1),
+            canopy: Some(1),
+            nu5: Some(1),
+            nu6: Some(1),
+            nu6_1: None,
+            nu7: None,
+        }),
         "regtest" => ChainType::Regtest(for_test::all_height_one_nus()),
         _ => return Err("Error: Not a valid chain hint!".to_string()),
     };
