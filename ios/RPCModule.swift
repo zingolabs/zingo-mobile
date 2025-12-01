@@ -665,7 +665,10 @@ class RPCModule: NSObject {
             resolve(respStr)
           }
         } catch {
-          let err = "Error: [Native] Sync poll info. \(error.localizedDescription)"
+          let detail = error.localizedDescription.isEmpty
+                          ? String(describing: error)
+                          : error.localizedDescription
+          let err = "Error: [Native] Sync poll info. \(detail)"
           NSLog(err)
           DispatchQueue.main.async {
             resolve(err)
