@@ -18,12 +18,17 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { ThemeType } from '../../../app/types/ThemeType';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../../../app/types';
+import { RouteEnum } from '../../../app/AppState';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
 type ModalState = 'idle' | 'sending' | 'success';
 
-export function AddStakeScreen() {
+type AddStakeScreenProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Stake>;
+
+const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
   const navigation = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
@@ -286,3 +291,5 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
   },
 });
+
+export default AddStakeScreen;

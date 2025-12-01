@@ -22,12 +22,17 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
+import { RouteEnum } from '../../../app/AppState';
+import { AppDrawerParamList } from '../../../app/types';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
 const AVAILABLE_BALANCE = 1.55; // TODO: Replace with real value
 
-export function Unstake() {
+type UnstakeProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Unstake>;
+
+const Unstake: React.FC<UnstakeProps> = () => {
   const navigation = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
@@ -331,3 +336,5 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
   },
 });
+
+export default Unstake;

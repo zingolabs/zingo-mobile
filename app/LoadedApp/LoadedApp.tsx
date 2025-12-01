@@ -100,9 +100,7 @@ import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import Seed from '../../components/Seed';
 import ComputingOK from './components/ComputingOK';
 import ComputingError from './components/ComputingError';
-import Staking from '../../components/Staking/Staking';
-import { AddStakeScreen } from '../../components/Staking/components/AddStake';
-import { Unstake } from '../../components/Staking/components/Unstake';
+import { Staking, AddStakeScreen, Unstake } from '../../components/Staking';
 import SettingsServers from '../../components/Settings/components/SettingsServers';
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();

@@ -8,7 +8,7 @@ import { Platform } from 'react-native';
 
 type MainTabParamList = {
   [RouteEnum.History]: undefined;
-  [RouteEnum.Staking]: undefined;
+  [RouteEnum.StakingHome]: undefined;
 };
 
 const Tab = createNativeBottomTabNavigator<MainTabParamList>();
@@ -62,7 +62,7 @@ export const MainTabs: React.FC<MainTabsProps> = ({
       </Tab.Screen>
 
       <Tab.Screen
-        name={RouteEnum.Staking}
+        name={RouteEnum.StakingHome}
         component={StakingScreen}
         options={{
           title: 'Staking',

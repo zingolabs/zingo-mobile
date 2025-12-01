@@ -510,18 +510,18 @@ export default class RPC {
     if (fullRescan) {
       await this.clearTimers();
       // clean the ValueTransfer list before.
-      this.fnSetValueTransfersList([], 0);
-      this.fnSetMessagesList([], 0);
-      this.fnSetTotalBalance({
-        totalOrchardBalance: 0,
-        totalSaplingBalance: 0,
-        totalTransparentBalance: 0,
-        confirmedTransparentBalance: 0,
-        confirmedOrchardBalance: 0,
-        confirmedSaplingBalance: 0,
-        totalSpendableBalance: 0,
-      } as TotalBalanceClass);
-      this.fnSetSyncingStatus({} as RPCSyncStatusType);
+      //this.fnSetValueTransfersList([], 0);
+      //this.fnSetMessagesList([], 0);
+      //this.fnSetTotalBalance({
+      //  totalOrchardBalance: 0,
+      //  totalSaplingBalance: 0,
+      //  totalTransparentBalance: 0,
+      //  confirmedTransparentBalance: 0,
+      //  confirmedOrchardBalance: 0,
+      //  confirmedSaplingBalance: 0,
+      //  totalSpendableBalance: 0,
+      //} as TotalBalanceClass);
+      //this.fnSetSyncingStatus({} as RPCSyncStatusType);
 
       // the rescan in zingolib do two tasks:
       // 1. stop the sync.
@@ -617,13 +617,27 @@ export default class RPC {
     if (returnPoll && returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fnSetLastError(`Error sync poll: ${returnPoll}`);
-      // This command have an error, fine. It's worthy to try running the sync process juat in case.
-      setTimeout(async () => {
-        await this.refreshSync();
-      }, 0);
-      setTimeout(async () => {
-        await this.fetchSyncStatus();
-      }, 0);
+      // if the error is: LightclientLockPoisoned force a rescan directly
+      if (returnPoll.includes('LightclientLockPoisoned')) {
+        let result: string = await RPCModule.loadExistingWallet(
+          this.indexerServer.uri,
+          this.indexerServer.chainName,
+          this.performanceLevel,
+          GlobalConst.minConfirmations.toString(),
+        );
+        console.log(result);
+        setTimeout(async () => {
+          await this.refreshSync(true);
+        }, 0);
+      } else {
+        // This command have an error, fine. It's worthy to try running the sync process juat in case.
+        setTimeout(async () => {
+          await this.refreshSync();
+        }, 0);
+        setTimeout(async () => {
+          await this.fetchSyncStatus();
+        }, 0);
+      }
       this.fetchSyncPollLock = false;
       return;
     }

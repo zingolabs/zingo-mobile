@@ -4,7 +4,6 @@ export enum RouteEnum {
   LoadedApp = 'LoadedApp',
 
   Servers = 'Servers',
-  Staking = 'Staking',
 
   MainTabs = 'MainTabs',
 
