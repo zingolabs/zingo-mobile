@@ -580,7 +580,7 @@ extension AppDelegate {
         NSLog("Opening the wallet file - No App active - serveruri: \(serveruri) chain: \(chainhint)")
         let rpcmodule = RPCModule()
         do {
-          _ = try rpcmodule.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "3")
+          _ = try rpcmodule.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "1")
         } catch {
           NSLog("Error: Unable to load the wallet. error: \(error.localizedDescription)")
         }
