@@ -900,7 +900,7 @@ pub fn parse_address(address: String) -> Result<String, ZingolibError> {
                                 "chain_name" => chain_name_string,
                                 "address_kind" => "unified",
                                 "receivers_available" => receivers_available,
-                                "only_orchard_ua" => "somethingsomething",
+                                "only_orchard_ua" => zcash_keys::address::UnifiedAddress::from_receivers(ua.orchard().cloned(), None, None).expect("To construct UA").encode(&chain_name),
                             }
                             .pretty(2)
                         } else {
