@@ -1,3 +1,5 @@
-// import Staking from './Staking';
+import Staking from './Staking';
+import AddStakeScreen from './components/AddStake';
+import Unstake from './components/Unstake';
 
-// export default Staking;
+export { Staking, AddStakeScreen, Unstake };

@@ -50,10 +50,10 @@ function Separator() {
   );
 }
 
-type StakingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Staking>;
+type StakingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.StakingHome>;
 
 const Staking: React.FC<StakingProps> = () => {
-  const screenName = ScreenEnum.Staking;
+  const screenName = ScreenEnum.StakingHome;
 
   const [loading] = useState(false);
   const [movements] = useState<ValueTransferType[]>(mockMovements);

@@ -60,7 +60,9 @@ export type AppDrawerParamList = {
   [RouteEnum.SettingsServers]: undefined;
   [RouteEnum.Faucet]: undefined;
   [RouteEnum.About]: undefined;
-  [RouteEnum.Staking]: undefined;
+  [RouteEnum.StakingHome]: undefined;
+  [RouteEnum.Stake]: undefined;
+  [RouteEnum.Unstake]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Info]: undefined;
   [RouteEnum.Insight]: undefined;

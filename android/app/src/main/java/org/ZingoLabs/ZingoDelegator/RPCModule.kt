@@ -635,8 +635,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)
                 }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] sync poll info: ${e.localizedMessage}"
+            } catch (e: Throwable) {
+                val detail = e.message
+                                ?.takeIf { it.isNotBlank() }
+                                ?: e.localizedMessage
+                                    ?.takeIf { it.isNotBlank() }
+                                ?: e.toString()
+                val errorMessage = "Error: [Native] sync poll info: $detail"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
