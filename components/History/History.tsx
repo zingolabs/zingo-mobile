@@ -52,7 +52,7 @@ import SettingsButton from './components/SettingsButton';
 import { Swipeable } from 'react-native-gesture-handler';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 import RegText from '../Components/RegText';
-import EmptyList from '../../assets/icons/empty-cardboard-box.svg'
+import EmptyList from '../../assets/icons/empty-cardboard-box.svg';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -177,9 +177,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
             // two lines
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 65 : 60);
+              Platform.OS === GlobalConst.platformOSandroid ? 65 : 60;
           } else if (type === ViewTypes.WITHOUT_MONTH_ADDRESS) {
-            // three lines 
+            // three lines
             dim.width = Dimensions.get('window').width;
             dim.height =
               (Platform.OS === GlobalConst.platformOSandroid ? 65 : 55) + 25;
@@ -192,7 +192,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
             // three lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 90) + 45 + 25;
+              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 90) +
+              45 +
+              25;
           }
         },
       ),
@@ -485,10 +487,18 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   paddingVertical: 20,
                   paddingHorizontal: 30,
                   backgroundColor: '#78788029',
-                }}>
+                }}
+              >
                 <RegText>Activity</RegText>
               </View>
-              <View style={{ paddingHorizontal: 5, backgroundColor: colors.secondary }}>
+              <View
+                style={{
+                  paddingHorizontal: 5,
+                  backgroundColor: '#62626929',
+                  borderBottomLeftRadius: 25,
+                  borderBottomRightRadius: 25,
+                }}
+              >
                 <View
                   style={{
                     display: 'flex',
@@ -496,9 +506,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
                     alignItems: 'center',
                     padding: 50,
                     borderBottomWidth: 1,
-                    borderBottomColor: colors.zingo,
+                    borderBottomColor: 'transparent',
+
                     borderStyle: 'solid',
-                  }}>
+                  }}
+                >
                   <EmptyList width={100} height={100} color={colors.text} />
                   <FadeText style={{ color: colors.text }}>
                     {'There are no transactions yet.'}
@@ -513,7 +525,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
               disabled={isScrollingToTop}
               style={({ pressed }) => ({
                 position: 'absolute',
-                bottom: !isLiquidGlassSupported && Platform.OS === GlobalConst.platformOSandroid ? 30 : 60,
+                bottom:
+                  !isLiquidGlassSupported &&
+                  Platform.OS === GlobalConst.platformOSandroid
+                    ? 30
+                    : 60,
                 right: 10,
                 paddingHorizontal: 5,
                 paddingVertical: 10,
