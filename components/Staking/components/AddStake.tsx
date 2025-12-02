@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Modal,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,6 +22,7 @@ import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../../app/types';
 import { RouteEnum } from '../../../app/AppState';
+import RegText from '../../Components/RegText';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -35,6 +37,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
+  const [finalizerText, setFinalizerText] = useState('');
+  const [addressText, setAddressText] = useState('');
 
   const hasSelection = selectedAmount !== null;
   const displayAmount = selectedAmount ?? 0;
@@ -143,6 +147,140 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
               </Pressable>
             );
           })}
+        </View>
+
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color: colors.text,
+            marginBottom: 8,
+            marginTop: 15
+          }}
+        >
+          Finalizer address
+        </Text>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            borderRadius: 12,
+            marginBottom: 10,
+            backgroundColor: colors.secondary,
+            width: '100%',
+            minWidth: '50%',
+            height: 44,
+            alignItems: 'center',
+            paddingHorizontal: 16,
+          }}
+        >
+          <TextInput
+            style={{
+              flex: 1,
+              color: colors.text,
+              fontSize: 17,
+              fontWeight: '400',
+              paddingVertical: 0,
+            }}
+            placeholder="Enter finalizer address"
+            placeholderTextColor={colors.placeholder}
+            keyboardType={'default'}
+            value={finalizerText}
+            onChangeText={setFinalizerText}
+          />
+          {!!finalizerText && (
+            <TouchableOpacity
+              onPress={() => {
+                setFinalizerText('');
+              }}
+            >
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: colors.zingo,
+                  borderRadius: 11,
+                  height: 22,
+                  width: 22,
+                  padding: 0,
+                }}
+              >
+                <RegText
+                  style={{ color: colors.background, marginTop: -3 }}
+                >
+                  x
+                </RegText>
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color: colors.text,
+            marginBottom: 8,
+            marginTop: 5
+          }}
+        >
+          Miner address
+        </Text>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            borderRadius: 12,
+            marginBottom: 10,
+            backgroundColor: colors.secondary,
+            width: '100%',
+            minWidth: '50%',
+            height: 44,
+            alignItems: 'center',
+            paddingHorizontal: 16,
+          }}
+        >
+          <TextInput
+            style={{
+              flex: 1,
+              color: colors.text,
+              fontSize: 17,
+              fontWeight: '400',
+              paddingVertical: 0,
+            }}
+            placeholder="Enter miner address"
+            placeholderTextColor={colors.placeholder}
+            keyboardType={'default'}
+            value={addressText}
+            onChangeText={setAddressText}
+          />
+          {!!addressText && (
+            <TouchableOpacity
+              onPress={() => {
+                setAddressText('');
+              }}
+            >
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: colors.zingo,
+                  borderRadius: 11,
+                  height: 22,
+                  width: 22,
+                  padding: 0,
+                }}
+              >
+                <RegText
+                  style={{ color: colors.background, marginTop: -3 }}
+                >
+                  x
+                </RegText>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 

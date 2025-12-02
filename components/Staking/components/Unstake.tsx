@@ -25,6 +25,7 @@ import { ThemeType } from '../../../app/types/ThemeType';
 import { RouteEnum } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import RegText from '../../Components/RegText';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -159,6 +160,31 @@ const Unstake: React.FC<UnstakeProps> = () => {
               onChangeText={setAmountText}
               maxLength={20}
             />
+            {!!amountText && (
+              <TouchableOpacity
+                onPress={() => {
+                  setAmountText('');
+                }}
+              >
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: colors.zingo,
+                    borderRadius: 11,
+                    height: 22,
+                    width: 22,
+                    padding: 0,
+                  }}
+                >
+                  <RegText
+                    style={{ color: colors.background, marginTop: -3 }}
+                  >
+                    x
+                  </RegText>
+                </View>
+              </TouchableOpacity>
+            )}
           </View>
 
           <View
