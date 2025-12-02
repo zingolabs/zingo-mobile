@@ -620,32 +620,6 @@ export default class RPC {
     if (Date.now() - start > 4000) {
       console.log('=========================================== > sync poll command - ', Date.now() - start);
     }
-
-
-
-    // test... DELETE THIS ASAP.
-    if (this.lastServerBlockHeight === 1080) {
-        // if the error is for the server vs wallet height.
-        if (!this.walletSeed || !this.walletBirthday) {
-          await this.fetchWalletBirthdaySeedUfvk();
-        }
-        console.log(this.walletBirthday, this.walletSeed);
-        const change = await this.changeWalletNoBackup();
-        console.log(change);
-        let result = await RPCModule.restoreWalletFromSeed(
-          this.walletSeed,
-          this.walletBirthday,
-          this.indexerServer.uri,
-          this.indexerServer.chainName,
-          this.performanceLevel,
-          GlobalConst.minConfirmations.toString(),
-        );
-        console.log(result);
-
-    }
-
-
-
     if (returnPoll && returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fnSetLastError(`Error sync poll: ${returnPoll}`);
@@ -662,22 +636,6 @@ export default class RPC {
         setTimeout(async () => {
           await this.refreshSync(true);
         }, 0);
-      } else if ((this.lastWalletBlockHeight - this.lastServerBlockHeight) >= 100 || returnPoll.includes('100 blocks ahead of best chain height')) {
-        // if the error is for the server vs wallet height.
-        if (!this.walletSeed || !this.walletBirthday) {
-          await this.fetchWalletBirthdaySeedUfvk();
-        }
-        console.log(this.walletBirthday, this.walletSeed);
-        await this.changeWalletNoBackup();
-        let result = await RPCModule.restoreWalletFromSeed(
-          this.walletSeed,
-          this.walletBirthday,
-          this.indexerServer.uri,
-          this.indexerServer.chainName,
-          this.performanceLevel,
-          GlobalConst.minConfirmations.toString(),
-        );
-        console.log(result);
       } else {
         // This command have an error, fine. It's worthy to try running the sync process juat in case.
         setTimeout(async () => {

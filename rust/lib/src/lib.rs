@@ -55,6 +55,7 @@ use zingolib::wallet::keys::{
     unified::{ReceiverSelection, UnifiedKeyStore},
 };
 use zingolib::wallet::{LightWallet, WalletBase, WalletSettings};
+use std::sync::TryLockError;
 
 #[derive(Debug, thiserror::Error, uniffi::Error)]
 pub enum ZingolibError {
@@ -200,33 +201,35 @@ lazy_static! {
     pub static ref RT: Runtime = tokio::runtime::Runtime::new().unwrap();
 }
 
-fn with_lightclient_write<F, R>(f: F) -> R
+fn with_lightclient_write<F, R>(f: F) -> Result<R, ZingolibError>
 where
     F: FnOnce(&mut Option<LightClient>) -> R,
 {
-    let mut guard = match LIGHTCLIENT.write() {
-        Ok(g) => g,
-        Err(poisoned) => {
-            log::warn!("LIGHTCLIENT RwLock poisoned; recovering and clearing poison");
-            let g = poisoned.into_inner();
-            LIGHTCLIENT.clear_poison();
-            g
+    match LIGHTCLIENT.try_write() {
+        Ok(mut guard) => {
+            Ok(f(&mut guard))
         }
-    };
-    f(&mut guard)
+        Err(TryLockError::WouldBlock) => {
+            Err(ZingolibError::Panic("Error: cannot acquiere write lock".to_string()))
+        }
+        Err(TryLockError::Poisoned(poisoned)) => {
+            let mut guard = poisoned.into_inner();
+            LIGHTCLIENT.clear_poison();
+            Ok(f(&mut guard))
+        }
+    }
 }
 
-fn reset_lightclient() {
+fn reset_lightclient() -> Result<(), ZingolibError> {
     with_lightclient_write(|slot| {
         *slot = None;
-    });
+    })
 }
 
-fn store_client(lightclient: LightClient) -> Result<(), ZingolibError> {
+fn store_lightclient(lightclient: LightClient) -> Result<(), ZingolibError> {
     with_lightclient_write(|slot| {
         *slot = Some(lightclient);
-    });
-    Ok(())
+    })
 }
 
 fn construct_uri_load_config(
@@ -308,7 +311,9 @@ pub fn init_new(
     min_confirmations: u32,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
-        reset_lightclient();
+        if let Err(e) = reset_lightclient() {
+            return Ok(format!("Error: {e}"))
+        }
         let (config, lightwalletd_uri) = match construct_uri_load_config(
             server_uri,
             chain_hint,
@@ -330,7 +335,9 @@ pub fn init_new(
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
-        let _ = store_client(lightclient);
+        if let Err(e) = store_lightclient(lightclient) {
+            return Ok(format!("Error: {e}"))
+        }
 
         get_seed()
     })
@@ -347,7 +354,9 @@ pub fn init_from_seed(
     min_confirmations: u32,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
-        reset_lightclient();
+        if let Err(e) = reset_lightclient() {
+            return Ok(format!("Error: {e}"))
+        }
         let (config, _lightwalletd_uri) = match construct_uri_load_config(
             server_uri,
             chain_hint,
@@ -377,7 +386,9 @@ pub fn init_from_seed(
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
-        let _ = store_client(lightclient);
+        if let Err(e) = store_lightclient(lightclient) {
+            return Ok(format!("Error: {e}"))
+        }
 
         get_seed()
     })
@@ -393,7 +404,9 @@ pub fn init_from_ufvk(
     min_confirmations: u32,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
-        reset_lightclient();
+        if let Err(e) = reset_lightclient() {
+            return Ok(format!("Error: {e}"))
+        }
         let (config, _lightwalletd_uri) = match construct_uri_load_config(
             server_uri,
             chain_hint,
@@ -416,7 +429,9 @@ pub fn init_from_ufvk(
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
-        let _ = store_client(lightclient);
+        if let Err(e) = store_lightclient(lightclient) {
+            return Ok(format!("Error: {e}"))
+        }
 
         get_ufvk()
     })
@@ -431,7 +446,9 @@ pub fn init_from_b64(
     min_confirmations: u32,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
-        reset_lightclient();
+        if let Err(e) = reset_lightclient() {
+            return Ok(format!("Error: {e}"))
+        }
         let (config, _lightwalletd_uri) = match construct_uri_load_config(
             server_uri,
             chain_hint,
@@ -462,7 +479,9 @@ pub fn init_from_b64(
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
-        let _ = store_client(lightclient);
+        if let Err(e) = store_lightclient(lightclient) {
+            return Ok(format!("Error: {e}"))
+        }
 
         if has_seed { get_seed() } else { get_ufvk() }
     })
