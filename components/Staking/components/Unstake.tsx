@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -40,6 +41,7 @@ const Unstake: React.FC<UnstakeProps> = () => {
 
   const [amountText, setAmountText] = useState('');
   const [modalState, setModalState] = useState<ModalState>('idle');
+  const [kbOpen, setKbOpen] = React.useState(false);
 
   const normalized = amountText.replace(',', '.');
   const amountNumber = parseFloat(normalized);
@@ -48,6 +50,12 @@ const Unstake: React.FC<UnstakeProps> = () => {
   const isValidAmount = hasAmount && withinBalance;
 
   const modalVisible = modalState !== 'idle';
+
+  useEffect(() => {
+    const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
+    const s2 = Keyboard.addListener('keyboardDidHide', () => setKbOpen(false));
+    return () => { s1.remove(); s2.remove(); };
+  }, []);
 
   const setHalf = () => {
     const half = AVAILABLE_BALANCE / 2;
@@ -86,12 +94,13 @@ const Unstake: React.FC<UnstakeProps> = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View
-        style={{
-          flex: 1,
+      <KeyboardAvoidingView
+        style={{ 
+          flex: 1, 
           backgroundColor: colors.background,
-          paddingTop: insets.top,
         }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0}
       >
         <View style={styles.header}>
           <TouchableOpacity
@@ -237,13 +246,14 @@ const Unstake: React.FC<UnstakeProps> = () => {
           </View>
         </View>
 
-        <View
-          style={{
-            paddingHorizontal: 24,
-            paddingBottom: insets.bottom + 16,
-            paddingTop: 8,
-          }}
-        >
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingTop: 10,
+          paddingBottom: 20,
+          paddingHorizontal: 24,
+        }}>
           <LiquidPrimaryButton
             title="Unstake"
             disabled={!isValidAmount || modalState === 'sending'}
@@ -316,7 +326,7 @@ const Unstake: React.FC<UnstakeProps> = () => {
             </View>
           </View>
         </Modal>
-      </View>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 }
