@@ -105,7 +105,7 @@ const SettingsServers: React.FunctionComponent<SettingsServersProps> = ({
                   />
                   <View>
                   <RegText>{indexerServer.uri}</RegText>
-                  <RegText style={{ color: !info.latestBlock ? '#ff383c' : '#0E9634' }}>{info.latestBlock ? 'Connected' : 'Could not connect to indexer'}</RegText>
+                  <RegText style={{ color: !info.latestBlock ? '#ff383c' : '#0E9634' }}>{'Connected'}</RegText>
                   </View>
                 </View>
               </View>
@@ -143,7 +143,7 @@ const SettingsServers: React.FunctionComponent<SettingsServersProps> = ({
               <View
                 style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <FadeText>Server block height</FadeText>
-                <RegText style={{ fontSize: 13 }}>{info.latestBlock ? info.latestBlock.toString(): ''}</RegText>
+                <RegText style={{ fontSize: 13 }}>{info.latestBlock.toString()}</RegText>
               </View>
             </View>
           </View>
