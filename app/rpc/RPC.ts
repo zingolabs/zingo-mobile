@@ -526,12 +526,14 @@ export default class RPC {
       // the rescan in zingolib do two tasks:
       // 1. stop the sync.
       // 2. launch the rescan.
+      await this.pauseSyncProcess();
+
       const start = Date.now();
       const rescanStr: string = await RPCModule.runRescanProcess();
       if (Date.now() - start > 4000) {
         console.log('=========================================== > rescan run command - ', Date.now() - start);
       }
-      //console.log('rescan RUN', rescanStr);
+      console.log('rescan RUN', rescanStr);
       if (rescanStr && rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error rescan: ${rescanStr}`);
         this.fnSetLastError(`Error rescan: ${rescanStr}`);
@@ -692,6 +694,7 @@ export default class RPC {
       if (Date.now() - start > 4000) {
         console.log('=========================================== > info - ', Date.now() - start);
       }
+      //console.log('INFO', infoStr);
       if (infoStr) {
         if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error info & server block height ${infoStr}`);
@@ -928,6 +931,7 @@ export default class RPC {
       if (Date.now() - start > 4000) {
         console.log('=========================================== > wallet height - ', Date.now() - start);
       }
+      //console.log('WALLET HEIGHT', heightStr);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet height ${heightStr}`);
@@ -1082,6 +1086,7 @@ export default class RPC {
       if (Date.now() - start > 4000) {
         console.log('=========================================== > server height - ', Date.now() - start);
       }
+      //console.log('GET SERVER HEIGHT', heightStr);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error server height ${heightStr}`);
@@ -1402,10 +1407,10 @@ export default class RPC {
       const result = await RPCModule.deleteExistingWallet();
 
       if (!(result && result !== GlobalConst.false)) {
-        return this.translate('rpc.deletewallet-error');
+        return this.translate('rpc.deletewallet-error') as string;
       }
     } else {
-      return this.translate('rpc.walletnotfound-error');
+      return this.translate('rpc.walletnotfound-error') as string;
     }
     return '';
   }
@@ -1419,10 +1424,10 @@ export default class RPC {
       const result = await RPCModule.deleteExistingWallet();
 
       if (!(result && result !== GlobalConst.false)) {
-        return this.translate('rpc.deletewallet-error');
+        return this.translate('rpc.deletewallet-error') as string;
       }
     } else {
-      return this.translate('rpc.walletnotfound-error');
+      return this.translate('rpc.walletnotfound-error') as string;
     }
     return '';
   }
@@ -1439,10 +1444,10 @@ export default class RPC {
         await this.pauseSyncProcess();
         await RPCModule.restoreExistingWalletBackup();
       } else {
-        return this.translate('rpc.walletnotfound-error');
+        return this.translate('rpc.walletnotfound-error') as string;
       }
     } else {
-      return this.translate('rpc.backupnotfound-error');
+      return this.translate('rpc.backupnotfound-error') as string;
     }
     return '';
   }
