@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Alert } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -25,7 +25,7 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { snackbars, removeFirstSnackbar } = context;
+  const { snackbars, removeFirstSnackbar, translate } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.SettingsMenu;
@@ -33,7 +33,18 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
   const insets = useSafeAreaInsets();
 
   const restoreWallet = () => {
-    onClickOKChangeWallet({ screen: 3, startingApp: false });
+    Alert.alert(
+      'Switch to different wallet',
+      'Please confirm that you want to switch to a different/another wallet and you will lose access to your current wallet.',
+      [
+        {
+          text: translate('confirm') as string,
+          onPress: () => onClickOKChangeWallet({ screen: 3, startingApp: false }),
+        },
+        { text: translate('cancel') as string, style: 'cancel' },
+      ],
+      { cancelable: true },
+    );
   };
 
   return (
@@ -163,7 +174,7 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
           paddingTop: 10,
           paddingBottom: 20,
         }}>
-        <Button type={ButtonTypeEnum.Primary} title={'Switch to different wallet'} onPress={restoreWallet} />
+        <Button type={ButtonTypeEnum.Tertiary} title={'Switch to different wallet'} onPress={restoreWallet} />
       </View>
     </ToastProvider>
   );

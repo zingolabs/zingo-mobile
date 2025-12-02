@@ -52,9 +52,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         : type === ButtonTypeEnum.Tertiary
           ? {
               backgroundColor: disabled
-                ? colors.secondaryDisabled
-                : colors.background,
-              borderColor: disabled ? colors.primaryDisabled : colors.primary,
+                ? colors.primaryDisabled
+                : '#ff383c',
               borderWidth: 1,
               width: twoButtons ? '40%' : '80%',
             }
