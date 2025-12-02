@@ -35,6 +35,7 @@ import { RPCWalletSaveRequiredType } from './types/RPCWalletSaveRequiredType';
 import { RPCConfigWalletPerformanceType } from './types/RPCConfigWalletPerformanceType';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
+import { LoadingAppNavigationState } from '../types';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -48,12 +49,14 @@ export default class RPC {
   fnSetZingolib: (zingolib: string) => void;
   fnSetWallet: (wallet: WalletType) => void;
   fnSetLastError: (error: string) => void;
+  fnOnClickOKChangeWallet: (state: LoadingAppNavigationState) => Promise<void>;
 
   updateTimerID?: NodeJS.Timeout;
 
   lastWalletBlockHeight: number;
   lastServerBlockHeight: number;
   walletBirthday: number;
+  walletSeed: string;
 
   fetchWalletHeightLock: boolean;
   fetchWalletBirthdaySeedUfvkLock: boolean;
@@ -90,6 +93,7 @@ export default class RPC {
     fnSetZingolib: (zingolib: string) => void,
     fnSetWallet: (wallet: WalletType) => void,
     fnSetLastError: (error: string) => void,
+    fnOnClickOKChangeWallet: (state: LoadingAppNavigationState) => Promise<void>,
     readOnly: boolean,
     indexerServer: ServerType,
     performanceLevel: RPCPerformanceLevelEnum,
@@ -105,10 +109,12 @@ export default class RPC {
     this.fnSetZingolib = fnSetZingolib;
     this.fnSetWallet = fnSetWallet;
     this.fnSetLastError = fnSetLastError;
+    this.fnOnClickOKChangeWallet = fnOnClickOKChangeWallet;
 
     this.lastWalletBlockHeight = 0;
     this.lastServerBlockHeight = 0;
     this.walletBirthday = 0;
+    this.walletSeed = '';
 
     this.fetchWalletHeightLock = false;
     this.fetchWalletBirthdaySeedUfvkLock = false;
@@ -526,16 +532,20 @@ export default class RPC {
       // the rescan in zingolib do two tasks:
       // 1. stop the sync.
       // 2. launch the rescan.
+      await this.pauseSyncProcess();
+
       const start = Date.now();
       const rescanStr: string = await RPCModule.runRescanProcess();
       if (Date.now() - start > 4000) {
         console.log('=========================================== > rescan run command - ', Date.now() - start);
       }
-      //console.log('rescan RUN', rescanStr);
+      console.log('rescan RUN', rescanStr);
       if (rescanStr && rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error rescan: ${rescanStr}`);
         this.fnSetLastError(`Error rescan: ${rescanStr}`);
       }
+      // The App needs to calculate heights
+
       await this.configure();
     } else {
       const start = Date.now();
@@ -618,7 +628,9 @@ export default class RPC {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fnSetLastError(`Error sync poll: ${returnPoll}`);
       // if the error is: LightclientLockPoisoned force a rescan directly
+      console.log('HEIGHTS  ------- ', this.lastWalletBlockHeight, this.lastServerBlockHeight)
       if (returnPoll.includes('LightclientLockPoisoned')) {
+        console.log('POISONEDDDDDDDDDDDDDDDD');
         let result: string = await RPCModule.loadExistingWallet(
           this.indexerServer.uri,
           this.indexerServer.chainName,
@@ -629,6 +641,18 @@ export default class RPC {
         setTimeout(async () => {
           await this.refreshSync(true);
         }, 0);
+      } else if ((this.lastWalletBlockHeight - this.lastServerBlockHeight) >= 100 || returnPoll.includes('100 blocks ahead of best chain height')) {
+        // if the error is for the server vs wallet height.
+        if (!this.walletSeed) {
+          await this.fetchWalletBirthdaySeedUfvk();
+        }
+        console.log(this.walletBirthday, this.walletSeed);
+        this.fnOnClickOKChangeWallet({ 
+          screen: 0, 
+          startingApp: false, 
+          walletSeed: this.walletSeed,
+          walletBirthday: this.walletBirthday,
+        });
       } else {
         // This command have an error, fine. It's worthy to try running the sync process juat in case.
         setTimeout(async () => {
@@ -692,6 +716,7 @@ export default class RPC {
       if (Date.now() - start > 4000) {
         console.log('=========================================== > info - ', Date.now() - start);
       }
+      console.log('INFO', infoStr);
       if (infoStr) {
         if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error info & server block height ${infoStr}`);
@@ -928,6 +953,7 @@ export default class RPC {
       if (Date.now() - start > 4000) {
         console.log('=========================================== > wallet height - ', Date.now() - start);
       }
+      console.log('WALLET HEIGHT', heightStr);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet height ${heightStr}`);
@@ -1054,6 +1080,7 @@ export default class RPC {
 
       if (wallet) {
         this.walletBirthday = wallet.birthday;
+        this.walletSeed = wallet.seed || '';
         this.fnSetWallet(wallet);
       }
       this.fetchWalletBirthdaySeedUfvkLock = false;
@@ -1082,6 +1109,7 @@ export default class RPC {
       if (Date.now() - start > 4000) {
         console.log('=========================================== > server height - ', Date.now() - start);
       }
+      console.log('GET SERVER HEIGHT', heightStr);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error server height ${heightStr}`);
@@ -1093,7 +1121,7 @@ export default class RPC {
         console.log('Internal Error server height');
       }
 
-      //console.log('SERVER HEIGHT', this.lastServerBlockHeight);
+      console.log('SERVER HEIGHT', this.lastServerBlockHeight);
 
       const start2 = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
@@ -1402,10 +1430,10 @@ export default class RPC {
       const result = await RPCModule.deleteExistingWallet();
 
       if (!(result && result !== GlobalConst.false)) {
-        return this.translate('rpc.deletewallet-error');
+        return this.translate('rpc.deletewallet-error') as string;
       }
     } else {
-      return this.translate('rpc.walletnotfound-error');
+      return this.translate('rpc.walletnotfound-error') as string;
     }
     return '';
   }
@@ -1419,10 +1447,10 @@ export default class RPC {
       const result = await RPCModule.deleteExistingWallet();
 
       if (!(result && result !== GlobalConst.false)) {
-        return this.translate('rpc.deletewallet-error');
+        return this.translate('rpc.deletewallet-error') as string;
       }
     } else {
-      return this.translate('rpc.walletnotfound-error');
+      return this.translate('rpc.walletnotfound-error') as string;
     }
     return '';
   }
@@ -1439,10 +1467,10 @@ export default class RPC {
         await this.pauseSyncProcess();
         await RPCModule.restoreExistingWalletBackup();
       } else {
-        return this.translate('rpc.walletnotfound-error');
+        return this.translate('rpc.walletnotfound-error') as string;
       }
     } else {
-      return this.translate('rpc.backupnotfound-error');
+      return this.translate('rpc.backupnotfound-error') as string;
     }
     return '';
   }
