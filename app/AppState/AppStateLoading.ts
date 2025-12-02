@@ -13,4 +13,6 @@ export default interface AppStateLoading {
   firstLaunchingMessage: LaunchingModeEnum;
   hasRecoveryWalletInfoSaved: boolean;
   fromSettings: boolean;
+  walletSeed: string;
+  walletBirthday: number;
 }

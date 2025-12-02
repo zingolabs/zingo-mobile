@@ -29,6 +29,8 @@ export type LoadingAppNavigationState = {
   screen?: number;
   startingApp?: boolean;
   biometricsFailed?: boolean;
+  walletSeed?: string;
+  walletBirthday?: number;
 };
 /**
  * Navigation state used for internal app navigation within LoadedApp

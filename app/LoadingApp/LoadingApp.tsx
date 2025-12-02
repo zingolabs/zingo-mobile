@@ -458,6 +458,14 @@ export class LoadingAppClass extends Component<
       serverErrorTries: 0,
       firstLaunchingMessage: props.firstLaunchingMessage,
       hasRecoveryWalletInfoSaved: false,
+      walletSeed:
+        !!props.route.params && props.route.params.walletSeed !== undefined
+          ? props.route.params.walletSeed
+          : '',
+      walletBirthday:
+        !!props.route.params && props.route.params.walletBirthday !== undefined
+          ? props.route.params.walletBirthday
+          : 0,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -713,11 +721,19 @@ export class LoadingAppClass extends Component<
           SettingsNameEnum.basicFirstViewSeed,
           true,
         );
-        this.setState(state => ({
-          screen: state.screen === 3 ? 3 : 1,
-          walletExists: false,
-          actionButtonsDisabled: false,
-        }));
+        // walletSeed/walletBirthday have value
+        // go directly to run restore...
+        if (!this.state.startingApp && 
+            !!this.state.walletSeed
+        ) {
+          this.doRestore(this.state.walletSeed, this.state.walletBirthday);
+        } else {
+          this.setState(state => ({
+            screen: state.screen === 3 ? 3 : 1,
+            walletExists: false,
+            actionButtonsDisabled: false,
+          }));
+        }
       }
     }
 

@@ -643,12 +643,12 @@ export default class RPC {
         }, 0);
       } else if ((this.lastWalletBlockHeight - this.lastServerBlockHeight) >= 100 || returnPoll.includes('100 blocks ahead of best chain height')) {
         // if the error is for the server vs wallet height.
-        if (!this.walletSeed || !this.walletBirthday) {
+        if (!this.walletSeed) {
           await this.fetchWalletBirthdaySeedUfvk();
         }
         console.log(this.walletBirthday, this.walletSeed);
         this.fnOnClickOKChangeWallet({ 
-          screen: 3, 
+          screen: 0, 
           startingApp: false, 
           walletSeed: this.walletSeed,
           walletBirthday: this.walletBirthday,

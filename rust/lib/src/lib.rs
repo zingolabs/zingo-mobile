@@ -55,7 +55,6 @@ use zingolib::wallet::keys::{
     unified::{ReceiverSelection, UnifiedKeyStore},
 };
 use zingolib::wallet::{LightWallet, WalletBase, WalletSettings};
-use std::sync::TryLockError;
 
 #[derive(Debug, thiserror::Error, uniffi::Error)]
 pub enum ZingolibError {
@@ -201,35 +200,33 @@ lazy_static! {
     pub static ref RT: Runtime = tokio::runtime::Runtime::new().unwrap();
 }
 
-fn with_lightclient_write<F, R>(f: F) -> Result<R, ZingolibError>
+fn with_lightclient_write<F, R>(f: F) -> R
 where
     F: FnOnce(&mut Option<LightClient>) -> R,
 {
-    match LIGHTCLIENT.try_write() {
-        Ok(mut guard) => {
-            Ok(f(&mut guard))
-        }
-        Err(TryLockError::WouldBlock) => {
-            Err(ZingolibError::Panic("Error: cannot acquiere write lock".to_string()))
-        }
-        Err(TryLockError::Poisoned(poisoned)) => {
-            let mut guard = poisoned.into_inner();
+    let mut guard = match LIGHTCLIENT.write() {
+        Ok(g) => g,
+        Err(poisoned) => {
+            log::warn!("LIGHTCLIENT RwLock poisoned; recovering and clearing poison");
+            let g = poisoned.into_inner();
             LIGHTCLIENT.clear_poison();
-            Ok(f(&mut guard))
+            g
         }
-    }
+    };
+    f(&mut guard)
 }
 
-fn reset_lightclient() -> Result<(), ZingolibError> {
+fn reset_lightclient() {
     with_lightclient_write(|slot| {
         *slot = None;
-    })
+    });
 }
 
-fn store_lightclient(lightclient: LightClient) -> Result<(), ZingolibError> {
+fn store_client(lightclient: LightClient) -> Result<(), ZingolibError> {
     with_lightclient_write(|slot| {
         *slot = Some(lightclient);
-    })
+    });
+    Ok(())
 }
 
 fn construct_uri_load_config(
@@ -311,9 +308,7 @@ pub fn init_new(
     min_confirmations: u32,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
-        if let Err(e) = reset_lightclient() {
-            return Ok(format!("Error: {e}"))
-        }
+        reset_lightclient();
         let (config, lightwalletd_uri) = match construct_uri_load_config(
             server_uri,
             chain_hint,
@@ -335,9 +330,7 @@ pub fn init_new(
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
-        if let Err(e) = store_lightclient(lightclient) {
-            return Ok(format!("Error: {e}"))
-        }
+        let _ = store_client(lightclient);
 
         get_seed()
     })
@@ -354,9 +347,7 @@ pub fn init_from_seed(
     min_confirmations: u32,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
-        if let Err(e) = reset_lightclient() {
-            return Ok(format!("Error: {e}"))
-        }
+        reset_lightclient();
         let (config, _lightwalletd_uri) = match construct_uri_load_config(
             server_uri,
             chain_hint,
@@ -386,9 +377,7 @@ pub fn init_from_seed(
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
-        if let Err(e) = store_lightclient(lightclient) {
-            return Ok(format!("Error: {e}"))
-        }
+        let _ = store_client(lightclient);
 
         get_seed()
     })
@@ -404,9 +393,7 @@ pub fn init_from_ufvk(
     min_confirmations: u32,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
-        if let Err(e) = reset_lightclient() {
-            return Ok(format!("Error: {e}"))
-        }
+        reset_lightclient();
         let (config, _lightwalletd_uri) = match construct_uri_load_config(
             server_uri,
             chain_hint,
@@ -429,9 +416,7 @@ pub fn init_from_ufvk(
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
-        if let Err(e) = store_lightclient(lightclient) {
-            return Ok(format!("Error: {e}"))
-        }
+        let _ = store_client(lightclient);
 
         get_ufvk()
     })
@@ -446,9 +431,7 @@ pub fn init_from_b64(
     min_confirmations: u32,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
-        if let Err(e) = reset_lightclient() {
-            return Ok(format!("Error: {e}"))
-        }
+        reset_lightclient();
         let (config, _lightwalletd_uri) = match construct_uri_load_config(
             server_uri,
             chain_hint,
@@ -479,9 +462,7 @@ pub fn init_from_b64(
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
-        if let Err(e) = store_lightclient(lightclient) {
-            return Ok(format!("Error: {e}"))
-        }
+        let _ = store_client(lightclient);
 
         if has_seed { get_seed() } else { get_ufvk() }
     })
@@ -850,23 +831,35 @@ pub fn wallet_kind() -> Result<String, ZingolibError> {
     })
 }
 
+fn make_decoded_chain_pair(
+    address: &str,
+) -> Option<(zcash_client_backend::address::Address, ChainType)> {
+    [
+        ChainType::Mainnet,
+        ChainType::Testnet(ConfiguredActivationHeights {
+            before_overwinter: Some(1),
+            overwinter: Some(1),
+            sapling: Some(1),
+            blossom: Some(1),
+            heartwood: Some(1),
+            canopy: Some(1),
+            nu5: Some(1),
+            nu6: Some(1),
+            nu6_1: None,
+            nu7: None,
+        }),
+        ChainType::Regtest(for_test::all_height_one_nus()),
+    ]
+    .iter()
+    .find_map(|chain| Address::decode(chain, address).zip(Some(*chain)))
+}
+
 #[uniffi::export]
 pub fn parse_address(address: String) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         if address.is_empty() {
             Ok("Error: The address is empty".to_string())
         } else {
-            fn make_decoded_chain_pair(
-                address: &str,
-            ) -> Option<(zcash_client_backend::address::Address, ChainType)> {
-                [
-                    ChainType::Mainnet,
-                    ChainType::Testnet(for_test::all_height_one_nus()),
-                    ChainType::Regtest(for_test::all_height_one_nus()),
-                ]
-                .iter()
-                .find_map(|chain| Address::decode(chain, address).zip(Some(*chain)))
-            }
             if let Some((recipient_address, chain_name)) = make_decoded_chain_pair(&address) {
                 let chain_name_string = match chain_name {
                     ChainType::Mainnet => "main",
@@ -1717,4 +1710,44 @@ pub fn confirm() -> Result<String, ZingolibError> {
             Err(ZingolibError::LightclientNotInitialized)
         }
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const REGTEST_UA: &str = "uregtest1vgzs0rxfeusg0yjlsj6p7f4v37c2w3xaezunn7a08rvexwz52uurck2w8kved3jwnqsyfa5ryz3s2rp320ue92g78c4c6y8agqlcjp4h";
+
+    #[test]
+    fn make_decoded_chain_pair_selects_regtest_for_regtest_address() {
+        let result = make_decoded_chain_pair(REGTEST_UA);
+
+        match result {
+            Some((_addr, chain_type)) => {
+                assert!(
+                    matches!(chain_type, ChainType::Regtest(_)),
+                    "expected Regtest chain, got: {:?}",
+                    chain_type
+                );
+            }
+            None => panic!("make_decoded_chain_pair returned None for valid regtest UA"),
+        }
+    }
+
+    #[test]
+    fn parse_address_returns_unified_regtest_json() {
+        let json_str = parse_address(REGTEST_UA.to_string())
+            .expect("parse_address returned an error for valid regtest UA");
+
+        let value = json::parse(&json_str).expect("parse_address did not return valid JSON");
+
+        assert_eq!(value["status"], "success");
+        assert_eq!(value["chain_name"], "regtest");
+        assert_eq!(value["address_kind"], "unified");
+        assert!(value["receivers_available"].is_array());
+        assert!(
+            value["receivers_available"].len() >= 1,
+            "expected at least one receiver in receivers_available"
+        );
+    }
 }

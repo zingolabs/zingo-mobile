@@ -549,6 +549,7 @@ export class LoadedAppClass extends Component<
       this.setZingolibVersion,
       this.setWallet,
       this.setLastError,
+      this.onClickOKChangeWallet,
       props.readOnly,
       props.indexerServer,
       props.performanceLevel,
