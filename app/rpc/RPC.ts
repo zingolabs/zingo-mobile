@@ -1098,7 +1098,7 @@ export default class RPC {
         console.log('Internal Error server height');
       }
 
-      console.log('SERVER HEIGHT', this.lastServerBlockHeight);
+      //console.log('SERVER HEIGHT', this.lastServerBlockHeight);
 
       const start2 = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
