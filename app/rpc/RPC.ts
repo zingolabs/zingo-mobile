@@ -54,7 +54,6 @@ export default class RPC {
   lastWalletBlockHeight: number;
   lastServerBlockHeight: number;
   walletBirthday: number;
-  walletSeed: string;
 
   fetchWalletHeightLock: boolean;
   fetchWalletBirthdaySeedUfvkLock: boolean;
@@ -110,7 +109,6 @@ export default class RPC {
     this.lastWalletBlockHeight = 0;
     this.lastServerBlockHeight = 0;
     this.walletBirthday = 0;
-    this.walletSeed = '';
 
     this.fetchWalletHeightLock = false;
     this.fetchWalletBirthdaySeedUfvkLock = false;
@@ -540,8 +538,6 @@ export default class RPC {
         console.log(`Error rescan: ${rescanStr}`);
         this.fnSetLastError(`Error rescan: ${rescanStr}`);
       }
-      // The App needs to calculate heights
-
       await this.configure();
     } else {
       const start = Date.now();
@@ -624,7 +620,6 @@ export default class RPC {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fnSetLastError(`Error sync poll: ${returnPoll}`);
       // if the error is: LightclientLockPoisoned force a rescan directly
-      console.log('HEIGHTS  ------- ', this.lastWalletBlockHeight, this.lastServerBlockHeight)
       if (returnPoll.includes('LightclientLockPoisoned')) {
         let result: string = await RPCModule.loadExistingWallet(
           this.indexerServer.uri,
@@ -699,7 +694,7 @@ export default class RPC {
       if (Date.now() - start > 4000) {
         console.log('=========================================== > info - ', Date.now() - start);
       }
-      console.log('INFO', infoStr);
+      //console.log('INFO', infoStr);
       if (infoStr) {
         if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error info & server block height ${infoStr}`);
@@ -936,7 +931,7 @@ export default class RPC {
       if (Date.now() - start > 4000) {
         console.log('=========================================== > wallet height - ', Date.now() - start);
       }
-      console.log('WALLET HEIGHT', heightStr);
+      //console.log('WALLET HEIGHT', heightStr);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet height ${heightStr}`);
@@ -1063,7 +1058,6 @@ export default class RPC {
 
       if (wallet) {
         this.walletBirthday = wallet.birthday;
-        this.walletSeed = wallet.seed || '';
         this.fnSetWallet(wallet);
       }
       this.fetchWalletBirthdaySeedUfvkLock = false;
@@ -1092,7 +1086,7 @@ export default class RPC {
       if (Date.now() - start > 4000) {
         console.log('=========================================== > server height - ', Date.now() - start);
       }
-      console.log('GET SERVER HEIGHT', heightStr);
+      //console.log('GET SERVER HEIGHT', heightStr);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error server height ${heightStr}`);
