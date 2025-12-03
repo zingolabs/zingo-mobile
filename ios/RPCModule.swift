@@ -1999,5 +1999,46 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
         }
       }
   }
+  
+  func fnGetAccumulatedStakeForTxidInfo(_ dict: [AnyHashable: Any]) {
+    if let txid = dict["txid"] as? String,
+       let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+      do {
+        let resp = try getAccumulatedStakeForTxid(txid: txid)
+        let respStr = String(resp)
+        DispatchQueue.main.async {
+          resolve(respStr)
+        }
+      } catch {
+        let err = "Error: [Native] accumulated stake for txid. \(error.localizedDescription)"
+        NSLog(err)
+        DispatchQueue.main.async {
+          resolve(err)
+        }
+      }
+    } else {
+      let err = "Error: [Native] accumulated stake for txid. Command arguments problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        DispatchQueue.main.async {
+          resolve(err)
+        }
+      }
+    }
+  }
+  
+  @objc(getAccumulatedStakeForTxidInfo:resolve:reject:)
+  func getAccumulatedStakeForTxidInfo(
+    _ txid: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    let dict: [String: Any] = ["txid": txid, "resolve": resolve]
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      if let self = self {
+        self.fnGetAccumulatedStakeForTxidInfo(dict)
+      }
+    }
+  }
 
 }

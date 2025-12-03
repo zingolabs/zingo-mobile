@@ -14,6 +14,7 @@ import {
   KeyboardAvoidingView,
   FlatList,
   Alert,
+  NativeModules,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -50,9 +51,21 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
 
+  const { RPCModule } = NativeModules as {
+    RPCModule: {
+      // Promise resolves to a string (either "Error: ..." or the u64 value in zats)
+      getAccumulatedStakeForTxidInfo(txid: string): Promise<string>;
+    };
+  };
+
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
-  const [kbOpen, setKbOpen] = React.useState(false);
+  const [kbOpen, setKbOpen] = useState(false);
+
+  // txid -> zats as string (from native)
+  const [accumulatedStakeByTxid, setAccumulatedStakeByTxid] = useState<
+    Record<string, string>
+  >({});
 
   const modalVisible = modalState !== 'idle';
 
@@ -83,6 +96,55 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
     };
   }, []);
 
+  // Fetch accumulated stake for each txid shown in the list
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchAccumulatedStake = async () => {
+      const updates: Record<string, string> = {};
+
+      for (const m of movements) {
+        try {
+          const resp = await RPCModule.getAccumulatedStakeForTxidInfo(m.txid);
+
+          if (typeof resp !== 'string') {
+            continue;
+          }
+
+          if (resp.toLowerCase().startsWith('error:')) {
+            console.warn(
+              '[Unstake] getAccumulatedStakeForTxidInfo error for',
+              m.txid,
+              resp,
+            );
+            continue;
+          }
+
+          // resp is the u64 number (zats) converted to string on Swift side
+          updates[m.txid] = resp;
+        } catch (e) {
+          console.warn(
+            '[Unstake] getAccumulatedStakeForTxidInfo failed for',
+            m.txid,
+            e,
+          );
+        }
+      }
+
+      if (!cancelled && Object.keys(updates).length > 0) {
+        setAccumulatedStakeByTxid(prev => ({ ...prev, ...updates }));
+      }
+    };
+
+    if (movements.length > 0) {
+      fetchAccumulatedStake();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [movements, RPCModule]);
+
   const shortenTxid = (txid: string) => {
     if (txid.length <= 16) {
       return txid;
@@ -90,13 +152,24 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
     return `${txid.slice(0, 10)}…${txid.slice(-8)}`;
   };
 
+  const getAccumulatedStakeZatsForTxid = (txid: string): number | null => {
+    const zatsStr = accumulatedStakeByTxid[txid];
+    if (!zatsStr) {
+      return null;
+    }
+    const zats = Number(zatsStr);
+    if (Number.isNaN(zats)) {
+      return null;
+    }
+    return zats;
+  };
+
   const handleUnstakePress = async () => {
     if (!isValidForm || !selectedTx) {
       return;
     }
 
-    const amount = selectedTx.amount; // in cTAZ / ZEC units
-    const miner = selectedTx.address; // derive miner from the original stake tx
+    const miner = selectedTx.address;
 
     if (!miner) {
       Alert.alert(
@@ -106,16 +179,35 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
       return;
     }
 
+    const zats = getAccumulatedStakeZatsForTxid(selectedTx.txid);
+    if (zats === null) {
+      Alert.alert(
+        'Unstake amount not ready',
+        'Could not determine the remaining staked amount for this transaction yet. Please wait a moment and try again.',
+      );
+      return;
+    }
+
+    if (zats <= 0) {
+      Alert.alert(
+        'Invalid unstake amount',
+        'The remaining staked amount for this transaction is invalid or zero.',
+      );
+      return;
+    }
+
     setModalState('sending');
 
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
     sendPageState.toaddr.to = miner;
     sendPageState.toaddr.memo = defaultUnifiedAddress;
+    // 0-value tx; the staking action captures the amount in zats
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(0, 8);
 
     const stakingAction: StakingActionType = {
       kind: 'sub',
-      val: amount * 10 ** 8,
+      // use the backend value (zats) directly
+      val: zats,
       target:
         (selectedTx.stakingAction && selectedTx.stakingAction?.target) || '',
       source: selectedTx.txid,
@@ -142,6 +234,15 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
 
   const renderStakedTxItem = ({ item }: { item: ValueTransferType }) => {
     const isSelected = item.txid === selectedTxid;
+
+    const zats = getAccumulatedStakeZatsForTxid(item.txid);
+    let displayAmount = String(item.amount); // fallback: original amount field
+
+    if (zats !== null) {
+      const amountInCoin = zats / 10 ** 8;
+      displayAmount = Utils.parseNumberFloatToStringLocale(amountInCoin, 8);
+    }
+
     return (
       <Pressable
         onPress={() => setSelectedTxid(item.txid)}
@@ -182,7 +283,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
             marginLeft: 12,
           }}
         >
-          {item.amount} cTAZ
+          {displayAmount} cTAZ
         </Text>
       </Pressable>
     );
@@ -293,7 +394,17 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
                   fontWeight: '500',
                 }}
               >
-                {selectedTx.amount} cTAZ
+                {(() => {
+                  const zats = getAccumulatedStakeZatsForTxid(selectedTx.txid);
+                  if (zats === null) {
+                    return `${selectedTx.amount} cTAZ`;
+                  }
+                  const amountInCoin = zats / 10 ** 8;
+                  return `${Utils.parseNumberFloatToStringLocale(
+                    amountInCoin,
+                    8,
+                  )} cTAZ`;
+                })()}
               </Text>
             </Text>
           )}
