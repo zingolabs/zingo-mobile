@@ -64,7 +64,7 @@ const Staking: React.FC<StakingProps> = () => {
   const [movements] = useState<ValueTransferType[]>(
     !valueTransfers 
       ? [] 
-      : valueTransfers.filter((vt: ValueTransferType) => !!vt.stakingAction)
+      : valueTransfers.filter((vt: ValueTransferType) => vt.stakingAction !== null)
   );
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -74,6 +74,8 @@ const Staking: React.FC<StakingProps> = () => {
   const monthHeader = hasMovements
     ? formatHeaderMonth(movements[0].time)
     : undefined;
+
+  console.log(movements);
 
   return (
     <View

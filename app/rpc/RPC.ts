@@ -1316,7 +1316,7 @@ export default class RPC {
       const valueTransfersJSON: RPCValueTransfersType =
         await JSON.parse(valueTransfersStr);
 
-      console.log(valueTransfersJSON);
+      console.log(valueTransfersJSON.value_transfers);
 
       let vtList: ValueTransferType[] = [];
 
@@ -1380,14 +1380,18 @@ export default class RPC {
             currentValueTransferList.poolType = !vt.pool_received
               ? undefined
               : vt.pool_received;
-            currentValueTransferList.stakingAction = {
-              kind: vt.staking_action?.kind,
-              val: (!vt.staking_action?.val ? 0 : vt.staking_action.val) / 10 ** 8,
-              target: vt.staking_action?.target,
-              source: vt.staking_action?.source,
-              insecureTargetName: vt.staking_action?.insecure_target_name,
-              insecureSourceName: vt.staking_action?.insecure_source_name,
-            } as StakingActionType;
+            if (vt.staking_action === null) {
+              currentValueTransferList.stakingAction = null;
+            } else {
+              currentValueTransferList.stakingAction = {
+                kind: vt.staking_action?.kind,
+                val: (!vt.staking_action?.val ? 0 : vt.staking_action.val) / 10 ** 8,
+                target: vt.staking_action?.target,
+                source: vt.staking_action?.source,
+                insecureTargetName: vt.staking_action?.insecure_target_name,
+                insecureSourceName: vt.staking_action?.insecure_source_name,
+              } as StakingActionType;
+            }
 
             if (vt.txid.startsWith('xxxxxxxxx')) {
               console.log('server', this.lastServerBlockHeight);
@@ -1410,7 +1414,7 @@ export default class RPC {
           },
         );
 
-      //console.log(vtlist);
+      console.log(vtList);
 
       this.fnSetValueTransfersList(vtList, vtList.length);
       this.fetchTandZandOValueTransfersLock = false;
