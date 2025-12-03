@@ -8,8 +8,10 @@ extern crate android_logger;
 
 #[cfg(target_os = "android")]
 use android_logger::{Config, FilterBuilder};
+use hex::FromHex;
 #[cfg(target_os = "android")]
 use log::Level;
+use zcash_primitives::transaction::{StakingAction, StakingActionKind};
 use zcash_protocol::memo::MemoBytes;
 use zingolib::{AccountId, ConfiguredActivationHeights};
 
@@ -1642,6 +1644,155 @@ pub fn send(send_json: String) -> Result<String, ZingolibError> {
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
+    })
+}
+
+/// `stake_json` is a JSON object with the following schema:
+/// {
+///   "stakingAction": {
+///     "kind": "add",
+///     "val": 1000000,
+///     "target": "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
+///     "source": "ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100",
+///     "insecureTargetName": "",
+///     "insecureSourceName": ""
+///   },
+///   "receivers": [
+///     { "address": "zs1...", "amount": 1000000, "memo": "stake" }
+///   ]
+/// }
+#[uniffi::export]
+pub fn stake(stake_json: String) -> Result<String, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lightclient) = &mut *guard {
+            Ok(RT.block_on(async move {
+                let json_args = match json::parse(&stake_json) {
+                    Ok(parsed) => parsed,
+                    Err(_) => return "Error: it is not a valid JSON".to_string(),
+                };
+
+                let staking_action = match parse_staking_action(&json_args) {
+                    Ok(sa) => sa,
+                    Err(e) => return e,
+                };
+
+                let receivers_json = &json_args["receivers"];
+                if !receivers_json.is_array() {
+                    return "Error: `receivers` must be an array".to_string();
+                }
+
+                let mut receivers = Receivers::new();
+                for j in receivers_json.members() {
+                    let recipient_address = match j["address"].as_str() {
+                        Some(addr) => match ZcashAddress::try_from_encoded(addr) {
+                            Ok(a) => a,
+                            Err(e) => return format!("Error: Invalid address: {e}"),
+                        },
+                        None => return "Error: Missing address".to_string(),
+                    };
+
+                    let amount = match j["amount"].as_u64() {
+                        Some(a) => match Zatoshis::from_u64(a) {
+                            Ok(a) => a,
+                            Err(e) => return format!("Error: Invalid amount: {e}"),
+                        },
+                        None => return "Error: Missing amount".to_string(),
+                    };
+
+                    let memo = if let Some(m) = j["memo"].as_str() {
+                        match interpret_memo_string(m.to_string()) {
+                            Ok(memo_bytes) => Some(memo_bytes),
+                            Err(e) => return format!("Error: Invalid memo: {e}"),
+                        }
+                    } else {
+                        None
+                    };
+
+                    receivers.push(zingolib::data::receivers::Receiver {
+                        recipient_address,
+                        amount,
+                        memo,
+                    });
+                }
+
+                let request = match transaction_request_from_receivers(receivers) {
+                    Ok(request) => request,
+                    Err(e) => return format!("Error: Request Error: {e}"),
+                };
+
+                match lightclient
+                    .propose_stake(request, staking_action, AccountId::ZERO)
+                    .await
+                {
+                    Ok(proposal) => {
+                        let fee = match total_fee(&proposal.proportional_fee_proposal()) {
+                            Ok(fee) => fee,
+                            Err(e) => return object! { "error" => e.to_string() }.pretty(2),
+                        };
+                        object! { "fee" => fee.into_u64() }.pretty(2)
+                    }
+                    Err(e) => object! { "error" => e.to_string() }.pretty(2),
+                }
+            }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
+fn parse_hex_32(s: &str) -> Result<[u8; 32], String> {
+    let bytes = Vec::from_hex(s).map_err(|e| format!("Error: invalid 32-byte hex string: {e}"))?;
+    if bytes.len() != 32 {
+        return Err("Error: stakingAction target/source must be 32 bytes".to_string());
+    }
+    let mut arr = [0u8; 32];
+    arr.copy_from_slice(&bytes);
+    Ok(arr)
+}
+
+fn parse_staking_action(root: &json::JsonValue) -> Result<StakingAction, String> {
+    let sa = &root["stakingAction"];
+
+    let kind_str = sa["kind"]
+        .as_str()
+        .ok_or_else(|| "Error: Missing stakingAction.kind".to_string())?;
+
+    let kind = match kind_str {
+        "add" => StakingActionKind::Add,
+        "sub" => StakingActionKind::Sub,
+        "clear" => StakingActionKind::Clear,
+        "move" => StakingActionKind::Move,
+        "moveClear" => StakingActionKind::MoveClear,
+        other => return Err(format!("Error: Unknown stakingAction.kind: {other}")),
+    };
+
+    let val = sa["val"]
+        .as_u64()
+        .ok_or_else(|| "Error: Missing stakingAction.val".to_string())?;
+
+    let target_str = sa["target"]
+        .as_str()
+        .ok_or_else(|| "Error: Missing stakingAction.target".to_string())?;
+    let source_str = sa["source"]
+        .as_str()
+        .ok_or_else(|| "Error: Missing stakingAction.source".to_string())?;
+
+    let target = parse_hex_32(target_str)?;
+    let source = parse_hex_32(source_str)?;
+
+    let insecure_target_name = sa["targetName"].as_str().unwrap_or_default().to_string();
+    let insecure_source_name = sa["sourceName"].as_str().unwrap_or_default().to_string();
+
+    Ok(StakingAction {
+        kind,
+        val,
+        target,
+        source,
+        insecure_target_name,
+        insecure_source_name,
     })
 }
 
