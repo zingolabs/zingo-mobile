@@ -42,7 +42,9 @@ export default class RPC {
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetValueTransfersList: (vtList: ValueTransferType[], total: number) => void;
   fnSetMessagesList: (mList: ValueTransferType[], total: number) => void;
-  fnSetAllAddresses: (allAddresses: (UnifiedAddressClass | TransparentAddressClass)[]) => void;
+  fnSetAllAddresses: (
+    allAddresses: (UnifiedAddressClass | TransparentAddressClass)[],
+  ) => void;
   fnSetSyncingStatus: (syncingStatus: RPCSyncStatusType) => void;
   translate: (key: string) => TranslateType;
   keepAwake: (keep: boolean) => void;
@@ -83,9 +85,14 @@ export default class RPC {
 
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
-    fnSetValueTransfersList: (vtlist: ValueTransferType[], total: number) => void,
+    fnSetValueTransfersList: (
+      vtlist: ValueTransferType[],
+      total: number,
+    ) => void,
     fnSetMessagesList: (mlist: ValueTransferType[], total: number) => void,
-    fnSetAllAddresses: (addresses: (UnifiedAddressClass | TransparentAddressClass)[]) => void,
+    fnSetAllAddresses: (
+      addresses: (UnifiedAddressClass | TransparentAddressClass)[],
+    ) => void,
     fnSetInfo: (info: InfoType) => void,
     fnSetSyncingStatus: (syncingStatus: RPCSyncStatusType) => void,
     translate: (key: string) => TranslateType,
@@ -93,7 +100,9 @@ export default class RPC {
     fnSetZingolib: (zingolib: string) => void,
     fnSetWallet: (wallet: WalletType) => void,
     fnSetLastError: (error: string) => void,
-    fnOnClickOKChangeWallet: (state: LoadingAppNavigationState) => Promise<void>,
+    fnOnClickOKChangeWallet: (
+      state: LoadingAppNavigationState,
+    ) => Promise<void>,
     readOnly: boolean,
     indexerServer: ServerType,
     performanceLevel: RPCPerformanceLevelEnum,
@@ -136,10 +145,11 @@ export default class RPC {
     this.readOnly = readOnly;
     this.indexerServer = indexerServer;
     this.performanceLevel = performanceLevel;
-
   }
 
-  static async rpcGetZecPrice(withTOR: boolean): Promise<{price: number, error: string}> {
+  static async rpcGetZecPrice(
+    withTOR: boolean,
+  ): Promise<{ price: number; error: string }> {
     try {
       // create the tor client if needed
       if (withTOR) {
@@ -154,40 +164,48 @@ export default class RPC {
       // -2  - error in RPCModule, likely.
       // > 0 - real value
       const start = Date.now();
-      const resultStr: string = await RPCModule.zecPriceInfo(withTOR ? GlobalConst.true : GlobalConst.false);
+      const resultStr: string = await RPCModule.zecPriceInfo(
+        withTOR ? GlobalConst.true : GlobalConst.false,
+      );
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > get ZEC price - ', Date.now() - start);
+        console.log(
+          '=========================================== > get ZEC price - ',
+          Date.now() - start,
+        );
       }
       //console.log(resultStr);
 
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error fetching price ${resultStr}`);
-          return {price: -1, error: resultStr};
+          return { price: -1, error: resultStr };
         } else {
           const resultJSON: RPCZecPriceType = await JSON.parse(resultStr);
           if (resultJSON.error) {
             console.log(`Error fetching price ${resultJSON.error}`);
-            return {price: -1, error: resultJSON.error};
+            return { price: -1, error: resultJSON.error };
           }
           if (!resultJSON.current_price) {
             // if no exists the field or is empty
-            return {price: 0, error: ''};
+            return { price: 0, error: '' };
           }
           if (resultJSON.current_price && isNaN(resultJSON.current_price)) {
             console.log(`Error fetching price ${resultJSON.current_price}`);
-            return {price: -1, error: `Error fetching price ${resultJSON.current_price}`};
+            return {
+              price: -1,
+              error: `Error fetching price ${resultJSON.current_price}`,
+            };
           } else {
-            return {price: resultJSON.current_price, error: ''};
+            return { price: resultJSON.current_price, error: '' };
           }
         }
       } else {
         console.log('Internal Error fetching price');
-        return {price: -2, error: 'Internal Error fetching price'};
+        return { price: -2, error: 'Internal Error fetching price' };
       }
     } catch (error) {
       console.log(`Critical Error fetching price ${error}`);
-      return {price: -2, error: `Critical Error fetching price ${error}`};
+      return { price: -2, error: `Critical Error fetching price ${error}` };
     }
   }
 
@@ -219,7 +237,10 @@ export default class RPC {
         const start = Date.now();
         const ufvkStr: string = await RPCModule.getUfvkInfo();
         if (Date.now() - start > 4000) {
-          console.log('=========================================== > get ufvk - ', Date.now() - start);
+          console.log(
+            '=========================================== > get ufvk - ',
+            Date.now() - start,
+          );
         }
         if (ufvkStr) {
           if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -251,7 +272,10 @@ export default class RPC {
         const start2 = Date.now();
         const seedStr: string = await RPCModule.getSeedInfo();
         if (Date.now() - start2 > 4000) {
-          console.log('=========================================== > get seed - ', Date.now() - start2);
+          console.log(
+            '=========================================== > get seed - ',
+            Date.now() - start2,
+          );
         }
         if (seedStr) {
           if (seedStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -288,18 +312,33 @@ export default class RPC {
     if (this.walletConfigPerformanceLevel !== this.performanceLevel) {
       const performance = await this.getConfigWalletPerformance();
       this.walletConfigPerformanceLevel = performance;
-      console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL', performance);
+      console.log(
+        '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL',
+        performance,
+      );
       if (performance !== this.performanceLevel) {
-        const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(this.performanceLevel, GlobalConst.minConfirmations.toString());
-        console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
-        if (setConfigWallet && setConfigWallet.toLowerCase().startsWith(GlobalConst.error)) {
+        const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
+          this.performanceLevel,
+          GlobalConst.minConfirmations.toString(),
+        );
+        console.log(
+          '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET',
+          setConfigWallet,
+        );
+        if (
+          setConfigWallet &&
+          setConfigWallet.toLowerCase().startsWith(GlobalConst.error)
+        ) {
           this.fnSetLastError(`Set wallet to prod error: ${setConfigWallet}`);
         }
         // I need to be sure in this point that the performance level is the selected setting
         await RPCModule.doSave();
         const performanceChanged = await this.getConfigWalletPerformance();
         this.walletConfigPerformanceLevel = performanceChanged;
-        console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL CHANGED', performanceChanged);
+        console.log(
+          '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL CHANGED',
+          performanceChanged,
+        );
       }
     }
 
@@ -395,7 +434,10 @@ export default class RPC {
             const start = Date.now();
             await RPCModule.doSave();
             if (Date.now() - start > 4000) {
-              console.log('=========================================== > save wallet - ', Date.now() - start);
+              console.log(
+                '=========================================== > save wallet - ',
+                Date.now() - start,
+              );
             }
             resolve();
           }),
@@ -456,7 +498,10 @@ export default class RPC {
 
   async pauseSyncProcess(): Promise<void> {
     let returnPause: string = await RPCModule.pauseSyncProcess();
-    if (returnPause && returnPause.toLowerCase().startsWith(GlobalConst.error)) {
+    if (
+      returnPause &&
+      returnPause.toLowerCase().startsWith(GlobalConst.error)
+    ) {
       console.log('SYNC PAUSE ERROR', returnPause);
       this.fnSetLastError(`Error sync pause: ${returnPause}`);
       return;
@@ -537,7 +582,10 @@ export default class RPC {
       const start = Date.now();
       const rescanStr: string = await RPCModule.runRescanProcess();
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > rescan run command - ', Date.now() - start);
+        console.log(
+          '=========================================== > rescan run command - ',
+          Date.now() - start,
+        );
       }
       console.log('rescan RUN', rescanStr);
       if (rescanStr && rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -551,7 +599,10 @@ export default class RPC {
       const start = Date.now();
       const syncStr: string = await RPCModule.runSyncProcess();
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > sync run command - ', Date.now() - start);
+        console.log(
+          '=========================================== > sync run command - ',
+          Date.now() - start,
+        );
       }
       console.log('sync RUN', syncStr);
       if (syncStr && syncStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -572,9 +623,15 @@ export default class RPC {
     const start = Date.now();
     const returnStatus: string = await RPCModule.statusSyncInfo();
     if (Date.now() - start > 4000) {
-      console.log('=========================================== > sync status command - ', Date.now() - start);
+      console.log(
+        '=========================================== > sync status command - ',
+        Date.now() - start,
+      );
     }
-    if (returnStatus && returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
+    if (
+      returnStatus &&
+      returnStatus.toLowerCase().startsWith(GlobalConst.error)
+    ) {
       console.log('SYNC STATUS ERROR', returnStatus);
       this.fnSetLastError(`Error sync status: ${returnStatus}`);
       this.fetchSyncStatusLock = false;
@@ -585,13 +642,20 @@ export default class RPC {
       ss = await JSON.parse(returnStatus);
     } catch (error) {
       console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus, error);
-      this.fnSetLastError(`Error sync status parse: ${error} value: ${returnStatus}`);
+      this.fnSetLastError(
+        `Error sync status parse: ${error} value: ${returnStatus}`,
+      );
       this.fetchSyncStatusLock = false;
       return;
     }
 
     //console.log('SYNC STATUS', ss);
-    console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned, ss.percentage_total_blocks_scanned);
+    console.log(
+      'SYNC STATUS',
+      ss.scan_ranges?.length,
+      ss.percentage_total_outputs_scanned,
+      ss.percentage_total_blocks_scanned,
+    );
 
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
@@ -599,11 +663,12 @@ export default class RPC {
     this.fnSetSyncingStatus(ss as RPCSyncStatusType);
 
     // Close the poll timer if the sync finished(checked via promise above)
-    const percentage: number = ss.percentage_total_outputs_scanned || ss.percentage_total_blocks_scanned || 0;
+    const percentage: number =
+      ss.percentage_total_outputs_scanned ||
+      ss.percentage_total_blocks_scanned ||
+      0;
     const inR: boolean =
-      !!ss.scan_ranges &&
-      ss.scan_ranges.length > 0 &&
-      percentage < 100;
+      !!ss.scan_ranges && ss.scan_ranges.length > 0 && percentage < 100;
     if (!inR) {
       // here we can release the screen...
       this.keepAwake(false);
@@ -622,13 +687,20 @@ export default class RPC {
     const start = Date.now();
     const returnPoll: string = await RPCModule.pollSyncInfo();
     if (Date.now() - start > 4000) {
-      console.log('=========================================== > sync poll command - ', Date.now() - start);
+      console.log(
+        '=========================================== > sync poll command - ',
+        Date.now() - start,
+      );
     }
     if (returnPoll && returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fnSetLastError(`Error sync poll: ${returnPoll}`);
       // if the error is: LightclientLockPoisoned force a rescan directly
-      console.log('HEIGHTS  ------- ', this.lastWalletBlockHeight, this.lastServerBlockHeight)
+      console.log(
+        'HEIGHTS  ------- ',
+        this.lastWalletBlockHeight,
+        this.lastServerBlockHeight,
+      );
       if (returnPoll.includes('LightclientLockPoisoned')) {
         console.log('POISONEDDDDDDDDDDDDDDDD');
         let result: string = await RPCModule.loadExistingWallet(
@@ -641,15 +713,18 @@ export default class RPC {
         setTimeout(async () => {
           await this.refreshSync(true);
         }, 0);
-      } else if ((this.lastWalletBlockHeight - this.lastServerBlockHeight) >= 100 || returnPoll.includes('100 blocks ahead of best chain height')) {
+      } else if (
+        this.lastWalletBlockHeight - this.lastServerBlockHeight >= 100 ||
+        returnPoll.includes('100 blocks ahead of best chain height')
+      ) {
         // if the error is for the server vs wallet height.
         if (!this.walletSeed) {
           await this.fetchWalletBirthdaySeedUfvk();
         }
         console.log(this.walletBirthday, this.walletSeed);
-        this.fnOnClickOKChangeWallet({ 
-          screen: 0, 
-          startingApp: false, 
+        this.fnOnClickOKChangeWallet({
+          screen: 0,
+          startingApp: false,
           walletSeed: this.walletSeed,
           walletBirthday: this.walletBirthday,
         });
@@ -666,7 +741,9 @@ export default class RPC {
       return;
     }
 
-    if (returnPoll.toLowerCase().startsWith('sync task has not been launched')) {
+    if (
+      returnPoll.toLowerCase().startsWith('sync task has not been launched')
+    ) {
       console.log('SYNC POLL -> RUN SYNC', returnPoll);
       setTimeout(async () => {
         await this.refreshSync();
@@ -689,7 +766,9 @@ export default class RPC {
       sp = await JSON.parse(returnPoll);
     } catch (error) {
       console.log('SYNC POLL ERROR - PARSE JSON', returnPoll, error);
-      this.fnSetLastError(`Error sync poll parse: ${error} value: ${returnPoll}`);
+      this.fnSetLastError(
+        `Error sync poll parse: ${error} value: ${returnPoll}`,
+      );
       this.fetchSyncPollLock = false;
       return;
     }
@@ -697,9 +776,9 @@ export default class RPC {
     console.log('SYNC POLL', sp);
 
     console.log('SYNC POLL -> FETCH STATUS');
-      setTimeout(async () => {
-        await this.fetchSyncStatus();
-      }, 0);
+    setTimeout(async () => {
+      await this.fetchSyncStatus();
+    }, 0);
 
     this.fetchSyncPollLock = false;
   }
@@ -714,7 +793,10 @@ export default class RPC {
       const start = Date.now();
       const infoStr: string = await RPCModule.infoServerInfo();
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > info - ', Date.now() - start);
+        console.log(
+          '=========================================== > info - ',
+          Date.now() - start,
+        );
       }
       console.log('INFO', infoStr);
       if (infoStr) {
@@ -748,7 +830,10 @@ export default class RPC {
         version: `${infoJSON.vendor}/${infoJSON.git_commit ? infoJSON.git_commit.substring(0, 6) : ''}/${
           infoJSON.version
         }`,
-        currencyName: infoJSON.chain_name === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.cTAZ,
+        currencyName:
+          infoJSON.chain_name === ChainNameEnum.mainChainName
+            ? CurrencyNameEnum.ZEC
+            : CurrencyNameEnum.cTAZ,
       };
 
       this.fnSetInfo(info);
@@ -774,7 +859,10 @@ export default class RPC {
       const start = Date.now();
       let zingolibStr: string = await RPCModule.getVersionInfo();
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > zingolib version - ', Date.now() - start);
+        console.log(
+          '=========================================== > zingolib version - ',
+          Date.now() - start,
+        );
       }
       if (zingolibStr) {
         if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -805,12 +893,17 @@ export default class RPC {
       }
       this.fetchTotalBalanceLock = true;
       const start = Date.now();
-      const spendableStr: string = await RPCModule.getSpendableBalanceTotalInfo();
+      const spendableStr: string =
+        await RPCModule.getSpendableBalanceTotalInfo();
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > spendable balance - ', Date.now() - start);
+        console.log(
+          '=========================================== > spendable balance - ',
+          Date.now() - start,
+        );
       }
       //console.log(spendableStr);
-      let spendableJSON: RPCSpendablebalanceType = {} as RPCSpendablebalanceType;
+      let spendableJSON: RPCSpendablebalanceType =
+        {} as RPCSpendablebalanceType;
       if (spendableStr) {
         if (spendableStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error spendable balance ${spendableStr}`);
@@ -825,7 +918,10 @@ export default class RPC {
       const start2 = Date.now();
       const balanceStr: string = await RPCModule.getBalanceInfo();
       if (Date.now() - start2 > 4000) {
-        console.log('=========================================== > balance - ', Date.now() - start2);
+        console.log(
+          '=========================================== > balance - ',
+          Date.now() - start2,
+        );
       }
       if (balanceStr) {
         if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -845,10 +941,14 @@ export default class RPC {
       const balance: TotalBalanceClass = {
         totalOrchardBalance: (balanceJSON.total_orchard_balance || 0) / 10 ** 8,
         totalSaplingBalance: (balanceJSON.total_sapling_balance || 0) / 10 ** 8,
-        totalTransparentBalance: (balanceJSON.total_transparent_balance || 0) / 10 ** 8,
-        confirmedOrchardBalance: (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
-        confirmedSaplingBalance: (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
-        confirmedTransparentBalance: (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
+        totalTransparentBalance:
+          (balanceJSON.total_transparent_balance || 0) / 10 ** 8,
+        confirmedOrchardBalance:
+          (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
+        confirmedSaplingBalance:
+          (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
+        confirmedTransparentBalance:
+          (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
         // header total balance
         totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
         //totalSpendableBalance: ((balanceJSON.confirmed_orchard_balance + balanceJSON.confirmed_sapling_balance) || 0) / 10 ** 8,
@@ -877,14 +977,20 @@ export default class RPC {
 
       // UNIFIED
       const start = Date.now();
-      const unifiedAddressesStr: string = await RPCModule.getUnifiedAddressesInfo();
+      const unifiedAddressesStr: string =
+        await RPCModule.getUnifiedAddressesInfo();
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > addresses unified - ', Date.now() - start);
+        console.log(
+          '=========================================== > addresses unified - ',
+          Date.now() - start,
+        );
       }
       if (unifiedAddressesStr) {
         if (unifiedAddressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${unifiedAddressesStr}`);
-          this.fnSetLastError(`Error unified addresses: ${unifiedAddressesStr}`);
+          this.fnSetLastError(
+            `Error unified addresses: ${unifiedAddressesStr}`,
+          );
           this.fetchAddressesLock = false;
           return;
         }
@@ -893,18 +999,25 @@ export default class RPC {
         this.fetchAddressesLock = false;
         return;
       }
-      const unifiedAddressesJSON: RPCUnifiedAddressType[] = await JSON.parse(unifiedAddressesStr) || [];
+      const unifiedAddressesJSON: RPCUnifiedAddressType[] =
+        (await JSON.parse(unifiedAddressesStr)) || [];
 
       // TRANSPARENT
       const start2 = Date.now();
-      const transparentAddressStr: string = await RPCModule.getTransparentAddressesInfo();
+      const transparentAddressStr: string =
+        await RPCModule.getTransparentAddressesInfo();
       if (Date.now() - start2 > 4000) {
-        console.log('=========================================== > addresses transparent - ', Date.now() - start2);
+        console.log(
+          '=========================================== > addresses transparent - ',
+          Date.now() - start2,
+        );
       }
       if (transparentAddressStr) {
         if (transparentAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${transparentAddressStr}`);
-          this.fnSetLastError(`Error transparent addresses: ${transparentAddressStr}`);
+          this.fnSetLastError(
+            `Error transparent addresses: ${transparentAddressStr}`,
+          );
           this.fetchAddressesLock = false;
           return;
         }
@@ -913,19 +1026,34 @@ export default class RPC {
         this.fetchAddressesLock = false;
         return;
       }
-      const transparentAddressesJSON: RPCTransparentAddressType[] = await JSON.parse(transparentAddressStr) || [];
+      const transparentAddressesJSON: RPCTransparentAddressType[] =
+        (await JSON.parse(transparentAddressStr)) || [];
 
       let allAddresses: (UnifiedAddressClass | TransparentAddressClass)[] = [];
 
-      unifiedAddressesJSON && unifiedAddressesJSON.forEach((u: RPCUnifiedAddressType) => {
-        const ua: UnifiedAddressClass = new UnifiedAddressClass(u.address_index, u.encoded_address, AddressKindEnum.u, u.has_orchard, u.has_sapling, u.has_transparent);
-        allAddresses.push(ua);
-      });
+      unifiedAddressesJSON &&
+        unifiedAddressesJSON.forEach((u: RPCUnifiedAddressType) => {
+          const ua: UnifiedAddressClass = new UnifiedAddressClass(
+            u.address_index,
+            u.encoded_address,
+            AddressKindEnum.u,
+            u.has_orchard,
+            u.has_sapling,
+            u.has_transparent,
+          );
+          allAddresses.push(ua);
+        });
 
-      transparentAddressesJSON && transparentAddressesJSON.forEach((u: RPCTransparentAddressType) => {
-        const t: TransparentAddressClass = new TransparentAddressClass(u.address_index, u.encoded_address, AddressKindEnum.t, u.scope);
-        allAddresses.push(t);
-      });
+      transparentAddressesJSON &&
+        transparentAddressesJSON.forEach((u: RPCTransparentAddressType) => {
+          const t: TransparentAddressClass = new TransparentAddressClass(
+            u.address_index,
+            u.encoded_address,
+            AddressKindEnum.t,
+            u.scope,
+          );
+          allAddresses.push(t);
+        });
 
       //console.log(allAddresses);
 
@@ -951,7 +1079,10 @@ export default class RPC {
       const start = Date.now();
       const heightStr: string = await RPCModule.getLatestBlockWalletInfo();
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > wallet height - ', Date.now() - start);
+        console.log(
+          '=========================================== > wallet height - ',
+          Date.now() - start,
+        );
       }
       console.log('WALLET HEIGHT', heightStr);
       if (heightStr) {
@@ -981,30 +1112,37 @@ export default class RPC {
     }
   }
 
-    async getWalletSaveRequired(): Promise<boolean> {
+  async getWalletSaveRequired(): Promise<boolean> {
     try {
       if (this.getWalletSaveRequiredLock) {
         return false;
       }
       this.getWalletSaveRequiredLock = true;
       const start = Date.now();
-      const walletSaveRequiredStr: string = await RPCModule.getWalletSaveRequiredInfo();
+      const walletSaveRequiredStr: string =
+        await RPCModule.getWalletSaveRequiredInfo();
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > wallet save required - ', Date.now() - start);
+        console.log(
+          '=========================================== > wallet save required - ',
+          Date.now() - start,
+        );
       }
       if (walletSaveRequiredStr) {
         if (walletSaveRequiredStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet save required ${walletSaveRequiredStr}`);
-          this.fnSetLastError(`Error wallet save required: ${walletSaveRequiredStr}`);
+          this.fnSetLastError(
+            `Error wallet save required: ${walletSaveRequiredStr}`,
+          );
           this.getWalletSaveRequiredLock = false;
           return false;
         }
       } else {
         console.log('Internal Error wallet save required');
-        this.getWalletSaveRequiredLock = false
+        this.getWalletSaveRequiredLock = false;
         return false;
       }
-      const walletSaveRequiredJSON: RPCWalletSaveRequiredType = await JSON.parse(walletSaveRequiredStr);
+      const walletSaveRequiredJSON: RPCWalletSaveRequiredType =
+        await JSON.parse(walletSaveRequiredStr);
 
       this.getWalletSaveRequiredLock = false;
       return walletSaveRequiredJSON.save_required;
@@ -1016,24 +1154,37 @@ export default class RPC {
     }
   }
 
-  async getConfigWalletPerformance(): Promise<RPCPerformanceLevelEnum | undefined> {
+  async getConfigWalletPerformance(): Promise<
+    RPCPerformanceLevelEnum | undefined
+  > {
     try {
       const start = Date.now();
-      const configWalletPerformanceStr: string = await RPCModule.getConfigWalletPerformanceInfo();
+      const configWalletPerformanceStr: string =
+        await RPCModule.getConfigWalletPerformanceInfo();
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > wallet config performance - ', Date.now() - start);
+        console.log(
+          '=========================================== > wallet config performance - ',
+          Date.now() - start,
+        );
       }
       if (configWalletPerformanceStr) {
-        if (configWalletPerformanceStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error wallet config performance ${configWalletPerformanceStr}`);
-          this.fnSetLastError(`Error wallet config performance: ${configWalletPerformanceStr}`);
+        if (
+          configWalletPerformanceStr.toLowerCase().startsWith(GlobalConst.error)
+        ) {
+          console.log(
+            `Error wallet config performance ${configWalletPerformanceStr}`,
+          );
+          this.fnSetLastError(
+            `Error wallet config performance: ${configWalletPerformanceStr}`,
+          );
           return;
         }
       } else {
         console.log('Internal Error wallet config performance');
         return;
       }
-      const configWalletPerformanceJSON: RPCConfigWalletPerformanceType = await JSON.parse(configWalletPerformanceStr);
+      const configWalletPerformanceJSON: RPCConfigWalletPerformanceType =
+        await JSON.parse(configWalletPerformanceStr);
 
       return configWalletPerformanceJSON.performance_level;
     } catch (error) {
@@ -1048,7 +1199,10 @@ export default class RPC {
       const start = Date.now();
       const walletVersionStr: string = await RPCModule.getWalletVersionInfo();
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > wallet version - ', Date.now() - start);
+        console.log(
+          '=========================================== > wallet version - ',
+          Date.now() - start,
+        );
       }
       if (walletVersionStr) {
         if (walletVersionStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1060,7 +1214,8 @@ export default class RPC {
         console.log('Internal Error wallet version');
         return;
       }
-      const walletVersionJSON: RPCWalletVersionType = await JSON.parse(walletVersionStr);
+      const walletVersionJSON: RPCWalletVersionType =
+        await JSON.parse(walletVersionStr);
 
       return walletVersionJSON.read_version;
     } catch (error) {
@@ -1105,9 +1260,14 @@ export default class RPC {
       this.fetchTandZandOValueTransfersLock = true;
       // first to get the last server block.
       const start = Date.now();
-      const heightStr: string = await RPCModule.getLatestBlockServerInfo(this.indexerServer.uri);
+      const heightStr: string = await RPCModule.getLatestBlockServerInfo(
+        this.indexerServer.uri,
+      );
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > server height - ', Date.now() - start);
+        console.log(
+          '=========================================== > server height - ',
+          Date.now() - start,
+        );
       }
       console.log('GET SERVER HEIGHT', heightStr);
       if (heightStr) {
@@ -1126,7 +1286,10 @@ export default class RPC {
       const start2 = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
       if (Date.now() - start2 > 4000) {
-        console.log('=========================================== > value transfers - ', Date.now() - start2);
+        console.log(
+          '=========================================== > value transfers - ',
+          Date.now() - start2,
+        );
       }
       //console.log(valueTransfersStr);
       if (valueTransfersStr) {
@@ -1141,9 +1304,10 @@ export default class RPC {
         this.fetchTandZandOValueTransfersLock = false;
         return;
       }
-      const valueTransfersJSON: RPCValueTransfersType = await JSON.parse(valueTransfersStr);
+      const valueTransfersJSON: RPCValueTransfersType =
+        await JSON.parse(valueTransfersStr);
 
-      //console.log(valueTransfersJSON);
+      console.log(valueTransfersJSON);
 
       let vtList: ValueTransferType[] = [];
 
@@ -1151,69 +1315,83 @@ export default class RPC {
       // value transfers.
       valueTransfersJSON &&
         valueTransfersJSON.value_transfers &&
-        valueTransfersJSON.value_transfers.forEach((vt: RPCValueTransferType) => {
-          const currentValueTransferList: ValueTransferType = {} as ValueTransferType;
+        valueTransfersJSON.value_transfers.forEach(
+          (vt: RPCValueTransferType) => {
+            const currentValueTransferList: ValueTransferType =
+              {} as ValueTransferType;
 
-          currentValueTransferList.txid = vt.txid;
-          currentValueTransferList.time = vt.datetime;
-          currentValueTransferList.kind =
-            vt.kind === RPCValueTransfersKindEnum.memoToSelf
-              ? ValueTransferKindEnum.MemoToSelf
-              : vt.kind === RPCValueTransfersKindEnum.sendToSelf
-              ? ValueTransferKindEnum.SendToSelf
-              : vt.kind === RPCValueTransfersKindEnum.received
-              ? ValueTransferKindEnum.Received
-              : vt.kind === RPCValueTransfersKindEnum.sent
-              ? ValueTransferKindEnum.Sent
-              : vt.kind === RPCValueTransfersKindEnum.shield
-              ? ValueTransferKindEnum.Shield
-              : vt.kind === RPCValueTransfersKindEnum.rejection
-              ? ValueTransferKindEnum.Rejection
-              : vt.kind;
-          currentValueTransferList.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
-          currentValueTransferList.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
-          if (
-            vt.status === RPCValueTransfersStatusEnum.calculated ||
-            vt.status === RPCValueTransfersStatusEnum.transmitted ||
-            vt.status === RPCValueTransfersStatusEnum.mempool
-          ) {
-            currentValueTransferList.confirmations = 0;
-          } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
-            currentValueTransferList.confirmations =
-              this.lastServerBlockHeight && this.lastServerBlockHeight >= this.lastWalletBlockHeight
-                ? this.lastServerBlockHeight - vt.blockheight + 1
-                : this.lastWalletBlockHeight - vt.blockheight + 1;
-          } else {
-            // impossible case... I guess.
-            currentValueTransferList.confirmations = 0;
-          }
-          currentValueTransferList.blockheight = vt.blockheight;
-          currentValueTransferList.status = vt.status;
-          currentValueTransferList.address = !vt.recipient_address ? undefined : vt.recipient_address;
-          currentValueTransferList.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
-          currentValueTransferList.memos =
-            !vt.memos || vt.memos.length === 0 || !vt.memos.join('') ? undefined : vt.memos;
-          currentValueTransferList.poolType = !vt.pool_received ? undefined : vt.pool_received;
+            currentValueTransferList.txid = vt.txid;
+            currentValueTransferList.time = vt.datetime;
+            currentValueTransferList.kind =
+              vt.kind === RPCValueTransfersKindEnum.memoToSelf
+                ? ValueTransferKindEnum.MemoToSelf
+                : vt.kind === RPCValueTransfersKindEnum.sendToSelf
+                  ? ValueTransferKindEnum.SendToSelf
+                  : vt.kind === RPCValueTransfersKindEnum.received
+                    ? ValueTransferKindEnum.Received
+                    : vt.kind === RPCValueTransfersKindEnum.sent
+                      ? ValueTransferKindEnum.Sent
+                      : vt.kind === RPCValueTransfersKindEnum.shield
+                        ? ValueTransferKindEnum.Shield
+                        : vt.kind === RPCValueTransfersKindEnum.rejection
+                          ? ValueTransferKindEnum.Rejection
+                          : vt.kind;
+            currentValueTransferList.fee =
+              (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
+            currentValueTransferList.zecPrice = !vt.zec_price
+              ? 0
+              : vt.zec_price;
+            if (
+              vt.status === RPCValueTransfersStatusEnum.calculated ||
+              vt.status === RPCValueTransfersStatusEnum.transmitted ||
+              vt.status === RPCValueTransfersStatusEnum.mempool
+            ) {
+              currentValueTransferList.confirmations = 0;
+            } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
+              currentValueTransferList.confirmations =
+                this.lastServerBlockHeight &&
+                this.lastServerBlockHeight >= this.lastWalletBlockHeight
+                  ? this.lastServerBlockHeight - vt.blockheight + 1
+                  : this.lastWalletBlockHeight - vt.blockheight + 1;
+            } else {
+              // impossible case... I guess.
+              currentValueTransferList.confirmations = 0;
+            }
+            currentValueTransferList.blockheight = vt.blockheight;
+            currentValueTransferList.status = vt.status;
+            currentValueTransferList.address = !vt.recipient_address
+              ? undefined
+              : vt.recipient_address;
+            currentValueTransferList.amount =
+              (!vt.value ? 0 : vt.value) / 10 ** 8;
+            currentValueTransferList.memos =
+              !vt.memos || vt.memos.length === 0 || !vt.memos.join('')
+                ? undefined
+                : vt.memos;
+            currentValueTransferList.poolType = !vt.pool_received
+              ? undefined
+              : vt.pool_received;
 
-          if (vt.txid.startsWith('xxxxxxxxx')) {
-            console.log('server', this.lastServerBlockHeight);
-            console.log('wallet', this.lastWalletBlockHeight);
-            console.log('valuetransfer zingolib: ', vt);
-            console.log('valuetransfer zingo', currentValueTransferList);
-            console.log('--------------------------------------------------');
-          }
-          //if (vt.status === RPCValueTransfersStatusEnum.calculated) {
-          //  console.log('CALCULATED ))))))))))))))))))))))))))))))))))');
-          //  console.log(vt);
-          //}
-          //if (vt.status === RPCValueTransfersStatusEnum.transmitted) {
-          //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
-          //  console.log(vt);
-          //}
+            if (vt.txid.startsWith('xxxxxxxxx')) {
+              console.log('server', this.lastServerBlockHeight);
+              console.log('wallet', this.lastWalletBlockHeight);
+              console.log('valuetransfer zingolib: ', vt);
+              console.log('valuetransfer zingo', currentValueTransferList);
+              console.log('--------------------------------------------------');
+            }
+            //if (vt.status === RPCValueTransfersStatusEnum.calculated) {
+            //  console.log('CALCULATED ))))))))))))))))))))))))))))))))))');
+            //  console.log(vt);
+            //}
+            //if (vt.status === RPCValueTransfersStatusEnum.transmitted) {
+            //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
+            //  console.log(vt);
+            //}
 
-          //console.log(currentValueTransferList);
-          vtList.push(currentValueTransferList);
-        });
+            //console.log(currentValueTransferList);
+            vtList.push(currentValueTransferList);
+          },
+        );
 
       //console.log(vtlist);
 
@@ -1241,7 +1419,10 @@ export default class RPC {
       const start = Date.now();
       const messagesStr: string = await RPCModule.getMessagesInfo('');
       if (Date.now() - start > 4000) {
-        console.log('=========================================== > messages - ', Date.now() - start);
+        console.log(
+          '=========================================== > messages - ',
+          Date.now() - start,
+        );
       }
       //console.log(messagesStr);
       if (messagesStr) {
@@ -1275,17 +1456,18 @@ export default class RPC {
             m.kind === RPCValueTransfersKindEnum.memoToSelf
               ? ValueTransferKindEnum.MemoToSelf
               : m.kind === RPCValueTransfersKindEnum.sendToSelf
-              ? ValueTransferKindEnum.SendToSelf
-              : m.kind === RPCValueTransfersKindEnum.received
-              ? ValueTransferKindEnum.Received
-              : m.kind === RPCValueTransfersKindEnum.sent
-              ? ValueTransferKindEnum.Sent
-              : m.kind === RPCValueTransfersKindEnum.shield
-              ? ValueTransferKindEnum.Shield
-              : m.kind === RPCValueTransfersKindEnum.rejection
-              ? ValueTransferKindEnum.Rejection
-              : m.kind;
-          currentMessageList.fee = (!m.transaction_fee ? 0 : m.transaction_fee) / 10 ** 8;
+                ? ValueTransferKindEnum.SendToSelf
+                : m.kind === RPCValueTransfersKindEnum.received
+                  ? ValueTransferKindEnum.Received
+                  : m.kind === RPCValueTransfersKindEnum.sent
+                    ? ValueTransferKindEnum.Sent
+                    : m.kind === RPCValueTransfersKindEnum.shield
+                      ? ValueTransferKindEnum.Shield
+                      : m.kind === RPCValueTransfersKindEnum.rejection
+                        ? ValueTransferKindEnum.Rejection
+                        : m.kind;
+          currentMessageList.fee =
+            (!m.transaction_fee ? 0 : m.transaction_fee) / 10 ** 8;
           currentMessageList.zecPrice = !m.zec_price ? 0 : m.zec_price;
           if (
             m.status === RPCValueTransfersStatusEnum.calculated ||
@@ -1295,7 +1477,8 @@ export default class RPC {
             currentMessageList.confirmations = 0;
           } else if (m.status === RPCValueTransfersStatusEnum.confirmed) {
             currentMessageList.confirmations =
-              this.lastServerBlockHeight && this.lastServerBlockHeight >= this.lastWalletBlockHeight
+              this.lastServerBlockHeight &&
+              this.lastServerBlockHeight >= this.lastWalletBlockHeight
                 ? this.lastServerBlockHeight - m.blockheight + 1
                 : this.lastWalletBlockHeight - m.blockheight + 1;
           } else {
@@ -1304,10 +1487,17 @@ export default class RPC {
           }
           currentMessageList.blockheight = m.blockheight;
           currentMessageList.status = m.status;
-          currentMessageList.address = !m.recipient_address ? undefined : m.recipient_address;
+          currentMessageList.address = !m.recipient_address
+            ? undefined
+            : m.recipient_address;
           currentMessageList.amount = (!m.value ? 0 : m.value) / 10 ** 8;
-          currentMessageList.memos = !m.memos || m.memos.length === 0 || !m.memos.join('') ? undefined : m.memos;
-          currentMessageList.poolType = !m.pool_received ? undefined : m.pool_received;
+          currentMessageList.memos =
+            !m.memos || m.memos.length === 0 || !m.memos.join('')
+              ? undefined
+              : m.memos;
+          currentMessageList.poolType = !m.pool_received
+            ? undefined
+            : m.pool_received;
 
           if (m.txid.startsWith('xxxxxxxxx')) {
             console.log('valuetransfer messages zingolib: ', m);
@@ -1357,7 +1547,9 @@ export default class RPC {
       try {
         console.log('send JSON', sendJson);
         // creating the propose
-        const proposeStr: string = await RPCModule.sendProcess(JSON.stringify(sendJson));
+        const proposeStr: string = await RPCModule.sendProcess(
+          JSON.stringify(sendJson),
+        );
         if (proposeStr) {
           if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error propose ${proposeStr}`);

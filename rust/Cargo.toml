@@ -1,40 +1,53 @@
 [workspace]
-members = ["lib", "android", "ios", "zingodelegator_utils"]
+members = ["lib"]
 resolver = "2"
+
+exclude = ["android", "ios", "zingodelegator_utils"]
 
 [workspace.lints.clippy]
 pedantic = { level = "deny", priority = -1 }
 nursery = { level = "deny", priority = -1 }
 
 [workspace.dependencies]
-zingolib = { git = "https://github.com/zingolabs/zingolib", default-features = true, tag = "2.0.9", features = [
+zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", default-features = true, rev = "e1ea7a1c59e131a475fe26fb6c994b5875565ce8", features = [
     "testutils",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib", tag = "2.0.9" }
-zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", tag = "2.0.9", features = [
+pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "e1ea7a1c59e131a475fe26fb6c994b5875565ce8" }
+zingolib_testutils = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "e1ea7a1c59e131a475fe26fb6c994b5875565ce8", features = [
     "test_lwd_zcashd",
 ] }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
 zingodelegator_utils = { path = "zingodelegator_utils" }
 
-zcash_address = { version = "0.10" }
-zcash_client_backend = { version = "0.20", features = [
+zcash_encoding = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93", features = [
+    "std",
+] }
+zcash_address = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93", features = [
+    "std",
+] }
+zcash_client_backend = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93", features = [
     "lightwalletd-tonic",
     "orchard",
     "transparent-inputs",
     "tor",
 ] }
-zcash_encoding = { version = "0.3" }
-zcash_keys = { version = "0.12", features = [
+zcash_keys = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93", features = [
     "transparent-inputs",
     "sapling",
     "orchard",
+    "std",
 ] }
-zcash_note_encryption = "0.4"
-zcash_primitives = { version = "0.26" }
-zcash_proofs = { version = "0.26" }
-zcash_protocol = { version = "0.7" }
-zcash_transparent = { version = "0.6" }
+zcash_primitives = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93", features = [
+    "std",
+] }
+zcash_proofs = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93" }
+zcash_protocol = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93", features = [
+    "std",
+    "local-consensus",
+] }
+zcash_transparent = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93", features = [
+    "std",
+] }
 
 zingo_common_components = { git = "https://github.com/zingolabs/zingo-common.git", branch = "dev" }
 
