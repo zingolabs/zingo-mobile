@@ -5,13 +5,18 @@ authors = ["Zingolabs <zingo@zingolabs.com>"]
 edition = "2024"
 
 [dependencies]
-zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "4d5785ce2cc347bf5a4849ce8ceb645e18b533cb", default-features = true, features = [
+zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "7d1d3c8f5490716306b26bfc829e66c359c3b9e8", default-features = true, features = [
     "testutils",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "4d5785ce2cc347bf5a4849ce8ceb645e18b533cb" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "7d1d3c8f5490716306b26bfc829e66c359c3b9e8" }
 
-zcash_address = { git = "https://github.com/zingolabs/librustzcash", rev = "ab1965d62f8500449389e473a08a06de3193648c" }
-zcash_client_backend = { git = "https://github.com/zingolabs/librustzcash", rev = "ab1965d62f8500449389e473a08a06de3193648c", features = [
+zcash_encoding = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93", features = [
+    "std",
+] }
+zcash_address = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93", features = [
+    "std",
+] }
+zcash_client_backend = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4c9567b7bd2a62cad5a5523f08a584d3f70e7b93", features = [
     "lightwalletd-tonic",
     "orchard",
     "transparent-inputs",
