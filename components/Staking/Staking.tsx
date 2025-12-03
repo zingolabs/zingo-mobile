@@ -50,21 +50,24 @@ function Separator() {
   );
 }
 
-type StakingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.StakingHome>;
+type StakingProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.StakingHome
+>;
 
 const Staking: React.FC<StakingProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const {
-    valueTransfers,
-  } = context;
+  const { valueTransfers } = context;
 
   const screenName = ScreenEnum.StakingHome;
 
   const [loading] = useState(false);
   const [movements] = useState<ValueTransferType[]>(
-    !valueTransfers 
-      ? [] 
-      : valueTransfers.filter((vt: ValueTransferType) => vt.stakingAction !== null)
+    !valueTransfers
+      ? []
+      : valueTransfers.filter(
+          (vt: ValueTransferType) => vt.stakingAction !== null,
+        ),
   );
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -75,7 +78,7 @@ const Staking: React.FC<StakingProps> = () => {
     ? formatHeaderMonth(movements[0].time)
     : undefined;
 
-  console.log(movements);
+  console.log('movements', movements);
 
   return (
     <View
@@ -195,7 +198,7 @@ const Staking: React.FC<StakingProps> = () => {
               renderItem={({ item }) => {
                 // negative amount => staked (tokens left wallet)
                 // positive amount => unstaked (tokens came back)
-                const isStake = item.amount < 0;
+                const isStake = item.amount > 0;
                 const label = isStake ? 'Staked' : 'Unstaked';
                 const amountLabel = `${
                   item.amount > 0 ? '+' : ''
