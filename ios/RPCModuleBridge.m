@@ -216,5 +216,9 @@ RCT_EXTERN_METHOD(shieldProcess:
 RCT_EXTERN_METHOD(confirmProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getAccumulatedStakeForTxidInfo:
+    (NSString)txid
+    resolve:(RCTPromiseResolveBlock)resolve
+    reject:(RCTPromiseRejectBlock)reject)
 
 @end

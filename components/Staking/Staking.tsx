@@ -68,16 +68,18 @@ const Staking: React.FC<StakingProps> = () => {
     () =>
       !valueTransfers
         ? []
-        : valueTransfers.filter(
-            (vt: ValueTransferType) => {
-              if (vt.stakingAction === null) {
-                return false;
-              }
-              if (vt.stakingAction.kind === 'add' && (vt.amount === 0 || vt.amount !== vt.stakingAction.val)) {
-                return false;
-              }
-              return true;
-            }),
+        : valueTransfers.filter((vt: ValueTransferType) => {
+            if (vt.stakingAction === null) {
+              return false;
+            }
+            if (
+              vt.stakingAction.kind === 'add' &&
+              (vt.amount === 0 || vt.amount !== vt.stakingAction.val)
+            ) {
+              return false;
+            }
+            return true;
+          }),
     [valueTransfers],
   );
 
@@ -209,11 +211,12 @@ const Staking: React.FC<StakingProps> = () => {
               renderItem={({ item }) => {
                 // negative amount => unstaked (tokens left wallet)
                 // positive amount => staked (tokens came back)
-                const isStake = item.amount > 0;
+                const isStake =
+                  item.stakingAction && item.stakingAction?.val > 0;
                 const label = isStake ? 'Staked' : 'Unstaked';
                 const amountLabel = `${
                   item.amount > 0 ? '+' : ''
-                }${item.amount.toFixed(3)} cTAZ`;
+                }${item.amount.toFixed(4)} cTAZ`;
 
                 return (
                   <View
@@ -224,14 +227,18 @@ const Staking: React.FC<StakingProps> = () => {
                       paddingVertical: 10,
                     }}
                   >
-                    <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+                    <View
+                      style={{ flexDirection: 'row', alignItems: 'center' }}
+                    >
                       <>
-                        {item.stakingAction && item.stakingAction.kind === 'add' && (
-                          <Stake width={20} height={20} />
-                        )}
-                        {item.stakingAction && item.stakingAction.kind === 'sub' && (
-                          <Unstake width={20} height={20} />
-                        )}
+                        {item.stakingAction &&
+                          item.stakingAction.kind === 'add' && (
+                            <Stake width={20} height={20} />
+                          )}
+                        {item.stakingAction &&
+                          item.stakingAction.kind === 'sub' && (
+                            <Unstake width={20} height={20} />
+                          )}
                       </>
 
                       <View>

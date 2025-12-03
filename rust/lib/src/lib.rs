@@ -1769,9 +1769,7 @@ fn parse_staking_action(root: &json::JsonValue) -> Result<StakingAction, String>
         other => return Err(format!("Error: Unknown stakingAction.kind: {other}")),
     };
 
-    let val = sa["val"]
-        .as_u64()
-        .ok_or_else(|| "Error: Missing stakingAction.val".to_string())?;
+    let val = sa["val"].as_u64().unwrap_or(0);
 
     let target_str = sa["target"]
         .as_str()
@@ -1855,6 +1853,28 @@ pub fn confirm() -> Result<String, ZingolibError> {
                     }
                 }
                 .pretty(2)
+            }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
+#[uniffi::export]
+pub fn get_accumulated_stake_for_txid(txid: String) -> Result<u64, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lightclient) = &mut *guard {
+            let txid = match txid_from_hex_encoded_str(&txid) {
+                Ok(txid) => txid,
+                Err(e) => return Ok(0),
+            };
+            Ok(RT.block_on(async move {
+                lightclient
+                    .get_accumulated_stake_for_txid(txid.into())
+                    .await
             }))
         } else {
             Err(ZingolibError::LightclientNotInitialized)

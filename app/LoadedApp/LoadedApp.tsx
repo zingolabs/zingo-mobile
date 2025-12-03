@@ -2048,7 +2048,12 @@ export class LoadedAppClass extends Component<
               </InnerStack.Screen>
 
               <InnerStack.Screen name={RouteEnum.Unstake}>
-                {props => <Unstake {...props} />}
+                {props => (
+                  <Unstake
+                    {...props}
+                    stakeTransaction={this.stakeTransaction}
+                  />
+                )}
               </InnerStack.Screen>
             </InnerStack.Navigator>
           </GestureHandlerRootView>

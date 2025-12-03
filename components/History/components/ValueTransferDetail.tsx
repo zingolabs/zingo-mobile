@@ -13,8 +13,6 @@ import {
   ValueTransferKindEnum,
   GlobalConst,
   RouteEnum,
-  UnifiedAddressClass,
-  TransparentAddressClass,
   ScreenEnum,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
@@ -27,7 +25,7 @@ import BoldText from '../../Components/BoldText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Stake from '../../../assets/icons/stake-white.svg';
 import Unstake from '../../../assets/icons/unstake-white.svg';
-import { faTriangleExclamation, faChevronDown, faChevronUp, faChevronLeft, faRefresh, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faChevronLeft, faRefresh, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -47,7 +45,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     language,
     privacy,
     addLastSnackbar,
-    addresses,
     snackbars,
     removeFirstSnackbar,
   } = context;
@@ -65,7 +62,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const [showNavigator, setShowNavigator] = useState<boolean>(true); // by default
   const isTheFirstMount = useRef(true);
 
-  const { memo, memoUA } = Utils.splitMemo(valueTransfer.memos);
+  const memo = valueTransfer.memos;
 
   const iconColor =
       valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'add' 
@@ -123,11 +120,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalLength]);
-
-  const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
-    return address.length >= 1;
-  };
 
   const moveValueTransferDetail = (indexParm: number, typeParm: number) => {
     // -1 -> Previous ValueTransfer
@@ -381,6 +373,56 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               borderRadius: 30,
               backgroundColor: colors.secondary,
           }}>
+            {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'add' && (
+              <>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
+                  <FadeText>{'Target'}</FadeText>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (valueTransfer.stakingAction?.target) {
+                        Clipboard.setString(valueTransfer.stakingAction.target);
+                        addLastSnackbar({
+                          message: translate('history.addresscopied') as string,
+                          duration: SnackbarDurationEnum.short,
+                          screenName: [screenName],
+                        });
+                      }
+                    }}>
+                    <RegText>{Utils.trimToSmall(valueTransfer.stakingAction.target, 10)}</RegText>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
+                  <FadeText>{'Val'}</FadeText>
+                  <RegText>{valueTransfer.stakingAction.val.toString()}</RegText>
+                </View>
+              </>
+            )}
+
+            {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'sub' && (
+              <>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
+                  <FadeText>{'Source'}</FadeText>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (valueTransfer.stakingAction?.source) {
+                          Clipboard.setString(valueTransfer.stakingAction.source);
+                          addLastSnackbar({
+                            message: translate('history.addresscopied') as string,
+                            duration: SnackbarDurationEnum.short,
+                            screenName: [screenName],
+                          });
+                        }
+                      }}>
+                    <RegText>{Utils.trimToSmall(valueTransfer.stakingAction.source, 10)}</RegText>
+                    </TouchableOpacity>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
+                  <FadeText>{'Val'}</FadeText>
+                  <RegText>{valueTransfer.stakingAction.val.toString()}</RegText>
+                </View>
+              </>
+            )}
+
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
               <FadeText>{'Status'}</FadeText>
               <RegText>{valueTransfer.status}</RegText>
@@ -453,13 +495,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               </View>
             )}
 
-            {(!!memo || !!memoUA) && false && (
+            {(!!memo) && (
               <View style={{ marginTop: 10 }}>
                 <FadeText>{translate('history.memo') as string}</FadeText>
                 {!!memo && (
                   <TouchableOpacity
                     onPress={() => {
-                      Clipboard.setString(memo);
+                      Clipboard.setString(memo.join(' '));
                       addLastSnackbar({
                         message: translate('history.memocopied') as string,
                         duration: SnackbarDurationEnum.short,
@@ -467,37 +509,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       });
                     }}>
                     <RegText selectable={true}>{memo}</RegText>
-                  </TouchableOpacity>
-                )}
-                {!!memoUA && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      Clipboard.setString(memoUA);
-                      if (!thisWalletAddress(memoUA)) {
-                        addLastSnackbar({
-                          message: translate('history.address-http') as string,
-                          duration: SnackbarDurationEnum.long,
-                          screenName: [screenName],
-                        });
-                      }
-                      addLastSnackbar({
-                        message: translate('history.addresscopied') as string,
-                        duration: SnackbarDurationEnum.short,
-                        screenName: [screenName],
-                      });
-                    }}>
-                    <RegText>{GlobalConst.replyTo}</RegText>
-                    {!thisWalletAddress(memoUA) && (
-                      <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
-                    )}
-                    <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
-                    {thisWalletAddress(memoUA) && (
-                      <View style={{ flexDirection: 'row' }}>
-                        <RegText color={colors.primaryDisabled}>
-                          {translate('history.thiswalletaddress') as string}
-                        </RegText>
-                      </View>
-                    )}
                   </TouchableOpacity>
                 )}
               </View>
