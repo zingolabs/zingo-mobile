@@ -72,16 +72,32 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
   const context = useContext(ContextAppLoaded);
   const { valueTransfers, defaultUnifiedAddress } = context;
 
-  const movements: ValueTransferType[] = useMemo(
-    () =>
-      !valueTransfers
-        ? []
-        : valueTransfers.filter(
-            (vt: ValueTransferType) =>
-              vt.stakingAction !== null && vt.stakingAction.kind === 'add',
-          ),
-    [valueTransfers],
-  );
+  const movements: ValueTransferType[] = useMemo(() => {
+    if (!valueTransfers) {
+      return [];
+    }
+
+    // All staking "add" actions
+    const stakingAdds = valueTransfers.filter(
+      (vt: ValueTransferType) =>
+        vt.stakingAction !== null && vt.stakingAction.kind === 'add',
+    );
+
+    // All txids that have been used as a source in a "sub" (unstake) action
+    const unstakeSources = new Set(
+      valueTransfers
+        .filter(
+          (vt: ValueTransferType) =>
+            vt.stakingAction !== null &&
+            vt.stakingAction.kind === 'sub' &&
+            !!vt.stakingAction.source,
+        )
+        .map(vt => vt.stakingAction!.source),
+    );
+
+    // Keep only adds whose txid is NOT present as a source in any "sub"
+    return stakingAdds.filter(vt => !unstakeSources.has(vt.txid));
+  }, [valueTransfers]);
 
   const selectedTx = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedTx;
@@ -236,7 +252,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
     const isSelected = item.txid === selectedTxid;
 
     const zats = getAccumulatedStakeZatsForTxid(item.txid);
-    let displayAmount = String(item.amount); // fallback: original amount field
+    let displayAmount = String(item.amount);
 
     if (zats !== null) {
       const amountInCoin = zats / 10 ** 8;
