@@ -389,7 +389,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           paddingBottom: 10,
         }}
       >
-        <WalletSummaryHeader />
+        <WalletSummaryHeader show_staked={false} />
 
         <View
           style={{

@@ -1781,7 +1781,7 @@ fn parse_staking_action(root: &json::JsonValue) -> Result<StakingAction, String>
         .ok_or_else(|| "Error: Missing stakingAction.source".to_string())?;
 
     let target = parse_hex_32(target_str)?;
-    let source = parse_hex_32(source_str)?;
+    let source = [0u8; 32];
 
     let insecure_target_name = sa["targetName"].as_str().unwrap_or_default().to_string();
     let insecure_source_name = sa["sourceName"].as_str().unwrap_or_default().to_string();

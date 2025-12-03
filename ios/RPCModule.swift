@@ -1890,12 +1890,52 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(sendProcess:resolve:reject:)
   func sendProcess(_ send_json: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["send_json": send_json, "resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnSendProcess(dict)
+    let dict: [String: Any] = ["send_json": send_json, "resolve": resolve]
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      if let self = self {
+        self.fnSendProcess(dict)
+      }
+    }
+  }
+  
+  func fnStakeProcess(_ dict: [AnyHashable: Any]) {
+    if let stake_json = dict["stake_json"] as? String,
+       let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+      do {
+        // Call into the Rust/uniffi function
+        let resp = try stake(stakeJson: stake_json)
+        let respStr = String(resp)
+        DispatchQueue.main.async {
+          resolve(respStr)
+        }
+      } catch {
+        let err = "Error: [Native] stake. \(error.localizedDescription)"
+        NSLog(err)
+        DispatchQueue.main.async {
+          resolve(err)
         }
       }
+    } else {
+      let err = "Error: [Native] stake. Command arguments problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        DispatchQueue.main.async {
+          resolve(err)
+        }
+      }
+    }
+  }
+  
+  @objc(stakeProcess:resolve:reject:)
+  func stakeProcess(_ stake_json: String,
+                    resolve: @escaping RCTPromiseResolveBlock,
+                    reject: @escaping RCTPromiseRejectBlock) {
+    let dict: [String: Any] = ["stake_json": stake_json, "resolve": resolve]
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      if let self = self {
+        self.fnStakeProcess(dict)
+      }
+    }
   }
 
   func fnShieldProcess(_ dict: [AnyHashable: Any]) {

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   View,
@@ -62,12 +62,14 @@ const Staking: React.FC<StakingProps> = () => {
   const screenName = ScreenEnum.StakingHome;
 
   const [loading] = useState(false);
-  const [movements] = useState<ValueTransferType[]>(
-    !valueTransfers
-      ? []
-      : valueTransfers.filter(
-          (vt: ValueTransferType) => vt.stakingAction !== null,
-        ),
+  const movements: ValueTransferType[] = useMemo(
+    () =>
+      !valueTransfers
+        ? []
+        : valueTransfers.filter(
+            (vt: ValueTransferType) => vt.stakingAction != null,
+          ),
+    [valueTransfers],
   );
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -96,7 +98,7 @@ const Staking: React.FC<StakingProps> = () => {
           paddingBottom: 10,
         }}
       >
-        <WalletSummaryHeader />
+        <WalletSummaryHeader show_staked={true} />
 
         <View
           style={{
@@ -196,8 +198,8 @@ const Staking: React.FC<StakingProps> = () => {
               contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
               ItemSeparatorComponent={Separator}
               renderItem={({ item }) => {
-                // negative amount => staked (tokens left wallet)
-                // positive amount => unstaked (tokens came back)
+                // negative amount => unstaked (tokens left wallet)
+                // positive amount => staked (tokens came back)
                 const isStake = item.amount > 0;
                 const label = isStake ? 'Staked' : 'Unstaked';
                 const amountLabel = `${

@@ -10,4 +10,6 @@ export type RPCBalancesType = {
   unconfirmed_orchard_balance: number;
   unconfirmed_sapling_balance: number;
   unconfirmed_transparent_balance: number;
+
+  staked_amount: number;
 };

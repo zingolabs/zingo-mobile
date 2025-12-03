@@ -11,7 +11,13 @@ import { RPCSyncStatusType } from '../../../app/rpc/types/RPCSyncStatusType';
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
 
-const WalletSummaryHeader: React.FC = () => {
+type WalletSummaryHeaderProps = {
+  show_staked: boolean;
+};
+
+const WalletSummaryHeader: React.FC<WalletSummaryHeaderProps> = ({
+  show_staked = false,
+}) => {
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
 
@@ -34,7 +40,10 @@ const WalletSummaryHeader: React.FC = () => {
 
   // Compute sync percentage
   useEffect(() => {
-    const percentage: number = syncingStatus.percentage_total_outputs_scanned || syncingStatus.percentage_total_blocks_scanned || 0;
+    const percentage: number =
+      syncingStatus.percentage_total_outputs_scanned ||
+      syncingStatus.percentage_total_blocks_scanned ||
+      0;
     if (
       !syncingStatus ||
       isEqual(syncingStatus, {} as RPCSyncStatusType) ||
@@ -98,10 +107,9 @@ const WalletSummaryHeader: React.FC = () => {
     navigation.navigate(RouteEnum.SyncReport);
   };
 
-  const balanceTotal =
-    (totalBalance?.totalOrchardBalance ?? 0) +
-    (totalBalance?.totalSaplingBalance ?? 0) +
-    (totalBalance?.totalTransparentBalance ?? 0);
+  const balanceTotal = show_staked
+    ? (totalBalance?.stakedAmount ?? 0)
+    : (totalBalance?.totalSpendableBalance ?? 0);
 
   return (
     <View

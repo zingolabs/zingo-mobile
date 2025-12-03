@@ -61,6 +61,7 @@ import {
   AddressKindEnum,
   ScreenEnum,
   LaunchingModeEnum,
+  SendJsonToTypeType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -103,6 +104,10 @@ import ComputingError from './components/ComputingError';
 import { Staking, AddStakeScreen, Unstake } from '../../components/Staking';
 import SettingsServers from '../../components/Settings/components/SettingsServers';
 import DebugInfo from '../../components/Settings/components/DebugInfo';
+import {
+  StakeJsonToTypeType,
+  StakingActionType,
+} from '../AppState/types/ValueTransferType';
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();
 
@@ -1210,6 +1215,34 @@ export class LoadedAppClass extends Component<
     }
   };
 
+  // Send a staking transaction using the send page state + staking action
+  stakeTransaction = async (
+    sendPageState: SendPageStateClass,
+    stakingAction: StakingActionType,
+  ): Promise<string> => {
+    try {
+      const { indexerServer, defaultUnifiedAddress } = this.state;
+
+      // Reuse the existing helper to build the receivers array
+      const receivers: SendJsonToTypeType[] = await Utils.getSendManyJSON(
+        sendPageState,
+        defaultUnifiedAddress,
+        indexerServer,
+        false,
+      );
+
+      const stakeJson: StakeJsonToTypeType = {
+        stakingAction,
+        receivers,
+      };
+
+      const txid = await this.rpc.sendStakingTransaction(stakeJson);
+      return txid;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   doRefresh = (screen: ScreenEnum) => {
     //console.log('================== MANUAL REFRESH ================== ', screen);
     if (screen === ScreenEnum.History || screen === ScreenEnum.ContactList) {
@@ -2006,7 +2039,12 @@ export class LoadedAppClass extends Component<
               </InnerStack.Screen>
 
               <InnerStack.Screen name={RouteEnum.Stake}>
-                {props => <AddStakeScreen {...props} />}
+                {props => (
+                  <AddStakeScreen
+                    {...props}
+                    stakeTransaction={this.stakeTransaction}
+                  />
+                )}
               </InnerStack.Screen>
 
               <InnerStack.Screen name={RouteEnum.Unstake}>

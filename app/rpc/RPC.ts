@@ -36,6 +36,7 @@ import { RPCConfigWalletPerformanceType } from './types/RPCConfigWalletPerforman
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 import { LoadingAppNavigationState } from '../types';
+import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 
 interface StakingActionType {
   kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
@@ -945,6 +946,8 @@ export default class RPC {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
+      console.log('balance:', balanceJSON);
+
       // Total Balance
       const balance: TotalBalanceClass = {
         totalOrchardBalance: (balanceJSON.total_orchard_balance || 0) / 10 ** 8,
@@ -960,6 +963,7 @@ export default class RPC {
         // header total balance
         totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
         //totalSpendableBalance: ((balanceJSON.confirmed_orchard_balance + balanceJSON.confirmed_sapling_balance) || 0) / 10 ** 8,
+        stakedAmount: (balanceJSON.staked_amount || 0) / 10 ** 8,
       };
       //console.log(balance);
       this.fnSetTotalBalance(balance);
@@ -1384,7 +1388,9 @@ export default class RPC {
             } else {
               currentValueTransferList.stakingAction = {
                 kind: vt.staking_action?.kind,
-                val: (!vt.staking_action?.val ? 0 : vt.staking_action.val) / 10 ** 8,
+                val:
+                  (!vt.staking_action?.val ? 0 : vt.staking_action.val) /
+                  10 ** 8,
                 target: vt.staking_action?.target,
                 source: vt.staking_action?.source,
                 insecureTargetName: vt.staking_action?.insecure_target_name,
@@ -1624,6 +1630,85 @@ export default class RPC {
       }
       if (sendError) {
         //console.log('00000000 REJECT send');
+        reject(sendError);
+        return;
+      }
+    });
+
+    return sendTxPromise;
+  }
+
+  // Send a staking transaction using the already constructed stakeJson structure
+  async sendStakingTransaction(
+    stakeJson: StakeJsonToTypeType,
+  ): Promise<string> {
+    const sendTxPromise = new Promise<string>(async (resolve, reject) => {
+      await this.clearTimers();
+      this.setInSend(true);
+      this.keepAwake(true);
+
+      let sendError = '';
+      let sendTxids = '';
+
+      try {
+        console.log('stake JSON', stakeJson);
+        const proposeStr: string = await RPCModule.stakeProcess(
+          JSON.stringify(stakeJson),
+        );
+
+        if (proposeStr) {
+          if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+            console.log(`Error stake propose ${proposeStr}`);
+            sendError = proposeStr;
+          }
+        } else {
+          console.log('Internal Error stake propose');
+          sendError = 'Error: Internal RPC Error: stake propose';
+        }
+
+        if (!sendError) {
+          const proposeJSON: RPCSendProposeType = await JSON.parse(proposeStr);
+          if (proposeJSON.error) {
+            console.log(`Error stake propose ${proposeJSON.error}`);
+            sendError = proposeJSON.error;
+          }
+
+          if (!sendError) {
+            const sendStr: string = await RPCModule.confirmProcess();
+            if (sendStr) {
+              if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
+                console.log(`Error stake confirm ${sendStr}`);
+                sendError = sendStr;
+              }
+            } else {
+              console.log('Internal Error stake confirm');
+              sendError = 'Error: Internal RPC Error: stake confirm';
+            }
+
+            if (!sendError) {
+              const sendJSON: RPCSendType = await JSON.parse(sendStr);
+              if (sendJSON.error) {
+                console.log(`Error stake confirm ${sendJSON.error}`);
+                sendError = sendJSON.error;
+              } else if (sendJSON.txids && sendJSON.txids.length > 0) {
+                sendTxids = sendJSON.txids.join(', ');
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.log(`Critical Error stake ${error}`);
+        sendError = `Error: stake ${error}`;
+      }
+
+      await this.configure();
+      this.setInSend(false);
+
+      if (sendTxids) {
+        resolve(sendTxids);
+        return;
+      }
+      if (sendError) {
         reject(sendError);
         return;
       }

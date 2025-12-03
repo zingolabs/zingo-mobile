@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   Platform,
   Keyboard,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,19 +26,37 @@ import { ThemeType } from '../../../app/types/ThemeType';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../../app/types';
-import { RouteEnum } from '../../../app/AppState';
+import {
+  RouteEnum,
+  SendPageStateClass,
+  ToAddrClass,
+} from '../../../app/AppState';
 import RegText from '../../Components/RegText';
+import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
+import { ContextAppLoaded } from '../../../app/context';
+import Utils from '../../../app/utils';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
 type ModalState = 'idle' | 'sending' | 'success';
 
-type AddStakeScreenProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Stake>;
+type AddStakeScreenProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Stake
+> & {
+  stakeTransaction: (
+    sendPageState: SendPageStateClass,
+    stakingAction: StakingActionType,
+  ) => Promise<string>;
+};
 
-const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
+const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
+  stakeTransaction,
+}) => {
   const navigation = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
+  const { totalBalance, defaultUnifiedAddress } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -53,31 +72,92 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
     const s2 = Keyboard.addListener('keyboardDidHide', () => setKbOpen(false));
-    return () => { s1.remove(); s2.remove(); };
+    return () => {
+      s1.remove();
+      s2.remove();
+    };
   }, []);
-
-  const mockSendStakeTx = async (amount: number) => {
-    // Here should go the usual balance checks, etc
-
-    console.log('Mock sending stake tx for amount:', amount);
-    return new Promise<void>(resolve => setTimeout(resolve, 2000));
-  };
 
   const handleConfirmStake = async () => {
     if (!hasSelection) {
       return;
     }
 
+    const amount = selectedAmount!;
+    const finalizer = finalizerText.trim();
+    const miner = addressText.trim();
+
+    // Basic field checks
+    if (!finalizer) {
+      Alert.alert(
+        'Finalizer required',
+        'Please enter a finalizer address (hex).',
+      );
+      return;
+    }
+
+    if (!miner) {
+      Alert.alert(
+        'Miner address required',
+        'Please enter a miner address (Zcash UA).',
+      );
+      return;
+    }
+
+    // Optional: 32-byte hex (64 chars)
+    const isHex32 = /^[0-9a-fA-F]{64}$/.test(finalizer);
+    if (!isHex32) {
+      Alert.alert(
+        'Invalid finalizer',
+        'Finalizer address must be 64 hex characters (32 bytes).',
+      );
+      return;
+    }
+
+    // Balance check (in cTAZ / ZEC units)
+    const spendable =
+      totalBalance && typeof totalBalance.totalSpendableBalance === 'number'
+        ? totalBalance.totalSpendableBalance
+        : 0;
+
+    if (amount > spendable) {
+      Alert.alert(
+        'Insufficient balance',
+        `You can stake up to ${spendable} cTAZ.`,
+      );
+      return;
+    }
+
+    // Build a minimal SendPageState to reuse existing plumbing
+    const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+    sendPageState.toaddr.to = miner;
+    sendPageState.toaddr.memo = defaultUnifiedAddress;
+    sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(
+      amount,
+      8,
+    );
+
+    // Build staking action – assumes these fields exist on StakingActionType
+    const stakingAction: StakingActionType = {
+      kind: 'add',
+      val: amount * 10 ** 8,
+      target: finalizer,
+      source: '',
+      insecureSourceName: '',
+      insecureTargetName: '',
+      // miner,
+    };
+
+    console.log('Staking action:', stakingAction);
+
     setModalState('sending');
 
     try {
-      // TODO: Replace mock
-      await mockSendStakeTx(selectedAmount!);
-
+      await stakeTransaction(sendPageState, stakingAction);
       setModalState('success');
     } catch (e) {
-      // TODO: Handle error
-      console.warn('Stake tx failed (mock):', e);
+      console.warn('Stake tx failed:', e);
+      Alert.alert('Error', 'Staking transaction failed. Please try again.');
       setModalState('idle');
     }
   };
@@ -89,12 +169,14 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
 
   return (
     <KeyboardAvoidingView
-      style={{ 
-        flex: 1, 
+      style={{
+        flex: 1,
         backgroundColor: colors.background,
       }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0}
+      keyboardVerticalOffset={
+        Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
+      }
     >
       <View style={styles.header}>
         <TouchableOpacity
@@ -117,193 +199,191 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
           paddingTop: insets.top,
           paddingBottom: insets.bottom + 8,
           paddingHorizontal: 10,
-        }}>
+        }}
+      >
+        <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24 }}>
+          <View style={{ marginBottom: 32 }}>
+            <Text
+              style={{
+                fontSize: 36,
+                fontWeight: '700',
+                textAlign: 'center',
+                color: hasSelection ? colors.text : colors.placeholder,
+              }}
+            >
+              {displayAmount} cTAZ
+            </Text>
+          </View>
 
-      <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24 }}>
-        <View style={{ marginBottom: 32 }}>
+          <View style={styles.grid}>
+            {PRESET_AMOUNTS.map(value => {
+              const isSelected = selectedAmount === value;
+
+              return (
+                <Pressable
+                  key={value}
+                  style={[
+                    styles.pill,
+                    isSelected && {
+                      backgroundColor: '#1A1A1A',
+                      borderColor: colors.primary,
+                    },
+                  ]}
+                  onPress={() => setSelectedAmount(value)}
+                >
+                  <Text
+                    style={[
+                      styles.pillAmount,
+                      { color: isSelected ? colors.primary : colors.text },
+                    ]}
+                  >
+                    +{value}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.pillLabel,
+                      {
+                        color: isSelected ? colors.primary : colors.placeholder,
+                      },
+                    ]}
+                  >
+                    cTAZ
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
           <Text
             style={{
-              fontSize: 36,
-              fontWeight: '700',
-              textAlign: 'center',
-              color: hasSelection ? colors.text : colors.placeholder,
+              fontSize: 16,
+              fontWeight: '600',
+              color: colors.text,
+              marginBottom: 8,
+              marginTop: 15,
             }}
           >
-            {displayAmount} cTAZ
+            Finalizer address
           </Text>
-        </View>
 
-        <View style={styles.grid}>
-          {PRESET_AMOUNTS.map(value => {
-            const isSelected = selectedAmount === value;
-
-            return (
-              <Pressable
-                key={value}
-                style={[
-                  styles.pill,
-                  isSelected && {
-                    backgroundColor: '#1A1A1A',
-                    borderColor: colors.primary,
-                  },
-                ]}
-                onPress={() => setSelectedAmount(value)}
-              >
-                <Text
-                  style={[
-                    styles.pillAmount,
-                    { color: isSelected ? colors.primary : colors.text },
-                  ]}
-                >
-                  +{value}
-                </Text>
-                <Text
-                  style={[
-                    styles.pillLabel,
-                    { color: isSelected ? colors.primary : colors.placeholder },
-                  ]}
-                >
-                  cTAZ
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: '600',
-            color: colors.text,
-            marginBottom: 8,
-            marginTop: 15
-          }}
-        >
-          Finalizer address
-        </Text>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            borderRadius: 12,
-            marginBottom: 10,
-            backgroundColor: colors.secondary,
-            width: '100%',
-            minWidth: '50%',
-            height: 44,
-            alignItems: 'center',
-            paddingHorizontal: 16,
-          }}
-        >
-          <TextInput
+          <View
             style={{
-              flex: 1,
-              color: colors.text,
-              fontSize: 17,
-              fontWeight: '400',
-              paddingVertical: 0,
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              borderRadius: 12,
+              marginBottom: 10,
+              backgroundColor: colors.secondary,
+              width: '100%',
+              minWidth: '50%',
+              height: 44,
+              alignItems: 'center',
+              paddingHorizontal: 16,
             }}
-            placeholder="Enter finalizer address"
-            placeholderTextColor={colors.placeholder}
-            keyboardType={'default'}
-            value={finalizerText}
-            onChangeText={setFinalizerText}
-          />
-          {!!finalizerText && (
-            <TouchableOpacity
-              onPress={() => {
-                setFinalizerText('');
+          >
+            <TextInput
+              style={{
+                flex: 1,
+                color: colors.text,
+                fontSize: 17,
+                fontWeight: '400',
+                paddingVertical: 0,
               }}
-            >
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: colors.zingo,
-                  borderRadius: 11,
-                  height: 22,
-                  width: 22,
-                  padding: 0,
+              placeholder="Enter finalizer address"
+              placeholderTextColor={colors.placeholder}
+              keyboardType={'default'}
+              value={finalizerText}
+              onChangeText={setFinalizerText}
+            />
+            {!!finalizerText && (
+              <TouchableOpacity
+                onPress={() => {
+                  setFinalizerText('');
                 }}
               >
-                <RegText
-                  style={{ color: colors.background, marginTop: -3 }}
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: colors.zingo,
+                    borderRadius: 11,
+                    height: 22,
+                    width: 22,
+                    padding: 0,
+                  }}
                 >
-                  x
-                </RegText>
-              </View>
-            </TouchableOpacity>
-          )}
-        </View>
+                  <RegText style={{ color: colors.background, marginTop: -3 }}>
+                    x
+                  </RegText>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
 
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: '600',
-            color: colors.text,
-            marginBottom: 8,
-            marginTop: 5
-          }}
-        >
-          Miner address
-        </Text>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            borderRadius: 12,
-            marginBottom: 10,
-            backgroundColor: colors.secondary,
-            width: '100%',
-            minWidth: '50%',
-            height: 44,
-            alignItems: 'center',
-            paddingHorizontal: 16,
-          }}
-        >
-          <TextInput
+          <Text
             style={{
-              flex: 1,
+              fontSize: 16,
+              fontWeight: '600',
               color: colors.text,
-              fontSize: 17,
-              fontWeight: '400',
-              paddingVertical: 0,
+              marginBottom: 8,
+              marginTop: 5,
             }}
-            placeholder="Enter miner address"
-            placeholderTextColor={colors.placeholder}
-            keyboardType={'default'}
-            value={addressText}
-            onChangeText={setAddressText}
-          />
-          {!!addressText && (
-            <TouchableOpacity
-              onPress={() => {
-                setAddressText('');
+          >
+            Miner address
+          </Text>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              borderRadius: 12,
+              marginBottom: 10,
+              backgroundColor: colors.secondary,
+              width: '100%',
+              minWidth: '50%',
+              height: 44,
+              alignItems: 'center',
+              paddingHorizontal: 16,
+            }}
+          >
+            <TextInput
+              style={{
+                flex: 1,
+                color: colors.text,
+                fontSize: 17,
+                fontWeight: '400',
+                paddingVertical: 0,
               }}
-            >
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: colors.zingo,
-                  borderRadius: 11,
-                  height: 22,
-                  width: 22,
-                  padding: 0,
+              placeholder="Enter miner address"
+              placeholderTextColor={colors.placeholder}
+              keyboardType={'default'}
+              value={addressText}
+              onChangeText={setAddressText}
+            />
+            {!!addressText && (
+              <TouchableOpacity
+                onPress={() => {
+                  setAddressText('');
                 }}
               >
-                <RegText
-                  style={{ color: colors.background, marginTop: -3 }}
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: colors.zingo,
+                    borderRadius: 11,
+                    height: 22,
+                    width: 22,
+                    padding: 0,
+                  }}
                 >
-                  x
-                </RegText>
-              </View>
-            </TouchableOpacity>
-          )}
+                  <RegText style={{ color: colors.background, marginTop: -3 }}>
+                    x
+                  </RegText>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
       </ScrollView>
 
       {/* Bottom CTA */}
@@ -314,10 +394,16 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
           paddingTop: 10,
           paddingBottom: 20,
           paddingHorizontal: 24,
-        }}>
+        }}
+      >
         <LiquidPrimaryButton
           title="Stake"
-          disabled={!hasSelection || modalState === 'sending'}
+          disabled={
+            !hasSelection ||
+            !finalizerText.trim() ||
+            !addressText.trim() ||
+            modalState === 'sending'
+          }
           onPress={handleConfirmStake}
           style={{
             alignSelf: 'stretch',
@@ -391,7 +477,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
       </Modal>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   header: {

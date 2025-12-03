@@ -18,11 +18,22 @@ export default interface ValueTransferType {
   stakingAction: StakingActionType | null;
 }
 
-interface StakingActionType {
+export interface StakingActionType {
   kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
   val: number;
   target: string;
   source: string;
   insecureTargetName: string;
   insecureSourceName: string;
+}
+
+export interface StakeReceiverToType {
+  address: string;
+  amount: number;
+  memo?: string;
+}
+
+export interface StakeJsonToTypeType {
+  stakingAction: StakingActionType;
+  receivers: StakeReceiverToType[];
 }
