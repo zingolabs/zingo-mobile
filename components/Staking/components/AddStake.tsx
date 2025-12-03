@@ -61,7 +61,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [finalizerText, setFinalizerText] = useState('');
-  const [addressText, setAddressText] = useState('');
   const [kbOpen, setKbOpen] = React.useState(false);
 
   const hasSelection = selectedAmount !== null;
@@ -85,21 +84,12 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
 
     const amount = selectedAmount!;
     const finalizer = finalizerText.trim();
-    const miner = addressText.trim();
 
     // Basic field checks
     if (!finalizer) {
       Alert.alert(
         'Finalizer required',
         'Please enter a finalizer address (hex).',
-      );
-      return;
-    }
-
-    if (!miner) {
-      Alert.alert(
-        'Miner address required',
-        'Please enter a miner address (Zcash UA).',
       );
       return;
     }
@@ -320,71 +310,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
               </TouchableOpacity>
             )}
           </View>
-
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '600',
-              color: colors.text,
-              marginBottom: 8,
-              marginTop: 5,
-            }}
-          >
-            Miner address
-          </Text>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              borderRadius: 12,
-              marginBottom: 10,
-              backgroundColor: colors.secondary,
-              width: '100%',
-              minWidth: '50%',
-              height: 44,
-              alignItems: 'center',
-              paddingHorizontal: 16,
-            }}
-          >
-            <TextInput
-              style={{
-                flex: 1,
-                color: colors.text,
-                fontSize: 17,
-                fontWeight: '400',
-                paddingVertical: 0,
-              }}
-              placeholder="Enter miner address"
-              placeholderTextColor={colors.placeholder}
-              keyboardType={'default'}
-              value={addressText}
-              onChangeText={setAddressText}
-            />
-            {!!addressText && (
-              <TouchableOpacity
-                onPress={() => {
-                  setAddressText('');
-                }}
-              >
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: colors.zingo,
-                    borderRadius: 11,
-                    height: 22,
-                    width: 22,
-                    padding: 0,
-                  }}
-                >
-                  <RegText style={{ color: colors.background, marginTop: -3 }}>
-                    x
-                  </RegText>
-                </View>
-              </TouchableOpacity>
-            )}
-          </View>
         </View>
       </ScrollView>
 
@@ -401,10 +326,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         <LiquidPrimaryButton
           title="Stake"
           disabled={
-            !hasSelection ||
-            !finalizerText.trim() ||
-            !addressText.trim() ||
-            modalState === 'sending'
+            !hasSelection || !finalizerText.trim() || modalState === 'sending'
           }
           onPress={handleConfirmStake}
           style={{
