@@ -14,4 +14,14 @@ export type RPCValueTransferType = {
   recipient_address?: string;
   pool_received?: PoolEnum;
   memos?: string[];
+  staking_action: RPCStakingActionType | null;
 };
+
+type RPCStakingActionType = {
+  kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
+  val: number;
+  target: string;
+  source: string;
+  insecure_target_name: string;
+  insecure_source_name: string;
+}

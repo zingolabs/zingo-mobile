@@ -15,5 +15,14 @@ export default interface ValueTransferType {
   memos?: string[];
   poolType?: PoolEnum;
   status: RPCValueTransfersStatusEnum;
-   
+  stakingAction: StakingActionType | null;
+}
+
+interface StakingActionType {
+  kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
+  val: number;
+  target: string;
+  source: string;
+  insecureTargetName: string;
+  insecureSourceName: string;
 }

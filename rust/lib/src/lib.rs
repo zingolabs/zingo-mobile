@@ -10,7 +10,8 @@ extern crate android_logger;
 use android_logger::{Config, FilterBuilder};
 #[cfg(target_os = "android")]
 use log::Level;
-use zingolib::ConfiguredActivationHeights;
+use zcash_protocol::memo::MemoBytes;
+use zingolib::{AccountId, ConfiguredActivationHeights};
 
 use std::any::Any;
 use std::backtrace::Backtrace;
@@ -31,16 +32,13 @@ use rustls::crypto::{CryptoProvider, ring::default_provider};
 use zcash_address::unified::{Container, Encoding, Ufvk};
 use zcash_keys::address::Address;
 use zcash_keys::keys::UnifiedFullViewingKey;
-use zcash_primitives::consensus::BlockHeight;
-use zcash_primitives::zip32::AccountId;
-use zcash_protocol::consensus::NetworkType;
+use zcash_protocol::consensus::{BlockHeight, NetworkType};
 
 use pepper_sync::config::{PerformanceLevel, SyncConfig, TransparentAddressDiscovery};
 use pepper_sync::keys::transparent;
 use pepper_sync::wallet::{KeyIdInterface, SyncMode};
 use tokio::runtime::Runtime;
 use zcash_address::ZcashAddress;
-use zcash_primitives::memo::MemoBytes;
 use zcash_protocol::value::Zatoshis;
 use zingo_common_components::protocol::activation_heights::for_test;
 use zingolib::config::{ChainType, ZingoConfig, construct_lightwalletd_uri};
@@ -274,6 +272,7 @@ fn construct_uri_load_config(
             min_confirmations: NonZeroU32::try_from(min_confirmations).unwrap(),
         },
         NonZeroU32::try_from(1).expect("hard-coded integer"),
+        String::new(),
     ) {
         Ok(c) => c,
         Err(e) => {
