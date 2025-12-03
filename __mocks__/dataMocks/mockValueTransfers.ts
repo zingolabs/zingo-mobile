@@ -14,6 +14,7 @@ export const mockValueTransfers: ValueTransferType[] = [
     amount: 0.12345678,
     memos: ['hola', '  & ', 'hello'],
     blockheight: 2000000,
+    stakingAction: null,
   },
   {
     kind: ValueTransferKindEnum.MemoToSelf,
@@ -26,6 +27,7 @@ export const mockValueTransfers: ValueTransferType[] = [
     amount: 0,
     memos: ['orchard memo', 'sapling memo'],
     blockheight: 2000000,
+    stakingAction: null,
   },
   {
     kind: ValueTransferKindEnum.SendToSelf,
@@ -37,6 +39,7 @@ export const mockValueTransfers: ValueTransferType[] = [
     zecPrice: 33.33,
     amount: 0,
     blockheight: 2000000,
+    stakingAction: null,
   },
   {
     kind: ValueTransferKindEnum.Received,
@@ -49,6 +52,7 @@ export const mockValueTransfers: ValueTransferType[] = [
     poolType: PoolEnum.OrchardPool,
     memos: ['hola', '  & ', 'hello'],
     blockheight: 2000000,
+    stakingAction: null,
   },
   {
     kind: ValueTransferKindEnum.Shield,
@@ -60,6 +64,7 @@ export const mockValueTransfers: ValueTransferType[] = [
     zecPrice: 33.33,
     amount: 0.0009,
     blockheight: 2000000,
+    stakingAction: null,
   },
   {
     kind: ValueTransferKindEnum.Rejection,
@@ -71,5 +76,6 @@ export const mockValueTransfers: ValueTransferType[] = [
     zecPrice: 33.33,
     amount: 0.0009,
     blockheight: 2000000,
+    stakingAction: null,
   },
 ];
