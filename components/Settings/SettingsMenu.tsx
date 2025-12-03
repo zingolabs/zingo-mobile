@@ -147,7 +147,7 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
             <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 20, marginHorizontal: 40, width: '80%' }}>
               <TouchableOpacity
                 style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
-                onPress={() => console.log('debug info')}>
+                onPress={() => navigation?.navigate(RouteEnum.DebugInfo)}>
                 <View style={{ flexDirection: 'row', gap: 15 }}>
                   <FontAwesomeIcon
                     size={20}

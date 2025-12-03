@@ -630,7 +630,6 @@ export default class RPC {
       // if the error is: LightclientLockPoisoned force a rescan directly
       console.log('HEIGHTS  ------- ', this.lastWalletBlockHeight, this.lastServerBlockHeight)
       if (returnPoll.includes('LightclientLockPoisoned')) {
-        console.log('POISONEDDDDDDDDDDDDDDDD');
         let result: string = await RPCModule.loadExistingWallet(
           this.indexerServer.uri,
           this.indexerServer.chainName,

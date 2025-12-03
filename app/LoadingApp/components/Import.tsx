@@ -421,6 +421,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
         </ScrollView>
         <View
           style={{
+            marginTop: 'auto',
             alignItems: 'center',
             justifyContent: 'center',
             paddingTop: 10,

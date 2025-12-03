@@ -264,6 +264,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         {
           "alignItems": "center",
           "justifyContent": "center",
+          "marginTop": "auto",
           "paddingBottom": 20,
           "paddingTop": 10,
         }

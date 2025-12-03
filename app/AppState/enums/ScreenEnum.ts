@@ -23,6 +23,7 @@ export enum ScreenEnum {
   SettingsMenu = 'SettingsMenu',
   StakingHome = 'StakingHome',
   SettingsServers = 'SettingsServers',
+  DebugInfo = 'DebugInfo',
   // Drawer
   About = 'About',
   Info = 'Info',
