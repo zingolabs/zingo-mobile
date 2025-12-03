@@ -1461,4 +1461,25 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    @ReactMethod
+    fun getAccumulatedStakeForTxidInfo(txid: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getAccumulatedStakeForTxid(txid)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp.toString())
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] accumulated stake for txid: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
 }
