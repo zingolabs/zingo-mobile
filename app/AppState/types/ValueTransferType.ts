@@ -19,5 +19,10 @@ export default interface ValueTransferType {
 }
 
 interface StakingActionType {
-  kind: 'add' | 'sub' | 'clear' | 'move' | 'moveClear';
+  kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
+  val: number;
+  target: string;
+  source: string;
+  insecureTargetName: string;
+  insecureSourceName: string;
 }

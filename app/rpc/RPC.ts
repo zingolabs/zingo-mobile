@@ -37,6 +37,15 @@ import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 import { LoadingAppNavigationState } from '../types';
 
+interface StakingActionType {
+  kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
+  val: number;
+  target: string;
+  source: string;
+  insecureTargetName: string;
+  insecureSourceName: string;
+}
+
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
@@ -1371,6 +1380,14 @@ export default class RPC {
             currentValueTransferList.poolType = !vt.pool_received
               ? undefined
               : vt.pool_received;
+            currentValueTransferList.stakingAction = {
+              kind: vt.staking_action?.kind,
+              val: (!vt.staking_action?.val ? 0 : vt.staking_action.val) / 10 ** 8,
+              target: vt.staking_action?.target,
+              source: vt.staking_action?.source,
+              insecureTargetName: vt.staking_action?.insecure_target_name,
+              insecureSourceName: vt.staking_action?.insecure_source_name,
+            } as StakingActionType;
 
             if (vt.txid.startsWith('xxxxxxxxx')) {
               console.log('server', this.lastServerBlockHeight);

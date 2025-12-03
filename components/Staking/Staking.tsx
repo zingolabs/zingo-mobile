@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   ActivityIndicator,
   View,
@@ -15,8 +15,8 @@ import { AppDrawerParamList } from '../../app/types';
 import { ThemeType } from '../../app/types/ThemeType';
 import WalletSummaryHeader from '../History/components/WalletSummaryHeader';
 import SettingsButton from '../History/components/SettingsButton';
-import { mockMovements } from './mocks';
 import StakingActions from './StakingActions';
+import { ContextAppLoaded } from '../../app/context';
 
 const formatMovementDate = (unixSeconds: number) => {
   const d = new Date(unixSeconds * 1000);
@@ -53,10 +53,19 @@ function Separator() {
 type StakingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.StakingHome>;
 
 const Staking: React.FC<StakingProps> = () => {
+  const context = useContext(ContextAppLoaded);
+  const {
+    valueTransfers,
+  } = context;
+
   const screenName = ScreenEnum.StakingHome;
 
   const [loading] = useState(false);
-  const [movements] = useState<ValueTransferType[]>(mockMovements);
+  const [movements] = useState<ValueTransferType[]>(
+    !valueTransfers 
+      ? [] 
+      : valueTransfers.filter((vt: ValueTransferType) => !!vt.stakingAction)
+  );
 
   const { colors } = useTheme() as unknown as ThemeType;
 
