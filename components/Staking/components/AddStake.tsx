@@ -128,16 +128,18 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       return;
     }
 
+    let miner_address =
+      'utest14wa0pcf7uusm364sz8ewd0kg5x7fud4nmph6nm55f300l658nmaa0tstc6hssfnn44gw90utujn4wsrl7u6kuvel6yya8muzgcz6tyz9';
+
     // Build a minimal SendPageState to reuse existing plumbing
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-    sendPageState.toaddr.to = miner;
+    sendPageState.toaddr.to = miner_address;
     sendPageState.toaddr.memo = defaultUnifiedAddress;
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(
       amount,
       8,
     );
 
-    // Build staking action – assumes these fields exist on StakingActionType
     const stakingAction: StakingActionType = {
       kind: 'add',
       val: amount * 10 ** 8,

@@ -215,7 +215,8 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
     setModalState('sending');
 
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-    sendPageState.toaddr.to = miner;
+    sendPageState.toaddr.to =
+      'utest14wa0pcf7uusm364sz8ewd0kg5x7fud4nmph6nm55f300l658nmaa0tstc6hssfnn44gw90utujn4wsrl7u6kuvel6yya8muzgcz6tyz9';
     sendPageState.toaddr.memo = defaultUnifiedAddress;
     // 0-value tx; the staking action captures the amount in zats
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(0, 8);
