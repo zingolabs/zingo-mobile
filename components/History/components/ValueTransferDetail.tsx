@@ -25,7 +25,8 @@ import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import BoldText from '../../Components/BoldText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-// this is for http. (red)
+import Stake from '../../../assets/icons/stake-white.svg';
+import Unstake from '../../../assets/icons/unstake-white.svg';
 import { faTriangleExclamation, faChevronDown, faChevronUp, faChevronLeft, faRefresh, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import Snackbars from '../../Components/Snackbars';
@@ -66,19 +67,17 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
 
   const { memo, memoUA } = Utils.splitMemo(valueTransfer.memos);
 
-  const amountColor =
-    valueTransfer.confirmations >= 0 &&
-    valueTransfer.confirmations < GlobalConst.minConfirmations
-      ? colors.primaryDisabled
-      : colors.text;
+  const iconColor =
+      valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'add' 
+        ? '#0091FF80' 
+        : valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'sub' 
+          ? '#FFAF0E80' 
+          : colors.text;
 
   const icon =
-    valueTransfer.confirmations >= 0 &&
-    valueTransfer.confirmations < GlobalConst.minConfirmations
-      ? faRefresh
-      : valueTransfer.kind === ValueTransferKindEnum.Received || valueTransfer.kind === ValueTransferKindEnum.Shield
-      ? faArrowDown
-      : faArrowUp;
+      valueTransfer.kind === ValueTransferKindEnum.Received || valueTransfer.kind === ValueTransferKindEnum.Shield
+        ? faArrowDown
+        : faArrowUp;
 
   useEffect(() => {
     Utils.setMomentLocale(language);
@@ -257,15 +256,38 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
              }}>
               <View style={{ 
                 padding: 20,
-                backgroundColor: colors.secondary,
+                backgroundColor: valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'add' 
+                  ? '#0091FF80' 
+                  : valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'sub' 
+                    ? '#FFAF0E80' 
+                    : colors.secondary,
                 borderRadius: 50,
               }}>
-                <FontAwesomeIcon
-                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
-                  size={30}
-                  icon={icon}
-                  color={amountColor}
-                />
+                {valueTransfer.confirmations >= 0 && valueTransfer.confirmations < GlobalConst.minConfirmations ? (
+                  <FontAwesomeIcon
+                    style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
+                    size={30}
+                    icon={faRefresh}
+                    color={iconColor}
+                  />
+                ) : (
+                  <>
+                    {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'add' && (
+                      <Stake width={30} height={30} />
+                    )}
+                    {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'sub' && (
+                      <Unstake width={30} height={30} />
+                    )}
+                    {valueTransfer.stakingAction === null && (
+                      <FontAwesomeIcon
+                        style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
+                        size={30}
+                        icon={icon}
+                        color={iconColor}
+                      />
+                    )}
+                  </>
+                )}
               </View>
             </View>
 
