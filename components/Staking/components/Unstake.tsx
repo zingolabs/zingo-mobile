@@ -249,6 +249,8 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
     navigation.goBack();
   };
 
+  const renderSeparator = () => <View style={{ height: 8 }} />;
+
   const renderStakedTxItem = ({ item }: { item: ValueTransferType }) => {
     const isSelected = item.txid === selectedTxid;
 
@@ -380,7 +382,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
               data={movements}
               keyExtractor={item => item.txid}
               renderItem={renderStakedTxItem}
-              ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+              ItemSeparatorComponent={renderSeparator}
               ListEmptyComponent={
                 <Text
                   style={{

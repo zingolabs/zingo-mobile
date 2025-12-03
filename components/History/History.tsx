@@ -177,22 +177,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
             // two lines
             dim.width = Dimensions.get('window').width;
             dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 65 : 60;
+              Platform.OS === GlobalConst.platformOSandroid ? 65 : 57;
           } else if (type === ViewTypes.WITHOUT_MONTH_ADDRESS) {
             // three lines
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 65 : 55) + 25;
+              (Platform.OS === GlobalConst.platformOSandroid ? 65 : 52) + 25;
           } else if (type === ViewTypes.WITH_MONTH) {
             // two lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 90) + 45;
+              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 88) + 45;
           } else if (type === ViewTypes.WITH_MONTH_ADDRESS) {
             // three lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 90) +
+              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 85) +
               45 +
               25;
           }

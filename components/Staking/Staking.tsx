@@ -212,11 +212,11 @@ const Staking: React.FC<StakingProps> = () => {
                 // negative amount => unstaked (tokens left wallet)
                 // positive amount => staked (tokens came back)
                 const isStake =
-                  item.stakingAction && item.stakingAction?.val > 0;
+                  item.stakingAction && item.stakingAction.kind === 'add';
                 const label = isStake ? 'Staked' : 'Unstaked';
                 const amountLabel = `${
-                  item.amount > 0 ? '+' : ''
-                }${item.amount.toFixed(4)} cTAZ`;
+                  isStake ? '+' : (item.amount === 0 ? '-' : '')
+                }${item.amount.toFixed(5)} cTAZ`;
 
                 return (
                   <View
