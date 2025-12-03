@@ -1860,6 +1860,28 @@ pub fn confirm() -> Result<String, ZingolibError> {
     })
 }
 
+#[uniffi::export]
+pub fn get_accumulated_stake_for_txid(txid: String) -> Result<u64, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lightclient) = &mut *guard {
+            let txid = match txid_from_hex_encoded_str(&txid) {
+                Ok(txid) => txid,
+                Err(e) => return Ok(0),
+            };
+            Ok(RT.block_on(async move {
+                lightclient
+                    .get_accumulated_stake_for_txid(txid.into())
+                    .await
+            }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
