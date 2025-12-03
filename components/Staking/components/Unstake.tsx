@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   TouchableOpacity,
   Pressable,
@@ -13,6 +12,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardAvoidingView,
+  FlatList,
+  Alert,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,66 +24,113 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
-import { RouteEnum } from '../../../app/AppState';
+import {
+  RouteEnum,
+  SendPageStateClass,
+  ToAddrClass,
+  ValueTransferType,
+} from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import RegText from '../../Components/RegText';
+import { ContextAppLoaded } from '../../../app/context';
+import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
+import Utils from '../../../app/utils';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
-const AVAILABLE_BALANCE = 1.55; // TODO: Replace with real value
+type UnstakeProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Unstake> & {
+  stakeTransaction: (
+    sendPageState: SendPageStateClass,
+    stakingAction: StakingActionType,
+  ) => Promise<string>;
+};
 
-type UnstakeProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Unstake>;
-
-const Unstake: React.FC<UnstakeProps> = () => {
+const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
   const navigation = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
 
-  const [amountText, setAmountText] = useState('');
+  const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = React.useState(false);
 
-  const normalized = amountText.replace(',', '.');
-  const amountNumber = parseFloat(normalized);
-  const hasAmount = !isNaN(amountNumber) && amountNumber > 0;
-  const withinBalance = hasAmount && amountNumber <= AVAILABLE_BALANCE;
-  const isValidAmount = hasAmount && withinBalance;
-
   const modalVisible = modalState !== 'idle';
+
+  const context = useContext(ContextAppLoaded);
+  const { valueTransfers, defaultUnifiedAddress } = context;
+
+  const movements: ValueTransferType[] = useMemo(
+    () =>
+      !valueTransfers
+        ? []
+        : valueTransfers.filter(
+            (vt: ValueTransferType) =>
+              vt.stakingAction !== null && vt.stakingAction.kind === 'add',
+          ),
+    [valueTransfers],
+  );
+
+  const selectedTx = movements.find(tx => tx.txid === selectedTxid);
+  const hasSelectedTx = !!selectedTx;
+  const isValidForm = hasSelectedTx;
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
     const s2 = Keyboard.addListener('keyboardDidHide', () => setKbOpen(false));
-    return () => { s1.remove(); s2.remove(); };
+    return () => {
+      s1.remove();
+      s2.remove();
+    };
   }, []);
 
-  const setHalf = () => {
-    const half = AVAILABLE_BALANCE / 2;
-    setAmountText(half.toString());
-  };
-
-  const setMax = () => {
-    setAmountText(AVAILABLE_BALANCE.toString());
-  };
-
-  const mockSendUnstakeTx = async (amount: number) => {
-    console.log('Mock sending UNSTAKE tx for amount:', amount);
-    return new Promise<void>(resolve => setTimeout(resolve, 2000));
+  const shortenTxid = (txid: string) => {
+    if (txid.length <= 16) {
+      return txid;
+    }
+    return `${txid.slice(0, 10)}…${txid.slice(-8)}`;
   };
 
   const handleUnstakePress = async () => {
-    if (!isValidAmount) {
+    if (!isValidForm || !selectedTx) {
+      return;
+    }
+
+    const amount = selectedTx.amount; // in cTAZ / ZEC units
+    const miner = selectedTx.address; // derive miner from the original stake tx
+
+    if (!miner) {
+      Alert.alert(
+        'Missing miner address',
+        'Could not determine the miner address from the selected transaction.',
+      );
       return;
     }
 
     setModalState('sending');
 
+    const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+    sendPageState.toaddr.to = miner;
+    sendPageState.toaddr.memo = defaultUnifiedAddress;
+    sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(0, 8);
+
+    const stakingAction: StakingActionType = {
+      kind: 'sub',
+      val: amount * 10 ** 8,
+      target:
+        (selectedTx.stakingAction && selectedTx.stakingAction?.target) || '',
+      source: selectedTx.txid,
+      insecureSourceName: '',
+      insecureTargetName: '',
+    };
+
+    console.log('Unstaking action:', stakingAction);
+
     try {
-      await mockSendUnstakeTx(amountNumber);
+      await stakeTransaction(sendPageState, stakingAction);
       setModalState('success');
     } catch (e) {
-      console.warn('Unstake tx failed (mock):', e);
+      console.warn('Unstake tx failed:', e);
+      Alert.alert('Error', 'Staking transaction failed. Please try again.');
       setModalState('idle');
     }
   };
@@ -92,16 +140,67 @@ const Unstake: React.FC<UnstakeProps> = () => {
     navigation.goBack();
   };
 
+  const renderStakedTxItem = ({ item }: { item: ValueTransferType }) => {
+    const isSelected = item.txid === selectedTxid;
+    return (
+      <Pressable
+        onPress={() => setSelectedTxid(item.txid)}
+        style={[
+          styles.txRow,
+          {
+            borderColor: isSelected ? colors.primary : colors.border,
+            backgroundColor: isSelected ? colors.secondary : colors.card,
+          },
+        ]}
+      >
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{
+              color: colors.text,
+              fontSize: 13,
+              fontWeight: '500',
+            }}
+            numberOfLines={1}
+          >
+            {shortenTxid(item.txid)}
+          </Text>
+          <Text
+            style={{
+              color: colors.placeholder,
+              fontSize: 11,
+              marginTop: 2,
+            }}
+          >
+            {item.txid}
+          </Text>
+        </View>
+        <Text
+          style={{
+            color: colors.text,
+            fontSize: 14,
+            fontWeight: '600',
+            marginLeft: 12,
+          }}
+        >
+          {item.amount} cTAZ
+        </Text>
+      </Pressable>
+    );
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
-        style={{ 
-          flex: 1, 
+        style={{
+          flex: 1,
           backgroundColor: colors.background,
         }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0}
+        keyboardVerticalOffset={
+          Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
+        }
       >
+        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
@@ -122,6 +221,7 @@ const Unstake: React.FC<UnstakeProps> = () => {
           <View style={{ width: 32 }} />
         </View>
 
+        {/* Content */}
         <View
           style={{
             flex: 1,
@@ -129,6 +229,7 @@ const Unstake: React.FC<UnstakeProps> = () => {
             paddingTop: 24,
           }}
         >
+          {/* Staked TX list */}
           <Text
             style={{
               fontSize: 16,
@@ -137,131 +238,86 @@ const Unstake: React.FC<UnstakeProps> = () => {
               marginBottom: 8,
             }}
           >
-            Amount
+            Choose stake to remove (TXID)
+          </Text>
+
+          <Text
+            style={{
+              fontSize: 12,
+              color: colors.placeholder,
+              marginBottom: 8,
+            }}
+          >
+            Select the original staking transaction. The unstake amount will be
+            the value from that transaction.
           </Text>
 
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              borderRadius: 12,
-              marginBottom: 10,
-              backgroundColor: colors.secondary,
-              width: '100%',
-              minWidth: '50%',
-              height: 44,
-              alignItems: 'center',
-              paddingHorizontal: 16,
+              flex: 1,
+              marginBottom: 16,
             }}
           >
-            <TextInput
-              style={{
-                flex: 1,
-                color: colors.text,
-                fontSize: 17,
-                fontWeight: '400',
-                paddingVertical: 0,
-              }}
-              placeholder="0.00"
-              placeholderTextColor={colors.placeholder}
-              keyboardType={Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'}
-              value={amountText}
-              onChangeText={setAmountText}
-              maxLength={20}
-            />
-            {!!amountText && (
-              <TouchableOpacity
-                onPress={() => {
-                  setAmountText('');
-                }}
-              >
-                <View
+            <FlatList
+              data={movements}
+              keyExtractor={item => item.txid}
+              renderItem={renderStakedTxItem}
+              ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+              ListEmptyComponent={
+                <Text
                   style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: colors.zingo,
-                    borderRadius: 11,
-                    height: 22,
-                    width: 22,
-                    padding: 0,
+                    color: colors.placeholder,
+                    fontSize: 13,
+                    textAlign: 'center',
+                    marginTop: 16,
                   }}
                 >
-                  <RegText
-                    style={{ color: colors.background, marginTop: -3 }}
-                  >
-                    x
-                  </RegText>
-                </View>
-              </TouchableOpacity>
-            )}
+                  You don&apos;t have any staked positions to unstake.
+                </Text>
+              }
+            />
           </View>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 24,
-            }}
-          >
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <Pressable
-                onPress={setHalf}
-                style={[
-                  styles.chip,
-                  { backgroundColor: colors.border, opacity: 0.9 },
-                ]}
-              >
-                <Text style={{ color: colors.text, fontSize: 13 }}>50%</Text>
-              </Pressable>
-
-              <Pressable
-                onPress={setMax}
-                style={[
-                  styles.chip,
-                  { backgroundColor: colors.border, opacity: 0.9 },
-                ]}
-              >
-                <Text style={{ color: colors.text, fontSize: 13 }}>Max</Text>
-              </Pressable>
-            </View>
-
-            <View style={{ flex: 1 }} />
-
+          {selectedTx && (
             <Text
               style={{
                 fontSize: 13,
                 color: colors.placeholder,
+                marginBottom: 8,
               }}
             >
-              Available for unstaking:{' '}
+              Amount to unstake:{' '}
               <Text
                 style={{
                   color: colors.text,
                   fontWeight: '500',
                 }}
               >
-                {AVAILABLE_BALANCE} cTAZ
+                {selectedTx.amount} cTAZ
               </Text>
             </Text>
-          </View>
+          )}
         </View>
 
-      <View
-        style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          paddingTop: 10,
-          paddingBottom: 20,
-          paddingHorizontal: 24,
-        }}>
+        {/* Bottom CTA */}
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: 10,
+            paddingBottom: 20,
+            paddingHorizontal: 24,
+          }}
+        >
           <LiquidPrimaryButton
             title="Unstake"
-            disabled={!isValidAmount || modalState === 'sending'}
+            disabled={!isValidForm || modalState === 'sending'}
             onPress={handleUnstakePress}
             style={{ alignSelf: 'stretch' }}
           />
         </View>
 
+        {/* Modal */}
         <Modal
           visible={modalVisible}
           transparent
@@ -329,7 +385,7 @@ const Unstake: React.FC<UnstakeProps> = () => {
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
-}
+};
 
 const styles = StyleSheet.create({
   header: {
@@ -349,13 +405,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
   },
-  chip: {
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.55)',
@@ -370,6 +419,14 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
+  },
+  txRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
 });
 

@@ -1769,9 +1769,7 @@ fn parse_staking_action(root: &json::JsonValue) -> Result<StakingAction, String>
         other => return Err(format!("Error: Unknown stakingAction.kind: {other}")),
     };
 
-    let val = sa["val"]
-        .as_u64()
-        .ok_or_else(|| "Error: Missing stakingAction.val".to_string())?;
+    let val = sa["val"].as_u64().unwrap_or(0);
 
     let target_str = sa["target"]
         .as_str()

@@ -67,7 +67,7 @@ const Staking: React.FC<StakingProps> = () => {
       !valueTransfers
         ? []
         : valueTransfers.filter(
-            (vt: ValueTransferType) => vt.stakingAction != null,
+            (vt: ValueTransferType) => vt.stakingAction !== null,
           ),
     [valueTransfers],
   );
@@ -200,11 +200,12 @@ const Staking: React.FC<StakingProps> = () => {
               renderItem={({ item }) => {
                 // negative amount => unstaked (tokens left wallet)
                 // positive amount => staked (tokens came back)
-                const isStake = item.amount > 0;
+                const isStake =
+                  item.stakingAction && item.stakingAction?.val > 0;
                 const label = isStake ? 'Staked' : 'Unstaked';
                 const amountLabel = `${
                   item.amount > 0 ? '+' : ''
-                }${item.amount.toFixed(3)} cTAZ`;
+                }${item.amount.toFixed(4)} cTAZ`;
 
                 return (
                   <View
