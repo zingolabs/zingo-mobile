@@ -17,6 +17,8 @@ import WalletSummaryHeader from '../History/components/WalletSummaryHeader';
 import SettingsButton from '../History/components/SettingsButton';
 import StakingActions from './StakingActions';
 import { ContextAppLoaded } from '../../app/context';
+import Stake from '../../assets/icons/stake-white.svg';
+import Unstake from '../../assets/icons/unstake-white.svg';
 
 const formatMovementDate = (unixSeconds: number) => {
   const d = new Date(unixSeconds * 1000);
@@ -66,9 +68,18 @@ const Staking: React.FC<StakingProps> = () => {
     () =>
       !valueTransfers
         ? []
-        : valueTransfers.filter(
-            (vt: ValueTransferType) => vt.stakingAction !== null,
-          ),
+        : valueTransfers.filter((vt: ValueTransferType) => {
+            if (vt.stakingAction === null) {
+              return false;
+            }
+            if (
+              vt.stakingAction.kind === 'add' &&
+              (vt.amount === 0 || vt.amount !== vt.stakingAction.val)
+            ) {
+              return false;
+            }
+            return true;
+          }),
     [valueTransfers],
   );
 
@@ -216,25 +227,42 @@ const Staking: React.FC<StakingProps> = () => {
                       paddingVertical: 10,
                     }}
                   >
-                    <View>
-                      <Text
-                        style={{
-                          color: colors.text,
-                          fontWeight: '500',
-                          fontSize: 14,
-                          marginBottom: 2,
-                        }}
-                      >
-                        {label}
-                      </Text>
-                      <Text
-                        style={{
-                          color: colors.placeholder,
-                          fontSize: 12,
-                        }}
-                      >
-                        {formatMovementDate(item.time)}
-                      </Text>
+                    <View
+                      style={{ flexDirection: 'row', alignItems: 'center' }}
+                    >
+                      <>
+                        {item.stakingAction &&
+                          item.stakingAction.kind === 'add' && (
+                            <Stake width={20} height={20} />
+                          )}
+                        {item.stakingAction &&
+                          item.stakingAction.kind === 'sub' && (
+                            <Unstake width={20} height={20} />
+                          )}
+                      </>
+
+                      <View>
+                        <Text
+                          style={{
+                            color: colors.text,
+                            fontWeight: '500',
+                            fontSize: 14,
+                            marginBottom: 2,
+                            marginLeft: 5,
+                          }}
+                        >
+                          {label}
+                        </Text>
+                        <Text
+                          style={{
+                            color: colors.placeholder,
+                            fontSize: 12,
+                            marginLeft: 5,
+                          }}
+                        >
+                          {formatMovementDate(item.time)}
+                        </Text>
+                      </View>
                     </View>
 
                     <Text

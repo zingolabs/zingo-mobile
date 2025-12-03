@@ -31,6 +31,8 @@ import { ContextAppLoaded } from '../../../app/context';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
+import Stake from '../../../assets/icons/stake-blue.svg';
+import Unstake from '../../../assets/icons/unstake-yellow.svg';
 
 type ValueTransferLineProps = {
   index: number;
@@ -79,15 +81,14 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   //const maxWidthHit = useRef<boolean>(false);
 
   const amountColor =
-    vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations
-      ? colors.primaryDisabled
-      : colors.text;
+      vt.stakingAction && vt.stakingAction.kind === 'add' 
+        ? '#0091FF80' 
+        : vt.stakingAction && vt.stakingAction.kind === 'sub' 
+          ? '#FFAF0E80' 
+          : colors.text;
 
   const icon =
-    vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations
-      ? faRefresh
-      : vt.kind === ValueTransferKindEnum.Received ||
-          vt.kind === ValueTransferKindEnum.Shield
+      vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
         ? faArrowDown
         : faArrowUp;
 
@@ -333,17 +334,31 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               }}
             >
               <View style={{ display: 'flex', marginHorizontal: 5 }}>
-                <FontAwesomeIcon
-                  style={{
-                    marginLeft: 5,
-                    marginRight: 5,
-                    marginTop: 0,
-                    transform: [{ rotate: '45deg' }],
-                  }}
-                  size={20}
-                  icon={icon}
-                  color={'#888888ff'}
-                />
+                {vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations ? (
+                  <FontAwesomeIcon
+                    style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
+                    size={20}
+                    icon={faRefresh}
+                    color={amountColor}
+                  />
+                ) : (
+                  <>
+                    {vt.stakingAction && vt.stakingAction.kind === 'add' && (
+                      <Stake width={20} height={20} />
+                    )}
+                    {vt.stakingAction && vt.stakingAction.kind === 'sub' && (
+                      <Unstake width={20} height={20} />
+                    )}
+                    {vt.stakingAction === null && (
+                      <FontAwesomeIcon
+                        style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
+                        size={20}
+                        icon={icon}
+                        color={amountColor}
+                      />
+                    )}
+                  </>
+                )}
               </View>
               <View style={{ display: 'flex' }}>
                 <View
