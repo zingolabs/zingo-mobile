@@ -19,6 +19,7 @@ export enum RouteEnum {
   Settings = 'Settings',
   SettingsMenu = 'SettingsMenu',
   SettingsServers = 'SettingsServers',
+  DebugInfo = 'DebugInfo',
   About = 'About',
   Rescan = 'Rescan',
   Info = 'Info',
