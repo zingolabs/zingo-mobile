@@ -381,6 +381,32 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               borderRadius: 30,
               backgroundColor: colors.secondary,
           }}>
+            {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'add' && (
+              <>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
+                  <FadeText>{'Target'}</FadeText>
+                  <RegText>{valueTransfer.stakingAction.target}</RegText>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
+                  <FadeText>{'Val'}</FadeText>
+                  <RegText>{valueTransfer.stakingAction.val.toString()}</RegText>
+                </View>
+              </>
+            )}
+
+            {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'sub' && (
+              <>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
+                  <FadeText>{'Source'}</FadeText>
+                  <RegText>{valueTransfer.stakingAction.source}</RegText>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
+                  <FadeText>{'Val'}</FadeText>
+                  <RegText>{valueTransfer.stakingAction.val.toString()}</RegText>
+                </View>
+              </>
+            )}
+
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
               <FadeText>{'Status'}</FadeText>
               <RegText>{valueTransfer.status}</RegText>
