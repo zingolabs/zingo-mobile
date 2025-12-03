@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,10 @@ import {
   Modal,
   ActivityIndicator,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  ScrollView,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -39,11 +43,18 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [finalizerText, setFinalizerText] = useState('');
   const [addressText, setAddressText] = useState('');
+  const [kbOpen, setKbOpen] = React.useState(false);
 
   const hasSelection = selectedAmount !== null;
   const displayAmount = selectedAmount ?? 0;
 
   const modalVisible = modalState !== 'idle';
+
+  useEffect(() => {
+    const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
+    const s2 = Keyboard.addListener('keyboardDidHide', () => setKbOpen(false));
+    return () => { s1.remove(); s2.remove(); };
+  }, []);
 
   const mockSendStakeTx = async (amount: number) => {
     // Here should go the usual balance checks, etc
@@ -77,12 +88,13 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
+    <KeyboardAvoidingView
+      style={{ 
+        flex: 1, 
         backgroundColor: colors.background,
-        paddingTop: insets.top,
       }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0}
     >
       <View style={styles.header}>
         <TouchableOpacity
@@ -97,6 +109,15 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
 
         <View style={{ width: 32 }} />
       </View>
+
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom + 8,
+          paddingHorizontal: 10,
+        }}>
 
       <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24 }}>
         <View style={{ marginBottom: 32 }}>
@@ -283,15 +304,17 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
           )}
         </View>
       </View>
+      </ScrollView>
 
       {/* Bottom CTA */}
       <View
         style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingTop: 10,
+          paddingBottom: 20,
           paddingHorizontal: 24,
-          paddingBottom: insets.bottom + 16,
-          paddingTop: 8,
-        }}
-      >
+        }}>
         <LiquidPrimaryButton
           title="Stake"
           disabled={!hasSelection || modalState === 'sending'}
@@ -366,7 +389,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

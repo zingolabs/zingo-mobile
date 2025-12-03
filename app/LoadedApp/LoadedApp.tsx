@@ -102,6 +102,7 @@ import ComputingOK from './components/ComputingOK';
 import ComputingError from './components/ComputingError';
 import { Staking, AddStakeScreen, Unstake } from '../../components/Staking';
 import SettingsServers from '../../components/Settings/components/SettingsServers';
+import DebugInfo from '../../components/Settings/components/DebugInfo';
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();
 
@@ -109,6 +110,7 @@ type InnerStackParamList = {
   [RouteEnum.MainTabs]: undefined;
   [RouteEnum.SettingsMenu]: undefined;
   [RouteEnum.SettingsServers]: undefined;
+  [RouteEnum.DebugInfo]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Faucet]: undefined;
@@ -1965,6 +1967,10 @@ export class LoadedAppClass extends Component<
                     navigateToLoadingApp={this.navigateToLoadingApp}
                   />
                 )}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.DebugInfo}>
+                {props => <DebugInfo {...props} />}
               </InnerStack.Screen>
 
               <InnerStack.Screen name={RouteEnum.Faucet}>
