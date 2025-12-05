@@ -1,0 +1,5 @@
+export const MINER_ADDRESS_TESTNET =
+  'utest14wa0pcf7uusm364sz8ewd0kg5x7fud4nmph6nm55f300l658nmaa0tstc6hssfnn44gw90utujn4wsrl7u6kuvel6yya8muzgcz6tyz9';
+
+export const MINER_ADDRESS_REGTEST =
+  'uregtest16k405smwvsuvfhfmmwa84qgztgh2d2mehzv7dz48vff8vlppn58wnpd0syt5ys7ldlgep4x0t3d5v2x65uafvah2z85pxh6sg5jq8lgp';

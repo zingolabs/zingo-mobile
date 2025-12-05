@@ -36,6 +36,10 @@ import RegText from '../../Components/RegText';
 import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
 import { ContextAppLoaded } from '../../../app/context';
 import Utils from '../../../app/utils';
+import {
+  MINER_ADDRESS_REGTEST,
+  MINER_ADDRESS_TESTNET,
+} from '../../../app/utils/constants';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -119,20 +123,13 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       );
       return;
     }
-
-    let miner_address_testnet =
-      'utest14wa0pcf7uusm364sz8ewd0kg5x7fud4nmph6nm55f300l658nmaa0tstc6hssfnn44gw90utujn4wsrl7u6kuvel6yya8muzgcz6tyz9';
-
-    let miner_address_regtest =
-      'uregtest16k405smwvsuvfhfmmwa84qgztgh2d2mehzv7dz48vff8vlppn58wnpd0syt5ys7ldlgep4x0t3d5v2x65uafvah2z85pxh6sg5jq8lgp';
-
     // Build a minimal SendPageState to reuse existing plumbing
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
 
     sendPageState.toaddr.to =
       indexerServer.chainName === ChainNameEnum.regtestChainName
-        ? miner_address_regtest
-        : miner_address_testnet;
+        ? MINER_ADDRESS_REGTEST
+        : MINER_ADDRESS_TESTNET;
     sendPageState.toaddr.memo = defaultUnifiedAddress;
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(
       amount,
