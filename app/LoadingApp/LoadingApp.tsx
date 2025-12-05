@@ -723,9 +723,7 @@ export class LoadingAppClass extends Component<
         );
         // walletSeed/walletBirthday have value
         // go directly to run restore...
-        if (!this.state.startingApp && 
-            !!this.state.walletSeed
-        ) {
+        if (!this.state.startingApp && !!this.state.walletSeed) {
           this.doRestore(this.state.walletSeed, this.state.walletBirthday);
         } else {
           this.setState(state => ({

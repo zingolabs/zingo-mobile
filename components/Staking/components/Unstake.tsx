@@ -26,6 +26,7 @@ import {
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
+  ChainNameEnum,
   RouteEnum,
   SendPageStateClass,
   ToAddrClass,
@@ -36,6 +37,10 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
 import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
 import Utils from '../../../app/utils';
+import {
+  MINER_ADDRESS_REGTEST,
+  MINER_ADDRESS_TESTNET,
+} from '../../../app/utils/constants';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -70,7 +75,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers, defaultUnifiedAddress } = context;
+  const { valueTransfers, indexerServer } = context;
 
   const movements: ValueTransferType[] = useMemo(() => {
     if (!valueTransfers) {
@@ -185,16 +190,6 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
       return;
     }
 
-    const miner = selectedTx.address;
-
-    if (!miner) {
-      Alert.alert(
-        'Missing miner address',
-        'Could not determine the miner address from the selected transaction.',
-      );
-      return;
-    }
-
     const zats = getAccumulatedStakeZatsForTxid(selectedTx.txid);
     if (zats === null) {
       Alert.alert(
@@ -214,10 +209,14 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
 
     setModalState('sending');
 
+    let memo = `@UNSTAKE_RECEIVE: ${selectedTx.txid}\nThanks for staking!`;
+
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
     sendPageState.toaddr.to =
-      'utest14wa0pcf7uusm364sz8ewd0kg5x7fud4nmph6nm55f300l658nmaa0tstc6hssfnn44gw90utujn4wsrl7u6kuvel6yya8muzgcz6tyz9';
-    sendPageState.toaddr.memo = defaultUnifiedAddress;
+      indexerServer.chainName === ChainNameEnum.regtestChainName
+        ? MINER_ADDRESS_REGTEST
+        : MINER_ADDRESS_TESTNET;
+    sendPageState.toaddr.memo = memo;
     // 0-value tx; the staking action captures the amount in zats
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(0, 8);
 
