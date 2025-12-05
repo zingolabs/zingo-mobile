@@ -27,6 +27,7 @@ import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../../app/types';
 import {
+  ChainNameEnum,
   RouteEnum,
   SendPageStateClass,
   ToAddrClass,
@@ -56,7 +57,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const navigation = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
-  const { totalBalance, defaultUnifiedAddress } = useContext(ContextAppLoaded);
+  const { totalBalance, defaultUnifiedAddress, indexerServer } =
+    useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -118,12 +120,19 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       return;
     }
 
-    let miner_address =
+    let miner_address_testnet =
       'utest14wa0pcf7uusm364sz8ewd0kg5x7fud4nmph6nm55f300l658nmaa0tstc6hssfnn44gw90utujn4wsrl7u6kuvel6yya8muzgcz6tyz9';
+
+    let miner_address_regtest =
+      'uregtest16k405smwvsuvfhfmmwa84qgztgh2d2mehzv7dz48vff8vlppn58wnpd0syt5ys7ldlgep4x0t3d5v2x65uafvah2z85pxh6sg5jq8lgp';
 
     // Build a minimal SendPageState to reuse existing plumbing
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-    sendPageState.toaddr.to = miner_address;
+
+    sendPageState.toaddr.to =
+      indexerServer.chainName === ChainNameEnum.regtestChainName
+        ? miner_address_regtest
+        : miner_address_testnet;
     sendPageState.toaddr.memo = defaultUnifiedAddress;
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(
       amount,

@@ -1,7 +1,26 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Dimensions, Keyboard, ScrollView, TouchableOpacity, View } from 'react-native';
-import { TabView, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
+import React, {
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
+import {
+  Dimensions,
+  Keyboard,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {
+  TabView,
+  SceneRendererProps,
+  Route,
+  NavigationState,
+} from 'react-native-tab-view';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -20,7 +39,11 @@ import {
   RouteEnum,
 } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -39,22 +62,24 @@ type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
   setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
-const Receive: React.FunctionComponent<ReceiveProps> = ({
-  // side menu
-  // balance
-  // privacy
-  // shielding
-  // for receive
-}) => {
+const Receive: React.FunctionComponent<ReceiveProps> = (
+  {
+    // side menu
+    // balance
+    // privacy
+    // shielding
+    // for receive
+  },
+) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { 
-    translate, 
-    addresses, 
-    defaultUnifiedAddress, 
-    mode, 
-    snackbars, 
-    removeFirstSnackbar, 
+  const {
+    translate,
+    addresses,
+    defaultUnifiedAddress,
+    mode,
+    snackbars,
+    removeFirstSnackbar,
     addLastSnackbar,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -63,7 +88,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
-  const [sheetType, setSheetType] = useState<'NA' | 'VA' | 'TW' | 'EA' | null>(null);
+  const [sheetType, setSheetType] = useState<'NA' | 'VA' | 'TW' | 'EA' | null>(
+    null,
+  );
 
   const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
   const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
@@ -86,10 +113,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     if (snap1 < 80) {
       snap2 = snap1 + 20;
     }
-    return [
-      `${snap1}%`,
-      `${snap2}%`,
-    ]
+    return [`${snap1}%`, `${snap2}%`];
   }, [heightLayout]);
 
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'TW' | 'EA') => {
@@ -113,18 +137,24 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   }, []);
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      if (indexBottomSheet > -1) {
-        bottomSheetRef.current?.snapToIndex(1);
-        setIndexBottomSheet(1);
-      }
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      if (indexBottomSheet > -1) {
-        bottomSheetRef.current?.snapToIndex(0);
-        setIndexBottomSheet(0);
-      }
-    });
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        if (indexBottomSheet > -1) {
+          bottomSheetRef.current?.snapToIndex(1);
+          setIndexBottomSheet(1);
+        }
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        if (indexBottomSheet > -1) {
+          bottomSheetRef.current?.snapToIndex(0);
+          setIndexBottomSheet(0);
+        }
+      },
+    );
 
     return () => {
       !!keyboardDidShowListener && keyboardDidShowListener.remove();
@@ -134,17 +164,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   useEffect(() => {
     if (addresses && addresses.length > 0) {
+      console.log('addresses', addresses);
+
       // we offering now two types:
       // 1. UA
       // 2. T
       const uAdd =
-        addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u) ||
-        [];
+        addresses.filter(
+          (a: UnifiedAddressClass | TransparentAddressClass) =>
+            a.addressKind === AddressKindEnum.u,
+        ) || [];
       // we are filtering only the `external` addresses... for now.
       const tAdd =
         addresses.filter(
           (a: UnifiedAddressClass | TransparentAddressClass) =>
-            a.addressKind === AddressKindEnum.t && a.scope === RPCAddressScopeEnum.external,
+            a.addressKind === AddressKindEnum.t &&
+            a.scope === RPCAddressScopeEnum.external,
         ) || [];
       setUAddr(uAdd as UnifiedAddressClass[]);
       setTAddr(tAdd as TransparentAddressClass[]);
@@ -155,7 +190,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   }, [addresses]);
 
   useEffect(() => {
-    const basicModeRoutes = [{ key: 'uaddr', title: translate('receive.u-title') as string }];
+    const basicModeRoutes = [
+      { key: 'uaddr', title: translate('receive.u-title') as string },
+    ];
     const advancedModeRoutes = [
       { key: 'uaddr', title: translate('receive.u-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
@@ -245,22 +282,29 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             paddingTop: insets.top,
             paddingBottom: insets.bottom + 8,
             paddingHorizontal: 16,
-          }}>
+          }}
+        >
           <View
             style={{
               flexGrow: 1,
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
-              
-            <RegText color={colors.text} style={{ fontSize: 25, marginBottom: 40 }}>Receive</RegText>
+            }}
+          >
+            <RegText
+              color={colors.text}
+              style={{ fontSize: 25, marginBottom: 40 }}
+            >
+              Receive
+            </RegText>
 
             {false && (
-              <FadeText style={{ marginBottom: 20, marginTop: 5 }}>texto</FadeText>
+              <FadeText style={{ marginBottom: 20, marginTop: 5 }}>
+                texto
+              </FadeText>
             )}
 
             {component}
-            
           </View>
         </ScrollView>
       </>
@@ -273,13 +317,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     },
   ) => ReactNode = () => {
     return (
-      <View style={{
-        position: 'absolute',
-        width: 75,
-        top: 10,
-        left: 10,
-        zIndex: 999,
-      }}>
+      <View
+        style={{
+          position: 'absolute',
+          width: 75,
+          top: 10,
+          left: 10,
+          zIndex: 999,
+        }}
+      >
         <View
           style={{
             borderRadius: 25,
@@ -288,41 +334,50 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             padding: 10,
             margin: 10,
             backgroundColor: colors.background,
-          }}>
-            <TouchableOpacity onPress={() => {
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
               clear();
               if (navigation.canGoBack()) {
                 navigation.goBack();
               }
-            }}>
-              <FontAwesomeIcon
-                size={30}
-                icon={faChevronLeft}
-                color={colors.text}
-              />
-            </TouchableOpacity>
+            }}
+          >
+            <FontAwesomeIcon
+              size={30}
+              icon={faChevronLeft}
+              color={colors.text}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     );
   };
 
   const renderBackdrop = (props: BottomSheetBackdropProps) => (
-    <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" />
+    <BottomSheetBackdrop
+      {...props}
+      disappearsOnIndex={-1}
+      appearsOnIndex={0}
+      pressBehavior="close"
+    />
   );
 
   const doCopy = () => {
-    Clipboard.setString(index === 0 && uAddrIndex !== null
-      ? uAddr[uAddrIndex].address
-      : index === 1 && tAddrIndex !== null
-      ? tAddr[tAddrIndex].address
-      : '');
+    Clipboard.setString(
+      index === 0 && uAddrIndex !== null
+        ? uAddr[uAddrIndex].address
+        : index === 1 && tAddrIndex !== null
+          ? tAddr[tAddrIndex].address
+          : '',
+    );
     addLastSnackbar({
-      message: (translate('history.addresscopied') as string),
+      message: translate('history.addresscopied') as string,
       duration: SnackbarDurationEnum.short,
       screenName: [screenName],
     });
   };
-
 
   const returnPage = (
     <ToastProvider>
@@ -349,8 +404,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         keyboardBehavior={'interactive'}
         handleStyle={{ display: 'none' }}
         backgroundStyle={{ backgroundColor: colors.background }}
-        backdropComponent={renderBackdrop}>
-        <BottomSheetView style={{ backgroundColor: colors.background, height: '100%' }}>
+        backdropComponent={renderBackdrop}
+      >
+        <BottomSheetView
+          style={{ backgroundColor: colors.background, height: '100%' }}
+        >
           {sheetType === 'NA' && (
             <NewAddress
               addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
@@ -369,30 +427,28 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           {sheetType === 'TW' && (
             <TransparentWarning
               closeSheet={hide}
-              onSuccess={
-                () => {
-                  setShowMoreOptions(false);
-                  setIndex(1);
-                }
-              }
+              onSuccess={() => {
+                setShowMoreOptions(false);
+                setIndex(1);
+              }}
               setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'EA' && (
             <ExpandedAddress
-                onCopy={doCopy}
-                closeSheet={hide}
-                title={translate('receive.title-address') as string}
-                button={translate('receive.copy-address-button') as string}
-                address={
-                  index === 0 && uAddrIndex !== null
-                    ? uAddr[uAddrIndex].address
-                    : index === 1 && tAddrIndex !== null
-                      ? tAddr[tAddrIndex].address
-                      : ''
-                }
-                setHeightLayout={setHeightLayout}
-              />
+              onCopy={doCopy}
+              closeSheet={hide}
+              title={translate('receive.title-address') as string}
+              button={translate('receive.copy-address-button') as string}
+              address={
+                index === 0 && uAddrIndex !== null
+                  ? uAddr[uAddrIndex].address
+                  : index === 1 && tAddrIndex !== null
+                    ? tAddr[tAddrIndex].address
+                    : ''
+              }
+              setHeightLayout={setHeightLayout}
+            />
           )}
         </BottomSheetView>
       </BottomSheet>
