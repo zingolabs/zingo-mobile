@@ -171,23 +171,6 @@ jobs:
           sudo chmod 777 /var/run/docker.sock
           sudo chmod 777 ./scripts/ci/android_integration_tests_ci.sh
 
-      - name: Remove unnecessary directories to free up space
-        run: |
-          echo "Disk space before post-build cleanup:"
-          df -h
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-          sudo docker image prune --all --force
-          sudo docker builder prune -a
-          sudo apt-get -y autoremove --purge
-          sudo apt-get clean
-          echo "Disk space after post-build cleanup:"
-          df -h
-
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -245,6 +228,31 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
           fail-on-cache-miss: true
+
+      - name: Remove unnecessary directories to free up space
+        run: |
+          echo "Disk space before post-build cleanup:"
+          df -h
+          sudo apt-get remove -y '^dotnet-.*'
+          sudo apt-get remove -y 'php.*'
+          sudo apt-get remove -y '^mongodb-.*'
+          sudo apt-get remove -y '^mysql-.*'
+          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo docker image prune --all --force
+          sudo docker builder prune -a
+          echo "Disk space after post-build cleanup:"
+          df -h
 
       - name: Pull docker image
         run: docker pull zingodevops/regchest:011
