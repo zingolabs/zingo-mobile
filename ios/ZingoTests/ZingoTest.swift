@@ -671,7 +671,7 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
     }
 }
 
-final class ExecuteParseAddresses: XCTestCase {
+final class ExecuteParseAddressForTex: XCTestCase {
     func executeParseAddressForTex() throws {
         setCryptoProvider()
 
@@ -714,7 +714,9 @@ final class ExecuteParseAddresses: XCTestCase {
           return
         }
     }
+}
 
+final class TestExecuteParseAddressInvalid: XCTestCase {
     func testExecuteParseAddressInvalid() throws {
         setCryptoProvider()
 

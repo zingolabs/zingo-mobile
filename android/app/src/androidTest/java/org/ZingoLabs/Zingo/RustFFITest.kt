@@ -612,7 +612,7 @@ class ExecuteSaplingBalanceFromSeed {
     }
 }
 
-class ExecuteParseAddresses {
+class ExecuteParseAddressForTex {
 
     @Test
     fun ExecuteParseAddressForTex() {
@@ -657,6 +657,9 @@ class ExecuteParseAddresses {
 
         assertThat(result).isEqualTo(expectedResult)
     }
+}
+
+class ExecuteParseAddresInvalid {
 
     @Test
     fun ExecuteParseAddresInvalid() {

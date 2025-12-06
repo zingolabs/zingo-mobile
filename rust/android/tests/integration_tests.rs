@@ -158,7 +158,7 @@ async fn execute_sapling_balance_from_seed(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-async fn execute_parse_addresses(abi: &str) {
+async fn execute_parse_address_for_tex(abi: &str) {
     #[cfg(not(feature = "regchest"))]
     let _local_net =
         scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
@@ -175,10 +175,45 @@ async fn execute_parse_addresses(abi: &str) {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteParseAddresses");
+        zingomobile_utils::android_integration_test(abi, "ExecuteParseAddressForTex");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteParseAddresses");
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteParseAddressForTex");
+
+    #[cfg(feature = "regchest")]
+    match regchest_utils::close(&docker).await {
+        Ok(_) => (),
+        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
+    }
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
+async fn execute_parse_address_invalid(abi: &str) {
+    #[cfg(not(feature = "regchest"))]
+    let _local_net =
+        scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
+    #[cfg(feature = "regchest")]
+    let docker = match regchest_utils::launch(
+        UNIX_SOCKET,
+        Some("funded_orchard_sapling_transparent_shielded_mobileclient"),
+    )
+    .await
+    {
+        Ok(d) => d,
+        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+    };
+
+    #[cfg(not(feature = "ci"))]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test(abi, "ExecuteParseAddressInvalid");
+    #[cfg(feature = "ci")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteParseAddressInvalid");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -223,8 +258,13 @@ mod android_integration {
         }
 
         #[tokio::test]
-        async fn execute_parse_addresses() {
-            crate::execute_parse_addresses(ABI).await;
+        async fn execute_parse_address_for_tex() {
+            crate::execute_parse_address_for_tex(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_parse_address_invalid() {
+            crate::execute_parse_address_invalid(ABI).await;
         }
     }
 
@@ -257,8 +297,13 @@ mod android_integration {
         }
 
         #[tokio::test]
-        async fn execute_parse_addresses() {
-            crate::execute_parse_addresses(ABI).await;
+        async fn execute_parse_address_for_tex() {
+            crate::execute_parse_address_for_tex(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_parse_address_invalid() {
+            crate::execute_parse_address_invalid(ABI).await;
         }
     }
 
@@ -291,8 +336,13 @@ mod android_integration {
         }
 
         #[tokio::test]
-        async fn execute_parse_addresses() {
-            crate::execute_parse_addresses(ABI).await;
+        async fn execute_parse_address_for_tex() {
+            crate::execute_parse_address_for_tex(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_parse_address_invalid() {
+            crate::execute_parse_address_invalid(ABI).await;
         }
     }
 
@@ -325,8 +375,13 @@ mod android_integration {
         }
 
         #[tokio::test]
-        async fn execute_parse_addresses() {
-            crate::execute_parse_addresses(ABI).await;
+        async fn execute_parse_address_for_tex() {
+            crate::execute_parse_address_for_tex(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_parse_address_invalid() {
+            crate::execute_parse_address_invalid(ABI).await;
         }
     }
 }
