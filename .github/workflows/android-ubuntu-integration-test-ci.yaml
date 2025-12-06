@@ -257,12 +257,9 @@ jobs:
 
           sudo docker image prune --all --force || true
           sudo docker builder prune -a || true
-          
+
           echo "Disk space after cleanup:"
           df -h
-
-      - name: Pull docker image
-        run: docker pull zingodevops/regchest:011
 
       - name: Yarn install
         run: yarn
@@ -275,15 +272,24 @@ jobs:
         run: |
           echo "Disk space before post-build cleanup:"
           df -h
+
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
           sudo rm -rf /usr/local/.ghcup
           sudo rm -rf /opt/hostedtoolcache/CodeQL
           sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
-          sudo apt-get clean
+
+          sudo apt-get clean || true
+
           echo "Disk space after post-build cleanup:"
           df -h
+
+      - name: Pull docker image
+        run: docker pull zingodevops/regchest:011
 
       - name: Run Android Integration Test
         uses: reactivecircus/android-emulator-runner@v2
