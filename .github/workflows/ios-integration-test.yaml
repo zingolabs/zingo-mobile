@@ -24,11 +24,6 @@ jobs:
         run: |
           xcodebuild -runFirstLaunch || true
 
-      - name: Info 1
-        run: |
-          xcrun simctl list runtimes
-          xcrun simctl list devices
-
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
@@ -59,21 +54,21 @@ jobs:
           nvm use 22.18.0
 
       - name: Yarn
-        run: yarn
+        run: |
+          nvm use 22.18.0
+          yarn
 
       - name: Pod Install
         working-directory: ios
-        run: pod install
-
-      - name: Info 2
         run: |
-          xcrun simctl list runtimes
-          xcrun simctl list devices
+          nvm use 22.18.0
+          pod install
 
       - name: Build for testing
         working-directory: ios
         run: |
           set -euxo pipefail
+          nvm use 22.18.0
           mkdir -p build/reports build/DerivedData
           xcodebuild build-for-testing \
             -workspace Zingo.xcworkspace \
