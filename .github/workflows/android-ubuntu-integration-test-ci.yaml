@@ -231,15 +231,20 @@ jobs:
 
       - name: Remove unnecessary directories to free up space
         run: |
-          echo "Disk space before post-build cleanup:"
+          set -eux
+          echo "Disk space before cleanup:"
           df -h
-          sudo apt-get remove -y '^dotnet-.*'
-          sudo apt-get remove -y 'php.*'
-          sudo apt-get remove -y '^mongodb-.*'
-          sudo apt-get remove -y '^mysql-.*'
-          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri
-          sudo apt-get autoremove -y
-          sudo apt-get clean
+
+          sudo apt-get update
+
+          sudo apt-get remove -y '^dotnet-.*' || true
+          sudo apt-get remove -y 'php.*' || true
+          sudo apt-get remove -y '^mongodb-.*' || true
+          sudo apt-get remove -y '^mysql-.*' || true
+          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri || true
+          sudo apt-get autoremove -y || true
+          sudo apt-get clean || true
+
           sudo rm -rf /usr/local/graalvm/
           sudo rm -rf /usr/local/share/powershell
           sudo rm -rf /usr/local/share/chromium
@@ -249,9 +254,11 @@ jobs:
           sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
-          sudo docker image prune --all --force
-          sudo docker builder prune -a
-          echo "Disk space after post-build cleanup:"
+
+          sudo docker image prune --all --force || true
+          sudo docker builder prune -a || true
+          
+          echo "Disk space after cleanup:"
           df -h
 
       - name: Pull docker image
