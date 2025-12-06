@@ -166,6 +166,11 @@ jobs:
           echo "AVD-ARCH=arm64-v8a" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
+      - name: Grant permissions
+        run: |
+          sudo chmod 777 /var/run/docker.sock
+          sudo chmod 777 ./scripts/ci/android_integration_tests_ci.sh
+
       - name: Remove unnecessary directories to free up space
         run: |
           echo "Disk space before post-build cleanup:"
@@ -176,14 +181,11 @@ jobs:
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
+          sudo docker image prune --all --force
+          sudo docker builder prune -a
           sudo apt-get clean
           echo "Disk space after post-build cleanup:"
           df -h
-
-      - name: Grant permissions
-        run: |
-          sudo chmod 777 /var/run/docker.sock
-          sudo chmod 777 ./scripts/ci/android_integration_tests_ci.sh
 
       - name: Enable KVM
         run: |
