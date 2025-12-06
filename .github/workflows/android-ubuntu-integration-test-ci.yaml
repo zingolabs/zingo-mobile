@@ -178,11 +178,12 @@ jobs:
           sudo rm -rf /usr/local/.ghcup
           sudo rm -rf /opt/hostedtoolcache/CodeQL
           sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
           sudo docker image prune --all --force
           sudo docker builder prune -a
+          sudo apt-get -y autoremove --purge
           sudo apt-get clean
           echo "Disk space after post-build cleanup:"
           df -h
