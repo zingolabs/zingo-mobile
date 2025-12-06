@@ -1,3 +1,4 @@
+ENV['NODE_BINARY'] = `which node`.strip
 # Resolve script with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',
 'require.resolve(
