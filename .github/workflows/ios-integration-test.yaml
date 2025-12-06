@@ -49,14 +49,14 @@ jobs:
         working-directory: rust/lib/Generated
         run: cp ./*.* ../../../ios
 
-      - name: Install nvm with node 20.9.0
+      - name: Install nvm with node 22.18.0
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-          nvm install 20.9.0
-          nvm use 20.9.0
+          nvm install 22.18.0
+          nvm use 22.18.0
 
       - name: Yarn
         run: yarn
@@ -201,14 +201,14 @@ jobs:
       - name: Pull docker image
         run: docker pull zingodevops/regchest:011
       
-      - name: Install nvm with node 20.9.0
+      - name: Install nvm with node 22.18.0
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-          nvm install 20.9.0
-          nvm use 20.9.0
+          nvm install 22.18.0
+          nvm use 22.18.0
 
       - name: Yarn
         run: yarn
