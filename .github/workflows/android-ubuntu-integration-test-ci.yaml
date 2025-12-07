@@ -288,19 +288,6 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
-      - name: Remove build artifacts to free space for emulator
-        run: |
-          echo "Disk space before removing build artifacts:"
-          df -h
-
-          rm -rf $HOME/.gradle
-          rm -rf android/.gradle
-          rm -rf android/app/build
-          rm -rf android/build
-
-          echo "Disk space after removing build artifacts:"
-          df -h
-
       - name: Pull docker image
         run: docker pull zingodevops/regchest:011
 
