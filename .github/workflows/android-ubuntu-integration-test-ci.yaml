@@ -301,7 +301,7 @@ jobs:
           df -h
 
       - name: Pull docker image
-        run: docker pull zingodevops/regchest:011
+        run: docker pull zingodevops/regchest:012
 
       - name: Run Android Integration Test
         uses: reactivecircus/android-emulator-runner@v2
