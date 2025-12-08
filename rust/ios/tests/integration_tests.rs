@@ -12,10 +12,10 @@ const MAC_SOCKET: Option<&str> = Some("unix:///Users/runner/.colima/default/dock
 async fn execute_version_from_seed() {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test("ZingoTests/ExecuteVersionFromSeed");
+        zingomobile_utils::ios_integration_test("ZingoTests/ExecuteVersionFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci("ZingoTests/ExecuteVersionFromSeed");
+        zingomobile_utils::ios_integration_test_ci("ZingoTests/ExecuteVersionFromSeed");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -27,10 +27,10 @@ async fn execute_version_from_seed() {
 async fn execute_addresses_from_ufvk() {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test("ZingoTests/ExecuteAddressesFromUfvk");
+        zingomobile_utils::ios_integration_test("ZingoTests/ExecuteAddressesFromUfvk");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci("ZingoTests/ExecuteAddressesFromUfvk");
+        zingomobile_utils::ios_integration_test_ci("ZingoTests/ExecuteAddressesFromUfvk");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -42,10 +42,10 @@ async fn execute_addresses_from_ufvk() {
 async fn execute_addresses_from_seed() {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test("ZingoTests/ExecuteAddressesFromSeed");
+        zingomobile_utils::ios_integration_test("ZingoTests/ExecuteAddressesFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci("ZingoTests/ExecuteAddressesFromSeed");
+        zingomobile_utils::ios_integration_test_ci("ZingoTests/ExecuteAddressesFromSeed");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
