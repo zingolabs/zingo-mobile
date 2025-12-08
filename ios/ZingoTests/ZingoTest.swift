@@ -716,8 +716,8 @@ final class ExecuteParseAddressForTex: XCTestCase {
     }
 }
 
-final class TestExecuteParseAddressInvalid: XCTestCase {
-    func testExecuteParseAddressInvalid() throws {
+final class ExecuteParseAddressInvalid: XCTestCase {
+    func executeParseAddressInvalid() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"

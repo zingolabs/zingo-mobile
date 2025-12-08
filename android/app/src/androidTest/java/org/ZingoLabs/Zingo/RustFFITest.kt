@@ -659,10 +659,10 @@ class ExecuteParseAddressForTex {
     }
 }
 
-class ExecuteParseAddresInvalid {
+class ExecuteParseAddressInvalid {
 
     @Test
-    fun ExecuteParseAddresInvalid() {
+    fun ExecuteParseAddressInvalid() {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
