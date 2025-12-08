@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 set_abi=false
 set_test_name=false
-test_name_default="OfflineTestSuite"
+test_name_default="ExecuteVersionFromSeed"
 timeout_seconds=1800  # default timeout set to 30 minutes
 
 while getopts 'a:e:x:h' OPTION; do
@@ -33,7 +33,7 @@ while getopts 'a:e:x:h' OPTION; do
             echo -e "      \t\t  'arm64-v8a' - default system image: API 30 google_apis_playstore x86_64"
             echo -e "      \t\t  'armeabi-v7a' - default system image: API 30 google_apis_playstore x86"
             echo -e "\n  -e\t\tSelect test name or test suite (optional)"
-            echo -e "      \t\t  Default: OfflineTestSuite"
+            echo -e "      \t\t  Default: ExecuteVersionFromSeed"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
             echo -e "      \t\t  Default: 1800"
             echo -e "      \t\t  Must be an integer"

@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 set_test_name=false
-test_name_default="ZingoTests/OfflineTestSuite"
+test_name_default="ZingoTests/ExecuteVersionFromSeed"
 
 while getopts 'a:e:x:h' OPTION; do
     case "$OPTION" in
@@ -13,7 +13,7 @@ while getopts 'a:e:x:h' OPTION; do
         h)
             echo -e "\nRun integration tests. Requires iOS Command-line Tools."
             echo -e "\n  -e\t\tSelect test name or test suite (optional)"
-            echo -e "      \t\t  Default: ZingoTests/OfflineTestSuite"
+            echo -e "      \t\t  Default: ZingoTests/ExecuteVersionFromSeed"
             exit 1
             ;;
         ?)

@@ -176,12 +176,12 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
     XCTFail("Sync timeout after \(timeoutSeconds) seconds")
 }
 
-final class OfflineTestSuite: XCTestCase {
+final class ExecuteAddressesFromSeed: XCTestCase {
     func executeAddressesFromSeed() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "main"
+        let chainhint = "regtest"
         let seed = Seeds.ABANDON
 
         do {
@@ -231,12 +231,14 @@ final class OfflineTestSuite: XCTestCase {
           return
         }
     }
+}
 
+final class ExecuteAddressFromUfvk: XCTestCase {
     func executeAddressFromUfvk() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "main"
+        let chainhint = "regtest"
         let ufvk = UfvkConst.ABANDON
 
         do {
@@ -298,11 +300,13 @@ final class OfflineTestSuite: XCTestCase {
         }
 
     }
+}
 
+final class ExecuteVersionFromSeed: XCTestCase {
     func executeVersionFromSeed() throws {
         setCryptoProvider()
         let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "main"
+        let chainhint = "regtest"
         let seed = Seeds.ABANDON
 
         do {

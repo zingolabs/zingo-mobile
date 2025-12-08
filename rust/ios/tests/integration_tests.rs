@@ -9,13 +9,43 @@ use zingolib_testutils::scenarios;
 #[cfg(all(feature = "ci", feature = "regchest"))]
 const MAC_SOCKET: Option<&str> = Some("unix:///Users/runner/.colima/default/docker.sock");
 
-async fn offline_testsuite() {
+async fn execute_version_from_seed(abi: &str) {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test("ZingoTests/OfflineTestSuite");
+        zingomobile_utils::android_integration_test(abi, "ZingoTests/ExecuteVersionFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test_ci("ZingoTests/OfflineTestSuite");
+        zingomobile_utils::android_integration_test_ci(abi, "ZingoTests/ExecuteVersionFromSeed");
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
+async fn execute_addresses_from_ufvk(abi: &str) {
+    #[cfg(not(feature = "ci"))]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test(abi, "ZingoTests/ExecuteAddressesFromUfvk");
+    #[cfg(feature = "ci")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test_ci(abi, "ZingoTests/ExecuteAddressesFromUfvk");
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
+async fn execute_addresses_from_seed(abi: &str) {
+    #[cfg(not(feature = "ci"))]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test(abi, "ZingoTests/ExecuteAddressesFromSeed");
+    #[cfg(feature = "ci")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test_ci(abi, "ZingoTests/ExecuteAddressesFromSeed");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -229,8 +259,18 @@ async fn execute_parse_address_invalid() {
 mod ios_integration {
     mod universal {
         #[tokio::test]
-        async fn offline_testsuite() {
-            crate::offline_testsuite().await;
+        async fn execute_version_from_seed() {
+            crate::execute_version_from_seed(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_addresses_from_ufvk() {
+            crate::execute_addresses_from_ufvk(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_addresses_from_seed() {
+            crate::execute_addresses_from_seed(ABI).await;
         }
 
         #[tokio::test]

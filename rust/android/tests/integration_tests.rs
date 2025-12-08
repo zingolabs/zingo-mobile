@@ -9,13 +9,43 @@ const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
 //#[cfg(feature = "ci", feature = "regchest")]
 //const UNIX_SOCKET: Option<&str> = Some("unix:///Users/runner/.colima/default/docker.sock");
 
-async fn offline_testsuite(abi: &str) {
+async fn execute_version_from_seed(abi: &str) {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "OfflineTestSuite");
+        zingomobile_utils::android_integration_test(abi, "ExecuteVersionFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "OfflineTestSuite");
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteVersionFromSeed");
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
+async fn execute_addresses_from_ufvk(abi: &str) {
+    #[cfg(not(feature = "ci"))]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test(abi, "ExecuteAddressesFromUfvk");
+    #[cfg(feature = "ci")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteAddressesFromUfvk");
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
+async fn execute_addresses_from_seed(abi: &str) {
+    #[cfg(not(feature = "ci"))]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test(abi, "ExecuteAddressesFromSeed");
+    #[cfg(feature = "ci")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteAddressesFromSeed");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -233,8 +263,18 @@ mod android_integration {
         const ABI: &str = "x86";
 
         #[tokio::test]
-        async fn offline_testsuite() {
-            crate::offline_testsuite(ABI).await;
+        async fn execute_version_from_seed() {
+            crate::execute_version_from_seed(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_addresses_from_ufvk() {
+            crate::execute_addresses_from_ufvk(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_addresses_from_seed() {
+            crate::execute_addresses_from_seed(ABI).await;
         }
 
         #[tokio::test]
@@ -272,8 +312,18 @@ mod android_integration {
         const ABI: &str = "x86_64";
 
         #[tokio::test]
-        async fn offline_testsuite() {
-            crate::offline_testsuite(ABI).await;
+        async fn execute_version_from_seed() {
+            crate::execute_version_from_seed(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_addresses_from_ufvk() {
+            crate::execute_addresses_from_ufvk(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_addresses_from_seed() {
+            crate::execute_addresses_from_seed(ABI).await;
         }
 
         #[tokio::test]
@@ -311,8 +361,18 @@ mod android_integration {
         const ABI: &str = "armeabi-v7a";
 
         #[tokio::test]
-        async fn offline_testsuite() {
-            crate::offline_testsuite(ABI).await;
+        async fn execute_version_from_seed() {
+            crate::execute_version_from_seed(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_addresses_from_ufvk() {
+            crate::execute_addresses_from_ufvk(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_addresses_from_seed() {
+            crate::execute_addresses_from_seed(ABI).await;
         }
 
         #[tokio::test]
@@ -350,8 +410,18 @@ mod android_integration {
         const ABI: &str = "arm64-v8a";
 
         #[tokio::test]
-        async fn offline_testsuite() {
-            crate::offline_testsuite(ABI).await;
+        async fn execute_version_from_seed() {
+            crate::execute_version_from_seed(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_addresses_from_ufvk() {
+            crate::execute_addresses_from_ufvk(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_addresses_from_seed() {
+            crate::execute_addresses_from_seed(ABI).await;
         }
 
         #[tokio::test]

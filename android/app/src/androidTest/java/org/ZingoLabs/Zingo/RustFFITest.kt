@@ -131,7 +131,6 @@ data class ParseResult (
 
 val context = MainApplication.getAppContext()!!
 
-@Category(OfflineTest::class)
 class ExecuteAddressesFromSeed {
     @Test
     fun executeAddressesFromSeed() {
@@ -176,7 +175,6 @@ class ExecuteAddressesFromSeed {
     }
 }
 
-@Category(OfflineTest::class)
 class ExecuteAddressesFromUfvk {
     @Test
     fun executeAddressFromUfvk() {
@@ -228,7 +226,6 @@ class ExecuteAddressesFromUfvk {
     }    
 }
 
-@Category(OfflineTest::class)
 class ExecuteVersionFromSeed {
     @Test
     fun executeVersionFromSeed() {
@@ -605,17 +602,16 @@ class ExecuteSaplingBalanceFromSeed {
         println(changeServerJson)
         assertThat(changeServerJson.lowercase().startsWith("error")).isFalse()
 
-        // open the wallet with no server - Offline mode
-        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "regtest", "Medium", "1")
+        // open the wallet with no server - Offline mode - Mainby default
+        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
         println("\nLoad Wallet:")
         println(loadWalletJson)
     }
 }
 
 class ExecuteParseAddressForTex {
-
     @Test
-    fun ExecuteParseAddressForTex() {
+    fun executeParseAddressForTex() {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
@@ -660,9 +656,8 @@ class ExecuteParseAddressForTex {
 }
 
 class ExecuteParseAddressInvalid {
-
     @Test
-    fun ExecuteParseAddressInvalid() {
+    fun executeParseAddressInvalid() {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"

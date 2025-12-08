@@ -121,7 +121,9 @@ jobs:
       fail-fast: false
       matrix:
         test: [
-          "offline_testsuite",
+          "execute_version_from_seed",
+          "execute_addresses_from_ufvk",
+          "execute_addresses_from_seed",
           "execute_sync_from_seed",
           "execute_send_from_orchard",
           "execute_currentprice_and_value_transfers_from_seed",
