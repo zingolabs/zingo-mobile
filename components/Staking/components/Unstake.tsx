@@ -504,7 +504,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
                       textAlign: 'center',
                     }}
                   >
-                    Unstaking transaction sent!
+                    Unstaking request transaction sent!
                   </Text>
 
                   <View style={{ marginTop: 24, alignSelf: 'stretch' }}>
