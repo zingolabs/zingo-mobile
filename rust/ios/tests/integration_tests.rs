@@ -9,13 +9,13 @@ use zingolib_testutils::scenarios;
 #[cfg(all(feature = "ci", feature = "regchest"))]
 const MAC_SOCKET: Option<&str> = Some("unix:///Users/runner/.colima/default/docker.sock");
 
-async fn execute_version_from_seed(abi: &str) {
+async fn execute_version_from_seed() {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ZingoTests/ExecuteVersionFromSeed");
+        zingomobile_utils::android_integration_test("ZingoTests/ExecuteVersionFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ZingoTests/ExecuteVersionFromSeed");
+        zingomobile_utils::android_integration_test_ci("ZingoTests/ExecuteVersionFromSeed");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -24,13 +24,13 @@ async fn execute_version_from_seed(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-async fn execute_addresses_from_ufvk(abi: &str) {
+async fn execute_addresses_from_ufvk() {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ZingoTests/ExecuteAddressesFromUfvk");
+        zingomobile_utils::android_integration_test("ZingoTests/ExecuteAddressesFromUfvk");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ZingoTests/ExecuteAddressesFromUfvk");
+        zingomobile_utils::android_integration_test_ci("ZingoTests/ExecuteAddressesFromUfvk");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -39,13 +39,13 @@ async fn execute_addresses_from_ufvk(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-async fn execute_addresses_from_seed(abi: &str) {
+async fn execute_addresses_from_seed() {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ZingoTests/ExecuteAddressesFromSeed");
+        zingomobile_utils::android_integration_test("ZingoTests/ExecuteAddressesFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ZingoTests/ExecuteAddressesFromSeed");
+        zingomobile_utils::android_integration_test_ci("ZingoTests/ExecuteAddressesFromSeed");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -260,17 +260,17 @@ mod ios_integration {
     mod universal {
         #[tokio::test]
         async fn execute_version_from_seed() {
-            crate::execute_version_from_seed(ABI).await;
+            crate::execute_version_from_seed().await;
         }
 
         #[tokio::test]
         async fn execute_addresses_from_ufvk() {
-            crate::execute_addresses_from_ufvk(ABI).await;
+            crate::execute_addresses_from_ufvk().await;
         }
 
         #[tokio::test]
         async fn execute_addresses_from_seed() {
-            crate::execute_addresses_from_seed(ABI).await;
+            crate::execute_addresses_from_seed().await;
         }
 
         #[tokio::test]
