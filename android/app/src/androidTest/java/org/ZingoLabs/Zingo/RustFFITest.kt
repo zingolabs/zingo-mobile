@@ -137,7 +137,7 @@ class ExecuteAddressesFromSeed {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = "main"
         val seed = Seeds.ABANDON
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
