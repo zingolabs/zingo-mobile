@@ -5,10 +5,10 @@ authors = ["Zingolabs <zingo@zingolabs.com>"]
 edition = "2024"
 
 [dependencies]
-zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "13700e54e313aeeaf4b926a7ec4c9d8d0878f235", default-features = true, features = [
+zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "08af3a538c85798ed1ca84b3ab15197a6eb12a6f", default-features = true, features = [
     "testutils",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "13700e54e313aeeaf4b926a7ec4c9d8d0878f235" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "08af3a538c85798ed1ca84b3ab15197a6eb12a6f" }
 
 zcash_encoding = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "889ef9f155ab7514ba9928f05236edba898a6331", features = [
     "std",

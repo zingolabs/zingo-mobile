@@ -9,10 +9,10 @@ pedantic = { level = "deny", priority = -1 }
 nursery = { level = "deny", priority = -1 }
 
 [workspace.dependencies]
-zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "13700e54e313aeeaf4b926a7ec4c9d8d0878f235", default-features = true, features = [
+zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "08af3a538c85798ed1ca84b3ab15197a6eb12a6f", default-features = true, features = [
     "testutils",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "13700e54e313aeeaf4b926a7ec4c9d8d0878f235" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "08af3a538c85798ed1ca84b3ab15197a6eb12a6f" }
 
 zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", tag = "2.0.9", features = [
     "test_lwd_zcashd",
@@ -68,14 +68,6 @@ log = "0.4"
 uniffi_build = "0.29"
 thiserror = "1"
 once_cell = "1"
-
-[patch.crates-io]
-zcash_client_backend = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
-zcash_address = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
-zcash_keys = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
-zcash_primitives = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
-zcash_protocol = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
-zcash_transparent = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8" }
 
 [profile.release]
 debug = 1

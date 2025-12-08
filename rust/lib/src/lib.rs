@@ -1779,10 +1779,22 @@ fn parse_staking_action(root: &json::JsonValue) -> Result<StakingAction, String>
         .ok_or_else(|| "Error: Missing stakingAction.source".to_string())?;
 
     let target = parse_hex_32(target_str)?;
-    let source = [0u8; 32];
+    let source = match kind {
+        StakingActionKind::Add => [0u8; 32],
+        StakingActionKind::Sub
+        | StakingActionKind::Clear
+        | StakingActionKind::Move
+        | StakingActionKind::MoveClear => parse_hex_32(source_str)?,
+    };
 
-    let insecure_target_name = sa["targetName"].as_str().unwrap_or_default().to_string();
-    let insecure_source_name = sa["sourceName"].as_str().unwrap_or_default().to_string();
+    let insecure_target_name = sa["insecureTargetName"]
+        .as_str()
+        .unwrap_or_default()
+        .to_string();
+    let insecure_source_name = sa["insecureSourceName"]
+        .as_str()
+        .unwrap_or_default()
+        .to_string();
 
     Ok(StakingAction {
         kind,
@@ -1843,7 +1855,7 @@ pub fn confirm() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 match lightclient
-                    .send_stored_proposal()
+                    .send_stored_proposal(true)
                     .await {
                     Ok(txids) => {
                         object! { "txids" => txids.iter().map(|txid| txid.to_string()).collect::<Vec<_>>() }
@@ -1869,7 +1881,7 @@ pub fn get_accumulated_stake_for_txid(txid: String) -> Result<u64, ZingolibError
         if let Some(lightclient) = &mut *guard {
             let txid = match txid_from_hex_encoded_str(&txid) {
                 Ok(txid) => txid,
-                Err(e) => return Ok(0),
+                Err(_e) => return Ok(0),
             };
             Ok(RT.block_on(async move {
                 lightclient
