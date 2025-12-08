@@ -190,6 +190,16 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
       return;
     }
 
+    const miner = selectedTx.address;
+
+    if (!miner) {
+      Alert.alert(
+        'Missing miner address',
+        'Could not determine the miner address from the selected transaction.',
+      );
+      return;
+    }
+
     const zats = getAccumulatedStakeZatsForTxid(selectedTx.txid);
     if (zats === null) {
       Alert.alert(
@@ -209,20 +219,18 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
 
     setModalState('sending');
 
-    let memo = `@UNSTAKE_RECEIVE: ${selectedTx.txid}\nThanks for staking!`;
-
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
     sendPageState.toaddr.to =
       indexerServer.chainName === ChainNameEnum.regtestChainName
         ? MINER_ADDRESS_REGTEST
         : MINER_ADDRESS_TESTNET;
-    sendPageState.toaddr.memo = memo;
-    // 0-value tx; the staking action captures the amount in zats
+    sendPageState.toaddr.memo = ''; // No memo. This is just a plain unstake request
+    // 0-value tx. The staking action captures the amount in zats
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(0, 8);
 
     const stakingAction: StakingActionType = {
       kind: 'sub',
-      // use the backend value (zats) directly
+      // use the backend value in zats directly
       val: zats,
       target:
         (selectedTx.stakingAction && selectedTx.stakingAction?.target) || '',

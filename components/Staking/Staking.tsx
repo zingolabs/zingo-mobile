@@ -64,24 +64,86 @@ const Staking: React.FC<StakingProps> = () => {
   const screenName = ScreenEnum.StakingHome;
 
   const [loading] = useState(false);
-  const movements: ValueTransferType[] = useMemo(
-    () =>
-      !valueTransfers
-        ? []
-        : valueTransfers.filter((vt: ValueTransferType) => {
-            if (vt.stakingAction === null) {
-              return false;
-            }
-            if (
-              vt.stakingAction.kind === 'add' &&
-              (vt.amount === 0 || vt.amount !== vt.stakingAction.val)
-            ) {
-              return false;
-            }
-            return true;
-          }),
-    [valueTransfers],
-  );
+  const movements: ValueTransferType[] = useMemo(() => {
+    if (!valueTransfers) {
+      return [];
+    }
+
+    // All local txids, so we can validate references in memos
+    const localTxids = new Set<string>(valueTransfers.map(vt => vt.txid));
+
+    return valueTransfers.filter((vt: ValueTransferType) => {
+      const stakingAction = vt.stakingAction;
+
+      switch (stakingAction?.kind) {
+        // - amount must be non-zero
+        // - amount must match stakingAction.val
+        case 'add':
+          if (vt.amount === 0 || vt.amount !== stakingAction.val) {
+            return false;
+          }
+          break;
+
+        // Unstake requests
+        case 'sub': {
+          // We expect a 0 value tx for the unstake request
+          if (vt.amount !== 0) {
+            return false;
+          }
+
+          const sourceTxid = stakingAction.source;
+          if (!sourceTxid) {
+            return false;
+          }
+
+          // Reference must be valid
+          if (!localTxids.has(sourceTxid)) {
+            return false;
+          }
+
+          break;
+        }
+
+        default: {
+          if (vt.amount <= 0) {
+            return false;
+          }
+
+          const rawMemos = vt.memos as string[] | undefined;
+          if (!rawMemos || rawMemos.length === 0) {
+            return false;
+          }
+
+          const prefix = '@UNSTAKE_RECEIVE: ';
+
+          // Find the first memo that looks like an unstake payout memo
+          const matchingMemo = rawMemos
+            .map(m => (m || '').replace(/\0+$/g, ''))
+            .find(memo => memo.startsWith(prefix));
+
+          if (!matchingMemo) {
+            return false;
+          }
+
+          const afterPrefix = matchingMemo.slice(prefix.length).trim();
+          const [refTxid] = afterPrefix.split(/\s+/);
+
+          if (!refTxid || !/^[0-9a-fA-F]{64}$/.test(refTxid)) {
+            return false;
+          }
+
+          if (!localTxids.has(refTxid)) {
+            return false;
+          }
+
+          // Include valid unstake payout
+          break;
+        }
+      }
+
+      return true;
+    });
+  }, [valueTransfers]);
 
   const { colors } = useTheme() as unknown as ThemeType;
 
@@ -215,7 +277,7 @@ const Staking: React.FC<StakingProps> = () => {
                   item.stakingAction && item.stakingAction.kind === 'add';
                 const label = isStake ? 'Staked' : 'Unstaked';
                 const amountLabel = `${
-                  isStake ? '+' : (item.amount === 0 ? '-' : '')
+                  isStake ? '+' : item.amount === 0 ? '-' : ''
                 }${item.amount.toFixed(5)} cTAZ`;
 
                 return (
