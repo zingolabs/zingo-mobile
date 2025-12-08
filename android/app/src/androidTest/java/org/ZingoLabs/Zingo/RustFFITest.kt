@@ -138,7 +138,7 @@ class ExecuteAddressesFromSeed {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "main"
+        val chainhint = "regtest"
         val seed = Seeds.ABANDON
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -183,7 +183,7 @@ class ExecuteAddressesFromUfvk {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "main"
+        val chainhint = "regtest"
         val ufvk = Ufvk.ABANDON
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -235,7 +235,7 @@ class ExecuteVersionFromSeed {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "main"
+        val chainhint = "regtest"
         val seed = Seeds.ABANDON
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -606,7 +606,7 @@ class ExecuteSaplingBalanceFromSeed {
         assertThat(changeServerJson.lowercase().startsWith("error")).isFalse()
 
         // open the wallet with no server - Offline mode
-        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
+        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "regtest", "Medium", "1")
         println("\nLoad Wallet:")
         println(loadWalletJson)
     }
