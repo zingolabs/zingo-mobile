@@ -113,9 +113,54 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
 
+  android-ubuntu-build:
+    name: Android Ubuntu Build (single)
+    runs-on: ubuntu-24.04
+    env:
+      RUSTFLAGS: -D warnings
+      CACHE-KEY: ${{ inputs.cache-key }}
+
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Gradle setup cache (read/write)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
+
+      - name: Yarn install
+        run: yarn
+
+      - name: Run Build (single)
+        working-directory: android
+        run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
+
+      - name: Upload Android build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-outputs
+          path: |
+            android/app/build/outputs
+
   android-ubuntu-integration-test-ci:
     name: Android Ubuntu Integration test
-    needs: android-ubuntu-integration-test-ci-avd-cache
+    needs: 
+      - android-ubuntu-integration-test-ci-avd-cache
+      - android-ubuntu-build
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -266,41 +311,11 @@ jobs:
       - name: Yarn install
         run: yarn
 
-      - name: Run Build
-        working-directory: android
-        run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
-
-      - name: Remove unnecessary directories to free up space after build
-        run: |
-          echo "Disk space before post-build cleanup:"
-          df -h
-
-          sudo rm -rf /usr/local/graalvm/
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/local/share/chromium
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-
-          sudo apt-get clean || true
-
-          echo "Disk space after post-build cleanup:"
-          df -h
-
-      - name: Remove build artifacts to free space for emulator
-        run: |
-          echo "Disk space before removing build artifacts:"
-          df -h
-
-          rm -rf $HOME/.gradle
-          rm -rf android/.gradle
-          rm -rf android/build
-
-          echo "Disk space after removing build artifacts:"
-          df -h
+      - name: Download Android build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: android-build-outputs
+          path: android/app/build
 
       #- name: Pull docker image
       #  run: docker pull zingodevops/regchest:012
