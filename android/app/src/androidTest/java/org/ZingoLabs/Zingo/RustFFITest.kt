@@ -160,7 +160,7 @@ class ExecuteAddressesFromSeed {
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
-        assertThat(addresses[0].encoded_address).isEqualTo("u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
+        assertThat(addresses[0].encoded_address).isEqualTo("uregtest1ue949txhf9t2z6ldg8wc6s5t439t2hu55yh9l58gc23cmxthths836nxtpyvhpkrftsp2jnnp9eadtqy2nefxn04eyxeu8l0x5kk8ct9")
         assertThat(addresses[0].has_orchard).isEqualTo(true)
         assertThat(addresses[0].has_sapling).isEqualTo(false)
         assertThat(addresses[0].has_transparent).isEqualTo(false)
@@ -169,7 +169,7 @@ class ExecuteAddressesFromSeed {
         println("\nT Addresses:")
         println(taddressesJson)
         val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
-        assertThat(taddresses[0].encoded_address).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(taddresses[0].encoded_address).isEqualTo("tmFLszfkjgim4zoUMAXpuohnFBAKy99rr2i")
         assertThat(taddresses[0].scope).isEqualTo("external")
     }
 }
@@ -211,7 +211,7 @@ class ExecuteAddressesFromUfvk {
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
-        assertThat(addresses[0].encoded_address).isEqualTo("u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
+        assertThat(addresses[0].encoded_address).isEqualTo("uregtest1ue949txhf9t2z6ldg8wc6s5t439t2hu55yh9l58gc23cmxthths836nxtpyvhpkrftsp2jnnp9eadtqy2nefxn04eyxeu8l0x5kk8ct9")
         assertThat(addresses[0].has_orchard).isEqualTo(true)
         assertThat(addresses[0].has_sapling).isEqualTo(false)
         assertThat(addresses[0].has_transparent).isEqualTo(false)
@@ -220,7 +220,7 @@ class ExecuteAddressesFromUfvk {
         println("\nT Addresses:")
         println(taddressesJson)
         val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
-        assertThat(taddresses[0].encoded_address).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(taddresses[0].encoded_address).isEqualTo("tmFLszfkjgim4zoUMAXpuohnFBAKy99rr2i")
         assertThat(taddresses[0].scope).isEqualTo("external")
     }    
 }
