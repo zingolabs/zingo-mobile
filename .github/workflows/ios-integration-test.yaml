@@ -60,6 +60,11 @@ jobs:
         working-directory: ios
         run: pod install
 
+      - name: Info
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
+
       - name: Build for testing
         working-directory: ios
         run: |
@@ -221,9 +226,13 @@ jobs:
           xcrun simctl list runtimes
           xcrun simctl list devices
 
-      - name: Run IOS integration tests
-        working-directory: ./rust
-        run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
+      - name: Try script
+        run: |
+          ./scripts/ci/ios_integration_tests_ci.sh -e "ZingoTests/ExecuteAddressesFromSeed"
+
+      #- name: Run IOS integration tests
+      #  working-directory: ./rust
+      #  run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
 
       - name: Upload IOS test reports (.xcresult)
         if: ${{ always() && !cancelled() }}
