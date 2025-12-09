@@ -145,6 +145,20 @@ jobs:
       - name: Yarn install
         run: yarn
 
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/src/main/jniLibs/${{ env.ABI }}
+          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Kotlin uniffi cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
       - name: Run Build (single)
         working-directory: android
         run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
