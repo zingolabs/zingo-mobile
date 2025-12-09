@@ -10,7 +10,7 @@ on:
 jobs:
   create-timestamp:
     name: Create timestamp
-    runs-on: macos-15
+    runs-on: ubuntu-24.04
     outputs:
       timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
     steps:
