@@ -114,7 +114,7 @@ jobs:
           key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
 
   android-ubuntu-build:
-    name: Android Ubuntu Build (single)
+    name: Android Ubuntu Build
     runs-on: ubuntu-24.04
     env:
       RUSTFLAGS: -D warnings
@@ -142,9 +142,6 @@ jobs:
           gradle-version: wrapper
           cache-read-only: false
 
-      - name: Yarn install
-        run: yarn
-
       - name: Native rust cache
         uses: actions/cache/restore@v4
         with:
@@ -159,7 +156,42 @@ jobs:
           key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
-      - name: Run Build (single)
+      - name: Remove unnecessary directories to free up space
+        run: |
+          set -eux
+          echo "Disk space before cleanup:"
+          df -h
+
+          sudo apt-get update
+
+          sudo apt-get remove -y '^dotnet-.*' || true
+          sudo apt-get remove -y 'php.*' || true
+          sudo apt-get remove -y '^mongodb-.*' || true
+          sudo apt-get remove -y '^mysql-.*' || true
+          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri || true
+          sudo apt-get autoremove -y || true
+          sudo apt-get clean || true
+
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+
+          sudo docker image prune --all --force || true
+          sudo docker builder prune -a || true
+
+          echo "Disk space after cleanup:"
+          df -h
+
+      - name: Yarn install
+        run: yarn
+
+      - name: Run Build
         working-directory: android
         run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
 
