@@ -14,7 +14,7 @@ RUN apt update \
 # TODO: use cargo chef
 RUN cargo install cargo-binstall
 
-WORKDIR /opt/zingo/rust/lib/
+WORKDIR /opt/zingo/rust/
 
 ENV CARGO_TARGET_DIR=/opt/zingo/rust/target
 
@@ -32,14 +32,13 @@ RUN cargo binstall sccache
 ENV PATH="/root/.cargo/bin:/usr/local/cargo/bin:${PATH}"
 
 # Copy just the lib crate to avoid docker cache invalidation
-COPY lib/ ./
+COPY Cargo.toml Cargo.lock ./
+COPY lib/ lib/
 
-COPY Cargo.lock ./Cargo.lock
-
-RUN cargo build --release
+RUN cargo build --release -p zingo
 
 RUN cargo run --release --features uniffi/cli --bin uniffi-bindgen -- \
-    generate --library ../target/release/libzingo.so --language kotlin --out-dir ./src
+    generate --library ./target/release/libzingo.so --language kotlin --out-dir ./src
 
 ENV RUSTC_WRAPPER=sccache
 ENV SCCACHE_DIR=/sccache
