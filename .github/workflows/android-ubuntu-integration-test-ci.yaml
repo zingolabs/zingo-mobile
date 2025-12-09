@@ -361,7 +361,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          path: android/app/build
+          path: android/app/build/outputs
 
       #- name: Pull docker image
       #  run: docker pull zingodevops/regchest:012
