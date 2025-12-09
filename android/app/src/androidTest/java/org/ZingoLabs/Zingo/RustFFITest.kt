@@ -7,12 +7,11 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 
 object Seeds {
-    const val ABANDON = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
     const val HOSPITAL = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
 }
 
 object Ufvk {
-    const val ABANDON = "uview1wj07tp4y3rwzjplg68c3lum2avq4v3j0w0mf0urdlxzthnfr26q8ssz9hvylspj638tuh2r233gaxm2qh27gj6m9q25prk7gt8xwqzmwxm580tg0f5llvr7d6h4y6jc2t7zl7lz9ge60ta6226jyysgk8xpu2wqxesrw4q2mydrhj5dea5l9scl0p3l4ayqgfej54wex5aa2ylq89nyqg94l4lh6dawuc2e3s8v7737zn7p5fl96hhpjqg4jucnp2r2jjqxev3z7lp3k9ulfpl2gw0lng8vfe8hj8afggqzdwxgfaq6dy82guvh34kv4q5ay7gq6n0ujg7exu0mgznpr4wf0agjdhnd4k6af5md3f3msqedw364vx3lyd3hwekvrulywa4c0ja4ze2fxtcm0vrz0278g9n37y0jg6dx847g3peyq9lwmm04ac3tt4sldnrcfc5ew3k0aqgycnryfvv44zxzng485ks27wky2ulfy9q8hu97l"
+    const val HOSPITAL = "uviewtest1swp7427e6cqtkvzj8esqj7f0cedxva9uu7s667zyuu4vsxnwaaqgmvavrejaw6r2r9m7y5u9870kruvjsyr544k83wp0s4gmnmku2d5d2csv8x86f9g598kkwj5zzxvnyrxfesacaatwhf3v944qxrxwy0lenwh93gw8lxzaxxfsvx9kafg27pwuzmuah33v9523u32wac6mdksvu7xwsshpe2ge7u4pn4ruhsj9qjwnvh77tyvk4tngz9rcya3t57c4q7f3fr7u82q9uwn0qxtrj6zk7t4gsmu3e90h43jrcsa6jj4m6he5jnw6xwzxrlce2guvmwt0a707f3clkj6zvjcxz0svgzfergy7y07hmkvrgfuvtqvm4rflgk6sl5ckxprjfxr024hexf4mr66t7dg480fdegxxhc74qc40zv4jty46dykq6x9k250jfjzxr86xmx9dfe8he347fr6zvsf2h7509uwmxaz546qpg387gvq6y4zz"
 }
 
 data class InitFromSeed (
@@ -137,8 +136,8 @@ class ExecuteAddressesFromSeed {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "main"
-        val seed = Seeds.ABANDON
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
@@ -182,7 +181,7 @@ class ExecuteAddressesFromUfvk {
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
-        val ufvk = Ufvk.ABANDON
+        val ufvk = Ufvk.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
@@ -233,7 +232,7 @@ class ExecuteVersionFromSeed {
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
-        val seed = Seeds.ABANDON
+        val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
@@ -268,7 +267,7 @@ class ExecuteSyncFromSeed {
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
-        val seed = Seeds.ABANDON
+        val seed = Seeds.HOSPITAL
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
@@ -602,7 +601,7 @@ class ExecuteSaplingBalanceFromSeed {
         println(changeServerJson)
         assertThat(changeServerJson.lowercase().startsWith("error")).isFalse()
 
-        // open the wallet with no server - Offline mode - Mainby default
+        // open the wallet with no server - Offline mode - Main by default
         val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
         println("\nLoad Wallet:")
         println(loadWalletJson)
