@@ -36,16 +36,12 @@ fi
 
 cd ios
 
-rm -rf build/reports
-rm -rf build/DerivedData
-mkdir -p build/reports build/DerivedData
-
 xcodebuild test \
     -workspace Zingo.xcworkspace \
     -scheme Zingo \
     -sdk iphonesimulator \
     -configuration Debug \
-    -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+    -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
     -derivedDataPath "build/DerivedData" \
     -resultBundlePath "build/reports/Zingo-Test.xcresult" \
     -only-testing:"${test_name}"
