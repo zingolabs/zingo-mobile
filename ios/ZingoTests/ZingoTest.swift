@@ -176,7 +176,7 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
 }
 
 final class ExecuteAddressesFromSeed: XCTestCase {
-    func executeAddressesFromSeed() throws {
+    func testExecuteAddressesFromSeed() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
@@ -233,7 +233,7 @@ final class ExecuteAddressesFromSeed: XCTestCase {
 }
 
 final class ExecuteAddressFromUfvk: XCTestCase {
-    func executeAddressFromUfvk() throws {
+    func testExecuteAddressFromUfvk() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
@@ -302,7 +302,7 @@ final class ExecuteAddressFromUfvk: XCTestCase {
 }
 
 final class ExecuteVersionFromSeed: XCTestCase {
-    func executeVersionFromSeed() throws {
+    func testExecuteVersionFromSeed() throws {
         setCryptoProvider()
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
@@ -343,7 +343,7 @@ final class ExecuteVersionFromSeed: XCTestCase {
 }
 
 final class ExecuteSyncFromSeed: XCTestCase {
-    func executeSyncFromSeed() throws {
+    func testExecuteSyncFromSeed() throws {
         setCryptoProvider()
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
@@ -404,10 +404,8 @@ final class ExecuteSyncFromSeed: XCTestCase {
 }
 
 final class ExecuteSendFromOrchard: XCTestCase {
-    func executeSendFromOrchard() throws {
+    func testExecuteSendFromOrchard() throws {
         setCryptoProvider()
-        let mapper = JSONEncoder() // para el body del send
-
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
@@ -445,9 +443,9 @@ final class ExecuteSendFromOrchard: XCTestCase {
         waitForSyncOrFail()
 
         do {
-            var balJson = try getBalance()
+            let balJson = try getBalance()
             print("\nBalance pre-send:\n\(balJson)")
-            var bal: Balance = try decodeJSON(balJson)
+            let bal: Balance = try decodeJSON(balJson)
             XCTAssertEqual(bal.confirmed_orchard_balance, 1_000_000)
             XCTAssertEqual(bal.confirmed_transparent_balance, 0)
         } catch {
@@ -502,9 +500,9 @@ final class ExecuteSendFromOrchard: XCTestCase {
         waitForSyncOrFail()
 
         do {
-            var balJson = try getBalance()
+            let balJson = try getBalance()
             print("\nBalance post-send:\n\(balJson)")
-            var bal: Balance = try decodeJSON(balJson)
+            let bal: Balance = try decodeJSON(balJson)
             XCTAssertEqual(bal.total_orchard_balance, 885_000)
             XCTAssertEqual(bal.confirmed_transparent_balance, 0)
             XCTAssertEqual(bal.unconfirmed_transparent_balance, 100_000)
@@ -516,7 +514,7 @@ final class ExecuteSendFromOrchard: XCTestCase {
 }
 
 final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
-    func updateCurrentPriceAndValueTransfersFromSeed() throws {
+    func testUpdateCurrentPriceAndValueTransfersFromSeed() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
@@ -596,7 +594,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
 }
 
 final class ExecuteSaplingBalanceFromSeed: XCTestCase {
-    func executeSaplingBalanceFromSeed() throws {
+    func testExecuteSaplingBalanceFromSeed() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
@@ -675,7 +673,7 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
 }
 
 final class ExecuteParseAddressForTex: XCTestCase {
-    func executeParseAddressForTex() throws {
+    func testExecuteParseAddressForTex() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
@@ -720,7 +718,7 @@ final class ExecuteParseAddressForTex: XCTestCase {
 }
 
 final class ExecuteParseAddressInvalid: XCTestCase {
-    func executeParseAddressInvalid() throws {
+    func testExecuteParseAddressInvalid() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
