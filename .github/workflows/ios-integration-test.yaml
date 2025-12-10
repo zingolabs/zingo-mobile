@@ -226,13 +226,9 @@ jobs:
           xcrun simctl list runtimes
           xcrun simctl list devices
 
-      - name: Try script
-        run: |
-          ./scripts/ci/ios_integration_tests_ci.sh -e "ZingoTests/ExecuteAddressesFromSeed"
-
-      #- name: Run IOS integration tests
-      #  working-directory: ./rust
-      #  run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
+      - name: Run IOS integration tests
+        working-directory: ./rust
+        run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
 
       - name: Upload IOS test reports (.xcresult)
         if: ${{ always() && !cancelled() }}

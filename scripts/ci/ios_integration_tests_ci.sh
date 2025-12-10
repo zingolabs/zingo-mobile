@@ -38,8 +38,6 @@ cd ios
 
 XCTESTRUN=$(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n 1)
 
-echo "\nTest: $(XCTESTRUN)"
-
 # just run the test
 xcodebuild test-without-building \
   -xctestrun "$XCTESTRUN" \
