@@ -156,6 +156,10 @@ class ExecuteAddressesFromSeed {
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
+        val exportUfvkJson: String = uniffi.zingo.getUfvk()
+        println("\nExport Ufvk:")
+        println(exportUfvkJson)
+
         val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
         println("\nAddresses:")
         println(addressesJson)
