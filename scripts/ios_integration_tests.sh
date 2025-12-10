@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 set_test_name=false
-test_name_default="ZingoTests/OfflineTestSuite"
+test_name_default="ZingoTests/ExecuteVersionFromSeed"
 
 while getopts 'a:e:x:h' OPTION; do
     case "$OPTION" in
@@ -13,7 +13,7 @@ while getopts 'a:e:x:h' OPTION; do
         h)
             echo -e "\nRun integration tests. Requires iOS Command-line Tools."
             echo -e "\n  -e\t\tSelect test name or test suite (optional)"
-            echo -e "      \t\t  Default: ZingoTests/OfflineTestSuite"
+            echo -e "      \t\t  Default: ZingoTests/ExecuteVersionFromSeed"
             exit 1
             ;;
         ?)
@@ -36,16 +36,12 @@ fi
 
 cd ios
 
-rm -rf build/reports
-rm -rf build/DerivedData
-mkdir -p build/reports build/DerivedData
-
 xcodebuild test \
     -workspace Zingo.xcworkspace \
     -scheme Zingo \
     -sdk iphonesimulator \
     -configuration Debug \
-    -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+    -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
     -derivedDataPath "build/DerivedData" \
     -resultBundlePath "build/reports/Zingo-Test.xcresult" \
     -only-testing:"${test_name}"

@@ -7,12 +7,11 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 
 object Seeds {
-    const val ABANDON = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
     const val HOSPITAL = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
 }
 
 object Ufvk {
-    const val ABANDON = "uview1wj07tp4y3rwzjplg68c3lum2avq4v3j0w0mf0urdlxzthnfr26q8ssz9hvylspj638tuh2r233gaxm2qh27gj6m9q25prk7gt8xwqzmwxm580tg0f5llvr7d6h4y6jc2t7zl7lz9ge60ta6226jyysgk8xpu2wqxesrw4q2mydrhj5dea5l9scl0p3l4ayqgfej54wex5aa2ylq89nyqg94l4lh6dawuc2e3s8v7737zn7p5fl96hhpjqg4jucnp2r2jjqxev3z7lp3k9ulfpl2gw0lng8vfe8hj8afggqzdwxgfaq6dy82guvh34kv4q5ay7gq6n0ujg7exu0mgznpr4wf0agjdhnd4k6af5md3f3msqedw364vx3lyd3hwekvrulywa4c0ja4ze2fxtcm0vrz0278g9n37y0jg6dx847g3peyq9lwmm04ac3tt4sldnrcfc5ew3k0aqgycnryfvv44zxzng485ks27wky2ulfy9q8hu97l"
+    const val HOSPITAL = "uviewregtest1zd5hsn447739jr5pk879pn06wan8gewam949xjqvwgfc7zec29x2ezqyeq6vmtwkcmn0kkfl447caqsccg582dp50ax972dfm4eh5f4mqj730fgr7hygvjeqxlgpwynrmcu57fjjqlns95chfjfq4xg7v977x603un9fuw73zvn2t32pfcfewrh67tzv04wstjg0yx4r3lpmpaea9nsyll6juu9jtyc0fstdwde06l4tvzlerytyutfd3yptq5r5csfck9c5ks8rzaj5r9tgltarejfdxu8h79sxmc6knxtnglp0pa7y3kw708rueg984ty6lhyrlzmk2swyqqfe0q2nmzhcxme9rsvprcw50ms463twx4suldhm0p94lem8ryan4e4y8fpp8grr5kmlygm70h2zhl0d7mfra5qs78jq9wqctvk8fhdu9cv78q00v7qzl9w50j242xr0945pmsu2vrh6jcvq8fxad420m8kxpd3cgyd6wxy6"
 }
 
 data class InitFromSeed (
@@ -131,15 +130,14 @@ data class ParseResult (
 
 val context = MainApplication.getAppContext()!!
 
-@Category(OfflineTest::class)
 class ExecuteAddressesFromSeed {
     @Test
     fun executeAddressesFromSeed() {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "main"
-        val seed = Seeds.ABANDON
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
@@ -158,11 +156,15 @@ class ExecuteAddressesFromSeed {
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
+        val exportUfvkJson: String = uniffi.zingo.getUfvk()
+        println("\nExport Ufvk:")
+        println(exportUfvkJson)
+
         val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
-        assertThat(addresses[0].encoded_address).isEqualTo("u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
+        assertThat(addresses[0].encoded_address).isEqualTo("uregtest1ue949txhf9t2z6ldg8wc6s5t439t2hu55yh9l58gc23cmxthths836nxtpyvhpkrftsp2jnnp9eadtqy2nefxn04eyxeu8l0x5kk8ct9")
         assertThat(addresses[0].has_orchard).isEqualTo(true)
         assertThat(addresses[0].has_sapling).isEqualTo(false)
         assertThat(addresses[0].has_transparent).isEqualTo(false)
@@ -171,20 +173,19 @@ class ExecuteAddressesFromSeed {
         println("\nT Addresses:")
         println(taddressesJson)
         val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
-        assertThat(taddresses[0].encoded_address).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(taddresses[0].encoded_address).isEqualTo("tmFLszfkjgim4zoUMAXpuohnFBAKy99rr2i")
         assertThat(taddresses[0].scope).isEqualTo("external")
     }
 }
 
-@Category(OfflineTest::class)
 class ExecuteAddressesFromUfvk {
     @Test
     fun executeAddressFromUfvk() {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "main"
-        val ufvk = Ufvk.ABANDON
+        val chainhint = "regtest"
+        val ufvk = Ufvk.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
@@ -214,7 +215,7 @@ class ExecuteAddressesFromUfvk {
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
-        assertThat(addresses[0].encoded_address).isEqualTo("u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
+        assertThat(addresses[0].encoded_address).isEqualTo("uregtest1ue949txhf9t2z6ldg8wc6s5t439t2hu55yh9l58gc23cmxthths836nxtpyvhpkrftsp2jnnp9eadtqy2nefxn04eyxeu8l0x5kk8ct9")
         assertThat(addresses[0].has_orchard).isEqualTo(true)
         assertThat(addresses[0].has_sapling).isEqualTo(false)
         assertThat(addresses[0].has_transparent).isEqualTo(false)
@@ -223,20 +224,19 @@ class ExecuteAddressesFromUfvk {
         println("\nT Addresses:")
         println(taddressesJson)
         val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
-        assertThat(taddresses[0].encoded_address).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(taddresses[0].encoded_address).isEqualTo("tmFLszfkjgim4zoUMAXpuohnFBAKy99rr2i")
         assertThat(taddresses[0].scope).isEqualTo("external")
     }    
 }
 
-@Category(OfflineTest::class)
 class ExecuteVersionFromSeed {
     @Test
     fun executeVersionFromSeed() {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "main"
-        val seed = Seeds.ABANDON
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
@@ -271,7 +271,7 @@ class ExecuteSyncFromSeed {
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
-        val seed = Seeds.ABANDON
+        val seed = Seeds.HOSPITAL
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
@@ -605,17 +605,16 @@ class ExecuteSaplingBalanceFromSeed {
         println(changeServerJson)
         assertThat(changeServerJson.lowercase().startsWith("error")).isFalse()
 
-        // open the wallet with no server - Offline mode
+        // open the wallet with no server - Offline mode - Main by default
         val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
         println("\nLoad Wallet:")
         println(loadWalletJson)
     }
 }
 
-class ExecuteParseAddresses {
-
+class ExecuteParseAddressForTex {
     @Test
-    fun ExecuteParseAddressForTex() {
+    fun executeParseAddressForTex() {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
@@ -657,9 +656,11 @@ class ExecuteParseAddresses {
 
         assertThat(result).isEqualTo(expectedResult)
     }
+}
 
+class ExecuteParseAddressInvalid {
     @Test
-    fun ExecuteParseAddresInvalid() {
+    fun executeParseAddressInvalid() {
         val mapper = jacksonObjectMapper()
 
         val serveruri = "http://10.0.2.2:20000"
