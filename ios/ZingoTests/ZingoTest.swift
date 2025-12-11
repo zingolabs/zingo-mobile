@@ -179,7 +179,7 @@ final class ExecuteAddressesFromSeed: XCTestCase {
     func testExecuteAddressesFromSeed() throws {
         setCryptoProvider()
 
-        let serveruri = "http://10.0.2.2:20000"
+        let serveruri = "http://127.0.0.1:20000"
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
@@ -721,7 +721,7 @@ final class ExecuteParseAddressInvalid: XCTestCase {
     func testExecuteParseAddressInvalid() throws {
         setCryptoProvider()
 
-        let serveruri = "http://10.0.2.2:20000"
+        let serveruri = "http://127.0.0.1:20000"
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 

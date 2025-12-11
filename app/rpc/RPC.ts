@@ -545,8 +545,12 @@ export default class RPC {
       }
       console.log('sync RUN', syncStr);
       if (syncStr && syncStr.toLowerCase().startsWith(GlobalConst.error)) {
+        // if it is this error: `sync is already running` 
+        // no save it as the last error 
         console.log(`Error sync: ${syncStr}`);
-        this.fnSetLastError(`Error sync: ${syncStr}`);
+        if (!syncStr.toLowerCase().includes('sync is already running')) {
+          this.fnSetLastError(`Error sync: ${syncStr}`);
+        }
       }
     }
 
