@@ -7,7 +7,7 @@ set_api_level=false
 set_api_target=false
 intel_host_os=true
 create_snapshot=false
-test_name_default="OfflineTestSuite"
+test_name_default="ExecuteVersionFromSeed"
 valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33" "34")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
@@ -113,7 +113,7 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             echo -e "\n  -A\t\tSets default system image of arm abis to arm instead of x86 (optional)"
             echo -e "      \t\t  Use this option if the host OS is arm"
             echo -e "\n  -e\t\tSelect test name or test suite (optional)"
-            echo -e "      \t\t  Default: OfflineTestSuite"
+            echo -e "      \t\t  Default: ExecuteVersionFromSeed"
             echo -e "\n  -l\t\tSelect API level (optional)"
             echo -e "      \t\t  Minimum API level: 23"
             echo -e "\n  -t\t\tSelect API target (optional)"

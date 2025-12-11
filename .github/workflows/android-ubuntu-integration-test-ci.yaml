@@ -113,20 +113,114 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
 
+  android-ubuntu-build:
+    name: Android Ubuntu Build
+    runs-on: ubuntu-24.04
+    env:
+      RUSTFLAGS: -D warnings
+      CACHE-KEY: ${{ inputs.cache-key }}
+
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Gradle setup cache (read/write)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
+
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/src/main/jniLibs/${{ env.ABI }}
+          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Kotlin uniffi cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Remove unnecessary directories to free up space
+        run: |
+          set -eux
+          echo "Disk space before cleanup:"
+          df -h
+
+          sudo apt-get update
+
+          sudo apt-get remove -y '^dotnet-.*' || true
+          sudo apt-get remove -y 'php.*' || true
+          sudo apt-get remove -y '^mongodb-.*' || true
+          sudo apt-get remove -y '^mysql-.*' || true
+          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri || true
+          sudo apt-get autoremove -y || true
+          sudo apt-get clean || true
+
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+
+          sudo docker image prune --all --force || true
+          sudo docker builder prune -a || true
+
+          echo "Disk space after cleanup:"
+          df -h
+
+      - name: Yarn install
+        run: yarn
+
+      - name: Run Build
+        working-directory: android
+        run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
+
+      - name: Upload Android build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          path: |
+            android/app/build/outputs
+
   android-ubuntu-integration-test-ci:
     name: Android Ubuntu Integration test
-    needs: android-ubuntu-integration-test-ci-avd-cache
+    needs: 
+      - android-ubuntu-integration-test-ci-avd-cache
+      - android-ubuntu-build
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         test: [
-          "offline_testsuite",
+          "execute_version_from_seed",
+          "execute_addresses_from_ufvk",
+          "execute_addresses_from_seed",
           "execute_sync_from_seed",
           "execute_send_from_orchard",
           "execute_currentprice_and_value_transfers_from_seed",
           "execute_sapling_balance_from_seed",
-          "execute_parse_addresses"
+          "execute_parse_address_for_tex",
+          "execute_parse_address_invalid"
         ]
     env:
       RUSTFLAGS: -D warnings
@@ -164,20 +258,6 @@ jobs:
         run: |
           echo "AVD-ARCH=arm64-v8a" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
-
-      - name: Remove unnecessary directories to free up space
-        run: |
-          echo "Disk space before post-build cleanup:"
-          df -h
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-          sudo apt-get clean
-          echo "Disk space after post-build cleanup:"
-          df -h
 
       - name: Grant permissions
         run: |
@@ -219,20 +299,6 @@ jobs:
           cache-write-only: false
           cache-read-only: true
 
-      - name: Native rust cache
-        uses: actions/cache/restore@v4
-        with:
-          path: android/app/src/main/jniLibs/${{ env.ABI }}
-          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
-
-      - name: Kotlin uniffi cache
-        uses: actions/cache/restore@v4
-        with:
-          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
-          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
-
       - name: Restore AVD cache
         uses: actions/cache/restore@v4
         with:
@@ -242,29 +308,67 @@ jobs:
           key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
           fail-on-cache-miss: true
 
-      - name: Pull docker image
-        run: docker pull zingodevops/regchest:011
+      - name: Remove unnecessary directories to free up space
+        run: |
+          set -eux
+          echo "Disk space before cleanup:"
+          df -h
+
+          sudo apt-get update
+
+          sudo apt-get remove -y '^dotnet-.*' || true
+          sudo apt-get remove -y 'php.*' || true
+          sudo apt-get remove -y '^mongodb-.*' || true
+          sudo apt-get remove -y '^mysql-.*' || true
+          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri || true
+          sudo apt-get autoremove -y || true
+          sudo apt-get clean || true
+
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+
+          sudo docker image prune --all --force || true
+          sudo docker builder prune -a || true
+
+          echo "Disk space after cleanup:"
+          df -h
 
       - name: Yarn install
         run: yarn
 
-      - name: Run Build
-        working-directory: android
-        run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
+      - name: Download Android build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          path: android/app/build/outputs
 
-      - name: Remove unnecessary directories to free up space after build
+      #- name: Pull docker image
+      #  run: docker pull zingodevops/regchest:012
+
+      - name: Pull ci-build docker image
+        run: docker pull zingodevops/ci-build:009
+
+      - name: Extract binaries & params from image
         run: |
-          echo "Disk space before post-build cleanup:"
-          df -h
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-          sudo apt-get clean
-          echo "Disk space after post-build cleanup:"
-          df -h
+          set -euxo pipefail
+          cid=$(docker create zingodevops/ci-build:009)
+          mkdir -p rust/test_binaries/bins
+          docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
+          docker rm "$cid"
+
+      - name: binaries env var
+        run: |
+          TEST_BINARIES_DIR="$(pwd)/rust/test_binaries/bins"
+          echo "TEST_BINARIES_DIR=$TEST_BINARIES_DIR" >> "$GITHUB_ENV"
 
       - name: Run Android Integration Test
         uses: reactivecircus/android-emulator-runner@v2
@@ -275,8 +379,10 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest" --verbose --release
+          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
           working-directory: ./rust
+        env:
+          TEST_BINARIES_DIR: ${{ env.TEST_BINARIES_DIR }}
 
       - name: Upload test reports
         if: ${{ always() && !cancelled() }}
