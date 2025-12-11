@@ -1,6 +1,6 @@
 //
 //  Constants.swift
-//  ZingoMobile
+//  Zingo
 //
 //  Created by Juan Carlos Carmona Calvo on 7/17/24.
 //

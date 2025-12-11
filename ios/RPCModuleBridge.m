@@ -1,6 +1,6 @@
 //
 //  RPCModuleBridge.m
-//  ZingoMobile
+//  Zingo
 //
 //  Created by Juan Carlos Carmona Calvo on 4/2/24.
 //

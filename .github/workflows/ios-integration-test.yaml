@@ -24,11 +24,6 @@ jobs:
         run: |
           xcodebuild -runFirstLaunch || true
 
-      - name: Info 1
-        run: |
-          xcrun simctl list runtimes
-          xcrun simctl list devices
-
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
@@ -49,14 +44,14 @@ jobs:
         working-directory: rust/lib/Generated
         run: cp ./*.* ../../../ios
 
-      - name: Install nvm with node 20.9.0
+      - name: Install nvm with node 22.18.0
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-          nvm install 20.9.0
-          nvm use 20.9.0
+          nvm install 22.18.0
+          nvm use 22.18.0
 
       - name: Yarn
         run: yarn
@@ -65,7 +60,7 @@ jobs:
         working-directory: ios
         run: pod install
 
-      - name: Info 2
+      - name: Info
         run: |
           xcrun simctl list runtimes
           xcrun simctl list devices
@@ -76,13 +71,13 @@ jobs:
           set -euxo pipefail
           mkdir -p build/reports build/DerivedData
           xcodebuild build-for-testing \
-            -workspace ZingoMobile.xcworkspace \
-            -scheme ZingoMobile \
+            -workspace Zingo.xcworkspace \
+            -scheme Zingo \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
             -derivedDataPath "build/DerivedData" \
-            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult" \
+            -resultBundlePath "build/reports/Zingo-BuildForTesting.xcresult" \
             -quiet
 
       - name: Upload Build Result
@@ -96,7 +91,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-ios-integration-build-reports.xcresult
-          path: ios/build/reports/ZingoMobile-BuildForTesting.xcresult
+          path: ios/build/reports/Zingo-BuildForTesting.xcresult
 
       - name: Upload IOS build DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}
@@ -120,12 +115,15 @@ jobs:
       fail-fast: false
       matrix:
         test: [
-          "offline_testsuite",
+          "execute_version_from_seed",
+          "execute_addresses_from_ufvk",
+          "execute_addresses_from_seed",
           "execute_sync_from_seed",
           "execute_send_from_orchard",
           "execute_currentprice_and_value_transfers_from_seed",
           "execute_sapling_balance_from_seed",
-          "execute_parse_addresses"
+          "execute_parse_address_for_tex",
+          "execute_parse_address_invalid"
         ]
     env:
       RUSTFLAGS: -D warnings
@@ -199,16 +197,16 @@ jobs:
           tool: nextest
 
       - name: Pull docker image
-        run: docker pull zingodevops/regchest:011
+        run: docker pull zingodevops/regchest:012
       
-      - name: Install nvm with node 20.9.0
+      - name: Install nvm with node 22.18.0
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-          nvm install 20.9.0
-          nvm use 20.9.0
+          nvm install 22.18.0
+          nvm use 22.18.0
 
       - name: Yarn
         run: yarn
@@ -237,7 +235,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-ios-integration-test-reports-${{ matrix.test }}.xcresult
-          path: ios/build/reports/ZingoMobile-Test.xcresult
+          path: ios/build/reports/Zingo-Test.xcresult
 
       - name: Upload IOS DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}

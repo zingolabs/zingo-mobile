@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 set_test_name=false
-test_name_default="ZingoMobileTests/OfflineTestSuite"
+test_name_default="ZingoTests/ExecuteVersionFromSeed"
 
 while getopts 'a:e:x:h' OPTION; do
     case "$OPTION" in
@@ -13,7 +13,7 @@ while getopts 'a:e:x:h' OPTION; do
         h)
             echo -e "\nRun integration tests. Requires iOS Command-line Tools."
             echo -e "\n  -e\t\tSelect test name or test suite (optional)"
-            echo -e "      \t\t  Default: ZingoMobileTests/OfflineTestSuite"
+            echo -e "      \t\t  Default: ZingoTests/ExecuteVersionFromSeed"
             exit 1
             ;;
         ?)
@@ -41,8 +41,8 @@ XCTESTRUN=$(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n 
 # just run the test
 xcodebuild test-without-building \
   -xctestrun "$XCTESTRUN" \
-  -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
-  -resultBundlePath "build/reports/ZingoMobile-Test.xcresult" \
+  -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
+  -resultBundlePath "build/reports/Zingo-Test.xcresult" \
   -only-testing:"${test_name}"
 
 if [ $? -ne 0 ]; then
