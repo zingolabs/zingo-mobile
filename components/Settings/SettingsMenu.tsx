@@ -77,7 +77,7 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
           left: 10,
           zIndex: 999,
         }}
-      ></View>
+       />
 
       <View
         style={{
