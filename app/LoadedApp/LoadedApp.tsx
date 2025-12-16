@@ -149,7 +149,7 @@ type LoadedAppProps = {
 
 const SERVER_DEFAULT_0: ServerType = {
   uri: '',
-  chainName: ChainNameEnum.testChainName,
+  chainName: ChainNameEnum.regtestChainName,
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
