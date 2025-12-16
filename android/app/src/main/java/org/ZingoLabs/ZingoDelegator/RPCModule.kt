@@ -1482,4 +1482,25 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    @ReactMethod
+    fun stakeProcess(stake_json: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.stake(stake_json)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp.toString())
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] create stake tx: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
 }
