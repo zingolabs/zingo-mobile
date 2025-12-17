@@ -40,6 +40,8 @@ import {
   MINER_ADDRESS_REGTEST,
   MINER_ADDRESS_TESTNET,
 } from '../../../app/utils/constants';
+import FadeText from '../../Components/FadeText';
+import ZecAmount from '../../Components/ZecAmount';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -73,13 +75,14 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const navigation = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
-  const { totalBalance, defaultUnifiedAddress, indexerServer } =
+  const { totalBalance, defaultUnifiedAddress, indexerServer, info, privacy } =
     useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
-  const [finalizerText, setFinalizerText] = useState('');
-  const [kbOpen, setKbOpen] = React.useState(false);
+  const [finalizerText, setFinalizerText] = useState<string>('');
+  const [kbOpen, setKbOpen] = useState<boolean>(false);
+  const [spendable, setSpendable] = useState<number>(0);
 
   const hasSelection = selectedAmount !== null;
   const displayAmount = selectedAmount ?? 0;
@@ -94,6 +97,15 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       s2.remove();
     };
   }, []);
+
+  useEffect(() => {
+    // Balance check (in cTAZ / ZEC units)
+    const _spendable =
+      totalBalance && typeof totalBalance.totalSpendableBalance === 'number'
+        ? totalBalance.totalSpendableBalance
+        : 0;
+    setSpendable(_spendable);
+  }, [totalBalance, totalBalance?.totalSpendableBalance]);
 
   const handleConfirmStake = async () => {
     if (!hasSelection) {
@@ -121,12 +133,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       );
       return;
     }
-
-    // Balance check (in cTAZ / ZEC units)
-    const spendable =
-      totalBalance && typeof totalBalance.totalSpendableBalance === 'number'
-        ? totalBalance.totalSpendableBalance
-        : 0;
 
     if (amount > spendable) {
       Alert.alert(
@@ -264,6 +270,11 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
             })}
           </View>
 
+          <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'flex-end' }}>
+            <FadeText style={{ marginRight: 5 }}>Available for staking:</FadeText>
+            <ZecAmount amtZec={spendable} size={15} currencyName={info.currencyName} privacy={privacy} />
+          </View>
+
           <Text
             style={{
               fontSize: 16,
@@ -346,7 +357,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           disabled={
             !hasSelection || !finalizerText.trim() || modalState === 'sending'
           }
-          onPress={handleConfirmStake}
+          onPress={async () => await handleConfirmStake()}
           style={{
             alignSelf: 'stretch',
           }}
