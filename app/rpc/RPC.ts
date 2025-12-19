@@ -452,7 +452,9 @@ export default class RPC {
     let returnPause: string = await RPCModule.pauseSyncProcess();
     if (returnPause && returnPause.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC PAUSE ERROR', returnPause);
-      this.fnSetLastError(`Error sync pause: ${returnPause}`);
+      if (!returnPause.toLowerCase().includes('sync is not running')) {
+        this.fnSetLastError(`Error sync pause: ${returnPause}`);
+      }
       return;
     } else {
       console.log('pause sync process. PAUSED', returnPause);
