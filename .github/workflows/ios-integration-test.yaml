@@ -13,12 +13,18 @@ env:
 
 jobs:
   build-for-testing:
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
-      - name: Xcode 16.4
+      - name: Xcode 26.1
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '26.1'
+
+      - name: Toolchain sanity
+        run: |
+          xcodebuild -version
+          xcrun simctl list runtimes
+          xcrun simctl list devices
 
       - name: First launch
         run: |
@@ -80,7 +86,7 @@ jobs:
             -scheme ZingoDelegator \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -destination 'platform=iOS Simulator,name=iPhone 16e,OS=26.1' \
             -derivedDataPath "build/DerivedData" \
             -resultBundlePath "build/reports/ZingoDelegator-BuildForTesting.xcresult" \
             -quiet
@@ -115,7 +121,7 @@ jobs:
   ios-integration-test:
     name: IOS Integration test
     needs: build-for-testing
-    runs-on: macos-15
+    runs-on: macos-26
     strategy:
       fail-fast: false
       matrix:
@@ -130,10 +136,10 @@ jobs:
     env:
       RUSTFLAGS: -D warnings
     steps:
-      - name: Xcode 16.4
+      - name: Xcode 26.1
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '26.1'
 
       - name: First launch
         run: |
