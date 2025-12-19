@@ -4,7 +4,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Pressable,
   Modal,
   ActivityIndicator,
@@ -20,7 +19,6 @@ import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  faChevronLeft,
   faCheckCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
@@ -41,6 +39,7 @@ import {
   MINER_ADDRESS_REGTEST,
   MINER_ADDRESS_TESTNET,
 } from '../../../app/utils/constants';
+import { HeaderTitle } from '../../Header';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -327,26 +326,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={18}
-              color={colors.text}
-            />
-          </TouchableOpacity>
-
-          <Text style={[styles.headerTitle, { color: colors.text }]}>
-            Unstake
-          </Text>
-
-          <View style={{ width: 32 }} />
-        </View>
+        <HeaderTitle title='Stake' goBack={() => navigation.goBack()} />
 
         {/* Content */}
         <View
@@ -525,23 +505,6 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
 };
 
 const styles = StyleSheet.create({
-  header: {
-    height: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  backButton: {
-    width: 32,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: '600',
-  },
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.55)',

@@ -16,7 +16,7 @@ import {
   ButtonTypeEnum,
   ScreenEnum,
 } from '../../AppState';
-import Header from '../../../components/Header';
+import { Header } from '../../../components/Header';
 import Utils from '../../utils';
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
