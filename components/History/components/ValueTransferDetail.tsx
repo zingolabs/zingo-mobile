@@ -25,12 +25,13 @@ import BoldText from '../../Components/BoldText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Stake from '../../../assets/icons/stake-white.svg';
 import Unstake from '../../../assets/icons/unstake-white.svg';
-import { faChevronDown, faChevronUp, faChevronLeft, faRefresh, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faRefresh, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { HeaderTitle } from '../../Header';
 
 type ValueTransferDetailProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail>;
 
@@ -156,36 +157,12 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
       >
 
-        <View style={{
-          position: 'absolute',
-          width: 75,
-          top: 10,
-          left: 10,
-          zIndex: 999,
-        }}>
-          <View
-            style={{
-              borderRadius: 25,
-              borderColor: colors.text,
-              borderWidth: 1,
-              padding: 10,
-              margin: 10,
-              backgroundColor: colors.background,
-            }}>
-              <TouchableOpacity onPress={() => {
-                clear();
-                if (navigation.canGoBack()) {
-                  navigation.goBack();
-                }
-              }}>
-                <FontAwesomeIcon
-                  size={30}
-                  icon={faChevronLeft}
-                  color={colors.text}
-                />
-              </TouchableOpacity>
-          </View>
-        </View>
+        <HeaderTitle title='Transaction details' goBack={() => {
+          clear();
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }} />
 
         {showNavigator && (
           <View
@@ -194,7 +171,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               justifyContent: 'flex-end',
               alignItems: 'center',
               marginRight: 30,
-              marginTop: 30,
+              marginTop: 0,
             }}>
             <TouchableOpacity
               onPress={() => moveValueTransferDetail(valueTransferIndex, -1)}
@@ -219,8 +196,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             </TouchableOpacity>
           </View>
         )}
-
-        <RegText color={colors.text} style={{ fontSize: 25, marginTop: showNavigator ? 10 : 30, alignSelf: 'center' }}>Transaction details</RegText>
 
         <ScrollView
           keyboardShouldPersistTaps="handled"

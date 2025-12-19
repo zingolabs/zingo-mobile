@@ -11,17 +11,16 @@ import {
 } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import FadeText from '../../../components/Components/FadeText';
 import RegText from '../../../components/Components/RegText';
 import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
-import { ButtonTypeEnum, GlobalConst, ScreenEnum, SelectServerEnum } from '../../AppState';
+import { ButtonTypeEnum, ScreenEnum, SelectServerEnum } from '../../AppState';
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { HeaderTitle } from '../../../components/Header';
 
 type ImportProps = {
   actionButtonsDisabled: boolean;
@@ -164,34 +163,10 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
         keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0}
       >
 
-        <View style={{
-          position: 'absolute',
-          width: 75,
-          top: 10 + (Platform.OS === GlobalConst.platformOSios ? insets.top : 0),
-          left: 10,
-          zIndex: 999,
-        }}>
-          <View
-            style={{
-              borderRadius: 25,
-              borderColor: colors.text,
-              borderWidth: 1,
-              padding: 10,
-              margin: 10,
-              backgroundColor: colors.background,
-            }}>
-              <TouchableOpacity onPress={() => {
-                clear();
-                onClickCancel();
-              }}>
-                <FontAwesomeIcon
-                  size={30}
-                  icon={faChevronLeft}
-                  color={colors.text}
-                />
-              </TouchableOpacity>
-          </View>
-        </View>
+        <HeaderTitle title='' goBack={() => {
+          clear();
+          onClickCancel();
+        }} />
 
         <ScrollView
           keyboardShouldPersistTaps="handled"

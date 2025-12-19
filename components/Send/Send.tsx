@@ -16,7 +16,6 @@ import {
 import {
   faQrcode,
   faCheck,
-  faChevronLeft,
   faArrowDown,
   faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
@@ -56,6 +55,7 @@ import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Wallet from '../../assets/icons/wallet.svg';
+import { HeaderTitle } from '../Header';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
@@ -890,45 +890,16 @@ const Send: React.FunctionComponent<SendProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <View
-          style={{
-            position: 'absolute',
-            width: 75,
-            top: 10,
-            left: 10,
-            zIndex: 999,
-          }}
-        >
-          <View
-            style={{
-              borderRadius: 25,
-              borderColor: colors.text,
-              borderWidth: 1,
-              padding: 10,
-              margin: 10,
-              backgroundColor: colors.background,
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                if (title === 'Send') {
-                  setTitle('Send to');
-                } else {
-                  clear();
-                  if (navigation.canGoBack()) {
-                    navigation.goBack();
-                  }
-                }
-              }}
-            >
-              <FontAwesomeIcon
-                size={30}
-                icon={faChevronLeft}
-                color={colors.text}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+        <HeaderTitle title={title} goBack={() => {
+          if (title === 'Send') {
+            setTitle('Send to');
+          } else {
+            clear();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
+          }
+        }} />
 
         <ScrollView
           keyboardShouldPersistTaps="handled"
@@ -945,10 +916,6 @@ const Send: React.FunctionComponent<SendProps> = ({
               alignItems: 'center',
             }}
           >
-            <RegText color={colors.text} style={{ fontSize: 25, marginBottom: 50 }}>
-              {title} 
-            </RegText>
-
             { title === 'Send to' && (
               <>
                 <View
@@ -1057,7 +1024,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       style={{ marginLeft: 10 }}
                       size={22}
                       icon={faQrcode}
-                      color={colors.border}
+                      color={colors.placeholder}
                     />
                   </TouchableOpacity>
                 </View>

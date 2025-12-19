@@ -184,7 +184,11 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <HeaderTitle title='Stake' goBack={() => navigation.goBack()} />
+        <HeaderTitle title='Stake' goBack={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }} />
 
         <ScrollView
           keyboardShouldPersistTaps="handled"

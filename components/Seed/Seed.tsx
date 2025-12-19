@@ -22,8 +22,7 @@ import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { HeaderTitle } from '../Header';
 
 type SeedProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
   onClickOK?: (seedPhrase: string, birthdayNumber: number) => void;
@@ -155,39 +154,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         screenName={screenName}
       />
 
-      <View style={{
-        position: 'absolute',
-        width: 75,
-        top: 10,
-        left: 10,
-        zIndex: 999,
-      }}>
-        <View
-          style={{
-            borderRadius: 25,
-            borderColor: colors.text,
-            borderWidth: 1,
-            padding: 10,
-            margin: 10,
-            backgroundColor: colors.background,
-          }}>
-            <TouchableOpacity onPress={() => {
-              onClickCancelHide();
-            }}>
-              <FontAwesomeIcon
-                size={30}
-                icon={faChevronLeft}
-                color={colors.text}
-              />
-            </TouchableOpacity>
-        </View>
-      </View>
+      <HeaderTitle title='Seed phrase' goBack={() => {
+        onClickCancelHide();
+      }} />
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           flexGrow: 1,
-          paddingTop: insets.top + 8,
           paddingBottom: insets.bottom + 8,
           paddingHorizontal: 10,
       }}>
@@ -198,9 +172,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             justifyContent: 'center',
         }}>
 
-          <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>Seed Phrase</RegText>
-
-          <FadeText style={{ marginTop: 20, padding: 10, textAlign: 'center', fontSize: 17 }}>
+          <FadeText style={{ padding: 10, textAlign: 'center', fontSize: 17 }}>
             {'Your seed phrase is the key to your wallet. Back it up so you can restore your wallet if you lose or damage your device '}
           </FadeText>
 

@@ -326,7 +326,12 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <HeaderTitle title='Stake' goBack={() => navigation.goBack()} />
+
+        <HeaderTitle title='Unstake' goBack={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }} />
 
         {/* Content */}
         <View

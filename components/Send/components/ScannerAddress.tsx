@@ -7,12 +7,11 @@ import { GlobalConst, RouteEnum, ScreenEnum } from '../../../app/AppState';
 import { useTheme } from '@react-navigation/native';
 import { AppDrawerParamList, ThemeType } from '../../../app/types';
 
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { HeaderTitle } from '../../Header';
 
 type ScannerAddressProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ScannerAddress>;
 
@@ -78,40 +77,18 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
         screenName={screenName}
       />
 
-      <View style={{
-        position: 'absolute',
-        width: 75,
-        top: 10,
-        left: 10,
-        zIndex: 999,
-      }}>
-        <View
-          style={{
-            borderRadius: 25,
-            borderColor: colors.text,
-            borderWidth: 1,
-            padding: 10,
-            margin: 10,
-            backgroundColor: colors.background,
-          }}>
-            <TouchableOpacity onPress={() => {
-              clear();
-              if (navigation.canGoBack()) {
-                navigation.goBack();
-              }
-            }}>
-              <FontAwesomeIcon
-                size={30}
-                icon={faChevronLeft}
-                color={colors.text}
-              />
-            </TouchableOpacity>
-        </View>
-      </View>
+      <HeaderTitle title='Scan zcash address' goBack={() => {
+        clear();
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
+      }} />
+
       <View
         style={{
           flex: 1,
           backgroundColor: colors.background,
+          marginTop: 15,
         }}>
         <Scanner 
           active={active}
