@@ -513,7 +513,9 @@ export default class RPC {
       returnPause.toLowerCase().startsWith(GlobalConst.error)
     ) {
       console.log('SYNC PAUSE ERROR', returnPause);
-      this.fnSetLastError(`Error sync pause: ${returnPause}`);
+      if (!returnPause.toLowerCase().includes('sync is not running')) {
+        this.fnSetLastError(`Error sync pause: ${returnPause}`);
+      }
       return;
     } else {
       console.log('pause sync process. PAUSED', returnPause);
@@ -617,7 +619,9 @@ export default class RPC {
       console.log('sync RUN', syncStr);
       if (syncStr && syncStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error sync: ${syncStr}`);
-        this.fnSetLastError(`Error sync: ${syncStr}`);
+        if (!syncStr.toLowerCase().includes('sync is already running')) {
+          this.fnSetLastError(`Error sync: ${syncStr}`);
+        }
       }
     }
 
