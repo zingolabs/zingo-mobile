@@ -735,7 +735,7 @@ export default class RPC {
           screen: 0,
           startingApp: false,
           walletSeed: this.walletSeed,
-          walletBirthday: this.walletBirthday,
+          walletBirthday: this.walletBirthday > this.lastServerBlockHeight ? 1 : this.walletBirthday,
         });
       } else {
         // This command have an error, fine. It's worthy to try running the sync process juat in case.
