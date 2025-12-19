@@ -83,7 +83,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
     };
   }, []);
 
-  console.log('Render Servers', insets);
+  //console.log('Render Servers', insets);
 
   return (
     <ToastProvider>
