@@ -4,6 +4,10 @@ version = "2.0.0"
 authors = ["Zingolabs <zingo@zingolabs.com>"]
 edition = "2024"
 
+[features]
+ci = []
+regchest = []
+
 [dependencies]
 zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "08af3a538c85798ed1ca84b3ab15197a6eb12a6f", default-features = true, features = [
     "testutils",

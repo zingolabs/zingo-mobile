@@ -17,7 +17,7 @@ import { useTheme } from '@react-navigation/native';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import Header from '../Header';
+import { Header } from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { ButtonTypeEnum, GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';

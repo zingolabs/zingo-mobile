@@ -9,7 +9,7 @@ import DetailLine from '../Components/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 
-import Header from '../Header';
+import { Header } from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';

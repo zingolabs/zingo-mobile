@@ -16,7 +16,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
-import Header from '../Header';
+import { Header } from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import Snackbars from '../Components/Snackbars';

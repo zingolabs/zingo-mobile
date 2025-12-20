@@ -148,7 +148,7 @@ const Staking: React.FC<StakingProps> = () => {
     ? formatHeaderMonth(movements[0].time)
     : undefined;
 
-  console.log('movements', movements);
+  //console.log('movements', movements);
 
   return (
     <View

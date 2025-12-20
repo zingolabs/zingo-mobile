@@ -27,12 +27,12 @@ import { serverUris } from '../../uris';
 import RNPickerSelect from 'react-native-picker-select';
 import {
   faCheck,
-  faChevronLeft,
   faWarning,
 } from '@fortawesome/free-solid-svg-icons';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import XIcon from '../../../assets/icons/x.svg';
 import LiquidPrimaryButton from '../../../components/Staking/LiquidPrimaryButton';
+import { HeaderTitle } from '../../../components/Header';
 
 type ServersProps = {
   actionButtonsDisabled: boolean;
@@ -83,7 +83,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
     };
   }, []);
 
-  console.log('Render Servers', insets);
+  //console.log('Render Servers', insets);
 
   return (
     <ToastProvider>
@@ -103,6 +103,13 @@ const Servers: React.FunctionComponent<ServersProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
+        {fromSettings && (
+          <HeaderTitle title='' goBack={() => {
+            clear();
+            closeServers();
+          }} />
+        )}
+
         <View
           style={{
             flexGrow: 1,
@@ -113,42 +120,6 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             paddingHorizontal: 16,
           }}
         >
-          {fromSettings && (
-            <View
-              style={{
-                position: 'absolute',
-                width: 75,
-                top: 10,
-                left: 10,
-                zIndex: 999,
-              }}
-            >
-              <View
-                style={{
-                  borderRadius: 25,
-                  borderColor: colors.text,
-                  borderWidth: 1,
-                  padding: 10,
-                  margin: 10,
-                  backgroundColor: colors.background,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    clear();
-                    closeServers();
-                  }}
-                >
-                  <FontAwesomeIcon
-                    size={30}
-                    icon={faChevronLeft}
-                    color={colors.text}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-
           <RegText color={colors.text} style={{ fontSize: 25 }}>
             Indexer Server
           </RegText>

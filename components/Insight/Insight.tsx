@@ -15,7 +15,7 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
 import FadeText from '../Components/FadeText';
-import Header from '../Header';
+import { Header } from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
 import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';

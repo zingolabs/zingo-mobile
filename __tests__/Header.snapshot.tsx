@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Header from '../components/Header';
+import { Header } from '../components/Header';
 import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
