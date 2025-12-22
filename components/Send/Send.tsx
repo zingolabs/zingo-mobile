@@ -48,7 +48,6 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { createAlert } from '../../app/createAlert';
 import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
-import { sendEmail } from '../../app/sendEmail';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
@@ -104,7 +103,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     shieldingAmount,
     selectIndexerServer,
     zenniesDonationAddress,
-    zingolibVersion,
     snackbars,
     removeFirstSnackbar,
   } = context;
@@ -825,8 +823,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         `${customError ? customError : error}`,
         false,
         translate,
-        sendEmail,
-        zingolibVersion,
       );
     }, 1 * 1000);
 
@@ -1179,16 +1175,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 spendableBalanceLastError,
                                 [
                                   {
-                                    text: translate('support') as string,
-                                    onPress: async () =>
-                                      sendEmail(
-                                        translate,
-                                        zingolibVersion,
-                                        'Available',
-                                        spendableBalanceLastError,
-                                      ),
-                                  },
-                                  {
                                     text: translate('cancel') as string,
                                     style: 'cancel',
                                   },
@@ -1299,16 +1285,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   translate('send.fee') as string,
                                   proposeSendLastError,
                                   [
-                                    {
-                                      text: translate('support') as string,
-                                      onPress: async () =>
-                                        sendEmail(
-                                          translate,
-                                          zingolibVersion,
-                                          translate('send.fee') as string,
-                                          proposeSendLastError,
-                                        ),
-                                    },
                                     {
                                       text: translate('cancel') as string,
                                       style: 'cancel',
