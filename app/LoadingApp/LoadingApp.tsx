@@ -71,7 +71,6 @@ import {
 
 // no lazy load because slowing down screens.
 import Import from './components/Import';
-import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
 import { ToastProvider } from 'react-native-toastier';
@@ -237,6 +236,8 @@ export default function LoadingApp(props: LoadingAppProps) {
       }
       // lightwallet server
       if (settings.indexerServer) {
+        // because I don't know what the app have in chain name...
+        settings.indexerServer.chainName = ChainNameEnum.testChainName
         setIndexerServer(settings.indexerServer);
       } else {
         await SettingsFileImpl.writeSettings(
@@ -938,8 +939,6 @@ export class LoadingAppClass extends Component<
         result,
         false,
         this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
       );
       this.setState({
         actionButtonsDisabled: false,
@@ -958,8 +957,6 @@ export class LoadingAppClass extends Component<
           result,
           false,
           this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
         );
         this.setState({
           actionButtonsDisabled: false,
@@ -997,8 +994,6 @@ export class LoadingAppClass extends Component<
                 result,
                 false,
                 this.state.translate,
-                sendEmail,
-                this.state.zingolibVersion,
               );
               this.setState({
                 actionButtonsDisabled: false,
@@ -1015,8 +1010,6 @@ export class LoadingAppClass extends Component<
               this.state.translate('loadingapp.noservers') as string,
               false,
               this.state.translate,
-              sendEmail,
-              this.state.zingolibVersion,
             );
             this.setState({
               actionButtonsDisabled: false,
@@ -1042,8 +1035,6 @@ export class LoadingAppClass extends Component<
               result,
               false,
               this.state.translate,
-              sendEmail,
-              this.state.zingolibVersion,
             );
             this.setState({
               actionButtonsDisabled: false,
@@ -1191,8 +1182,6 @@ export class LoadingAppClass extends Component<
             seedJSON.error,
             false,
             this.state.translate,
-            sendEmail,
-            this.state.zingolibVersion,
           );
           return;
         }
@@ -1206,8 +1195,6 @@ export class LoadingAppClass extends Component<
           e instanceof Error ? e.message : String(e),
           false,
           this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
         );
         return;
       }
@@ -1266,8 +1253,6 @@ export class LoadingAppClass extends Component<
         this.state.translate('loadingapp.emptyseedufvk-error') as string,
         false,
         this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
       );
       return;
     }
@@ -1285,8 +1270,6 @@ export class LoadingAppClass extends Component<
         this.state.translate('loadingapp.invalidseedufvk-error') as string,
         false,
         this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
       );
       return;
     }
