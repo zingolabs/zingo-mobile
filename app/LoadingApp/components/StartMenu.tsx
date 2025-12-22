@@ -1,10 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, Alert, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { View, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
@@ -18,6 +15,7 @@ import Snackbars from '../../../components/Components/Snackbars';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
+import { HeaderTitle } from '../../../components/Header';
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
@@ -60,6 +58,12 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
       >
+        
+        <HeaderTitle title='' goBack={() => {
+          clear();
+          openServers();
+        }} />
+
         <View
           style={{
             flexGrow: 1,
@@ -70,35 +74,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             paddingHorizontal: 16,
         }}>
         
-          <View style={{
-            position: 'absolute',
-            width: 75,
-            top: 10,
-            left: 10,
-            zIndex: 999,
-          }}>
-            <View
-              style={{
-                borderRadius: 25,
-                borderColor: colors.text,
-                borderWidth: 1,
-                padding: 10,
-                margin: 10,
-                backgroundColor: colors.background,
-              }}>
-                <TouchableOpacity onPress={() => {
-                  clear();
-                  openServers();
-                }}>
-                  <FontAwesomeIcon
-                    size={30}
-                    icon={faChevronLeft}
-                    color={colors.text}
-                  />
-                </TouchableOpacity>
-            </View>
-          </View>
-
           <RegText color={colors.text} style={{ fontSize: 30 }}>Welcome to</RegText>
           <RegText color={colors.text} style={{ fontSize: 30 }}>your wallet</RegText>
 

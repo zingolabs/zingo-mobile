@@ -14,14 +14,12 @@ import {
   Keyboard,
   ScrollView,
   Alert,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faChevronLeft,
-  faCheckCircle,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { ThemeType } from '../../../app/types/ThemeType';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -42,6 +40,7 @@ import {
 } from '../../../app/utils/constants';
 import FadeText from '../../Components/FadeText';
 import ZecAmount from '../../Components/ZecAmount';
+import { HeaderTitle } from '../../Header';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -184,272 +183,271 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-      }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={
-        Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
-      }
-    >
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <FontAwesomeIcon icon={faChevronLeft} size={18} color={colors.text} />
-        </TouchableOpacity>
-
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Stake</Text>
-
-        <View style={{ width: 32 }} />
-      </View>
-
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom + 8,
-          paddingHorizontal: 10,
-        }}
-      >
-        <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24 }}>
-          <View style={{ marginBottom: 32 }}>
-            <Text
-              style={{
-                fontSize: 36,
-                fontWeight: '700',
-                textAlign: 'center',
-                color: hasSelection ? colors.text : colors.placeholder,
-              }}
-            >
-              {displayAmount} cTAZ
-            </Text>
-          </View>
-
-          <View style={styles.grid}>
-            {PRESET_AMOUNTS.map(value => {
-              const isSelected = selectedAmount === value;
-
-              return (
-                <Pressable
-                  key={value}
-                  style={[
-                    styles.pill,
-                    isSelected && {
-                      backgroundColor: '#1A1A1A',
-                      borderColor: colors.primary,
-                    },
-                  ]}
-                  onPress={() => setSelectedAmount(value)}
-                >
-                  <Text
-                    style={[
-                      styles.pillAmount,
-                      { color: isSelected ? colors.primary : colors.text },
-                    ]}
-                  >
-                    +{value}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.pillLabel,
-                      {
-                        color: isSelected ? colors.primary : colors.placeholder,
-                      },
-                    ]}
-                  >
-                    cTAZ
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-
-          <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'flex-end' }}>
-            <FadeText style={{ marginRight: 5 }}>Available for staking:</FadeText>
-            <ZecAmount amtZec={spendable} size={15} currencyName={info.currencyName} privacy={privacy} />
-          </View>
-
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '600',
-              color: colors.text,
-              marginBottom: 8,
-              marginTop: 15,
-            }}
-          >
-            Finalizer address
-          </Text>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              borderRadius: 12,
-              marginBottom: 10,
-              backgroundColor: colors.secondary,
-              width: '100%',
-              minWidth: '50%',
-              height: 44,
-              alignItems: 'center',
-              paddingHorizontal: 16,
-            }}
-          >
-            <TextInput
-              style={{
-                flex: 1,
-                color: colors.text,
-                fontSize: 17,
-                fontWeight: '400',
-                paddingVertical: 0,
-              }}
-              placeholder="Enter finalizer address"
-              placeholderTextColor={colors.placeholder}
-              keyboardType={'default'}
-              value={finalizerText}
-              onChangeText={setFinalizerText}
-            />
-            {!!finalizerText && (
-              <TouchableOpacity
-                onPress={() => {
-                  setFinalizerText('');
-                }}
-              >
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: colors.zingo,
-                    borderRadius: 11,
-                    height: 22,
-                    width: 22,
-                    padding: 0,
-                  }}
-                >
-                  <RegText style={{ color: colors.background, marginTop: -3 }}>
-                    x
-                  </RegText>
-                </View>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      </ScrollView>
-
-      {/* Bottom CTA */}
-      <View
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
         style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          paddingTop: 10,
-          paddingBottom: 20,
-          paddingHorizontal: 24,
+          flex: 1,
+          backgroundColor: colors.background,
         }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={
+          Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
+        }
       >
-        <LiquidPrimaryButton
+        <HeaderTitle
           title="Stake"
-          disabled={
-            !hasSelection || !finalizerText.trim() || modalState === 'sending'
-          }
-          onPress={async () => await handleConfirmStake()}
-          style={{
-            alignSelf: 'stretch',
+          goBack={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
-      </View>
 
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => {
-          if (modalState === 'success') {
-            setModalState('idle');
-          }
-        }}
-      >
-        <View style={styles.modalBackdrop}>
-          <View
-            style={[
-              styles.modalCard,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-          >
-            {modalState === 'sending' && (
-              <>
-                <ActivityIndicator size="large" color={colors.text} />
-                <Text
-                  style={{
-                    marginTop: 16,
-                    color: colors.text,
-                    fontSize: 16,
-                    textAlign: 'center',
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom + 8,
+            paddingHorizontal: 10,
+          }}
+        >
+          <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24 }}>
+            <View style={{ marginBottom: 32 }}>
+              <Text
+                style={{
+                  fontSize: 36,
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  color: hasSelection ? colors.text : colors.placeholder,
+                }}
+              >
+                {displayAmount} cTAZ
+              </Text>
+            </View>
+
+            <View style={styles.grid}>
+              {PRESET_AMOUNTS.map(value => {
+                const isSelected = selectedAmount === value;
+
+                return (
+                  <Pressable
+                    key={value}
+                    style={[
+                      styles.pill,
+                      isSelected && {
+                        backgroundColor: '#1A1A1A',
+                        borderColor: colors.primary,
+                      },
+                    ]}
+                    onPress={() => setSelectedAmount(value)}
+                  >
+                    <Text
+                      style={[
+                        styles.pillAmount,
+                        { color: isSelected ? colors.primary : colors.text },
+                      ]}
+                    >
+                      +{value}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.pillLabel,
+                        {
+                          color: isSelected
+                            ? colors.primary
+                            : colors.placeholder,
+                        },
+                      ]}
+                    >
+                      cTAZ
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <View
+              style={{
+                marginTop: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+                width: '100%',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <FadeText style={{ marginRight: 5 }}>
+                Available for staking:
+              </FadeText>
+              <ZecAmount
+                amtZec={spendable}
+                size={15}
+                currencyName={info.currencyName}
+                privacy={privacy}
+              />
+            </View>
+
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: '600',
+                color: colors.text,
+                marginBottom: 8,
+                marginTop: 15,
+              }}
+            >
+              Finalizer address
+            </Text>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                borderRadius: 12,
+                marginBottom: 10,
+                backgroundColor: colors.secondary,
+                width: '100%',
+                minWidth: '50%',
+                height: 44,
+                alignItems: 'center',
+                paddingHorizontal: 16,
+              }}
+            >
+              <TextInput
+                style={{
+                  flex: 1,
+                  color: colors.text,
+                  fontSize: 17,
+                  fontWeight: '400',
+                  paddingVertical: 0,
+                }}
+                placeholder="Enter finalizer address"
+                placeholderTextColor={colors.placeholder}
+                keyboardType={'default'}
+                value={finalizerText}
+                onChangeText={setFinalizerText}
+              />
+              {!!finalizerText && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setFinalizerText('');
                   }}
                 >
-                  Sending staking transaction…
-                </Text>
-              </>
-            )}
-
-            {modalState === 'success' && (
-              <>
-                <FontAwesomeIcon
-                  icon={faCheckCircle}
-                  size={40}
-                  color={colors.primary}
-                />
-                <Text
-                  style={{
-                    marginTop: 16,
-                    color: colors.text,
-                    fontSize: 18,
-                    fontWeight: '600',
-                    textAlign: 'center',
-                  }}
-                >
-                  Staking transaction sent!
-                </Text>
-
-                <View style={{ marginTop: 24, alignSelf: 'stretch' }}>
-                  <LiquidPrimaryButton
-                    title="View movements"
-                    onPress={handleViewMovements}
-                    style={{ alignSelf: 'stretch' }}
-                  />
-                </View>
-              </>
-            )}
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: colors.zingo,
+                      borderRadius: 11,
+                      height: 22,
+                      width: 22,
+                      padding: 0,
+                    }}
+                  >
+                    <RegText
+                      style={{ color: colors.background, marginTop: -3 }}
+                    >
+                      x
+                    </RegText>
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
+        </ScrollView>
+
+        {/* Bottom CTA */}
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: 10,
+            paddingBottom: 20,
+            paddingHorizontal: 24,
+          }}
+        >
+          <LiquidPrimaryButton
+            title="Stake"
+            disabled={
+              !hasSelection || !finalizerText.trim() || modalState === 'sending'
+            }
+            onPress={async () => await handleConfirmStake()}
+            style={{
+              alignSelf: 'stretch',
+            }}
+          />
         </View>
-      </Modal>
-    </KeyboardAvoidingView>
+
+        <Modal
+          visible={modalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => {
+            if (modalState === 'success') {
+              setModalState('idle');
+            }
+          }}
+        >
+          <View style={styles.modalBackdrop}>
+            <View
+              style={[
+                styles.modalCard,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
+            >
+              {modalState === 'sending' && (
+                <>
+                  <ActivityIndicator size="large" color={colors.text} />
+                  <Text
+                    style={{
+                      marginTop: 16,
+                      color: colors.text,
+                      fontSize: 16,
+                      textAlign: 'center',
+                    }}
+                  >
+                    Sending staking transaction…
+                  </Text>
+                </>
+              )}
+
+              {modalState === 'success' && (
+                <>
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    size={40}
+                    color={colors.primary}
+                  />
+                  <Text
+                    style={{
+                      marginTop: 16,
+                      color: colors.text,
+                      fontSize: 18,
+                      fontWeight: '600',
+                      textAlign: 'center',
+                    }}
+                  >
+                    Staking transaction sent!
+                  </Text>
+
+                  <View style={{ marginTop: 24, alignSelf: 'stretch' }}>
+                    <LiquidPrimaryButton
+                      title="View movements"
+                      onPress={handleViewMovements}
+                      style={{ alignSelf: 'stretch' }}
+                    />
+                  </View>
+                </>
+              )}
+            </View>
+          </View>
+        </Modal>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
-  header: {
-    height: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  backButton: {
-    width: 32,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: '600',
-  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',

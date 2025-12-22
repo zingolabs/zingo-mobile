@@ -1,3 +1,4 @@
+import HeaderTitle from "./HeaderTitle";
 import Header from './Header';
 
-export default Header;
+export { Header, HeaderTitle };

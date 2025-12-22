@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -14,9 +14,8 @@ import { ChainNameEnum, CurrencyEnum, RouteEnum, ScreenEnum } from '../../app/Ap
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { HeaderTitle } from '../Header';
 
 type InfoProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Info>;
 
@@ -48,36 +47,12 @@ const Info: React.FunctionComponent<InfoProps> = ({
         screenName={screenName}
       />
 
-      <View style={{
-        position: 'absolute',
-        width: 75,
-        top: 10,
-        left: 10,
-        zIndex: 999,
-      }}>
-        <View
-          style={{
-            borderRadius: 25,
-            borderColor: colors.text,
-            borderWidth: 1,
-            padding: 10,
-            margin: 10,
-            backgroundColor: colors.background,
-          }}>
-            <TouchableOpacity onPress={() => {
-              clear();
-              if (navigation.canGoBack()) {
-                navigation.goBack();
-              }
-            }}>
-              <FontAwesomeIcon
-                size={30}
-                icon={faChevronLeft}
-                color={colors.text}
-              />
-            </TouchableOpacity>
-        </View>
-      </View>
+      <HeaderTitle title='Server info' goBack={() => {
+        clear();
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
+      }} />
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
@@ -93,8 +68,6 @@ const Info: React.FunctionComponent<InfoProps> = ({
             alignItems: 'flex-start',
             justifyContent: 'center',
         }}>
-
-          <RegText color={colors.text} style={{ fontSize: 30, alignSelf: 'center' }}>Server Info</RegText>
 
           <View style={{ display: 'flex', margin: 20 }}>
             <DetailLine

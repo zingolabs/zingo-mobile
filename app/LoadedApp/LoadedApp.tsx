@@ -1702,8 +1702,6 @@ export class LoadedAppClass extends Component<
         resultStr,
         false,
         this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
       );
       return;
     }
@@ -1726,8 +1724,6 @@ export class LoadedAppClass extends Component<
         resultStr,
         false,
         this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
       );
       return;
     }
@@ -1810,8 +1806,6 @@ export class LoadedAppClass extends Component<
           resultStr2,
           false,
           this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
         );
         //return;
       }

@@ -11,11 +11,7 @@ import {
 
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  IconDefinition,
-  faChevronLeft,
-  faDotCircle,
-} from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
 import RegText from '../Components/RegText';
@@ -52,6 +48,7 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { HeaderTitle } from '../Header';
 
 type SettingsProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -807,55 +804,22 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <View
-          style={{
-            position: 'absolute',
-            width: 75,
-            top: 10,
-            left: 10,
-            zIndex: 999,
+        <HeaderTitle
+          title="Settings"
+          goBack={() => {
+            if (!disabled) {
+              navigateToHome(true);
+            }
           }}
-        >
-          <View
-            style={{
-              borderRadius: 25,
-              borderColor: colors.text,
-              borderWidth: 1,
-              padding: 10,
-              margin: 10,
-              backgroundColor: colors.background,
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                if (!disabled) {
-                  navigateToHome(true);
-                }
-              }}
-            >
-              <FontAwesomeIcon
-                size={30}
-                icon={faChevronLeft}
-                color={colors.text}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+        />
 
         <View
           style={{
             flexGrow: 1,
-            alignItems: 'flex-start',
-            justifyContent: 'center',
+            paddingBottom: insets.bottom + 8,
+            paddingHorizontal: 16,
           }}
         >
-          <RegText
-            color={colors.text}
-            style={{ fontSize: 25, alignSelf: 'center' }}
-          >
-            Settings
-          </RegText>
-
           <View style={{ display: 'flex', margin: 10 }}>
             <BoldText>{translate('settings.mode-title') as string}</BoldText>
           </View>

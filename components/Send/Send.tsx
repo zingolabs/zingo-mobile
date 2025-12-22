@@ -16,7 +16,6 @@ import {
 import {
   faQrcode,
   faCheck,
-  faChevronLeft,
   faArrowDown,
   faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
@@ -49,13 +48,13 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { createAlert } from '../../app/createAlert';
 import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
-import { sendEmail } from '../../app/sendEmail';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Wallet from '../../assets/icons/wallet.svg';
+import { HeaderTitle } from '../Header';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
@@ -104,7 +103,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     shieldingAmount,
     selectIndexerServer,
     zenniesDonationAddress,
-    zingolibVersion,
     snackbars,
     removeFirstSnackbar,
   } = context;
@@ -825,8 +823,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         `${customError ? customError : error}`,
         false,
         translate,
-        sendEmail,
-        zingolibVersion,
       );
     }, 1 * 1000);
 
@@ -890,45 +886,16 @@ const Send: React.FunctionComponent<SendProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <View
-          style={{
-            position: 'absolute',
-            width: 75,
-            top: 10,
-            left: 10,
-            zIndex: 999,
-          }}
-        >
-          <View
-            style={{
-              borderRadius: 25,
-              borderColor: colors.text,
-              borderWidth: 1,
-              padding: 10,
-              margin: 10,
-              backgroundColor: colors.background,
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                if (title === 'Send') {
-                  setTitle('Send to');
-                } else {
-                  clear();
-                  if (navigation.canGoBack()) {
-                    navigation.goBack();
-                  }
-                }
-              }}
-            >
-              <FontAwesomeIcon
-                size={30}
-                icon={faChevronLeft}
-                color={colors.text}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+        <HeaderTitle title={title} goBack={() => {
+          if (title === 'Send') {
+            setTitle('Send to');
+          } else {
+            clear();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
+          }
+        }} />
 
         <ScrollView
           keyboardShouldPersistTaps="handled"
@@ -945,10 +912,6 @@ const Send: React.FunctionComponent<SendProps> = ({
               alignItems: 'center',
             }}
           >
-            <RegText color={colors.text} style={{ fontSize: 25, marginBottom: 50 }}>
-              {title} 
-            </RegText>
-
             { title === 'Send to' && (
               <>
                 <View
@@ -1057,7 +1020,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       style={{ marginLeft: 10 }}
                       size={22}
                       icon={faQrcode}
-                      color={colors.border}
+                      color={colors.placeholder}
                     />
                   </TouchableOpacity>
                 </View>
@@ -1212,16 +1175,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 spendableBalanceLastError,
                                 [
                                   {
-                                    text: translate('support') as string,
-                                    onPress: async () =>
-                                      sendEmail(
-                                        translate,
-                                        zingolibVersion,
-                                        'Available',
-                                        spendableBalanceLastError,
-                                      ),
-                                  },
-                                  {
                                     text: translate('cancel') as string,
                                     style: 'cancel',
                                   },
@@ -1332,16 +1285,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   translate('send.fee') as string,
                                   proposeSendLastError,
                                   [
-                                    {
-                                      text: translate('support') as string,
-                                      onPress: async () =>
-                                        sendEmail(
-                                          translate,
-                                          zingolibVersion,
-                                          translate('send.fee') as string,
-                                          proposeSendLastError,
-                                        ),
-                                    },
                                     {
                                       text: translate('cancel') as string,
                                       style: 'cancel',

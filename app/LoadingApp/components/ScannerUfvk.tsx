@@ -2,7 +2,7 @@
 import React, { useContext } from 'react';
 import { ContextAppLoading } from '../../context';
 import Scanner from '../../../components/Scanner';
-import Header from '../../../components/Header';
+import { Header } from '../../../components/Header';
 
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../types';

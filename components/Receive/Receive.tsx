@@ -12,7 +12,6 @@ import {
   Dimensions,
   Keyboard,
   ScrollView,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import {
@@ -51,11 +50,8 @@ import Snackbars from '../Components/Snackbars';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from './components/ExpandedAddress';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
-import RegText from '../Components/RegText';
-import FadeText from '../Components/FadeText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { HeaderTitle } from '../Header';
 
 type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
   toggleMenuDrawer: () => void;
@@ -279,7 +275,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = (
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
             flexGrow: 1,
-            paddingTop: insets.top,
             paddingBottom: insets.bottom + 8,
             paddingHorizontal: 16,
           }}
@@ -291,19 +286,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = (
               justifyContent: 'center',
             }}
           >
-            <RegText
-              color={colors.text}
-              style={{ fontSize: 25, marginBottom: 40 }}
-            >
-              Receive
-            </RegText>
-
-            {false && (
-              <FadeText style={{ marginBottom: 20, marginTop: 5 }}>
-                texto
-              </FadeText>
-            )}
-
             {component}
           </View>
         </ScrollView>
@@ -317,41 +299,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = (
     },
   ) => ReactNode = () => {
     return (
-      <View
-        style={{
-          position: 'absolute',
-          width: 75,
-          top: 10,
-          left: 10,
-          zIndex: 999,
-        }}
-      >
-        <View
-          style={{
-            borderRadius: 25,
-            borderColor: colors.text,
-            borderWidth: 1,
-            padding: 10,
-            margin: 10,
-            backgroundColor: colors.background,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              clear();
-              if (navigation.canGoBack()) {
-                navigation.goBack();
-              }
-            }}
-          >
-            <FontAwesomeIcon
-              size={30}
-              icon={faChevronLeft}
-              color={colors.text}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <HeaderTitle title='Receive' goBack={() => {
+        clear();
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
+      }} />
     );
   };
 

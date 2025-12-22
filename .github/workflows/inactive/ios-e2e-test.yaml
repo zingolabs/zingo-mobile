@@ -89,7 +89,7 @@ jobs:
           timeout_minutes: 30
           max_attempts: 3
           command: |
-            SIMULATOR_UID=$(xcrun simctl list devices | grep -m 1 "iPhone 16" | awk -F '[()]' '{print $2}' | tr -d '[:space:]')
+            SIMULATOR_UID=$(xcrun simctl list devices | grep -m 1 "iPhone 16e" | awk -F '[()]' '{print $2}' | tr -d '[:space:]')
             xcrun simctl boot $SIMULATOR_UID
           #  xcrun simctl bootstatus $SIMULATOR_UID
           #  SIMULATOR_STATUS=$(xcrun simctl list | grep "$SIMULATOR_UID" | grep "Booted")

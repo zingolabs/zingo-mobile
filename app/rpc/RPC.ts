@@ -513,7 +513,9 @@ export default class RPC {
       returnPause.toLowerCase().startsWith(GlobalConst.error)
     ) {
       console.log('SYNC PAUSE ERROR', returnPause);
-      this.fnSetLastError(`Error sync pause: ${returnPause}`);
+      if (!returnPause.toLowerCase().includes('sync is not running')) {
+        this.fnSetLastError(`Error sync pause: ${returnPause}`);
+      }
       return;
     } else {
       console.log('pause sync process. PAUSED', returnPause);
@@ -617,7 +619,9 @@ export default class RPC {
       console.log('sync RUN', syncStr);
       if (syncStr && syncStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error sync: ${syncStr}`);
-        this.fnSetLastError(`Error sync: ${syncStr}`);
+        if (!syncStr.toLowerCase().includes('sync is already running')) {
+          this.fnSetLastError(`Error sync: ${syncStr}`);
+        }
       }
     }
 
@@ -705,12 +709,12 @@ export default class RPC {
     if (returnPoll && returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fnSetLastError(`Error sync poll: ${returnPoll}`);
-      // if the error is: LightclientLockPoisoned force a rescan directly
       console.log(
         'HEIGHTS  ------- ',
         this.lastWalletBlockHeight,
         this.lastServerBlockHeight,
       );
+      // if the error is: LightclientLockPoisoned force a rescan directly
       if (returnPoll.includes('LightclientLockPoisoned')) {
         let result: string = await RPCModule.loadExistingWallet(
           this.indexerServer.uri,
@@ -718,7 +722,7 @@ export default class RPC {
           this.performanceLevel,
           GlobalConst.minConfirmations.toString(),
         );
-        console.log(result);
+        console.log('POISONED ERROR RECOVERY', result);
         setTimeout(async () => {
           await this.refreshSync(true);
         }, 0);
@@ -730,12 +734,12 @@ export default class RPC {
         if (!this.walletSeed) {
           await this.fetchWalletBirthdaySeedUfvk();
         }
-        console.log(this.walletBirthday, this.walletSeed);
+        console.log('100 BLOCKS AHEAD RECOVERY', this.walletBirthday, this.walletSeed);
         this.fnOnClickOKChangeWallet({
           screen: 0,
           startingApp: false,
           walletSeed: this.walletSeed,
-          walletBirthday: this.walletBirthday,
+          walletBirthday: this.walletBirthday > this.lastServerBlockHeight ? 1 : this.walletBirthday,
         });
       } else {
         // This command have an error, fine. It's worthy to try running the sync process juat in case.
@@ -807,7 +811,7 @@ export default class RPC {
           Date.now() - start,
         );
       }
-      console.log('INFO', infoStr);
+      //console.log('INFO', infoStr);
       if (infoStr) {
         if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error info & server block height ${infoStr}`);
@@ -1096,7 +1100,7 @@ export default class RPC {
           Date.now() - start,
         );
       }
-      console.log('WALLET HEIGHT', heightStr);
+      //console.log('WALLET HEIGHT', heightStr);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet height ${heightStr}`);
@@ -1281,7 +1285,7 @@ export default class RPC {
           Date.now() - start,
         );
       }
-      console.log('GET SERVER HEIGHT', heightStr);
+      //console.log('GET SERVER HEIGHT', heightStr);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error server height ${heightStr}`);
@@ -1293,7 +1297,7 @@ export default class RPC {
         console.log('Internal Error server height');
       }
 
-      console.log('SERVER HEIGHT', this.lastServerBlockHeight);
+      //console.log('SERVER HEIGHT', this.lastServerBlockHeight);
 
       const start2 = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
@@ -1319,7 +1323,7 @@ export default class RPC {
       const valueTransfersJSON: RPCValueTransfersType =
         await JSON.parse(valueTransfersStr);
 
-      console.log(valueTransfersJSON.value_transfers);
+      //console.log(valueTransfersJSON.value_transfers);
 
       let vtList: ValueTransferType[] = [];
 
@@ -1419,7 +1423,7 @@ export default class RPC {
           },
         );
 
-      console.log(vtList);
+      //console.log(vtList);
 
       this.fnSetValueTransfersList(vtList, vtList.length);
       this.fetchTandZandOValueTransfersLock = false;
