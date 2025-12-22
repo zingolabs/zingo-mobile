@@ -15,8 +15,8 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
 import FadeText from '../Components/FadeText';
-import { Header } from '../Header';
-import RPCModule from '../../app/RPCModule';
+import { HeaderTitle } from '../Header';
+//import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
 import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
@@ -29,7 +29,7 @@ type DataType = {
   };
   value: number;
   key: string;
-  address: string;
+  finalizer: string;
   tag: string;
 } & pieDataItem;
 
@@ -50,7 +50,6 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
     addLastSnackbar, 
     snackbars, 
     removeFirstSnackbar, 
-    setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
@@ -59,7 +58,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [tab, setTab] = useState<'sent' | 'sends' | 'memobytes'>('sent');
+  const [tab, setTab] = useState<'my' | 'network'>('my');
   const dimensions = {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
@@ -70,54 +69,64 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
       setLoading(true);
       let resultStr: string = '';
       switch (tab) {
-        case 'sent':
-          resultStr = await RPCModule.getTotalValueToAddressInfo();
+        case 'my':
+          //resultStr = await RPCModule.getTotalValueToAddressInfo();
+          resultStr = JSON.stringify([
+            {pub_key: '01234567890123456789012345678901', voting_power: 2000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 3000000},
+          ]);
           //console.log('################# value', resultStr);
           break;
-        case 'sends':
-          resultStr = await RPCModule.getTotalSpendsToAddressInfo();
+        case 'network':
+          //resultStr = await RPCModule.getTotalSpendsToAddressInfo();
+          resultStr = JSON.stringify([
+            {pub_key: '01234567890123456789012345678901', voting_power: 1000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 2000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 3000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 4000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 5000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 6000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 7000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 8000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 9000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 10000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 11000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 12000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 13000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 14000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 15000000},
+            {pub_key: '01234567890123456789012345678901', voting_power: 16000000},
+          ]);
           //console.log('################# sends', resultStr);
-          break;
-        case 'memobytes':
-          resultStr = await RPCModule.getTotalMemobytesToAddressInfo();
-          //console.log('################# memobytes', resultStr);
           break;
         default:
           break;
       }
-      let resultJSON: Record<string, unknown>;
+      let resultJSON: { pub_key: string, voting_power: number }[];
       try {
         resultJSON = await JSON.parse(resultStr);
       } catch (e) {
-        resultJSON = {};
+        resultJSON = [];
       }
-      let amounts: { value: number; address: string; tag: string }[] = [];
-      const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
-      resultJSONEntries &&
-        resultJSONEntries.forEach(([key, value]) => {
-          if (!(tab !== 'sent' && key === 'fee')) {
-            // excluding the fee for `sends` and `memobytes`.
-            if (value > 0) {
-              amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
-            }
-          }
-        });
-      const randomColors = Utils.generateColorList(amounts.length);
-      const newPieAmounts: DataType[] = amounts
-        .sort((a, b) => b.value - a.value)
+      console.log(resultStr, resultJSON);
+      const randomColors = Utils.generateColorList(resultJSON.length + 10);
+      const newPieAmounts: DataType[] = resultJSON
+        .filter((i: { pub_key: string, voting_power: number }) => i.voting_power > 0 && !!i.pub_key)
+        .sort((a, b) => b.voting_power - a.voting_power)
         .map((item, index) => {
           return {
-            value: item.value,
-            address: item.address,
-            tag: item.tag,
-            svg: { fill: item.address === 'fee' ? colors.zingo: randomColors[index] },
-            color: item.address === 'fee' ? colors.zingo: randomColors[index],
+            value: item.voting_power / 10 ** 8,
+            finalizer: item.pub_key,
+            tag: '',
+            svg: { fill: randomColors[index] },
+            color: randomColors[index],
             labelLineConfig: {
-              color: item.address === 'fee' ? colors.zingo: randomColors[index],
+              color: randomColors[index],
             },
             key: `pie-${index}`,
           };
         });
+      console.log(newPieAmounts);
       setPieAmounts(newPieAmounts);
       const newExpandAddress = Array(newPieAmounts.length).fill(false);
       setExpandAddress(newExpandAddress);
@@ -135,7 +144,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
     const totalValue = pieAmounts ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0) : 0;
     const percent = (100 * item.value) / totalValue;
     // 30 characters per line
-    const numLines = item.address.length < 40 ? 2 : item.address.length / (dimensions.width < 500 ? 21 : 30);
+    const numLines = item.finalizer.length < 40 ? 2 : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <View style={{ width: '100%' }} key={`tag-${index}`}>
         <View
@@ -145,7 +154,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
             justifyContent: 'space-between',
             marginBottom: 5,
             borderBottomColor: '#333333',
-            borderBottomWidth: item.address !== 'fee' ? 1 : 0,
+            borderBottomWidth: 1,
           }}>
           <View
             style={{
@@ -153,21 +162,19 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            {(!expandAddress[index] || item.address === 'fee') && (
+            {(!expandAddress[index] || item.finalizer === 'fee') && (
               <FontAwesomeIcon style={{ margin: 5 }} size={45} icon={faQrcode} color={item.svg.fill} />
             )}
             {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
             <TouchableOpacity
               onPress={() => {
-                if (item.address !== 'fee') {
-                  Clipboard.setString(item.address);
-                  addLastSnackbar({
-                    message: translate('history.addresscopied') as string,
-                    duration: SnackbarDurationEnum.short,
-                    screenName: [screenName],
-                  });
-                  selectExpandAddress(index);
-                }
+                Clipboard.setString(item.finalizer);
+                addLastSnackbar({
+                  message: translate('history.addresscopied') as string,
+                  duration: SnackbarDurationEnum.short,
+                  screenName: [screenName],
+                });
+                selectExpandAddress(index);
               }}>
               <View
                 style={{
@@ -175,19 +182,17 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
                   flexDirection: 'column',
                   flexWrap: 'wrap',
                 }}>
-                {item.address !== 'fee' && (
-                  <AddressItem address={item.address} screenName={screenName} oneLine={true} onlyContact={true} withIcon={true} />
-                )}
-                {!expandAddress[index] && !!item.address && (
+                <AddressItem address={item.finalizer} screenName={screenName} oneLine={true} onlyContact={true} withIcon={true} />
+                {!expandAddress[index] && !!item.finalizer && (
                   <RegText>
-                    {item.address.length > (dimensions.width < 500 ? 10 : 20)
-                      ? Utils.trimToSmall(item.address, dimensions.width < 500 ? 5 : 10)
-                      : item.address}
+                    {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
+                      ? Utils.trimToSmall(item.finalizer, dimensions.width < 500 ? 5 : 10)
+                      : item.finalizer}
                   </RegText>
                 )}
                 {expandAddress[index] &&
-                  !!item.address &&
-                  Utils.splitStringIntoChunks(item.address, Number(numLines.toFixed(0))).map(
+                  !!item.finalizer &&
+                  Utils.splitStringIntoChunks(item.finalizer, Number(numLines.toFixed(0))).map(
                     (c: string, idx: number) => (
                       <RegText color={item.svg.fill} key={idx}>
                         {c}
@@ -199,26 +204,18 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
           </View>
           <View
             style={{
-              flexDirection: expandAddress[index] && item.address !== 'fee' ? 'column-reverse' : 'row',
+              flexDirection: 'column-reverse',
               alignItems: 'center',
               justifyContent: 'center',
             }}>
             <RegText>{getPercent(percent)}</RegText>
-            {tab === 'sent' ? (
-              <ZecAmount
-                currencyName={info.currencyName}
-                size={15}
-                amtZec={item.value}
-                style={{ marginHorizontal: 5 }}
-                privacy={privacy}
-              />
-            ) : (
-              <RegText style={{ marginLeft: 10 }}>
-                {'# ' +
-                  item.value.toString() +
-                  (tab === 'sends' ? translate('insight.sends-unit') : translate('insight.memobytes-unit'))}
-              </RegText>
-            )}
+            <ZecAmount
+              currencyName={info.currencyName}
+              size={15}
+              amtZec={item.value}
+              style={{ marginHorizontal: 5 }}
+              privacy={privacy}
+            />
           </View>
         </View>
       </View>
@@ -249,87 +246,50 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Header
-          title={translate('insight.title') as string}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noUfvkIcon={true}
-          setPrivacyOption={setPrivacyOption}
-          addLastSnackbar={addLastSnackbar}
-          closeScreen={() => {
-            clear();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
-        />
 
-        <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>
-          <TouchableOpacity onPress={() => setTab('sent')}>
+        <HeaderTitle title='Distribution' goBack={() => {
+          clear();
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }} />
+
+        <View style={{ width: '100%', flexDirection: 'row', marginTop: 20 }}>
+          <TouchableOpacity onPress={() => setTab('my')}>
             <View
               style={{
-                width: (dimensions.width - 20) / 3,
+                width: (dimensions.width - 20) / 2,
                 alignItems: 'center',
                 borderBottomColor: colors.primary,
-                borderBottomWidth: tab === 'sent' ? 2 : 0,
+                borderBottomWidth: tab === 'my' ? 2 : 0,
                 paddingBottom: 10,
               }}>
               <RegText
                 style={{
-                  fontWeight: tab === 'sent' ? 'bold' : 'normal',
-                  fontSize: tab === 'sent' ? 15 : 14,
-                  color: colors.text,
+                  fontWeight: tab === 'my' ? 'bold' : 'normal',
+                  fontSize: tab === 'my' ? 15 : 14,
+                  color: tab === 'my' ? colors.primary : colors.text,
                 }}>
-                {translate('insight.sent') as string}
-              </RegText>
-              <RegText style={{ fontSize: 11, color: tab === 'sent' ? colors.primary : colors.text }}>
-                ({translate('insight.sent-text') as string})
+                {'My Staking'}
               </RegText>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setTab('sends')}>
+          <TouchableOpacity onPress={() => setTab('network')}>
             <View
               style={{
-                width: (dimensions.width - 20) / 3,
+                width: (dimensions.width - 20) / 2,
                 alignItems: 'center',
                 borderBottomColor: colors.primary,
-                borderBottomWidth: tab === 'sends' ? 2 : 0,
+                borderBottomWidth: tab === 'network' ? 2 : 0,
                 paddingBottom: 10,
               }}>
               <RegText
                 style={{
-                  fontWeight: tab === 'sends' ? 'bold' : 'normal',
-                  fontSize: tab === 'sends' ? 15 : 14,
-                  color: colors.text,
+                  fontWeight: tab === 'network' ? 'bold' : 'normal',
+                  fontSize: tab === 'network' ? 15 : 14,
+                  color: tab === 'network' ? colors.primary : colors.text
                 }}>
-                {translate('insight.sends') as string}
-              </RegText>
-              <RegText style={{ fontSize: 11, color: tab === 'sends' ? colors.primary : colors.text }}>
-                ({translate('insight.sends-text') as string})
-              </RegText>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setTab('memobytes')}>
-            <View
-              style={{
-                width: (dimensions.width - 20) / 3,
-                alignItems: 'center',
-                borderBottomColor: colors.primary,
-                borderBottomWidth: tab === 'memobytes' ? 2 : 0,
-                paddingBottom: 10,
-              }}>
-              <RegText
-                style={{
-                  fontWeight: tab === 'memobytes' ? 'bold' : 'normal',
-                  fontSize: tab === 'memobytes' ? 15 : 14,
-                  color: colors.text,
-                }}>
-                {translate('insight.memobytes') as string}
-              </RegText>
-              <RegText style={{ fontSize: 11, color: tab === 'memobytes' ? colors.primary : colors.text }}>
-                ({translate('insight.memobytes-text') as string})
+                {'Global Network'}
               </RegText>
             </View>
           </TouchableOpacity>
@@ -379,13 +339,6 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               {!loading && !!pieAmounts && !!pieAmounts.length && (
                 <>
                   {pieAmounts
-                    .filter(item => item.address === 'fee')
-                    .map((item, index) => {
-                      return line(item, index);
-                    })}
-                  <View style={{ height: 1, backgroundColor: colors.primary }} />
-                  {pieAmounts
-                    .filter(item => item.address !== 'fee')
                     .map((item, index) => {
                       return line(item, index);
                     })}
