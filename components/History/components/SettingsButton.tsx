@@ -3,6 +3,7 @@ import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import SettingsIcon from '../../../assets/icons/settings.svg';
+import ChartPieIcon from '../../../assets/icons/chart-pie.svg';
 
 import { ThemeType } from '../../../app/types';
 import { RouteEnum, ScreenEnum } from '../../../app/AppState';
@@ -17,6 +18,15 @@ const SettingsButton: React.FC<SettingsButtonProps> = () => {
 
   return (
     <View style={{ alignItems: 'flex-end' }}>
+      <TouchableOpacity
+        style={{ marginRight: 20, padding: 10 }}
+        testID="header.finalizers"
+        onPress={() => {
+          navigation.navigate(RouteEnum.Distribution);
+        }}
+      >
+        <ChartPieIcon height={24} width={24} color={colors.text} />
+      </TouchableOpacity>
       <TouchableOpacity
         style={{ marginRight: 20, padding: 10 }}
         testID="header.settings"
