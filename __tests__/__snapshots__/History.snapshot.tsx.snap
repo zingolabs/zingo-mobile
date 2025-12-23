@@ -225,6 +225,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         style={
           {
             "alignItems": "flex-end",
+            "flexDirection": "row",
           }
         }
       >
@@ -258,9 +259,9 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           onStartShouldSetResponder={[Function]}
           style={
             {
-              "marginRight": 20,
+              "marginRight": 5,
               "opacity": 1,
-              "padding": 10,
+              "padding": 5,
             }
           }
           testID="header.settings"
@@ -748,6 +749,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
         style={
           {
             "alignItems": "flex-end",
+            "flexDirection": "row",
           }
         }
       >
@@ -781,9 +783,9 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           onStartShouldSetResponder={[Function]}
           style={
             {
-              "marginRight": 20,
+              "marginRight": 5,
               "opacity": 1,
-              "padding": 10,
+              "padding": 5,
             }
           }
           testID="header.settings"

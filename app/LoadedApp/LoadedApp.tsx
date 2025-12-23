@@ -108,6 +108,7 @@ import {
   StakeJsonToTypeType,
   StakingActionType,
 } from '../AppState/types/ValueTransferType';
+import Distribution from '../../components/Distribution'
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();
 
@@ -128,6 +129,7 @@ type InnerStackParamList = {
   [RouteEnum.StakingHome]: undefined;
   [RouteEnum.Stake]: undefined;
   [RouteEnum.Unstake]: undefined;
+  [RouteEnum.Distribution]: undefined;
 };
 
 const en = require('../translations/en.json');
@@ -1994,6 +1996,10 @@ export class LoadedAppClass extends Component<
                     navigateToLoadingApp={this.navigateToLoadingApp}
                   />
                 )}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.Distribution}>
+                {props => <Distribution {...props} />}
               </InnerStack.Screen>
 
               <InnerStack.Screen name={RouteEnum.DebugInfo}>
