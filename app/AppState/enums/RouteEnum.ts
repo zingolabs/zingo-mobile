@@ -33,6 +33,7 @@ export enum RouteEnum {
   StakingHome = 'StakingHome',
   Stake = 'Stake',
   Unstake = 'Unstake',
+  Distribution = 'Distribution',
 
   // Drawer with params
   AddressList = 'AddressList',
