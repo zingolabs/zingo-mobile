@@ -254,45 +254,61 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
           }
         }} />
 
-        <View style={{ width: '100%', flexDirection: 'row', marginTop: 20 }}>
-          <TouchableOpacity onPress={() => setTab('my')}>
-            <View
-              style={{
-                width: (dimensions.width - 20) / 2,
-                alignItems: 'center',
-                borderBottomColor: colors.primary,
-                borderBottomWidth: tab === 'my' ? 2 : 0,
-                paddingBottom: 10,
-              }}>
+        <View 
+          style={{ 
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: 20, 
+            borderRadius: 20,
+            backgroundColor: 'rgba(118, 118, 128, 0.24)', 
+            padding: 5,
+            marginHorizontal: 20,
+          }}>
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+              backgroundColor: tab === 'my' ? '#6C6C71' : 'transparent',
+              padding: 5,
+              overflow: 'hidden',
+            }}>
+            <TouchableOpacity onPress={() => setTab('my')}>
               <RegText
                 style={{
                   fontWeight: tab === 'my' ? 'bold' : 'normal',
-                  fontSize: tab === 'my' ? 15 : 14,
-                  color: tab === 'my' ? colors.primary : colors.text,
+                  fontSize: 15,
+                  color: colors.text,
                 }}>
                 {'My Staking'}
               </RegText>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setTab('network')}>
-            <View
-              style={{
-                width: (dimensions.width - 20) / 2,
-                alignItems: 'center',
-                borderBottomColor: colors.primary,
-                borderBottomWidth: tab === 'network' ? 2 : 0,
-                paddingBottom: 10,
-              }}>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+              backgroundColor: tab === 'network' ? '#6C6C71' : 'transparent',
+              padding: 5,
+              overflow: 'hidden',
+            }}>
+            <TouchableOpacity onPress={() => setTab('network')}>
               <RegText
                 style={{
                   fontWeight: tab === 'network' ? 'bold' : 'normal',
-                  fontSize: tab === 'network' ? 15 : 14,
-                  color: tab === 'network' ? colors.primary : colors.text
+                  fontSize: 15,
+                  color: colors.text
                 }}>
                 {'Global Network'}
               </RegText>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
         </View>
         <ScrollView
           showsVerticalScrollIndicator={true}
