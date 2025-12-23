@@ -83,7 +83,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
         disabled={disabled}
         testID="settings.custom-server-chain.testnet"
         style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.regtestChainName)}
+        onPress={() => onPress(ChainNameEnum.testChainName)}
       >
         <View
           style={{
