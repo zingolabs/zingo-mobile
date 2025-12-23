@@ -5,7 +5,7 @@ import { View, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } fro
 import { useTheme } from '@react-navigation/native';
 import { PieChart, pieDataItem } from 'react-native-gifted-charts';
 import { Text as SvgText } from 'react-native-svg';
-import { faQrcode } from '@fortawesome/free-solid-svg-icons';
+import { faCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -140,7 +140,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
     setExpandAddress(newExpandAddress);
   };
 
-  const line = (item: DataType, index: number) => {
+  const lineMy = (item: DataType, index: number, last: boolean) => {
     const totalValue = pieAmounts ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0) : 0;
     const percent = (100 * item.value) / totalValue;
     // 30 characters per line
@@ -149,12 +149,12 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
       <View style={{ width: '100%' }} key={`tag-${index}`}>
         <View
           style={{
-            width: '100%',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginBottom: 5,
+            marginHorizontal: 20,
+            paddingVertical: 15,
             borderBottomColor: '#333333',
-            borderBottomWidth: 1,
+            borderBottomWidth: last ? 0 : 1,
           }}>
           <View
             style={{
@@ -162,9 +162,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            {(!expandAddress[index] || item.finalizer === 'fee') && (
-              <FontAwesomeIcon style={{ margin: 5 }} size={45} icon={faQrcode} color={item.svg.fill} />
-            )}
+            <FontAwesomeIcon style={{ marginRight: 15 }} size={15} icon={faCircle} color={item.svg.fill} />
             {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
             <TouchableOpacity
               onPress={() => {
@@ -194,7 +192,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
                   !!item.finalizer &&
                   Utils.splitStringIntoChunks(item.finalizer, Number(numLines.toFixed(0))).map(
                     (c: string, idx: number) => (
-                      <RegText color={item.svg.fill} key={idx}>
+                      <RegText key={idx}>
                         {c}
                       </RegText>
                     ),
@@ -208,14 +206,108 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <RegText>{getPercent(percent)}</RegText>
-            <ZecAmount
-              currencyName={info.currencyName}
-              size={15}
-              amtZec={item.value}
-              style={{ marginHorizontal: 5 }}
-              privacy={privacy}
-            />
+            <FadeText >{getPercent(percent)}</FadeText>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+    const lineNetwork = (item: DataType, index: number, last: boolean) => {
+    const totalValue = pieAmounts ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0) : 0;
+    const percent = (100 * item.value) / totalValue;
+    // 30 characters per line
+    const numLines = item.finalizer.length < 40 ? 2 : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
+    return (
+      <View style={{ width: '100%' }} key={`tag-${index}`}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: 20,
+            paddingVertical: 15,
+            borderBottomColor: '#333333',
+            borderBottomWidth: last ? 0 : 1,
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <FadeText style={{ marginRight: 15 }}>{`#${(index + 1).toString()}`}</FadeText>
+            {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
+            <TouchableOpacity
+              onPress={() => {
+                Clipboard.setString(item.finalizer);
+                addLastSnackbar({
+                  message: translate('history.addresscopied') as string,
+                  duration: SnackbarDurationEnum.short,
+                  screenName: [screenName],
+                });
+                selectExpandAddress(index);
+              }}>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexWrap: 'wrap',
+                }}>
+                <AddressItem address={item.finalizer} screenName={screenName} oneLine={true} onlyContact={true} withIcon={true} />
+                {!expandAddress[index] && !!item.finalizer && (
+                  <RegText>
+                    {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
+                      ? Utils.trimToSmall(item.finalizer, dimensions.width < 500 ? 5 : 10)
+                      : item.finalizer}
+                  </RegText>
+                )}
+                {expandAddress[index] &&
+                  !!item.finalizer &&
+                  Utils.splitStringIntoChunks(item.finalizer, Number(numLines.toFixed(0))).map(
+                    (c: string, idx: number) => (
+                      <RegText key={idx}>
+                        {c}
+                      </RegText>
+                    ),
+                  )}
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              marginLeft: 25,
+              flexGrow: 1,
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                justifyContent: 'flex-end',
+                width: '100%',
+                height: 5,
+                marginTop: 10,
+                borderRadius: 3,
+              }}
+            >
+              <View
+                style={{
+                  height: 5,
+                  width: '100%',
+                  borderRadius: 3,
+                  backgroundColor: '#6C6C71',
+                }}
+              />
+              <View
+                style={{
+                  height: 5,
+                  width: `${percent}%`,
+                  borderRadius: 3,
+                  backgroundColor: item.svg.fill,
+                  marginTop: -5,
+                }}
+              />
+            </View>
+            <FadeText >{getPercent(percent)}</FadeText>
           </View>
         </View>
       </View>
@@ -316,7 +408,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
           indicatorStyle={'white'}
           style={{ maxHeight: '90%' }}
           contentContainerStyle={{}}>
-          <View style={{ display: 'flex', margin: 20 }}>
+          <View style={{ display: 'flex' }}>
             {!loading && (!pieAmounts || !pieAmounts.length) && (
               <View style={{ width: '100%', alignItems: 'center', marginTop: 100 }}>
                 <RegText>{translate('insight.no-data') as string}</RegText>
@@ -325,7 +417,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
             {loading ? (
               <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 100 }} />
             ) : (
-              <View style={{ width: '100%', alignItems: 'center', paddingVertical: 10 }}>
+              <View style={{ width: '100%', alignItems: 'center' }}>
                 {!!pieAmounts && !!pieAmounts.length && (
                   <PieChart
                     showExternalLabels={true}
@@ -344,19 +436,30 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
                     externalLabelComponent={renderExternalLabel}
                     textBackgroundColor={colors.background}
                     data={pieAmounts}
-                    innerRadius={dimensions.width * 0.09}
+                    innerRadius={dimensions.width * 0.14}
                   />
                 )}
               </View>
             )}
           </View>
-          <View style={{ display: 'flex', marginHorizontal: 5, padding: 0, alignItems: 'center' }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 30 }}>
+            <RegText>{tab === 'my' ? 'Total Stake' : 'Total amount Staked'}</RegText>
+            <ZecAmount
+              currencyName={info.currencyName}
+              size={20}
+              amtZec={pieAmounts.reduce((sum, item) => sum + item.value, 0)}
+              style={{ marginHorizontal: 5 }}
+              privacy={privacy}
+            />
+          </View>
+          <RegText style={{ marginHorizontal: 10, marginBottom: 10 }}>{tab === 'my' ? 'Staking Position' : 'Finalizers'}</RegText>
+          <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: 'rgba(118, 118, 128, 0.24)', borderRadius: 26 }}>
             <View style={{ width: '100%' }}>
               {!loading && !!pieAmounts && !!pieAmounts.length && (
                 <>
                   {pieAmounts
                     .map((item, index) => {
-                      return line(item, index);
+                      return tab === 'my' ? lineMy(item, index, (index + 1) === pieAmounts.length ) : lineNetwork(item, index, (index + 1) === pieAmounts.length );
                     })}
                 </>
               )}
