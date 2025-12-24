@@ -206,6 +206,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 items={[
                   { label: serverUris()[0].uri, value: serverUris()[0].uri },
                   { label: serverUris()[1].uri, value: serverUris()[1].uri },
+                  { label: serverUris()[2].uri, value: serverUris()[2].uri },
                 ]}
                 placeholder={{
                   label: translate('settings.select-placeholder') as string,
