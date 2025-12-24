@@ -71,14 +71,12 @@ const formatHeaderMonth = (unixSeconds: number) => {
 };
 
 function Separator() {
-  const { colors } = useTheme() as unknown as ThemeType;
-
   return (
     <View
       style={{
-        height: StyleSheet.hairlineWidth,
-        backgroundColor: colors.border,
-        opacity: 0.4,
+        borderBottomWidth: 1,
+        borderBottomColor: '#333333',
+        borderStyle: 'solid',
       }}
     />
   );
@@ -406,40 +404,15 @@ const Staking: React.FC<StakingProps> = () => {
         <View
           style={{
             flex: 1,
-            paddingHorizontal: 16,
-            paddingTop: 12,
+            paddingHorizontal: 10,
+            paddingTop: 15,
           }}
         >
           <View
             style={{
               flex: 1,
-              borderRadius: 24,
-              backgroundColor: colors.card,
-              paddingHorizontal: 16,
-              paddingTop: 16,
             }}
           >
-            {tab === 'movements' && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                }}
-              >
-                {hasMovements && monthHeader && (
-                  <Text
-                    style={{
-                      color: colors.placeholder,
-                      fontSize: 12,
-                    }}
-                  >
-                    {monthHeader}
-                  </Text>
-                )}
-              </View>
-            )}
-
             {loading && (
               <View style={styles.centerContent}>
                 <ActivityIndicator size="small" color={colors.text} />
@@ -469,12 +442,58 @@ const Staking: React.FC<StakingProps> = () => {
               </View>
             )}
 
+            {!loading && !hasStaked && (
+              <View style={styles.centerContent}>
+                <View
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    borderWidth: 2,
+                    borderStyle: 'dashed',
+                    borderColor: colors.placeholder,
+                  }}
+                />
+                <Text
+                  style={{
+                    color: colors.placeholder,
+                    fontSize: 14,
+                  }}
+                >
+                  There are no finalizers yet.
+                </Text>
+              </View>
+            )}
+
             {!loading && hasMovements && tab === 'movements' && (
               <FlatList
                 data={movements}
                 keyExtractor={item => item.txid}
                 contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
                 ItemSeparatorComponent={Separator}
+                ListHeaderComponent={
+                  <View
+                    style={{
+                      marginTop: 20,
+                      borderTopLeftRadius: 25,
+                      borderTopRightRadius: 25,
+                      paddingVertical: 10,
+                      paddingHorizontal: 25,
+                      backgroundColor: '#78788029',
+                    }}
+                  >
+                    {monthHeader && (
+                      <Text
+                        style={{
+                          color: colors.placeholder,
+                          fontSize: 12,
+                        }}
+                      >
+                        {monthHeader}
+                      </Text>
+                    )}
+                  </View>
+                }
                 renderItem={({ item }: { item: StakingMovement }) => {
                   let label: string;
                   let amountLabel: string;
@@ -512,10 +531,12 @@ const Staking: React.FC<StakingProps> = () => {
                   return (
                     <View
                       style={{
+                        backgroundColor: colors.secondary,
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         paddingVertical: 10,
+                        paddingHorizontal: 10,
                       }}
                     >
                       <View
@@ -569,10 +590,12 @@ const Staking: React.FC<StakingProps> = () => {
                 indicatorStyle={'white'}
                 style={{ maxHeight: '100%' }}
                 contentContainerStyle={{}}>
-                {staked
-                  .map((item, index) => {
-                    return line(item, index, (index + 1) === staked.length );
-                  })}
+                <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: colors.secondary, borderRadius: 26 }}>
+                  {staked
+                    .map((item, index) => {
+                      return line(item, index, (index + 1) === staked.length );
+                    })}
+                </View>
               </ScrollView>
             )}
           </View>
