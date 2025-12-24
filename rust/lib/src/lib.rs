@@ -1774,11 +1774,12 @@ fn parse_staking_action(root: &json::JsonValue) -> Result<StakingAction, String>
     let target_str = sa["target"]
         .as_str()
         .ok_or_else(|| "Error: Missing stakingAction.target".to_string())?;
+
+    let target = parse_hex_32(target_str)?;
     let source_str = sa["source"]
         .as_str()
         .ok_or_else(|| "Error: Missing stakingAction.source".to_string())?;
 
-    let target = parse_hex_32(target_str)?;
     let source = match kind {
         StakingActionKind::Add => [0u8; 32],
         StakingActionKind::Sub

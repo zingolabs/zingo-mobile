@@ -19,9 +19,7 @@ import {
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faCheckCircle,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { ThemeType } from '../../../app/types/ThemeType';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -57,6 +55,18 @@ type AddStakeScreenProps = DrawerScreenProps<
     stakingAction: StakingActionType,
   ) => Promise<string>;
 };
+
+function reverseHexBytes(hex: string): string {
+  if (hex.length !== 64) {
+    throw new Error('Finalizer address must be 64 hex chars');
+  }
+  let out = '';
+  for (let i = 0; i < 32; i++) {
+    const byte = hex.slice(i * 2, i * 2 + 2);
+    out = byte + out; // reverse byte order
+  }
+  return out.toLowerCase();
+}
 
 const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   stakeTransaction,
@@ -146,7 +156,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     const stakingAction: StakingActionType = {
       kind: 'add',
       val: amount * 10 ** 8,
-      target: finalizer,
+      target: reverseHexBytes(finalizer),
       source: '',
       insecureSourceName: '',
       insecureTargetName: '',
@@ -184,11 +194,14 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <HeaderTitle title='Stake' goBack={() => {
-          if (navigation.canGoBack()) {
-            navigation.goBack();
-          }
-        }} />
+        <HeaderTitle
+          title="Stake"
+          goBack={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
+          }}
+        />
 
         <ScrollView
           keyboardShouldPersistTaps="handled"
@@ -241,7 +254,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                       style={[
                         styles.pillLabel,
                         {
-                          color: isSelected ? colors.primary : colors.placeholder,
+                          color: isSelected
+                            ? colors.primary
+                            : colors.placeholder,
                         },
                       ]}
                     >
@@ -252,9 +267,24 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
               })}
             </View>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'flex-end' }}>
-              <FadeText style={{ marginRight: 5 }}>Available for staking:</FadeText>
-              <ZecAmount amtZec={spendable} size={15} currencyName={info.currencyName} privacy={privacy} />
+            <View
+              style={{
+                marginTop: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+                width: '100%',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <FadeText style={{ marginRight: 5 }}>
+                Available for staking:
+              </FadeText>
+              <ZecAmount
+                amtZec={spendable}
+                size={15}
+                currencyName={info.currencyName}
+                privacy={privacy}
+              />
             </View>
 
             <Text
@@ -314,7 +344,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                       padding: 0,
                     }}
                   >
-                    <RegText style={{ color: colors.background, marginTop: -3 }}>
+                    <RegText
+                      style={{ color: colors.background, marginTop: -3 }}
+                    >
                       x
                     </RegText>
                   </View>

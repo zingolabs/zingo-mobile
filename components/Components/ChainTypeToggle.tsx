@@ -21,43 +21,60 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
   translate,
   disabled,
 }) => {
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <TouchableOpacity
         disabled={disabled}
         testID="settings.custom-server-chain.mainnet"
         style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.mainChainName)}>
+        onPress={() => onPress(ChainNameEnum.mainChainName)}
+      >
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
             marginBottom: 10,
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              borderWidth: customServerChainName === ChainNameEnum.mainChainName ? 2 : 1,
+              borderWidth:
+                customServerChainName === ChainNameEnum.mainChainName ? 2 : 1,
               borderColor:
-                customServerChainName === ChainNameEnum.mainChainName ? colors.primary : colors.primaryDisabled,
+                customServerChainName === ChainNameEnum.mainChainName
+                  ? colors.primary
+                  : colors.primaryDisabled,
               borderRadius: 5,
               paddingHorizontal: 5,
-            }}>
+            }}
+          >
             <Text
               style={{
                 fontSize: 13,
                 color: colors.border,
                 marginRight: 5,
-              }}>
+              }}
+            >
               {translate('settings.value-chainname-main') as string}
             </Text>
             {customServerChainName === ChainNameEnum.mainChainName && (
-              <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
+              <FontAwesomeIcon
+                icon={faCashRegister}
+                size={14}
+                color={colors.primary}
+              />
             )}
           </View>
         </View>
@@ -66,35 +83,46 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
         disabled={disabled}
         testID="settings.custom-server-chain.testnet"
         style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.testChainName)}>
+        onPress={() => onPress(ChainNameEnum.testChainName)}
+      >
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
             marginBottom: 10,
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              borderWidth: customServerChainName === ChainNameEnum.testChainName ? 2 : 1,
+              borderWidth:
+                customServerChainName === ChainNameEnum.testChainName ? 2 : 1,
               borderColor:
-                customServerChainName === ChainNameEnum.testChainName ? colors.primary : colors.primaryDisabled,
+                customServerChainName === ChainNameEnum.testChainName
+                  ? colors.primary
+                  : colors.primaryDisabled,
               borderRadius: 5,
               paddingHorizontal: 5,
-            }}>
+            }}
+          >
             <Text
               style={{
                 fontSize: 13,
                 color: colors.border,
                 marginRight: 5,
-              }}>
+              }}
+            >
               {translate('settings.value-chainname-test') as string}
             </Text>
             {customServerChainName === ChainNameEnum.testChainName && (
-              <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
+              <FontAwesomeIcon
+                icon={faCashRegister}
+                size={14}
+                color={colors.primary}
+              />
             )}
           </View>
         </View>
@@ -103,35 +131,48 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
         disabled={disabled}
         testID="settings.custom-server-chain.regtest"
         style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.regtestChainName)}>
+        onPress={() => onPress(ChainNameEnum.regtestChainName)}
+      >
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
             marginBottom: 10,
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              borderWidth: customServerChainName === ChainNameEnum.regtestChainName ? 2 : 1,
+              borderWidth:
+                customServerChainName === ChainNameEnum.regtestChainName
+                  ? 2
+                  : 1,
               borderColor:
-                customServerChainName === ChainNameEnum.regtestChainName ? colors.primary : colors.primaryDisabled,
+                customServerChainName === ChainNameEnum.regtestChainName
+                  ? colors.primary
+                  : colors.primaryDisabled,
               borderRadius: 5,
               paddingHorizontal: 5,
-            }}>
+            }}
+          >
             <Text
               style={{
                 fontSize: 13,
                 color: colors.border,
                 marginRight: 5,
-              }}>
+              }}
+            >
               {translate('settings.value-chainname-regtest') as string}
             </Text>
             {customServerChainName === ChainNameEnum.regtestChainName && (
-              <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
+              <FontAwesomeIcon
+                icon={faCashRegister}
+                size={14}
+                color={colors.primary}
+              />
             )}
           </View>
         </View>

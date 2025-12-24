@@ -2,7 +2,7 @@ import { ChainNameEnum, CurrencyNameEnum, InfoType } from '../../app/AppState';
 import { mockIndexerServer } from './mockServers';
 
 export const mockInfo: InfoType = {
-  chainName: ChainNameEnum.mainChainName,
+  chainName: ChainNameEnum.regtestChainName,
   serverUri: mockIndexerServer.uri,
   latestBlock: 2000000,
   version: 'server_version',

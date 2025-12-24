@@ -50,6 +50,18 @@ type UnstakeProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Unstake> & {
   ) => Promise<string>;
 };
 
+const hexToBytes = (hex: string): string => {
+  const clean = hex.trim().toLowerCase();
+  if (clean.length !== 64) {
+    throw new Error(`Expected 32-byte txid hex, got length ${clean.length}`);
+  }
+  const bytes = clean.match(/../g);
+  if (!bytes) {
+    throw new Error('Invalid hex string for txid');
+  }
+  return bytes.reverse().join('');
+};
+
 const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
   const navigation = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
@@ -100,7 +112,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
     );
 
     // Keep only adds whose txid is NOT present as a source in any "sub"
-    return stakingAdds.filter(vt => !unstakeSources.has(vt.txid));
+    return stakingAdds.filter(vt => !unstakeSources.has(hexToBytes(vt.txid)));
   }, [valueTransfers]);
 
   const selectedTx = movements.find(tx => tx.txid === selectedTxid);
@@ -233,12 +245,12 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
       val: zats,
       target:
         (selectedTx.stakingAction && selectedTx.stakingAction?.target) || '',
-      source: selectedTx.txid,
+      source: hexToBytes(selectedTx.txid),
       insecureSourceName: '',
       insecureTargetName: '',
     };
 
-    console.log('Unstaking action:', stakingAction);
+    console.log('UNSTAKING action:', stakingAction);
 
     try {
       await stakeTransaction(sendPageState, stakingAction);
