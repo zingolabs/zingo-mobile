@@ -451,7 +451,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             alignItems: 'center',
                             justifyContent: 'flex-start',
                             marginTop: 5,
-                            marginBottom: 100,
+                            marginBottom: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
                           }}
                         >
                           <Button
@@ -466,7 +466,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             !!valueTransfersSliced.length && (
                               <View
                                 style={{
-                                  marginBottom: 90,
+                                  marginBottom: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
                                 }}
                               />
                             )}
@@ -507,7 +507,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
                     padding: 50,
                     borderBottomWidth: 1,
                     borderBottomColor: 'transparent',
-
                     borderStyle: 'solid',
                   }}
                 >

@@ -549,6 +549,11 @@ const Staking: React.FC<StakingProps> = () => {
                     )}
                   </View>
                 }
+                ListFooterComponent={
+                  <View style={{
+                    height: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+                  }} />
+                }
                 renderItem={({ item }: { item: StakingMovement }) => {
                   let label: string;
                   let amountLabel: string;
@@ -639,21 +644,26 @@ const Staking: React.FC<StakingProps> = () => {
             )}
 
             {!loading && hasStaked && tab === 'staked' && (
-              <ScrollView
-                ref={scrollViewRef}
-                onScroll={handleScroll}
-                showsVerticalScrollIndicator={true}
-                persistentScrollbar={true}
-                indicatorStyle={'white'}
-                style={{ maxHeight: '100%' }}
-                contentContainerStyle={{}}>
-                <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: colors.secondary, borderRadius: 26 }}>
-                  {staked
-                    .map((item, index) => {
-                      return line(item, index, (index + 1) === staked.length );
-                    })}
-                </View>
-              </ScrollView>
+              <>
+                <ScrollView
+                  ref={scrollViewRef}
+                  onScroll={handleScroll}
+                  showsVerticalScrollIndicator={true}
+                  persistentScrollbar={true}
+                  indicatorStyle={'white'}
+                  style={{ maxHeight: '100%' }}
+                  contentContainerStyle={{}}>
+                  <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: colors.secondary, borderRadius: 26 }}>
+                    {staked
+                      .map((item, index) => {
+                        return line(item, index, (index + 1) === staked.length );
+                      })}
+                  </View>
+                  <View style={{
+                    height: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+                    }} />
+                </ScrollView>
+              </>
             )}
 
             {!isAtTop && (
