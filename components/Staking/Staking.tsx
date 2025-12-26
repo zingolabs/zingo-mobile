@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   View,
@@ -9,11 +9,15 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  Platform,
+  Pressable,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum, ValueTransferType } from '../../app/AppState';
+import { GlobalConst, RouteEnum, ScreenEnum, SnackbarDurationEnum, ValueTransferType } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
 import { ThemeType } from '../../app/types/ThemeType';
 import WalletSummaryHeader from '../History/components/WalletSummaryHeader';
@@ -27,10 +31,11 @@ import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faCircle } from '@fortawesome/free-solid-svg-icons';
 import AddressItem from '../Components/AddressItem';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
+import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 
 type DataType = {
   svg: {
@@ -96,10 +101,19 @@ const Staking: React.FC<StakingProps> = () => {
   const [loading] = useState(false);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [tab, setTab] = useState<'movements' | 'staked'>('movements');
+  const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    
   const dimensions = {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   };
+
+  const scrollViewRef =
+    useRef<ScrollView & FlatList<StakingMovement>>(
+      null,
+    );
   
   const movements: StakingMovement[] = useMemo(() => {
     if (!valueTransfers) {
@@ -231,6 +245,45 @@ const Staking: React.FC<StakingProps> = () => {
     setExpandAddress(newExpandAddress);
   };
 
+  const handleScrollToTop = useCallback(() => {
+    if (scrollViewRef.current && !isScrollingToTop) {
+      setIsScrollingToTop(true);
+
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // Force set to top immediately for UI feedback
+      setIsAtTop(true);
+
+      // Try multiple scroll methods for reliability
+      try {
+        scrollViewRef.current.scrollTo({y: 0, animated: true});
+      } catch (error) {
+        console.log('scrollToTop failed:', error);
+        scrollViewRef.current.scrollToOffset({offset: 0, animated: true});
+      }
+    }
+  }, [isScrollingToTop]);
+
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset } = event.nativeEvent;
+    const isTop = contentOffset.y <= 100;
+
+    // Always update isAtTop for manual scrolling
+    setIsAtTop(isTop);
+
+    // If we're scrolling to top and we've reached the top, stop the scrolling state
+    if (isScrollingToTop && isTop) {
+      setIsScrollingToTop(false);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
+      }
+    }
+  }, [isScrollingToTop]);
+  
   const line = (item: DataType, index: number, last: boolean) => {
     const totalValue = staked ? staked.reduce((acc, curr) => acc + curr.value, 0) : 0;
     const percent = (100 * item.value) / totalValue;
@@ -467,6 +520,8 @@ const Staking: React.FC<StakingProps> = () => {
 
             {!loading && hasMovements && tab === 'movements' && (
               <FlatList
+                ref={scrollViewRef}
+                onScroll={handleScroll}
                 data={movements}
                 keyExtractor={item => item.txid}
                 contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
@@ -585,6 +640,8 @@ const Staking: React.FC<StakingProps> = () => {
 
             {!loading && hasStaked && tab === 'staked' && (
               <ScrollView
+                ref={scrollViewRef}
+                onScroll={handleScroll}
                 showsVerticalScrollIndicator={true}
                 persistentScrollbar={true}
                 indicatorStyle={'white'}
@@ -598,6 +655,38 @@ const Staking: React.FC<StakingProps> = () => {
                 </View>
               </ScrollView>
             )}
+
+            {!isAtTop && (
+              <Pressable
+                onPress={handleScrollToTop}
+                disabled={isScrollingToTop}
+                style={({ pressed }) => ({
+                  position: 'absolute',
+                  bottom:
+                    !isLiquidGlassSupported &&
+                    Platform.OS === GlobalConst.platformOSandroid
+                      ? 30
+                      : 60,
+                  right: 10,
+                  paddingHorizontal: 5,
+                  paddingVertical: 10,
+                  backgroundColor: colors.sideMenuBackground,
+                  borderRadius: 50,
+                  transform: [{ scale: pressed ? 0.9 : 1 }],
+                  borderWidth: 1,
+                  borderColor: colors.zingo,
+                  opacity: isScrollingToTop ? 0.5 : 1,
+                })}
+              >
+                <FontAwesomeIcon
+                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                  size={16}
+                  icon={faAngleUp}
+                  color={colors.zingo}
+                />
+              </Pressable>
+            )}
+            
           </View>
         </View>
       </View>
