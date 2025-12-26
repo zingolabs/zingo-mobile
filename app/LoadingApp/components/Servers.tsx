@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
 import { ThemeType } from '../../types';
-import { GlobalConst, ScreenEnum } from '../../AppState';
+import { ChainNameEnum, GlobalConst, ScreenEnum } from '../../AppState';
 import { ContextAppLoading } from '../../context';
 import BoldText from '../../../components/Components/BoldText';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -82,6 +82,18 @@ const Servers: React.FunctionComponent<ServersProps> = ({
       s2.remove();
     };
   }, []);
+
+  const getChainName = (chain: ChainNameEnum) => {
+    return !chain
+            ? '-'
+            : chain === ChainNameEnum.mainChainName
+            ? 'Mainnet'
+            : chain === ChainNameEnum.testChainName
+            ? 'Testnet'
+            : chain === ChainNameEnum.regtestChainName
+            ? 'Regtest'
+            : (translate('info.unknown') as string) + ' (' + chain + ')'
+  }
 
   //console.log('Render Servers', insets);
 
@@ -204,9 +216,9 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 fixAndroidTouchableBug={true}
                 value={indexerServerUriLocal}
                 items={[
-                  { label: serverUris()[0].uri, value: serverUris()[0].uri },
-                  { label: serverUris()[1].uri, value: serverUris()[1].uri },
-                  { label: serverUris()[2].uri, value: serverUris()[2].uri },
+                  { label: `${serverUris()[0].uri}  [${getChainName(serverUris()[0].chainName)}]`, value: serverUris()[0].uri },
+                  { label: `${serverUris()[1].uri}  [${getChainName(serverUris()[1].chainName)}]`, value: serverUris()[1].uri },
+                  { label: `${serverUris()[2].uri}  [${getChainName(serverUris()[2].chainName)}]`, value: serverUris()[2].uri },
                 ]}
                 placeholder={{
                   label: translate('settings.select-placeholder') as string,
