@@ -749,7 +749,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           isChecked={value}
           useBuiltInState={false}
           onPress={() => setValue(!value)}
-          unFillColor={colors.card}
+          unFillColor={colors.background}
           fillColor={colors.primary}
           style={{
             marginRight: 10,

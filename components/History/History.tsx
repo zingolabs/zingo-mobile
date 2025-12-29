@@ -384,7 +384,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     >
       <View
         style={{
-          backgroundColor: colors.card,
+          backgroundColor: colors.background,
           paddingTop: 10,
           paddingBottom: 10,
         }}

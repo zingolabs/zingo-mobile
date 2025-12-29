@@ -203,7 +203,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({
                       display: 'flex',
                       flexDirection: 'row',
                       marginTop: 5,
-                      backgroundColor: colors.card,
+                      backgroundColor: colors.background,
                       padding: 5,
                       borderRadius: 10,
                     }}>
@@ -218,7 +218,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({
                       display: 'flex',
                       flexDirection: 'row',
                       marginTop: 5,
-                      backgroundColor: colors.card,
+                      backgroundColor: colors.background,
                       padding: 5,
                       borderRadius: 10,
                     }}>

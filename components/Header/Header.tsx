@@ -197,7 +197,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             display: 'flex',
             alignItems: 'center',
             paddingBottom: 0,
-            backgroundColor: colors.card,
+            backgroundColor: colors.background,
             paddingTop: 10,
             minHeight: !noDrawMenu ? 60 : 25,
           }}

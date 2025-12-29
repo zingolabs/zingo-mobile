@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   View,
@@ -36,6 +36,8 @@ import AddressItem from '../Components/AddressItem';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
+import ClockActive from '../../assets/icons/clock-active.svg';
+import ClockInactive from '../../assets/icons/clock-inactive.svg';
 
 type DataType = {
   svg: {
@@ -101,6 +103,7 @@ const Staking: React.FC<StakingProps> = () => {
   const [loading] = useState(false);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [tab, setTab] = useState<'movements' | 'staked'>('movements');
+  const [stakingDay, setStakingDay] = useState<boolean>(true);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -114,6 +117,11 @@ const Staking: React.FC<StakingProps> = () => {
     useRef<ScrollView & FlatList<StakingMovement>>(
       null,
     );
+
+  useEffect(() => {
+    // TODO: fetching staking day info
+    setStakingDay(true);
+  }, []);
   
   const movements: StakingMovement[] = useMemo(() => {
     if (!valueTransfers) {
@@ -374,27 +382,56 @@ const Staking: React.FC<StakingProps> = () => {
           backgroundColor: colors.background,
         }}
       >
+        <View
+          style={{
+            position: 'absolute',
+            right: 10,
+            top: 10,
+            zIndex: 999,
+          }}
+        >
+          <SettingsButton screenName={screenName} />
+        </View>
+
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View
+            style={{
+              minWidth: '50%',
+              maxWidth: '60%',
+              marginTop: 30,
+              paddingHorizontal: 15,
+              paddingRight: 20,
+              paddingVertical: 7,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: stakingDay ? 'rgba(52, 199, 89, 0.2)' : 'rgba(65, 65, 65, 1)',
+              borderRadius: 25,
+            }}
+          >
+            <View style={{ flexDirection: 'row', gap: 10, justifyContent: 'center', alignItems: 'center' }}>
+              {stakingDay 
+                ? <ClockActive width={24} height={24} />
+                : <ClockInactive width={24} height={24} />
+              }
+              <View>
+                <RegText>{`Staking day ${stakingDay ? 'active' : 'inactive'}`}</RegText> 
+                <FadeText style={{ color: stakingDay ? '#34c759' : '#8e8e93' }}>{`${stakingDay ? 'Permitted actions' : 'Opening in 2 days'}`}</FadeText>
+              </View>
+            </View>
+          </View>
+        </View>
+
         {/* Header + quick actions */}
         <View
           style={{
-            backgroundColor: colors.card,
+            backgroundColor: colors.background,
             paddingTop: 10,
             paddingBottom: 10,
           }}
         >
           <WalletSummaryHeader show_staked={true} />
 
-          <View
-            style={{
-              position: 'absolute',
-              right: 10,
-              top: 10,
-            }}
-          >
-            <SettingsButton screenName={screenName} />
-          </View>
-
-          <StakingActions />
+          <StakingActions stakingDay={stakingDay} />
         </View>
 
         <View 
