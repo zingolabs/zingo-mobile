@@ -287,7 +287,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
           styles.txRow,
           {
             borderColor: isSelected ? colors.primary : colors.border,
-            backgroundColor: isSelected ? colors.secondary : colors.card,
+            backgroundColor: isSelected ? colors.secondary : colors.background,
           },
         ]}
       >
@@ -466,7 +466,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
             <View
               style={[
                 styles.modalCard,
-                { backgroundColor: colors.card, borderColor: colors.border },
+                { backgroundColor: colors.background, borderColor: colors.border },
               ]}
             >
               {modalState === 'sending' && (

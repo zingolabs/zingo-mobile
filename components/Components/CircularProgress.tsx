@@ -28,7 +28,7 @@ const CircularProgress: React.FunctionComponent<circularProgressProps> = props =
     <View style={{ margin: 10 }}>
       <Svg width={size} height={size}>
         <Circle
-          stroke={props.bgColor ? props.bgColor : colors.card}
+          stroke={props.bgColor ? props.bgColor : colors.background}
           fill="none"
           cx={size / 2}
           cy={size / 2}

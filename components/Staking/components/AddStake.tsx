@@ -392,7 +392,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
             <View
               style={[
                 styles.modalCard,
-                { backgroundColor: colors.card, borderColor: colors.border },
+                { backgroundColor: colors.background, borderColor: colors.border },
               ]}
             >
               {modalState === 'sending' && (

@@ -377,7 +377,7 @@ const Staking: React.FC<StakingProps> = () => {
         {/* Header + quick actions */}
         <View
           style={{
-            backgroundColor: colors.card,
+            backgroundColor: colors.background,
             paddingTop: 10,
             paddingBottom: 10,
           }}

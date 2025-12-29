@@ -117,7 +117,7 @@ const WalletSummaryHeader: React.FC<WalletSummaryHeaderProps> = ({
         alignItems: 'center',
         paddingTop: 10,
         paddingBottom: 10,
-        backgroundColor: colors.card,
+        backgroundColor: colors.background,
       }}
     >
       {/* Balance */}
