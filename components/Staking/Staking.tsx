@@ -38,6 +38,8 @@ import { ToastProvider } from 'react-native-toastier';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 import ClockActive from '../../assets/icons/clock-active.svg';
 import ClockInactive from '../../assets/icons/clock-inactive.svg';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
+import FinalizerDetail from './components/FinalizerDetail';
 
 type DataType = {
   svg: {
@@ -106,6 +108,10 @@ const Staking: React.FC<StakingProps> = () => {
   const [stakingDay, setStakingDay] = useState<boolean>(true);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
+  const [heightLayout, setHeightLayout] = useState<number>(10);
+  const [currentItem, setCurrentItem] = useState<DataType | null>(null);
+  
+  const bottomSheetRef = useRef<BottomSheet>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     
   const dimensions = {
@@ -118,6 +124,39 @@ const Staking: React.FC<StakingProps> = () => {
       null,
     );
 
+  const snapPoints = useMemo(() => {
+    let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
+    if (snap1 < 1) {
+      snap1 = 1;
+    }
+    let snap2: number = 80;
+    if (snap1 < 80) {
+      snap2 = snap1 + 20;
+    }
+    return [`${snap1}%`, `${snap2}%`];
+  }, [heightLayout]);
+
+  const show = useCallback((item: DataType) => {
+    bottomSheetRef.current?.snapToIndex(0);
+    setCurrentItem(item);
+  }, []);
+
+  const hide = useCallback(() => {
+    bottomSheetRef.current?.snapToIndex(-1);
+    bottomSheetRef.current?.close();
+    setHeightLayout(10);
+    setCurrentItem(null);
+  }, []);
+
+  const renderBackdrop = (props: BottomSheetBackdropProps) => (
+    <BottomSheetBackdrop
+      {...props}
+      disappearsOnIndex={-1}
+      appearsOnIndex={0}
+      pressBehavior="close"
+    />
+  );
+    
   useEffect(() => {
     // TODO: fetching staking day info
     setStakingDay(true);
@@ -298,7 +337,7 @@ const Staking: React.FC<StakingProps> = () => {
     // 30 characters per line
     const numLines = item.finalizer.length < 40 ? 2 : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
     return (
-      <View style={{ width: '100%' }} key={`tag-${index}`}>
+      <TouchableOpacity style={{ width: '100%' }} key={`tag-${index}`} onPress={() => show(item)}>
         <View
           style={{
             flexDirection: 'row',
@@ -325,6 +364,9 @@ const Staking: React.FC<StakingProps> = () => {
                   screenName: [screenName],
                 });
                 selectExpandAddress(index);
+                setTimeout(() => {
+                  show(item);
+                }, 100);
               }}>
               <View
                 style={{
@@ -361,7 +403,7 @@ const Staking: React.FC<StakingProps> = () => {
             <FadeText >{getPercent(percent)}</FadeText>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -737,6 +779,39 @@ const Staking: React.FC<StakingProps> = () => {
           </View>
         </View>
       </View>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enableDynamicSizing={false}
+        enablePanDownToClose
+        keyboardBehavior={'interactive'}
+        handleStyle={{ display: 'none' }}
+        backgroundStyle={{ backgroundColor: colors.background }}
+        backdropComponent={renderBackdrop}
+      >
+        <BottomSheetView
+          style={{ 
+            backgroundColor: 'rgba(36, 36, 38, 1)', 
+            height: '100%',
+            borderTopLeftRadius: 38,
+            borderTopRightRadius: 38,
+          }}
+        >
+          {tab === 'staked' && currentItem && (
+            <>
+              <FinalizerDetail
+                item={currentItem}
+                closeSheet={hide}
+                setHeightLayout={setHeightLayout}
+              />
+              <View style={{
+                height: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+              }} />
+            </>
+          )}
+        </BottomSheetView>
+      </BottomSheet>
     </ToastProvider>
   );
 };

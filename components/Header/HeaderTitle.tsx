@@ -3,16 +3,18 @@ import { useTheme } from "@react-navigation/native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ThemeType } from "../../app/types";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 type HeaderTitleProps = {
   title: string,
   goBack: () => void,
+  bottomSheet?: boolean,
 };
 
 const HeaderTitle: React.FC<HeaderTitleProps> = ({
   title,
   goBack,
+  bottomSheet,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
 
@@ -23,7 +25,7 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({
         style={[styles.backButton, { borderColor: colors.text }]}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
-        <FontAwesomeIcon icon={faChevronLeft} size={22} color={colors.text} />
+        <FontAwesomeIcon icon={bottomSheet ? faXmark : faChevronLeft} size={22} color={colors.text} />
       </TouchableOpacity>
 
       <Text style={[styles.headerTitle, { color: colors.text }]}>{title}</Text>
