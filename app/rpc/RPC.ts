@@ -13,6 +13,7 @@ import {
   TransparentAddressClass,
   ValueTransferKindEnum,
   ServerType,
+  StakeType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCUnifiedAddressType } from './types/RPCUnifiedAddressType';
@@ -37,6 +38,7 @@ import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
+import { RPCStakedType } from './types/RPCStakedType';
 
 interface StakingActionType {
   kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
@@ -50,6 +52,8 @@ interface StakingActionType {
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
+  fnSetStaked: (staked: StakeType[]) => void;
+  fnSetGlobalStaked: (GlobalStaked: StakeType[]) => void;
   fnSetValueTransfersList: (vtList: ValueTransferType[], total: number) => void;
   fnSetMessagesList: (mList: ValueTransferType[], total: number) => void;
   fnSetAllAddresses: (
@@ -76,6 +80,7 @@ export default class RPC {
   fetchTandZandOValueTransfersLock: boolean;
   fetchTandZandOMessagesLock: boolean;
   fetchTotalBalanceLock: boolean;
+  fetchStakedLock: boolean;
   fetchAddressesLock: boolean;
   refreshSyncLock: boolean;
   fetchSyncStatusLock: boolean;
@@ -95,6 +100,8 @@ export default class RPC {
 
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
+    fnSetStaked: (staked: StakeType[]) => void,
+    fnSetGlobalStaked: (GlobalStaked: StakeType[]) => void,
     fnSetValueTransfersList: (
       vtlist: ValueTransferType[],
       total: number,
@@ -118,6 +125,8 @@ export default class RPC {
     performanceLevel: RPCPerformanceLevelEnum,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
+    this.fnSetStaked = fnSetStaked;
+    this.fnSetGlobalStaked = fnSetGlobalStaked;
     this.fnSetValueTransfersList = fnSetValueTransfersList;
     this.fnSetMessagesList = fnSetMessagesList;
     this.fnSetAllAddresses = fnSetAllAddresses;
@@ -141,6 +150,7 @@ export default class RPC {
     this.fetchTandZandOValueTransfersLock = false;
     this.fetchTandZandOMessagesLock = false;
     this.fetchTotalBalanceLock = false;
+    this.fetchStakedLock = false;
     this.fetchAddressesLock = false;
     this.refreshSyncLock = false;
     this.fetchSyncStatusLock = false;
@@ -373,6 +383,7 @@ export default class RPC {
         this.fetchInfoAndServerHeightLock ||
         this.fetchAddressesLock ||
         this.fetchTotalBalanceLock ||
+        this.fetchStakedLock ||
         this.fetchTandZandOValueTransfersLock ||
         this.fetchTandZandOMessagesLock ||
         this.fetchSyncStatusLock ||
@@ -438,6 +449,14 @@ export default class RPC {
             resolve();
           }),
         );
+        taskPromises.push(
+          new Promise<void>(async resolve => {
+            //const s = Date.now();
+            await this.fetchStaked();
+            //console.log('staked - ', Date.now() - s);
+            resolve();
+          }),
+        );
         // save the wallet as required.
         taskPromises.push(
           new Promise<void>(async resolve => {
@@ -485,6 +504,7 @@ export default class RPC {
     await this.fetchTandZandOValueTransfers();
     await this.fetchAddresses();
     await this.fetchTotalBalance();
+    await this.fetchStaked();
     await this.fetchInfoAndServerHeight();
 
     // I need to fetch this quickly.
@@ -979,6 +999,104 @@ export default class RPC {
       await this.clearTimers();
       await this.configure();
       this.fetchTotalBalanceLock = false;
+      return;
+    }
+  }
+
+  async fetchStaked() {
+    try {
+      if (this.fetchStakedLock) {
+        return;
+      }
+      this.fetchStakedLock = true;
+      const start = Date.now();
+      const resultStakedStr = JSON.stringify([
+        {pub_key: '01234567890123456789012345678901', voting_power: 2000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 3000000},
+      ]);
+      if (Date.now() - start > 4000) {
+        console.log(
+          '=========================================== > spendable balance - ',
+          Date.now() - start,
+        );
+      }
+      if (resultStakedStr) {
+        if (resultStakedStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error staked ${resultStakedStr}`);
+          this.fnSetLastError(`Error staked: ${resultStakedStr}`);
+          this.fetchStakedLock = false;
+          return;
+        }
+      } else {
+        console.log('Internal Error staked');
+        this.fetchStakedLock = false;
+        return;
+      }
+      const stakedJSON: RPCStakedType[] = await JSON.parse(resultStakedStr);
+
+      const stakedList: StakeType[] = stakedJSON.map((item: RPCStakedType) => ({
+        pubKey: item.pub_key,
+        votingPower: (item.voting_power || 0) / 10 ** 8,
+      }));
+
+      console.log('Global Staked:', stakedList);
+
+      const start2 = Date.now();
+      const resultGlobalStakedStr = JSON.stringify([
+        {pub_key: '01234567890123456789012345678901', voting_power: 1000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 2000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 3000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 4000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 5000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 6000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 7000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 8000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 9000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 10000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 11000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 12000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 13000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 14000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 15000000},
+        {pub_key: '01234567890123456789012345678901', voting_power: 16000000},
+      ]);
+      if (Date.now() - start2 > 4000) {
+        console.log(
+          '=========================================== > balance - ',
+          Date.now() - start2,
+        );
+      }
+      if (resultGlobalStakedStr) {
+        if (resultGlobalStakedStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error global staked ${resultGlobalStakedStr}`);
+          this.fnSetLastError(`Error global staked: ${resultGlobalStakedStr}`);
+          this.fetchStakedLock = false;
+          return;
+        }
+      } else {
+        console.log('Internal Error global staked');
+        this.fetchStakedLock = false;
+        return;
+      }
+      const globalStakedJSON: RPCStakedType[] = await JSON.parse(resultGlobalStakedStr);
+
+      const globalStakedList: StakeType[] = globalStakedJSON.map((item: RPCStakedType) => ({
+        pubKey: item.pub_key,
+        votingPower: (item.voting_power || 0) / 10 ** 8,
+      } as StakeType));
+
+      console.log('Global Staked:', globalStakedJSON);
+
+      this.fnSetStaked(stakedList);
+      this.fnSetGlobalStaked(globalStakedList)
+      this.fetchStakedLock = false;
+    } catch (error) {
+      console.log(`Critical Error staked ${error}`);
+      this.fnSetLastError(`Error staked: ${error}`);
+      // relaunch the interval tasks just in case they are aborted.
+      await this.clearTimers();
+      await this.configure();
+      this.fetchStakedLock = false;
       return;
     }
   }

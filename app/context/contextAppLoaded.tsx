@@ -26,6 +26,8 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
   syncingStatus: {} as RPCSyncStatusType,
   totalBalance: null,
+  staked: [],
+  globalStaked: [],
   addresses: null,
   valueTransfers: null,
   valueTransfersTotal: null,

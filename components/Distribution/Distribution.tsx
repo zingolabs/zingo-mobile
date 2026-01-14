@@ -18,7 +18,7 @@ import FadeText from '../Components/FadeText';
 import { HeaderTitle } from '../Header';
 //import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
+import { RouteEnum, ScreenEnum, SnackbarDurationEnum, StakeType } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -49,7 +49,9 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
     privacy, 
     addLastSnackbar, 
     snackbars, 
-    removeFirstSnackbar, 
+    removeFirstSnackbar,
+    staked,
+    globalStaked,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
@@ -67,56 +69,26 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
   useEffect(() => {
     (async () => {
       setLoading(true);
-      let resultStr: string = '';
+      let resultJSON: StakeType[] = [];
       switch (tab) {
         case 'my':
-          //resultStr = await RPCModule.getTotalValueToAddressInfo();
-          resultStr = JSON.stringify([
-            {pub_key: '01234567890123456789012345678901', voting_power: 2000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 3000000},
-          ]);
-          //console.log('################# value', resultStr);
+          resultJSON = staked;
           break;
         case 'network':
-          //resultStr = await RPCModule.getTotalSpendsToAddressInfo();
-          resultStr = JSON.stringify([
-            {pub_key: '01234567890123456789012345678901', voting_power: 1000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 2000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 3000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 4000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 5000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 6000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 7000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 8000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 9000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 10000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 11000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 12000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 13000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 14000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 15000000},
-            {pub_key: '01234567890123456789012345678901', voting_power: 16000000},
-          ]);
-          //console.log('################# sends', resultStr);
+          resultJSON = globalStaked;
           break;
         default:
           break;
       }
-      let resultJSON: { pub_key: string, voting_power: number }[];
-      try {
-        resultJSON = await JSON.parse(resultStr);
-      } catch (e) {
-        resultJSON = [];
-      }
-      console.log(resultStr, resultJSON);
+      console.log(resultJSON);
       const randomColors = Utils.generateColorList(resultJSON.length + 10);
       const newPieAmounts: DataType[] = resultJSON
-        .filter((i: { pub_key: string, voting_power: number }) => i.voting_power > 0 && !!i.pub_key)
-        .sort((a, b) => b.voting_power - a.voting_power)
+        .filter((i: StakeType) => i.votingPower > 0 && !!i.pubKey)
+        .sort((a, b) => b.votingPower - a.votingPower)
         .map((item, index) => {
           return {
-            value: item.voting_power / 10 ** 8,
-            finalizer: item.pub_key,
+            value: item.votingPower,
+            finalizer: item.pubKey,
             tag: '',
             svg: { fill: randomColors[index] },
             color: randomColors[index],
@@ -132,7 +104,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
       setExpandAddress(newExpandAddress);
       setLoading(false);
     })();
-  }, [colors.zingo, tab]);
+  }, [colors.zingo, globalStaked, staked, tab]);
 
   const selectExpandAddress = (index: number) => {
     let newExpandAddress = Array(expandAddress.length).fill(false);

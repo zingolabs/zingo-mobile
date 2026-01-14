@@ -62,6 +62,7 @@ import {
   ScreenEnum,
   LaunchingModeEnum,
   SendJsonToTypeType,
+  StakeType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -109,6 +110,7 @@ import {
   StakingActionType,
 } from '../AppState/types/ValueTransferType';
 import Distribution from '../../components/Distribution'
+import Redelegate from '../../components/Staking/components/Redelegate';
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();
 
@@ -130,6 +132,7 @@ type InnerStackParamList = {
   [RouteEnum.Stake]: undefined;
   [RouteEnum.Unstake]: undefined;
   [RouteEnum.Distribution]: undefined;
+  [RouteEnum.Redelegate]: undefined;
 };
 
 const en = require('../translations/en.json');
@@ -483,6 +486,8 @@ export class LoadedAppClass extends Component<
       //context
       netInfo: {} as NetInfoType,
       totalBalance: null,
+      staked: [],
+      globalStaked: [],
       addresses: null,
       valueTransfers: null,
       valueTransfersTotal: null,
@@ -548,6 +553,8 @@ export class LoadedAppClass extends Component<
 
     this.rpc = new RPC(
       this.setTotalBalance,
+      this.setStaked,
+      this.setGlobalStaked,
       this.setValueTransfersList,
       this.setMessagesList,
       this.setAllAddresses,
@@ -874,6 +881,24 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ totalBalance });
       //console.log('=========================================== > BALANCE STORED SETSTATE - ', Date.now() - start);
+    }
+  };
+
+  setStaked = (staked: StakeType[]) => {
+    if (!isEqual(this.state.staked, staked)) {
+      //console.log('fetch staked');
+      //const start = Date.now();
+      this.setState({ staked });
+      //console.log('=========================================== > STAKED STORED SETSTATE - ', Date.now() - start);
+    }
+  };
+
+  setGlobalStaked = (globalStaked: StakeType[]) => {
+    if (!isEqual(this.state.globalStaked, globalStaked)) {
+      //console.log('fetch global staked');
+      //const start = Date.now();
+      this.setState({ globalStaked });
+      //console.log('=========================================== > GLOBAL STAKED STORED SETSTATE - ', Date.now() - start);
     }
   };
 
@@ -1876,6 +1901,8 @@ export class LoadedAppClass extends Component<
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
       totalBalance: this.state.totalBalance,
+      staked: this.state.staked,
+      globalStaked: this.state.globalStaked,
       addresses: this.state.addresses,
       valueTransfers: this.state.valueTransfers,
       valueTransfersTotal: this.state.valueTransfersTotal,
@@ -2050,6 +2077,15 @@ export class LoadedAppClass extends Component<
               <InnerStack.Screen name={RouteEnum.Unstake}>
                 {props => (
                   <Unstake
+                    {...props}
+                    stakeTransaction={this.stakeTransaction}
+                  />
+                )}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.Redelegate}>
+                {props => (
+                  <Redelegate
                     {...props}
                     stakeTransaction={this.stakeTransaction}
                   />
