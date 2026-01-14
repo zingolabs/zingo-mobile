@@ -14,7 +14,7 @@ zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "2f6
 ] }
 pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "2f6365594ce7d73803415d89a71456e038a255df" }
 
-zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", tag = "2.0.9", features = [
+zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", rev = "2f6365594ce7d73803415d89a71456e038a255df", features = [
     "test_lwd_zcashd",
 ] }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }

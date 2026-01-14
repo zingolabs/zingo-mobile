@@ -700,6 +700,28 @@ pub fn info_server() -> Result<String, ZingolibError> {
     })
 }
 
+#[uniffi::export]
+pub fn get_roster_info() -> Result<String, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lightclient) = &mut *guard {
+            Ok(RT.block_on(async move {
+                match lightclient.get_roster_info().await {
+                    Ok(roster_info) => serde_json::to_string_pretty(&roster_info)
+                        .unwrap_or_else(|_| "Error: get seed. failed to serialize".to_string()),
+                    Err(e) => {
+                        format!("Error: {e}")
+                    }
+                }
+            }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
 // TODO: rename "get_seed_phrase" or "get_mnemonic_phrase"
 // or if other recovery info is being used could rename "get_recovery_info" ?
 #[uniffi::export]
@@ -1761,11 +1783,10 @@ fn parse_staking_action(root: &json::JsonValue) -> Result<StakingAction, String>
         .ok_or_else(|| "Error: Missing stakingAction.kind".to_string())?;
 
     let kind = match kind_str {
-        "add" => StakingActionKind::Add,
-        "sub" => StakingActionKind::Sub,
-        "clear" => StakingActionKind::Clear,
-        "move" => StakingActionKind::Move,
-        "moveClear" => StakingActionKind::MoveClear,
+        "create_bond" => StakingActionKind::CreateNewDelegationBond,
+        "begin_unbonding" => StakingActionKind::BeginDelegationUnbonding,
+        "withdraw_bond" => StakingActionKind::WithdrawDelegationBond,
+        "retarget_bond" => StakingActionKind::RetargetDelegationBond,
         other => return Err(format!("Error: Unknown stakingAction.kind: {other}")),
     };
 
