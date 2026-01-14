@@ -105,6 +105,7 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
               setTimeout(() => {
                 closeSheet();
               }, 100);
+              navigation.navigate(RouteEnum.Redelegate);
             }}
             twoButtons={true}
           />
@@ -117,7 +118,7 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
               setTimeout(() => {
                 closeSheet();
               }, 100);
-              navigation.navigate(RouteEnum.Unstake)
+              navigation.navigate(RouteEnum.Unstake);
             }}
             twoButtons={true}
           />

@@ -17,7 +17,7 @@ import {
 import { useTheme } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
-import { GlobalConst, RouteEnum, ScreenEnum, SnackbarDurationEnum, ValueTransferType } from '../../app/AppState';
+import { GlobalConst, RouteEnum, ScreenEnum, SnackbarDurationEnum, StakeType, ValueTransferType } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
 import { ThemeType } from '../../app/types/ThemeType';
 import WalletSummaryHeader from '../History/components/WalletSummaryHeader';
@@ -98,7 +98,7 @@ type StakingProps = DrawerScreenProps<
 
 const Staking: React.FC<StakingProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers, addLastSnackbar, translate, snackbars, removeFirstSnackbar } = context;
+  const { valueTransfers, addLastSnackbar, translate, snackbars, removeFirstSnackbar, staked } = context;
 
   const screenName = ScreenEnum.StakingHome;
 
@@ -232,41 +232,17 @@ const Staking: React.FC<StakingProps> = () => {
       .sort((a, b) => b.time - a.time);
   }, [valueTransfers]);
 
-  const staked: DataType[] = useMemo(() => {
-    //resultStr = await RPCModule.getTotalSpendsToAddressInfo();
-    const resultStr: string = JSON.stringify([
-      {pub_key: '01234567890123456789012345678901', voting_power: 1000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 2000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 3000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 4000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 5000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 6000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 7000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 8000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 9000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 10000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 11000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 12000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 13000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 14000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 15000000},
-      {pub_key: '01234567890123456789012345678901', voting_power: 16000000},
-    ]);
-    let resultJSON: { pub_key: string, voting_power: number }[];
-    try {
-      resultJSON = JSON.parse(resultStr);
-    } catch (e) {
-      resultJSON = [];
-    }
-    console.log(resultStr, resultJSON);
+  const stakedData: DataType[] = useMemo(() => {
+    const resultJSON: StakeType[] = staked;
+    console.log(resultJSON);
     const randomColors = Utils.generateColorList(resultJSON.length + 10);
     const r = resultJSON
-      .filter((i: { pub_key: string, voting_power: number }) => i.voting_power > 0 && !!i.pub_key)
-      .sort((a, b) => b.voting_power - a.voting_power)
+      .filter((i: StakeType) => i.votingPower > 0 && !!i.pubKey)
+      .sort((a, b) => b.votingPower - a.votingPower)
       .map((item, index) => {
         return {
-          value: item.voting_power / 10 ** 8,
-          finalizer: item.pub_key,
+          value: item.votingPower,
+          finalizer: item.pubKey,
           tag: '',
           svg: { fill: randomColors[index] },
           key: `pie-${index}`,
@@ -275,12 +251,12 @@ const Staking: React.FC<StakingProps> = () => {
       const newExpandAddress = Array(r.length).fill(false);
       setExpandAddress(newExpandAddress);
       return r;
-  }, []);
+  }, [staked]);
 
   const { colors } = useTheme() as unknown as ThemeType;
 
   const hasMovements = !loading && movements.length > 0;
-  const hasStaked = !loading && staked.length > 0;
+  const hasStaked = !loading && stakedData.length > 0;
 
   const monthHeader = hasMovements
     ? formatHeaderMonth(movements[0].time)
@@ -332,7 +308,7 @@ const Staking: React.FC<StakingProps> = () => {
   }, [isScrollingToTop]);
   
   const line = (item: DataType, index: number, last: boolean) => {
-    const totalValue = staked ? staked.reduce((acc, curr) => acc + curr.value, 0) : 0;
+    const totalValue = stakedData ? stakedData.reduce((acc, curr) => acc + curr.value, 0) : 0;
     const percent = (100 * item.value) / totalValue;
     // 30 characters per line
     const numLines = item.finalizer.length < 40 ? 2 : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
@@ -733,9 +709,9 @@ const Staking: React.FC<StakingProps> = () => {
                   style={{ maxHeight: '100%' }}
                   contentContainerStyle={{}}>
                   <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: colors.secondary, borderRadius: 26 }}>
-                    {staked
+                    {stakedData
                       .map((item, index) => {
-                        return line(item, index, (index + 1) === staked.length );
+                        return line(item, index, (index + 1) === stakedData.length );
                       })}
                   </View>
                   <View style={{

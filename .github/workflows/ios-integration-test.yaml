@@ -205,7 +205,7 @@ jobs:
           tool: nextest
 
       - name: Pull docker image
-        run: docker pull zingodevops/regchest:011
+        run: docker pull zingodevops/regchest:013
       
       - name: Install nvm with node 20.9.0
         run: |

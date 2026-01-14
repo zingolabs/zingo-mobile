@@ -22,12 +22,17 @@ import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import StakeType from './types/StakeType';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
 
   // The total confirmed and pending balance in this wallet
   totalBalance: TotalBalanceClass | null;
+
+  // Staked
+  staked: StakeType[];
+  globalStaked: StakeType[];
 
   // List of all diversified addresses of the wallet
   addresses: (UnifiedAddressClass | TransparentAddressClass)[] | null;

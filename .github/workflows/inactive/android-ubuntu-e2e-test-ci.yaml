@@ -212,7 +212,7 @@ jobs:
           tool: nextest
 
       - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:011
+        run: docker pull zingodevops/regchest:013
 
       - name: Setup Java
         uses: actions/setup-java@v4

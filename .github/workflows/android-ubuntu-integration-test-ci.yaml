@@ -246,12 +246,12 @@ jobs:
         run: yarn
 
       - name: Pull ci-build docker image
-        run: docker pull zingodevops/ci-build:009
+        run: docker pull zingodevops/ci-build:010
 
       - name: Extract binaries & params from image
         run: |
           set -euxo pipefail
-          cid=$(docker create zingodevops/ci-build:009)
+          cid=$(docker create zingodevops/ci-build:010)
           mkdir -p rust/test_binaries/bins
           docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
           docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
