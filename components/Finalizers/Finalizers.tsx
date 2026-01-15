@@ -314,11 +314,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
           disabled={isScrollingToTop}
           style={({ pressed }) => ({
             position: 'absolute',
-            bottom:
-              !isLiquidGlassSupported &&
-              Platform.OS === GlobalConst.platformOSandroid
-                ? 30
-                : 60,
+            bottom: 30,
             right: 20,
             paddingHorizontal: 5,
             paddingVertical: 10,
