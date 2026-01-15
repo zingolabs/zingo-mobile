@@ -119,6 +119,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const handleConfirmStake = async () => {
     if (!hasSelection) {
       return;
@@ -347,7 +348,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                   navigation.navigate(
                     RouteEnum.Finalizers, 
                     {
-                      setFinalizer: (f: string) => setFinalizerText(f)
+                      setFinalizer: (f: string) => setFinalizerText(f),
+                      scope: 'network',
                     }
                   )
                 }

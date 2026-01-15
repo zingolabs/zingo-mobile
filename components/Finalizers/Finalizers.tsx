@@ -25,7 +25,7 @@ type FinalizersProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Finalizer
 
 const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, route }) => {
   const setFinalizer = !!route.params && route.params.setFinalizer !== undefined ? route.params.setFinalizer : () => {};
-  const scope = !!route.params && route.params.scope !== undefined ? route.params.scope : () => {};
+  const scope = !!route.params && route.params.scope !== undefined ? route.params.scope : '';
   
   const { colors } = useTheme() as unknown as ThemeType;
   const context = useContext(ContextAppLoaded);

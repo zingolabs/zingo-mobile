@@ -65,9 +65,7 @@ export type AppDrawerParamList = {
   [RouteEnum.About]: undefined;
   [RouteEnum.StakingHome]: undefined;
   [RouteEnum.Stake]: undefined;
-  [RouteEnum.Unstake]: undefined;
   [RouteEnum.Distribution]: undefined;
-  [RouteEnum.Redelegate]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Info]: undefined;
   [RouteEnum.Insight]: undefined;
@@ -91,6 +89,8 @@ export type AppDrawerParamList = {
   [RouteEnum.ComputingOK]: ComputingOKNavigationState | undefined;
   [RouteEnum.ComputingError]: ComputingErrorNavigationState | undefined;
   [RouteEnum.Finalizers]: FinalizersNavigationState | undefined;
+  [RouteEnum.Unstake]: UnstakeNavigationState | undefined;
+  [RouteEnum.Redelegate]: RedelegateNavigationState | undefined;
 
 };
 
@@ -120,6 +120,14 @@ export type MemoNavigationState = {
 export type FinalizersNavigationState = {
   setFinalizer: (f: string) => void;
   scope: 'my' | 'network';
+};
+
+export type UnstakeNavigationState = {
+  finalizer: string;
+};
+
+export type RedelegateNavigationState = {
+  finalizer: string;
 };
 
 export type ConfirmNavigationState = {
