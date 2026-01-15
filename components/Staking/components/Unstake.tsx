@@ -384,7 +384,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
             color: colors.text,
             marginBottom: 8,
             marginTop: 15,
-            marginHorizontal: 10
+            marginHorizontal: 20
           }}
         >
           Finalizer address
