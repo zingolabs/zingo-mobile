@@ -112,7 +112,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       navigation.navigate(
         RouteEnum.Finalizers, 
         {
-          setFinalizer: (f: string) => setFinalizerText(f)
+          setFinalizer: (f: string) => setFinalizerText(f),
+          scope: 'network',
         }
       );
     }

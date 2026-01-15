@@ -119,6 +119,7 @@ export type MemoNavigationState = {
 
 export type FinalizersNavigationState = {
   setFinalizer: (f: string) => void;
+  scope: 'my' | 'network';
 };
 
 export type ConfirmNavigationState = {

@@ -17,7 +17,6 @@ import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import AddressItem from '../Components/AddressItem';
-import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 import ChartPieIcon from '../../assets/icons/chart-pie.svg';
 import ZcashIcon from '../../assets/icons/zcash.svg';
 import ZecAmount from '../Components/ZecAmount';
@@ -26,15 +25,16 @@ type FinalizersProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Finalizer
 
 const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, route }) => {
   const setFinalizer = !!route.params && route.params.setFinalizer !== undefined ? route.params.setFinalizer : () => {};
+  const scope = !!route.params && route.params.scope !== undefined ? route.params.scope : () => {};
   
   const { colors } = useTheme() as unknown as ThemeType;
   const context = useContext(ContextAppLoaded);
-  const { snackbars, removeFirstSnackbar, globalStaked, addLastSnackbar, translate, info } = context;
+  const { snackbars, removeFirstSnackbar, staked, globalStaked, addLastSnackbar, translate, info } = context;
   const { clear } = useToast();
   const screenName = ScreenEnum.About;
 
   const [searchText, setSearchText] = useState<string>('');
-  const [globalStakedFiltered, setGlobalStakedFiltered] = useState<StakeType[]>([]);
+  const [stakedFiltered, setStakedFiltered] = useState<StakeType[]>([]);
   const [randomColors, setRandomColors] = useState<string[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
@@ -52,21 +52,22 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
-    let filtered: StakeType[];
+    let filtered: StakeType[] = scope === 'my' ? staked : globalStaked;
     if (searchText) {
-      filtered = globalStaked
+      filtered = filtered
         .filter((item: StakeType) => item.pubKey.toLowerCase().includes(searchText.toLowerCase()))
         .sort((a, b) => b.votingPower - a.votingPower);
     } else {
-      filtered = globalStaked
+      filtered = filtered
         .sort((a, b) => b.votingPower - a.votingPower);
     }
-    setGlobalStakedFiltered(filtered);
+    setStakedFiltered(filtered);
     if (randomColors.length === 0) {
       const rc = Utils.generateColorList(filtered.length + 10);
       setRandomColors(rc);
     }
-  }, [globalStaked, randomColors.length, searchText]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalStaked, randomColors.length, searchText, staked]); // scope won't change
 
   const selectExpandAddress = (index: number) => {
     let newExpandAddress = Array(expandAddress.length).fill(false);
@@ -117,7 +118,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
   }, [isScrollingToTop]);
 
   const line = (item: StakeType, index: number, last: boolean) => {
-    const totalValue = globalStakedFiltered ? globalStakedFiltered.reduce((acc, curr) => acc + curr.votingPower, 0) : 0;
+    const totalValue = stakedFiltered ? stakedFiltered.reduce((acc, curr) => acc + curr.votingPower, 0) : 0;
     const percent = (100 * item.votingPower) / totalValue;
     // 30 characters per line
     const numLines = item.pubKey.length < 40 ? 2 : item.pubKey.length / (dimensions.width < 500 ? 21 : 30);
@@ -287,7 +288,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
         )}
       </View>
 
-      {globalStakedFiltered && globalStakedFiltered.length > 0 && (
+      {stakedFiltered && stakedFiltered.length > 0 && (
         <ScrollView
           ref={scrollViewRef}
           onScroll={handleScroll}
@@ -297,9 +298,9 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
           style={{ maxHeight: '100%' }}
           contentContainerStyle={{}}>
           <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: colors.secondary, borderRadius: 26 }}>
-            {globalStakedFiltered
+            {stakedFiltered
               .map((item, index) => {
-                return line(item, index, (index + 1) === globalStakedFiltered.length );
+                return line(item, index, (index + 1) === stakedFiltered.length );
               })}
           </View>
           <View style={{
