@@ -35,6 +35,7 @@ export enum RouteEnum {
   Unstake = 'Unstake',
   Distribution = 'Distribution',
   Redelegate = 'Redelegate',
+  Finalizers = 'Finalizers',
 
   // Drawer with params
   AddressList = 'AddressList',

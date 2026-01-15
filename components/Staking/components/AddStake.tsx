@@ -71,7 +71,7 @@ function reverseHexBytes(hex: string): string {
 const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   stakeTransaction,
 }) => {
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
   const { totalBalance, defaultUnifiedAddress, indexerServer, info, privacy } =
@@ -179,7 +179,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
 
   const handleViewMovements = () => {
     setModalState('idle');
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
   return (
@@ -326,6 +328,14 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                 keyboardType={'default'}
                 value={finalizerText}
                 onChangeText={setFinalizerText}
+                onPress={() => 
+                  navigation.navigate(
+                    RouteEnum.Finalizers, 
+                    {
+                      setFinalizer: (f: string) => setFinalizerText(f)
+                    }
+                  )
+                }
               />
               {!!finalizerText && (
                 <TouchableOpacity

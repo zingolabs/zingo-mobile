@@ -63,7 +63,7 @@ const hexToBytes = (hex: string): string => {
 };
 
 const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
 
@@ -264,7 +264,9 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
 
   const handleViewMovements = () => {
     setModalState('idle');
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
   const renderSeparator = () => <View style={{ height: 8 }} />;

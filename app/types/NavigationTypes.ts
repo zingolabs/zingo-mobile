@@ -90,6 +90,7 @@ export type AppDrawerParamList = {
   [RouteEnum.Computing]: ComputingNavigationState | undefined;
   [RouteEnum.ComputingOK]: ComputingOKNavigationState | undefined;
   [RouteEnum.ComputingError]: ComputingErrorNavigationState | undefined;
+  [RouteEnum.Finalizers]: FinalizersNavigationState | undefined;
 
 };
 
@@ -114,6 +115,10 @@ export type MemoNavigationState = {
   message: string;
   includeUAMessage: boolean;
   setMessage: (m: string) => void;
+};
+
+export type FinalizersNavigationState = {
+  setFinalizer: (f: string) => void;
 };
 
 export type ConfirmNavigationState = {
