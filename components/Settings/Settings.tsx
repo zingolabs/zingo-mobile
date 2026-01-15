@@ -674,7 +674,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
       setPerformanceLevel(performanceLevelContext);
     }
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
   const optionsRadio = (
