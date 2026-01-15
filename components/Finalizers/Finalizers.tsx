@@ -319,7 +319,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
               Platform.OS === GlobalConst.platformOSandroid
                 ? 30
                 : 60,
-            right: 10,
+            right: 20,
             paddingHorizontal: 5,
             paddingVertical: 10,
             backgroundColor: colors.sideMenuBackground,
