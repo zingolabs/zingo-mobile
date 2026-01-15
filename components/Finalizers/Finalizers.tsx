@@ -12,12 +12,15 @@ import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressabl
 import { useTheme } from '@react-navigation/native';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faCircle, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faChevronRight, faCircle, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import AddressItem from '../Components/AddressItem';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
+import ChartPieIcon from '../../assets/icons/chart-pie.svg';
+import ZcashIcon from '../../assets/icons/zcash.svg';
+import ZecAmount from '../Components/ZecAmount';
 
 type FinalizersProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Finalizers>;
 
@@ -26,7 +29,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
   
   const { colors } = useTheme() as unknown as ThemeType;
   const context = useContext(ContextAppLoaded);
-  const { snackbars, removeFirstSnackbar, globalStaked, addLastSnackbar, translate } = context;
+  const { snackbars, removeFirstSnackbar, globalStaked, addLastSnackbar, translate, info } = context;
   const { clear } = useToast();
   const screenName = ScreenEnum.About;
 
@@ -59,9 +62,11 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
         .sort((a, b) => b.votingPower - a.votingPower);
     }
     setGlobalStakedFiltered(filtered);
-    const rc = Utils.generateColorList(filtered.length + 10);
-    setRandomColors(rc);
-  }, [globalStaked, searchText]);
+    if (randomColors.length === 0) {
+      const rc = Utils.generateColorList(filtered.length + 10);
+      setRandomColors(rc);
+    }
+  }, [globalStaked, randomColors.length, searchText]);
 
   const selectExpandAddress = (index: number) => {
     let newExpandAddress = Array(expandAddress.length).fill(false);
@@ -177,6 +182,21 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
                     ),
                   )}
               </View>
+
+              <View
+                style={{
+                  marginTop: 10,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  gap: 5,
+                }}>
+                <ChartPieIcon height={16} width={16} color={colors.text} />
+                <FadeText style={{ marginRight: 10 }}>{getPercent(percent)}</FadeText>
+                <ZcashIcon height={16} width={16} color={colors.text} />
+                <ZecAmount amtZec={item.votingPower} size={14} currencyName={info.currencyName} />
+              </View>
+
             </TouchableOpacity>
           </View>
           <View
@@ -185,7 +205,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <FadeText >{getPercent(percent)}</FadeText>
+            <FontAwesomeIcon style={{ marginRight: 15 }} size={15} icon={faChevronRight} color={colors.text} />
           </View>
         </View>
       </TouchableOpacity>

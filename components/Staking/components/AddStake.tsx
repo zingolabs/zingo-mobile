@@ -30,7 +30,6 @@ import {
   SendPageStateClass,
   ToAddrClass,
 } from '../../../app/AppState';
-import RegText from '../../Components/RegText';
 import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
 import { ContextAppLoaded } from '../../../app/context';
 import Utils from '../../../app/utils';
@@ -41,6 +40,8 @@ import {
 import FadeText from '../../Components/FadeText';
 import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
+import ChevronDown from '../../../assets/icons/chevron-down.svg';
+import XIcon from '../../../assets/icons/x.svg';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -98,7 +99,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   }, []);
 
   useEffect(() => {
-    // Balance check (in cTAZ / ZEC units)
+    // Balance check (in cTAZ / ZEC units) 
     const _spendable =
       totalBalance && typeof totalBalance.totalSpendableBalance === 'number'
         ? totalBalance.totalSpendableBalance
@@ -106,6 +107,17 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     setSpendable(_spendable);
   }, [totalBalance, totalBalance?.totalSpendableBalance]);
 
+  useEffect(() => {
+    if (!finalizerText) {
+      navigation.navigate(
+        RouteEnum.Finalizers, 
+        {
+          setFinalizer: (f: string) => setFinalizerText(f)
+        }
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const handleConfirmStake = async () => {
     if (!hasSelection) {
       return;
@@ -305,12 +317,12 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
-                borderRadius: 12,
+                borderRadius: 40,
                 marginBottom: 10,
                 backgroundColor: colors.secondary,
                 width: '100%',
                 minWidth: '50%',
-                height: 44,
+                height: 70,
                 alignItems: 'center',
                 paddingHorizontal: 16,
               }}
@@ -328,6 +340,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                 keyboardType={'default'}
                 value={finalizerText}
                 onChangeText={setFinalizerText}
+              />
+              <TouchableOpacity
                 onPress={() => 
                   navigation.navigate(
                     RouteEnum.Finalizers, 
@@ -336,7 +350,15 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                     }
                   )
                 }
-              />
+              >
+                <ChevronDown
+                  width={30}
+                  height={30}
+                  style={{ marginHorizontal: 15 }}
+                  color={colors.text}
+                />
+              </TouchableOpacity>
+
               {!!finalizerText && (
                 <TouchableOpacity
                   onPress={() => {
@@ -354,11 +376,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                       padding: 0,
                     }}
                   >
-                    <RegText
-                      style={{ color: colors.background, marginTop: -3 }}
-                    >
-                      x
-                    </RegText>
+                    <XIcon color={colors.background} width={20} height={20} />
                   </View>
                 </TouchableOpacity>
               )}
