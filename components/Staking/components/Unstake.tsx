@@ -152,6 +152,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
         {
           setFinalizer: (f: string) => setFinalizerText(f),
           scope: 'my',
+          exclude: '',
         }
       );
     }
@@ -314,7 +315,12 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
 
     return (
       <Pressable
-        onPress={() => setSelectedTxid(item.txid)}
+        onPress={() => {
+          setSelectedTxid(item.txid);
+          if (item.stakingAction?.target) {
+            setFinalizerText(item.stakingAction.target);
+          }
+        }}
         style={[
           styles.txRow,
           {
@@ -424,6 +430,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
                 {
                   setFinalizer: (f: string) => setFinalizerText(f),
                   scope: 'my',
+                  exclude: '',
                 }
               )
             }

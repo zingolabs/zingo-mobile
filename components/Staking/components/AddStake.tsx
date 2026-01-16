@@ -114,6 +114,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         {
           setFinalizer: (f: string) => setFinalizerText(f),
           scope: 'network',
+          exclude: '',
         }
       );
     }
@@ -266,6 +267,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                 {
                   setFinalizer: (f: string) => setFinalizerText(f),
                   scope: 'network',
+                  exclude: '',
                 }
               )
             }

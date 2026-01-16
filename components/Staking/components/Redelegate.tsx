@@ -14,6 +14,8 @@ import {
   FlatList,
   Alert,
   NativeModules,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -40,6 +42,8 @@ import {
   MINER_ADDRESS_TESTNET,
 } from '../../../app/utils/constants';
 import { HeaderTitle } from '../../Header';
+import { ChevronDown } from '../../Components/Icons/Chevron';
+import { XIcon } from '../../Components/Icons/XIcon';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -62,7 +66,9 @@ const hexToBytes = (hex: string): string => {
   return bytes.reverse().join('');
 };
 
-const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
+const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
+  const finalizer = !!route.params && route.params.finalizer !== undefined ? route.params.finalizer : '';
+
   const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
@@ -74,6 +80,9 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
     };
   };
 
+  const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
+  const [finalizerToText, setFinalizerToText] = useState<string>('');
+  
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
@@ -95,8 +104,18 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
 
     // All staking "add" actions
     const stakingAdds = valueTransfers.filter(
-      (vt: ValueTransferType) =>
-        vt.stakingAction !== null && vt.stakingAction.kind === 'add',
+      (vt: ValueTransferType) => {
+        if (vt.stakingAction !== null && 
+            vt.stakingAction.kind === 'add') {
+          if (finalizerFromText && vt.stakingAction.target === finalizerFromText) {
+            return true;
+          }
+          if (!finalizerFromText) {
+            return true;
+          }
+        }
+        return false;
+      }
     );
 
     // All txids that have been used as a source in a "sub" (unstake) action
@@ -113,7 +132,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
 
     // Keep only adds whose txid is NOT present as a source in any "sub"
     return stakingAdds.filter(vt => !unstakeSources.has(hexToBytes(vt.txid)));
-  }, [valueTransfers]);
+  }, [finalizerFromText, valueTransfers]);
 
   const selectedTx = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedTx;
@@ -127,6 +146,21 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
       s2.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (!finalizerFromText) {
+      navigation.navigate(
+        RouteEnum.Finalizers, 
+        {
+          setFinalizer: (f: string) => setFinalizerFromText(f),
+          scope: 'my',
+          exclude: '',
+        }
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
 
   // Fetch accumulated stake for each txid shown in the list
   useEffect(() => {
@@ -284,7 +318,12 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
 
     return (
       <Pressable
-        onPress={() => setSelectedTxid(item.txid)}
+        onPress={() => {
+          setSelectedTxid(item.txid);
+          if (item.stakingAction?.target) {
+            setFinalizerFromText(item.stakingAction.target);
+          }
+        }}
         style={[
           styles.txRow,
           {
@@ -346,6 +385,172 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
             navigation.goBack();
           }
         }} />
+
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color: colors.text,
+            marginBottom: 8,
+            marginTop: 15,
+            marginHorizontal: 20
+          }}
+        >
+          Finalizer address (from)
+        </Text>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            borderRadius: 40,
+            marginBottom: 10,
+            backgroundColor: colors.secondary,
+            height: 70,
+            alignItems: 'center',
+            paddingHorizontal: 16,
+            marginHorizontal: 10,
+          }}
+        >
+          <TextInput
+            style={{
+              flex: 1,
+              color: colors.text,
+              fontSize: 17,
+              fontWeight: '400',
+              paddingVertical: 0,
+            }}
+            placeholder="Enter finalizer address"
+            placeholderTextColor={colors.placeholder}
+            keyboardType={'default'}
+            value={finalizerFromText}
+            onChangeText={setFinalizerFromText}
+          />
+          <TouchableOpacity
+            onPress={() => 
+              navigation.navigate(
+                RouteEnum.Finalizers, 
+                {
+                  setFinalizer: (f: string) => setFinalizerFromText(f),
+                  scope: 'my',
+                  exclude: '',
+                }
+              )
+            }
+          >
+            <ChevronDown
+              width={30}
+              height={30}
+              style={{ marginHorizontal: 15 }}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+
+          {!!finalizerFromText && (
+            <TouchableOpacity
+              onPress={() => {
+                setFinalizerFromText('');
+              }}
+            >
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: colors.zingo,
+                  borderRadius: 11,
+                  height: 22,
+                  width: 22,
+                  padding: 0,
+                }}
+              >
+                <XIcon color={colors.background} width={20} height={20} />
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color: colors.text,
+            marginBottom: 8,
+            marginTop: 15,
+            marginHorizontal: 20
+          }}
+        >
+          Finalizer address (to)
+        </Text>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            borderRadius: 40,
+            marginBottom: 10,
+            backgroundColor: colors.secondary,
+            height: 70,
+            alignItems: 'center',
+            paddingHorizontal: 16,
+            marginHorizontal: 10,
+          }}
+        >
+          <TextInput
+            style={{
+              flex: 1,
+              color: colors.text,
+              fontSize: 17,
+              fontWeight: '400',
+              paddingVertical: 0,
+            }}
+            placeholder="Enter finalizer address"
+            placeholderTextColor={colors.placeholder}
+            keyboardType={'default'}
+            value={finalizerToText}
+            onChangeText={setFinalizerToText}
+          />
+          <TouchableOpacity
+            onPress={() => 
+              navigation.navigate(
+                RouteEnum.Finalizers, 
+                {
+                  setFinalizer: (f: string) => setFinalizerToText(f),
+                  scope: 'network',
+                  exclude: finalizerFromText,
+                }
+              )
+            }
+          >
+            <ChevronDown
+              width={30}
+              height={30}
+              style={{ marginHorizontal: 15 }}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+
+          {!!finalizerToText && (
+            <TouchableOpacity
+              onPress={() => {
+                setFinalizerToText('');
+              }}
+            >
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: colors.zingo,
+                  borderRadius: 11,
+                  height: 22,
+                  width: 22,
+                  padding: 0,
+                }}
+              >
+                <XIcon color={colors.background} width={20} height={20} />
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {/* Content */}
         <View

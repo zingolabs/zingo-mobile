@@ -1011,8 +1011,8 @@ export default class RPC {
       this.fetchStakedLock = true;
       const start = Date.now();
       const resultStakedStr = JSON.stringify([
-        {pub_key: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', voting_power: 2000000},
-        {pub_key: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', voting_power: 3000000},
+        {pub_key: 'dddddddddddddddddddddddddddddddd', voting_power: 2000000},
+        {pub_key: 'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm', voting_power: 3000000},
       ]);
       if (Date.now() - start > 4000) {
         console.log(
