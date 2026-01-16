@@ -26,6 +26,7 @@ type FinalizersProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Finalizer
 const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, route }) => {
   const setFinalizer = !!route.params && route.params.setFinalizer !== undefined ? route.params.setFinalizer : () => {};
   const scope = !!route.params && route.params.scope !== undefined ? route.params.scope : '';
+  const exclude = !!route.params && route.params.exclude !== undefined ? route.params.exclude : '';
   
   const { colors } = useTheme() as unknown as ThemeType;
   const context = useContext(ContextAppLoaded);
@@ -53,6 +54,10 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
   
   useEffect(() => {
     let filtered: StakeType[] = scope === 'my' ? staked : globalStaked;
+    if (exclude) {
+      filtered = filtered
+        .filter((item: StakeType) => item.pubKey !== exclude);
+    }
     if (searchText) {
       filtered = filtered
         .filter((item: StakeType) => item.pubKey.toLowerCase().includes(searchText.toLowerCase()))
