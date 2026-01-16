@@ -641,6 +641,12 @@ export default class RPC {
       setTimeout(async () => {
         await this.fetchSyncStatus();
       }, 0);
+      // I don't trust in this message, when the tx is stuck in Trasmitted
+      // this is the message I got & after that the status says 100% complete
+      // this is not true, here Just in case, I need to run the sync again.
+      setTimeout(async () => {
+        await this.refreshSync();
+      }, 0);
       this.fetchSyncPollLock = false;
       return;
     }
