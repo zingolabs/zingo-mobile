@@ -136,7 +136,9 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
 
   const selectedTx = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedTx;
-  const isValidForm = hasSelectedTx;
+  const hasFinalizetTo = !!finalizerToText && finalizerToText !== finalizerFromText;
+  // selected a tx & selected a 'to' finalizer & different finalizers.
+  const isValidForm = hasSelectedTx && hasFinalizetTo;
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -380,7 +382,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
         }
       >
 
-        <HeaderTitle title='Unstake' goBack={() => {
+        <HeaderTitle title='Redelegate' goBack={() => {
           if (navigation.canGoBack()) {
             navigation.goBack();
           }
