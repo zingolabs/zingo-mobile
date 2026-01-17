@@ -77,6 +77,7 @@ export default class RPC {
   performanceLevel: RPCPerformanceLevelEnum;
 
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
+  pollTotalPercent: number | undefined;
 
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
@@ -591,6 +592,11 @@ export default class RPC {
 
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
+    // compare poll & status %, using the biggest.
+    if ((this.pollTotalPercent || 0) > (ss.percentage_total_outputs_scanned || 0)) {
+      ss.percentage_total_outputs_scanned = this.pollTotalPercent;
+    }
+
     // store SyncStatus object for a new screen
     this.fnSetSyncingStatus(ss as RPCSyncStatusType);
 
@@ -599,7 +605,7 @@ export default class RPC {
       !!ss.scan_ranges &&
       ss.scan_ranges.length > 0 &&
       !!ss.percentage_total_outputs_scanned &&
-      ss.percentage_total_outputs_scanned < 100;
+      ss.percentage_total_outputs_scanned <= 99.99;
     if (!inR) {
       // here we can release the screen...
       this.keepAwake(false);
@@ -661,12 +667,17 @@ export default class RPC {
       return;
     }
 
-    if (sp.sync_complete && sp.sync_complete.percentage_total_outputs_scanned &&
-        sp.sync_complete.percentage_total_outputs_scanned >= 100) {
+    const inR: boolean =
+      !!sp.sync_complete.percentage_total_outputs_scanned &&
+      sp.sync_complete.percentage_total_outputs_scanned <= 99.99;
+    if (!inR) {
+      // here we can release the screen...
       this.keepAwake(false);
     } else {
       this.keepAwake(true);
     }
+
+    this.pollTotalPercent = sp.sync_complete.percentage_total_outputs_scanned;
 
     console.log('SYNC POLL', sp);
 
