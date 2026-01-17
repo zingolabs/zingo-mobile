@@ -453,9 +453,7 @@ export default class RPC {
     let returnPause: string = await RPCModule.pauseSyncProcess();
     if (returnPause && returnPause.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC PAUSE ERROR', returnPause);
-      if (!returnPause.toLowerCase().includes('sync is not running')) {
-        this.fnSetLastError(`Error sync pause: ${returnPause}`);
-      }
+      this.fnSetLastError(`Error sync pause: ${returnPause}`);
       return;
     } else {
       console.log('pause sync process. PAUSED', returnPause);
@@ -548,12 +546,8 @@ export default class RPC {
       }
       console.log('sync RUN', syncStr);
       if (syncStr && syncStr.toLowerCase().startsWith(GlobalConst.error)) {
-        // if it is this error: `sync is already running` 
-        // no save it as the last error 
         console.log(`Error sync: ${syncStr}`);
-        if (!syncStr.toLowerCase().includes('sync is already running')) {
-          this.fnSetLastError(`Error sync: ${syncStr}`);
-        }
+        this.fnSetLastError(`Error sync: ${syncStr}`);
       }
     }
 
