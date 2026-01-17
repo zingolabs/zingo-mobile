@@ -600,12 +600,22 @@ export default class RPC {
     // store SyncStatus object for a new screen
     this.fnSetSyncingStatus(ss as RPCSyncStatusType);
 
+    // avoiding 0.00, minimum 0.01, maximun 100
+    // fixing when is:
+    // - 0.00000000123 (rounded 0)   better: 0.01  than 0
+    // - 99.9999999123 (rounded 100)
+    ss.percentage_total_outputs_scanned = 
+      ss.percentage_total_outputs_scanned && 
+      ss.percentage_total_outputs_scanned < 0.01
+        ? 0.01
+        : Number(ss.percentage_total_outputs_scanned?.toFixed(2));
+
     // Close the poll timer if the sync finished(checked via promise above)
     const inR: boolean =
       !!ss.scan_ranges &&
       ss.scan_ranges.length > 0 &&
       !!ss.percentage_total_outputs_scanned &&
-      ss.percentage_total_outputs_scanned <= 99.99;
+      ss.percentage_total_outputs_scanned < 100;
     if (!inR) {
       // here we can release the screen...
       this.keepAwake(false);
@@ -667,9 +677,19 @@ export default class RPC {
       return;
     }
 
+    // avoiding 0.00, minimum 0.01, maximun 100
+    // fixing when is:
+    // - 0.00000000123 (rounded 0)   better: 0.01  than 0
+    // - 99.9999999123 (rounded 100)
+    sp.sync_complete.percentage_total_outputs_scanned = 
+      sp.sync_complete.percentage_total_outputs_scanned && 
+      sp.sync_complete.percentage_total_outputs_scanned < 0.01
+        ? 0.01
+        : Number(sp.sync_complete.percentage_total_outputs_scanned?.toFixed(2));
+
     const inR: boolean =
       !!sp.sync_complete.percentage_total_outputs_scanned &&
-      sp.sync_complete.percentage_total_outputs_scanned <= 99.99;
+      sp.sync_complete.percentage_total_outputs_scanned < 100;
     if (!inR) {
       // here we can release the screen...
       this.keepAwake(false);

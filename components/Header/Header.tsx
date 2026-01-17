@@ -171,25 +171,16 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
-      // avoiding 0.00 or 100%, minimum 0.01, maximun 99.99
-      // fixing when is:
-      // - 0.00000000123 (rounded 0)   better: 0.01  than 0
-      // - 99.9999999123 (rounded 100)
       setPercentageOutputsScanned(
-        syncingStatus.percentage_total_outputs_scanned && 
-        syncingStatus.percentage_total_outputs_scanned < 0.01
-          ? 0.01
-          : syncingStatus.percentage_total_outputs_scanned && 
-            syncingStatus.percentage_total_outputs_scanned > 99.99 &&
-            syncingStatus.percentage_total_outputs_scanned < 100
-            ? 100
-            : Number(syncingStatus.percentage_total_outputs_scanned?.toFixed(2)),
+        syncingStatus.percentage_total_outputs_scanned 
+        ? syncingStatus.percentage_total_outputs_scanned
+        : 0,
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
         syncingStatus.scan_ranges.length > 0 &&
         !!syncingStatus.percentage_total_outputs_scanned &&
-        syncingStatus.percentage_total_outputs_scanned <= 99.99,
+        syncingStatus.percentage_total_outputs_scanned < 100,
       );
     }
   }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
@@ -384,16 +375,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         Animated.sequence([
           Animated.delay(2000),
           Animated.timing(opacityValue, {
-            toValue: 0,
-            duration: 200,
+            toValue: 0.15,
+            duration: 40,
             useNativeDriver: true,
           }),
           Animated.timing(opacityValue, {
             toValue: 1,
-            duration: 200,
+            duration: 120,
             useNativeDriver: true,
           }),
         ]),
+        { resetBeforeIteration: true },
       );
     }
 
