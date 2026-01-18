@@ -77,7 +77,6 @@ export default class RPC {
   performanceLevel: RPCPerformanceLevelEnum;
 
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
-  pollTotalPercent: number | undefined;
 
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
@@ -524,9 +523,6 @@ export default class RPC {
       } as TotalBalanceClass);
       this.fnSetSyncingStatus({} as RPCSyncStatusType);
 
-      // the rescan in zingolib do two tasks:
-      // 1. stop the sync.
-      // 2. launch the rescan.
       const start = Date.now();
       const rescanStr: string = await RPCModule.runRescanProcess();
       if (Date.now() - start > 4000) {
@@ -586,14 +582,6 @@ export default class RPC {
 
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
-    // compare poll & status %, using the biggest.
-    if ((this.pollTotalPercent || 0) > (ss.percentage_total_outputs_scanned || 0)) {
-      ss.percentage_total_outputs_scanned = this.pollTotalPercent;
-    }
-
-    // store SyncStatus object for a new screen
-    this.fnSetSyncingStatus(ss as RPCSyncStatusType);
-
     // avoiding 0.00, minimum 0.01, maximun 100
     // fixing when is:
     // - 0.00000000123 (rounded 0)   better: 0.01  than 0
@@ -613,7 +601,12 @@ export default class RPC {
     if (!inR) {
       // here we can release the screen...
       this.keepAwake(false);
+    } else {
+      this.keepAwake(true);
     }
+
+    // store SyncStatus object for a new screen
+    this.fnSetSyncingStatus(ss as RPCSyncStatusType);
 
     this.fetchSyncStatusLock = false;
   }
@@ -651,6 +644,7 @@ export default class RPC {
       setTimeout(async () => {
         await this.fetchSyncStatus();
       }, 0);
+      console.log('SYNC POLL -> RUN SYNC', returnPoll);
       // I don't trust in this message, when the tx is stuck in Trasmitted
       // this is the message I got & after that the status says 100% complete
       // this is not true, here Just in case, I need to run the sync again.
@@ -691,14 +685,12 @@ export default class RPC {
       this.keepAwake(true);
     }
 
-    this.pollTotalPercent = sp.sync_complete.percentage_total_outputs_scanned;
-
     console.log('SYNC POLL', sp);
 
     console.log('SYNC POLL -> FETCH STATUS');
-      setTimeout(async () => {
-        await this.fetchSyncStatus();
-      }, 0);
+    setTimeout(async () => {
+      await this.fetchSyncStatus();
+    }, 0);
 
     this.fetchSyncPollLock = false;
   }
@@ -1395,6 +1387,9 @@ export default class RPC {
         console.log(`Critical Error send ${error}`);
         sendError = `Error: send ${error}`;
       }
+
+      // run sync process here just in case.
+      await this.refreshSync();
 
       // create the tasks
       await this.configure();
