@@ -1405,7 +1405,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     try {
       const start = Date.now();
       let zingolibStr: string = await RPCModule.getVersionInfo();
-      if (Date.now() - start) {
+      if (Date.now() - start > 4000) {
         console.log('=========================================== > zingolib version - ', Date.now() - start);
       }
       if (zingolibStr) {
