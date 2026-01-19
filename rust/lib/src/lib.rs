@@ -1725,6 +1725,69 @@ pub fn stake(stake_json: String) -> Result<String, ZingolibError> {
     })
 }
 
+/// `withdraw_stake_json` is a JSON object with the following schema:
+/// {
+///   "txid": "..."
+/// }
+#[uniffi::export]
+pub fn withdraw_stake(withdraw_stake_json: String) -> Result<String, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lightclient) = &mut *guard {
+            Ok(RT.block_on(async move {
+                let json_args = match json::parse(&withdraw_stake_json) {
+                    Ok(parsed) => parsed,
+                    Err(_) => return "Error: it is not a valid JSON".to_string(),
+                };
+
+                // txid is in display order here
+                let txid = parse_hex_32(json_args["txid"].as_str().unwrap()).unwrap();
+
+                let unfiltered_txs = lightclient.transaction_summaries(false).await.unwrap();
+
+                let found_tx = unfiltered_txs
+                    .iter()
+                    .filter(|tx| tx.staking_action.is_some())
+                    .find(|tx| tx.txid.to_string() == hex::encode(txid))
+                    .unwrap();
+
+                let pubkey = found_tx.staking_action.as_ref().unwrap().arg32_0;
+
+                let amount = found_tx.staking_action.as_ref().unwrap().amount_zats;
+
+                let request = match transaction_request_from_receivers(vec![]) {
+                    Ok(request) => request,
+                    Err(e) => return format!("Error: Request Error: {e}"),
+                };
+
+                match lightclient
+                    .propose_withdraw_stake(
+                        request,
+                        [0u8; 32],
+                        pubkey,
+                        Zatoshis::const_from_u64(amount),
+                        AccountId::ZERO,
+                    )
+                    .await
+                {
+                    Ok(proposal) => {
+                        let fee = match total_fee(&proposal.proportional_fee_proposal()) {
+                            Ok(fee) => fee,
+                            Err(e) => return object! { "error" => e.to_string() }.pretty(2),
+                        };
+                        object! { "fee" => fee.into_u64() }.pretty(2)
+                    }
+                    Err(e) => object! { "error" => e.to_string() }.pretty(2),
+                }
+            }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
 /// `begin_unstake_json` is a JSON object with the following schema:
 /// {
 ///   "txid": "..."
