@@ -11,7 +11,6 @@ use android_logger::{Config, FilterBuilder};
 use hex::FromHex;
 #[cfg(target_os = "android")]
 use log::Level;
-use zcash_primitives::transaction::{StakingAction, StakingActionKind};
 use zcash_protocol::memo::MemoBytes;
 use zingolib::{AccountId, ConfiguredActivationHeights};
 

@@ -2040,5 +2040,101 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
     }
   }
+  
+  private func makeJsonString(_ obj: [String: Any]) -> String? {
+    guard JSONSerialization.isValidJSONObject(obj),
+          let data = try? JSONSerialization.data(withJSONObject: obj, options: []),
+          let s = String(data: data, encoding: .utf8)
+    else { return nil }
+    return s
+  }
+  
+  func fnWithdrawStakeProcess(_ dict: [AnyHashable: Any]) {
+    if let txid = dict["txid"] as? String,
+       let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+
+      guard let payload = makeJsonString(["txid": txid]) else {
+        let err = "Error: [Native] withdraw_stake. Could not build JSON."
+        NSLog(err)
+        DispatchQueue.main.async { resolve(err) }
+        return
+      }
+
+      do {
+        // UniFFI typically camelCases: withdraw_stake -> withdrawStake(withdrawStakeJson:)
+        let resp = try withdrawStake(withdrawStakeJson: payload)
+        let respStr = String(resp)
+        DispatchQueue.main.async { resolve(respStr) }
+      } catch {
+        let err = "Error: [Native] withdraw_stake. \(error.localizedDescription)"
+        NSLog(err)
+        DispatchQueue.main.async { resolve(err) }
+      }
+
+    } else {
+      let err = "Error: [Native] withdraw_stake. Command arguments problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        DispatchQueue.main.async { resolve(err) }
+      }
+    }
+  }
+
+  @objc(withdrawStakeProcess:resolve:reject:)
+  func withdrawStakeProcess(
+    _ txid: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    let dict: [String: Any] = ["txid": txid, "resolve": resolve]
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      guard let self = self else { return }
+      self.fnWithdrawStakeProcess(dict)
+    }
+  }
+  
+  func fnBeginUnstakeProcess(_ dict: [AnyHashable: Any]) {
+    if let txid = dict["txid"] as? String,
+       let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+
+      guard let payload = makeJsonString(["txid": txid]) else {
+        let err = "Error: [Native] begin_unstake. Could not build JSON."
+        NSLog(err)
+        DispatchQueue.main.async { resolve(err) }
+        return
+      }
+
+      do {
+        // UniFFI typically camelCases: begin_unstake -> beginUnstake(beginUnstakeJson:)
+        let resp = try beginUnstake(beginUnstakeJson: payload)
+        let respStr = String(resp)
+        DispatchQueue.main.async { resolve(respStr) }
+      } catch {
+        let err = "Error: [Native] begin_unstake. \(error.localizedDescription)"
+        NSLog(err)
+        DispatchQueue.main.async { resolve(err) }
+      }
+
+    } else {
+      let err = "Error: [Native] begin_unstake. Command arguments problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        DispatchQueue.main.async { resolve(err) }
+      }
+    }
+  }
+
+  @objc(beginUnstakeProcess:resolve:reject:)
+  func beginUnstakeProcess(
+    _ txid: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    let dict: [String: Any] = ["txid": txid, "resolve": resolve]
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      guard let self = self else { return }
+      self.fnBeginUnstakeProcess(dict)
+    }
+  }
 
 }
