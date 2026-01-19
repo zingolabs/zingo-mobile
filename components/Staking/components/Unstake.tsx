@@ -22,6 +22,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCheckCircle,
+  faCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
@@ -43,7 +44,7 @@ import {
 } from '../../../app/utils/constants';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
-import { XIcon } from '../../Components/Icons/XIcon';
+import FadeText from '../../Components/FadeText';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -68,6 +69,7 @@ const hexToBytes = (hex: string): string => {
 
 const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
   const finalizer = !!route.params && route.params.finalizer !== undefined ? route.params.finalizer : '';
+  const staked = !!route.params && route.params.staked !== undefined ? route.params.staked : 0;
 
   const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
@@ -80,7 +82,8 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
     };
   };
 
-  const [finalizerText, setFinalizerText] = useState<string>(finalizer);
+  const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
+  const [stakedFrom, setStakedFrom] = useState<number>(staked);
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
@@ -105,10 +108,10 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
       (vt: ValueTransferType) => {
         if (vt.stakingAction !== null && 
             vt.stakingAction.kind === 'add') {
-          if (finalizerText && vt.stakingAction.target === finalizerText) {
+          if (finalizerFromText && vt.stakingAction.target === finalizerFromText) {
             return true;
           }
-          if (!finalizerText) {
+          if (!finalizerFromText) {
             return true;
           }
         }
@@ -130,7 +133,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
 
     // Keep only adds whose txid is NOT present as a source in any "sub"
     return stakingAdds.filter(vt => !unstakeSources.has(hexToBytes(vt.txid)));
-  }, [finalizerText, valueTransfers]); // finalizer won't change
+  }, [finalizerFromText, valueTransfers]); // finalizer won't change
 
   const selectedTx = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedTx;
@@ -146,11 +149,14 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
   }, []);
 
   useEffect(() => {
-    if (!finalizerText) {
+    if (!finalizerFromText) {
       navigation.navigate(
         RouteEnum.Finalizers, 
         {
-          setFinalizer: (f: string) => setFinalizerText(f),
+          setFinalizer: (f: string, s: number) => {
+            setFinalizerFromText(f);
+            setStakedFrom(s);
+          },
           scope: 'my',
           exclude: '',
         }
@@ -317,9 +323,11 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
       <Pressable
         onPress={() => {
           setSelectedTxid(item.txid);
-          if (item.stakingAction?.target) {
-            setFinalizerText(item.stakingAction.target);
-          }
+          //if (item.stakingAction?.target) {
+          //  setFinalizerFromText(item.stakingAction.target);
+            // TODO: find the staked amount for this finalizer.
+          //  setStakedFrom(0);
+          //}
         }}
         style={[
           styles.txRow,
@@ -396,75 +404,60 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
           Finalizer address
         </Text>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            borderRadius: 40,
-            marginBottom: 10,
-            backgroundColor: colors.secondary,
-            height: 70,
-            alignItems: 'center',
-            paddingHorizontal: 16,
-            marginHorizontal: 10,
-          }}
+        <TouchableOpacity
+          onPress={() => 
+            navigation.navigate(
+              RouteEnum.Finalizers, 
+              {
+                setFinalizer: (f: string, s: number) => {
+                  setFinalizerFromText(f);
+                  setStakedFrom(s);
+                },
+                scope: 'my',
+                exclude: '',
+              }
+            )
+          }
         >
-          <TextInput
+          <View
             style={{
-              flex: 1,
-              color: colors.text,
-              fontSize: 17,
-              fontWeight: '400',
-              paddingVertical: 0,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: 20,
+              marginBottom: 10,
+              backgroundColor: colors.secondary,
+              padding: 16,
+              marginHorizontal: 10,
+              borderWidth: 0.5,
+              borderColor: colors.text,
             }}
-            placeholder="Enter finalizer address"
-            placeholderTextColor={colors.placeholder}
-            keyboardType={'default'}
-            value={finalizerText}
-            onChangeText={setFinalizerText}
-          />
-          <TouchableOpacity
-            onPress={() => 
-              navigation.navigate(
-                RouteEnum.Finalizers, 
-                {
-                  setFinalizer: (f: string) => setFinalizerText(f),
-                  scope: 'my',
-                  exclude: '',
-                }
-              )
-            }
           >
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='#FC0' />
+              <View style={{ justifyContent: 'center', alignItems: 'flex-start', gap: 0 }}>
+                <TextInput
+                  style={{
+                    color: colors.text,
+                    fontSize: 17,
+                    fontWeight: '400',
+                  }}
+                  placeholder="Tap here for finalizer address" 
+                  placeholderTextColor={colors.placeholder}
+                  value={Utils.trimToSmall(finalizerFromText, 7)}
+                  editable={false}
+                />
+                {!!stakedFrom && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${stakedFrom}`}</FadeText>}
+              </View>
+            </View>
             <ChevronDown
               width={30}
               height={30}
-              style={{ marginHorizontal: 15 }}
+              style={{ transform: [{ rotate: '-90deg' }] }}
               color={colors.text}
             />
-          </TouchableOpacity>
-
-          {!!finalizerText && (
-            <TouchableOpacity
-              onPress={() => {
-                setFinalizerText('');
-              }}
-            >
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: colors.zingo,
-                  borderRadius: 11,
-                  height: 22,
-                  width: 22,
-                  padding: 0,
-                }}
-              >
-                <XIcon color={colors.background} width={20} height={20} />
-              </View>
-            </TouchableOpacity>
-          )}
-        </View>
+          </View>
+        </TouchableOpacity>
 
         {/* Content */}
         <View

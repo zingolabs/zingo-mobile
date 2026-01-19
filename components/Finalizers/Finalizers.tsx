@@ -20,6 +20,7 @@ import AddressItem from '../Components/AddressItem';
 import ChartPieIcon from '../../assets/icons/chart-pie.svg';
 import ZcashIcon from '../../assets/icons/zcash.svg';
 import ZecAmount from '../Components/ZecAmount';
+import { XIcon } from '../Components/Icons/XIcon';
 
 type FinalizersProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Finalizers>;
 
@@ -132,7 +133,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
         style={{ width: '100%' }} 
         key={`tag-${index}`} 
         onPress={() => {
-          setFinalizer(item.pubKey);
+          setFinalizer(item.pubKey, item.votingPower);
           if (navigation.canGoBack()) {
             navigation.goBack();
           }
@@ -283,11 +284,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
                 padding: 0,
               }}
             >
-              <RegText
-                style={{ color: colors.background, marginTop: -3 }}
-              >
-                x
-              </RegText>
+              <XIcon color={colors.background} width={20} height={20} />
             </View>
           </TouchableOpacity>
         )}

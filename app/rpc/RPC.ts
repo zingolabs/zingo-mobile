@@ -790,6 +790,10 @@ export default class RPC {
       setTimeout(async () => {
         await this.fetchSyncStatus();
       }, 0);
+      console.log('SYNC POLL -> RUN SYNC', returnPoll);
+      setTimeout(async () => {
+        await this.refreshSync();
+      }, 0);
       this.fetchSyncPollLock = false;
       return;
     }
@@ -1744,6 +1748,8 @@ export default class RPC {
       // create the tasks
       await this.configure();
       this.setInSend(false);
+
+      await this.refreshSync();
 
       if (sendTxids) {
         //console.log('00000000 RESOLVE send');

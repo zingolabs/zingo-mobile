@@ -47,6 +47,7 @@ const StakingActions: React.FC<StakingActionsProps> = ({
             onPress={() => 
               navigation.navigate(RouteEnum.Unstake, {
                 finalizer: undefined,
+                staked: undefined,
               })
             }
             style={{

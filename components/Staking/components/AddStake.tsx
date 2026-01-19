@@ -19,7 +19,7 @@ import {
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
 import { ThemeType } from '../../../app/types/ThemeType';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -41,7 +41,6 @@ import FadeText from '../../Components/FadeText';
 import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
-import XIcon from '../../../assets/icons/x.svg';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -81,6 +80,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [finalizerText, setFinalizerText] = useState<string>('');
+  const [staked, setStaked] = useState<number>(0);
   const [kbOpen, setKbOpen] = useState<boolean>(false);
   const [spendable, setSpendable] = useState<number>(0);
 
@@ -112,7 +112,10 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       navigation.navigate(
         RouteEnum.Finalizers, 
         {
-          setFinalizer: (f: string) => setFinalizerText(f),
+          setFinalizer: (f: string, s: number) => {
+            setFinalizerText(f);
+            setStaked(s);
+          },
           scope: 'network',
           exclude: '',
         }
@@ -233,75 +236,60 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           Finalizer address
         </Text>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            borderRadius: 40,
-            marginBottom: 10,
-            backgroundColor: colors.secondary,
-            height: 70,
-            alignItems: 'center',
-            paddingHorizontal: 16,
-            marginHorizontal: 10,
-          }}
+        <TouchableOpacity
+          onPress={() => 
+            navigation.navigate(
+              RouteEnum.Finalizers, 
+              {
+                setFinalizer: (f: string, s: number) => {
+                  setFinalizerText(f);
+                  setStaked(s);
+                },
+                scope: 'network',
+                exclude: '',
+              }
+            )
+          }
         >
-          <TextInput
+          <View
             style={{
-              flex: 1,
-              color: colors.text,
-              fontSize: 17,
-              fontWeight: '400',
-              paddingVertical: 0,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: 20,
+              marginBottom: 10,
+              backgroundColor: colors.secondary,
+              padding: 16,
+              marginHorizontal: 10,
+              borderWidth: 0.5,
+              borderColor: colors.text,
             }}
-            placeholder="Enter finalizer address"
-            placeholderTextColor={colors.placeholder}
-            keyboardType={'default'}
-            value={finalizerText}
-            onChangeText={setFinalizerText}
-          />
-          <TouchableOpacity
-            onPress={() => 
-              navigation.navigate(
-                RouteEnum.Finalizers, 
-                {
-                  setFinalizer: (f: string) => setFinalizerText(f),
-                  scope: 'network',
-                  exclude: '',
-                }
-              )
-            }
           >
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='rgba(143, 191, 250, 1)' />
+              <View style={{ justifyContent: 'center', alignItems: 'flex-start', gap: 0 }}>
+                <TextInput
+                  style={{
+                    color: colors.text,
+                    fontSize: 17,
+                    fontWeight: '400',
+                  }}
+                  placeholder="Tap here for finalizer address" 
+                  placeholderTextColor={colors.placeholder}
+                  value={Utils.trimToSmall(finalizerText, 7)}
+                  editable={false}
+                />
+                {!!staked && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${staked}`}</FadeText>}
+              </View>
+            </View>
             <ChevronDown
               width={30}
               height={30}
-              style={{ marginHorizontal: 15 }}
+              style={{ transform: [{ rotate: '-90deg' }] }}
               color={colors.text}
             />
-          </TouchableOpacity>
-
-          {!!finalizerText && (
-            <TouchableOpacity
-              onPress={() => {
-                setFinalizerText('');
-              }}
-            >
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: colors.zingo,
-                  borderRadius: 11,
-                  height: 22,
-                  width: 22,
-                  padding: 0,
-                }}
-              >
-                <XIcon color={colors.background} width={20} height={20} />
-              </View>
-            </TouchableOpacity>
-          )}
-        </View>
+          </View>
+        </TouchableOpacity>
 
         <ScrollView
           keyboardShouldPersistTaps="handled"
