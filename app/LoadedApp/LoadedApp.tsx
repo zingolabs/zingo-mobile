@@ -1712,6 +1712,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setLastError = (error: string) => {
+    // irrelevant errors ignored.
+    // don't store time-out errors
+    // don't store silly sync errors
+    if (
+      error.toLowerCase().includes('Deadline expired before operation could complete'.toLowerCase()) ||
+      error.toLowerCase().includes('Sync is not running'.toLowerCase()) ||
+      error.toLowerCase().includes('Sync is already running'.toLowerCase())
+    ) {
+      return;
+    }
     this.setState({ lastError: error });
   };
 
