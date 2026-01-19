@@ -21,6 +21,7 @@ import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderTitle } from '../../../components/Header';
+import { XIcon } from '../../../components/Components/Icons/XIcon';
 
 type ImportProps = {
   actionButtonsDisabled: boolean;
@@ -247,7 +248,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                         width: 22,
                         padding: 0,
                     }}>
-                      <RegText style={{ color: colors.background, marginTop: -3 }}>x</RegText>
+                      <XIcon color={colors.background} width={20} height={20} />
                     </View>
                   </TouchableOpacity>
                 )}
@@ -387,7 +388,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                       width: 22,
                       padding: 0,
                   }}>
-                    <RegText style={{ color: colors.background, marginTop: -3 }}>x</RegText>
+                    <XIcon color={colors.background} width={20} height={20} />
                   </View>
                 </TouchableOpacity>
               )}

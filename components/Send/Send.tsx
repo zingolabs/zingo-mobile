@@ -55,6 +55,7 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Wallet from '../../assets/icons/wallet.svg';
 import { HeaderTitle } from '../Header';
+import { XIcon } from '../Components/Icons/XIcon';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
@@ -1000,11 +1001,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           padding: 0,
                         }}
                       >
-                        <RegText
-                          style={{ color: colors.background, marginTop: -3 }}
-                        >
-                          x
-                        </RegText>
+                        <XIcon color={colors.background} width={20} height={20} />
                       </View>
                     </TouchableOpacity>
                   )}
@@ -1130,11 +1127,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             padding: 0,
                           }}
                         >
-                          <RegText
-                            style={{ color: colors.background, marginTop: -3 }}
-                          >
-                            x
-                          </RegText>
+                          <XIcon color={colors.background} width={20} height={20} />
                         </View>
                       </TouchableOpacity>
                     )}
@@ -1485,11 +1478,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           padding: 0,
                         }}
                       >
-                        <RegText
-                          style={{ color: colors.background, marginTop: -3 }}
-                        >
-                          x
-                        </RegText>
+                        <XIcon color={colors.background} width={20} height={20} />
                       </View>
                     </TouchableOpacity>
                   )}

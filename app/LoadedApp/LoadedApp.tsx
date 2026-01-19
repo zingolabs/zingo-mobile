@@ -111,6 +111,7 @@ import {
 } from '../AppState/types/ValueTransferType';
 import Distribution from '../../components/Distribution'
 import Redelegate from '../../components/Staking/components/Redelegate';
+import Finalizers from '../../components/Finalizers/Finalizers';
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();
 
@@ -133,6 +134,7 @@ type InnerStackParamList = {
   [RouteEnum.Unstake]: undefined;
   [RouteEnum.Distribution]: undefined;
   [RouteEnum.Redelegate]: undefined;
+  [RouteEnum.Finalizers]: undefined;
 };
 
 const en = require('../translations/en.json');
@@ -2027,6 +2029,10 @@ export class LoadedAppClass extends Component<
 
               <InnerStack.Screen name={RouteEnum.Distribution}>
                 {props => <Distribution {...props} />}
+              </InnerStack.Screen>
+
+              <InnerStack.Screen name={RouteEnum.Finalizers}>
+                {props => <Finalizers {...props} />}
               </InnerStack.Screen>
 
               <InnerStack.Screen name={RouteEnum.DebugInfo}>

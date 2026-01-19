@@ -14,12 +14,16 @@ import {
   FlatList,
   Alert,
   NativeModules,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
+  faArrowDown,
   faCheckCircle,
+  faCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
@@ -40,6 +44,8 @@ import {
   MINER_ADDRESS_TESTNET,
 } from '../../../app/utils/constants';
 import { HeaderTitle } from '../../Header';
+import { ChevronDown } from '../../Components/Icons/Chevron';
+import FadeText from '../../Components/FadeText';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -62,8 +68,11 @@ const hexToBytes = (hex: string): string => {
   return bytes.reverse().join('');
 };
 
-const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
-  const navigation = useNavigation();
+const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
+  const finalizer = !!route.params && route.params.finalizer !== undefined ? route.params.finalizer : '';
+  const staked = !!route.params && route.params.staked !== undefined ? route.params.staked : 0;
+
+  const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
 
@@ -74,6 +83,11 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
     };
   };
 
+  const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
+  const [stakedFrom, setStakedFrom] = useState<number>(staked);
+  const [finalizerToText, setFinalizerToText] = useState<string>('');
+  const [stakedTo, setStakedTo] = useState<number>(0);
+  
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
@@ -95,8 +109,18 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
 
     // All staking "add" actions
     const stakingAdds = valueTransfers.filter(
-      (vt: ValueTransferType) =>
-        vt.stakingAction !== null && vt.stakingAction.kind === 'add',
+      (vt: ValueTransferType) => {
+        if (vt.stakingAction !== null && 
+            vt.stakingAction.kind === 'add') {
+          if (finalizerFromText && vt.stakingAction.target === finalizerFromText) {
+            return true;
+          }
+          if (!finalizerFromText) {
+            return true;
+          }
+        }
+        return false;
+      }
     );
 
     // All txids that have been used as a source in a "sub" (unstake) action
@@ -113,11 +137,13 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
 
     // Keep only adds whose txid is NOT present as a source in any "sub"
     return stakingAdds.filter(vt => !unstakeSources.has(hexToBytes(vt.txid)));
-  }, [valueTransfers]);
+  }, [finalizerFromText, valueTransfers]);
 
   const selectedTx = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedTx;
-  const isValidForm = hasSelectedTx;
+  const hasFinalizetTo = !!finalizerToText && finalizerToText !== finalizerFromText;
+  // selected a tx & selected a 'to' finalizer & different finalizers.
+  const isValidForm = hasSelectedTx && hasFinalizetTo;
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -127,6 +153,24 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
       s2.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (!finalizerFromText) {
+      navigation.navigate(
+        RouteEnum.Finalizers, 
+        {
+          setFinalizer: (f: string, s: number) => {
+            setFinalizerFromText(f);
+            setStakedFrom(s);
+          },
+          scope: 'my',
+          exclude: finalizerToText,
+        }
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
 
   // Fetch accumulated stake for each txid shown in the list
   useEffect(() => {
@@ -264,7 +308,9 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
 
   const handleViewMovements = () => {
     setModalState('idle');
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
   const renderSeparator = () => <View style={{ height: 8 }} />;
@@ -282,7 +328,14 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
 
     return (
       <Pressable
-        onPress={() => setSelectedTxid(item.txid)}
+        onPress={() => {
+          setSelectedTxid(item.txid);
+          //if (item.stakingAction?.target) {
+          //  setFinalizerFromText(item.stakingAction.target);
+            // TODO: find the staked amount for this finalizer
+          //  setStakedFrom(0);
+          //}
+        }}
         style={[
           styles.txRow,
           {
@@ -339,11 +392,158 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction }) => {
         }
       >
 
-        <HeaderTitle title='Unstake' goBack={() => {
+        <HeaderTitle title='Redelegate' goBack={() => {
           if (navigation.canGoBack()) {
             navigation.goBack();
           }
         }} />
+
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color: colors.text,
+            marginBottom: 8,
+            marginTop: 15,
+            marginHorizontal: 20
+          }}
+        >
+          Finalizer addresses
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => 
+            navigation.navigate(
+              RouteEnum.Finalizers, 
+              {
+                setFinalizer: (f: string, s: number) => {
+                  setFinalizerFromText(f);
+                  setStakedFrom(s);
+                },
+                scope: 'my',
+                exclude: finalizerToText,
+              }
+            )
+          }
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: 20,
+              marginBottom: 10,
+              backgroundColor: colors.secondary,
+              padding: 16,
+              marginHorizontal: 10,
+              borderWidth: 0.5,
+              borderColor: colors.text,
+            }}
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='rgba(143, 191, 250, 1)' />
+              <View style={{ justifyContent: 'center', alignItems: 'flex-start', gap: 0 }}>
+                <TextInput
+                  style={{
+                    color: colors.text,
+                    fontSize: 17,
+                    fontWeight: '400',
+                  }}
+                  placeholder="Tap here for finalizer address" 
+                  placeholderTextColor={colors.placeholder}
+                  value={Utils.trimToSmall(finalizerFromText, 7)}
+                  editable={false}
+                />
+                {!!stakedFrom && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${stakedFrom}`}</FadeText>}
+              </View>
+            </View>
+            <ChevronDown
+              width={30}
+              height={30}
+              style={{ transform: [{ rotate: '-90deg' }] }}
+              color={colors.text}
+            />
+          </View>
+        </TouchableOpacity>
+
+        <View>
+          <View 
+            style={{ 
+              padding: 10,
+              paddingHorizontal: 12,
+              borderColor: colors.text,
+              backgroundColor: colors.background,
+              borderWidth: 1,
+              borderRadius: 30,
+              marginTop: -25,
+              zIndex: 999,
+              width: 50,
+              alignSelf: 'center',
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faArrowDown}
+              size={25}
+              color={colors.text}
+            />
+          </View>
+        </View>
+
+        <TouchableOpacity
+          onPress={() => 
+            navigation.navigate(
+              RouteEnum.Finalizers, 
+              {
+                setFinalizer: (f: string, s: number) => {
+                  setFinalizerToText(f);
+                  setStakedTo(s);
+                },
+                scope: 'network',
+                exclude: finalizerFromText,
+              }
+            )
+          }
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: 20,
+              marginBottom: 10,
+              backgroundColor: colors.secondary,
+              padding: 16,
+              marginHorizontal: 10,
+              borderWidth: 0.5,
+              borderColor: colors.text,
+              marginTop: -15,
+            }}
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='#FC0' />
+              <View style={{ justifyContent: 'center', alignItems: 'flex-start', gap: 0 }}>
+                <TextInput
+                  style={{
+                    color: colors.text,
+                    fontSize: 17,
+                    fontWeight: '400',
+                  }}
+                  placeholder="Tap here for finalizer address" 
+                  placeholderTextColor={colors.placeholder}
+                  value={Utils.trimToSmall(finalizerToText, 7)}
+                  editable={false}
+                />
+                {!!stakedTo && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${stakedTo}`}</FadeText>}
+              </View>
+            </View>
+            <ChevronDown
+              width={30}
+              height={30}
+              style={{ transform: [{ rotate: '-90deg' }] }}
+              color={colors.text}
+            />
+          </View>
+        </TouchableOpacity>
 
         {/* Content */}
         <View

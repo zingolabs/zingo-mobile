@@ -14,12 +14,15 @@ import {
   FlatList,
   Alert,
   NativeModules,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCheckCircle,
+  faCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
@@ -40,6 +43,8 @@ import {
   MINER_ADDRESS_TESTNET,
 } from '../../../app/utils/constants';
 import { HeaderTitle } from '../../Header';
+import { ChevronDown } from '../../Components/Icons/Chevron';
+import FadeText from '../../Components/FadeText';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -62,8 +67,11 @@ const hexToBytes = (hex: string): string => {
   return bytes.reverse().join('');
 };
 
-const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
-  const navigation = useNavigation();
+const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
+  const finalizer = !!route.params && route.params.finalizer !== undefined ? route.params.finalizer : '';
+  const staked = !!route.params && route.params.staked !== undefined ? route.params.staked : 0;
+
+  const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
 
@@ -74,6 +82,8 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
     };
   };
 
+  const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
+  const [stakedFrom, setStakedFrom] = useState<number>(staked);
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
@@ -95,8 +105,18 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
 
     // All staking "add" actions
     const stakingAdds = valueTransfers.filter(
-      (vt: ValueTransferType) =>
-        vt.stakingAction !== null && vt.stakingAction.kind === 'add',
+      (vt: ValueTransferType) => {
+        if (vt.stakingAction !== null && 
+            vt.stakingAction.kind === 'add') {
+          if (finalizerFromText && vt.stakingAction.target === finalizerFromText) {
+            return true;
+          }
+          if (!finalizerFromText) {
+            return true;
+          }
+        }
+        return false;
+      }
     );
 
     // All txids that have been used as a source in a "sub" (unstake) action
@@ -113,7 +133,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
 
     // Keep only adds whose txid is NOT present as a source in any "sub"
     return stakingAdds.filter(vt => !unstakeSources.has(hexToBytes(vt.txid)));
-  }, [valueTransfers]);
+  }, [finalizerFromText, valueTransfers]); // finalizer won't change
 
   const selectedTx = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedTx;
@@ -128,6 +148,23 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!finalizerFromText) {
+      navigation.navigate(
+        RouteEnum.Finalizers, 
+        {
+          setFinalizer: (f: string, s: number) => {
+            setFinalizerFromText(f);
+            setStakedFrom(s);
+          },
+          scope: 'my',
+          exclude: '',
+        }
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
   // Fetch accumulated stake for each txid shown in the list
   useEffect(() => {
     let cancelled = false;
@@ -264,7 +301,9 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
 
   const handleViewMovements = () => {
     setModalState('idle');
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
   const renderSeparator = () => <View style={{ height: 8 }} />;
@@ -282,7 +321,14 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
 
     return (
       <Pressable
-        onPress={() => setSelectedTxid(item.txid)}
+        onPress={() => {
+          setSelectedTxid(item.txid);
+          //if (item.stakingAction?.target) {
+          //  setFinalizerFromText(item.stakingAction.target);
+            // TODO: find the staked amount for this finalizer.
+          //  setStakedFrom(0);
+          //}
+        }}
         style={[
           styles.txRow,
           {
@@ -344,6 +390,74 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction }) => {
             navigation.goBack();
           }
         }} />
+
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color: colors.text,
+            marginBottom: 8,
+            marginTop: 15,
+            marginHorizontal: 20
+          }}
+        >
+          Finalizer address
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => 
+            navigation.navigate(
+              RouteEnum.Finalizers, 
+              {
+                setFinalizer: (f: string, s: number) => {
+                  setFinalizerFromText(f);
+                  setStakedFrom(s);
+                },
+                scope: 'my',
+                exclude: '',
+              }
+            )
+          }
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: 20,
+              marginBottom: 10,
+              backgroundColor: colors.secondary,
+              padding: 16,
+              marginHorizontal: 10,
+              borderWidth: 0.5,
+              borderColor: colors.text,
+            }}
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='#FC0' />
+              <View style={{ justifyContent: 'center', alignItems: 'flex-start', gap: 0 }}>
+                <TextInput
+                  style={{
+                    color: colors.text,
+                    fontSize: 17,
+                    fontWeight: '400',
+                  }}
+                  placeholder="Tap here for finalizer address" 
+                  placeholderTextColor={colors.placeholder}
+                  value={Utils.trimToSmall(finalizerFromText, 7)}
+                  editable={false}
+                />
+                {!!stakedFrom && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${stakedFrom}`}</FadeText>}
+              </View>
+            </View>
+            <ChevronDown
+              width={30}
+              height={30}
+              style={{ transform: [{ rotate: '-90deg' }] }}
+              color={colors.text}
+            />
+          </View>
+        </TouchableOpacity>
 
         {/* Content */}
         <View

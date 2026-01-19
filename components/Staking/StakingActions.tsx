@@ -44,7 +44,12 @@ const StakingActions: React.FC<StakingActionsProps> = ({
           </Pressable>
 
           <Pressable
-            onPress={() => navigation.navigate(RouteEnum.Unstake)}
+            onPress={() => 
+              navigation.navigate(RouteEnum.Unstake, {
+                finalizer: undefined,
+                staked: undefined,
+              })
+            }
             style={{
               alignItems: 'center',
               backgroundColor: '#FFAF0E4D',

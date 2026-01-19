@@ -19,7 +19,7 @@ import {
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
 import { ThemeType } from '../../../app/types/ThemeType';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -30,7 +30,6 @@ import {
   SendPageStateClass,
   ToAddrClass,
 } from '../../../app/AppState';
-import RegText from '../../Components/RegText';
 import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
 import { ContextAppLoaded } from '../../../app/context';
 import Utils from '../../../app/utils';
@@ -41,6 +40,7 @@ import {
 import FadeText from '../../Components/FadeText';
 import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
+import ChevronDown from '../../../assets/icons/chevron-down.svg';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -71,7 +71,7 @@ function reverseHexBytes(hex: string): string {
 const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   stakeTransaction,
 }) => {
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
   const { totalBalance, defaultUnifiedAddress, indexerServer, info, privacy } =
@@ -80,6 +80,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [finalizerText, setFinalizerText] = useState<string>('');
+  const [staked, setStaked] = useState<number>(0);
   const [kbOpen, setKbOpen] = useState<boolean>(false);
   const [spendable, setSpendable] = useState<number>(0);
 
@@ -98,13 +99,30 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   }, []);
 
   useEffect(() => {
-    // Balance check (in cTAZ / ZEC units)
+    // Balance check (in cTAZ / ZEC units) 
     const _spendable =
       totalBalance && typeof totalBalance.totalSpendableBalance === 'number'
         ? totalBalance.totalSpendableBalance
         : 0;
     setSpendable(_spendable);
   }, [totalBalance, totalBalance?.totalSpendableBalance]);
+
+  useEffect(() => {
+    if (!finalizerText) {
+      navigation.navigate(
+        RouteEnum.Finalizers, 
+        {
+          setFinalizer: (f: string, s: number) => {
+            setFinalizerText(f);
+            setStaked(s);
+          },
+          scope: 'network',
+          exclude: '',
+        }
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleConfirmStake = async () => {
     if (!hasSelection) {
@@ -179,7 +197,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
 
   const handleViewMovements = () => {
     setModalState('idle');
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
   return (
@@ -203,11 +223,78 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           }}
         />
 
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color: colors.text,
+            marginBottom: 8,
+            marginTop: 15,
+            marginHorizontal: 20,
+          }}
+        >
+          Finalizer address
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => 
+            navigation.navigate(
+              RouteEnum.Finalizers, 
+              {
+                setFinalizer: (f: string, s: number) => {
+                  setFinalizerText(f);
+                  setStaked(s);
+                },
+                scope: 'network',
+                exclude: '',
+              }
+            )
+          }
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: 20,
+              marginBottom: 10,
+              backgroundColor: colors.secondary,
+              padding: 16,
+              marginHorizontal: 10,
+              borderWidth: 0.5,
+              borderColor: colors.text,
+            }}
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='rgba(143, 191, 250, 1)' />
+              <View style={{ justifyContent: 'center', alignItems: 'flex-start', gap: 0 }}>
+                <TextInput
+                  style={{
+                    color: colors.text,
+                    fontSize: 17,
+                    fontWeight: '400',
+                  }}
+                  placeholder="Tap here for finalizer address" 
+                  placeholderTextColor={colors.placeholder}
+                  value={Utils.trimToSmall(finalizerText, 7)}
+                  editable={false}
+                />
+                {!!staked && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${staked}`}</FadeText>}
+              </View>
+            </View>
+            <ChevronDown
+              width={30}
+              height={30}
+              style={{ transform: [{ rotate: '-90deg' }] }}
+              color={colors.text}
+            />
+          </View>
+        </TouchableOpacity>
+
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
             flexGrow: 1,
-            paddingTop: insets.top,
             paddingBottom: insets.bottom + 8,
             paddingHorizontal: 10,
           }}
@@ -287,72 +374,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
               />
             </View>
 
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '600',
-                color: colors.text,
-                marginBottom: 8,
-                marginTop: 15,
-              }}
-            >
-              Finalizer address
-            </Text>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                borderRadius: 12,
-                marginBottom: 10,
-                backgroundColor: colors.secondary,
-                width: '100%',
-                minWidth: '50%',
-                height: 44,
-                alignItems: 'center',
-                paddingHorizontal: 16,
-              }}
-            >
-              <TextInput
-                style={{
-                  flex: 1,
-                  color: colors.text,
-                  fontSize: 17,
-                  fontWeight: '400',
-                  paddingVertical: 0,
-                }}
-                placeholder="Enter finalizer address"
-                placeholderTextColor={colors.placeholder}
-                keyboardType={'default'}
-                value={finalizerText}
-                onChangeText={setFinalizerText}
-              />
-              {!!finalizerText && (
-                <TouchableOpacity
-                  onPress={() => {
-                    setFinalizerText('');
-                  }}
-                >
-                  <View
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      backgroundColor: colors.zingo,
-                      borderRadius: 11,
-                      height: 22,
-                      width: 22,
-                      padding: 0,
-                    }}
-                  >
-                    <RegText
-                      style={{ color: colors.background, marginTop: -3 }}
-                    >
-                      x
-                    </RegText>
-                  </View>
-                </TouchableOpacity>
-              )}
-            </View>
           </View>
         </ScrollView>
 

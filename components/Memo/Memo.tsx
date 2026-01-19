@@ -18,14 +18,13 @@ import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { Header } from '../Header';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { ButtonTypeEnum, GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { XIcon } from '../Components/Icons/XIcon';
 
 type MemoProps =  DrawerScreenProps<AppDrawerParamList, RouteEnum.Memo>;
 
@@ -154,7 +153,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
                   onPress={() => {
                     setMemo('');
                   }}>
-                  <FontAwesomeIcon style={{ margin: 10 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+                  <XIcon color={colors.background} width={20} height={20} />
                 </TouchableOpacity>
               )}
             </View>

@@ -790,6 +790,10 @@ export default class RPC {
       setTimeout(async () => {
         await this.fetchSyncStatus();
       }, 0);
+      console.log('SYNC POLL -> RUN SYNC', returnPoll);
+      setTimeout(async () => {
+        await this.refreshSync();
+      }, 0);
       this.fetchSyncPollLock = false;
       return;
     }
@@ -1011,8 +1015,8 @@ export default class RPC {
       this.fetchStakedLock = true;
       const start = Date.now();
       const resultStakedStr = JSON.stringify([
-        {pub_key: '01234567890123456789012345678901', voting_power: 2000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 3000000},
+        {pub_key: 'dddddddddddddddddddddddddddddddd', voting_power: 2000000},
+        {pub_key: 'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm', voting_power: 3000000},
       ]);
       if (Date.now() - start > 4000) {
         console.log(
@@ -1043,22 +1047,22 @@ export default class RPC {
 
       const start2 = Date.now();
       const resultGlobalStakedStr = JSON.stringify([
-        {pub_key: '01234567890123456789012345678901', voting_power: 1000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 2000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 3000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 4000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 5000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 6000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 7000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 8000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 9000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 10000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 11000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 12000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 13000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 14000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 15000000},
-        {pub_key: '01234567890123456789012345678901', voting_power: 16000000},
+        {pub_key: 'cccccccccccccccccccccccccccccccc', voting_power: 1000000},
+        {pub_key: 'dddddddddddddddddddddddddddddddd', voting_power: 2000000},
+        {pub_key: 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', voting_power: 3000000},
+        {pub_key: 'ffffffffffffffffffffffffffffffff', voting_power: 4000000},
+        {pub_key: 'gggggggggggggggggggggggggggggggg', voting_power: 5000000},
+        {pub_key: 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh', voting_power: 6000000},
+        {pub_key: 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii', voting_power: 7000000},
+        {pub_key: 'jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj', voting_power: 8000000},
+        {pub_key: 'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk', voting_power: 9000000},
+        {pub_key: 'llllllllllllllllllllllllllllllll', voting_power: 10000000},
+        {pub_key: 'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm', voting_power: 11000000},
+        {pub_key: 'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn', voting_power: 12000000},
+        {pub_key: 'oooooooooooooooooooooooooooooooo', voting_power: 13000000},
+        {pub_key: 'pppppppppppppppppppppppppppppppp', voting_power: 14000000},
+        {pub_key: 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq', voting_power: 15000000},
+        {pub_key: 'rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr', voting_power: 16000000},
       ]);
       if (Date.now() - start2 > 4000) {
         console.log(
@@ -1744,6 +1748,8 @@ export default class RPC {
       // create the tasks
       await this.configure();
       this.setInSend(false);
+
+      await this.refreshSync();
 
       if (sendTxids) {
         //console.log('00000000 RESOLVE send');
