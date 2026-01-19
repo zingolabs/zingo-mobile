@@ -111,21 +111,26 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   }, [info.latestBlock]);
 
   useEffect(() => {
-    if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) || syncingStatus.percentage_total_outputs_scanned === 0) {
+    if (
+      !syncingStatus || 
+      isEqual(syncingStatus, {} as RPCSyncStatusType) || 
+      (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) || 
+      syncingStatus.percentage_total_outputs_scanned === 0
+    ) {
       // if the App is waiting for the first fetching, let's put 0.
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
       setPercentageOutputsScanned(
-        syncingStatus.percentage_total_outputs_scanned && syncingStatus.percentage_total_outputs_scanned < 0.01
-          ? 0.01
-          : Number(syncingStatus.percentage_total_outputs_scanned?.toFixed(2).replace(/\.?0+$/, '')),
+        syncingStatus.percentage_total_outputs_scanned 
+        ? syncingStatus.percentage_total_outputs_scanned
+        : 0,
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
         syncingStatus.scan_ranges.length > 0 &&
         !!syncingStatus.percentage_total_outputs_scanned &&
-        syncingStatus.percentage_total_outputs_scanned < 100
+        syncingStatus.percentage_total_outputs_scanned < 100,
       );
     }
   }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);

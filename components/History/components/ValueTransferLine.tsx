@@ -397,7 +397,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               />
             </View>
             {vt.confirmations === 0 && (
-              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 3 }}>
                 {(vt.status === RPCValueTransfersStatusEnum.transmitted ||
                   vt.status === RPCValueTransfersStatusEnum.calculated) && (
                   <FontAwesomeIcon
