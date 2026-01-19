@@ -118,17 +118,19 @@ export type MemoNavigationState = {
 };
 
 export type FinalizersNavigationState = {
-  setFinalizer: (f: string) => void;
+  setFinalizer: (f: string, s: number) => void;
   scope: 'my' | 'network';
   exclude: string;
 };
 
 export type UnstakeNavigationState = {
   finalizer: string;
+  staked: number;
 };
 
 export type RedelegateNavigationState = {
   finalizer: string;
+  staked: number;
 };
 
 export type ConfirmNavigationState = {

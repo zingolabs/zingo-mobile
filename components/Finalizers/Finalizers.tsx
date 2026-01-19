@@ -133,7 +133,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({ navigation, rout
         style={{ width: '100%' }} 
         key={`tag-${index}`} 
         onPress={() => {
-          setFinalizer(item.pubKey);
+          setFinalizer(item.pubKey, item.votingPower);
           if (navigation.canGoBack()) {
             navigation.goBack();
           }
