@@ -1725,6 +1725,61 @@ pub fn stake(stake_json: String) -> Result<String, ZingolibError> {
     })
 }
 
+/// `begin_unstake_json` is a JSON object with the following schema:
+/// {
+///   "txid": "..."
+/// }
+#[uniffi::export]
+pub fn begin_unstake(begin_unstake_json: String) -> Result<String, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lightclient) = &mut *guard {
+            Ok(RT.block_on(async move {
+                let json_args = match json::parse(&begin_unstake_json) {
+                    Ok(parsed) => parsed,
+                    Err(_) => return "Error: it is not a valid JSON".to_string(),
+                };
+
+                // txid is in display order here
+                let txid = parse_hex_32(json_args["txid"].as_str().unwrap()).unwrap();
+
+                let unfiltered_txs = lightclient.transaction_summaries(false).await.unwrap();
+
+                let found_tx = unfiltered_txs
+                    .iter()
+                    .filter(|tx| tx.staking_action.is_some())
+                    .find(|tx| tx.txid.to_string() == hex::encode(txid))
+                    .unwrap();
+
+                let pubkey = found_tx.staking_action.as_ref().unwrap().arg32_0;
+
+                let request = match transaction_request_from_receivers(vec![]) {
+                    Ok(request) => request,
+                    Err(e) => return format!("Error: Request Error: {e}"),
+                };
+
+                match lightclient
+                    .propose_begin_unstake(request, [0u8; 32], pubkey, AccountId::ZERO)
+                    .await
+                {
+                    Ok(proposal) => {
+                        let fee = match total_fee(&proposal.proportional_fee_proposal()) {
+                            Ok(fee) => fee,
+                            Err(e) => return object! { "error" => e.to_string() }.pretty(2),
+                        };
+                        object! { "fee" => fee.into_u64() }.pretty(2)
+                    }
+                    Err(e) => object! { "error" => e.to_string() }.pretty(2),
+                }
+            }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
 fn parse_hex_32(s: &str) -> Result<[u8; 32], String> {
     let bytes = Vec::from_hex(s).map_err(|e| format!("Error: invalid 32-byte hex string: {e}"))?;
     if bytes.len() != 32 {
@@ -1734,62 +1789,6 @@ fn parse_hex_32(s: &str) -> Result<[u8; 32], String> {
     arr.copy_from_slice(&bytes);
     Ok(arr)
 }
-
-// fn parse_staking_action(root: &json::JsonValue) -> Result<StakingAction, String> {
-//     let sa = &root["stakingAction"];
-
-//     let kind_str = sa["kind"]
-//         .as_str()
-//         .ok_or_else(|| "Error: Missing stakingAction.kind".to_string())?;
-
-//     let kind = match kind_str {
-//         "create_bond" => StakingActionKind::CreateNewDelegationBond,
-//         "begin_unbonding" => StakingActionKind::BeginDelegationUnbonding,
-//         "withdraw_bond" => StakingActionKind::WithdrawDelegationBond,
-//         "retarget_bond" => StakingActionKind::RetargetDelegationBond,
-//         other => return Err(format!("Error: Unknown stakingAction.kind: {other}")),
-//     };
-
-//     let val = sa["val"].as_u64().unwrap_or(0);
-
-//     let target_str = sa["target"]
-//         .as_str()
-//         .ok_or_else(|| "Error: Missing stakingAction.target".to_string())?;
-
-//     let target = parse_hex_32(target_str)?;
-//     let source_str = sa["source"]
-//         .as_str()
-//         .ok_or_else(|| "Error: Missing stakingAction.source".to_string())?;
-
-//     let source = match kind {
-//         StakingActionKind::CreateNewDelegationBond => [0u8; 32],
-//         StakingActionKind::BeginDelegationUnbonding
-//         | StakingActionKind::WithdrawDelegationBond
-//         | StakingActionKind::RetargetDelegationBond
-//         | StakingActionKind::Null
-//         | StakingActionKind::RegisterFinalizer
-//         | StakingActionKind::ConvertFinalizerRewardToDelegationBond
-//         | StakingActionKind::UpdateFinalizerKey => parse_hex_32(source_str)?,
-//     };
-
-//     let insecure_target_name = sa["insecureTargetName"]
-//         .as_str()
-//         .unwrap_or_default()
-//         .to_string();
-//     let insecure_source_name = sa["insecureSourceName"]
-//         .as_str()
-//         .unwrap_or_default()
-//         .to_string();
-
-//     Ok(StakingAction {
-//         kind,
-//         val,
-//         target,
-//         source,
-//         insecure_target_name,
-//         insecure_source_name,
-//     })
-// }
 
 #[uniffi::export]
 pub fn shield() -> Result<String, ZingolibError> {
