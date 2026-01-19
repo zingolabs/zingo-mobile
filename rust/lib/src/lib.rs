@@ -1671,10 +1671,8 @@ pub fn send(send_json: String) -> Result<String, ZingolibError> {
 
 /// `stake_json` is a JSON object with the following schema:
 /// {
-///   "stakingAction": {
-///     "amount_zats": 1000000,
-///     "finalizer_address": "..."
-///   }
+///   "amount_zats": 1000000,
+///   "finalizer_address": "..."
 /// }
 #[uniffi::export]
 pub fn stake(stake_json: String) -> Result<String, ZingolibError> {
@@ -1689,7 +1687,7 @@ pub fn stake(stake_json: String) -> Result<String, ZingolibError> {
                     Err(_) => return "Error: it is not a valid JSON".to_string(),
                 };
 
-                let amount = match json_args["stakingAction"]["amount_zats"].as_u64() {
+                let amount = match json_args["amount_zats"].as_u64() {
                     Some(a) => match Zatoshis::from_u64(a) {
                         Ok(a) => a,
                         Err(e) => return format!("Error: Invalid amount: {e}"),
@@ -1697,55 +1695,10 @@ pub fn stake(stake_json: String) -> Result<String, ZingolibError> {
                     None => return "Missing amount".to_string(),
                 };
 
-                let finalizer_address =
-                    match json_args["stakingAction"]["finalizer_address"].as_str() {
-                        Some(addr) => parse_hex_32(addr).unwrap(),
-                        None => return "Error: Missing address".to_string(),
-                    };
-
-                // let staking_action = match parse_staking_action(&json_args) {
-                //     Ok(sa) => sa,
-                //     Err(e) => return e,
-                // };
-
-                // let receivers_json = &json_args["receivers"];
-                // if !receivers_json.is_array() {
-                //     return "Error: `receivers` must be an array".to_string();
-                // }
-
-                // let mut receivers = Receivers::new();
-                // for j in receivers_json.members() {
-                //     let recipient_address = match j["address"].as_str() {
-                //         Some(addr) => match ZcashAddress::try_from_encoded(addr) {
-                //             Ok(a) => a,
-                //             Err(e) => return format!("Error: Invalid address: {e}"),
-                //         },
-                //         None => return "Error: Missing address".to_string(),
-                //     };
-
-                //     let amount = match j["amount"].as_u64() {
-                //         Some(a) => match Zatoshis::from_u64(a) {
-                //             Ok(a) => a,
-                //             Err(e) => return format!("Error: Invalid amount: {e}"),
-                //         },
-                //         None => return "Error: Missing amount".to_string(),
-                //     };
-
-                //     let memo = if let Some(m) = j["memo"].as_str() {
-                //         match interpret_memo_string(m.to_string()) {
-                //             Ok(memo_bytes) => Some(memo_bytes),
-                //             Err(e) => return format!("Error: Invalid memo: {e}"),
-                //         }
-                //     } else {
-                //         None
-                //     };
-
-                //     receivers.push(zingolib::data::receivers::Receiver {
-                //         recipient_address,
-                //         amount,
-                //         memo,
-                //     });
-                // }
+                let finalizer_address = match json_args["finalizer_address"].as_str() {
+                    Some(addr) => parse_hex_32(addr).unwrap(),
+                    None => return "Error: Missing address".to_string(),
+                };
 
                 let request = match transaction_request_from_receivers(vec![]) {
                     Ok(request) => request,
