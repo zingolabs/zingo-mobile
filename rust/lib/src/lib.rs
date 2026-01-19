@@ -709,8 +709,11 @@ pub fn get_roster_info() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 match lightclient.get_roster_info().await {
-                    Ok(roster_info) => serde_json::to_string_pretty(&roster_info)
-                        .unwrap_or_else(|_| "Error: get seed. failed to serialize".to_string()),
+                    Ok(roster_info) => {
+                        serde_json::to_string_pretty(&roster_info).unwrap_or_else(|_| {
+                            "Error: get_roster_info. failed to serialize".to_string()
+                        })
+                    }
                     Err(e) => {
                         format!("Error: {e}")
                     }
