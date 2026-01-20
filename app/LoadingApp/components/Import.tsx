@@ -28,10 +28,21 @@ type ImportProps = {
   onClickCancel: () => void;
   onClickOK: (keyText: string, birthday: number) => void;
 };
-const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, onClickCancel, onClickOK }) => {
+const Import: React.FunctionComponent<ImportProps> = ({
+  actionButtonsDisabled,
+  onClickCancel,
+  onClickOK,
+}) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, addLastSnackbar, selectIndexerServer, snackbars, removeFirstSnackbar } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const {
+    translate,
+    netInfo,
+    addLastSnackbar,
+    selectIndexerServer,
+    snackbars,
+    removeFirstSnackbar,
+  } = context;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.Import;
 
@@ -48,14 +59,17 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
 
   const insets = useSafeAreaInsets();
 
-  const maxW = 520; //tablets -> landscape. 
+  const maxW = 520; //tablets -> landscape.
 
   const inputsRef = useRef<Array<TextInput | null>>([]);
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
     const s2 = Keyboard.addListener('keyboardDidHide', () => setKbOpen(false));
-    return () => { s1.remove(); s2.remove(); };
+    return () => {
+      s1.remove();
+      s2.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -78,8 +92,13 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
     if (seedTextArray.length === 25) {
       // if the last word is a number -> move it to the birthday field
       const lastWord: string = seedTextArray[seedTextArray.length - 1];
-      const possibleBirthday: number | null = isNaN(Number(lastWord)) ? null : Number(lastWord);
-      if ((possibleBirthday && !birthday) || (possibleBirthday && possibleBirthday === Number(birthday))) {
+      const possibleBirthday: number | null = isNaN(Number(lastWord))
+        ? null
+        : Number(lastWord);
+      if (
+        (possibleBirthday && !birthday) ||
+        (possibleBirthday && possibleBirthday === Number(birthday))
+      ) {
         setBirthday(possibleBirthday.toString());
         setSeedTextVisible(false);
         setSeedText(seedTextArray.slice(0, 24).join(' '));
@@ -98,7 +117,8 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
       } else {
         setSeedTextVisible(true);
       }
-      const lengthWords: number = seedTextArray.length > 25 ? 24 : seedTextArray.length;
+      const lengthWords: number =
+        seedTextArray.length > 25 ? 24 : seedTextArray.length;
       setSeedText(_seedText);
       _words = seedTextArray.slice(0, lengthWords);
       setWords(seedTextArray.slice(0, lengthWords));
@@ -122,8 +142,14 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
   }, [seedText]);
 
   const okButton = async () => {
-    if (!netInfo.isConnected || selectIndexerServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
+    if (
+      !netInfo.isConnected ||
+      selectIndexerServer === SelectServerEnum.offline
+    ) {
+      addLastSnackbar({
+        message: translate('loadedapp.connection-error') as string,
+        screenName: [screenName],
+      });
       return;
     }
     onClickOK(words.join(' '), Number(birthday));
@@ -144,7 +170,6 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
     });
   };
 
-
   //console.log('Render Import', words, buttonDisabled, rows, seedText);
 
   return (
@@ -156,19 +181,15 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
       />
 
       <KeyboardAvoidingView
-        style={{ 
-          flex: 1, 
+        style={{
+          flex: 1,
           backgroundColor: colors.background,
         }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0}
+        keyboardVerticalOffset={
+          Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
+        }
       >
-
-        <HeaderTitle title='' goBack={() => {
-          clear();
-          onClickCancel();
-        }} />
-
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
@@ -176,17 +197,29 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
             paddingTop: insets.top,
             paddingBottom: insets.bottom + 8,
             paddingHorizontal: 10,
-          }}>
+          }}
+        >
+          <HeaderTitle
+            title=""
+            goBack={() => {
+              clear();
+              onClickCancel();
+            }}
+          />
           <View
             style={{
               flexGrow: 1,
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
-              
-            <RegText color={colors.text} style={{ fontSize: 25 }}>Import wallet</RegText>
+            }}
+          >
+            <RegText color={colors.text} style={{ fontSize: 25 }}>
+              Import wallet
+            </RegText>
 
-            <FadeText style={{ marginBottom: 15, marginTop: 5 }}>Enter your recovery phrase</FadeText>
+            <FadeText style={{ marginBottom: 15, marginTop: 5 }}>
+              Enter your recovery phrase
+            </FadeText>
 
             {seedTextVisible && (
               <View
@@ -205,9 +238,10 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                   alignItems: 'center',
                   paddingHorizontal: 25,
                   paddingVertical: 7,
-                }}>
+                }}
+              >
                 <TextInput
-                  placeholder='Paste your seed phrase (24 words)'
+                  placeholder="Paste your seed phrase (24 words)"
                   placeholderTextColor={colors.placeholder}
                   testID="import.seedufvkinput"
                   multiline
@@ -231,14 +265,15 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                   returnKeyType="done"
                 />
                 {!!seedText && (
-                  <TouchableOpacity 
-                    disabled={actionButtonsDisabled} 
+                  <TouchableOpacity
+                    disabled={actionButtonsDisabled}
                     onPress={() => {
                       setSeedText('');
                       setWords([]);
                       setRows([]);
-                  }}>
-                    <View 
+                    }}
+                  >
+                    <View
                       style={{
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -247,7 +282,8 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                         height: 22,
                         width: 22,
                         padding: 0,
-                    }}>
+                      }}
+                    >
                       <XIcon color={colors.background} width={20} height={20} />
                     </View>
                   </TouchableOpacity>
@@ -279,7 +315,8 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                             alignItems: 'center',
                             paddingHorizontal: 15,
                             paddingVertical: 0,
-                          }}>
+                          }}
+                        >
                           <FadeText>{`${index + 1}`}.</FadeText>
                           <TextInput
                             ref={(el: TextInput | null) => {
@@ -296,7 +333,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                               backgroundColor: 'transparent',
                             }}
                             value={word}
-                            onChangeText={(txt) => handleWordChange(index, txt)}
+                            onChangeText={txt => handleWordChange(index, txt)}
                             editable={!actionButtonsDisabled}
                             keyboardType="default"
                             autoCapitalize="none"
@@ -309,31 +346,46 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                   </View>
                 ))}
                 {!seedTextVisible && (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={{ alignSelf: 'flex-end' }}
-                    disabled={actionButtonsDisabled} 
+                    disabled={actionButtonsDisabled}
                     onPress={() => {
                       setSeedText('');
                       setWords([]);
                       setRows([]);
                       setSeedTextVisible(true);
-                  }}>
-                    <View 
+                    }}
+                  >
+                    <View
                       style={{
                         justifyContent: 'center',
                         alignItems: 'center',
                         width: '30%',
                         height: 30,
                         padding: 0,
-                    }}>
-                      <RegText style={{ color: colors.primary, textDecorationStyle: 'solid', textDecorationLine: 'underline' }}>Clear words</RegText>
+                      }}
+                    >
+                      <RegText
+                        style={{
+                          color: colors.primary,
+                          textDecorationStyle: 'solid',
+                          textDecorationLine: 'underline',
+                        }}
+                      >
+                        Clear words
+                      </RegText>
                     </View>
                   </TouchableOpacity>
-                ) }
+                )}
               </View>
             )}
 
-            <RegText color={colors.text} style={{ fontSize: 20, marginTop: 20, marginBottom: 10 }}>Birthday (Optional)</RegText>
+            <RegText
+              color={colors.text}
+              style={{ fontSize: 20, marginTop: 20, marginBottom: 10 }}
+            >
+              Birthday (Optional)
+            </RegText>
 
             <View
               style={{
@@ -351,7 +403,8 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                 alignItems: 'center',
                 paddingHorizontal: 25,
                 paddingVertical: 7,
-              }}>
+              }}
+            >
               <TextInput
                 placeholder={'0'}
                 placeholderTextColor={colors.placeholder}
@@ -366,7 +419,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                   backgroundColor: 'transparent',
                 }}
                 value={birthday}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setBirthday(text);
                 }}
                 editable={!actionButtonsDisabled}
@@ -377,8 +430,11 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                 returnKeyType="done"
               />
               {!!birthday && (
-                <TouchableOpacity disabled={actionButtonsDisabled} onPress={() => setBirthday('')}>
-                  <View 
+                <TouchableOpacity
+                  disabled={actionButtonsDisabled}
+                  onPress={() => setBirthday('')}
+                >
+                  <View
                     style={{
                       justifyContent: 'center',
                       alignItems: 'center',
@@ -387,7 +443,8 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                       height: 22,
                       width: 22,
                       padding: 0,
-                  }}>
+                    }}
+                  >
                     <XIcon color={colors.background} width={20} height={20} />
                   </View>
                 </TouchableOpacity>
@@ -402,7 +459,8 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
             justifyContent: 'center',
             paddingTop: 10,
             paddingBottom: 20,
-          }}>
+          }}
+        >
           <Button
             type={ButtonTypeEnum.Primary}
             title={translate('continue') as string}
@@ -412,7 +470,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
               okButton();
               Keyboard.dismiss();
             }}
-            style={{ 
+            style={{
               marginBottom: 4,
               maxWidth: maxW,
             }}
