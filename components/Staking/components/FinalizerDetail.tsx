@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
-import { ButtonTypeEnum, RouteEnum } from '../../../app/AppState';
+import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
@@ -44,7 +44,7 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
         //console.log('LAYOUTTT', height);
-        setHeightLayout(height + 80);
+        setHeightLayout(height + (Platform.OS === GlobalConst.platformOSios ? 120 : 80));
       }}
       style={{
         backgroundColor: 'rgba(36, 36, 38, 1)',
@@ -108,12 +108,10 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
             title={'Redelegate'}
             onPress={() => {
               clear();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
               navigation.navigate(RouteEnum.Redelegate, {
                 finalizer: item?.finalizer,
                 staked: item?.value,
+                closeSheet: closeSheet,
               });
             }}
             twoButtons={true}
@@ -124,12 +122,10 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
             style={{ marginLeft: 10 }}
             onPress={() => {
               clear();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
               navigation.navigate(RouteEnum.Unstake, {
                 finalizer: item?.finalizer,
                 staked: item?.value,
+                closeSheet: closeSheet,
               });
             }}
             twoButtons={true}
