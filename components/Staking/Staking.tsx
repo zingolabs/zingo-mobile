@@ -618,7 +618,7 @@ const Staking: React.FC<StakingProps> = () => {
               </View>
             )}
 
-            {!loading && !hasMovements && (
+            {!loading && !hasMovements && tab === 'movements' && (
               <View style={styles.centerContent}>
                 <View
                   style={{
@@ -641,7 +641,7 @@ const Staking: React.FC<StakingProps> = () => {
               </View>
             )}
 
-            {!loading && !hasStaked && (
+            {!loading && !hasStaked && tab === 'staked' && (
               <View style={styles.centerContent}>
                 <View
                   style={{
