@@ -25,9 +25,9 @@ docker cp \
     ../android/app/src/main/jniLibs/arm64-v8a/libzingo.so
 
 docker cp \
-    $id:/opt/zingo/rust/lib/src/uniffi/zingo/zingo.kt \
+    $id:/opt/zingo/rust/src/uniffi/zingo/zingo.kt \
     ../android/app/build/generated/source/uniffi/debug/java/uniffi/zingo/zingo.kt
 docker cp \
-    $id:/opt/zingo/rust/lib/src/uniffi/zingo/zingo.kt \
+    $id:/opt/zingo/rust/src/uniffi/zingo/zingo.kt \
     ../android/app/build/generated/source/uniffi/release/java/uniffi/zingo/zingo.kt
 docker rm -v $id

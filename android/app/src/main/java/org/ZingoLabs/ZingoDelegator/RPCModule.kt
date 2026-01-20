@@ -12,6 +12,8 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import org.ZingoLabs.ZingoDelegator.Constants.*
 import kotlinx.coroutines.*
+import org.json.JSONObject
+
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext) {
     private val applicationContext: Context = reactContext?.applicationContext ?: MainApplication.getAppContext()!!
@@ -1494,6 +1496,74 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] create stake tx: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    private fun makeJsonString(obj: Map<String, Any?>): String? {
+        return try {
+            JSONObject(obj).toString()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    @ReactMethod
+    fun withdrawStakeProcess(txid: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val payload = makeJsonString(mapOf("txid" to txid))
+                if (payload == null) {
+                    val err = "Error: [Native] withdraw stake. Could not build JSON."
+                    Log.i("MAIN", err)
+                    withContext(Dispatchers.Main) {
+                        promise.resolve(err)
+                    }
+                } else {
+                    val resp = uniffi.zingo.withdrawStake(payload)
+
+                    withContext(Dispatchers.Main) {
+                        promise.resolve(resp.toString())
+                    }
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] withdraw stake tx: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun beginUnstakeProcess(txid: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val payload = makeJsonString(mapOf("txid" to txid))
+                if (payload == null) {
+                    val err = "Error: [Native] begin unstake. Could not build JSON."
+                    Log.i("MAIN", err)
+                    withContext(Dispatchers.Main) {
+                        promise.resolve(err)
+                    }
+                } else {
+                    val resp = uniffi.zingo.beginUnstake(payload)
+
+                    withContext(Dispatchers.Main) {
+                        promise.resolve(resp.toString())
+                    }
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] begin unstake tx: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {

@@ -50,6 +50,8 @@ ENV CARGO_NDK_ANDROID_PLATFORM=24
 ENV AR=llvm-ar
 ENV RANLIB=llvm-ranlib
 
+ENV AWS_LC_SYS_CMAKE_BUILDER=1
+
 # aarch64
 # this is for indexmap 1.9.3 -> forcing `features = ["std"]`
 ENV CC=aarch64-linux-android24-clang
