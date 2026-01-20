@@ -20,9 +20,11 @@ import {
   Pressable,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  Image,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { LifeHash, LifeHashVersion } from 'lifehash';
 
 import {
   GlobalConst,
@@ -45,7 +47,7 @@ import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { faAngleUp, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import AddressItem from '../Components/AddressItem';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
@@ -58,10 +60,11 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import FinalizerDetail from './components/FinalizerDetail';
+import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
 
 type DataType = {
   svg: {
-    fill: string;
+    data: string;
   };
   value: number;
   key: string;
@@ -263,7 +266,7 @@ const Staking: React.FC<StakingProps> = () => {
   const stakedData: DataType[] = useMemo(() => {
     const resultJSON: StakeType[] = staked;
     console.log(resultJSON);
-    const randomColors = Utils.generateColorList(resultJSON.length + 10);
+    // const randomColors = Utils.generateColorList(resultJSON.length + 10);
     const r = resultJSON
       .filter((i: StakeType) => i.votingPower > 0 && !!i.pubKey)
       .sort((a, b) => b.votingPower - a.votingPower)
@@ -272,7 +275,14 @@ const Staking: React.FC<StakingProps> = () => {
           value: item.votingPower,
           finalizer: item.pubKey,
           tag: '',
-          svg: { fill: randomColors[index] },
+          svg: {
+            data: LifeHash.makeFrom(
+              item.pubKey,
+              LifeHashVersion.version2,
+              1,
+              true,
+            ).toDataUrl(),
+          },
           key: `pie-${index}`,
         };
       });
@@ -371,11 +381,15 @@ const Staking: React.FC<StakingProps> = () => {
               justifyContent: 'center',
             }}
           >
-            <FontAwesomeIcon
-              style={{ marginRight: 15 }}
-              size={15}
-              icon={faCircle}
-              color={item.svg.fill}
+            <Image
+              source={{ uri: lifehashDataUrlFromStringSync(item.svg.data) }}
+              style={{
+                width: 28,
+                height: 28,
+                marginRight: 10,
+                borderRadius: 12,
+              }}
+              resizeMode="contain"
             />
             {!!item.tag && (
               <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>

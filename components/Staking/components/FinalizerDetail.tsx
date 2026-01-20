@@ -3,10 +3,7 @@ import React, { useContext } from 'react';
 import { View } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
-import {
-  ButtonTypeEnum,
-  RouteEnum,
-} from '../../../app/AppState';
+import { ButtonTypeEnum, RouteEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
@@ -18,7 +15,7 @@ import ZecAmount from '../../Components/ZecAmount';
 
 type DataType = {
   svg: {
-    fill: string;
+    data: string;
   };
   value: number;
   key: string;
@@ -31,9 +28,9 @@ type FinalizerDetailProps = {
   closeSheet: () => void;
   setHeightLayout: (h: number) => void;
 };
-const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({ 
-  item, 
-  closeSheet, 
+const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
+  item,
+  closeSheet,
   setHeightLayout,
 }) => {
   const navigation: any = useNavigation();
@@ -54,8 +51,9 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
         paddingTop: 15,
         borderTopLeftRadius: 38,
         borderTopRightRadius: 38,
-      }}>
-      <HeaderTitle 
+      }}
+    >
+      <HeaderTitle
         title={item?.finalizer ? Utils.trimToSmall(item.finalizer, 7) : ''}
         goBack={() => {
           clear();
@@ -63,9 +61,10 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
         }}
         bottomSheet={true}
       />
-      <View
-        style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
-        <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{'Your deposited amount'}</RegText>
+      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
+        <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
+          {'Your deposited amount'}
+        </RegText>
         <View
           style={{
             display: 'flex',
@@ -73,7 +72,8 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
             justifyContent: 'flex-start',
             alignItems: 'center',
             marginTop: 10,
-          }}>
+          }}
+        >
           <View
             accessible={true}
             style={{
@@ -83,8 +83,13 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
               backgroundColor: colors.background,
               paddingHorizontal: 20,
               paddingVertical: 15,
-            }}>
-              <ZecAmount amtZec={item?.value} size={18} currencyName={info.currencyName} />
+            }}
+          >
+            <ZecAmount
+              amtZec={item?.value}
+              size={18}
+              currencyName={info.currencyName}
+            />
           </View>
         </View>
 
@@ -96,7 +101,8 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
             alignItems: 'center',
             marginVertical: 5,
             marginTop: 30,
-          }}>
+          }}
+        >
           <Button
             type={ButtonTypeEnum.Primary}
             title={'Redelegate'}

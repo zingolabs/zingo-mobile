@@ -1,0 +1,104 @@
+diff --git a/node_modules/lifehash/src/lifehash/LifeHash.js b/node_modules/lifehash/src/lifehash/LifeHash.js
+index 808f79b..03165a5 100644
+--- a/node_modules/lifehash/src/lifehash/LifeHash.js
++++ b/node_modules/lifehash/src/lifehash/LifeHash.js
+@@ -1,7 +1,7 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.LifeHash = void 0;
+-const createHash = require("create-hash");
++const sha2_1 = require("@noble/hashes/sha2");
+ const BitEnumerator_1 = require("./BitEnumerator");
+ const CellGrid_1 = require("./CellGrid");
+ const ChangeGrid_1 = require("./ChangeGrid");
+@@ -27,7 +27,7 @@ class LifeHash {
+         if (!(data instanceof Uint8Array)) {
+             throw new Error('data must be utf-8 string or bytes');
+         }
+-        const digest = createHash('sha256').update(data).digest();
++        const digest = (0, sha2_1.sha256)(data);
+         return this.makeFromDigest(digest, version, module_size, has_alpha);
+     }
+     static makeFromDigest(digest, version = LifeHashVersion_1.LifeHashVersion.version2, module_size = 1, has_alpha = false) {
+@@ -115,12 +115,13 @@ class LifeHash {
+                 current_change_grid,
+             ];
+             data = current_cell_grid.get_data();
+-            _hash = createHash('sha256').update(data);
+-            const _hashDigest = _hash.digest();
+-            if (history_set.has(_hashDigest.toString())) {
+-                break;
++            const _hashDigest = (0, sha2_1.sha256)(data);
++            const key = (0, utils_1.toHexString)(_hashDigest);
++
++            if (history_set.has(key)) {
++            break;
+             }
+-            history_set.add(_hashDigest.toString());
++            history_set.add(key);
+             history.push(data);
+             current_cell_grid.next_generation(current_change_grid, next_cell_grid, next_change_grid);
+         }
+diff --git a/node_modules/lifehash/src/lifehash/utils.js b/node_modules/lifehash/src/lifehash/utils.js
+index db3a5a8..caebe06 100644
+--- a/node_modules/lifehash/src/lifehash/utils.js
++++ b/node_modules/lifehash/src/lifehash/utils.js
+@@ -1,15 +1,27 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.sha256 = exports.reverse = void 0;
+-const crypto_1 = require("crypto");
++
++// REPLACE: const crypto_1 = require("crypto");
++const sha2_1 = require("@noble/hashes/sha2");
++
+ function reverse(some_colorfunc) {
+-    function reverse_anonfunc(t) {
+-        return some_colorfunc(1 - t);
+-    }
+-    return reverse_anonfunc;
++  function reverse_anonfunc(t) {
++    return some_colorfunc(1 - t);
++  }
++  return reverse_anonfunc;
+ }
+ exports.reverse = reverse;
++
++// REPLACE sha256 implementation
+ const sha256 = (value) => {
+-    return (0, crypto_1.createHash)('sha256').update(value).digest();
++  // value can be Buffer/Uint8Array; noble accepts Uint8Array
++  // Buffer is a Uint8Array subclass, so this works.
++  return (0, sha2_1.sha256)(value);
+ };
+ exports.sha256 = sha256;
++
++
++const toHexString = (bytes) =>
++  bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
++exports.toHexString = toHexString;
+\ No newline at end of file
+diff --git a/node_modules/lifehash/src/utils.js b/node_modules/lifehash/src/utils.js
+index 66de1ac..fc3b82e 100644
+--- a/node_modules/lifehash/src/utils.js
++++ b/node_modules/lifehash/src/utils.js
+@@ -1,10 +1,15 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.sha256 = exports.toHexString = void 0;
+-const createHash = require("create-hash");
+-const toHexString = (bytes) => bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
++
++const sha2_1 = require("@noble/hashes/sha2");
++
++const toHexString = (bytes) =>
++  bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
+ exports.toHexString = toHexString;
++
+ const sha256 = (value) => {
+-    return createHash('sha256').update(value).digest();
++  // noble returns Uint8Array(32)
++  return (0, sha2_1.sha256)(value);
+ };
+ exports.sha256 = sha256;
+\ No newline at end of file
