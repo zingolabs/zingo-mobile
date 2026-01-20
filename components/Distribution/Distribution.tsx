@@ -57,7 +57,10 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
   const { clear } = useToast();
   const screenName = ScreenEnum.Insight;
 
+  const rc = Utils.generateColorList(50);
+
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
+  const [randomColors, setRandomColors] = useState<string[]>(rc);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [tab, setTab] = useState<'my' | 'network'>('my');
@@ -81,7 +84,10 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
           break;
       }
       console.log(resultJSON);
-      const randomColors = Utils.generateColorList(resultJSON.length + 10);
+      if (randomColors.length < resultJSON.length) { 
+        const rc2 = Utils.generateColorList(resultJSON.length + 10);
+        setRandomColors(rc2);
+      }
       const newPieAmounts: DataType[] = resultJSON
         .filter((i: StakeType) => i.votingPower > 0 && !!i.pubKey)
         .sort((a, b) => b.votingPower - a.votingPower)
@@ -104,6 +110,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
       setExpandAddress(newExpandAddress);
       setLoading(false);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [colors.zingo, globalStaked, staked, tab]);
 
   const selectExpandAddress = (index: number) => {
@@ -340,7 +347,11 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               padding: 5,
               overflow: 'hidden',
             }}>
-            <TouchableOpacity onPress={() => setTab('my')}>
+            <TouchableOpacity onPress={() => {
+              const rc3 = Utils.generateColorList(pieAmounts.length + 10);
+              setRandomColors(rc3);
+              setTab('my');
+            }}>
               <RegText
                 style={{
                   fontWeight: tab === 'my' ? 'bold' : 'normal',
@@ -362,7 +373,11 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               padding: 5,
               overflow: 'hidden',
             }}>
-            <TouchableOpacity onPress={() => setTab('network')}>
+            <TouchableOpacity onPress={() => {
+              const rc4 = Utils.generateColorList(pieAmounts.length + 10);
+              setRandomColors(rc4);
+              setTab('network');
+            }}>
               <RegText
                 style={{
                   fontWeight: tab === 'network' ? 'bold' : 'normal',
@@ -382,7 +397,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
           contentContainerStyle={{}}>
           <View style={{ display: 'flex' }}>
             {!loading && (!pieAmounts || !pieAmounts.length) && (
-              <View style={{ width: '100%', alignItems: 'center', marginTop: 100 }}>
+              <View style={{ alignItems: 'center', marginTop: 100, marginHorizontal: 20 }}>
                 <RegText>{translate('insight.no-data') as string}</RegText>
               </View>
             )}
@@ -391,51 +406,53 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
             ) : (
               <View style={{ width: '100%', alignItems: 'center' }}>
                 {!!pieAmounts && !!pieAmounts.length && (
-                  <PieChart
-                    showExternalLabels={true}
-                    labelLineConfig={{
-                      thickness: 1,
-                      avoidOverlappingOfLabels: true,
-                    }}
-                    strokeWidth={4}
-                    donut={true}
-                    innerCircleColor={colors.background}
-                    innerCircleBorderWidth={0}
-                    innerCircleBorderColor={colors.background}
-                    strokeColor={colors.background}
-                    showValuesAsTooltipText={true}
-                    showText
-                    externalLabelComponent={renderExternalLabel}
-                    textBackgroundColor={colors.background}
-                    data={pieAmounts}
-                    innerRadius={dimensions.width * 0.14}
-                  />
+                  <>
+                    <PieChart
+                      showExternalLabels={true}
+                      labelLineConfig={{
+                        thickness: 1,
+                        avoidOverlappingOfLabels: true,
+                      }}
+                      strokeWidth={4}
+                      donut={true}
+                      innerCircleColor={colors.background}
+                      innerCircleBorderWidth={0}
+                      innerCircleBorderColor={colors.background}
+                      strokeColor={colors.background}
+                      showValuesAsTooltipText={true}
+                      showText
+                      externalLabelComponent={renderExternalLabel}
+                      textBackgroundColor={colors.background}
+                      data={pieAmounts}
+                      innerRadius={dimensions.width * 0.14}
+                    />
+                    <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 30 }}>
+                      <RegText>{tab === 'my' ? 'Total Stake' : 'Total amount Staked'}</RegText>
+                      <ZecAmount
+                        currencyName={info.currencyName}
+                        size={20}
+                        amtZec={pieAmounts.reduce((sum, item) => sum + item.value, 0)}
+                        style={{ marginHorizontal: 5 }}
+                        privacy={privacy}
+                      />
+                    </View>
+                    <RegText style={{ marginHorizontal: 10, marginBottom: 10 }}>{tab === 'my' ? 'Staking Position' : 'Finalizers'}</RegText>
+                    <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: 'rgba(118, 118, 128, 0.24)', borderRadius: 26, width: '90%' }}>
+                      <View style={{ width: '100%' }}>
+                        {!loading && !!pieAmounts && !!pieAmounts.length && (
+                          <>
+                            {pieAmounts
+                              .map((item, index) => {
+                                return tab === 'my' ? lineMy(item, index, (index + 1) === pieAmounts.length ) : lineNetwork(item, index, (index + 1) === pieAmounts.length );
+                              })}
+                          </>
+                        )}
+                      </View>
+                    </View>
+                  </>
                 )}
               </View>
             )}
-          </View>
-          <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 30 }}>
-            <RegText>{tab === 'my' ? 'Total Stake' : 'Total amount Staked'}</RegText>
-            <ZecAmount
-              currencyName={info.currencyName}
-              size={20}
-              amtZec={pieAmounts.reduce((sum, item) => sum + item.value, 0)}
-              style={{ marginHorizontal: 5 }}
-              privacy={privacy}
-            />
-          </View>
-          <RegText style={{ marginHorizontal: 10, marginBottom: 10 }}>{tab === 'my' ? 'Staking Position' : 'Finalizers'}</RegText>
-          <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: 'rgba(118, 118, 128, 0.24)', borderRadius: 26 }}>
-            <View style={{ width: '100%' }}>
-              {!loading && !!pieAmounts && !!pieAmounts.length && (
-                <>
-                  {pieAmounts
-                    .map((item, index) => {
-                      return tab === 'my' ? lineMy(item, index, (index + 1) === pieAmounts.length ) : lineNetwork(item, index, (index + 1) === pieAmounts.length );
-                    })}
-                </>
-              )}
-            </View>
           </View>
         </ScrollView>
       </View>

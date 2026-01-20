@@ -70,6 +70,7 @@ const hexToBytes = (hex: string): string => {
 const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
   const finalizer = !!route.params && route.params.finalizer !== undefined ? route.params.finalizer : '';
   const staked = !!route.params && route.params.staked !== undefined ? route.params.staked : 0;
+  const closeSheet = !!route.params && route.params.closeSheet !== undefined ? route.params.closeSheet : () => {};
 
   const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
@@ -301,6 +302,7 @@ const Unstake: React.FC<UnstakeProps> = ({ stakeTransaction, route }) => {
 
   const handleViewMovements = () => {
     setModalState('idle');
+    closeSheet();
     if (navigation.canGoBack()) {
       navigation.goBack();
     }

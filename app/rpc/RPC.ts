@@ -363,6 +363,25 @@ export default class RPC {
 
     const taskPromises: Promise<void>[] = [];
 
+    // always the App have to fetch this. staked info.
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        //const s = Date.now();
+        await this.fetchStaked();
+        //console.log('staked - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    // same here. staked balance.
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        //const s = Date.now();
+        await this.fetchTotalBalance();
+        //console.log('balance - ', Date.now() - s);
+        resolve();
+      }),
+    );
+
     // if the wallet needs to save, means the App needs to fetch all the new data
     if (!(await this.getWalletSaveRequired())) {
       console.log('***************** NOT SAVE REQUIRED: No fetching data');
@@ -382,7 +401,6 @@ export default class RPC {
         this.fetchInfoAndServerHeightLock ||
         this.fetchAddressesLock ||
         this.fetchTotalBalanceLock ||
-        this.fetchStakedLock ||
         this.fetchTandZandOValueTransfersLock ||
         this.fetchTandZandOMessagesLock ||
         this.fetchSyncStatusLock ||
@@ -437,22 +455,6 @@ export default class RPC {
             //const s = Date.now();
             await this.fetchAddresses();
             //console.log('addresses - ', Date.now() - s);
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchTotalBalance();
-            //console.log('balance - ', Date.now() - s);
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchStaked();
-            //console.log('staked - ', Date.now() - s);
             resolve();
           }),
         );
