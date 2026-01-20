@@ -126,11 +126,13 @@ export type FinalizersNavigationState = {
 export type UnstakeNavigationState = {
   finalizer: string;
   staked: number;
+  closeSheet: () => void;
 };
 
 export type RedelegateNavigationState = {
   finalizer: string;
   staked: number;
+  closeSheet: () => void;
 };
 
 export type ConfirmNavigationState = {

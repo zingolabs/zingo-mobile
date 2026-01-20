@@ -24,7 +24,6 @@ import {
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { LifeHash, LifeHashVersion } from 'lifehash';
 
 import {
   GlobalConst,

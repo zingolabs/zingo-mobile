@@ -57,7 +57,10 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
   const { clear } = useToast();
   const screenName = ScreenEnum.Insight;
 
+  const rc = Utils.generateColorList(50);
+
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
+  const [randomColors, setRandomColors] = useState<string[]>(rc);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [tab, setTab] = useState<'my' | 'network'>('my');
@@ -81,7 +84,10 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
           break;
       }
       console.log(resultJSON);
-      const randomColors = Utils.generateColorList(resultJSON.length + 10);
+      if (randomColors.length < resultJSON.length) { 
+        const rc2 = Utils.generateColorList(resultJSON.length + 10);
+        setRandomColors(rc2);
+      }
       const newPieAmounts: DataType[] = resultJSON
         .filter((i: StakeType) => i.votingPower > 0 && !!i.pubKey)
         .sort((a, b) => b.votingPower - a.votingPower)
@@ -104,6 +110,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
       setExpandAddress(newExpandAddress);
       setLoading(false);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [colors.zingo, globalStaked, staked, tab]);
 
   const selectExpandAddress = (index: number) => {
@@ -340,7 +347,11 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               padding: 5,
               overflow: 'hidden',
             }}>
-            <TouchableOpacity onPress={() => setTab('my')}>
+            <TouchableOpacity onPress={() => {
+              const rc3 = Utils.generateColorList(pieAmounts.length + 10);
+              setRandomColors(rc3);
+              setTab('my');
+            }}>
               <RegText
                 style={{
                   fontWeight: tab === 'my' ? 'bold' : 'normal',
@@ -362,7 +373,11 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               padding: 5,
               overflow: 'hidden',
             }}>
-            <TouchableOpacity onPress={() => setTab('network')}>
+            <TouchableOpacity onPress={() => {
+              const rc4 = Utils.generateColorList(pieAmounts.length + 10);
+              setRandomColors(rc4);
+              setTab('network');
+            }}>
               <RegText
                 style={{
                   fontWeight: tab === 'network' ? 'bold' : 'normal',

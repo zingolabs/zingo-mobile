@@ -108,12 +108,10 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
             title={'Redelegate'}
             onPress={() => {
               clear();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
               navigation.navigate(RouteEnum.Redelegate, {
                 finalizer: item?.finalizer,
                 staked: item?.value,
+                closeSheet: closeSheet,
               });
             }}
             twoButtons={true}
@@ -124,12 +122,10 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
             style={{ marginLeft: 10 }}
             onPress={() => {
               clear();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
               navigation.navigate(RouteEnum.Unstake, {
                 finalizer: item?.finalizer,
                 staked: item?.value,
+                closeSheet: closeSheet,
               });
             }}
             twoButtons={true}
