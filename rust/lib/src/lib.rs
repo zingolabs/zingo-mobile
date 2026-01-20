@@ -11,7 +11,6 @@ use android_logger::{Config, FilterBuilder};
 use hex::FromHex;
 #[cfg(target_os = "android")]
 use log::Level;
-use zcash_primitives::transaction::{StakingAction, StakingActionKind};
 use zcash_protocol::memo::MemoBytes;
 use zingolib::{AccountId, ConfiguredActivationHeights};
 
@@ -694,6 +693,31 @@ pub fn info_server() -> Result<String, ZingolibError> {
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move { lightclient.do_info().await }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
+#[uniffi::export]
+pub fn get_roster_info() -> Result<String, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lightclient) = &mut *guard {
+            Ok(RT.block_on(async move {
+                match lightclient.get_roster_info().await {
+                    Ok(roster_info) => {
+                        serde_json::to_string_pretty(&roster_info).unwrap_or_else(|_| {
+                            "Error: get_roster_info. failed to serialize".to_string()
+                        })
+                    }
+                    Err(e) => {
+                        format!("Error: {e}")
+                    }
+                }
+            }))
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
@@ -1649,17 +1673,8 @@ pub fn send(send_json: String) -> Result<String, ZingolibError> {
 
 /// `stake_json` is a JSON object with the following schema:
 /// {
-///   "stakingAction": {
-///     "kind": "add",
-///     "val": 1000000,
-///     "target": "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
-///     "source": "ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100",
-///     "insecureTargetName": "",
-///     "insecureSourceName": ""
-///   },
-///   "receivers": [
-///     { "address": "zs1...", "amount": 1000000, "memo": "stake" }
-///   ]
+///   "amount_zats": 1000000,
+///   "finalizer_address": "..."
 /// }
 #[uniffi::export]
 pub fn stake(stake_json: String) -> Result<String, ZingolibError> {
@@ -1674,57 +1689,144 @@ pub fn stake(stake_json: String) -> Result<String, ZingolibError> {
                     Err(_) => return "Error: it is not a valid JSON".to_string(),
                 };
 
-                let staking_action = match parse_staking_action(&json_args) {
-                    Ok(sa) => sa,
-                    Err(e) => return e,
+                let amount = match json_args["amount_zats"].as_u64() {
+                    Some(a) => match Zatoshis::from_u64(a) {
+                        Ok(a) => a,
+                        Err(e) => return format!("Error: Invalid amount: {e}"),
+                    },
+                    None => return "Missing amount".to_string(),
                 };
 
-                let receivers_json = &json_args["receivers"];
-                if !receivers_json.is_array() {
-                    return "Error: `receivers` must be an array".to_string();
-                }
+                let finalizer_address = match json_args["finalizer_address"].as_str() {
+                    Some(addr) => parse_hex_32(addr).unwrap(),
+                    None => return "Error: Missing address".to_string(),
+                };
 
-                let mut receivers = Receivers::new();
-                for j in receivers_json.members() {
-                    let recipient_address = match j["address"].as_str() {
-                        Some(addr) => match ZcashAddress::try_from_encoded(addr) {
-                            Ok(a) => a,
-                            Err(e) => return format!("Error: Invalid address: {e}"),
-                        },
-                        None => return "Error: Missing address".to_string(),
-                    };
-
-                    let amount = match j["amount"].as_u64() {
-                        Some(a) => match Zatoshis::from_u64(a) {
-                            Ok(a) => a,
-                            Err(e) => return format!("Error: Invalid amount: {e}"),
-                        },
-                        None => return "Error: Missing amount".to_string(),
-                    };
-
-                    let memo = if let Some(m) = j["memo"].as_str() {
-                        match interpret_memo_string(m.to_string()) {
-                            Ok(memo_bytes) => Some(memo_bytes),
-                            Err(e) => return format!("Error: Invalid memo: {e}"),
-                        }
-                    } else {
-                        None
-                    };
-
-                    receivers.push(zingolib::data::receivers::Receiver {
-                        recipient_address,
-                        amount,
-                        memo,
-                    });
-                }
-
-                let request = match transaction_request_from_receivers(receivers) {
+                let request = match transaction_request_from_receivers(vec![]) {
                     Ok(request) => request,
                     Err(e) => return format!("Error: Request Error: {e}"),
                 };
 
                 match lightclient
-                    .propose_stake(request, staking_action, AccountId::ZERO)
+                    .propose_stake(request, amount, finalizer_address, AccountId::ZERO)
+                    .await
+                {
+                    Ok(proposal) => {
+                        let fee = match total_fee(&proposal.proportional_fee_proposal()) {
+                            Ok(fee) => fee,
+                            Err(e) => return object! { "error" => e.to_string() }.pretty(2),
+                        };
+                        object! { "fee" => fee.into_u64() }.pretty(2)
+                    }
+                    Err(e) => object! { "error" => e.to_string() }.pretty(2),
+                }
+            }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
+/// `withdraw_stake_json` is a JSON object with the following schema:
+/// {
+///   "txid": "..."
+/// }
+#[uniffi::export]
+pub fn withdraw_stake(withdraw_stake_json: String) -> Result<String, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lightclient) = &mut *guard {
+            Ok(RT.block_on(async move {
+                let json_args = match json::parse(&withdraw_stake_json) {
+                    Ok(parsed) => parsed,
+                    Err(_) => return "Error: it is not a valid JSON".to_string(),
+                };
+
+                // txid is in display order here
+                let txid = parse_hex_32(json_args["txid"].as_str().unwrap()).unwrap();
+
+                let unfiltered_txs = lightclient.transaction_summaries(false).await.unwrap();
+
+                let found_tx = unfiltered_txs
+                    .iter()
+                    .filter(|tx| tx.staking_action.is_some())
+                    .find(|tx| tx.txid.to_string() == hex::encode(txid))
+                    .unwrap();
+
+                let pubkey = found_tx.staking_action.as_ref().unwrap().arg32_0;
+
+                let amount = found_tx.staking_action.as_ref().unwrap().amount_zats;
+
+                let request = match transaction_request_from_receivers(vec![]) {
+                    Ok(request) => request,
+                    Err(e) => return format!("Error: Request Error: {e}"),
+                };
+
+                match lightclient
+                    .propose_withdraw_stake(
+                        request,
+                        [0u8; 32],
+                        pubkey,
+                        Zatoshis::const_from_u64(amount),
+                        AccountId::ZERO,
+                    )
+                    .await
+                {
+                    Ok(proposal) => {
+                        let fee = match total_fee(&proposal.proportional_fee_proposal()) {
+                            Ok(fee) => fee,
+                            Err(e) => return object! { "error" => e.to_string() }.pretty(2),
+                        };
+                        object! { "fee" => fee.into_u64() }.pretty(2)
+                    }
+                    Err(e) => object! { "error" => e.to_string() }.pretty(2),
+                }
+            }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
+/// `begin_unstake_json` is a JSON object with the following schema:
+/// {
+///   "txid": "..."
+/// }
+#[uniffi::export]
+pub fn begin_unstake(begin_unstake_json: String) -> Result<String, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lightclient) = &mut *guard {
+            Ok(RT.block_on(async move {
+                let json_args = match json::parse(&begin_unstake_json) {
+                    Ok(parsed) => parsed,
+                    Err(_) => return "Error: it is not a valid JSON".to_string(),
+                };
+
+                // txid is in display order here
+                let txid = parse_hex_32(json_args["txid"].as_str().unwrap()).unwrap();
+
+                let unfiltered_txs = lightclient.transaction_summaries(false).await.unwrap();
+
+                let found_tx = unfiltered_txs
+                    .iter()
+                    .filter(|tx| tx.staking_action.is_some())
+                    .find(|tx| tx.txid.to_string() == hex::encode(txid))
+                    .unwrap();
+
+                let pubkey = found_tx.staking_action.as_ref().unwrap().arg32_0;
+
+                let request = match transaction_request_from_receivers(vec![]) {
+                    Ok(request) => request,
+                    Err(e) => return format!("Error: Request Error: {e}"),
+                };
+
+                match lightclient
+                    .propose_begin_unstake(request, [0u8; 32], pubkey, AccountId::ZERO)
                     .await
                 {
                     Ok(proposal) => {
@@ -1751,60 +1853,6 @@ fn parse_hex_32(s: &str) -> Result<[u8; 32], String> {
     let mut arr = [0u8; 32];
     arr.copy_from_slice(&bytes);
     Ok(arr)
-}
-
-fn parse_staking_action(root: &json::JsonValue) -> Result<StakingAction, String> {
-    let sa = &root["stakingAction"];
-
-    let kind_str = sa["kind"]
-        .as_str()
-        .ok_or_else(|| "Error: Missing stakingAction.kind".to_string())?;
-
-    let kind = match kind_str {
-        "add" => StakingActionKind::Add,
-        "sub" => StakingActionKind::Sub,
-        "clear" => StakingActionKind::Clear,
-        "move" => StakingActionKind::Move,
-        "moveClear" => StakingActionKind::MoveClear,
-        other => return Err(format!("Error: Unknown stakingAction.kind: {other}")),
-    };
-
-    let val = sa["val"].as_u64().unwrap_or(0);
-
-    let target_str = sa["target"]
-        .as_str()
-        .ok_or_else(|| "Error: Missing stakingAction.target".to_string())?;
-
-    let target = parse_hex_32(target_str)?;
-    let source_str = sa["source"]
-        .as_str()
-        .ok_or_else(|| "Error: Missing stakingAction.source".to_string())?;
-
-    let source = match kind {
-        StakingActionKind::Add => [0u8; 32],
-        StakingActionKind::Sub
-        | StakingActionKind::Clear
-        | StakingActionKind::Move
-        | StakingActionKind::MoveClear => parse_hex_32(source_str)?,
-    };
-
-    let insecure_target_name = sa["insecureTargetName"]
-        .as_str()
-        .unwrap_or_default()
-        .to_string();
-    let insecure_source_name = sa["insecureSourceName"]
-        .as_str()
-        .unwrap_or_default()
-        .to_string();
-
-    Ok(StakingAction {
-        kind,
-        val,
-        target,
-        source,
-        insecure_target_name,
-        insecure_source_name,
-    })
 }
 
 #[uniffi::export]
