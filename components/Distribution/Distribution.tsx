@@ -382,7 +382,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
           contentContainerStyle={{}}>
           <View style={{ display: 'flex' }}>
             {!loading && (!pieAmounts || !pieAmounts.length) && (
-              <View style={{ width: '100%', alignItems: 'center', marginTop: 100 }}>
+              <View style={{ alignItems: 'center', marginTop: 100, marginHorizontal: 20 }}>
                 <RegText>{translate('insight.no-data') as string}</RegText>
               </View>
             )}
@@ -391,51 +391,53 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
             ) : (
               <View style={{ width: '100%', alignItems: 'center' }}>
                 {!!pieAmounts && !!pieAmounts.length && (
-                  <PieChart
-                    showExternalLabels={true}
-                    labelLineConfig={{
-                      thickness: 1,
-                      avoidOverlappingOfLabels: true,
-                    }}
-                    strokeWidth={4}
-                    donut={true}
-                    innerCircleColor={colors.background}
-                    innerCircleBorderWidth={0}
-                    innerCircleBorderColor={colors.background}
-                    strokeColor={colors.background}
-                    showValuesAsTooltipText={true}
-                    showText
-                    externalLabelComponent={renderExternalLabel}
-                    textBackgroundColor={colors.background}
-                    data={pieAmounts}
-                    innerRadius={dimensions.width * 0.14}
-                  />
+                  <>
+                    <PieChart
+                      showExternalLabels={true}
+                      labelLineConfig={{
+                        thickness: 1,
+                        avoidOverlappingOfLabels: true,
+                      }}
+                      strokeWidth={4}
+                      donut={true}
+                      innerCircleColor={colors.background}
+                      innerCircleBorderWidth={0}
+                      innerCircleBorderColor={colors.background}
+                      strokeColor={colors.background}
+                      showValuesAsTooltipText={true}
+                      showText
+                      externalLabelComponent={renderExternalLabel}
+                      textBackgroundColor={colors.background}
+                      data={pieAmounts}
+                      innerRadius={dimensions.width * 0.14}
+                    />
+                    <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 30 }}>
+                      <RegText>{tab === 'my' ? 'Total Stake' : 'Total amount Staked'}</RegText>
+                      <ZecAmount
+                        currencyName={info.currencyName}
+                        size={20}
+                        amtZec={pieAmounts.reduce((sum, item) => sum + item.value, 0)}
+                        style={{ marginHorizontal: 5 }}
+                        privacy={privacy}
+                      />
+                    </View>
+                    <RegText style={{ marginHorizontal: 10, marginBottom: 10 }}>{tab === 'my' ? 'Staking Position' : 'Finalizers'}</RegText>
+                    <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: 'rgba(118, 118, 128, 0.24)', borderRadius: 26, width: '90%' }}>
+                      <View style={{ width: '100%' }}>
+                        {!loading && !!pieAmounts && !!pieAmounts.length && (
+                          <>
+                            {pieAmounts
+                              .map((item, index) => {
+                                return tab === 'my' ? lineMy(item, index, (index + 1) === pieAmounts.length ) : lineNetwork(item, index, (index + 1) === pieAmounts.length );
+                              })}
+                          </>
+                        )}
+                      </View>
+                    </View>
+                  </>
                 )}
               </View>
             )}
-          </View>
-          <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 30 }}>
-            <RegText>{tab === 'my' ? 'Total Stake' : 'Total amount Staked'}</RegText>
-            <ZecAmount
-              currencyName={info.currencyName}
-              size={20}
-              amtZec={pieAmounts.reduce((sum, item) => sum + item.value, 0)}
-              style={{ marginHorizontal: 5 }}
-              privacy={privacy}
-            />
-          </View>
-          <RegText style={{ marginHorizontal: 10, marginBottom: 10 }}>{tab === 'my' ? 'Staking Position' : 'Finalizers'}</RegText>
-          <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: 'rgba(118, 118, 128, 0.24)', borderRadius: 26 }}>
-            <View style={{ width: '100%' }}>
-              {!loading && !!pieAmounts && !!pieAmounts.length && (
-                <>
-                  {pieAmounts
-                    .map((item, index) => {
-                      return tab === 'my' ? lineMy(item, index, (index + 1) === pieAmounts.length ) : lineNetwork(item, index, (index + 1) === pieAmounts.length );
-                    })}
-                </>
-              )}
-            </View>
           </View>
         </ScrollView>
       </View>
