@@ -24,7 +24,6 @@ import {
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { LifeHash, LifeHashVersion } from 'lifehash';
 
 import {
   GlobalConst,
@@ -636,7 +635,7 @@ const Staking: React.FC<StakingProps> = () => {
               </View>
             )}
 
-            {!loading && !hasStaked && (
+            {!loading && !hasStaked && tab === 'staked' && (
               <View style={styles.centerContent}>
                 <View
                   style={{

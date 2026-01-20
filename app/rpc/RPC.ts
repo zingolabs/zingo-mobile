@@ -1046,10 +1046,12 @@ export default class RPC {
         }),
       );
 
-      const stakedList: StakeType[] = (rosterInfo.members ?? []).map(m => ({
-        pubKey: m.pub_key,
-        votingPower: (m.voting_power || 0) / 10 ** 8,
-      }));
+      const stakedList: StakeType[] = (rosterInfo.members ?? [])
+        .map(m => ({
+          pubKey: m.pub_key,
+          votingPower: (m.voting_power || 0) / 10 ** 8,
+        }))
+        .filter(_m => false); // TODO: Properly apply filter
 
       this.fnSetStaked(stakedList);
       this.fnSetGlobalStaked(globalStakedList);
