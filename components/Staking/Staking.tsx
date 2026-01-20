@@ -276,12 +276,7 @@ const Staking: React.FC<StakingProps> = () => {
           finalizer: item.pubKey,
           tag: '',
           svg: {
-            data: LifeHash.makeFrom(
-              item.pubKey,
-              LifeHashVersion.version2,
-              1,
-              true,
-            ).toDataUrl(),
+            data: lifehashDataUrlFromStringSync(item.pubKey),
           },
           key: `pie-${index}`,
         };
@@ -382,7 +377,7 @@ const Staking: React.FC<StakingProps> = () => {
             }}
           >
             <Image
-              source={{ uri: lifehashDataUrlFromStringSync(item.svg.data) }}
+              source={{ uri: item.svg.data }}
               style={{
                 width: 28,
                 height: 28,
@@ -618,7 +613,7 @@ const Staking: React.FC<StakingProps> = () => {
               </View>
             )}
 
-            {!loading && !hasMovements && (
+            {!loading && !hasMovements && tab === 'movements' && (
               <View style={styles.centerContent}>
                 <View
                   style={{
