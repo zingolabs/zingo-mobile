@@ -38,7 +38,6 @@ import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
-import { RPCStakedType } from './types/RPCStakedType';
 
 interface StakingActionType {
   kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
@@ -754,12 +753,19 @@ export default class RPC {
         if (!this.walletSeed) {
           await this.fetchWalletBirthdaySeedUfvk();
         }
-        console.log('100 BLOCKS AHEAD RECOVERY', this.walletBirthday, this.walletSeed);
+        console.log(
+          '100 BLOCKS AHEAD RECOVERY',
+          this.walletBirthday,
+          this.walletSeed,
+        );
         this.fnOnClickOKChangeWallet({
           screen: 0,
           startingApp: false,
           walletSeed: this.walletSeed,
-          walletBirthday: this.walletBirthday > this.lastServerBlockHeight ? 1 : this.walletBirthday,
+          walletBirthday:
+            this.walletBirthday > this.lastServerBlockHeight
+              ? 1
+              : this.walletBirthday,
         });
       } else {
         // This command have an error, fine. It's worthy to try running the sync process juat in case.
@@ -1009,99 +1015,52 @@ export default class RPC {
 
   async fetchStaked() {
     try {
-      if (this.fetchStakedLock) {
-        return;
-      }
+      if (this.fetchStakedLock) return;
       this.fetchStakedLock = true;
-      const start = Date.now();
-      const resultStakedStr = JSON.stringify([
-        {pub_key: 'dddddddddddddddddddddddddddddddd', voting_power: 2000000},
-        {pub_key: 'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm', voting_power: 3000000},
-      ]);
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > spendable balance - ',
-          Date.now() - start,
-        );
-      }
-      if (resultStakedStr) {
-        if (resultStakedStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error staked ${resultStakedStr}`);
-          this.fnSetLastError(`Error staked: ${resultStakedStr}`);
-          this.fetchStakedLock = false;
-          return;
-        }
-      } else {
-        console.log('Internal Error staked');
+
+      const rosterInfoStr: string = await RPCModule.getRosterInfoProcess();
+
+      if (!rosterInfoStr) {
+        this.fnSetLastError('Error roster_info: empty response');
         this.fetchStakedLock = false;
         return;
       }
-      const stakedJSON: RPCStakedType[] = await JSON.parse(resultStakedStr);
+      if (rosterInfoStr.toLowerCase().startsWith(GlobalConst.error)) {
+        this.fnSetLastError(`Error roster_info: ${rosterInfoStr}`);
+        this.fetchStakedLock = false;
+        return;
+      }
 
-      const stakedList: StakeType[] = stakedJSON.map((item: RPCStakedType) => ({
-        pubKey: item.pub_key,
-        votingPower: (item.voting_power || 0) / 10 ** 8,
+      const rosterInfo = JSON.parse(rosterInfoStr) as {
+        members: Array<{
+          pub_key: string;
+          voting_power: number;
+          txids?: any[];
+        }>;
+      };
+
+      const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
+        m => ({
+          pubKey: m.pub_key,
+          votingPower: (m.voting_power || 0) / 10 ** 8,
+        }),
+      );
+
+      const stakedList: StakeType[] = (rosterInfo.members ?? []).map(m => ({
+        pubKey: m.pub_key,
+        votingPower: (m.voting_power || 0) / 10 ** 8,
       }));
 
-      console.log('Global Staked:', stakedList);
-
-      const start2 = Date.now();
-      const resultGlobalStakedStr = JSON.stringify([
-        {pub_key: 'cccccccccccccccccccccccccccccccc', voting_power: 1000000},
-        {pub_key: 'dddddddddddddddddddddddddddddddd', voting_power: 2000000},
-        {pub_key: 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', voting_power: 3000000},
-        {pub_key: 'ffffffffffffffffffffffffffffffff', voting_power: 4000000},
-        {pub_key: 'gggggggggggggggggggggggggggggggg', voting_power: 5000000},
-        {pub_key: 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh', voting_power: 6000000},
-        {pub_key: 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii', voting_power: 7000000},
-        {pub_key: 'jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj', voting_power: 8000000},
-        {pub_key: 'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk', voting_power: 9000000},
-        {pub_key: 'llllllllllllllllllllllllllllllll', voting_power: 10000000},
-        {pub_key: 'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm', voting_power: 11000000},
-        {pub_key: 'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn', voting_power: 12000000},
-        {pub_key: 'oooooooooooooooooooooooooooooooo', voting_power: 13000000},
-        {pub_key: 'pppppppppppppppppppppppppppppppp', voting_power: 14000000},
-        {pub_key: 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq', voting_power: 15000000},
-        {pub_key: 'rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr', voting_power: 16000000},
-      ]);
-      if (Date.now() - start2 > 4000) {
-        console.log(
-          '=========================================== > balance - ',
-          Date.now() - start2,
-        );
-      }
-      if (resultGlobalStakedStr) {
-        if (resultGlobalStakedStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error global staked ${resultGlobalStakedStr}`);
-          this.fnSetLastError(`Error global staked: ${resultGlobalStakedStr}`);
-          this.fetchStakedLock = false;
-          return;
-        }
-      } else {
-        console.log('Internal Error global staked');
-        this.fetchStakedLock = false;
-        return;
-      }
-      const globalStakedJSON: RPCStakedType[] = await JSON.parse(resultGlobalStakedStr);
-
-      const globalStakedList: StakeType[] = globalStakedJSON.map((item: RPCStakedType) => ({
-        pubKey: item.pub_key,
-        votingPower: (item.voting_power || 0) / 10 ** 8,
-      } as StakeType));
-
-      console.log('Global Staked:', globalStakedJSON);
-
       this.fnSetStaked(stakedList);
-      this.fnSetGlobalStaked(globalStakedList)
+      this.fnSetGlobalStaked(globalStakedList);
+
       this.fetchStakedLock = false;
     } catch (error) {
       console.log(`Critical Error staked ${error}`);
       this.fnSetLastError(`Error staked: ${error}`);
-      // relaunch the interval tasks just in case they are aborted.
       await this.clearTimers();
       await this.configure();
       this.fetchStakedLock = false;
-      return;
     }
   }
 

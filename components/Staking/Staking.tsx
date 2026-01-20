@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   View,
@@ -13,11 +20,20 @@ import {
   Pressable,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  Image,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { LifeHash, LifeHashVersion } from 'lifehash';
 
-import { GlobalConst, RouteEnum, ScreenEnum, SnackbarDurationEnum, StakeType, ValueTransferType } from '../../app/AppState';
+import {
+  GlobalConst,
+  RouteEnum,
+  ScreenEnum,
+  SnackbarDurationEnum,
+  StakeType,
+  ValueTransferType,
+} from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
 import { ThemeType } from '../../app/types/ThemeType';
 import WalletSummaryHeader from '../History/components/WalletSummaryHeader';
@@ -31,19 +47,24 @@ import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { faAngleUp, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import AddressItem from '../Components/AddressItem';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 import ClockActive from '../../assets/icons/clock-active.svg';
 import ClockInactive from '../../assets/icons/clock-inactive.svg';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import FinalizerDetail from './components/FinalizerDetail';
+import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
 
 type DataType = {
   svg: {
-    fill: string;
+    data: string;
   };
   value: number;
   key: string;
@@ -52,7 +73,13 @@ type DataType = {
 };
 
 const getPercent = (percent: number) => {
-  return (percent < 1 ? '<1' : percent < 100 && percent >= 99 ? '99' : percent.toFixed(0)) + '%';
+  return (
+    (percent < 1
+      ? '<1'
+      : percent < 100 && percent >= 99
+        ? '99'
+        : percent.toFixed(0)) + '%'
+  );
 };
 
 type StakingUiKind = 'stake' | 'unstake_request' | 'unstake_payout';
@@ -98,7 +125,14 @@ type StakingProps = DrawerScreenProps<
 
 const Staking: React.FC<StakingProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers, addLastSnackbar, translate, snackbars, removeFirstSnackbar, staked } = context;
+  const {
+    valueTransfers,
+    addLastSnackbar,
+    translate,
+    snackbars,
+    removeFirstSnackbar,
+    staked,
+  } = context;
 
   const screenName = ScreenEnum.StakingHome;
 
@@ -110,19 +144,16 @@ const Staking: React.FC<StakingProps> = () => {
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const [heightLayout, setHeightLayout] = useState<number>(10);
   const [currentItem, setCurrentItem] = useState<DataType | null>(null);
-  
+
   const bottomSheetRef = useRef<BottomSheet>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    
+
   const dimensions = {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   };
 
-  const scrollViewRef =
-    useRef<ScrollView & FlatList<StakingMovement>>(
-      null,
-    );
+  const scrollViewRef = useRef<ScrollView & FlatList<StakingMovement>>(null);
 
   const snapPoints = useMemo(() => {
     let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
@@ -156,12 +187,12 @@ const Staking: React.FC<StakingProps> = () => {
       pressBehavior="close"
     />
   );
-    
+
   useEffect(() => {
     // TODO: fetching staking day info
     setStakingDay(true);
   }, []);
-  
+
   const movements: StakingMovement[] = useMemo(() => {
     if (!valueTransfers) {
       return [];
@@ -235,7 +266,7 @@ const Staking: React.FC<StakingProps> = () => {
   const stakedData: DataType[] = useMemo(() => {
     const resultJSON: StakeType[] = staked;
     console.log(resultJSON);
-    const randomColors = Utils.generateColorList(resultJSON.length + 10);
+    // const randomColors = Utils.generateColorList(resultJSON.length + 10);
     const r = resultJSON
       .filter((i: StakeType) => i.votingPower > 0 && !!i.pubKey)
       .sort((a, b) => b.votingPower - a.votingPower)
@@ -244,13 +275,15 @@ const Staking: React.FC<StakingProps> = () => {
           value: item.votingPower,
           finalizer: item.pubKey,
           tag: '',
-          svg: { fill: randomColors[index] },
+          svg: {
+            data: lifehashDataUrlFromStringSync(item.pubKey),
+          },
           key: `pie-${index}`,
         };
       });
-      const newExpandAddress = Array(r.length).fill(false);
-      setExpandAddress(newExpandAddress);
-      return r;
+    const newExpandAddress = Array(r.length).fill(false);
+    setExpandAddress(newExpandAddress);
+    return r;
   }, [staked]);
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -282,38 +315,50 @@ const Staking: React.FC<StakingProps> = () => {
 
       // Try multiple scroll methods for reliability
       try {
-        scrollViewRef.current.scrollTo({y: 0, animated: true});
+        scrollViewRef.current.scrollTo({ y: 0, animated: true });
       } catch (error) {
         console.log('scrollToTop failed:', error);
-        scrollViewRef.current.scrollToOffset({offset: 0, animated: true});
+        scrollViewRef.current.scrollToOffset({ offset: 0, animated: true });
       }
     }
   }, [isScrollingToTop]);
 
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y <= 100;
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset } = event.nativeEvent;
+      const isTop = contentOffset.y <= 100;
 
-    // Always update isAtTop for manual scrolling
-    setIsAtTop(isTop);
+      // Always update isAtTop for manual scrolling
+      setIsAtTop(isTop);
 
-    // If we're scrolling to top and we've reached the top, stop the scrolling state
-    if (isScrollingToTop && isTop) {
-      setIsScrollingToTop(false);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = null;
+      // If we're scrolling to top and we've reached the top, stop the scrolling state
+      if (isScrollingToTop && isTop) {
+        setIsScrollingToTop(false);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = null;
+        }
       }
-    }
-  }, [isScrollingToTop]);
-  
+    },
+    [isScrollingToTop],
+  );
+
   const line = (item: DataType, index: number, last: boolean) => {
-    const totalValue = stakedData ? stakedData.reduce((acc, curr) => acc + curr.value, 0) : 0;
+    const totalValue = stakedData
+      ? stakedData.reduce((acc, curr) => acc + curr.value, 0)
+      : 0;
     const percent = (100 * item.value) / totalValue;
     // 30 characters per line
-    const numLines = item.finalizer.length < 40 ? 2 : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
+    const numLines =
+      item.finalizer.length < 40
+        ? 2
+        : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
     return (
-      <TouchableOpacity style={{ width: '100%' }} key={`tag-${index}`} onPress={() => show(item)}>
+      <TouchableOpacity
+        style={{ width: '100%' }}
+        key={`tag-${index}`}
+        onPress={() => show(item)}
+      >
         <View
           style={{
             flexDirection: 'row',
@@ -322,15 +367,28 @@ const Staking: React.FC<StakingProps> = () => {
             paddingVertical: 15,
             borderBottomColor: '#333333',
             borderBottomWidth: last ? 0 : 1,
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
-            <FontAwesomeIcon style={{ marginRight: 15 }} size={15} icon={faCircle} color={item.svg.fill} />
-            {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
+            }}
+          >
+            <Image
+              source={{ uri: item.svg.data }}
+              style={{
+                width: 28,
+                height: 28,
+                marginRight: 10,
+                borderRadius: 12,
+              }}
+              resizeMode="contain"
+            />
+            {!!item.tag && (
+              <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>
+            )}
             <TouchableOpacity
               onPress={() => {
                 Clipboard.setString(item.finalizer);
@@ -343,30 +401,40 @@ const Staking: React.FC<StakingProps> = () => {
                 setTimeout(() => {
                   show(item);
                 }, 100);
-              }}>
+              }}
+            >
               <View
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   flexWrap: 'wrap',
-                }}>
-                <AddressItem address={item.finalizer} screenName={screenName} oneLine={true} onlyContact={true} withIcon={true} />
+                }}
+              >
+                <AddressItem
+                  address={item.finalizer}
+                  screenName={screenName}
+                  oneLine={true}
+                  onlyContact={true}
+                  withIcon={true}
+                />
                 {!expandAddress[index] && !!item.finalizer && (
                   <RegText>
                     {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
-                      ? Utils.trimToSmall(item.finalizer, dimensions.width < 500 ? 5 : 10)
+                      ? Utils.trimToSmall(
+                          item.finalizer,
+                          dimensions.width < 500 ? 5 : 10,
+                        )
                       : item.finalizer}
                   </RegText>
                 )}
                 {expandAddress[index] &&
                   !!item.finalizer &&
-                  Utils.splitStringIntoChunks(item.finalizer, Number(numLines.toFixed(0))).map(
-                    (c: string, idx: number) => (
-                      <RegText key={idx}>
-                        {c}
-                      </RegText>
-                    ),
-                  )}
+                  Utils.splitStringIntoChunks(
+                    item.finalizer,
+                    Number(numLines.toFixed(0)),
+                  ).map((c: string, idx: number) => (
+                    <RegText key={idx}>{c}</RegText>
+                  ))}
               </View>
             </TouchableOpacity>
           </View>
@@ -375,8 +443,9 @@ const Staking: React.FC<StakingProps> = () => {
               flexDirection: 'column-reverse',
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
-            <FadeText >{getPercent(percent)}</FadeText>
+            }}
+          >
+            <FadeText>{getPercent(percent)}</FadeText>
           </View>
         </View>
       </TouchableOpacity>
@@ -422,18 +491,30 @@ const Staking: React.FC<StakingProps> = () => {
               paddingVertical: 7,
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: stakingDay ? 'rgba(52, 199, 89, 0.2)' : 'rgba(65, 65, 65, 1)',
+              backgroundColor: stakingDay
+                ? 'rgba(52, 199, 89, 0.2)'
+                : 'rgba(65, 65, 65, 1)',
               borderRadius: 25,
             }}
           >
-            <View style={{ flexDirection: 'row', gap: 10, justifyContent: 'center', alignItems: 'center' }}>
-              {stakingDay 
-                ? <ClockActive width={24} height={24} />
-                : <ClockInactive width={24} height={24} />
-              }
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              {stakingDay ? (
+                <ClockActive width={24} height={24} />
+              ) : (
+                <ClockInactive width={24} height={24} />
+              )}
               <View>
-                <RegText>{`Staking day ${stakingDay ? 'active' : 'inactive'}`}</RegText> 
-                <FadeText style={{ color: stakingDay ? '#34c759' : '#8e8e93' }}>{`${stakingDay ? 'Permitted actions' : 'Opening in 2 days'}`}</FadeText>
+                <RegText>{`Staking day ${stakingDay ? 'active' : 'inactive'}`}</RegText>
+                {/* <FadeText
+                  style={{ color: stakingDay ? '#34c759' : '#8e8e93' }}
+                >{`${stakingDay ? 'Permitted actions' : 'Opening in 2 days'}`}</FadeText> */}
               </View>
             </View>
           </View>
@@ -452,17 +533,18 @@ const Staking: React.FC<StakingProps> = () => {
           <StakingActions stakingDay={stakingDay} />
         </View>
 
-        <View 
-          style={{ 
+        <View
+          style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginTop: 20, 
+            marginTop: 20,
             borderRadius: 20,
-            backgroundColor: 'rgba(118, 118, 128, 0.24)', 
+            backgroundColor: 'rgba(118, 118, 128, 0.24)',
             padding: 5,
             marginHorizontal: 20,
-          }}>
+          }}
+        >
           <View
             style={{
               flexGrow: 1,
@@ -473,14 +555,16 @@ const Staking: React.FC<StakingProps> = () => {
               backgroundColor: tab === 'movements' ? '#6C6C71' : 'transparent',
               padding: 5,
               overflow: 'hidden',
-            }}>
+            }}
+          >
             <TouchableOpacity onPress={() => setTab('movements')}>
               <RegText
                 style={{
                   fontWeight: tab === 'movements' ? 'bold' : 'normal',
                   fontSize: 15,
                   color: colors.text,
-                }}>
+                }}
+              >
                 {'Movements'}
               </RegText>
             </TouchableOpacity>
@@ -495,14 +579,16 @@ const Staking: React.FC<StakingProps> = () => {
               backgroundColor: tab === 'staked' ? '#6C6C71' : 'transparent',
               padding: 5,
               overflow: 'hidden',
-            }}>
+            }}
+          >
             <TouchableOpacity onPress={() => setTab('staked')}>
               <RegText
                 style={{
                   fontWeight: tab === 'staked' ? 'bold' : 'normal',
                   fontSize: 15,
-                  color: colors.text
-                }}>
+                  color: colors.text,
+                }}
+              >
                 {'Staked'}
               </RegText>
             </TouchableOpacity>
@@ -527,7 +613,7 @@ const Staking: React.FC<StakingProps> = () => {
               </View>
             )}
 
-            {!loading && !hasMovements && (
+            {!loading && !hasMovements && tab === 'movements' && (
               <View style={styles.centerContent}>
                 <View
                   style={{
@@ -605,9 +691,12 @@ const Staking: React.FC<StakingProps> = () => {
                   </View>
                 }
                 ListFooterComponent={
-                  <View style={{
-                    height: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
-                  }} />
+                  <View
+                    style={{
+                      height:
+                        Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+                    }}
+                  />
                 }
                 renderItem={({ item }: { item: StakingMovement }) => {
                   let label: string;
@@ -707,16 +796,28 @@ const Staking: React.FC<StakingProps> = () => {
                   persistentScrollbar={true}
                   indicatorStyle={'white'}
                   style={{ maxHeight: '100%' }}
-                  contentContainerStyle={{}}>
-                  <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: colors.secondary, borderRadius: 26 }}>
-                    {stakedData
-                      .map((item, index) => {
-                        return line(item, index, (index + 1) === stakedData.length );
-                      })}
+                  contentContainerStyle={{}}
+                >
+                  <View
+                    style={{
+                      display: 'flex',
+                      marginHorizontal: 10,
+                      padding: 5,
+                      alignItems: 'flex-start',
+                      backgroundColor: colors.secondary,
+                      borderRadius: 26,
+                    }}
+                  >
+                    {stakedData.map((item, index) => {
+                      return line(item, index, index + 1 === stakedData.length);
+                    })}
                   </View>
-                  <View style={{
-                    height: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
-                    }} />
+                  <View
+                    style={{
+                      height:
+                        Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+                    }}
+                  />
                 </ScrollView>
               </>
             )}
@@ -751,7 +852,6 @@ const Staking: React.FC<StakingProps> = () => {
                 />
               </Pressable>
             )}
-            
           </View>
         </View>
       </View>
@@ -767,8 +867,8 @@ const Staking: React.FC<StakingProps> = () => {
         backdropComponent={renderBackdrop}
       >
         <BottomSheetView
-          style={{ 
-            backgroundColor: 'rgba(36, 36, 38, 1)', 
+          style={{
+            backgroundColor: 'rgba(36, 36, 38, 1)',
             height: '100%',
             borderTopLeftRadius: 38,
             borderTopRightRadius: 38,
@@ -781,9 +881,11 @@ const Staking: React.FC<StakingProps> = () => {
                 closeSheet={hide}
                 setHeightLayout={setHeightLayout}
               />
-              <View style={{
-                height: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
-              }} />
+              <View
+                style={{
+                  height: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+                }}
+              />
             </>
           )}
         </BottomSheetView>
