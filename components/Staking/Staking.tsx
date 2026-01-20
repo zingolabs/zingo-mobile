@@ -503,9 +503,9 @@ const Staking: React.FC<StakingProps> = () => {
               )}
               <View>
                 <RegText>{`Staking day ${stakingDay ? 'active' : 'inactive'}`}</RegText>
-                <FadeText
+                {/* <FadeText
                   style={{ color: stakingDay ? '#34c759' : '#8e8e93' }}
-                >{`${stakingDay ? 'Permitted actions' : 'Opening in 2 days'}`}</FadeText>
+                >{`${stakingDay ? 'Permitted actions' : 'Opening in 2 days'}`}</FadeText> */}
               </View>
             </View>
           </View>
