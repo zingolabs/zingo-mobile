@@ -19,7 +19,7 @@ export default interface ValueTransferType {
 }
 
 export interface StakingActionType {
-  kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
+  kind: 'stake' | 'begin_unstake' | 'withdraw_stake' | 'redelegate';
   val: number;
   target: string;
   source: string;

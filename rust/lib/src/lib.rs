@@ -251,7 +251,18 @@ fn construct_uri_load_config(
             nu6_1: None,
             nu7: None,
         }),
-        "regtest" => ChainType::Regtest(for_test::all_height_one_nus()),
+        "regtest" => ChainType::Regtest(ConfiguredActivationHeights {
+            before_overwinter: Some(1),
+            overwinter: Some(1),
+            sapling: Some(1),
+            blossom: Some(1),
+            heartwood: Some(1),
+            canopy: Some(1),
+            nu5: Some(1),
+            nu6: Some(1),
+            nu6_1: None,
+            nu7: None,
+        }),
         _ => return Err("Error: Not a valid chain hint!".to_string()),
     };
     let performancetype = match performance_level.as_str() {

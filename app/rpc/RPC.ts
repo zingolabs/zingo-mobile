@@ -40,7 +40,7 @@ import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 
 interface StakingActionType {
-  kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
+  kind: 'stake' | 'begin_unstake' | 'withdraw_stake' | 'redelegate';
   val: number;
   target: string;
   source: string;
@@ -1743,47 +1743,71 @@ export default class RPC {
 
       try {
         console.log('stake JSON', stakeJson);
-        const proposeStr: string = await RPCModule.stakeProcess(
-          JSON.stringify(stakeJson),
-        );
 
-        if (proposeStr) {
-          if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-            console.log(`Error stake propose ${proposeStr}`);
-            sendError = proposeStr;
-          }
+        const action = stakeJson.stakingAction;
+
+        let proposeStr = '';
+
+        if (action.kind === 'stake') {
+          const payload = {
+            amount_zats: action.val, // must be integer zats
+            finalizer_address: action.target, // 32-byte hex string
+          };
+
+          console.log('HEEEEEEEEEEREREREREE');
+
+          proposeStr = await RPCModule.stakeProcess(JSON.stringify(payload));
+          // } else if (action.kind === 'begin_unstake') {
+          //   // begin_unstake()
+          //   // You need the bond/create txid here (string). Use whatever your UI stores.
+          //   // Commonly action.txid or stakeJson.stakingActionTxid etc.
+          //   proposeStr = await RPCModule.beginUnstakeProcess(action.txid);
+          // } else if (action.kind === 'withdraw_stake') {
+          //   // withdraw_stake()
+          //   proposeStr = await RPCModule.withdrawStakeProcess(action.txid);
         } else {
-          console.log('Internal Error stake propose');
-          sendError = 'Error: Internal RPC Error: stake propose';
+          sendError = `Error: Unsupported stakingAction.kind ${action.kind}`;
         }
 
         if (!sendError) {
-          const proposeJSON: RPCSendProposeType = await JSON.parse(proposeStr);
+          if (proposeStr) {
+            if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+              console.log(`Error staking propose ${proposeStr}`);
+              sendError = proposeStr;
+            }
+          } else {
+            console.log('Internal Error staking propose');
+            sendError = 'Error: Internal RPC Error: staking propose';
+          }
+        }
+
+        if (!sendError) {
+          const proposeJSON: RPCSendProposeType = JSON.parse(proposeStr);
           if (proposeJSON.error) {
-            console.log(`Error stake propose ${proposeJSON.error}`);
+            console.log(`Error staking propose ${proposeJSON.error}`);
             sendError = proposeJSON.error;
+          }
+        }
+
+        if (!sendError) {
+          const sendStr: string = await RPCModule.confirmProcess();
+
+          if (sendStr) {
+            if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
+              console.log(`Error staking confirm ${sendStr}`);
+              sendError = sendStr;
+            }
+          } else {
+            console.log('Internal Error staking confirm');
+            sendError = 'Error: Internal RPC Error: staking confirm';
           }
 
           if (!sendError) {
-            const sendStr: string = await RPCModule.confirmProcess();
-            if (sendStr) {
-              if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
-                console.log(`Error stake confirm ${sendStr}`);
-                sendError = sendStr;
-              }
-            } else {
-              console.log('Internal Error stake confirm');
-              sendError = 'Error: Internal RPC Error: stake confirm';
-            }
-
-            if (!sendError) {
-              const sendJSON: RPCSendType = await JSON.parse(sendStr);
-              if (sendJSON.error) {
-                console.log(`Error stake confirm ${sendJSON.error}`);
-                sendError = sendJSON.error;
-              } else if (sendJSON.txids && sendJSON.txids.length > 0) {
-                sendTxids = sendJSON.txids.join(', ');
-              }
+            const sendJSON: RPCSendType = JSON.parse(sendStr);
+            if (sendJSON.error) {
+              sendError = sendJSON.error;
+            } else if (sendJSON.txids && sendJSON.txids.length > 0) {
+              sendTxids = sendJSON.txids.join(', ');
             }
           }
         }
@@ -1795,14 +1819,8 @@ export default class RPC {
       await this.configure();
       this.setInSend(false);
 
-      if (sendTxids) {
-        resolve(sendTxids);
-        return;
-      }
-      if (sendError) {
-        reject(sendError);
-        return;
-      }
+      if (sendTxids) return resolve(sendTxids);
+      if (sendError) return reject(sendError);
     });
 
     return sendTxPromise;

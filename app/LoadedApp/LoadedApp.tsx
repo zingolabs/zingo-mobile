@@ -109,7 +109,7 @@ import {
   StakeJsonToTypeType,
   StakingActionType,
 } from '../AppState/types/ValueTransferType';
-import Distribution from '../../components/Distribution'
+import Distribution from '../../components/Distribution';
 import Redelegate from '../../components/Staking/components/Redelegate';
 import Finalizers from '../../components/Finalizers/Finalizers';
 
@@ -1252,17 +1252,9 @@ export class LoadedAppClass extends Component<
     try {
       const { indexerServer, defaultUnifiedAddress } = this.state;
 
-      // Reuse the existing helper to build the receivers array
-      const receivers: SendJsonToTypeType[] = await Utils.getSendManyJSON(
-        sendPageState,
-        defaultUnifiedAddress,
-        indexerServer,
-        false,
-      );
-
       const stakeJson: StakeJsonToTypeType = {
         stakingAction,
-        receivers,
+        // receivers,
       };
 
       const txid = await this.rpc.sendStakingTransaction(stakeJson);

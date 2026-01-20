@@ -18,10 +18,10 @@ export type RPCValueTransferType = {
 };
 
 type RPCStakingActionType = {
-  kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
+  kind: 'stake' | 'begin_unstake' | 'withdraw_stake' | 'redelegate';
   val: number;
   target: string;
   source: string;
   insecure_target_name: string;
   insecure_source_name: string;
-}
+};
