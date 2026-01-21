@@ -1718,12 +1718,12 @@ export default class RPC {
       await this.refreshSync();
 
       if (sendTxids) {
-        //console.log('00000000 RESOLVE send');
+        console.log('00000000 RESOLVE send', sendTxids);
         resolve(sendTxids);
         return;
       }
       if (sendError) {
-        //console.log('00000000 REJECT send');
+        console.log('00000000 REJECT send', sendError);
         reject(sendError);
         return;
       }
