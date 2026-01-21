@@ -556,8 +556,8 @@ export class LoadingAppClass extends Component<
       this.setState({ walletExists: true });
       let result: string = await RPCModule.loadExistingWallet(
         this.state.indexerServer.uri,
-        // this.state.indexerServer.chainName,
-        'regtest',
+        this.state.indexerServer.chainName,
+        // 'regtest',
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
