@@ -61,7 +61,6 @@ import {
   AddressKindEnum,
   ScreenEnum,
   LaunchingModeEnum,
-  SendJsonToTypeType,
   StakeType,
 } from '../AppState';
 import Utils from '../utils';
@@ -109,7 +108,7 @@ import {
   StakeJsonToTypeType,
   StakingActionType,
 } from '../AppState/types/ValueTransferType';
-import Distribution from '../../components/Distribution'
+import Distribution from '../../components/Distribution';
 import Redelegate from '../../components/Staking/components/Redelegate';
 import Finalizers from '../../components/Finalizers/Finalizers';
 
@@ -156,7 +155,7 @@ type LoadedAppProps = {
 
 const SERVER_DEFAULT_0: ServerType = {
   uri: '',
-  chainName: ChainNameEnum.regtestChainName,
+  chainName: ChainNameEnum.testChainName,
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
@@ -925,6 +924,7 @@ export class LoadedAppClass extends Component<
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
   ) => {
+    console.log('VALUE TRANSFERS', valueTransfers);
     const basicFirstViewSeed = (await SettingsFileImpl.readSettings())
       .basicFirstViewSeed;
     // only for basic mode
@@ -1250,22 +1250,30 @@ export class LoadedAppClass extends Component<
     stakingAction: StakingActionType,
   ): Promise<string> => {
     try {
-      const { indexerServer, defaultUnifiedAddress } = this.state;
-
-      // Reuse the existing helper to build the receivers array
-      const receivers: SendJsonToTypeType[] = await Utils.getSendManyJSON(
-        sendPageState,
-        defaultUnifiedAddress,
-        indexerServer,
-        false,
-      );
-
       const stakeJson: StakeJsonToTypeType = {
         stakingAction,
-        receivers,
+        receivers: [],
       };
 
       const txid = await this.rpc.sendStakingTransaction(stakeJson);
+      return txid;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  beginUnstakeTransaction = async (createBondTxid: string): Promise<string> => {
+    try {
+      const txid = await this.rpc.sendBeginUnstakingTx(createBondTxid);
+      return txid;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  withdrawBondTransaction = async (createBondTxid: string): Promise<string> => {
+    try {
+      const txid = await this.rpc.sendWithdrawBondTx(createBondTxid);
       return txid;
     } catch (err) {
       throw err;
@@ -1461,6 +1469,7 @@ export class LoadedAppClass extends Component<
       //   But I have to restart the sync if needed.
       let result: string = await RPCModule.loadExistingWallet(
         value.uri,
+        // 'regtest',
         value.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
@@ -2085,6 +2094,8 @@ export class LoadedAppClass extends Component<
                   <Unstake
                     {...props}
                     stakeTransaction={this.stakeTransaction}
+                    beginUnstakeTransaction={this.beginUnstakeTransaction}
+                    withdrawBondTransaction={this.withdrawBondTransaction}
                   />
                 )}
               </InnerStack.Screen>

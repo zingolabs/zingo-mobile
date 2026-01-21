@@ -18,10 +18,11 @@ export type RPCValueTransferType = {
 };
 
 type RPCStakingActionType = {
-  kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
+  kind: 'create_bond' | 'begin_unbonding' | 'withdraw_bond' | 'redelegate';
   val: number;
   target: string;
   source: string;
   insecure_target_name: string;
   insecure_source_name: string;
-}
+  unique_public_key: string;
+};

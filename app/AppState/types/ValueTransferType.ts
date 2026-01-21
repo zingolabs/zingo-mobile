@@ -19,12 +19,10 @@ export default interface ValueTransferType {
 }
 
 export interface StakingActionType {
-  kind: 'add' | 'sub' | 'clear' | 'move' | 'move_clear';
+  kind: 'create_bond' | 'begin_unbonding' | 'withdraw_bond' | 'redelegate';
   val: number;
   target: string;
-  source: string;
-  insecureTargetName: string;
-  insecureSourceName: string;
+  unique_public_key: string;
 }
 
 export interface StakeReceiverToType {

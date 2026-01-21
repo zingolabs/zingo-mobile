@@ -11,7 +11,9 @@ use android_logger::{Config, FilterBuilder};
 use hex::FromHex;
 #[cfg(target_os = "android")]
 use log::Level;
+use zcash_protocol::local_consensus::LocalNetwork;
 use zcash_protocol::memo::MemoBytes;
+use zingolib::grpc_client::get_zcb_client;
 use zingolib::{AccountId, ConfiguredActivationHeights};
 
 use std::any::Any;
@@ -33,7 +35,7 @@ use rustls::crypto::{CryptoProvider, ring::default_provider};
 use zcash_address::unified::{Container, Encoding, Ufvk};
 use zcash_keys::address::Address;
 use zcash_keys::keys::UnifiedFullViewingKey;
-use zcash_protocol::consensus::{BlockHeight, NetworkType};
+use zcash_protocol::consensus::{BlockHeight, NetworkType, TEST_NETWORK};
 
 use pepper_sync::config::{PerformanceLevel, SyncConfig, TransparentAddressDiscovery};
 use pepper_sync::keys::transparent;
@@ -54,6 +56,17 @@ use zingolib::wallet::keys::{
     unified::{ReceiverSelection, UnifiedKeyStore},
 };
 use zingolib::wallet::{LightWallet, WalletBase, WalletSettings};
+
+const REGTEST_NETWORK: LocalNetwork = LocalNetwork {
+    overwinter: Some(zcash_protocol::consensus::BlockHeight(1)),
+    sapling: Some(zcash_protocol::consensus::BlockHeight(1)),
+    blossom: Some(zcash_protocol::consensus::BlockHeight(1)),
+    heartwood: Some(zcash_protocol::consensus::BlockHeight(1)),
+    canopy: Some(zcash_protocol::consensus::BlockHeight(1)),
+    nu5: Some(zcash_protocol::consensus::BlockHeight(1)),
+    nu6: Some(zcash_protocol::consensus::BlockHeight(1)),
+    nu6_1: None,
+};
 
 #[derive(Debug, thiserror::Error, uniffi::Error)]
 pub enum ZingolibError {
@@ -251,7 +264,18 @@ fn construct_uri_load_config(
             nu6_1: None,
             nu7: None,
         }),
-        "regtest" => ChainType::Regtest(for_test::all_height_one_nus()),
+        "regtest" => ChainType::Regtest(ConfiguredActivationHeights {
+            before_overwinter: Some(1),
+            overwinter: Some(1),
+            sapling: Some(1),
+            blossom: Some(1),
+            heartwood: Some(1),
+            canopy: Some(1),
+            nu5: Some(1),
+            nu6: Some(1),
+            nu6_1: None,
+            nu7: None,
+        }),
         _ => return Err("Error: Not a valid chain hint!".to_string()),
     };
     let performancetype = match performance_level.as_str() {
@@ -1737,51 +1761,56 @@ pub fn withdraw_stake(withdraw_stake_json: String) -> Result<String, ZingolibErr
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 let json_args = match json::parse(&withdraw_stake_json) {
                     Ok(parsed) => parsed,
-                    Err(_) => return "Error: it is not a valid JSON".to_string(),
+                    Err(_) => return object! { "error" => "invalid JSON" }.pretty(2),
                 };
 
-                // txid is in display order here
-                let txid = parse_hex_32(json_args["txid"].as_str().unwrap()).unwrap();
+                let txid_bytes = match json_args["txid"]
+                    .as_str()
+                    .and_then(|s| parse_hex_32(s).ok())
+                {
+                    Some(t) => t,
+                    None => return object! { "error" => "missing/invalid txid" }.pretty(2),
+                };
 
-                let unfiltered_txs = lightclient.transaction_summaries(false).await.unwrap();
+                let unfiltered_txs = match lightclient.transaction_summaries(false).await {
+                    Ok(t) => t,
+                    Err(e) => return object! { "error" => e.to_string() }.pretty(2),
+                };
 
-                let found_tx = unfiltered_txs
+                let found_tx = match unfiltered_txs
                     .iter()
                     .filter(|tx| tx.staking_action.is_some())
-                    .find(|tx| tx.txid.to_string() == hex::encode(txid))
-                    .unwrap();
+                    .find(|tx| tx.txid.to_string() == hex::encode(txid_bytes))
+                {
+                    Some(t) => t,
+                    None => return object! { "error" => "tx not found" }.pretty(2),
+                };
 
-                let pubkey = found_tx.staking_action.as_ref().unwrap().arg32_0;
+                let sa = found_tx.staking_action.as_ref().unwrap();
 
-                let amount = found_tx.staking_action.as_ref().unwrap().amount_zats;
+                let bond_key: [u8; 32] = sa.arg32_0;
 
-                let request = match transaction_request_from_receivers(vec![]) {
-                    Ok(request) => request,
-                    Err(e) => return format!("Error: Request Error: {e}"),
+                let mut client = match get_zcb_client(lightclient.server_uri()).await {
+                    Ok(c) => c,
+                    Err(e) => return object! { "error" => format!("grpc client: {e}") }.pretty(2),
                 };
 
                 match lightclient
-                    .propose_withdraw_stake(
-                        request,
-                        [0u8; 32],
-                        pubkey,
-                        Zatoshis::const_from_u64(amount),
-                        AccountId::ZERO,
-                    )
+                    .wallet
+                    .write()
+                    .await
+                    .withdraw_bond_using_orchard(&TEST_NETWORK, &mut client, &bond_key)
                     .await
                 {
-                    Ok(proposal) => {
-                        let fee = match total_fee(&proposal.proportional_fee_proposal()) {
-                            Ok(fee) => fee,
-                            Err(e) => return object! { "error" => e.to_string() }.pretty(2),
-                        };
-                        object! { "fee" => fee.into_u64() }.pretty(2)
+                    Some(txid) => object! { "txid" => txid.to_string() }.pretty(2),
+                    None => {
+                        object! { "error" => "withdraw failed (builder returned None)" }.pretty(2)
                     }
-                    Err(e) => object! { "error" => e.to_string() }.pretty(2),
                 }
             }))
         } else {

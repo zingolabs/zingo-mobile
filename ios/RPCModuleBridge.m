@@ -222,5 +222,12 @@ RCT_EXTERN_METHOD(getAccumulatedStakeForTxidInfo:
     reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getRosterInfoProcess:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(withdrawStakeProcess:(NSString *)txid
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(beginUnstakeProcess:(NSString *)txid
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

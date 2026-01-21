@@ -9,38 +9,38 @@ ci = []
 regchest = []
 
 [dependencies]
-zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "a9da5006cc87bc5e9d33116d9276227a129e9a23", default-features = true, features = [
+zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "44556e717ba496917bb8bc01147dbb96dd487441", default-features = true, features = [
     "testutils",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "a9da5006cc87bc5e9d33116d9276227a129e9a23" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "44556e717ba496917bb8bc01147dbb96dd487441" }
 
-zcash_encoding = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "96323630711b4137ee1ccfd60915343079703c9f", features = [
+zcash_encoding = { git = "https://github.com/dorianvp/crosslink_monolith.git", rev = "4fac1abf052732f2839bcbec8682b29eaed96bac", features = [
     "std",
 ] }
-zcash_address = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "96323630711b4137ee1ccfd60915343079703c9f", features = [
+zcash_address = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "4fac1abf052732f2839bcbec8682b29eaed96bac", features = [
     "std",
 ] }
-zcash_client_backend = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "96323630711b4137ee1ccfd60915343079703c9f", features = [
+zcash_client_backend = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "4fac1abf052732f2839bcbec8682b29eaed96bac", features = [
     "lightwalletd-tonic",
     "orchard",
     "transparent-inputs",
     "tor",
 ] }
-zcash_keys = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "96323630711b4137ee1ccfd60915343079703c9f", features = [
+zcash_keys = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "4fac1abf052732f2839bcbec8682b29eaed96bac", features = [
     "transparent-inputs",
     "sapling",
     "orchard",
     "std",
 ] }
-zcash_primitives = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "96323630711b4137ee1ccfd60915343079703c9f", features = [
+zcash_primitives = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "4fac1abf052732f2839bcbec8682b29eaed96bac", features = [
     "std",
 ] }
-zcash_proofs = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "96323630711b4137ee1ccfd60915343079703c9f" }
-zcash_protocol = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "96323630711b4137ee1ccfd60915343079703c9f", features = [
+zcash_proofs = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "4fac1abf052732f2839bcbec8682b29eaed96bac" }
+zcash_protocol = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "4fac1abf052732f2839bcbec8682b29eaed96bac", features = [
     "std",
     "local-consensus",
 ] }
-zcash_transparent = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "96323630711b4137ee1ccfd60915343079703c9f", features = [
+zcash_transparent = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "4fac1abf052732f2839bcbec8682b29eaed96bac", features = [
     "std",
 ] }
 # zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "4d5785ce2cc347bf5a4849ce8ceb645e18b533cb", default-features = true, features = [

@@ -25,7 +25,6 @@ import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../../app/types';
 import {
-  ChainNameEnum,
   RouteEnum,
   SendPageStateClass,
   ToAddrClass,
@@ -33,10 +32,6 @@ import {
 import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
 import { ContextAppLoaded } from '../../../app/context';
 import Utils from '../../../app/utils';
-import {
-  MINER_ADDRESS_REGTEST,
-  MINER_ADDRESS_TESTNET,
-} from '../../../app/utils/constants';
 import FadeText from '../../Components/FadeText';
 import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
@@ -74,8 +69,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
-  const { totalBalance, defaultUnifiedAddress, indexerServer, info, privacy } =
-    useContext(ContextAppLoaded);
+  const { totalBalance, info, privacy } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -99,7 +93,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   }, []);
 
   useEffect(() => {
-    // Balance check (in cTAZ / ZEC units) 
+    // Balance check (in cTAZ / ZEC units)
     const _spendable =
       totalBalance && typeof totalBalance.totalSpendableBalance === 'number'
         ? totalBalance.totalSpendableBalance
@@ -109,17 +103,14 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
 
   useEffect(() => {
     if (!finalizerText) {
-      navigation.navigate(
-        RouteEnum.Finalizers, 
-        {
-          setFinalizer: (f: string, s: number) => {
-            setFinalizerText(f);
-            setStaked(s);
-          },
-          scope: 'network',
-          exclude: '',
-        }
-      );
+      navigation.navigate(RouteEnum.Finalizers, {
+        setFinalizer: (f: string, s: number) => {
+          setFinalizerText(f);
+          setStaked(s);
+        },
+        scope: 'network',
+        exclude: '',
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -161,23 +152,24 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     // Build a minimal SendPageState to reuse existing plumbing
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
 
-    sendPageState.toaddr.to =
-      indexerServer.chainName === ChainNameEnum.regtestChainName
-        ? MINER_ADDRESS_REGTEST
-        : MINER_ADDRESS_TESTNET;
-    sendPageState.toaddr.memo = defaultUnifiedAddress;
+    // sendPageState.toaddr.to =
+    //   indexerServer.chainName === ChainNameEnum.regtestChainName
+    //     ? MINER_ADDRESS_REGTEST
+    //     : MINER_ADDRESS_TESTNET;
+    // sendPageState.toaddr.memo = defaultUnifiedAddress;
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(
       amount,
       8,
     );
 
     const stakingAction: StakingActionType = {
-      kind: 'add',
+      kind: 'create_bond',
       val: amount * 10 ** 8,
       target: reverseHexBytes(finalizer),
-      source: '',
-      insecureSourceName: '',
-      insecureTargetName: '',
+      unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
+      // source: '',
+      // insecureSourceName: '',
+      // insecureTargetName: '',
       // miner,
     };
 
@@ -237,18 +229,15 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         </Text>
 
         <TouchableOpacity
-          onPress={() => 
-            navigation.navigate(
-              RouteEnum.Finalizers, 
-              {
-                setFinalizer: (f: string, s: number) => {
-                  setFinalizerText(f);
-                  setStaked(s);
-                },
-                scope: 'network',
-                exclude: '',
-              }
-            )
+          onPress={() =>
+            navigation.navigate(RouteEnum.Finalizers, {
+              setFinalizer: (f: string, s: number) => {
+                setFinalizerText(f);
+                setStaked(s);
+              },
+              scope: 'network',
+              exclude: '',
+            })
           }
         >
           <View
@@ -265,21 +254,42 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
               borderColor: colors.text,
             }}
           >
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-              <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='rgba(143, 191, 250, 1)' />
-              <View style={{ justifyContent: 'center', alignItems: 'flex-start', gap: 0 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <FontAwesomeIcon
+                style={{ marginRight: 15 }}
+                size={20}
+                icon={faCircle}
+                color="rgba(143, 191, 250, 1)"
+              />
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  gap: 0,
+                }}
+              >
                 <TextInput
                   style={{
                     color: colors.text,
                     fontSize: 17,
                     fontWeight: '400',
                   }}
-                  placeholder="Tap here for finalizer address" 
+                  placeholder="Tap here for finalizer address"
                   placeholderTextColor={colors.placeholder}
                   value={Utils.trimToSmall(finalizerText, 7)}
                   editable={false}
                 />
-                {!!staked && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${staked}`}</FadeText>}
+                {!!staked && (
+                  <FadeText
+                    style={{ marginLeft: 5, marginBottom: 10 }}
+                  >{`Staked: ${staked}`}</FadeText>
+                )}
               </View>
             </View>
             <ChevronDown
@@ -373,7 +383,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                 privacy={privacy}
               />
             </View>
-
           </View>
         </ScrollView>
 
@@ -413,7 +422,10 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
             <View
               style={[
                 styles.modalCard,
-                { backgroundColor: colors.background, borderColor: colors.border },
+                {
+                  backgroundColor: colors.background,
+                  borderColor: colors.border,
+                },
               ]}
             >
               {modalState === 'sending' && (

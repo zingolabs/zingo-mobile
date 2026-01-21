@@ -20,7 +20,7 @@ const serverUris = (): ServerUrisType[] => {
       obsolete: false,
     },
     {
-      uri: 'http://127.0.0.1:18233',
+      uri: 'http://127.0.0.1:18234',
       region: 'CrossLink RegTest',
       chainName: ChainNameEnum.regtestChainName,
       default: true,
