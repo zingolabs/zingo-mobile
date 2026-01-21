@@ -23,6 +23,7 @@ export interface StakingActionType {
   val: number;
   target: string;
   unique_public_key: string;
+  source: string; // maybe obsolete...
 }
 
 export interface StakeReceiverToType {

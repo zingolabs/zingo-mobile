@@ -66,9 +66,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const memo = valueTransfer.memos;
 
   const iconColor =
-      valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'add' 
+      valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'create_bond' 
         ? '#0091FF80' 
-        : valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'sub' 
+        : valueTransfer.stakingAction && (valueTransfer.stakingAction.kind === 'begin_unbonding' || valueTransfer.stakingAction.kind === 'withdraw_bond')
           ? '#FFAF0E80' 
           : colors.text;
 
@@ -223,9 +223,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
              }}>
               <View style={{ 
                 padding: 20,
-                backgroundColor: valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'add' 
+                backgroundColor: valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'create_bond' 
                   ? '#0091FF80' 
-                  : valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'sub' 
+                  : valueTransfer.stakingAction && (valueTransfer.stakingAction.kind === 'begin_unbonding' || valueTransfer.stakingAction.kind === 'withdraw_bond')
                     ? '#FFAF0E80' 
                     : colors.secondary,
                 borderRadius: 50,
@@ -239,10 +239,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                   />
                 ) : (
                   <>
-                    {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'add' && (
+                    {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'create_bond' && (
                       <Stake width={30} height={30} />
                     )}
-                    {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'sub' && (
+                    {valueTransfer.stakingAction && (valueTransfer.stakingAction.kind === 'begin_unbonding' || valueTransfer.stakingAction.kind === 'withdraw_bond') && (
                       <Unstake width={30} height={30} />
                     )}
                     {valueTransfer.stakingAction === null && (
@@ -348,7 +348,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               borderRadius: 30,
               backgroundColor: colors.secondary,
           }}>
-            {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'add' && (
+            {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'create_bond' && (
               <>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
                   <FadeText>{'Target'}</FadeText>
@@ -373,7 +373,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               </>
             )}
 
-            {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'sub' && (
+            {valueTransfer.stakingAction && (valueTransfer.stakingAction.kind === 'begin_unbonding' || valueTransfer.stakingAction.kind === 'withdraw_bond') && (
               <>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
                   <FadeText>{'Source'}</FadeText>

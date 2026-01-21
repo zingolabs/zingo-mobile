@@ -12,6 +12,14 @@ import { AppStackParamList } from '../app/types';
 import { LaunchingModeEnum, RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+jest.mock('@noble/hashes/sha2.js', () => ({
+  sha256: jest.fn(() => new Uint8Array([1, 2, 3])), // lo que necesites
+}));
+
+jest.mock('@noble/hashes/utils.js', () => ({
+  utf8ToBytes: jest.fn(_s => new Uint8Array([1, 2, 3])),
+}));
+
 jest.mock('react-native-localize', () => ({
   findBestLanguageTag: jest.fn().mockImplementation((supportedLocales) => {
     return { languageTag: supportedLocales?.[0] || 'en', isRTL: false };

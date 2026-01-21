@@ -112,7 +112,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
     const stakingAdds = valueTransfers.filter(
       (vt: ValueTransferType) => {
         if (vt.stakingAction !== null && 
-            vt.stakingAction.kind === 'add') {
+            vt.stakingAction.kind === 'create_bond') {
           if (finalizerFromText && vt.stakingAction.target === finalizerFromText) {
             return true;
           }
@@ -130,7 +130,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
         .filter(
           (vt: ValueTransferType) =>
             vt.stakingAction !== null &&
-            vt.stakingAction.kind === 'sub' &&
+            (vt.stakingAction.kind === 'begin_unbonding' || vt.stakingAction.kind === 'withdraw_bond' || vt.stakingAction.kind === 'redelegate') &&
             !!vt.stakingAction.source,
         )
         .map(vt => vt.stakingAction!.source),
@@ -285,14 +285,15 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(0, 8);
 
     const stakingAction: StakingActionType = {
-      kind: 'sub',
+      kind: 'begin_unbonding',
+      unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
       // use the backend value in zats directly
       val: zats,
       target:
         (selectedTx.stakingAction && selectedTx.stakingAction?.target) || '',
       source: hexToBytes(selectedTx.txid),
-      insecureSourceName: '',
-      insecureTargetName: '',
+      //insecureSourceName: '',
+      //insecureTargetName: '',
     };
 
     console.log('UNSTAKING action:', stakingAction);

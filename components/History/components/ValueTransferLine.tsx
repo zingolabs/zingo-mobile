@@ -81,9 +81,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   //const maxWidthHit = useRef<boolean>(false);
 
   const amountColor =
-      vt.stakingAction && vt.stakingAction.kind === 'add' 
+      vt.stakingAction && vt.stakingAction.kind === 'create_bond' 
         ? '#0091FF80' 
-        : vt.stakingAction && vt.stakingAction.kind === 'sub' 
+        : vt.stakingAction && (vt.stakingAction.kind === 'begin_unbonding' || vt.stakingAction.kind === 'withdraw_bond' )
           ? '#FFAF0E80' 
           : colors.text;
 
@@ -343,10 +343,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   />
                 ) : (
                   <>
-                    {vt.stakingAction && vt.stakingAction.kind === 'add' && (
+                    {vt.stakingAction && vt.stakingAction.kind === 'create_bond' && (
                       <Stake width={20} height={20} />
                     )}
-                    {vt.stakingAction && vt.stakingAction.kind === 'sub' && (
+                    {vt.stakingAction && (vt.stakingAction.kind === 'begin_unbonding' || vt.stakingAction.kind === 'withdraw_bond') && (
                       <Unstake width={20} height={20} />
                     )}
                     {vt.stakingAction === null && (

@@ -258,24 +258,24 @@ const Unstake: React.FC<UnstakeProps> = ({
   const isHex64 = (s: string) => /^[0-9a-fA-F]{64}$/.test(s);
 
   const getBondTxidDisplayFromSelection = (
-    selectedTx: ValueTransferType,
-    valueTransfers: ValueTransferType[] | undefined,
+    _selectedTx: ValueTransferType,
+    _valueTransfers: ValueTransferType[] | undefined,
   ): string | null => {
-    console.log('getBondTxidDisplayFromSelection selectedTx', selectedTx);
+    console.log('getBondTxidDisplayFromSelection selectedTx', _selectedTx);
     console.log(
       'getBondTxidDisplayFromSelection valueTransfers',
-      valueTransfers,
+      _valueTransfers,
     );
-    const a = selectedTx.stakingAction as any;
+    const a = _selectedTx.stakingAction as any;
     if (!a) return null;
 
-    if (a.kind === 'create_bond') return selectedTx.txid;
+    if (a.kind === 'create_bond') return _selectedTx.txid;
 
     if (a.kind === 'begin_unbonding') {
       const bondKey = a.unique_public_key ?? a.arg32_0;
       if (!isHex64(bondKey)) return null;
 
-      const match = (valueTransfers ?? []).find(vt => {
+      const match = (_valueTransfers ?? []).find(vt => {
         const sa = vt.stakingAction as any;
         if (!sa || sa.kind !== 'create_bond') return false;
         const k = sa.unique_public_key ?? sa.arg32_0;
@@ -336,7 +336,7 @@ const Unstake: React.FC<UnstakeProps> = ({
     if (k === 'create_bond') return 'Unbond';
 
     return 'Unstake';
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [selectedTx]);
 
   const handleViewMovements = () => {
