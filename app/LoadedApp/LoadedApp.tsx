@@ -61,7 +61,6 @@ import {
   AddressKindEnum,
   ScreenEnum,
   LaunchingModeEnum,
-  SendJsonToTypeType,
   StakeType,
 } from '../AppState';
 import Utils from '../utils';
@@ -1250,11 +1249,9 @@ export class LoadedAppClass extends Component<
     stakingAction: StakingActionType,
   ): Promise<string> => {
     try {
-      const { indexerServer, defaultUnifiedAddress } = this.state;
-
       const stakeJson: StakeJsonToTypeType = {
         stakingAction,
-        // receivers,
+        receivers: [],
       };
 
       const txid = await this.rpc.sendStakingTransaction(stakeJson);
@@ -1453,6 +1450,7 @@ export class LoadedAppClass extends Component<
       //   But I have to restart the sync if needed.
       let result: string = await RPCModule.loadExistingWallet(
         value.uri,
+        // 'regtest',
         value.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),

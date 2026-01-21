@@ -25,7 +25,6 @@ import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../../app/types';
 import {
-  ChainNameEnum,
   RouteEnum,
   SendPageStateClass,
   ToAddrClass,
@@ -33,10 +32,6 @@ import {
 import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
 import { ContextAppLoaded } from '../../../app/context';
 import Utils from '../../../app/utils';
-import {
-  MINER_ADDRESS_REGTEST,
-  MINER_ADDRESS_TESTNET,
-} from '../../../app/utils/constants';
 import FadeText from '../../Components/FadeText';
 import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
@@ -74,8 +69,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
-  const { totalBalance, defaultUnifiedAddress, indexerServer, info, privacy } =
-    useContext(ContextAppLoaded);
+  const { totalBalance, info, privacy } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -169,7 +163,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     );
 
     const stakingAction: StakingActionType = {
-      kind: 'stake',
+      kind: 'create_bond',
       val: amount * 10 ** 8,
       target: reverseHexBytes(finalizer),
       // source: '',

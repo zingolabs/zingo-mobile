@@ -81,7 +81,7 @@ const getPercent = (percent: number) => {
   );
 };
 
-type StakingUiKind = 'stake' | 'unstake_request' | 'unstake_payout';
+type StakingUiKind = 'create_bond' | 'begin_unstake' | 'withdraw_bond';
 
 type StakingMovement = ValueTransferType & {
   stakingUiKind: StakingUiKind;
@@ -196,67 +196,32 @@ const Staking: React.FC<StakingProps> = () => {
     if (!valueTransfers) {
       return [];
     }
-    const localTxids = new Set(
-      valueTransfers
-        .map(vt => vt.txid)
-        .filter((txid): txid is string => !!txid),
-    );
-
-    const normalizeMemos = (memos: unknown): string[] => {
-      if (!memos) return [];
-      if (Array.isArray(memos)) {
-        return memos
-          .filter((m): m is string => typeof m === 'string')
-          .map(m => m.replace(/\0+$/g, ''));
-      }
-      if (typeof memos === 'string') {
-        return [memos.replace(/\0+$/g, '')];
-      }
-      return [];
-    };
 
     return valueTransfers
-      .map<StakingMovement | null>(vt => {
+      .map(vt => {
+        console.log('VALUE TRANSFER FOUND', vt);
+
         const action = vt.stakingAction;
 
-        if (action?.kind === 'add') {
-          if (vt.amount === 0 || vt.amount !== action.val) {
-            return null;
-          }
-          return { ...vt, stakingUiKind: 'stake' };
+        if (action?.kind === 'create_bond') {
+          return { ...vt, stakingUiKind: 'create_bond' };
         }
 
-        if (action?.kind === 'sub') {
-          return { ...vt, stakingUiKind: 'unstake_request' };
+        if (action?.kind === 'begin_unstake') {
+          return { ...vt, stakingUiKind: 'begin_unstake' };
         }
 
-        const memos = normalizeMemos((vt as any).memos);
-        if (!memos.length) {
-          return null;
-        }
-
-        const prefix = '@UNSTAKE_RECEIVE: ';
-        const matchingMemo = memos.find(m => m.startsWith(prefix));
-        if (!matchingMemo) {
-          return null;
-        }
-
-        const afterPrefix = matchingMemo.slice(prefix.length).trim();
-        const [refTxid] = afterPrefix.split(/\s+/);
-
-        if (!refTxid || !/^[0-9a-fA-F]{64}$/.test(refTxid)) {
-          return null;
-        }
-
-        if (!localTxids.has(refTxid)) {
-          return null;
+        if (action?.kind === 'withdraw_stake') {
+          return { ...vt, stakingUiKind: 'withdraw_stake' };
         }
 
         if (vt.amount <= 0) {
           return null;
         }
 
-        return { ...vt, stakingUiKind: 'unstake_payout' };
+        console.log(vt);
+
+        return null;
       })
       .filter((vt): vt is StakingMovement => vt !== null)
       .sort((a, b) => b.time - a.time);
@@ -286,6 +251,8 @@ const Staking: React.FC<StakingProps> = () => {
   }, [staked]);
 
   const { colors } = useTheme() as unknown as ThemeType;
+
+  console.log('MOVEMENTS -> ', movements);
 
   const hasMovements = !loading && movements.length > 0;
   const hasStaked = !loading && stakedData.length > 0;
@@ -706,15 +673,16 @@ const Staking: React.FC<StakingProps> = () => {
                   }> | null = null;
 
                   switch (item.stakingUiKind) {
-                    case 'stake': {
-                      label = 'Staked';
+                    case 'create_bond': {
+                      label = 'Bond Created';
                       Icon = Stake;
-                      amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
+                      const fee = item.fee ?? 0;
+                      amountLabel = `+${(fee - 0.0001).toFixed(2)} cTAZ`;
                       break;
                     }
 
-                    case 'unstake_request': {
-                      label = 'Unstake request';
+                    case 'begin_unstake': {
+                      label = 'BEGIN_UNBONDING';
                       Icon = Unstake;
 
                       const valZats = item.stakingAction?.val ?? 0;
@@ -723,8 +691,8 @@ const Staking: React.FC<StakingProps> = () => {
                       break;
                     }
 
-                    case 'unstake_payout': {
-                      label = 'Unstaked';
+                    case 'withdraw_bond': {
+                      label = 'BOND_WITHDRAWAL';
                       Icon = Unstake;
                       amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
                       break;

@@ -237,7 +237,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       // lightwallet server
       if (settings.indexerServer) {
         // because I don't know what the app have in chain name...
-        settings.indexerServer.chainName = ChainNameEnum.testChainName
+        settings.indexerServer.chainName = ChainNameEnum.testChainName;
         setIndexerServer(settings.indexerServer);
       } else {
         await SettingsFileImpl.writeSettings(
@@ -557,6 +557,7 @@ export class LoadingAppClass extends Component<
       let result: string = await RPCModule.loadExistingWallet(
         this.state.indexerServer.uri,
         this.state.indexerServer.chainName,
+        // 'regtest',
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );

@@ -40,7 +40,7 @@ import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 
 interface StakingActionType {
-  kind: 'stake' | 'begin_unstake' | 'withdraw_stake' | 'redelegate';
+  kind: 'create_bond' | 'begin_unstake' | 'withdraw_stake' | 'redelegate';
   val: number;
   target: string;
   source: string;
@@ -740,6 +740,7 @@ export default class RPC {
         let result: string = await RPCModule.loadExistingWallet(
           this.indexerServer.uri,
           this.indexerServer.chainName,
+          'regtest',
           this.performanceLevel,
           GlobalConst.minConfirmations.toString(),
         );
@@ -1748,7 +1749,7 @@ export default class RPC {
 
         let proposeStr = '';
 
-        if (action.kind === 'stake') {
+        if (action.kind === 'create_bond') {
           const payload = {
             amount_zats: action.val, // must be integer zats
             finalizer_address: action.target, // 32-byte hex string

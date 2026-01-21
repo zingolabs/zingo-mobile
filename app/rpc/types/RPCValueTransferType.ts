@@ -18,7 +18,7 @@ export type RPCValueTransferType = {
 };
 
 type RPCStakingActionType = {
-  kind: 'stake' | 'begin_unstake' | 'withdraw_stake' | 'redelegate';
+  kind: 'create_bond' | 'begin_unstake' | 'withdraw_stake' | 'redelegate';
   val: number;
   target: string;
   source: string;
