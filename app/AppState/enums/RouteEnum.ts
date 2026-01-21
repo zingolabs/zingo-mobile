@@ -31,7 +31,7 @@ export enum RouteEnum {
   Pools = 'Pools',
   ContactList = 'ContactList',
   StakingHome = 'StakingHome',
-  Stake = 'create_bond',
+  Stake = 'Stake',
   Unstake = 'Unstake',
   Distribution = 'Distribution',
   Redelegate = 'Redelegate',
