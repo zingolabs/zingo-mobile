@@ -401,7 +401,6 @@ export default class RPC {
         this.fetchWalletBirthdaySeedUfvkLock ||
         this.fetchInfoAndServerHeightLock ||
         this.fetchAddressesLock ||
-        this.fetchTotalBalanceLock ||
         this.fetchTandZandOValueTransfersLock ||
         this.fetchTandZandOMessagesLock ||
         this.fetchSyncStatusLock ||
