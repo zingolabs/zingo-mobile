@@ -9,7 +9,7 @@ import { render } from '@testing-library/react-native';
 import App from '../App';
 
 jest.mock('@noble/hashes/sha2.js', () => ({
-  sha256: jest.fn(() => new Uint8Array([1, 2, 3])), // lo que necesites
+  sha256: jest.fn(() => new Uint8Array([1, 2, 3])),
 }));
 
 jest.mock('@noble/hashes/utils.js', () => ({

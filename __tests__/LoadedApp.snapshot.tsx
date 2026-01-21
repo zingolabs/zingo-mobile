@@ -13,7 +13,7 @@ import { LaunchingModeEnum, RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@noble/hashes/sha2.js', () => ({
-  sha256: jest.fn(() => new Uint8Array([1, 2, 3])), // lo que necesites
+  sha256: jest.fn(() => new Uint8Array([1, 2, 3])),
 }));
 
 jest.mock('@noble/hashes/utils.js', () => ({
