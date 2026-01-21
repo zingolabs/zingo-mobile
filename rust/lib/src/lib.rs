@@ -35,7 +35,7 @@ use rustls::crypto::{CryptoProvider, ring::default_provider};
 use zcash_address::unified::{Container, Encoding, Ufvk};
 use zcash_keys::address::Address;
 use zcash_keys::keys::UnifiedFullViewingKey;
-use zcash_protocol::consensus::{BlockHeight, NetworkType};
+use zcash_protocol::consensus::{BlockHeight, NetworkType, TEST_NETWORK};
 
 use pepper_sync::config::{PerformanceLevel, SyncConfig, TransparentAddressDiscovery};
 use pepper_sync::keys::transparent;
@@ -1804,7 +1804,7 @@ pub fn withdraw_stake(withdraw_stake_json: String) -> Result<String, ZingolibErr
                     .wallet
                     .write()
                     .await
-                    .withdraw_bond_using_orchard(&REGTEST_NETWORK, &mut client, &bond_key)
+                    .withdraw_bond_using_orchard(&TEST_NETWORK, &mut client, &bond_key)
                     .await
                 {
                     Some(txid) => object! { "txid" => txid.to_string() }.pretty(2),
