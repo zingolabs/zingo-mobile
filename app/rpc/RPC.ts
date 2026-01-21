@@ -40,12 +40,13 @@ import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 
 interface StakingActionType {
-  kind: 'create_bond' | 'begin_unstake' | 'withdraw_stake' | 'redelegate';
+  kind: 'create_bond' | 'begin_unbonding' | 'withdraw_stake' | 'redelegate';
   val: number;
   target: string;
   source: string;
   insecureTargetName: string;
   insecureSourceName: string;
+  unique_public_key: string;
 }
 
 export default class RPC {
@@ -1054,7 +1055,7 @@ export default class RPC {
           pubKey: m.pub_key,
           votingPower: (m.voting_power || 0) / 10 ** 8,
         }))
-        .filter(_m => false); // TODO: Properly apply filter
+        .filter(_m => true); // TODO: Properly apply filter
 
       this.fnSetStaked(stakedList);
       this.fnSetGlobalStaked(globalStakedList);
@@ -1387,6 +1388,7 @@ export default class RPC {
 
       const start2 = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
+
       if (Date.now() - start2 > 4000) {
         console.log(
           '=========================================== > value transfers - ',
@@ -1478,6 +1480,7 @@ export default class RPC {
             } else {
               currentValueTransferList.stakingAction = {
                 kind: vt.staking_action?.kind,
+                unique_public_key: vt.staking_action?.unique_public_key,
                 val:
                   (!vt.staking_action?.val ? 0 : vt.staking_action.val) /
                   10 ** 8,
@@ -1758,14 +1761,14 @@ export default class RPC {
           console.log('HEEEEEEEEEEREREREREE');
 
           proposeStr = await RPCModule.stakeProcess(JSON.stringify(payload));
-          // } else if (action.kind === 'begin_unstake') {
+          // } else if (action.kind === 'begin_unbonding') {
           //   // begin_unstake()
           //   // You need the bond/create txid here (string). Use whatever your UI stores.
           //   // Commonly action.txid or stakeJson.stakingActionTxid etc.
           //   proposeStr = await RPCModule.beginUnstakeProcess(action.txid);
-          // } else if (action.kind === 'withdraw_stake') {
+        } else if (action.kind === 'withdraw_stake') {
           //   // withdraw_stake()
-          //   proposeStr = await RPCModule.withdrawStakeProcess(action.txid);
+          // proposeStr = await RPCModule.withdrawStakeProcess(action.txid);
         } else {
           sendError = `Error: Unsupported stakingAction.kind ${action.kind}`;
         }
@@ -1825,6 +1828,123 @@ export default class RPC {
     });
 
     return sendTxPromise;
+  }
+  async sendBeginUnstakingTx(bondCreateTxid: string): Promise<string> {
+    return new Promise<string>(async (resolve, reject) => {
+      await this.clearTimers();
+      this.setInSend(true);
+      this.keepAwake(true);
+
+      let sendError = '';
+      let sendTxids = '';
+
+      try {
+        if (!/^[0-9a-fA-F]{64}$/.test(bondCreateTxid)) {
+          sendError = 'Error: begin_unstake requires a 64-hex create_bond txid';
+        }
+
+        // 1) propose begin_unstake
+        let proposeStr = '';
+        if (!sendError) {
+          proposeStr = await RPCModule.beginUnstakeProcess(bondCreateTxid);
+
+          if (!proposeStr) {
+            sendError = 'Error: Internal RPC Error: begin_unstake propose';
+          } else if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+            sendError = proposeStr;
+          } else {
+            const proposeJSON: RPCSendProposeType = JSON.parse(proposeStr);
+            if (proposeJSON.error) sendError = proposeJSON.error;
+          }
+        }
+
+        // 2) confirm
+        if (!sendError) {
+          const sendStr: string = await RPCModule.confirmProcess();
+
+          if (!sendStr) {
+            sendError = 'Error: Internal RPC Error: confirm';
+          } else if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
+            sendError = sendStr;
+          } else {
+            const sendJSON: RPCSendType = JSON.parse(sendStr);
+            if (sendJSON.error) {
+              sendError = sendJSON.error;
+            } else if (sendJSON.txids?.length) {
+              sendTxids = sendJSON.txids.join(', ');
+            } else {
+              sendError = 'Error: confirm returned no txids';
+            }
+          }
+        }
+      } catch (e) {
+        sendError = `Error: begin_unstake ${e}`;
+      }
+
+      await this.configure();
+      this.setInSend(false);
+
+      if (sendTxids) return resolve(sendTxids);
+      return reject(sendError || 'Error: begin_unstake failed');
+    });
+  }
+  async sendWithdrawBondTx(bondCreateTxid: string): Promise<string> {
+    return new Promise<string>(async (resolve, reject) => {
+      await this.clearTimers();
+      this.setInSend(true);
+      this.keepAwake(true);
+
+      let sendError = '';
+      let sendTxids = '';
+
+      try {
+        if (!/^[0-9a-fA-F]{64}$/.test(bondCreateTxid)) {
+          sendError =
+            'Error: withdraw_stake requires a 64-hex create_bond txid';
+        }
+
+        let proposeStr = '';
+        if (!sendError) {
+          proposeStr = await RPCModule.withdrawStakeProcess(bondCreateTxid);
+
+          if (!proposeStr) {
+            sendError = 'Error: Internal RPC Error: withdraw_stake propose';
+          } else if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+            sendError = proposeStr;
+          } else {
+            const proposeJSON: RPCSendProposeType = JSON.parse(proposeStr);
+            if (proposeJSON.error) sendError = proposeJSON.error;
+          }
+        }
+
+        if (!sendError) {
+          const sendStr: string = await RPCModule.confirmProcess();
+
+          if (!sendStr) {
+            sendError = 'Error: Internal RPC Error: confirm';
+          } else if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
+            sendError = sendStr;
+          } else {
+            const sendJSON: RPCSendType = JSON.parse(sendStr);
+            if (sendJSON.error) {
+              sendError = sendJSON.error;
+            } else if (sendJSON.txids?.length) {
+              sendTxids = sendJSON.txids.join(', ');
+            } else {
+              sendError = 'Error: confirm returned no txids';
+            }
+          }
+        }
+      } catch (e) {
+        sendError = `Error: withdraw_stake ${e}`;
+      }
+
+      await this.configure();
+      this.setInSend(false);
+
+      if (sendTxids) return resolve(sendTxids);
+      return reject(sendError || 'Error: withdraw_stake failed');
+    });
   }
 
   async changeWallet() {

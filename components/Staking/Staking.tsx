@@ -81,7 +81,7 @@ const getPercent = (percent: number) => {
   );
 };
 
-type StakingUiKind = 'create_bond' | 'begin_unstake' | 'withdraw_bond';
+type StakingUiKind = 'create_bond' | 'begin_unbonding' | 'withdraw_bond';
 
 type StakingMovement = ValueTransferType & {
   stakingUiKind: StakingUiKind;
@@ -207,8 +207,8 @@ const Staking: React.FC<StakingProps> = () => {
           return { ...vt, stakingUiKind: 'create_bond' };
         }
 
-        if (action?.kind === 'begin_unstake') {
-          return { ...vt, stakingUiKind: 'begin_unstake' };
+        if (action?.kind === 'begin_unbonding') {
+          return { ...vt, stakingUiKind: 'begin_unbonding' };
         }
 
         if (action?.kind === 'withdraw_stake') {
@@ -674,15 +674,15 @@ const Staking: React.FC<StakingProps> = () => {
 
                   switch (item.stakingUiKind) {
                     case 'create_bond': {
-                      label = 'Bond Created';
+                      label = 'Bond created';
                       Icon = Stake;
                       const fee = item.fee ?? 0;
                       amountLabel = `+${(fee - 0.0001).toFixed(2)} cTAZ`;
                       break;
                     }
 
-                    case 'begin_unstake': {
-                      label = 'BEGIN_UNBONDING';
+                    case 'begin_unbonding': {
+                      label = 'Begin unbonding';
                       Icon = Unstake;
 
                       const valZats = item.stakingAction?.val ?? 0;
@@ -692,7 +692,7 @@ const Staking: React.FC<StakingProps> = () => {
                     }
 
                     case 'withdraw_bond': {
-                      label = 'BOND_WITHDRAWAL';
+                      label = 'Withdraw bond';
                       Icon = Unstake;
                       amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
                       break;

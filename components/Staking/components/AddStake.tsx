@@ -166,6 +166,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       kind: 'create_bond',
       val: amount * 10 ** 8,
       target: reverseHexBytes(finalizer),
+      unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
       // source: '',
       // insecureSourceName: '',
       // insecureTargetName: '',

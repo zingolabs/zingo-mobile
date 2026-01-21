@@ -1261,6 +1261,24 @@ export class LoadedAppClass extends Component<
     }
   };
 
+  beginUnstakeTransaction = async (createBondTxid: string): Promise<string> => {
+    try {
+      const txid = await this.rpc.sendBeginUnstakingTx(createBondTxid);
+      return txid;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  withdrawBondTransaction = async (createBondTxid: string): Promise<string> => {
+    try {
+      const txid = await this.rpc.sendWithdrawBondTx(createBondTxid);
+      return txid;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   doRefresh = (screen: ScreenEnum) => {
     //console.log('================== MANUAL REFRESH ================== ', screen);
     if (screen === ScreenEnum.History || screen === ScreenEnum.ContactList) {
@@ -2075,6 +2093,8 @@ export class LoadedAppClass extends Component<
                   <Unstake
                     {...props}
                     stakeTransaction={this.stakeTransaction}
+                    beginUnstakeTransaction={this.beginUnstakeTransaction}
+                    withdrawBondTransaction={this.withdrawBondTransaction}
                   />
                 )}
               </InnerStack.Screen>
