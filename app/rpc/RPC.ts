@@ -741,7 +741,7 @@ export default class RPC {
         let result: string = await RPCModule.loadExistingWallet(
           this.indexerServer.uri,
           this.indexerServer.chainName,
-          'regtest',
+          // 'regtest',
           this.performanceLevel,
           GlobalConst.minConfirmations.toString(),
         );
