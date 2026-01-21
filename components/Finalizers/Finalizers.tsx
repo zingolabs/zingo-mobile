@@ -103,29 +103,26 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    let filtered: StakeType[] = scope === 'my' ? staked : globalStaked;
-    if (exclude) {
-      filtered = filtered.filter((item: StakeType) => item.pubKey !== exclude);
-    }
+    console.log('SCOPE', scope);
+
+    let base: StakeType[] = scope === 'my' ? staked : globalStaked;
+
+    if (exclude) base = base.filter(i => i.pubKey !== exclude);
+
     if (searchText) {
-      filtered = filtered
-        .filter((item: StakeType) =>
-          item.pubKey.toLowerCase().includes(searchText.toLowerCase()),
-        )
-        .sort((a, b) => b.votingPower - a.votingPower);
-    } else {
-      filtered = filtered.sort((a, b) => b.votingPower - a.votingPower);
+      const q = searchText.toLowerCase();
+      base = base.filter(i => i.pubKey.toLowerCase().includes(q));
     }
+
+    base = base.sort((a, b) => b.votingPower - a.votingPower);
 
     const withdrawnKeys = new Set(
       (valueTransfers ?? [])
         .map(vt => vt.stakingAction)
         .filter((sa): sa is NonNullable<typeof sa> => !!sa)
-        .filter(sa => sa.kind === 'withdraw_stake')
+        .filter(sa => sa.kind === 'withdraw_bond')
         .map(sa => sa.target),
     );
-
-    console.log('WITHDRAWN KEYS', withdrawnKeys);
 
     const activeBondKeys = Array.from(
       new Set(
@@ -138,18 +135,21 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
       ),
     );
 
-    console.log('ACTIVE BOND KEYS', activeBondKeys);
+    const activeSet = new Set(activeBondKeys.map(k => k.toLowerCase()));
 
-    const activeFinalizers = globalStaked.filter(s =>
-      activeBondKeys.includes(reverseHex32Bytes(s.pubKey)),
-    );
+    const finalList =
+      activeSet.size === 0
+        ? base
+        : base.filter(s => {
+            const pk = s.pubKey.toLowerCase();
+            const rev = reverseHex32Bytes(s.pubKey).toLowerCase();
+            return activeSet.has(pk) || activeSet.has(rev);
+          });
 
-    console.log('ACTIVE FINALIZERS', activeFinalizers);
+    setStakedFiltered(finalList);
 
-    setStakedFiltered(activeFinalizers);
     if (randomColors.length === 0) {
-      const rc = Utils.generateColorList(filtered.length + 10);
-      setRandomColors(rc);
+      setRandomColors(Utils.generateColorList(finalList.length + 10));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalStaked, randomColors.length, searchText, staked]); // scope won't change

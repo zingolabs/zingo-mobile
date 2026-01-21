@@ -924,6 +924,7 @@ export class LoadedAppClass extends Component<
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
   ) => {
+    console.log('VALUE TRANSFERS', valueTransfers);
     const basicFirstViewSeed = (await SettingsFileImpl.readSettings())
       .basicFirstViewSeed;
     // only for basic mode

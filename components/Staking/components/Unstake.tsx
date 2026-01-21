@@ -261,6 +261,11 @@ const Unstake: React.FC<UnstakeProps> = ({
     selectedTx: ValueTransferType,
     valueTransfers: ValueTransferType[] | undefined,
   ): string | null => {
+    console.log('getBondTxidDisplayFromSelection selectedTx', selectedTx);
+    console.log(
+      'getBondTxidDisplayFromSelection valueTransfers',
+      valueTransfers,
+    );
     const a = selectedTx.stakingAction as any;
     if (!a) return null;
 
@@ -297,13 +302,16 @@ const Unstake: React.FC<UnstakeProps> = ({
       return;
     }
 
+    console.log('bondTxid', bondTxid);
+    console.log('selectedKind', selectedKind);
+
     setModalState('sending');
 
     try {
       if (selectedKind === 'create_bond') {
         await beginUnstakeTransaction(bondTxid);
       } else if (selectedKind === 'begin_unbonding') {
-        await withdrawBondTransaction(bondTxid);
+        await withdrawBondTransaction(selectedTx.txid);
       } else {
         Alert.alert(
           'Error',

@@ -211,8 +211,8 @@ const Staking: React.FC<StakingProps> = () => {
           return { ...vt, stakingUiKind: 'begin_unbonding' };
         }
 
-        if (action?.kind === 'withdraw_stake') {
-          return { ...vt, stakingUiKind: 'withdraw_stake' };
+        if (action?.kind === 'withdraw_bond') {
+          return { ...vt, stakingUiKind: 'withdraw_bond' };
         }
 
         if (vt.amount <= 0) {
