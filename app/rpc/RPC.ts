@@ -33,12 +33,13 @@ import { RPCSyncPollType } from './types/RPCSyncPollType';
 import { RPCZecPriceType } from './types/RPCZecPriceType';
 import { RPCTransparentAddressType } from './types/RPCTransparentAddressType';
 import { RPCSpendablebalanceType } from './types/RPCSpendablebalanceType';
-import { RPCWalletSaveRequiredType } from './types/RPCWalletSaveRequiredType';
+//import { RPCWalletSaveRequiredType } from './types/RPCWalletSaveRequiredType';
 import { RPCConfigWalletPerformanceType } from './types/RPCConfigWalletPerformanceType';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
+import { reverseHex32Bytes } from '../utils/hex';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -375,17 +376,17 @@ export default class RPC {
     );
 
     // if the wallet needs to save, means the App needs to fetch all the new data
-    if (!(await this.getWalletSaveRequired())) {
-      console.log('***************** NOT SAVE REQUIRED: No fetching data');
+    //if (!(await this.getWalletSaveRequired())) {
+    //  console.log('***************** NOT SAVE REQUIRED: No fetching data');
       // do need this because of the sync process
-      taskPromises.push(
-        new Promise<void>(async resolve => {
-          await this.fetchSyncPoll();
-          //console.log('INTERVAL poll sync');
-          resolve();
-        }),
-      );
-    } else {
+    //  taskPromises.push(
+    //    new Promise<void>(async resolve => {
+    //      await this.fetchSyncPoll();
+    //      //console.log('INTERVAL poll sync');
+    //      resolve();
+    //    }),
+    //  );
+    //} else {
       if (
         this.getWalletSaveRequiredLock ||
         this.fetchWalletHeightLock ||
@@ -480,7 +481,7 @@ export default class RPC {
           }),
         );
       }
-    }
+    //}
 
     Promise.allSettled(taskPromises);
   }
@@ -1033,6 +1034,8 @@ export default class RPC {
         }>;
       };
 
+      console.log('ROSTERRRRR', rosterInfo);
+
       const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
         m => ({
           pubKey: m.pub_key,
@@ -1204,7 +1207,7 @@ export default class RPC {
       return;
     }
   }
-
+/*
   async getWalletSaveRequired(): Promise<boolean> {
     try {
       if (this.getWalletSaveRequiredLock) {
@@ -1246,7 +1249,7 @@ export default class RPC {
       return false;
     }
   }
-
+*/
   async getConfigWalletPerformance(): Promise<
     RPCPerformanceLevelEnum | undefined
   > {
@@ -1474,7 +1477,7 @@ export default class RPC {
                 val:
                   (!vt.staking_action?.val ? 0 : vt.staking_action.val) /
                   10 ** 8,
-                target: vt.staking_action?.target,
+                target: reverseHex32Bytes(vt.staking_action?.target),
               } as StakingActionType;
             }
 

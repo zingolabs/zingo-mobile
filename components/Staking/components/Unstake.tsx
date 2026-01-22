@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
@@ -36,7 +36,6 @@ import Utils from '../../../app/utils';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
-import { reverseHex32Bytes } from '../../../app/utils/hex';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -84,6 +83,8 @@ const Unstake: React.FC<UnstakeProps> = ({
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
 
+  const launchedSelectorRef = useRef<boolean>(false);
+
   const [_accumulatedStakeByTxid, setAccumulatedStakeByTxid] = useState<
     Record<string, string>
   >({});
@@ -110,7 +111,7 @@ const Unstake: React.FC<UnstakeProps> = ({
       if (!sa || sa.kind !== 'create_bond') return false;
 
       if (!finalizerFromText) return true;
-      return reverseHex32Bytes(sa.target) === finalizerFromText;
+      return sa.target === finalizerFromText;
     });
 
     const beginByBondKey = new Map<string, ValueTransferType>();
@@ -173,8 +174,19 @@ const Unstake: React.FC<UnstakeProps> = ({
     };
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (launchedSelectorRef.current && !finalizerFromText) {
+        if (navigation.canGoBack) {
+          navigation.goBack();
+        }
+      }
+    }, [finalizerFromText, navigation])
+  );
+  
   useEffect(() => {
     if (!finalizerFromText) {
+      launchedSelectorRef.current = true;
       navigation.navigate(RouteEnum.Finalizers, {
         setFinalizer: (f: string, s: number) => {
           setFinalizerFromText(f);
@@ -322,10 +334,11 @@ const Unstake: React.FC<UnstakeProps> = ({
       }
 
       setModalState('success');
-    } catch (e) {
-      console.warn('Staking tx failed:', e);
-      Alert.alert('Error', 'Staking transaction failed. Please try again.');
+    } catch (error) {
+      console.warn('Staking tx failed:', error);
       setModalState('idle');
+      //Alert.alert('Error', 'Staking transaction failed. Please try again.');
+      navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
   };
 

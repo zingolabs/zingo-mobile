@@ -97,7 +97,10 @@ const ComputingError: React.FunctionComponent<ComputingErrorProps> = ({
               style={{ marginLeft: 10 }}
               title={'Back'}
               onPress={() => {
-                navigation.navigate(RouteEnum.MainTabs, { screen: RouteEnum.History });
+                //navigation.navigate(RouteEnum.MainTabs, { screen: RouteEnum.History });
+                if (navigation.canGoBack) {
+                  navigation.goBack();
+                }
               }}
               twoButtons={true}
             />

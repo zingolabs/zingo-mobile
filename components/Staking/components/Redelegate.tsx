@@ -46,7 +46,6 @@ import {
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
-import { reverseHex32Bytes } from '../../../app/utils/hex';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -109,7 +108,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
       if (!sa || sa.kind !== 'create_bond') return false;
 
       if (!finalizerFromText) return true;
-      return reverseHex32Bytes(sa.target) === finalizerFromText;
+      return sa.target === finalizerFromText;
     });
 
     const beginByBondKey = new Map<string, ValueTransferType>();
@@ -317,10 +316,11 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
     try {
       await stakeTransaction(sendPageState, stakingAction);
       setModalState('success');
-    } catch (e) {
-      console.warn('Unstake tx failed:', e);
-      Alert.alert('Error', 'Staking transaction failed. Please try again.');
+    } catch (error) {
+      console.warn('Unstake tx failed:', error);
       setModalState('idle');
+      //Alert.alert('Error', 'Staking transaction failed. Please try again.');
+      navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
   };
 
