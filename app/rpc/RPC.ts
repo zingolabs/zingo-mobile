@@ -1652,7 +1652,7 @@ export default class RPC {
 
   // Send a transaction using the already constructed sendJson structure
   async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
-    const sendTxPromise = new Promise<string>(async (resolve, reject) => {
+    return new Promise<string>(async (resolve, reject) => {
       // clear the timers - Tasks.
       await this.clearTimers();
       // sending
@@ -1717,26 +1717,16 @@ export default class RPC {
 
       await this.refreshSync();
 
-      if (sendTxids) {
-        console.log('00000000 RESOLVE send', sendTxids);
-        resolve(sendTxids);
-        return;
-      }
-      if (sendError) {
-        console.log('00000000 REJECT send', sendError);
-        reject(sendError);
-        return;
-      }
+      if (sendTxids) return resolve(sendTxids);
+      return reject(sendError || 'Error: send failed');
     });
-
-    return sendTxPromise;
   }
 
   // Send a staking transaction using the already constructed stakeJson structure
   async sendStakingTransaction(
     stakeJson: StakeJsonToTypeType,
   ): Promise<string> {
-    const sendTxPromise = new Promise<string>(async (resolve, reject) => {
+    return new Promise<string>(async (resolve, reject) => {
       await this.clearTimers();
       this.setInSend(true);
       this.keepAwake(true);
@@ -1822,12 +1812,13 @@ export default class RPC {
       await this.configure();
       this.setInSend(false);
 
-      if (sendTxids) return resolve(sendTxids);
-      if (sendError) return reject(sendError);
-    });
+      await this.refreshSync();
 
-    return sendTxPromise;
+      if (sendTxids) return resolve(sendTxids);
+      return reject(sendError || 'Error: staking failed');
+    });
   }
+
   async sendBeginUnstakingTx(bondCreateTxid: string): Promise<string> {
     return new Promise<string>(async (resolve, reject) => {
       await this.clearTimers();
@@ -1839,7 +1830,7 @@ export default class RPC {
 
       try {
         if (!/^[0-9a-fA-F]{64}$/.test(bondCreateTxid)) {
-          sendError = 'Error: begin_unstake requires a 64-hex create_bond txid';
+          sendError = 'Error: begin_unstake requires a 64-hex create bond txid';
         }
 
         // 1) propose begin_unstake
@@ -1883,8 +1874,10 @@ export default class RPC {
       await this.configure();
       this.setInSend(false);
 
+      await this.refreshSync();
+
       if (sendTxids) return resolve(sendTxids);
-      return reject(sendError || 'Error: begin_unstake failed');
+      return reject(sendError || 'Error: begin unstake failed');
     });
   }
 
@@ -1900,7 +1893,7 @@ export default class RPC {
       try {
         if (!/^[0-9a-fA-F]{64}$/.test(bondCreateTxid)) {
           sendError =
-            'Error: withdraw_stake requires a 64-hex create_bond txid';
+            'Error: withdraw_stake requires a 64-hex create bond txid';
         }
 
         if (!sendError) {
@@ -1943,6 +1936,8 @@ export default class RPC {
 
       await this.configure();
       this.setInSend(false);
+
+      await this.refreshSync();
 
       if (sendTxids) return resolve(sendTxids);
       return reject(sendError || 'Error: withdraw_stake failed');

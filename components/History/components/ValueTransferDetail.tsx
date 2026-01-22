@@ -65,12 +65,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
 
   const memo = valueTransfer.memos;
 
-  const iconColor =
-      valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'create_bond' 
-        ? '#0091FF80' 
-        : valueTransfer.stakingAction && (valueTransfer.stakingAction.kind === 'begin_unbonding' || valueTransfer.stakingAction.kind === 'withdraw_bond')
-          ? '#FFAF0E80' 
-          : colors.text;
+  const iconColor = Utils.valueTransferKindColor(colors.text, valueTransfer);
 
   const icon =
       valueTransfer.kind === ValueTransferKindEnum.Received || valueTransfer.kind === ValueTransferKindEnum.Shield
@@ -223,11 +218,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
              }}>
               <View style={{ 
                 padding: 20,
-                backgroundColor: valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'create_bond' 
-                  ? '#0091FF80' 
-                  : valueTransfer.stakingAction && (valueTransfer.stakingAction.kind === 'begin_unbonding' || valueTransfer.stakingAction.kind === 'withdraw_bond')
-                    ? '#FFAF0E80' 
-                    : colors.secondary,
+                backgroundColor: Utils.valueTransferKindColor(colors.secondary, valueTransfer),
                 borderRadius: 50,
               }}>
                 {valueTransfer.confirmations >= 0 && valueTransfer.confirmations < GlobalConst.minConfirmations ? (
@@ -239,10 +230,14 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                   />
                 ) : (
                   <>
-                    {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'create_bond' && (
+                    {valueTransfer.stakingAction && 
+                      valueTransfer.stakingAction.kind === 'create_bond' && (
                       <Stake width={30} height={30} />
                     )}
-                    {valueTransfer.stakingAction && (valueTransfer.stakingAction.kind === 'begin_unbonding' || valueTransfer.stakingAction.kind === 'withdraw_bond') && (
+                    {valueTransfer.stakingAction && 
+                      (valueTransfer.stakingAction.kind === 'begin_unbonding' || 
+                        valueTransfer.stakingAction.kind === 'withdraw_bond' ||
+                        valueTransfer.stakingAction.kind === 'redelegate') && (
                       <Unstake width={30} height={30} />
                     )}
                     {valueTransfer.stakingAction === null && (
@@ -258,33 +253,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               </View>
             </View>
 
-            {false && (
+            {true && (
               <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-                {valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations === 0
-                  ? (translate('history.sending') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations !== 0
-                  ? (translate('history.sent') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.Received && valueTransfer.confirmations === 0
-                  ? (translate('history.receiving') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.Received && valueTransfer.confirmations !== 0
-                  ? (translate('history.received') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.MemoToSelf && valueTransfer.confirmations === 0
-                  ? (translate('history.sendingtoself') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.MemoToSelf && valueTransfer.confirmations !== 0
-                  ? (translate('history.memotoself') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.SendToSelf && valueTransfer.confirmations === 0
-                  ? (translate('history.sendingtoself') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.SendToSelf && valueTransfer.confirmations !== 0
-                  ? (translate('history.sendtoself') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.Shield && valueTransfer.confirmations === 0
-                  ? (translate('history.shielding') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.Shield && valueTransfer.confirmations !== 0
-                  ? (translate('history.shield') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.Rejection && valueTransfer.confirmations === 0
-                  ? (translate('history.sending') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.Rejection && valueTransfer.confirmations !== 0
-                  ? (translate('history.rejection') as string)
-                  : ''}
+                {Utils.valueTransferKindText(translate, valueTransfer)}
               </BoldText>
             )}
             <ZecAmount
@@ -348,7 +319,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               borderRadius: 30,
               backgroundColor: colors.secondary,
           }}>
-            {valueTransfer.stakingAction && valueTransfer.stakingAction.kind === 'create_bond' && (
+            {valueTransfer.stakingAction && 
+              valueTransfer.stakingAction.kind === 'create_bond' && (
               <>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
                   <FadeText>{'Target'}</FadeText>
@@ -373,7 +345,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               </>
             )}
 
-            {valueTransfer.stakingAction && (valueTransfer.stakingAction.kind === 'begin_unbonding' || valueTransfer.stakingAction.kind === 'withdraw_bond') && (
+            {valueTransfer.stakingAction && 
+              (valueTransfer.stakingAction.kind === 'begin_unbonding' || 
+                valueTransfer.stakingAction.kind === 'withdraw_bond' ||
+                valueTransfer.stakingAction.kind === 'redelegate') && (
               <>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
                   <FadeText>{'Source'}</FadeText>

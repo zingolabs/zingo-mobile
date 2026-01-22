@@ -130,7 +130,9 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
         .filter(
           (vt: ValueTransferType) =>
             vt.stakingAction !== null &&
-            (vt.stakingAction.kind === 'begin_unbonding' || vt.stakingAction.kind === 'withdraw_bond' || vt.stakingAction.kind === 'redelegate') &&
+            (vt.stakingAction.kind === 'begin_unbonding' || 
+              vt.stakingAction.kind === 'withdraw_bond' || 
+              vt.stakingAction.kind === 'redelegate') &&
             !!vt.stakingAction.source,
         )
         .map(vt => vt.stakingAction!.source),
