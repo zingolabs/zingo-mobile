@@ -167,7 +167,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       val: amount * 10 ** 8,
       target: reverseHexBytes(finalizer),
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
-      // source: '',
+      source: '',
       // insecureSourceName: '',
       // insecureTargetName: '',
       // miner,

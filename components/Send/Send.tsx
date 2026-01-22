@@ -773,61 +773,25 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       navigation.navigate(RouteEnum.ComputingOK, { txid });
       return;
-    } catch (err1) {
-      error = err1 as string;
+    } catch (err) {
+      error = err as string;
 
       customError = interceptCustomError(error);
-
-      // in this point the App is failing, there is two possibilities:
-      // 1. Server Error
-      // 2. Another type of Error
-      // here is worth it to try again...
-      try {
-        const txid = await sendTransaction(sendPageStatePar);
-
-        // Clear the fields
-        clearState();
-
-        // scroll to top in history, just in case.
-        setScrollToTop(true);
-        setScrollToBottom(true);
-
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          [screenName, ScreenEnum.History],
-          translate('send.confirm-title') as string,
-          `${translate('send.Broadcast')} ${txid}`,
-          true,
-          translate,
-        );
-        // the app send successfully on the second attemp.
-
-        navigation.navigate(RouteEnum.ComputingOK, { txid });
-        return;
-      } catch (err2) {
-        error = err2 as string;
-
-        customError = interceptCustomError(error);
-      }
     }
 
-    setTimeout(() => {
-      //console.log('sendtx error', error);
-      // if the App is in background I need to store the error
-      // and when the App come back to foreground shows it to the user.
-      createAlert(
-        setBackgroundError,
-        addLastSnackbar,
-        [screenName],
-        translate('send.sending-error') as string,
-        `${customError ? customError : error}`,
-        false,
-        translate,
-      );
-    }, 1 * 1000);
+    //setTimeout(() => {
+    //  createAlert(
+    //    setBackgroundError,
+    //    addLastSnackbar,
+    //    [screenName],
+    //    translate('send.sending-error') as string,
+    //    `${customError ? customError : error}`,
+    //    false,
+    //    translate,
+    //  );
+    //}, 1 * 1000);
 
-    navigation.navigate(RouteEnum.ComputingOK, { error: `${customError ? customError : error}` });
+    navigation.navigate(RouteEnum.ComputingError, { error: `${customError ? customError : error}` });
   };
 
   const interceptCustomError = (error: string) => {
