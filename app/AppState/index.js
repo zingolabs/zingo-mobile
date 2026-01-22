@@ -22,6 +22,7 @@ import ContactType from './types/ContactType';
 import TransactionType from './types/TransactionType';
 import TxDetailType from './types/TxDetailType';
 import StakeType from './types/StakeType';
+import StakingActionType from './types/StakingActionType';
 
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
@@ -89,6 +90,7 @@ export {
   TransactionType,
   TxDetailType,
   StakeType,
+  StakingActionType,
   MenuItemEnum,
   LanguageEnum,
   ModeEnum,

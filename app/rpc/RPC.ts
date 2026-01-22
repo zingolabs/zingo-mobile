@@ -14,6 +14,7 @@ import {
   ValueTransferKindEnum,
   ServerType,
   StakeType,
+  StakingActionType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCUnifiedAddressType } from './types/RPCUnifiedAddressType';
@@ -38,16 +39,6 @@ import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
-
-interface StakingActionType {
-  kind: 'create_bond' | 'begin_unbonding' | 'withdraw_bond' | 'redelegate';
-  val: number;
-  target: string;
-  source: string;
-  insecureTargetName: string;
-  insecureSourceName: string;
-  unique_public_key: string;
-}
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -1484,9 +1475,6 @@ export default class RPC {
                   (!vt.staking_action?.val ? 0 : vt.staking_action.val) /
                   10 ** 8,
                 target: vt.staking_action?.target,
-                source: vt.staking_action?.source,
-                insecureTargetName: vt.staking_action?.insecure_target_name,
-                insecureSourceName: vt.staking_action?.insecure_source_name,
               } as StakingActionType;
             }
 

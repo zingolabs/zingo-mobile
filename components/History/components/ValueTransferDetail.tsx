@@ -345,34 +345,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               </>
             )}
 
-            {valueTransfer.stakingAction && 
-              (valueTransfer.stakingAction.kind === 'begin_unbonding' || 
-                valueTransfer.stakingAction.kind === 'withdraw_bond' ||
-                valueTransfer.stakingAction.kind === 'redelegate') && (
-              <>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
-                  <FadeText>{'Source'}</FadeText>
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (valueTransfer.stakingAction?.source) {
-                          Clipboard.setString(valueTransfer.stakingAction.source);
-                          addLastSnackbar({
-                            message: translate('history.addresscopied') as string,
-                            duration: SnackbarDurationEnum.short,
-                            screenName: [screenName],
-                          });
-                        }
-                      }}>
-                    <RegText>{Utils.trimToSmall(valueTransfer.stakingAction.source, 10)}</RegText>
-                    </TouchableOpacity>
-                </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
-                  <FadeText>{'Val'}</FadeText>
-                  <RegText>{valueTransfer.stakingAction.val.toString()}</RegText>
-                </View>
-              </>
-            )}
-
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
               <FadeText>{'Status'}</FadeText>
               <RegText>{valueTransfer.status}</RegText>

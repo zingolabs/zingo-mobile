@@ -29,7 +29,7 @@ import {
   SendPageStateClass,
   ToAddrClass,
 } from '../../../app/AppState';
-import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
+import { StakingActionType } from '../../../app/AppState';
 import { ContextAppLoaded } from '../../../app/context';
 import Utils from '../../../app/utils';
 import FadeText from '../../Components/FadeText';
@@ -167,10 +167,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       val: amount * 10 ** 8,
       target: reverseHexBytes(finalizer),
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
-      source: '',
-      // insecureSourceName: '',
-      // insecureTargetName: '',
-      // miner,
     };
 
     console.log('Staking action:', stakingAction);

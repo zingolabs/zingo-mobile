@@ -31,7 +31,7 @@ import {
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
-import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
+import { StakingActionType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
