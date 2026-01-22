@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import {
   Alert,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
@@ -29,7 +29,7 @@ import {
   SendPageStateClass,
   ToAddrClass,
 } from '../../../app/AppState';
-import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
+import { StakingActionType } from '../../../app/AppState';
 import { ContextAppLoaded } from '../../../app/context';
 import Utils from '../../../app/utils';
 import FadeText from '../../Components/FadeText';
@@ -37,7 +37,7 @@ import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 
-const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
+const PRESET_AMOUNTS = [0.01, 0.1, 1, 10]; 
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -78,6 +78,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const [kbOpen, setKbOpen] = useState<boolean>(false);
   const [spendable, setSpendable] = useState<number>(0);
 
+  const launchedSelectorRef = useRef<boolean>(false);
+
   const hasSelection = selectedAmount !== null;
   const displayAmount = selectedAmount ?? 0;
 
@@ -93,7 +95,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   }, []);
 
   useEffect(() => {
-    // Balance check (in cTAZ / ZEC units)
+    // Balance check (in cTAZ / ZEC units) 
     const _spendable =
       totalBalance && typeof totalBalance.totalSpendableBalance === 'number'
         ? totalBalance.totalSpendableBalance
@@ -101,8 +103,19 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     setSpendable(_spendable);
   }, [totalBalance, totalBalance?.totalSpendableBalance]);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (launchedSelectorRef.current && !finalizerText) {
+        if (navigation.canGoBack) {
+          navigation.goBack();
+        }
+      }
+    }, [finalizerText, navigation])
+  );
+
   useEffect(() => {
     if (!finalizerText) {
+      launchedSelectorRef.current = true;
       navigation.navigate(RouteEnum.Finalizers, {
         setFinalizer: (f: string, s: number) => {
           setFinalizerText(f);
@@ -167,10 +180,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       val: amount * 10 ** 8,
       target: reverseHexBytes(finalizer),
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
-      source: '',
-      // insecureSourceName: '',
-      // insecureTargetName: '',
-      // miner,
     };
 
     console.log('Staking action:', stakingAction);
@@ -180,10 +189,11 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     try {
       await stakeTransaction(sendPageState, stakingAction);
       setModalState('success');
-    } catch (e) {
-      console.warn('Stake tx failed:', e);
-      Alert.alert('Error', 'Staking transaction failed. Please try again.');
+    } catch (error) {
+      console.warn('Stake tx failed:', error);
       setModalState('idle');
+      //Alert.alert('Error', 'Staking transaction failed. Please try again.');
+      navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
   };
 

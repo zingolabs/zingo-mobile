@@ -80,12 +80,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   //};
   //const maxWidthHit = useRef<boolean>(false);
 
-  const amountColor =
-      vt.stakingAction && vt.stakingAction.kind === 'create_bond' 
-        ? '#0091FF80' 
-        : vt.stakingAction && (vt.stakingAction.kind === 'begin_unbonding' || vt.stakingAction.kind === 'withdraw_bond' )
-          ? '#FFAF0E80' 
-          : colors.text;
+  const amountColor = Utils.valueTransferKindColor(colors.text, vt);
 
   const icon =
       vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
@@ -346,7 +341,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     {vt.stakingAction && vt.stakingAction.kind === 'create_bond' && (
                       <Stake width={20} height={20} />
                     )}
-                    {vt.stakingAction && (vt.stakingAction.kind === 'begin_unbonding' || vt.stakingAction.kind === 'withdraw_bond') && (
+                    {vt.stakingAction && 
+                      (vt.stakingAction.kind === 'begin_unbonding' || 
+                        vt.stakingAction.kind === 'withdraw_bond' ||
+                        vt.stakingAction.kind === 'redelegate') && (
                       <Unstake width={20} height={20} />
                     )}
                     {vt.stakingAction === null && (
@@ -376,61 +374,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       fontSize: 18,
                     }}
                   >
-                    {vt.kind === ValueTransferKindEnum.Sent &&
-                    vt.confirmations === 0
-                      ? (translate('history.sending') as string)
-                      : vt.kind === ValueTransferKindEnum.Sent &&
-                          vt.confirmations !== 0
-                        ? (translate('history.sent') as string)
-                        : vt.kind === ValueTransferKindEnum.Received &&
-                            vt.confirmations === 0
-                          ? (translate('history.receiving') as string)
-                          : vt.kind === ValueTransferKindEnum.Received &&
-                              vt.confirmations !== 0
-                            ? (translate('history.received') as string)
-                            : vt.kind === ValueTransferKindEnum.MemoToSelf &&
-                                vt.confirmations === 0
-                              ? (translate('history.sendingtoself') as string)
-                              : vt.kind === ValueTransferKindEnum.MemoToSelf &&
-                                  vt.confirmations !== 0
-                                ? (translate('history.memotoself') as string)
-                                : vt.kind ===
-                                      ValueTransferKindEnum.SendToSelf &&
-                                    vt.confirmations === 0
-                                  ? (translate(
-                                      'history.sendingtoself',
-                                    ) as string)
-                                  : vt.kind ===
-                                        ValueTransferKindEnum.SendToSelf &&
-                                      vt.confirmations !== 0
-                                    ? (translate(
-                                        'history.sendtoself',
-                                      ) as string)
-                                    : vt.kind ===
-                                          ValueTransferKindEnum.Shield &&
-                                        vt.confirmations === 0
-                                      ? (translate(
-                                          'history.shielding',
-                                        ) as string)
-                                      : vt.kind ===
-                                            ValueTransferKindEnum.Shield &&
-                                          vt.confirmations !== 0
-                                        ? (translate(
-                                            'history.shield',
-                                          ) as string)
-                                        : vt.kind ===
-                                              ValueTransferKindEnum.Rejection &&
-                                            vt.confirmations === 0
-                                          ? (translate(
-                                              'history.sending',
-                                            ) as string)
-                                          : vt.kind ===
-                                                ValueTransferKindEnum.Rejection &&
-                                              vt.confirmations !== 0
-                                            ? (translate(
-                                                'history.rejection',
-                                              ) as string)
-                                            : ''}
+                    {Utils.valueTransferKindText(translate, vt)}
                   </FadeText>
 
                   {!!vt.address && (

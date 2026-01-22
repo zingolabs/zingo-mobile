@@ -1,4 +1,4 @@
-import { PoolEnum } from '../../AppState';
+import { PoolEnum, StakingActionType } from '../../AppState';
 import { RPCValueTransfersStatusEnum } from '../enums/RPCValueTransfersStatusEnum';
 import { RPCValueTransfersKindEnum } from '../enums/RPCValueTransfersKindEnum';
 
@@ -14,15 +14,5 @@ export type RPCValueTransferType = {
   recipient_address?: string;
   pool_received?: PoolEnum;
   memos?: string[];
-  staking_action: RPCStakingActionType | null;
-};
-
-type RPCStakingActionType = {
-  kind: 'create_bond' | 'begin_unbonding' | 'withdraw_bond' | 'redelegate';
-  val: number;
-  target: string;
-  source: string;
-  insecure_target_name: string;
-  insecure_source_name: string;
-  unique_public_key: string;
+  staking_action: StakingActionType | null;
 };

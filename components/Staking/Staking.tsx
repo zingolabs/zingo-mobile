@@ -81,7 +81,7 @@ const getPercent = (percent: number) => {
   );
 };
 
-type StakingUiKind = 'create_bond' | 'begin_unbonding' | 'withdraw_bond';
+type StakingUiKind = 'create_bond' | 'begin_unbonding' | 'withdraw_bond' | 'redelegate';
 
 type StakingMovement = ValueTransferType & {
   stakingUiKind: StakingUiKind;
@@ -665,8 +665,8 @@ const Staking: React.FC<StakingProps> = () => {
                   />
                 }
                 renderItem={({ item }: { item: StakingMovement }) => {
-                  let label: string;
-                  let amountLabel: string;
+                  let label: string = '';
+                  let amountLabel: string = '';
                   let Icon: React.ComponentType<{
                     width: number;
                     height: number;

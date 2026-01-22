@@ -37,7 +37,7 @@ import {
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
-import { StakingActionType } from '../../../app/AppState/types/ValueTransferType';
+import { StakingActionType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import {
   MINER_ADDRESS_REGTEST,
@@ -54,18 +54,6 @@ type RedelegateProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Redelegat
     sendPageState: SendPageStateClass,
     stakingAction: StakingActionType,
   ) => Promise<string>;
-};
-
-const hexToBytes = (hex: string): string => {
-  const clean = hex.trim().toLowerCase();
-  if (clean.length !== 64) {
-    throw new Error(`Expected 32-byte txid hex, got length ${clean.length}`);
-  }
-  const bytes = clean.match(/../g);
-  if (!bytes) {
-    throw new Error('Invalid hex string for txid');
-  }
-  return bytes.reverse().join('');
 };
 
 const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
@@ -104,40 +92,70 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
   const { valueTransfers, indexerServer } = context;
 
   const movements: ValueTransferType[] = useMemo(() => {
-    if (!valueTransfers) {
-      return [];
+    if (!valueTransfers) return [];
+
+    const bondKeyOf = (vt: ValueTransferType): string | null => {
+      const sa = vt.stakingAction;
+      if (!sa) return null;
+      const k = sa.unique_public_key ?? null;
+      return typeof k === 'string' && /^[0-9a-fA-F]{64}$/.test(k)
+        ? k.toLowerCase()
+        : null;
+    };
+
+    const createBonds = valueTransfers.filter(vt => {
+      const sa = vt.stakingAction;
+      if (!sa || sa.kind !== 'create_bond') return false;
+
+      if (!finalizerFromText) return true;
+      return sa.target === finalizerFromText;
+    });
+
+    const beginByBondKey = new Map<string, ValueTransferType>();
+    for (const vt of valueTransfers) {
+      const sa = vt.stakingAction;
+      if (!sa || sa.kind !== 'begin_unbonding') continue;
+
+      const k = bondKeyOf(vt);
+      if (!k) continue;
+
+      const prev = beginByBondKey.get(k);
+      if (!prev || vt.time > prev.time) beginByBondKey.set(k, vt);
     }
 
-    // All staking "add" actions
-    const stakingAdds = valueTransfers.filter(
-      (vt: ValueTransferType) => {
-        if (vt.stakingAction !== null && 
-            vt.stakingAction.kind === 'create_bond') {
-          if (finalizerFromText && vt.stakingAction.target === finalizerFromText) {
-            return true;
-          }
-          if (!finalizerFromText) {
-            return true;
-          }
-        }
-        return false;
+    const out: ValueTransferType[] = [];
+    const seen = new Set<string>();
+
+    for (const bond of createBonds) {
+      const k = bondKeyOf(bond);
+
+      const begin = k ? beginByBondKey.get(k) : undefined;
+
+      const row: ValueTransferType = begin
+        ? ({
+            ...begin,
+            fee: bond.fee,
+            stakingAction: begin.stakingAction
+              ? {
+                  ...begin.stakingAction,
+                  val: bond.stakingAction?.val ?? begin.stakingAction.val,
+                  target:
+                    bond.stakingAction?.target ?? begin.stakingAction.target,
+                  unique_public_key:
+                    bond.stakingAction?.unique_public_key ??
+                    begin.stakingAction.unique_public_key,
+                }
+              : begin.stakingAction,
+          } as ValueTransferType)
+        : bond;
+
+      if (!seen.has(row.txid)) {
+        out.push(row);
+        seen.add(row.txid);
       }
-    );
+    }
 
-    // All txids that have been used as a source in a "sub" (unstake) action
-    const unstakeSources = new Set(
-      valueTransfers
-        .filter(
-          (vt: ValueTransferType) =>
-            vt.stakingAction !== null &&
-            (vt.stakingAction.kind === 'begin_unbonding' || vt.stakingAction.kind === 'withdraw_bond' || vt.stakingAction.kind === 'redelegate') &&
-            !!vt.stakingAction.source,
-        )
-        .map(vt => vt.stakingAction!.source),
-    );
-
-    // Keep only adds whose txid is NOT present as a source in any "sub"
-    return stakingAdds.filter(vt => !unstakeSources.has(hexToBytes(vt.txid)));
+    return out.sort((a, b) => b.time - a.time);
   }, [finalizerFromText, valueTransfers]);
 
   const selectedTx = movements.find(tx => tx.txid === selectedTxid);
@@ -291,9 +309,6 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
       val: zats,
       target:
         (selectedTx.stakingAction && selectedTx.stakingAction?.target) || '',
-      source: hexToBytes(selectedTx.txid),
-      //insecureSourceName: '',
-      //insecureTargetName: '',
     };
 
     console.log('UNSTAKING action:', stakingAction);
@@ -301,10 +316,11 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
     try {
       await stakeTransaction(sendPageState, stakingAction);
       setModalState('success');
-    } catch (e) {
-      console.warn('Unstake tx failed:', e);
-      Alert.alert('Error', 'Staking transaction failed. Please try again.');
+    } catch (error) {
+      console.warn('Unstake tx failed:', error);
       setModalState('idle');
+      //Alert.alert('Error', 'Staking transaction failed. Please try again.');
+      navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
   };
 

@@ -14,6 +14,7 @@ import {
   ValueTransferKindEnum,
   ServerType,
   StakeType,
+  StakingActionType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCUnifiedAddressType } from './types/RPCUnifiedAddressType';
@@ -32,22 +33,13 @@ import { RPCSyncPollType } from './types/RPCSyncPollType';
 import { RPCZecPriceType } from './types/RPCZecPriceType';
 import { RPCTransparentAddressType } from './types/RPCTransparentAddressType';
 import { RPCSpendablebalanceType } from './types/RPCSpendablebalanceType';
-import { RPCWalletSaveRequiredType } from './types/RPCWalletSaveRequiredType';
+//import { RPCWalletSaveRequiredType } from './types/RPCWalletSaveRequiredType';
 import { RPCConfigWalletPerformanceType } from './types/RPCConfigWalletPerformanceType';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
-
-interface StakingActionType {
-  kind: 'create_bond' | 'begin_unbonding' | 'withdraw_bond' | 'redelegate';
-  val: number;
-  target: string;
-  source: string;
-  insecureTargetName: string;
-  insecureSourceName: string;
-  unique_public_key: string;
-}
+import { reverseHex32Bytes } from '../utils/hex';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -384,17 +376,17 @@ export default class RPC {
     );
 
     // if the wallet needs to save, means the App needs to fetch all the new data
-    if (!(await this.getWalletSaveRequired())) {
-      console.log('***************** NOT SAVE REQUIRED: No fetching data');
+    //if (!(await this.getWalletSaveRequired())) {
+    //  console.log('***************** NOT SAVE REQUIRED: No fetching data');
       // do need this because of the sync process
-      taskPromises.push(
-        new Promise<void>(async resolve => {
-          await this.fetchSyncPoll();
-          //console.log('INTERVAL poll sync');
-          resolve();
-        }),
-      );
-    } else {
+    //  taskPromises.push(
+    //    new Promise<void>(async resolve => {
+    //      await this.fetchSyncPoll();
+    //      //console.log('INTERVAL poll sync');
+    //      resolve();
+    //    }),
+    //  );
+    //} else {
       if (
         this.getWalletSaveRequiredLock ||
         this.fetchWalletHeightLock ||
@@ -489,7 +481,7 @@ export default class RPC {
           }),
         );
       }
-    }
+    //}
 
     Promise.allSettled(taskPromises);
   }
@@ -1042,6 +1034,8 @@ export default class RPC {
         }>;
       };
 
+      console.log('ROSTERRRRR', rosterInfo);
+
       const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
         m => ({
           pubKey: m.pub_key,
@@ -1213,7 +1207,7 @@ export default class RPC {
       return;
     }
   }
-
+/*
   async getWalletSaveRequired(): Promise<boolean> {
     try {
       if (this.getWalletSaveRequiredLock) {
@@ -1255,7 +1249,7 @@ export default class RPC {
       return false;
     }
   }
-
+*/
   async getConfigWalletPerformance(): Promise<
     RPCPerformanceLevelEnum | undefined
   > {
@@ -1483,10 +1477,7 @@ export default class RPC {
                 val:
                   (!vt.staking_action?.val ? 0 : vt.staking_action.val) /
                   10 ** 8,
-                target: vt.staking_action?.target,
-                source: vt.staking_action?.source,
-                insecureTargetName: vt.staking_action?.insecure_target_name,
-                insecureSourceName: vt.staking_action?.insecure_source_name,
+                target: reverseHex32Bytes(vt.staking_action?.target),
               } as StakingActionType;
             }
 
@@ -1652,7 +1643,7 @@ export default class RPC {
 
   // Send a transaction using the already constructed sendJson structure
   async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
-    const sendTxPromise = new Promise<string>(async (resolve, reject) => {
+    return new Promise<string>(async (resolve, reject) => {
       // clear the timers - Tasks.
       await this.clearTimers();
       // sending
@@ -1717,26 +1708,16 @@ export default class RPC {
 
       await this.refreshSync();
 
-      if (sendTxids) {
-        console.log('00000000 RESOLVE send', sendTxids);
-        resolve(sendTxids);
-        return;
-      }
-      if (sendError) {
-        console.log('00000000 REJECT send', sendError);
-        reject(sendError);
-        return;
-      }
+      if (sendTxids) return resolve(sendTxids);
+      return reject(sendError || 'Error: send failed');
     });
-
-    return sendTxPromise;
   }
 
   // Send a staking transaction using the already constructed stakeJson structure
   async sendStakingTransaction(
     stakeJson: StakeJsonToTypeType,
   ): Promise<string> {
-    const sendTxPromise = new Promise<string>(async (resolve, reject) => {
+    return new Promise<string>(async (resolve, reject) => {
       await this.clearTimers();
       this.setInSend(true);
       this.keepAwake(true);
@@ -1822,12 +1803,13 @@ export default class RPC {
       await this.configure();
       this.setInSend(false);
 
-      if (sendTxids) return resolve(sendTxids);
-      if (sendError) return reject(sendError);
-    });
+      await this.refreshSync();
 
-    return sendTxPromise;
+      if (sendTxids) return resolve(sendTxids);
+      return reject(sendError || 'Error: staking failed');
+    });
   }
+
   async sendBeginUnstakingTx(bondCreateTxid: string): Promise<string> {
     return new Promise<string>(async (resolve, reject) => {
       await this.clearTimers();
@@ -1839,7 +1821,7 @@ export default class RPC {
 
       try {
         if (!/^[0-9a-fA-F]{64}$/.test(bondCreateTxid)) {
-          sendError = 'Error: begin_unstake requires a 64-hex create_bond txid';
+          sendError = 'Error: begin_unstake requires a 64-hex create bond txid';
         }
 
         // 1) propose begin_unstake
@@ -1883,8 +1865,10 @@ export default class RPC {
       await this.configure();
       this.setInSend(false);
 
+      await this.refreshSync();
+
       if (sendTxids) return resolve(sendTxids);
-      return reject(sendError || 'Error: begin_unstake failed');
+      return reject(sendError || 'Error: begin unstake failed');
     });
   }
 
@@ -1900,7 +1884,7 @@ export default class RPC {
       try {
         if (!/^[0-9a-fA-F]{64}$/.test(bondCreateTxid)) {
           sendError =
-            'Error: withdraw_stake requires a 64-hex create_bond txid';
+            'Error: withdraw_stake requires a 64-hex create bond txid';
         }
 
         if (!sendError) {
@@ -1943,6 +1927,8 @@ export default class RPC {
 
       await this.configure();
       this.setInSend(false);
+
+      await this.refreshSync();
 
       if (sendTxids) return resolve(sendTxids);
       return reject(sendError || 'Error: withdraw_stake failed');

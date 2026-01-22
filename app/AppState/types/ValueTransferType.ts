@@ -1,6 +1,7 @@
 import { ValueTransferKindEnum } from '../enums/ValueTransferKindEnum';
 import { PoolEnum } from '../enums/PoolEnum';
 import { RPCValueTransfersStatusEnum } from '../../rpc/enums/RPCValueTransfersStatusEnum';
+import StakingActionType from './StakingActionType';
 
 export default interface ValueTransferType {
   txid: string;
@@ -16,14 +17,6 @@ export default interface ValueTransferType {
   poolType?: PoolEnum;
   status: RPCValueTransfersStatusEnum;
   stakingAction: StakingActionType | null;
-}
-
-export interface StakingActionType {
-  kind: 'create_bond' | 'begin_unbonding' | 'withdraw_bond' | 'redelegate';
-  val: number;
-  target: string;
-  unique_public_key: string;
-  source: string; // maybe obsolete...
 }
 
 export interface StakeReceiverToType {

@@ -62,6 +62,7 @@ import {
   ScreenEnum,
   LaunchingModeEnum,
   StakeType,
+  StakingActionType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -106,7 +107,6 @@ import SettingsServers from '../../components/Settings/components/SettingsServer
 import DebugInfo from '../../components/Settings/components/DebugInfo';
 import {
   StakeJsonToTypeType,
-  StakingActionType,
 } from '../AppState/types/ValueTransferType';
 import Distribution from '../../components/Distribution';
 import Redelegate from '../../components/Staking/components/Redelegate';
