@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 
 import { ContextAppLoaded } from '../../../app/context';
 import Scanner from '../../Scanner';
@@ -25,6 +25,8 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.ScannerAddress;
+
+  const goBackExecutedAlready = useRef<boolean>(false);
 
   const [active, setActive] = useState<boolean>(
     !!route.params && route.params.active !== undefined ? route.params.active : false
@@ -64,8 +66,12 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
   const onCloseScreen = () => {
     clear();
     setActive(false);
-    if (navigation.canGoBack()) {
+    // in iOS this is execute twice
+    // ...avoiding that...
+    if (navigation.canGoBack() && !goBackExecutedAlready.current) {
+      goBackExecutedAlready.current = true;
       navigation.goBack();
+      //console.log('GOOOOOOOOOOO BACK');
     }
   };
 
@@ -77,12 +83,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
         screenName={screenName}
       />
 
-      <HeaderTitle title='Scan zcash address' goBack={() => {
-        clear();
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        }
-      }} />
+      <HeaderTitle title='Scan zcash address' goBack={() => onCloseScreen()} />
 
       <View
         style={{

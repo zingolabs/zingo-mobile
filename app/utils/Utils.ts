@@ -336,7 +336,7 @@ export default class Utils {
     //const start = Date.now();
     const result: string = await RPCModule.parseAddressInfo(address);
     //console.log('=========================================== > parse address - ', Date.now() - start);
-    console.log(result, serverChainName);
+    console.log('is valid address?', result, serverChainName);
     let isValid: boolean = false;
     let isFullUA: boolean = false;
     let onlyOrchardUA: string = '';
