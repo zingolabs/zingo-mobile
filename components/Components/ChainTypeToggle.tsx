@@ -31,54 +31,56 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
         alignItems: 'center',
       }}
     >
-      <TouchableOpacity
-        disabled={disabled}
-        testID="settings.custom-server-chain.mainnet"
-        style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.mainChainName)}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 10,
-          }}
+      {false && (
+        <TouchableOpacity
+          disabled={disabled}
+          testID="settings.custom-server-chain.mainnet"
+          style={{ marginHorizontal: 5 }}
+          onPress={() => onPress(ChainNameEnum.mainChainName)}
         >
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              borderWidth:
-                customServerChainName === ChainNameEnum.mainChainName ? 2 : 1,
-              borderColor:
-                customServerChainName === ChainNameEnum.mainChainName
-                  ? colors.primary
-                  : colors.primaryDisabled,
-              borderRadius: 5,
-              paddingHorizontal: 5,
+              marginBottom: 10,
             }}
           >
-            <Text
+            <View
               style={{
-                fontSize: 13,
-                color: colors.border,
-                marginRight: 5,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth:
+                  customServerChainName === ChainNameEnum.mainChainName ? 2 : 1,
+                borderColor:
+                  customServerChainName === ChainNameEnum.mainChainName
+                    ? colors.primary
+                    : colors.primaryDisabled,
+                borderRadius: 5,
+                paddingHorizontal: 5,
               }}
             >
-              {translate('settings.value-chainname-main') as string}
-            </Text>
-            {customServerChainName === ChainNameEnum.mainChainName && (
-              <FontAwesomeIcon
-                icon={faCashRegister}
-                size={14}
-                color={colors.primary}
-              />
-            )}
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: colors.text,
+                  marginRight: 5,
+                }}
+              >
+                {translate('settings.value-chainname-main') as string}
+              </Text>
+              {customServerChainName === ChainNameEnum.mainChainName && (
+                <FontAwesomeIcon
+                  icon={faCashRegister}
+                  size={14}
+                  color={colors.primary}
+                />
+              )}
+            </View>
           </View>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      )}
       <TouchableOpacity
         disabled={disabled}
         testID="settings.custom-server-chain.testnet"
@@ -111,7 +113,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
             <Text
               style={{
                 fontSize: 13,
-                color: colors.border,
+                color: colors.text,
                 marginRight: 5,
               }}
             >
@@ -130,7 +132,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
       <TouchableOpacity
         disabled={disabled}
         testID="settings.custom-server-chain.regtest"
-        style={{ marginHorizontal: 5 }}
+        style={{ marginHorizontal: 30 }}
         onPress={() => onPress(ChainNameEnum.regtestChainName)}
       >
         <View
@@ -161,7 +163,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
             <Text
               style={{
                 fontSize: 13,
-                color: colors.border,
+                color: colors.text,
                 marginRight: 5,
               }}
             >
