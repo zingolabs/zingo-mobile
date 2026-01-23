@@ -1800,14 +1800,21 @@ pub fn withdraw_stake(withdraw_stake_json: String) -> Result<String, ZingolibErr
                     Err(e) => return object! { "error" => format!("grpc client: {e}") }.pretty(2),
                 };
 
-                match lightclient
-                    .wallet
-                    .write()
-                    .await
-                    .withdraw_bond_using_orchard(&REGTEST_NETWORK, &mut client, &bond_key)
-                    // .withdraw_bond_using_orchard(&TEST_NETWORK, &mut client, &bond_key)
-                    .await
-                {
+                let mut wallet = lightclient.wallet.write().await;
+
+                let res = match lightclient.config().chain {
+                    ChainType::Regtest(_) => {
+                        wallet
+                            .withdraw_bond_using_orchard(&REGTEST_NETWORK, &mut client, &bond_key)
+                            .await
+                    }
+                    ChainType::Testnet(_) | ChainType::Mainnet => {
+                        wallet
+                            .withdraw_bond_using_orchard(&TEST_NETWORK, &mut client, &bond_key)
+                            .await
+                    }
+                };
+                match res {
                     Some(txid) => object! { "txid" => txid.to_string() }.pretty(2),
                     None => {
                         object! { "error" => "withdraw failed (builder returned None)" }.pretty(2)
@@ -1950,6 +1957,28 @@ pub fn confirm() -> Result<String, ZingolibError> {
         }
     })
 }
+
+// #[uniffi::export]
+// pub fn get_accumulated_stake_for_txid(txid: String) -> Result<u64, ZingolibError> {
+//     with_panic_guard(|| {
+//         let mut guard = LIGHTCLIENT
+//             .write()
+//             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+//         if let Some(lightclient) = &mut *guard {
+//             let txid = match txid_from_hex_encoded_str(&txid) {
+//                 Ok(txid) => txid,
+//                 Err(_e) => return Ok(0),
+//             };
+//             Ok(RT.block_on(async move {
+//                 lightclient
+//                     .get_accumulated_stake_for_txid(txid.into())
+//                     .await
+//             }))
+//         } else {
+//             Err(ZingolibError::LightclientNotInitialized)
+//         }
+//     })
+// }
 
 #[uniffi::export]
 pub fn get_wallet_bonds() -> Result<String, ZingolibError> {
