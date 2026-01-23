@@ -41,6 +41,7 @@ import StakingActions from './StakingActions';
 import { ContextAppLoaded } from '../../app/context';
 import Stake from '../../assets/icons/stake-white.svg';
 import Unstake from '../../assets/icons/unstake-white.svg';
+import Refresh from '../../assets/icons/refresh.svg';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
@@ -213,6 +214,10 @@ const Staking: React.FC<StakingProps> = () => {
 
         if (action?.kind === 'withdraw_bond') {
           return { ...vt, stakingUiKind: 'withdraw_bond' };
+        }
+
+        if (action?.kind === 'redelegate') {
+          return { ...vt, stakingUiKind: 'redelegate' };
         }
 
         if (vt.amount <= 0) {
@@ -675,7 +680,7 @@ const Staking: React.FC<StakingProps> = () => {
                   switch (item.stakingUiKind) {
                     case 'create_bond': {
                       label = 'Bond created';
-                      Icon = Stake;
+                      Icon = item.confirmations === 0 ? Refresh : Stake;
                       const fee = item.fee ?? 0;
                       amountLabel = `+${(fee - 0.0001).toFixed(2)} cTAZ`;
                       break;
@@ -683,17 +688,21 @@ const Staking: React.FC<StakingProps> = () => {
 
                     case 'begin_unbonding': {
                       label = 'Begin unbonding';
-                      Icon = Unstake;
-
-                      const valZats = item.stakingAction?.val ?? 0;
-                      const valCoins = valZats / 10 ** 8;
-                      amountLabel = `-${valCoins.toFixed(5)} cTAZ`;
+                      Icon = item.confirmations === 0 ? Refresh : Unstake;
+                      amountLabel = `-${item.stakingAction?.val.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case 'withdraw_bond': {
                       label = 'Withdraw bond';
-                      Icon = Unstake;
+                      Icon = item.confirmations === 0 ? Refresh : Unstake;
+                      amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
+                      break;
+                    }
+
+                    case 'redelegate': {
+                      label = 'Redelegate bond';
+                      Icon = item.confirmations === 0 ? Refresh : Unstake;
                       amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }

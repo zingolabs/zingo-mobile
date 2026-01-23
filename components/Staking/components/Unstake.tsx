@@ -98,6 +98,7 @@ const Unstake: React.FC<UnstakeProps> = ({
     if (!valueTransfers) return [];
 
     const bondKeyOf = (vt: ValueTransferType): string | null => {
+      if (vt.confirmations === 0) return null;
       const sa = vt.stakingAction;
       if (!sa) return null;
       const k = sa.unique_public_key ?? null;
@@ -107,6 +108,7 @@ const Unstake: React.FC<UnstakeProps> = ({
     };
 
     const createBonds = valueTransfers.filter(vt => {
+      if (vt.confirmations === 0) return false;
       const sa = vt.stakingAction;
       if (!sa || sa.kind !== 'create_bond') return false;
 
@@ -116,6 +118,7 @@ const Unstake: React.FC<UnstakeProps> = ({
 
     const beginByBondKey = new Map<string, ValueTransferType>();
     for (const vt of valueTransfers) {
+      if (vt.confirmations === 0) continue;
       const sa = vt.stakingAction;
       if (!sa || sa.kind !== 'begin_unbonding') continue;
 
@@ -288,6 +291,7 @@ const Unstake: React.FC<UnstakeProps> = ({
       if (!isHex64(bondKey)) return null;
 
       const match = (_valueTransfers ?? []).find(vt => {
+        if (vt.confirmations === 0) return false;
         const sa = vt.stakingAction as any;
         if (!sa || sa.kind !== 'create_bond') return false;
         const k = sa.unique_public_key ?? sa.arg32_0;

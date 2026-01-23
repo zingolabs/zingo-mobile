@@ -1036,6 +1036,35 @@ export default class RPC {
 
       console.log('ROSTERRRRR', rosterInfo);
 
+      const start2 = Date.now();
+      const valueTransfersStr: string = await RPCModule.getValueTransfersList();
+
+      if (Date.now() - start2 > 4000) {
+        console.log(
+          '=========================================== > value transfers for roster - ',
+          Date.now() - start2,
+        );
+      }
+      //console.log(valueTransfersStr);
+      if (valueTransfersStr) {
+        if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error value transfers ${valueTransfersStr}`);
+          this.fnSetLastError(`Error value transfers: ${valueTransfersStr}`);
+          this.fetchTandZandOValueTransfersLock = false;
+          return;
+        }
+      } else {
+        console.log('Internal Error value transfers');
+        this.fetchTandZandOValueTransfersLock = false;
+        return;
+      }
+      const valueTransfersJSON: RPCValueTransfersType =
+        await JSON.parse(valueTransfersStr);
+
+      const valueTransferTxids = new Set(
+        (valueTransfersJSON.value_transfers ?? []).map(vt => vt.txid)
+      );    
+
       const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
         m => ({
           pubKey: m.pub_key,
@@ -1044,11 +1073,11 @@ export default class RPC {
       );
 
       const stakedList: StakeType[] = (rosterInfo.members ?? [])
+        .filter(m => (m.txids ?? []).some(txid => valueTransferTxids.has(txid)))
         .map(m => ({
           pubKey: m.pub_key,
           votingPower: (m.voting_power || 0) / 10 ** 8,
-        }))
-        .filter(_m => true); // TODO: Properly apply filter
+        }));
 
       this.fnSetStaked(stakedList);
       this.fnSetGlobalStaked(globalStakedList);
@@ -1741,14 +1770,6 @@ export default class RPC {
           console.log('HEEEEEEEEEEREREREREE');
 
           proposeStr = await RPCModule.stakeProcess(JSON.stringify(payload));
-          // } else if (action.kind === 'begin_unbonding') {
-          //   // begin_unstake()
-          //   // You need the bond/create txid here (string). Use whatever your UI stores.
-          //   // Commonly action.txid or stakeJson.stakingActionTxid etc.
-          //   proposeStr = await RPCModule.beginUnstakeProcess(action.txid);
-        } else if (action.kind === 'withdraw_bond') {
-          //   // withdraw_stake()
-          // proposeStr = await RPCModule.withdrawStakeProcess(action.txid);
         } else {
           sendError = `Error: Unsupported stakingAction.kind ${action.kind}`;
         }
