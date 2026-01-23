@@ -118,6 +118,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
 
     const withdrawnKeys = new Set(
       (valueTransfers ?? [])
+        .filter(vt => vt.confirmations > 0)
         .map(vt => vt.stakingAction)
         .filter((sa): sa is NonNullable<typeof sa> => !!sa)
         .filter(sa => sa.kind === 'withdraw_bond')
@@ -127,6 +128,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
     const activeBondKeys = Array.from(
       new Set(
         (valueTransfers ?? [])
+          .filter(vt => vt.confirmations > 0)
           .map(vt => vt.stakingAction)
           .filter((sa): sa is NonNullable<typeof sa> => !!sa)
           .filter(sa => sa.kind === 'create_bond')
