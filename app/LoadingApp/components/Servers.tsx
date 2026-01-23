@@ -33,12 +33,14 @@ import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import XIcon from '../../../assets/icons/x.svg';
 import LiquidPrimaryButton from '../../../components/Staking/LiquidPrimaryButton';
 import { HeaderTitle } from '../../../components/Header';
+import ChainTypeToggle from '../../../components/Components/ChainTypeToggle';
 
 type ServersProps = {
   actionButtonsDisabled: boolean;
-  setIndexerServerUri: (v: string) => Promise<void>;
+  setIndexerServer: (u: string, c: ChainNameEnum) => Promise<void>;
   checkIndexerServer: (
     indexerServerUri: string,
+    indexerServerChainName: ChainNameEnum,
   ) => Promise<{ result: boolean; indexerServerUriParsed: string }>;
   closeServers: () => void;
   fromSettings: boolean;
@@ -46,7 +48,7 @@ type ServersProps = {
 
 const Servers: React.FunctionComponent<ServersProps> = ({
   actionButtonsDisabled,
-  setIndexerServerUri,
+  setIndexerServer,
   checkIndexerServer,
   closeServers,
   fromSettings,
@@ -68,6 +70,9 @@ const Servers: React.FunctionComponent<ServersProps> = ({
   const [kbOpen, setKbOpen] = useState(false);
   const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(
     indexerServerContext.uri,
+  );
+  const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] = useState<ChainNameEnum>(
+    indexerServerContext.chainName,
   );
 
   const insets = useSafeAreaInsets();
@@ -175,6 +180,9 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 setConnected(null);
                 setBorderColor(colors.primary);
                 setIndexerServerUriLocal(text);
+                if (serverUris().filter(s => s.uri === text).length > 0) {
+                  setIndexerServerChainNameLocal(serverUris().filter(s => s.uri === text)[0].chainName)
+                }
               }}
               editable={!actionButtonsDisabled}
               maxLength={100}
@@ -233,6 +241,9 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                     setConnected(null);
                     setBorderColor(colors.primary);
                     setIndexerServerUriLocal(itemValue);
+                    if (serverUris().filter(s => s.uri === itemValue).length > 0) {
+                      setIndexerServerChainNameLocal(serverUris().filter(s => s.uri === itemValue)[0].chainName)
+                    }
                   }
                 }}
               >
@@ -271,6 +282,13 @@ const Servers: React.FunctionComponent<ServersProps> = ({
               </TouchableOpacity>
             )}
           </View>
+
+          <ChainTypeToggle
+            customServerChainName={indexerServerChainNameLocal}
+            onPress={setIndexerServerChainNameLocal}
+            translate={translate}
+            disabled={serverUris().filter(s => s.uri === indexerServerUriLocal).length > 0 || actionButtonsDisabled}
+          />
 
           <View
             style={{
@@ -367,7 +385,8 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             <LiquidPrimaryButton
               title="Continue"
               onPress={() => {
-                setIndexerServerUri(indexerServerUriLocal);
+                // using params
+                setIndexerServer(indexerServerUriLocal, indexerServerChainNameLocal);
                 Keyboard.dismiss();
                 clear();
                 // the App needs some time to store data.
@@ -382,15 +401,16 @@ const Servers: React.FunctionComponent<ServersProps> = ({
           ) : (
             <LiquidPrimaryButton
               title={connected === null ? 'Test Connection' : 'Retry'}
-              disabled={actionButtonsDisabled || !indexerServerUriLocal}
+              disabled={actionButtonsDisabled || !indexerServerUriLocal || !indexerServerChainNameLocal}
               onPress={async () => {
                 setConnected(null);
                 setBorderColor('transparent');
                 const {
                   result: _connected,
                   indexerServerUriParsed: _indexerServerUri,
-                } = await checkIndexerServer(indexerServerUriLocal);
+                } = await checkIndexerServer(indexerServerUriLocal, indexerServerChainNameLocal);
                 setConnected(_connected);
+                // using local state
                 setIndexerServerUriLocal(_indexerServerUri);
                 if (_connected) {
                   setBorderColor('#0E9634');

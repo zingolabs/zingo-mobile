@@ -236,8 +236,10 @@ export default function LoadingApp(props: LoadingAppProps) {
       }
       // lightwallet server
       if (settings.indexerServer) {
-        // because I don't know what the app have in chain name...
-        settings.indexerServer.chainName = ChainNameEnum.testChainName;
+        // check the server info, just in case...
+        if (serverUris().filter(s => s.uri === settings.indexerServer.uri).length > 0) {
+          settings.indexerServer.chainName = serverUris().filter(s => s.uri === settings.indexerServer.uri)[0].chainName;
+        }
         setIndexerServer(settings.indexerServer);
       } else {
         await SettingsFileImpl.writeSettings(
@@ -1054,10 +1056,10 @@ export class LoadingAppClass extends Component<
     this.setState({ background: backgroundJson });
   };
 
-  setIndexerServerUri = async (indexerServerUri: string) => {
+  setIndexerServer = async (indexerServerUri: string, indexerServerChainName: ChainNameEnum) => {
     const NewIndexerServer: ServerType = {
       uri: indexerServerUri,
-      chainName: this.state.indexerServer.chainName,
+      chainName: indexerServerChainName,
     };
     this.setState({
       indexerServer: NewIndexerServer,
@@ -1082,7 +1084,10 @@ export class LoadingAppClass extends Component<
 
   checkIndexerServer = async (indexerServerUri: string) => {
     if (!indexerServerUri) {
-      return { result: false, indexerServerUriParsed: indexerServerUri };
+      return { 
+        result: false, 
+        indexerServerUriParsed: indexerServerUri,
+      };
     }
 
     this.setState({ actionButtonsDisabled: true });
@@ -1092,35 +1097,27 @@ export class LoadingAppClass extends Component<
         indexerServerUri,
         this.state.translate,
       );
-      // const chainName = this.state.indexerServer.chainName;
 
       if (!uri || uri.toLowerCase().startsWith(GlobalConst.error)) {
-        // this.addLastSnackbar({
-        //   message: this.state.translate('settings.isuri') as string,
-        //   screenName: [this.screenName],
-        // });
-        return { result: false, indexerServerUriParsed: indexerServerUri };
+        return { 
+          result: false, 
+          indexerServerUriParsed: indexerServerUri,
+        };
       }
-
-      // this.addLastSnackbar({
-      //   message: this.state.translate('loadedapp.tryingnewserver') as string,
-      //   screenName: [this.screenName],
-      // });
 
       const latency = await pingIndexerServer(uri);
 
       if (latency !== null) {
-        return { result: true, indexerServerUriParsed: uri };
+        return { 
+          result: true, 
+          indexerServerUriParsed: uri,
+         };
       }
 
-      // this.addLastSnackbar({
-      //   message:
-      //     (this.state.translate('loadedapp.changeservernew-error') as string) +
-      //     uri,
-      //   screenName: [this.screenName],
-      // });
-
-      return { result: false, indexerServerUriParsed: indexerServerUri };
+      return { 
+        result: false, 
+        indexerServerUriParsed: indexerServerUri,
+      };
     } finally {
       this.setState({ actionButtonsDisabled: false });
     }
@@ -1646,7 +1643,7 @@ export class LoadingAppClass extends Component<
           {screen === 0.5 && (
             <Servers
               actionButtonsDisabled={actionButtonsDisabled}
-              setIndexerServerUri={this.setIndexerServerUri}
+              setIndexerServer={this.setIndexerServer}
               checkIndexerServer={this.checkIndexerServer}
               closeServers={this.closeServers}
               fromSettings={fromSettings}
