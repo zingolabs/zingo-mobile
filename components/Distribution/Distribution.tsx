@@ -113,6 +113,13 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [colors.zingo, globalStaked, staked, tab]);
 
+  useEffect(() => {
+    if (tab === 'my' && pieAmounts.length === 0) {
+      setTab('network');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const selectExpandAddress = (index: number) => {
     let newExpandAddress = Array(expandAddress.length).fill(false);
     newExpandAddress[index] = true;
