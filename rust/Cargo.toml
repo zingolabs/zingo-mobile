@@ -9,12 +9,12 @@ pedantic = { level = "deny", priority = -1 }
 nursery = { level = "deny", priority = -1 }
 
 [workspace.dependencies]
-zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "44556e717ba496917bb8bc01147dbb96dd487441", default-features = true, features = [
+zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "71248eba28befe43dc6413747e87cf8105cd2841", default-features = true, features = [
     "testutils",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "44556e717ba496917bb8bc01147dbb96dd487441" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "71248eba28befe43dc6413747e87cf8105cd2841" }
 
-zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", rev = "44556e717ba496917bb8bc01147dbb96dd487441", features = [
+zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", rev = "71248eba28befe43dc6413747e87cf8105cd2841", features = [
     "test_lwd_zcashd",
 ] }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
