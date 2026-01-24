@@ -1,14 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import { useTheme } from "@react-navigation/native";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { ThemeType } from "../../app/types";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faChevronLeft, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { useTheme } from '@react-navigation/native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ThemeType } from '../../app/types';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faChevronLeft, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 type HeaderTitleProps = {
-  title: string,
-  goBack: () => void,
-  bottomSheet?: boolean,
+  title: string;
+  goBack: () => void;
+  bottomSheet?: boolean;
 };
 
 const HeaderTitle: React.FC<HeaderTitleProps> = ({
@@ -25,7 +25,11 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({
         style={[styles.backButton, { borderColor: colors.text }]}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
-        <FontAwesomeIcon icon={bottomSheet ? faXmark : faChevronLeft} size={22} color={colors.text} />
+        <FontAwesomeIcon
+          icon={bottomSheet ? faXmark : faChevronLeft}
+          size={22}
+          color={colors.text}
+        />
       </TouchableOpacity>
 
       <Text style={[styles.headerTitle, { color: colors.text }]}>{title}</Text>
@@ -42,6 +46,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
+    marginTop: 10,
   },
   backButton: {
     marginTop: 5,

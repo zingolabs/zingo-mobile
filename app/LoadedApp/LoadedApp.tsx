@@ -105,9 +105,7 @@ import ComputingError from './components/ComputingError';
 import { Staking, AddStakeScreen, Unstake } from '../../components/Staking';
 import SettingsServers from '../../components/Settings/components/SettingsServers';
 import DebugInfo from '../../components/Settings/components/DebugInfo';
-import {
-  StakeJsonToTypeType,
-} from '../AppState/types/ValueTransferType';
+import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 import Distribution from '../../components/Distribution';
 import Redelegate from '../../components/Staking/components/Redelegate';
 import Finalizers from '../../components/Finalizers/Finalizers';
@@ -2040,7 +2038,10 @@ export class LoadedAppClass extends Component<
                 {props => <Distribution {...props} />}
               </InnerStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.Finalizers}>
+              <InnerStack.Screen
+                name={RouteEnum.Finalizers}
+                options={{ presentation: 'modal' }}
+              >
                 {props => <Finalizers {...props} />}
               </InnerStack.Screen>
 

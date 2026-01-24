@@ -139,6 +139,10 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
 
     const activeSet = new Set(activeBondKeys.map(k => k.toLowerCase()));
 
+    console.log('WITHDRAWN', withdrawnKeys);
+    console.log('ACTIVE', activeBondKeys);
+    console.log('ACTIVE SET', activeSet);
+
     const finalList =
       activeSet.size === 0
         ? base
@@ -226,6 +230,11 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
           if (navigation.canGoBack()) {
             navigation.goBack();
           }
+          // navigation.navigate(goBackRoute, {
+          //   finalizer: item.pubKey,
+          //   staked: item.votingPower,
+          //   closeSheet: () => navigation.goBack(),
+          // });
         }}
       >
         <View
@@ -379,7 +388,6 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
             color: colors.text,
             fontSize: 17,
             fontWeight: '400',
-            paddingVertical: 0,
           }}
           placeholder="Search finalizer..."
           placeholderTextColor={colors.placeholder}

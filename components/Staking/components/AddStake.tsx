@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState, useContext, useCallback, useRef } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+  useRef,
+} from 'react';
 import {
   View,
   Text,
@@ -16,7 +22,11 @@ import {
   Alert,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
@@ -37,7 +47,7 @@ import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 
-const PRESET_AMOUNTS = [0.01, 0.1, 1, 10]; 
+const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -95,7 +105,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   }, []);
 
   useEffect(() => {
-    // Balance check (in cTAZ / ZEC units) 
+    // Balance check (in cTAZ / ZEC units)
     const _spendable =
       totalBalance && typeof totalBalance.totalSpendableBalance === 'number'
         ? totalBalance.totalSpendableBalance
@@ -110,7 +120,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           navigation.goBack();
         }
       }
-    }, [finalizerText, navigation])
+    }, [finalizerText, navigation]),
   );
 
   useEffect(() => {

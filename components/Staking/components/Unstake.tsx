@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   View,
   Text,
@@ -17,7 +24,11 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
@@ -36,6 +47,7 @@ import Utils from '../../../app/utils';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
+import { reverseHex32Bytes } from '../../../app/utils/hex';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -107,58 +119,91 @@ const Unstake: React.FC<UnstakeProps> = ({
         : null;
     };
 
+    const isNewer = (a: ValueTransferType, b: ValueTransferType) => {
+      // Use time as primary; blockheight as tie-breaker if you want.
+      // (time seems stable in your logs)
+      return a.time > b.time;
+    };
+
     const createBonds = valueTransfers.filter(vt => {
       if (vt.confirmations === 0) return false;
       const sa = vt.stakingAction;
       if (!sa || sa.kind !== 'create_bond') return false;
 
       if (!finalizerFromText) return true;
-      return sa.target === finalizerFromText;
+      return sa.target === reverseHex32Bytes(finalizerFromText);
     });
 
     const beginByBondKey = new Map<string, ValueTransferType>();
+    const withdrawByBondKey = new Map<string, ValueTransferType>();
+
     for (const vt of valueTransfers) {
       if (vt.confirmations === 0) continue;
       const sa = vt.stakingAction;
-      if (!sa || sa.kind !== 'begin_unbonding') continue;
+      if (!sa) continue;
 
       const k = bondKeyOf(vt);
       if (!k) continue;
 
-      const prev = beginByBondKey.get(k);
-      if (!prev || vt.time > prev.time) beginByBondKey.set(k, vt);
+      if (sa.kind === 'begin_unbonding') {
+        const prev = beginByBondKey.get(k);
+        if (!prev || isNewer(vt, prev)) beginByBondKey.set(k, vt);
+      }
+
+      if (sa.kind === 'withdraw_bond') {
+        const prev = withdrawByBondKey.get(k);
+        if (!prev || isNewer(vt, prev)) withdrawByBondKey.set(k, vt);
+      }
     }
 
     const out: ValueTransferType[] = [];
-    const seen = new Set<string>();
+    const seenBondKey = new Set<string>();
 
     for (const bond of createBonds) {
       const k = bondKeyOf(bond);
+      if (!k) continue;
+      if (seenBondKey.has(k)) continue;
+      seenBondKey.add(k);
 
-      const begin = k ? beginByBondKey.get(k) : undefined;
+      const begin = beginByBondKey.get(k);
+      const withdraw = withdrawByBondKey.get(k);
 
-      const row: ValueTransferType = begin
-        ? ({
-            ...begin,
-            fee: bond.fee,
-            stakingAction: begin.stakingAction
-              ? {
-                  ...begin.stakingAction,
-                  val: bond.stakingAction?.val ?? begin.stakingAction.val,
-                  target:
-                    bond.stakingAction?.target ?? begin.stakingAction.target,
-                  unique_public_key:
-                    bond.stakingAction?.unique_public_key ??
-                    begin.stakingAction.unique_public_key,
-                }
-              : begin.stakingAction,
-          } as ValueTransferType)
-        : bond;
+      // If there's a withdraw that is newer than the last begin/create, hide it.
+      // (This is what you want: "I shouldn't see anything")
+      const latestAction = (() => {
+        let latest: ValueTransferType = bond;
+        if (begin && isNewer(begin, latest)) latest = begin;
+        if (withdraw && isNewer(withdraw, latest)) latest = withdraw;
+        return latest;
+      })();
 
-      if (!seen.has(row.txid)) {
-        out.push(row);
-        seen.add(row.txid);
+      if (latestAction.stakingAction?.kind === 'withdraw_bond') {
+        continue;
       }
+
+      // Display row: prefer begin if that's the latest (and not withdrawn)
+      const row: ValueTransferType =
+        latestAction.stakingAction?.kind === 'begin_unbonding'
+          ? ({
+              ...latestAction, // begin tx
+              fee: bond.fee, // keep your “stake amount from create” hack if desired
+              stakingAction: latestAction.stakingAction
+                ? {
+                    ...latestAction.stakingAction,
+                    val:
+                      bond.stakingAction?.val ?? latestAction.stakingAction.val,
+                    target:
+                      bond.stakingAction?.target ??
+                      latestAction.stakingAction.target,
+                    unique_public_key:
+                      bond.stakingAction?.unique_public_key ??
+                      latestAction.stakingAction.unique_public_key,
+                  }
+                : latestAction.stakingAction,
+            } as ValueTransferType)
+          : bond; // still bonded
+
+      out.push(row);
     }
 
     return out.sort((a, b) => b.time - a.time);
@@ -184,9 +229,9 @@ const Unstake: React.FC<UnstakeProps> = ({
           navigation.goBack();
         }
       }
-    }, [finalizerFromText, navigation])
+    }, [finalizerFromText, navigation]),
   );
-  
+
   useEffect(() => {
     if (!finalizerFromText) {
       launchedSelectorRef.current = true;
@@ -257,18 +302,6 @@ const Unstake: React.FC<UnstakeProps> = ({
     }
     return `${txid.slice(0, 10)}…${txid.slice(-8)}`;
   };
-
-  // const getAccumulatedStakeZatsForTxid = (txid: string): number | null => {
-  //   const zatsStr = accumulatedStakeByTxid[txid];
-  //   if (!zatsStr) {
-  //     return null;
-  //   }
-  //   const zats = Number(zatsStr);
-  //   if (Number.isNaN(zats)) {
-  //     return null;
-  //   }
-  //   return zats;
-  // };
 
   const isHex64 = (s: string) => /^[0-9a-fA-F]{64}$/.test(s);
 
@@ -353,7 +386,6 @@ const Unstake: React.FC<UnstakeProps> = ({
     if (k === 'create_bond') return 'Unbond';
 
     return 'Unstake';
-     
   }, [selectedTx]);
 
   const handleViewMovements = () => {
@@ -370,15 +402,8 @@ const Unstake: React.FC<UnstakeProps> = ({
     console.log('item', item);
     const isSelected = item.txid === selectedTxid;
 
-    // const zats = getAccumulatedStakeZatsForTxid(item.txid);
-
     const fee = item.fee ?? 0;
     let displayAmount = String((fee - 0.0001).toFixed(2));
-
-    // if (zats !== null) {
-    //   const amountInCoin = zats / 10 ** 8;
-    //   displayAmount = Utils.parseNumberFloatToStringLocale(amountInCoin, 8);
-    // }
 
     return (
       <Pressable
