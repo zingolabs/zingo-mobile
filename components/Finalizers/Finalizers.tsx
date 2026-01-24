@@ -48,7 +48,6 @@ import ChartPieIcon from '../../assets/icons/chart-pie.svg';
 import ZcashIcon from '../../assets/icons/zcash.svg';
 import ZecAmount from '../Components/ZecAmount';
 import { XIcon } from '../Components/Icons/XIcon';
-import { reverseHex32Bytes } from '../../app/utils/hex';
 
 type FinalizersProps = DrawerScreenProps<
   AppDrawerParamList,
