@@ -2140,7 +2140,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       do {
         // UniFFI camelCases: get_wallet_bonds -> getWalletBonds()
-        let resp = try ZingoDelegator.getWalletBonds()
+        let resp = try getWalletBonds()
         let respStr = String(resp)
         DispatchQueue.main.async {
           resolve(respStr)

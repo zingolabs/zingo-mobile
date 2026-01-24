@@ -91,8 +91,9 @@ export default QuickActionsRow;
 
 export async function requestFaucetDonation(
   address: string,
-  rpcUrl: string = 'http://127.0.0.1:8232',
+  rpcUrl: string = 'http://45.76.30.90:8232',
 ): Promise<any> {
+  console.log('faucet start', address);
   const resp = await fetch(rpcUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -103,6 +104,8 @@ export async function requestFaucetDonation(
       params: [{ address }],
     }),
   });
+
+  console.log('faucet', address);
 
   const json = await resp.json().catch(() => null);
 

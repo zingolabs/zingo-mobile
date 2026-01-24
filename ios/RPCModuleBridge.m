@@ -217,8 +217,7 @@ RCT_EXTERN_METHOD(confirmProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getWalletBondsInfo:
-    (NSString)txid
-                  resolve:(RCTPromiseResolveBlock)resolve
+    (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getRosterInfo:
     (RCTPromiseResolveBlock)resolve
