@@ -724,7 +724,7 @@ pub fn info_server() -> Result<String, ZingolibError> {
 }
 
 #[uniffi::export]
-pub fn get_roster_info() -> Result<String, ZingolibError> {
+pub fn get_roster() -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()

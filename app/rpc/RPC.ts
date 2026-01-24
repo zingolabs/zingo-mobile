@@ -1013,7 +1013,7 @@ export default class RPC {
       if (this.fetchStakedLock) return;
       this.fetchStakedLock = true;
 
-      const rosterInfoStr: string = await RPCModule.getRosterInfoProcess();
+      const rosterInfoStr: string = await RPCModule.getRosterInfo();
 
       if (!rosterInfoStr) {
         this.fnSetLastError('Error roster_info: empty response');

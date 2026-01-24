@@ -144,7 +144,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
     console.log('ACTIVE SET', activeSet);
 
     const finalList =
-      activeSet.size === 0
+      scope === 'network'
         ? base
         : base.filter(s => {
             const pk = s.pubKey.toLowerCase();
