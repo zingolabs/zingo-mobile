@@ -28,6 +28,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   totalBalance: null,
   staked: [],
   globalStaked: [],
+  walletBonds: [],
   addresses: null,
   valueTransfers: null,
   valueTransfersTotal: null,

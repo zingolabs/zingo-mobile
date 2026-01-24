@@ -107,9 +107,11 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
 
     let base: StakeType[] = scope === 'my' ? staked : globalStaked;
 
+    console.log('BASE', base, staked, globalStaked);
+
     if (exclude) base = base.filter(i => i.pubKey !== exclude);
 
-    if (searchText) {
+    if (searchText !== '') {
       const q = searchText.toLowerCase();
       base = base.filter(i => i.pubKey.toLowerCase().includes(q));
     }
@@ -137,20 +139,20 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
       ),
     );
 
-    const activeSet = new Set(activeBondKeys.map(k => k.toLowerCase()));
-
     console.log('WITHDRAWN', withdrawnKeys);
     console.log('ACTIVE', activeBondKeys);
-    console.log('ACTIVE SET', activeSet);
 
     const finalList =
       scope === 'network'
         ? base
         : base.filter(s => {
             const pk = s.pubKey.toLowerCase();
-            const rev = reverseHex32Bytes(s.pubKey).toLowerCase();
-            return activeSet.has(pk) || activeSet.has(rev);
+            const rev = s.pubKey.toLowerCase();
+            console.log('>>>>>>>> FILTERING PK', pk, rev);
+            return activeBondKeys.includes(pk) || activeBondKeys.includes(rev);
           });
+
+    console.log('FINAL LIST', finalList, base);
 
     setStakedFiltered(finalList);
 

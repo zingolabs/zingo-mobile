@@ -63,6 +63,7 @@ import {
   LaunchingModeEnum,
   StakeType,
   StakingActionType,
+  WalletBondsType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -487,6 +488,7 @@ export class LoadedAppClass extends Component<
       totalBalance: null,
       staked: [],
       globalStaked: [],
+      walletBonds: [],
       addresses: null,
       valueTransfers: null,
       valueTransfersTotal: null,
@@ -554,6 +556,7 @@ export class LoadedAppClass extends Component<
       this.setTotalBalance,
       this.setStaked,
       this.setGlobalStaked,
+      this.setWalletBonds,
       this.setValueTransfersList,
       this.setMessagesList,
       this.setAllAddresses,
@@ -898,6 +901,15 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ globalStaked });
       //console.log('=========================================== > GLOBAL STAKED STORED SETSTATE - ', Date.now() - start);
+    }
+  };
+
+  setWalletBonds = (walletBonds: WalletBondsType[]) => {
+    if (!isEqual(this.state.walletBonds, walletBonds)) {
+      //console.log('fetch wallet bonds');
+      //const start = Date.now();
+      this.setState({ walletBonds });
+      //console.log('=========================================== > WALLET BONDS STORED SETSTATE - ', Date.now() - start);
     }
   };
 
@@ -1912,6 +1924,7 @@ export class LoadedAppClass extends Component<
       totalBalance: this.state.totalBalance,
       staked: this.state.staked,
       globalStaked: this.state.globalStaked,
+      walletBonds: this.state.walletBonds,
       addresses: this.state.addresses,
       valueTransfers: this.state.valueTransfers,
       valueTransfersTotal: this.state.valueTransfersTotal,
