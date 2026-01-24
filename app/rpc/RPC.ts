@@ -15,6 +15,7 @@ import {
   ServerType,
   StakeType,
   StakingActionType,
+  WalletBondsType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCUnifiedAddressType } from './types/RPCUnifiedAddressType';
@@ -40,12 +41,14 @@ import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 import { reverseHex32Bytes } from '../utils/hex';
+import RPCWalletBondsType from './types/RPCWalletBondsType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetStaked: (staked: StakeType[]) => void;
   fnSetGlobalStaked: (GlobalStaked: StakeType[]) => void;
+  fnSetWalletBonds: (walletBonds: WalletBondsType[]) => void;
   fnSetValueTransfersList: (vtList: ValueTransferType[], total: number) => void;
   fnSetMessagesList: (mList: ValueTransferType[], total: number) => void;
   fnSetAllAddresses: (
@@ -94,6 +97,7 @@ export default class RPC {
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
     fnSetStaked: (staked: StakeType[]) => void,
     fnSetGlobalStaked: (GlobalStaked: StakeType[]) => void,
+    fnSetWalletBonds: (walletBonds: WalletBondsType[]) => void,
     fnSetValueTransfersList: (
       vtlist: ValueTransferType[],
       total: number,
@@ -119,6 +123,7 @@ export default class RPC {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetStaked = fnSetStaked;
     this.fnSetGlobalStaked = fnSetGlobalStaked;
+    this.fnSetWalletBonds = fnSetWalletBonds;
     this.fnSetValueTransfersList = fnSetValueTransfersList;
     this.fnSetMessagesList = fnSetMessagesList;
     this.fnSetAllAddresses = fnSetAllAddresses;
@@ -1034,36 +1039,46 @@ export default class RPC {
         }>;
       };
 
-      console.log('ROSTERRRRR', rosterInfo);
+      const start3 = Date.now();
+      const walletBondsStr: string = await RPCModule.getWalletBondsInfo();
 
-      const start2 = Date.now();
-      const valueTransfersStr: string = await RPCModule.getValueTransfersList();
-
-      if (Date.now() - start2 > 4000) {
+      if (Date.now() - start3 > 4000) {
         console.log(
-          '=========================================== > value transfers for roster - ',
-          Date.now() - start2,
+          '=========================================== > wallet bonds - ',
+          Date.now() - start3,
         );
       }
       //console.log(valueTransfersStr);
-      if (valueTransfersStr) {
-        if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error value transfers ${valueTransfersStr}`);
-          this.fnSetLastError(`Error value transfers: ${valueTransfersStr}`);
-          this.fetchTandZandOValueTransfersLock = false;
+      if (walletBondsStr) {
+        if (walletBondsStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error wallet bonds ${walletBondsStr}`);
+          this.fnSetLastError(`Error wallet bonds: ${walletBondsStr}`);
+          this.fetchStakedLock = false;
           return;
         }
       } else {
         console.log('Internal Error value transfers');
-        this.fetchTandZandOValueTransfersLock = false;
+        this.fetchStakedLock = false;
         return;
       }
-      const valueTransfersJSON: RPCValueTransfersType =
-        await JSON.parse(valueTransfersStr);
+      const walletBondsJSON = JSON.parse(walletBondsStr) as {
+        bonds: Array<RPCWalletBondsType>;
+      };
 
-      const valueTransferTxids = new Set(
-        (valueTransfersJSON.value_transfers ?? []).map(vt => vt.txid)
-      );    
+      const walletBondsList: WalletBondsType[] = (walletBondsJSON.bonds ?? []).map(
+        m => ({
+          txid: m.created_in_txid,
+          pubKey: m.pubkey,
+          amount: (m.amount_zats || 0) / 10 ** 8,
+          status: m.status === 0 
+                    ? 'Active'
+                    : m.status === 1
+                      ? 'Unbonding'
+                      : m.status === 2
+                        ? 'Withdrawn'
+                        : 'Active' // can be an error here
+        }),
+      );
 
       const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
         m => ({
@@ -1073,14 +1088,20 @@ export default class RPC {
       );
 
       const stakedList: StakeType[] = (rosterInfo.members ?? [])
-        .filter(m => (m.txids ?? []).some(txid => valueTransferTxids.has(txid)))
+        //.filter(m => (m.txids ?? []).some(txid => valueTransferTxids.has(txid)))
+        .filter(m => walletBondsList.filter(b => b.pubKey === m.pub_key).length > 0)
         .map(m => ({
           pubKey: m.pub_key,
           votingPower: (m.voting_power || 0) / 10 ** 8,
         }));
 
+      console.log('GLOBAL STAKED', globalStakedList);
+      console.log('STAKED', stakedList);
+      console.log('BONDS', walletBondsList);
+
       this.fnSetStaked(stakedList);
       this.fnSetGlobalStaked(globalStakedList);
+      this.fnSetWalletBonds(walletBondsList);
 
       this.fetchStakedLock = false;
     } catch (error) {
