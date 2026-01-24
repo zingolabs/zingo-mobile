@@ -1048,6 +1048,7 @@ export default class RPC {
           Date.now() - start3,
         );
       }
+
       //console.log(valueTransfersStr);
       if (walletBondsStr) {
         if (walletBondsStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1079,6 +1080,7 @@ export default class RPC {
               : m.status === 2
                 ? 'Withdrawn'
                 : 'Active', // can be an error here
+        finalizer: m.finalizer,
       }));
 
       const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
@@ -1088,15 +1090,28 @@ export default class RPC {
         }),
       );
 
-      const stakedList: StakeType[] = (rosterInfo.members ?? [])
-        //.filter(m => (m.txids ?? []).some(txid => valueTransferTxids.has(txid)))
-        .filter(
-          m => walletBondsList.filter(b => b.pubKey === m.pub_key).length > 0,
-        )
-        .map(m => ({
-          pubKey: m.pub_key,
-          votingPower: (m.voting_power || 0) / 10 ** 8,
-        }));
+      console.log('GLOBAL STAKED', globalStakedList);
+
+      const stakedList = walletBondsList
+        .filter(b => b.status === 'Active' || b.status === 'Unbonding')
+        .map(m => {
+          console.log(m);
+          return {
+            pubKey: m.pubKey,
+            votingPower: (m.amount || 0) / 10 ** 8,
+            finalizer: m.finalizer,
+          };
+        });
+
+      // const stakedList: StakeType[] = (rosterInfo.members ?? [])
+      //   //.filter(m => (m.txids ?? []).some(txid => valueTransferTxids.has(txid)))
+      //   .filter(
+      //     m => walletBondsList.filter(b => b.pubKey === m.pub_key).length > 0,
+      //   )
+      //   .map(m => ({
+      //     pubKey: m.pub_key,
+      //     votingPower: (m.voting_power || 0) / 10 ** 8,
+      //   }));
 
       console.log('GLOBAL STAKED', globalStakedList);
       console.log('STAKED', stakedList);

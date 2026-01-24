@@ -107,7 +107,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
 
     let base: StakeType[] = scope === 'my' ? staked : globalStaked;
 
-    console.log('BASE', base, staked, globalStaked);
+    console.log('BASE', base, staked, globalStaked, scope);
 
     if (exclude) base = base.filter(i => i.pubKey !== exclude);
 
@@ -139,7 +139,6 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
       ),
     );
 
-    console.log('WITHDRAWN', withdrawnKeys);
     console.log('ACTIVE', activeBondKeys);
 
     const finalList =
