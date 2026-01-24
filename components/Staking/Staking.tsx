@@ -82,7 +82,11 @@ const getPercent = (percent: number) => {
   );
 };
 
-type StakingUiKind = 'create_bond' | 'begin_unbonding' | 'withdraw_bond' | 'redelegate';
+type StakingUiKind =
+  | 'create_bond'
+  | 'begin_unbonding'
+  | 'withdraw_bond'
+  | 'redelegate';
 
 type StakingMovement = ValueTransferType & {
   stakingUiKind: StakingUiKind;
@@ -200,8 +204,6 @@ const Staking: React.FC<StakingProps> = () => {
 
     return valueTransfers
       .map(vt => {
-        console.log('VALUE TRANSFER FOUND', vt);
-
         const action = vt.stakingAction;
 
         if (action?.kind === 'create_bond') {
@@ -234,7 +236,6 @@ const Staking: React.FC<StakingProps> = () => {
 
   const stakedData: DataType[] = useMemo(() => {
     const resultJSON: StakeType[] = staked;
-    console.log(resultJSON);
     // const randomColors = Utils.generateColorList(resultJSON.length + 10);
     const r = resultJSON
       .filter((i: StakeType) => i.votingPower > 0 && !!i.pubKey)
@@ -256,8 +257,6 @@ const Staking: React.FC<StakingProps> = () => {
   }, [staked]);
 
   const { colors } = useTheme() as unknown as ThemeType;
-
-  console.log('MOVEMENTS -> ', movements);
 
   const hasMovements = !loading && movements.length > 0;
   const hasStaked = !loading && stakedData.length > 0;

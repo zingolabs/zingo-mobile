@@ -1087,6 +1087,7 @@ export default class RPC {
         m => ({
           pubKey: m.pub_key,
           votingPower: (m.voting_power || 0) / 10 ** 8,
+          finalizer: m.pub_key, // TODO: RENAME PLS
         }),
       );
 

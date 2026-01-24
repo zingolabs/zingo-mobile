@@ -15,7 +15,6 @@ import {
   GlobalConst,
   RouteEnum,
   ScreenEnum,
-  SnackbarDurationEnum,
   StakeType,
 } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -42,12 +41,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
-import Clipboard from '@react-native-clipboard/clipboard';
 import AddressItem from '../Components/AddressItem';
 import ChartPieIcon from '../../assets/icons/chart-pie.svg';
 import ZcashIcon from '../../assets/icons/zcash.svg';
 import ZecAmount from '../Components/ZecAmount';
 import { XIcon } from '../Components/Icons/XIcon';
+import { reverseHex32Bytes } from '../../app/utils/hex';
 
 type FinalizersProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -78,10 +77,9 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
     removeFirstSnackbar,
     staked,
     globalStaked,
-    addLastSnackbar,
-    translate,
     info,
     valueTransfers,
+    walletBonds,
   } = context;
   const { clear } = useToast();
   const screenName = ScreenEnum.About;
@@ -138,21 +136,41 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
       ),
     );
 
-    console.log('ACTIVE', activeBondKeys);
+    console.log('ACTIVE BONDS', activeBondKeys);
 
     const finalList =
       scope === 'network'
-        ? base
-        : base.filter(s => {
-            const pk = s.pubKey.toLowerCase();
-            const rev = s.pubKey.toLowerCase();
-            console.log('>>>>>>>> FILTERING PK', pk, rev);
-            return activeBondKeys.includes(pk) || activeBondKeys.includes(rev);
-          });
+        ? base.map(s => {
+            return {
+              ...s,
+              finalizer: reverseHex32Bytes(s.pubKey),
+            };
+          })
+        : base
+            .filter(s => {
+              let found = walletBonds.find(b => {
+                return b.pubKey === s.pubKey;
+              });
 
-    console.log('FINAL LIST', finalList, base);
+              if (found) {
+                return true;
+              }
+            })
+            .map(s => {
+              return {
+                ...s,
+                finalizer: reverseHex32Bytes(s.finalizer),
+              };
+            });
+    const byFinalizer = new Map<string, (typeof finalList)[number]>();
 
-    setStakedFiltered(finalList);
+    for (const s of finalList) {
+      if (!byFinalizer.has(s.finalizer)) byFinalizer.set(s.finalizer, s);
+    }
+
+    const filteredFinalList = [...byFinalizer.values()];
+
+    setStakedFiltered(filteredFinalList);
 
     if (randomColors.length === 0) {
       setRandomColors(Utils.generateColorList(finalList.length + 10));
@@ -226,7 +244,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
         style={{ width: '100%' }}
         key={`tag-${index}`}
         onPress={() => {
-          setFinalizer(item.pubKey, item.votingPower);
+          setFinalizer(item.finalizer, item.votingPower);
           if (navigation.canGoBack()) {
             navigation.goBack();
           }
@@ -260,16 +278,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
               icon={faCircle}
               color={randomColors[index]}
             />
-            <TouchableOpacity
-              onPress={() => {
-                Clipboard.setString(item.pubKey);
-                addLastSnackbar({
-                  message: translate('history.addresscopied') as string,
-                  duration: SnackbarDurationEnum.short,
-                  screenName: [screenName],
-                });
-              }}
-            >
+            <TouchableOpacity onPress={() => {}}>
               <View
                 style={{
                   display: 'flex',
@@ -278,26 +287,26 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
                 }}
               >
                 <AddressItem
-                  address={item.pubKey}
+                  address={item.finalizer}
                   screenName={screenName}
                   oneLine={true}
                   onlyContact={true}
                   withIcon={true}
                 />
-                {!expandAddress[index] && !!item.pubKey && (
+                {!expandAddress[index] && !!item.finalizer && (
                   <RegText>
-                    {item.pubKey.length > (dimensions.width < 500 ? 10 : 20)
+                    {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
                       ? Utils.trimToSmall(
-                          item.pubKey,
+                          item.finalizer,
                           dimensions.width < 500 ? 5 : 10,
                         )
-                      : item.pubKey}
+                      : item.finalizer}
                   </RegText>
                 )}
                 {expandAddress[index] &&
-                  !!item.pubKey &&
+                  !!item.finalizer &&
                   Utils.splitStringIntoChunks(
-                    item.pubKey,
+                    item.finalizer,
                     Number(numLines.toFixed(0)),
                   ).map((c: string, idx: number) => (
                     <RegText key={idx}>{c}</RegText>

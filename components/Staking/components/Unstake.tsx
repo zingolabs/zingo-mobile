@@ -37,7 +37,7 @@ import { ThemeType } from '../../../app/types/ThemeType';
 import {
   RouteEnum,
   SendPageStateClass,
-  ValueTransferType,
+  WalletBondsType,
 } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -104,113 +104,17 @@ const Unstake: React.FC<UnstakeProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers } = context;
+  const { walletBonds } = context;
 
-  const movements: ValueTransferType[] = useMemo(() => {
-    if (!valueTransfers) return [];
+  const movements = walletBonds.filter(
+    b =>
+      b.status !== 'Withdrawn' &&
+      finalizerFromText &&
+      b.finalizer === reverseHex32Bytes(finalizerFromText),
+  );
 
-    const bondKeyOf = (vt: ValueTransferType): string | null => {
-      if (vt.confirmations === 0) return null;
-      const sa = vt.stakingAction;
-      if (!sa) return null;
-      const k = sa.unique_public_key ?? null;
-      return typeof k === 'string' && /^[0-9a-fA-F]{64}$/.test(k)
-        ? k.toLowerCase()
-        : null;
-    };
-
-    const isNewer = (a: ValueTransferType, b: ValueTransferType) => {
-      // Use time as primary; blockheight as tie-breaker if you want.
-      // (time seems stable in your logs)
-      return a.time > b.time;
-    };
-
-    const createBonds = valueTransfers.filter(vt => {
-      if (vt.confirmations === 0) return false;
-      const sa = vt.stakingAction;
-      if (!sa || sa.kind !== 'create_bond') return false;
-
-      if (!finalizerFromText) return true;
-      return sa.target === reverseHex32Bytes(finalizerFromText);
-    });
-
-    const beginByBondKey = new Map<string, ValueTransferType>();
-    const withdrawByBondKey = new Map<string, ValueTransferType>();
-
-    for (const vt of valueTransfers) {
-      if (vt.confirmations === 0) continue;
-      const sa = vt.stakingAction;
-      if (!sa) continue;
-
-      const k = bondKeyOf(vt);
-      if (!k) continue;
-
-      if (sa.kind === 'begin_unbonding') {
-        const prev = beginByBondKey.get(k);
-        if (!prev || isNewer(vt, prev)) beginByBondKey.set(k, vt);
-      }
-
-      if (sa.kind === 'withdraw_bond') {
-        const prev = withdrawByBondKey.get(k);
-        if (!prev || isNewer(vt, prev)) withdrawByBondKey.set(k, vt);
-      }
-    }
-
-    const out: ValueTransferType[] = [];
-    const seenBondKey = new Set<string>();
-
-    for (const bond of createBonds) {
-      const k = bondKeyOf(bond);
-      if (!k) continue;
-      if (seenBondKey.has(k)) continue;
-      seenBondKey.add(k);
-
-      const begin = beginByBondKey.get(k);
-      const withdraw = withdrawByBondKey.get(k);
-
-      // If there's a withdraw that is newer than the last begin/create, hide it.
-      // (This is what you want: "I shouldn't see anything")
-      const latestAction = (() => {
-        let latest: ValueTransferType = bond;
-        if (begin && isNewer(begin, latest)) latest = begin;
-        if (withdraw && isNewer(withdraw, latest)) latest = withdraw;
-        return latest;
-      })();
-
-      if (latestAction.stakingAction?.kind === 'withdraw_bond') {
-        continue;
-      }
-
-      // Display row: prefer begin if that's the latest (and not withdrawn)
-      const row: ValueTransferType =
-        latestAction.stakingAction?.kind === 'begin_unbonding'
-          ? ({
-              ...latestAction, // begin tx
-              fee: bond.fee, // keep your “stake amount from create” hack if desired
-              stakingAction: latestAction.stakingAction
-                ? {
-                    ...latestAction.stakingAction,
-                    val:
-                      bond.stakingAction?.val ?? latestAction.stakingAction.val,
-                    target:
-                      bond.stakingAction?.target ??
-                      latestAction.stakingAction.target,
-                    unique_public_key:
-                      bond.stakingAction?.unique_public_key ??
-                      latestAction.stakingAction.unique_public_key,
-                  }
-                : latestAction.stakingAction,
-            } as ValueTransferType)
-          : bond; // still bonded
-
-      out.push(row);
-    }
-
-    return out.sort((a, b) => b.time - a.time);
-  }, [finalizerFromText, valueTransfers]);
-
-  const selectedTx = movements.find(tx => tx.txid === selectedTxid);
-  const hasSelectedTx = !!selectedTx;
+  const selectedBond = movements.find(tx => tx.txid === selectedTxid);
+  const hasSelectedTx = !!selectedBond;
   const isValidForm = hasSelectedTx;
 
   useEffect(() => {
@@ -303,49 +207,12 @@ const Unstake: React.FC<UnstakeProps> = ({
     return `${txid.slice(0, 10)}…${txid.slice(-8)}`;
   };
 
-  const isHex64 = (s: string) => /^[0-9a-fA-F]{64}$/.test(s);
-
-  const getBondTxidDisplayFromSelection = (
-    _selectedTx: ValueTransferType,
-    _valueTransfers: ValueTransferType[] | undefined,
-  ): string | null => {
-    console.log('getBondTxidDisplayFromSelection selectedTx', _selectedTx);
-    console.log(
-      'getBondTxidDisplayFromSelection valueTransfers',
-      _valueTransfers,
-    );
-    const a = _selectedTx.stakingAction as any;
-    if (!a) return null;
-
-    if (a.kind === 'create_bond') return _selectedTx.txid;
-
-    if (a.kind === 'begin_unbonding') {
-      const bondKey = a.unique_public_key ?? a.arg32_0;
-      if (!isHex64(bondKey)) return null;
-
-      const match = (_valueTransfers ?? []).find(vt => {
-        if (vt.confirmations === 0) return false;
-        const sa = vt.stakingAction as any;
-        if (!sa || sa.kind !== 'create_bond') return false;
-        const k = sa.unique_public_key ?? sa.arg32_0;
-        return isHex64(k) && k.toLowerCase() === bondKey.toLowerCase();
-      });
-
-      return match?.txid ?? null;
-    }
-
-    return null;
-  };
-
   const handleUnstakePress = async () => {
-    if (!isValidForm || !selectedTx) return;
+    if (!isValidForm || !selectedBond) return;
 
-    const selectedKind = selectedTx.stakingAction?.kind;
+    const selectedKind = selectedBond.status;
 
-    const bondTxid = getBondTxidDisplayFromSelection(
-      selectedTx,
-      valueTransfers as ValueTransferType[], // TODO
-    );
+    const bondTxid = selectedBond.txid;
     if (!bondTxid) {
       Alert.alert('Error', 'Could not determine the original bond txid.');
       return;
@@ -357,10 +224,10 @@ const Unstake: React.FC<UnstakeProps> = ({
     setModalState('sending');
 
     try {
-      if (selectedKind === 'create_bond') {
+      if (selectedKind === 'Active') {
         await beginUnstakeTransaction(bondTxid);
-      } else if (selectedKind === 'begin_unbonding') {
-        await withdrawBondTransaction(selectedTx.txid);
+      } else if (selectedKind === 'Unbonding') {
+        await withdrawBondTransaction(selectedBond.txid);
       } else {
         Alert.alert(
           'Error',
@@ -380,13 +247,13 @@ const Unstake: React.FC<UnstakeProps> = ({
   };
 
   const actionVerb = useMemo(() => {
-    const k = selectedTx?.stakingAction?.kind;
+    const k = selectedBond?.status;
 
-    if (k === 'begin_unbonding') return 'Withdraw';
-    if (k === 'create_bond') return 'Unbond';
+    if (k === 'Unbonding') return 'Withdraw';
+    if (k === 'Active') return 'Unbond';
 
     return 'Unstake';
-  }, [selectedTx]);
+  }, [selectedBond]);
 
   const handleViewMovements = () => {
     setModalState('idle');
@@ -398,12 +265,11 @@ const Unstake: React.FC<UnstakeProps> = ({
 
   const renderSeparator = () => <View style={{ height: 8 }} />;
 
-  const renderStakedTxItem = ({ item }: { item: ValueTransferType }) => {
+  const renderStakedTxItem = ({ item }: { item: WalletBondsType }) => {
     console.log('item', item);
     const isSelected = item.txid === selectedTxid;
 
-    const fee = item.fee ?? 0;
-    let displayAmount = String((fee - 0.0001).toFixed(2));
+    let displayAmount = item.amount;
 
     return (
       <Pressable
@@ -432,7 +298,9 @@ const Unstake: React.FC<UnstakeProps> = ({
             }}
             numberOfLines={1}
           >
-            {shortenTxid(item.txid)}
+            {item.status === 'Unbonding'
+              ? 'Inactive'
+              : item.status || 'unknown'}
           </Text>
           <Text
             style={{
@@ -441,7 +309,7 @@ const Unstake: React.FC<UnstakeProps> = ({
               marginTop: 2,
             }}
           >
-            Type: {item.stakingAction?.kind || 'unknown'}
+            {shortenTxid(item.pubKey)}
           </Text>
         </View>
         <Text
