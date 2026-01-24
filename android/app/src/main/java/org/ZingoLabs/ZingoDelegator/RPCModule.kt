@@ -1464,27 +1464,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun getAccumulatedStakeForTxidInfo(txid: String, promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getAccumulatedStakeForTxid(txid)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp.toString())
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] accumulated stake for txid: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
-    }
-
-    @ReactMethod
     fun stakeProcess(stake_json: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -1574,17 +1553,38 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun getRosterInfoProcess(promise: Promise) {
+    fun getRosterInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getRosterInfo()
+                val resp = uniffi.zingo.getRoster()
 
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] get roster info: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getWalletBondsInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getWalletBonds()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] get wallet bonds info: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {

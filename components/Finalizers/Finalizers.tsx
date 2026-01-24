@@ -140,7 +140,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
     const activeSet = new Set(activeBondKeys.map(k => k.toLowerCase()));
 
     const finalList =
-      activeSet.size === 0
+      scope === 'network'
         ? base
         : base.filter(s => {
             const pk = s.pubKey.toLowerCase();
