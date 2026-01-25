@@ -1290,6 +1290,16 @@ export class LoadedAppClass extends Component<
     }
   };
 
+  redelegateTransaction = async (createBondTxid: string): Promise<string> => {
+    try {
+      //const txid = await this.rpc.sendWithdrawBondTx(createBondTxid);
+      const txid = createBondTxid; // TODO: ffi for redelagate
+      return txid;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   doRefresh = (screen: ScreenEnum) => {
     //console.log('================== MANUAL REFRESH ================== ', screen);
     if (screen === ScreenEnum.History || screen === ScreenEnum.ContactList) {
@@ -2107,7 +2117,6 @@ export class LoadedAppClass extends Component<
                 {props => (
                   <Unstake
                     {...props}
-                    stakeTransaction={this.stakeTransaction}
                     beginUnstakeTransaction={this.beginUnstakeTransaction}
                     withdrawBondTransaction={this.withdrawBondTransaction}
                   />
@@ -2118,7 +2127,7 @@ export class LoadedAppClass extends Component<
                 {props => (
                   <Redelegate
                     {...props}
-                    stakeTransaction={this.stakeTransaction}
+                    redelegateTransaction={this.redelegateTransaction}
                   />
                 )}
               </InnerStack.Screen>

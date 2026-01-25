@@ -28,22 +28,22 @@ import {
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
-  ChainNameEnum,
+  //ChainNameEnum,
   GlobalConst,
   RouteEnum,
-  SendPageStateClass,
-  ToAddrClass,
+  //SendPageStateClass,
+  //ToAddrClass,
   ValueTransferType,
 } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
-import { StakingActionType } from '../../../app/AppState';
+//import { StakingActionType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
-import {
-  MINER_ADDRESS_REGTEST,
-  MINER_ADDRESS_TESTNET,
-} from '../../../app/utils/constants';
+//import {
+//  MINER_ADDRESS_REGTEST,
+//  MINER_ADDRESS_TESTNET,
+//} from '../../../app/utils/constants';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
@@ -51,13 +51,10 @@ import FadeText from '../../Components/FadeText';
 type ModalState = 'idle' | 'sending' | 'success';
 
 type RedelegateProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Redelegate> & {
-  stakeTransaction: (
-    sendPageState: SendPageStateClass,
-    stakingAction: StakingActionType,
-  ) => Promise<string>;
+  redelegateTransaction: (txid: string) => Promise<string>;
 };
 
-const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
+const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
   const finalizer = !!route.params && route.params.finalizer !== undefined ? route.params.finalizer : '';
   const staked = !!route.params && route.params.staked !== undefined ? route.params.staked : 0;
   const closeSheet = !!route.params && route.params.closeSheet !== undefined ? route.params.closeSheet : () => {};
@@ -90,7 +87,10 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers, indexerServer } = context;
+  const { 
+    valueTransfers, 
+    //indexerServer,
+  } = context;
 
   const movements: ValueTransferType[] = useMemo(() => {
     if (!valueTransfers) return [];
@@ -268,6 +268,13 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
       return;
     }
 
+    Alert.alert(
+      "Redelegate",
+      "Functionallity under construction.",
+    );
+    return;
+
+  /*
     const miner = selectedTx.address;
 
     if (!miner) {
@@ -318,13 +325,14 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
     console.log('UNSTAKING action:', stakingAction);
 
     try {
-      await stakeTransaction(sendPageState, stakingAction);
+      //await redelegateTransaction(txid);
       setModalState('success');
     } catch (error) {
       console.warn('Unstake tx failed:', error);
       setModalState('idle');
       navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
+  */
   };
 
   const handleViewMovements = () => {
