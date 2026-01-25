@@ -238,15 +238,15 @@ const Staking: React.FC<StakingProps> = () => {
     const resultJSON: StakeType[] = staked;
     // const randomColors = Utils.generateColorList(resultJSON.length + 10);
     const r = resultJSON
-      .filter((i: StakeType) => i.votingPower > 0 && !!i.pubKey)
+      .filter((i: StakeType) => i.votingPower > 0 && !!i.finalizer)
       .sort((a, b) => b.votingPower - a.votingPower)
       .map((item, index) => {
         return {
           value: item.votingPower,
-          finalizer: item.pubKey,
+          finalizer: item.finalizer,
           tag: '',
           svg: {
-            data: lifehashDataUrlFromStringSync(item.pubKey),
+            data: lifehashDataUrlFromStringSync(item.finalizer),
           },
           key: `pie-${index}`,
         };

@@ -1,6 +1,6 @@
 export default interface RPCWalletBondsType {
   created_in_txid: string;
-  pub_key: string;
+  pub_key: string; // is not finalizer
   amount_zats: number;
   // 0 - Active
   // 1 - Unbonding

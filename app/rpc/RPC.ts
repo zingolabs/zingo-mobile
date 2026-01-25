@@ -42,6 +42,7 @@ import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 import { reverseHex32Bytes } from '../utils/hex';
 import RPCWalletBondsType from './types/RPCWalletBondsType';
+import { RPCStakedType } from './types/RPCStakedType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -1032,11 +1033,7 @@ export default class RPC {
       }
 
       const rosterInfo = JSON.parse(rosterInfoStr) as {
-        members: Array<{
-          pub_key: string;
-          voting_power: number;
-          txids?: any[];
-        }>;
+        members: Array<RPCStakedType>;
       };
 
       const start3 = Date.now();
@@ -1080,39 +1077,34 @@ export default class RPC {
               : m.status === 2
                 ? 'Withdrawn'
                 : 'Active', // can be an error here
-        finalizer: m.finalizer,
+        finalizer: reverseHex32Bytes(m.finalizer),
       }));
 
       const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
         m => ({
-          pubKey: m.pub_key,
-          votingPower: (m.voting_power || 0) / 10 ** 8,
           finalizer: m.pub_key, // TODO: RENAME PLS
+          votingPower: (m.voting_power || 0) / 10 ** 8,
         }),
       );
 
-      console.log('GLOBAL STAKED', globalStakedList);
-
-      const stakedList = walletBondsList
-        .filter(b => b.status === 'Active' || b.status === 'Unbonding')
+      const stakedList: StakeType[] = (rosterInfo.members ?? [])
+        .filter(
+          m => walletBondsList
+            .filter(b => m.pub_key === b.finalizer && 
+                   (b.status === 'Active' || 
+                    b.status === 'Unbonding')).length > 0,
+        )
         .map(m => {
-          console.log(m);
+          const amount = walletBondsList
+            .filter(b => m.pub_key === b.finalizer && 
+                   (b.status === 'Active' || 
+                    b.status === 'Unbonding'))
+            .reduce((acc, curr) => acc + curr.amount, 0);
           return {
-            pubKey: m.pubKey,
-            votingPower: (m.amount || 0) / 10 ** 8,
-            finalizer: m.finalizer,
+            finalizer: m.pub_key,
+            votingPower: (amount || 0),
           };
         });
-
-      // const stakedList: StakeType[] = (rosterInfo.members ?? [])
-      //   //.filter(m => (m.txids ?? []).some(txid => valueTransferTxids.has(txid)))
-      //   .filter(
-      //     m => walletBondsList.filter(b => b.pubKey === m.pub_key).length > 0,
-      //   )
-      //   .map(m => ({
-      //     pubKey: m.pub_key,
-      //     votingPower: (m.voting_power || 0) / 10 ** 8,
-      //   }));
 
       console.log('GLOBAL STAKED', globalStakedList);
       console.log('STAKED', stakedList);

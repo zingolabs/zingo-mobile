@@ -46,7 +46,6 @@ import ChartPieIcon from '../../assets/icons/chart-pie.svg';
 import ZcashIcon from '../../assets/icons/zcash.svg';
 import ZecAmount from '../Components/ZecAmount';
 import { XIcon } from '../Components/Icons/XIcon';
-import { reverseHex32Bytes } from '../../app/utils/hex';
 
 type FinalizersProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -78,7 +77,6 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
     staked,
     globalStaked,
     info,
-    valueTransfers,
     walletBonds,
   } = context;
   const { clear } = useToast();
@@ -106,50 +104,27 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
 
     console.log('BASE', base, staked, globalStaked, scope);
 
-    if (exclude) base = base.filter(i => i.pubKey !== exclude);
+    if (exclude) base = base.filter(i => i.finalizer !== exclude);
 
     if (searchText !== '') {
       const q = searchText.toLowerCase();
-      base = base.filter(i => i.pubKey.toLowerCase().includes(q));
+      base = base.filter(i => i.finalizer.toLowerCase().includes(q));
     }
 
     base = base.sort((a, b) => b.votingPower - a.votingPower);
-
-    const withdrawnKeys = new Set(
-      (valueTransfers ?? [])
-        .filter(vt => vt.confirmations > 0)
-        .map(vt => vt.stakingAction)
-        .filter((sa): sa is NonNullable<typeof sa> => !!sa)
-        .filter(sa => sa.kind === 'withdraw_bond')
-        .map(sa => sa.target),
-    );
-
-    const activeBondKeys = Array.from(
-      new Set(
-        (valueTransfers ?? [])
-          .filter(vt => vt.confirmations > 0)
-          .map(vt => vt.stakingAction)
-          .filter((sa): sa is NonNullable<typeof sa> => !!sa)
-          .filter(sa => sa.kind === 'create_bond')
-          .map(sa => sa.target)
-          .filter(pk => !withdrawnKeys.has(pk)),
-      ),
-    );
-
-    console.log('ACTIVE BONDS', activeBondKeys);
 
     const finalList =
       scope === 'network'
         ? base.map(s => {
             return {
               ...s,
-              finalizer: reverseHex32Bytes(s.pubKey),
+              finalizer: s.finalizer,
             };
           })
         : base
             .filter(s => {
               let found = walletBonds.find(b => {
-                return b.pubKey === s.pubKey;
+                return b.finalizer === s.finalizer;
               });
 
               if (found) {
@@ -159,7 +134,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
             .map(s => {
               return {
                 ...s,
-                finalizer: reverseHex32Bytes(s.finalizer),
+                finalizer: s.finalizer,
               };
             });
     const byFinalizer = new Map<string, (typeof finalList)[number]>();
@@ -236,9 +211,9 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
     const percent = (100 * item.votingPower) / totalValue;
     // 30 characters per line
     const numLines =
-      item.pubKey.length < 40
+      item.finalizer.length < 40
         ? 2
-        : item.pubKey.length / (dimensions.width < 500 ? 21 : 30);
+        : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <TouchableOpacity
         style={{ width: '100%' }}
@@ -248,11 +223,6 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
           if (navigation.canGoBack()) {
             navigation.goBack();
           }
-          // navigation.navigate(goBackRoute, {
-          //   finalizer: item.pubKey,
-          //   staked: item.votingPower,
-          //   closeSheet: () => navigation.goBack(),
-          // });
         }}
       >
         <View

@@ -47,7 +47,6 @@ import Utils from '../../../app/utils';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
-import { reverseHex32Bytes } from '../../../app/utils/hex';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -107,11 +106,14 @@ const Unstake: React.FC<UnstakeProps> = ({
   const { walletBonds } = context;
 
   const movements = walletBonds.filter(
-    b =>
-      b.status !== 'Withdrawn' &&
-      finalizerFromText &&
-      b.finalizer === reverseHex32Bytes(finalizerFromText),
-  );
+    b => {
+      if (b.status === 'Withdrawn') return false;
+      if (!!finalizerFromText && b.finalizer === finalizerFromText) return true
+      // no finalizer selected, all bonds visible. Impossible case for now.
+      if (!finalizerFromText) return true;
+      return false;
+    }
+  ).sort((a, b) => b.amount - a.amount);
 
   const selectedBond = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedBond;
@@ -269,7 +271,7 @@ const Unstake: React.FC<UnstakeProps> = ({
     console.log('item', item);
     const isSelected = item.txid === selectedTxid;
 
-    let displayAmount = item.amount;
+    let displayAmount = item.amount.toFixed(5);
 
     return (
       <Pressable
@@ -420,7 +422,7 @@ const Unstake: React.FC<UnstakeProps> = ({
                 {!!stakedFrom && (
                   <FadeText
                     style={{ marginLeft: 5, marginBottom: 10 }}
-                  >{`Voting power: ${stakedFrom}`}</FadeText>
+                  >{`Voting power: ${stakedFrom.toFixed(5)}`}</FadeText>
                 )}
               </View>
             </View>
