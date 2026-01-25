@@ -20,7 +20,6 @@ import {
   KeyboardAvoidingView,
   FlatList,
   Alert,
-  NativeModules,
   TextInput,
   TouchableOpacity,
 } from 'react-native';
@@ -35,7 +34,6 @@ import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
-  GlobalConst,
   RouteEnum,
   SendPageStateClass,
   WalletBondsType,
@@ -83,13 +81,6 @@ const Unstake: React.FC<UnstakeProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
 
-  const { RPCModule } = NativeModules as {
-    RPCModule: {
-      // Promise resolves to a string (either "Error: ..." or the u64 value in zats)
-      getAccumulatedStakeForTxidInfo(txid: string): Promise<string>;
-    };
-  };
-
   const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
   const [stakedFrom, setStakedFrom] = useState<number>(staked);
   const [selectedTxid, setSelectedTxid] = useState<string>('');
@@ -97,10 +88,6 @@ const Unstake: React.FC<UnstakeProps> = ({
   const [kbOpen, setKbOpen] = useState(false);
 
   const launchedSelectorRef = useRef<boolean>(false);
-
-  const [_accumulatedStakeByTxid, setAccumulatedStakeByTxid] = useState<
-    Record<string, string>
-  >({});
 
   const modalVisible = modalState !== 'idle';
 
@@ -154,55 +141,6 @@ const Unstake: React.FC<UnstakeProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Fetch accumulated stake for each txid shown in the list
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchAccumulatedStake = async () => {
-      const updates: Record<string, string> = {};
-
-      for (const m of movements) {
-        try {
-          const resp = await RPCModule.getAccumulatedStakeForTxidInfo(m.txid);
-
-          if (typeof resp !== 'string') {
-            continue;
-          }
-
-          if (resp.toLowerCase().startsWith(GlobalConst.error)) {
-            console.warn(
-              '[Unstake] getAccumulatedStakeForTxidInfo error for',
-              m.txid,
-              resp,
-            );
-            continue;
-          }
-
-          // resp is the u64 number (zats) converted to string on Swift side
-          updates[m.txid] = resp;
-        } catch (e) {
-          console.warn(
-            '[Unstake] getAccumulatedStakeForTxidInfo failed for',
-            m.txid,
-            e,
-          );
-        }
-      }
-
-      if (!cancelled && Object.keys(updates).length > 0) {
-        setAccumulatedStakeByTxid(prev => ({ ...prev, ...updates }));
-      }
-    };
-
-    if (movements.length > 0) {
-      fetchAccumulatedStake();
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [movements, RPCModule]);
 
   const shortenTxid = (txid: string) => {
     if (txid.length <= 16) {
@@ -466,7 +404,7 @@ const Unstake: React.FC<UnstakeProps> = ({
               marginBottom: 8,
             }}
           >
-            Active bonds
+            Bonds
           </Text>
 
           <Text

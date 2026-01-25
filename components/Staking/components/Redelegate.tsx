@@ -13,7 +13,6 @@ import {
   KeyboardAvoidingView,
   FlatList,
   Alert,
-  NativeModules,
   TextInput,
   TouchableOpacity,
 } from 'react-native';
@@ -29,7 +28,6 @@ import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
   ChainNameEnum,
-  GlobalConst,
   RouteEnum,
   SendPageStateClass,
   ToAddrClass,
@@ -66,13 +64,6 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
 
-  const { RPCModule } = NativeModules as {
-    RPCModule: {
-      // Promise resolves to a string (either "Error: ..." or the u64 value in zats)
-      getAccumulatedStakeForTxidInfo(txid: string): Promise<string>;
-    };
-  };
-
   const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
   const [stakedFrom, setStakedFrom] = useState<number>(staked);
   const [finalizerToText, setFinalizerToText] = useState<string>('');
@@ -81,11 +72,6 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
-
-  // txid -> zats as string (from native)
-  const [accumulatedStakeByTxid, setAccumulatedStakeByTxid] = useState<
-    Record<string, string>
-  >({});
 
   const modalVisible = modalState !== 'idle';
 
@@ -194,73 +180,11 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
-
-  // Fetch accumulated stake for each txid shown in the list
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchAccumulatedStake = async () => {
-      const updates: Record<string, string> = {};
-
-      for (const m of movements) {
-        try {
-          const resp = await RPCModule.getAccumulatedStakeForTxidInfo(m.txid);
-
-          if (typeof resp !== 'string') {
-            continue;
-          }
-
-          if (resp.toLowerCase().startsWith(GlobalConst.error)) {
-            console.warn(
-              '[Unstake] getAccumulatedStakeForTxidInfo error for',
-              m.txid,
-              resp,
-            );
-            continue;
-          }
-
-          // resp is the u64 number (zats) converted to string on Swift side
-          updates[m.txid] = resp;
-        } catch (e) {
-          console.warn(
-            '[Unstake] getAccumulatedStakeForTxidInfo failed for',
-            m.txid,
-            e,
-          );
-        }
-      }
-
-      if (!cancelled && Object.keys(updates).length > 0) {
-        setAccumulatedStakeByTxid(prev => ({ ...prev, ...updates }));
-      }
-    };
-
-    if (movements.length > 0) {
-      fetchAccumulatedStake();
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [movements, RPCModule]);
-
   const shortenTxid = (txid: string) => {
     if (txid.length <= 16) {
       return txid;
     }
     return `${txid.slice(0, 10)}…${txid.slice(-8)}`;
-  };
-
-  const getAccumulatedStakeZatsForTxid = (txid: string): number | null => {
-    const zatsStr = accumulatedStakeByTxid[txid];
-    if (!zatsStr) {
-      return null;
-    }
-    const zats = Number(zatsStr);
-    if (Number.isNaN(zats)) {
-      return null;
-    }
-    return zats;
   };
 
   const handleUnstakePress = async () => {
@@ -274,23 +198,6 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
       Alert.alert(
         'Missing miner address',
         'Could not determine the miner address from the selected transaction.',
-      );
-      return;
-    }
-
-    const zats = getAccumulatedStakeZatsForTxid(selectedTx.txid);
-    if (zats === null) {
-      Alert.alert(
-        'Unstake amount not ready',
-        'Could not determine the remaining staked amount for this transaction yet. Please wait a moment and try again.',
-      );
-      return;
-    }
-
-    if (zats <= 0) {
-      Alert.alert(
-        'Invalid unstake amount',
-        'The remaining staked amount for this transaction is invalid or zero.',
       );
       return;
     }
@@ -310,7 +217,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
       kind: 'begin_unbonding',
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
       // use the backend value in zats directly
-      val: zats,
+      val: 0, // incorredt - need to fix.
       target:
         (selectedTx.stakingAction && selectedTx.stakingAction?.target) || '',
     };
@@ -340,13 +247,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
   const renderStakedTxItem = ({ item }: { item: ValueTransferType }) => {
     const isSelected = item.txid === selectedTxid;
 
-    const zats = getAccumulatedStakeZatsForTxid(item.txid);
     let displayAmount = String(item.amount);
-
-    if (zats !== null) {
-      const amountInCoin = zats / 10 ** 8;
-      displayAmount = Utils.parseNumberFloatToStringLocale(amountInCoin, 8);
-    }
 
     return (
       <Pressable
@@ -640,15 +541,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
                 }}
               >
                 {(() => {
-                  const zats = getAccumulatedStakeZatsForTxid(selectedTx.txid);
-                  if (zats === null) {
                     return `${selectedTx.amount} cTAZ`;
-                  }
-                  const amountInCoin = zats / 10 ** 8;
-                  return `${Utils.parseNumberFloatToStringLocale(
-                    amountInCoin,
-                    8,
-                  )} cTAZ`;
                 })()}
               </Text>
             </Text>
