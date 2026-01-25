@@ -11,9 +11,7 @@ type StakingActionsProps = {
   stakingDay: boolean;
 };
 
-const StakingActions: React.FC<StakingActionsProps> = ({ 
-  stakingDay
-}) => {
+const StakingActions: React.FC<StakingActionsProps> = ({ stakingDay }) => {
   const navigation: any = useNavigation();
 
   return (
@@ -28,7 +26,7 @@ const StakingActions: React.FC<StakingActionsProps> = ({
         gap: 20,
       }}
     >
-      {stakingDay ? (
+      {stakingDay || true ? (
         <>
           <Pressable
             onPress={() => navigation.navigate(RouteEnum.Stake)}
@@ -44,7 +42,7 @@ const StakingActions: React.FC<StakingActionsProps> = ({
           </Pressable>
 
           <Pressable
-            onPress={() => 
+            onPress={() =>
               navigation.navigate(RouteEnum.Unstake, {
                 finalizer: undefined,
                 staked: undefined,
@@ -76,18 +74,19 @@ const StakingActions: React.FC<StakingActionsProps> = ({
               margin: 25,
             }}
           >
-            <View 
-              style={{ 
-                flexDirection: 'row', 
-                gap: 10, 
-                justifyContent: 'center', 
-                alignItems: 'center', 
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
                 flexShrink: 1,
                 padding: 10,
-              }}>
+              }}
+            >
               <TriangleAlert color={'#8e8e93'} size={24} />
               <View>
-                <RegText>Staking actions are currently disabled.</RegText> 
+                <RegText>Staking actions are currently disabled.</RegText>
                 <RegText style={{ color: '#8e8e93' }}>
                   They will only be available during the next staking day.
                 </RegText>

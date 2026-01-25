@@ -111,7 +111,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
 
   useEffect(() => {
-    const percentage: number = syncingStatus.percentage_total_outputs_scanned || syncingStatus.percentage_total_blocks_scanned || 0;
+    const percentage: number =
+      syncingStatus.percentage_total_outputs_scanned ||
+      syncingStatus.percentage_total_blocks_scanned ||
+      0;
     if (
       !syncingStatus ||
       isEqual(syncingStatus, {} as RPCSyncStatusType) ||
@@ -124,17 +127,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     } else {
       // avoiding 0.00 or 100%, minimum 0.01, maximun 99.99
       setPercentageOutputsScanned(
-        percentage &&
-          percentage < 0.01
+        percentage && percentage < 0.01
           ? 0.01
-          : percentage &&
-              percentage > 99.99
+          : percentage && percentage > 99.99
             ? 99.99
-            : Number(
-                percentage
-                  ?.toFixed(2)
-                  .replace(/\.?0+$/, ''),
-              ),
+            : Number(percentage?.toFixed(2).replace(/\.?0+$/, '')),
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&

@@ -63,6 +63,7 @@ import {
   LaunchingModeEnum,
   StakeType,
   StakingActionType,
+  WalletBondsType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -105,9 +106,7 @@ import ComputingError from './components/ComputingError';
 import { Staking, AddStakeScreen, Unstake } from '../../components/Staking';
 import SettingsServers from '../../components/Settings/components/SettingsServers';
 import DebugInfo from '../../components/Settings/components/DebugInfo';
-import {
-  StakeJsonToTypeType,
-} from '../AppState/types/ValueTransferType';
+import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 import Distribution from '../../components/Distribution';
 import Redelegate from '../../components/Staking/components/Redelegate';
 import Finalizers from '../../components/Finalizers/Finalizers';
@@ -489,6 +488,7 @@ export class LoadedAppClass extends Component<
       totalBalance: null,
       staked: [],
       globalStaked: [],
+      walletBonds: [],
       addresses: null,
       valueTransfers: null,
       valueTransfersTotal: null,
@@ -556,6 +556,7 @@ export class LoadedAppClass extends Component<
       this.setTotalBalance,
       this.setStaked,
       this.setGlobalStaked,
+      this.setWalletBonds,
       this.setValueTransfersList,
       this.setMessagesList,
       this.setAllAddresses,
@@ -903,6 +904,15 @@ export class LoadedAppClass extends Component<
     }
   };
 
+  setWalletBonds = (walletBonds: WalletBondsType[]) => {
+    if (!isEqual(this.state.walletBonds, walletBonds)) {
+      //console.log('fetch wallet bonds');
+      //const start = Date.now();
+      this.setState({ walletBonds });
+      //console.log('=========================================== > WALLET BONDS STORED SETSTATE - ', Date.now() - start);
+    }
+  };
+
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
     // here is a good place to fetch the background task info
     this.fetchBackgroundSyncing();
@@ -924,7 +934,7 @@ export class LoadedAppClass extends Component<
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
   ) => {
-    console.log('VALUE TRANSFERS', valueTransfers);
+    //console.log('VALUE TRANSFERS', valueTransfers);
     const basicFirstViewSeed = (await SettingsFileImpl.readSettings())
       .basicFirstViewSeed;
     // only for basic mode
@@ -1914,6 +1924,7 @@ export class LoadedAppClass extends Component<
       totalBalance: this.state.totalBalance,
       staked: this.state.staked,
       globalStaked: this.state.globalStaked,
+      walletBonds: this.state.walletBonds,
       addresses: this.state.addresses,
       valueTransfers: this.state.valueTransfers,
       valueTransfersTotal: this.state.valueTransfersTotal,
@@ -2040,7 +2051,10 @@ export class LoadedAppClass extends Component<
                 {props => <Distribution {...props} />}
               </InnerStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.Finalizers}>
+              <InnerStack.Screen
+                name={RouteEnum.Finalizers}
+                options={{ presentation: 'modal' }}
+              >
                 {props => <Finalizers {...props} />}
               </InnerStack.Screen>
 

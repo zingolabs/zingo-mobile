@@ -15,6 +15,7 @@ import {
   ServerType,
   StakeType,
   StakingActionType,
+  WalletBondsType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCUnifiedAddressType } from './types/RPCUnifiedAddressType';
@@ -39,6 +40,8 @@ import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
+import RPCWalletBondsType from './types/RPCWalletBondsType';
+import { RPCStakedType } from './types/RPCStakedType';
 import { reverseHex32Bytes } from '../utils/hex';
 
 export default class RPC {
@@ -46,6 +49,7 @@ export default class RPC {
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetStaked: (staked: StakeType[]) => void;
   fnSetGlobalStaked: (GlobalStaked: StakeType[]) => void;
+  fnSetWalletBonds: (walletBonds: WalletBondsType[]) => void;
   fnSetValueTransfersList: (vtList: ValueTransferType[], total: number) => void;
   fnSetMessagesList: (mList: ValueTransferType[], total: number) => void;
   fnSetAllAddresses: (
@@ -94,6 +98,7 @@ export default class RPC {
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
     fnSetStaked: (staked: StakeType[]) => void,
     fnSetGlobalStaked: (GlobalStaked: StakeType[]) => void,
+    fnSetWalletBonds: (walletBonds: WalletBondsType[]) => void,
     fnSetValueTransfersList: (
       vtlist: ValueTransferType[],
       total: number,
@@ -119,6 +124,7 @@ export default class RPC {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetStaked = fnSetStaked;
     this.fnSetGlobalStaked = fnSetGlobalStaked;
+    this.fnSetWalletBonds = fnSetWalletBonds;
     this.fnSetValueTransfersList = fnSetValueTransfersList;
     this.fnSetMessagesList = fnSetMessagesList;
     this.fnSetAllAddresses = fnSetAllAddresses;
@@ -378,7 +384,7 @@ export default class RPC {
     // if the wallet needs to save, means the App needs to fetch all the new data
     //if (!(await this.getWalletSaveRequired())) {
     //  console.log('***************** NOT SAVE REQUIRED: No fetching data');
-      // do need this because of the sync process
+    // do need this because of the sync process
     //  taskPromises.push(
     //    new Promise<void>(async resolve => {
     //      await this.fetchSyncPoll();
@@ -387,100 +393,100 @@ export default class RPC {
     //    }),
     //  );
     //} else {
-      if (
-        this.getWalletSaveRequiredLock ||
-        this.fetchWalletHeightLock ||
-        this.fetchWalletBirthdaySeedUfvkLock ||
-        this.fetchInfoAndServerHeightLock ||
-        this.fetchAddressesLock ||
-        this.fetchTandZandOValueTransfersLock ||
-        this.fetchTandZandOMessagesLock ||
-        this.fetchSyncStatusLock ||
-        this.fetchSyncPollLock ||
-        this.fetchZingolibVersionLock ||
-        this.refreshSyncLock
-      ) {
-        console.log('***************** LONG TASKS: No fetching data');
-        // do need this because of the sync process
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            await this.fetchSyncPoll();
-            //console.log('INTERVAL poll sync');
-            resolve();
-          }),
-        );
-      } else {
-        // do need this because of the sync process
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            await this.fetchSyncPoll();
-            //console.log('INTERVAL poll sync');
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchWalletHeight();
-            //console.log('wallet height - ', Date.now() - s);
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchWalletBirthdaySeedUfvk();
-            //console.log('wallet birthday - ', Date.now() - s);
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchInfoAndServerHeight();
-            //console.log('info & server height - ', Date.now() - s);
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchAddresses();
-            //console.log('addresses - ', Date.now() - s);
-            resolve();
-          }),
-        );
-        // save the wallet as required.
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            const start = Date.now();
-            await RPCModule.doSave();
-            if (Date.now() - start > 4000) {
-              console.log(
-                '=========================================== > save wallet - ',
-                Date.now() - start,
-              );
-            }
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchTandZandOValueTransfers();
-            //console.log('value transfers - ', Date.now() - s);
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchTandZandOMessages();
-            //console.log('messages - ', Date.now() - s);
-            resolve();
-          }),
-        );
-      }
+    if (
+      this.getWalletSaveRequiredLock ||
+      this.fetchWalletHeightLock ||
+      this.fetchWalletBirthdaySeedUfvkLock ||
+      this.fetchInfoAndServerHeightLock ||
+      this.fetchAddressesLock ||
+      this.fetchTandZandOValueTransfersLock ||
+      this.fetchTandZandOMessagesLock ||
+      this.fetchSyncStatusLock ||
+      this.fetchSyncPollLock ||
+      this.fetchZingolibVersionLock ||
+      this.refreshSyncLock
+    ) {
+      console.log('***************** LONG TASKS: No fetching data');
+      // do need this because of the sync process
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          await this.fetchSyncPoll();
+          //console.log('INTERVAL poll sync');
+          resolve();
+        }),
+      );
+    } else {
+      // do need this because of the sync process
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          await this.fetchSyncPoll();
+          //console.log('INTERVAL poll sync');
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchWalletHeight();
+          //console.log('wallet height - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchWalletBirthdaySeedUfvk();
+          //console.log('wallet birthday - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchInfoAndServerHeight();
+          //console.log('info & server height - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchAddresses();
+          //console.log('addresses - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      // save the wallet as required.
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          const start = Date.now();
+          await RPCModule.doSave();
+          if (Date.now() - start > 4000) {
+            console.log(
+              '=========================================== > save wallet - ',
+              Date.now() - start,
+            );
+          }
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchTandZandOValueTransfers();
+          //console.log('value transfers - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchTandZandOMessages();
+          //console.log('messages - ', Date.now() - s);
+          resolve();
+        }),
+      );
+    }
     //}
 
     Promise.allSettled(taskPromises);
@@ -1013,7 +1019,7 @@ export default class RPC {
       if (this.fetchStakedLock) return;
       this.fetchStakedLock = true;
 
-      const rosterInfoStr: string = await RPCModule.getRosterInfoProcess();
+      const rosterInfoStr: string = await RPCModule.getRosterInfo();
 
       if (!rosterInfoStr) {
         this.fnSetLastError('Error roster_info: empty response');
@@ -1027,60 +1033,91 @@ export default class RPC {
       }
 
       const rosterInfo = JSON.parse(rosterInfoStr) as {
-        members: Array<{
-          pub_key: string;
-          voting_power: number;
-          txids?: any[];
-        }>;
+        roster_members: Array<RPCStakedType>;
       };
 
-      console.log('ROSTERRRRR', rosterInfo);
+      const start3 = Date.now();
+      const walletBondsStr: string = await RPCModule.getWalletBondsInfo();
 
-      const start2 = Date.now();
-      const valueTransfersStr: string = await RPCModule.getValueTransfersList();
-
-      if (Date.now() - start2 > 4000) {
+      if (Date.now() - start3 > 4000) {
         console.log(
-          '=========================================== > value transfers for roster - ',
-          Date.now() - start2,
+          '=========================================== > wallet bonds - ',
+          Date.now() - start3,
         );
       }
+
       //console.log(valueTransfersStr);
-      if (valueTransfersStr) {
-        if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error value transfers ${valueTransfersStr}`);
-          this.fnSetLastError(`Error value transfers: ${valueTransfersStr}`);
-          this.fetchTandZandOValueTransfersLock = false;
+      if (walletBondsStr) {
+        if (walletBondsStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error wallet bonds ${walletBondsStr}`);
+          this.fnSetLastError(`Error wallet bonds: ${walletBondsStr}`);
+          this.fetchStakedLock = false;
           return;
         }
       } else {
         console.log('Internal Error value transfers');
-        this.fetchTandZandOValueTransfersLock = false;
+        this.fetchStakedLock = false;
         return;
       }
-      const valueTransfersJSON: RPCValueTransfersType =
-        await JSON.parse(valueTransfersStr);
+      const walletBondsJSON = JSON.parse(walletBondsStr) as {
+        bonds: Array<RPCWalletBondsType>;
+      };
 
-      const valueTransferTxids = new Set(
-        (valueTransfersJSON.value_transfers ?? []).map(vt => vt.txid)
-      );    
+      const globalStakedList: StakeType[] = (
+        rosterInfo.roster_members ?? []
+      ).map(m => ({
+        finalizer: m.pubkey, // TODO: RENAME PLS
+        votingPower: (m.voting_power || 0) / 10 ** 8,
+      }));
 
-      const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
-        m => ({
-          pubKey: m.pub_key,
-          votingPower: (m.voting_power || 0) / 10 ** 8,
-        }),
-      );
+      const walletBondsList: WalletBondsType[] = (
+        walletBondsJSON.bonds ?? []
+      ).map(m => ({
+        txid: m.created_in_txid,
+        pubKey: m.pub_key,
+        amount: (m.amount_zats || 0) / 10 ** 8,
+        status:
+          m.status === 0
+            ? 'Active'
+            : m.status === 1
+              ? 'Unbonding'
+              : m.status === 2
+                ? 'Withdrawn'
+                : 'Active', // can be an error here
+        finalizer: m.finalizer,
+      }));
 
-      const stakedList: StakeType[] = (rosterInfo.members ?? [])
-        .filter(m => (m.txids ?? []).some(txid => valueTransferTxids.has(txid)))
-        .map(m => ({
-          pubKey: m.pub_key,
-          votingPower: (m.voting_power || 0) / 10 ** 8,
-        }));
+      const stakedList: StakeType[] = (rosterInfo.roster_members ?? [])
+        .filter(
+          m =>
+            walletBondsList.filter(
+              b =>
+                m.pubkey === b.finalizer &&
+                (b.status === 'Active' || b.status === 'Unbonding'),
+            ).length > 0,
+        )
+        .map(m => {
+          const amount = walletBondsList
+            .filter(
+              b =>
+                m.pubkey === b.finalizer &&
+                (b.status === 'Active' || b.status === 'Unbonding'),
+            )
+            .reduce((acc, curr) => acc + curr.amount, 0);
+          return {
+            finalizer: m.pubkey,
+            votingPower: amount || 0,
+          };
+        });
+
+      console.log('GLOBAL STAKED', globalStakedList);
+      console.log('STAKED', stakedList);
+      console.log('BONDS', walletBondsList);
+      console.log('ROSTER', rosterInfo);
 
       this.fnSetStaked(stakedList);
       this.fnSetGlobalStaked(globalStakedList);
+      this.fnSetWalletBonds(walletBondsList);
 
       this.fetchStakedLock = false;
     } catch (error) {
@@ -1236,7 +1273,7 @@ export default class RPC {
       return;
     }
   }
-/*
+  /*
   async getWalletSaveRequired(): Promise<boolean> {
     try {
       if (this.getWalletSaveRequiredLock) {
@@ -1433,7 +1470,7 @@ export default class RPC {
       const valueTransfersJSON: RPCValueTransfersType =
         await JSON.parse(valueTransfersStr);
 
-      //console.log(valueTransfersJSON.value_transfers);
+      console.log(valueTransfersJSON.value_transfers);
 
       let vtList: ValueTransferType[] = [];
 
@@ -1506,7 +1543,7 @@ export default class RPC {
                 val:
                   (!vt.staking_action?.val ? 0 : vt.staking_action.val) /
                   10 ** 8,
-                target: reverseHex32Bytes(vt.staking_action?.target),
+                target: vt.staking_action?.target,
               } as StakingActionType;
             }
 
@@ -1763,11 +1800,9 @@ export default class RPC {
 
         if (action.kind === 'create_bond') {
           const payload = {
-            amount_zats: action.val, // must be integer zats
-            finalizer_address: action.target, // 32-byte hex string
+            amount_zats: action.val,
+            finalizer_address: reverseHex32Bytes(action.target), // ONLY PLACE WHERE IT SHOULD BE USED
           };
-
-          console.log('HEEEEEEEEEEREREREREE');
 
           proposeStr = await RPCModule.stakeProcess(JSON.stringify(payload));
         } else {

@@ -45,6 +45,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
               "flexDirection": "row",
               "height": 48,
               "justifyContent": "center",
+              "marginTop": 10,
               "paddingHorizontal": 16,
             }
           }

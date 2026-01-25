@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   View,
   Text,
@@ -17,16 +24,21 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
+  GlobalConst,
   RouteEnum,
   SendPageStateClass,
-  ValueTransferType,
+  WalletBondsType,
 } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -36,6 +48,7 @@ import Utils from '../../../app/utils';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
+import Refresh from '../../../assets/icons/refresh.svg';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -92,80 +105,20 @@ const Unstake: React.FC<UnstakeProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers } = context;
+  const { walletBonds, valueTransfers } = context;
 
-  const movements: ValueTransferType[] = useMemo(() => {
-    if (!valueTransfers) return [];
-
-    const bondKeyOf = (vt: ValueTransferType): string | null => {
-      if (vt.confirmations === 0) return null;
-      const sa = vt.stakingAction;
-      if (!sa) return null;
-      const k = sa.unique_public_key ?? null;
-      return typeof k === 'string' && /^[0-9a-fA-F]{64}$/.test(k)
-        ? k.toLowerCase()
-        : null;
-    };
-
-    const createBonds = valueTransfers.filter(vt => {
-      if (vt.confirmations === 0) return false;
-      const sa = vt.stakingAction;
-      if (!sa || sa.kind !== 'create_bond') return false;
-
+  const movements = walletBonds
+    .filter(b => {
+      if (b.status === 'Withdrawn') return false;
+      if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
+      // no finalizer selected, all bonds visible. Impossible case for now.
       if (!finalizerFromText) return true;
-      return sa.target === finalizerFromText;
-    });
+      return false;
+    })
+    .sort((a, b) => b.amount - a.amount);
 
-    const beginByBondKey = new Map<string, ValueTransferType>();
-    for (const vt of valueTransfers) {
-      if (vt.confirmations === 0) continue;
-      const sa = vt.stakingAction;
-      if (!sa || sa.kind !== 'begin_unbonding') continue;
-
-      const k = bondKeyOf(vt);
-      if (!k) continue;
-
-      const prev = beginByBondKey.get(k);
-      if (!prev || vt.time > prev.time) beginByBondKey.set(k, vt);
-    }
-
-    const out: ValueTransferType[] = [];
-    const seen = new Set<string>();
-
-    for (const bond of createBonds) {
-      const k = bondKeyOf(bond);
-
-      const begin = k ? beginByBondKey.get(k) : undefined;
-
-      const row: ValueTransferType = begin
-        ? ({
-            ...begin,
-            fee: bond.fee,
-            stakingAction: begin.stakingAction
-              ? {
-                  ...begin.stakingAction,
-                  val: bond.stakingAction?.val ?? begin.stakingAction.val,
-                  target:
-                    bond.stakingAction?.target ?? begin.stakingAction.target,
-                  unique_public_key:
-                    bond.stakingAction?.unique_public_key ??
-                    begin.stakingAction.unique_public_key,
-                }
-              : begin.stakingAction,
-          } as ValueTransferType)
-        : bond;
-
-      if (!seen.has(row.txid)) {
-        out.push(row);
-        seen.add(row.txid);
-      }
-    }
-
-    return out.sort((a, b) => b.time - a.time);
-  }, [finalizerFromText, valueTransfers]);
-
-  const selectedTx = movements.find(tx => tx.txid === selectedTxid);
-  const hasSelectedTx = !!selectedTx;
+  const selectedBond = movements.find(tx => tx.txid === selectedTxid);
+  const hasSelectedTx = !!selectedBond;
   const isValidForm = hasSelectedTx;
 
   useEffect(() => {
@@ -184,9 +137,9 @@ const Unstake: React.FC<UnstakeProps> = ({
           navigation.goBack();
         }
       }
-    }, [finalizerFromText, navigation])
+    }, [finalizerFromText, navigation]),
   );
-  
+
   useEffect(() => {
     if (!finalizerFromText) {
       launchedSelectorRef.current = true;
@@ -217,7 +170,7 @@ const Unstake: React.FC<UnstakeProps> = ({
             continue;
           }
 
-          if (resp.toLowerCase().startsWith('error:')) {
+          if (resp.toLowerCase().startsWith(GlobalConst.error)) {
             console.warn(
               '[Unstake] getAccumulatedStakeForTxidInfo error for',
               m.txid,
@@ -258,64 +211,26 @@ const Unstake: React.FC<UnstakeProps> = ({
     return `${txid.slice(0, 10)}…${txid.slice(-8)}`;
   };
 
-  // const getAccumulatedStakeZatsForTxid = (txid: string): number | null => {
-  //   const zatsStr = accumulatedStakeByTxid[txid];
-  //   if (!zatsStr) {
-  //     return null;
-  //   }
-  //   const zats = Number(zatsStr);
-  //   if (Number.isNaN(zats)) {
-  //     return null;
-  //   }
-  //   return zats;
-  // };
-
-  const isHex64 = (s: string) => /^[0-9a-fA-F]{64}$/.test(s);
-
-  const getBondTxidDisplayFromSelection = (
-    _selectedTx: ValueTransferType,
-    _valueTransfers: ValueTransferType[] | undefined,
-  ): string | null => {
-    console.log('getBondTxidDisplayFromSelection selectedTx', _selectedTx);
-    console.log(
-      'getBondTxidDisplayFromSelection valueTransfers',
-      _valueTransfers,
-    );
-    const a = _selectedTx.stakingAction as any;
-    if (!a) return null;
-
-    if (a.kind === 'create_bond') return _selectedTx.txid;
-
-    if (a.kind === 'begin_unbonding') {
-      const bondKey = a.unique_public_key ?? a.arg32_0;
-      if (!isHex64(bondKey)) return null;
-
-      const match = (_valueTransfers ?? []).find(vt => {
-        if (vt.confirmations === 0) return false;
-        const sa = vt.stakingAction as any;
-        if (!sa || sa.kind !== 'create_bond') return false;
-        const k = sa.unique_public_key ?? sa.arg32_0;
-        return isHex64(k) && k.toLowerCase() === bondKey.toLowerCase();
-      });
-
-      return match?.txid ?? null;
-    }
-
-    return null;
-  };
-
   const handleUnstakePress = async () => {
-    if (!isValidForm || !selectedTx) return;
+    if (!isValidForm || !selectedBond) return;
 
-    const selectedKind = selectedTx.stakingAction?.kind;
+    const selectedKind = selectedBond.status;
 
-    const bondTxid = getBondTxidDisplayFromSelection(
-      selectedTx,
-      valueTransfers as ValueTransferType[], // TODO
-    );
+    const bondTxid = selectedBond.txid;
     if (!bondTxid) {
       Alert.alert('Error', 'Could not determine the original bond txid.');
       return;
+    }
+
+    if (valueTransfers?.filter(v => v.txid === bondTxid).length === 0) {
+      Alert.alert('Error', 'Could not determine the original bond txid as a existent Transaction.');
+      return;
+    } else {
+      const confirmations = (valueTransfers?.filter(v => v.txid === bondTxid)[0].confirmations) || 0;
+      if (confirmations <= 0) {
+        Alert.alert('Error', 'This bond is still processing, wait for confirmations.');
+        return;
+      }
     }
 
     console.log('bondTxid', bondTxid);
@@ -324,10 +239,10 @@ const Unstake: React.FC<UnstakeProps> = ({
     setModalState('sending');
 
     try {
-      if (selectedKind === 'create_bond') {
+      if (selectedKind === 'Active') {
         await beginUnstakeTransaction(bondTxid);
-      } else if (selectedKind === 'begin_unbonding') {
-        await withdrawBondTransaction(selectedTx.txid);
+      } else if (selectedKind === 'Unbonding') {
+        await withdrawBondTransaction(selectedBond.txid);
       } else {
         Alert.alert(
           'Error',
@@ -341,20 +256,18 @@ const Unstake: React.FC<UnstakeProps> = ({
     } catch (error) {
       console.warn('Staking tx failed:', error);
       setModalState('idle');
-      //Alert.alert('Error', 'Staking transaction failed. Please try again.');
       navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
   };
 
   const actionVerb = useMemo(() => {
-    const k = selectedTx?.stakingAction?.kind;
+    const k = selectedBond?.status;
 
-    if (k === 'begin_unbonding') return 'Withdraw';
-    if (k === 'create_bond') return 'Unbond';
+    if (k === 'Unbonding') return 'Withdraw';
+    if (k === 'Active') return 'Unbond';
 
     return 'Unstake';
-     
-  }, [selectedTx]);
+  }, [selectedBond]);
 
   const handleViewMovements = () => {
     setModalState('idle');
@@ -366,29 +279,20 @@ const Unstake: React.FC<UnstakeProps> = ({
 
   const renderSeparator = () => <View style={{ height: 8 }} />;
 
-  const renderStakedTxItem = ({ item }: { item: ValueTransferType }) => {
+  const renderStakedTxItem = ({ item }: { item: WalletBondsType }) => {
     console.log('item', item);
     const isSelected = item.txid === selectedTxid;
 
-    // const zats = getAccumulatedStakeZatsForTxid(item.txid);
-
-    const fee = item.fee ?? 0;
-    let displayAmount = String((fee - 0.0001).toFixed(2));
-
-    // if (zats !== null) {
-    //   const amountInCoin = zats / 10 ** 8;
-    //   displayAmount = Utils.parseNumberFloatToStringLocale(amountInCoin, 8);
-    // }
+    let displayAmount = item.amount.toFixed(5);
+    let confirmations = valueTransfers && 
+                        valueTransfers.filter(v => v.txid === item.txid).length > 0 
+                          ? valueTransfers.filter(v => v.txid === item.txid)[0].confirmations
+                          : 0;
 
     return (
       <Pressable
         onPress={() => {
           setSelectedTxid(item.txid);
-          //if (item.stakingAction?.target) {
-          //  setFinalizerFromText(item.stakingAction.target);
-          // TODO: find the staked amount for this finalizer.
-          //  setStakedFrom(0);
-          //}
         }}
         style={[
           styles.txRow,
@@ -399,16 +303,21 @@ const Unstake: React.FC<UnstakeProps> = ({
         ]}
       >
         <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              color: colors.text,
-              fontSize: 13,
-              fontWeight: '500',
-            }}
-            numberOfLines={1}
-          >
-            {shortenTxid(item.txid)}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {!confirmations && <Refresh width={15} height={15} style= {{ marginRight: 5 }} />}
+            <Text
+              style={{
+                color: colors.text,
+                fontSize: 13,
+                fontWeight: '500',
+              }}
+              numberOfLines={1}
+            >
+              {item.status === 'Unbonding'
+                ? 'Inactive'
+                : item.status || 'unknown'}
+            </Text>
+          </View>
           <Text
             style={{
               color: colors.placeholder,
@@ -416,7 +325,7 @@ const Unstake: React.FC<UnstakeProps> = ({
               marginTop: 2,
             }}
           >
-            Type: {item.stakingAction?.kind || 'unknown'}
+            {shortenTxid(item.pubKey)}
           </Text>
         </View>
         <Text
@@ -527,7 +436,7 @@ const Unstake: React.FC<UnstakeProps> = ({
                 {!!stakedFrom && (
                   <FadeText
                     style={{ marginLeft: 5, marginBottom: 10 }}
-                  >{`Voting power: ${stakedFrom}`}</FadeText>
+                  >{`Voting power: ${stakedFrom.toFixed(5)}`}</FadeText>
                 )}
               </View>
             </View>

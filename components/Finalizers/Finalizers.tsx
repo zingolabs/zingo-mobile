@@ -15,7 +15,6 @@ import {
   GlobalConst,
   RouteEnum,
   ScreenEnum,
-  SnackbarDurationEnum,
   StakeType,
 } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -42,13 +41,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
-import Clipboard from '@react-native-clipboard/clipboard';
 import AddressItem from '../Components/AddressItem';
 import ChartPieIcon from '../../assets/icons/chart-pie.svg';
 import ZcashIcon from '../../assets/icons/zcash.svg';
 import ZecAmount from '../Components/ZecAmount';
 import { XIcon } from '../Components/Icons/XIcon';
-import { reverseHex32Bytes } from '../../app/utils/hex';
 
 type FinalizersProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -79,10 +76,8 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
     removeFirstSnackbar,
     staked,
     globalStaked,
-    addLastSnackbar,
-    translate,
     info,
-    valueTransfers,
+    walletBonds,
   } = context;
   const { clear } = useToast();
   const screenName = ScreenEnum.About;
@@ -103,52 +98,50 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    console.log('SCOPE', scope);
-
     let base: StakeType[] = scope === 'my' ? staked : globalStaked;
 
-    if (exclude) base = base.filter(i => i.pubKey !== exclude);
+    if (exclude) base = base.filter(i => i.finalizer !== exclude);
 
-    if (searchText) {
+    if (searchText !== '') {
       const q = searchText.toLowerCase();
-      base = base.filter(i => i.pubKey.toLowerCase().includes(q));
+      base = base.filter(i => i.finalizer.toLowerCase().includes(q));
     }
 
     base = base.sort((a, b) => b.votingPower - a.votingPower);
 
-    const withdrawnKeys = new Set(
-      (valueTransfers ?? [])
-        .filter(vt => vt.confirmations > 0)
-        .map(vt => vt.stakingAction)
-        .filter((sa): sa is NonNullable<typeof sa> => !!sa)
-        .filter(sa => sa.kind === 'withdraw_bond')
-        .map(sa => sa.target),
-    );
-
-    const activeBondKeys = Array.from(
-      new Set(
-        (valueTransfers ?? [])
-          .filter(vt => vt.confirmations > 0)
-          .map(vt => vt.stakingAction)
-          .filter((sa): sa is NonNullable<typeof sa> => !!sa)
-          .filter(sa => sa.kind === 'create_bond')
-          .map(sa => sa.target)
-          .filter(pk => !withdrawnKeys.has(pk)),
-      ),
-    );
-
-    const activeSet = new Set(activeBondKeys.map(k => k.toLowerCase()));
-
     const finalList =
-      activeSet.size === 0
-        ? base
-        : base.filter(s => {
-            const pk = s.pubKey.toLowerCase();
-            const rev = reverseHex32Bytes(s.pubKey).toLowerCase();
-            return activeSet.has(pk) || activeSet.has(rev);
-          });
+      scope === 'network'
+        ? base.map(s => {
+            return {
+              ...s,
+              finalizer: s.finalizer,
+            };
+          })
+        : base
+            .filter(s => {
+              let found = walletBonds.find(b => {
+                return b.finalizer === s.finalizer;
+              });
 
-    setStakedFiltered(finalList);
+              if (found) {
+                return true;
+              }
+            })
+            .map(s => {
+              return {
+                ...s,
+                finalizer: s.finalizer,
+              };
+            });
+    const byFinalizer = new Map<string, (typeof finalList)[number]>();
+
+    for (const s of finalList) {
+      if (!byFinalizer.has(s.finalizer)) byFinalizer.set(s.finalizer, s);
+    }
+
+    const filteredFinalList = [...byFinalizer.values()];
+
+    setStakedFiltered(filteredFinalList);
 
     if (randomColors.length === 0) {
       setRandomColors(Utils.generateColorList(finalList.length + 10));
@@ -214,15 +207,15 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
     const percent = (100 * item.votingPower) / totalValue;
     // 30 characters per line
     const numLines =
-      item.pubKey.length < 40
+      item.finalizer.length < 40
         ? 2
-        : item.pubKey.length / (dimensions.width < 500 ? 21 : 30);
+        : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <TouchableOpacity
         style={{ width: '100%' }}
         key={`tag-${index}`}
         onPress={() => {
-          setFinalizer(item.pubKey, item.votingPower);
+          setFinalizer(item.finalizer, item.votingPower);
           if (navigation.canGoBack()) {
             navigation.goBack();
           }
@@ -251,16 +244,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
               icon={faCircle}
               color={randomColors[index]}
             />
-            <TouchableOpacity
-              onPress={() => {
-                Clipboard.setString(item.pubKey);
-                addLastSnackbar({
-                  message: translate('history.addresscopied') as string,
-                  duration: SnackbarDurationEnum.short,
-                  screenName: [screenName],
-                });
-              }}
-            >
+            <View>
               <View
                 style={{
                   display: 'flex',
@@ -269,26 +253,26 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
                 }}
               >
                 <AddressItem
-                  address={item.pubKey}
+                  address={item.finalizer}
                   screenName={screenName}
                   oneLine={true}
                   onlyContact={true}
                   withIcon={true}
                 />
-                {!expandAddress[index] && !!item.pubKey && (
+                {!expandAddress[index] && !!item.finalizer && (
                   <RegText>
-                    {item.pubKey.length > (dimensions.width < 500 ? 10 : 20)
+                    {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
                       ? Utils.trimToSmall(
-                          item.pubKey,
+                          item.finalizer,
                           dimensions.width < 500 ? 5 : 10,
                         )
-                      : item.pubKey}
+                      : item.finalizer}
                   </RegText>
                 )}
                 {expandAddress[index] &&
-                  !!item.pubKey &&
+                  !!item.finalizer &&
                   Utils.splitStringIntoChunks(
-                    item.pubKey,
+                    item.finalizer,
                     Number(numLines.toFixed(0)),
                   ).map((c: string, idx: number) => (
                     <RegText key={idx}>{c}</RegText>
@@ -315,7 +299,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
                   currencyName={info.currencyName}
                 />
               </View>
-            </TouchableOpacity>
+            </View>
           </View>
           <View
             style={{
@@ -379,7 +363,6 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
             color: colors.text,
             fontSize: 17,
             fontWeight: '400',
-            paddingVertical: 0,
           }}
           placeholder="Search finalizer..."
           placeholderTextColor={colors.placeholder}

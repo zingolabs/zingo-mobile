@@ -91,7 +91,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Finalizers]: FinalizersNavigationState | undefined;
   [RouteEnum.Unstake]: UnstakeNavigationState | undefined;
   [RouteEnum.Redelegate]: RedelegateNavigationState | undefined;
-
 };
 
 export type AddressListNavigationState = {
@@ -121,6 +120,7 @@ export type FinalizersNavigationState = {
   setFinalizer: (f: string, s: number) => void;
   scope: 'my' | 'network';
   exclude: string;
+  goBackRoute: RouteEnum;
 };
 
 export type UnstakeNavigationState = {

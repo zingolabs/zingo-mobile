@@ -89,12 +89,12 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
         setRandomColors(rc2);
       }
       const newPieAmounts: DataType[] = resultJSON
-        .filter((i: StakeType) => i.votingPower > 0 && !!i.pubKey)
+        .filter((i: StakeType) => i.votingPower > 0 && !!i.finalizer)
         .sort((a, b) => b.votingPower - a.votingPower)
         .map((item, index) => {
           return {
             value: item.votingPower,
-            finalizer: item.pubKey,
+            finalizer: item.finalizer,
             tag: '',
             svg: { fill: randomColors[index] },
             color: randomColors[index],
@@ -113,13 +113,6 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [colors.zingo, globalStaked, staked, tab]);
 
-  useEffect(() => {
-    if (tab === 'my' && pieAmounts.length === 0) {
-      setTab('network');
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const selectExpandAddress = (index: number) => {
     let newExpandAddress = Array(expandAddress.length).fill(false);
     newExpandAddress[index] = true;
@@ -129,7 +122,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
   const lineMy = (item: DataType, index: number, last: boolean) => {
     const totalValue = pieAmounts ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0) : 0;
     const percent = (100 * item.value) / totalValue;
-    // 30 characters per line
+    // 30 characters per line 
     const numLines = item.finalizer.length < 40 ? 2 : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <View style={{ width: '100%' }} key={`tag-${index}`}>

@@ -28,7 +28,7 @@ use std::sync::RwLock;
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use bip0039::Mnemonic;
-use json::object;
+use json::{JsonValue, object};
 use once_cell::sync::Lazy;
 use rustls::crypto::{CryptoProvider, ring::default_provider};
 
@@ -724,7 +724,7 @@ pub fn info_server() -> Result<String, ZingolibError> {
 }
 
 #[uniffi::export]
-pub fn get_roster_info() -> Result<String, ZingolibError> {
+pub fn get_roster() -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
@@ -732,11 +732,7 @@ pub fn get_roster_info() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 match lightclient.get_roster_info().await {
-                    Ok(roster_info) => {
-                        serde_json::to_string_pretty(&roster_info).unwrap_or_else(|_| {
-                            "Error: get_roster_info. failed to serialize".to_string()
-                        })
-                    }
+                    Ok(roster_info) => JsonValue::from(roster_info).pretty(2).to_string(),
                     Err(e) => {
                         format!("Error: {e}")
                     }
@@ -1800,13 +1796,21 @@ pub fn withdraw_stake(withdraw_stake_json: String) -> Result<String, ZingolibErr
                     Err(e) => return object! { "error" => format!("grpc client: {e}") }.pretty(2),
                 };
 
-                match lightclient
-                    .wallet
-                    .write()
-                    .await
-                    .withdraw_bond_using_orchard(&TEST_NETWORK, &mut client, &bond_key)
-                    .await
-                {
+                let mut wallet = lightclient.wallet.write().await;
+
+                let res = match lightclient.config().chain {
+                    ChainType::Regtest(_) => {
+                        wallet
+                            .withdraw_bond_using_orchard(&REGTEST_NETWORK, &mut client, &bond_key)
+                            .await
+                    }
+                    ChainType::Testnet(_) | ChainType::Mainnet => {
+                        wallet
+                            .withdraw_bond_using_orchard(&TEST_NETWORK, &mut client, &bond_key)
+                            .await
+                    }
+                };
+                match res {
                     Some(txid) => object! { "txid" => txid.to_string() }.pretty(2),
                     None => {
                         object! { "error" => "withdraw failed (builder returned None)" }.pretty(2)
@@ -1950,21 +1954,43 @@ pub fn confirm() -> Result<String, ZingolibError> {
     })
 }
 
+// #[uniffi::export]
+// pub fn get_accumulated_stake_for_txid(txid: String) -> Result<u64, ZingolibError> {
+//     with_panic_guard(|| {
+//         let mut guard = LIGHTCLIENT
+//             .write()
+//             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+//         if let Some(lightclient) = &mut *guard {
+//             let txid = match txid_from_hex_encoded_str(&txid) {
+//                 Ok(txid) => txid,
+//                 Err(_e) => return Ok(0),
+//             };
+//             Ok(RT.block_on(async move {
+//                 lightclient
+//                     .get_accumulated_stake_for_txid(txid.into())
+//                     .await
+//             }))
+//         } else {
+//             Err(ZingolibError::LightclientNotInitialized)
+//         }
+//     })
+// }
+
 #[uniffi::export]
-pub fn get_accumulated_stake_for_txid(txid: String) -> Result<u64, ZingolibError> {
+pub fn get_wallet_bonds() -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            let txid = match txid_from_hex_encoded_str(&txid) {
-                Ok(txid) => txid,
-                Err(_e) => return Ok(0),
-            };
             Ok(RT.block_on(async move {
-                lightclient
-                    .get_accumulated_stake_for_txid(txid.into())
-                    .await
+                match lightclient.get_wallet_bonds().await {
+                    Ok(bonds) => bonds.into(),
+                    Err(e) => {
+                        object! { "error" => e.to_string() }
+                    }
+                }
+                .pretty(2)
             }))
         } else {
             Err(ZingolibError::LightclientNotInitialized)

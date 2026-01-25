@@ -1,4 +1,5 @@
 export type RPCStakedType = {
-  pub_key: string;
+  pubkey: string; // finalizer
   voting_power: number;
+  txids?: any[];
 };

@@ -1,4 +1,4 @@
 export default interface StakeType {
-  pubKey: string;
+  finalizer: string;
   votingPower: number;
 }

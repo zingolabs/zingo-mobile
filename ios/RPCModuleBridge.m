@@ -216,17 +216,17 @@ RCT_EXTERN_METHOD(shieldProcess:
 RCT_EXTERN_METHOD(confirmProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getAccumulatedStakeForTxidInfo:
-    (NSString)txid
-    resolve:(RCTPromiseResolveBlock)resolve
-    reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getRosterInfoProcess:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(getWalletBondsInfo:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(withdrawStakeProcess:(NSString *)txid
+RCT_EXTERN_METHOD(getRosterInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(withdrawStakeProcess:
+    (NSString *)txid
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-
-RCT_EXTERN_METHOD(beginUnstakeProcess:(NSString *)txid
+RCT_EXTERN_METHOD(beginUnstakeProcess:
+    (NSString *)txid
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 

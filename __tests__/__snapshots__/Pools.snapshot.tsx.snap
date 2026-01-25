@@ -19,6 +19,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
         "flexDirection": "row",
         "height": 48,
         "justifyContent": "center",
+        "marginTop": 10,
         "paddingHorizontal": 16,
       }
     }

@@ -1960,47 +1960,6 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
   
-  func fnGetAccumulatedStakeForTxidInfo(_ dict: [AnyHashable: Any]) {
-    if let txid = dict["txid"] as? String,
-       let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-      do {
-        let resp = try getAccumulatedStakeForTxid(txid: txid)
-        let respStr = String(resp)
-        DispatchQueue.main.async {
-          resolve(respStr)
-        }
-      } catch {
-        let err = "Error: [Native] accumulated stake for txid. \(error.localizedDescription)"
-        NSLog(err)
-        DispatchQueue.main.async {
-          resolve(err)
-        }
-      }
-    } else {
-      let err = "Error: [Native] accumulated stake for txid. Command arguments problem."
-      NSLog(err)
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        DispatchQueue.main.async {
-          resolve(err)
-        }
-      }
-    }
-  }
-  
-  @objc(getAccumulatedStakeForTxidInfo:resolve:reject:)
-  func getAccumulatedStakeForTxidInfo(
-    _ txid: String,
-    resolve: @escaping RCTPromiseResolveBlock,
-    reject: @escaping RCTPromiseRejectBlock
-  ) {
-    let dict: [String: Any] = ["txid": txid, "resolve": resolve]
-    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-      if let self = self {
-        self.fnGetAccumulatedStakeForTxidInfo(dict)
-      }
-    }
-  }
-
   func fnStakeProcess(_ dict: [AnyHashable: Any]) {
     if let stake_json = dict["stake_json"] as? String,
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
@@ -2137,24 +2096,24 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     }
   }
   
-  func fnGetRosterInfoProcess(_ dict: [AnyHashable: Any]) {
+  func fnGetRosterInfo(_ dict: [AnyHashable: Any]) {
     if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       do {
-        // UniFFI typically camelCases: get_roster_info -> getRosterInfo()
-        let resp = try getRosterInfo()
+        // UniFFI typically camelCases: get_roster -> getRoster()
+        let resp = try getRoster()
         let respStr = String(resp)
         DispatchQueue.main.async {
           resolve(respStr)
         }
       } catch {
-        let err = "Error: [Native] get_roster_info. \(error.localizedDescription)"
+        let err = "Error: [Native] get_roster. \(error.localizedDescription)"
         NSLog(err)
         DispatchQueue.main.async {
           resolve(err)
         }
       }
     } else {
-      let err = "Error: [Native] get_roster_info. Command arguments problem."
+      let err = "Error: [Native] get_roster. Command arguments problem."
       NSLog(err)
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         DispatchQueue.main.async {
@@ -2164,15 +2123,55 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     }
   }
 
-  @objc(getRosterInfoProcess:reject:)
-  func getRosterInfoProcess(
+  @objc(getRosterInfo:reject:)
+  func getRosterInfo(
     _ resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
     let dict: [String: Any] = ["resolve": resolve]
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
       guard let self = self else { return }
-      self.fnGetRosterInfoProcess(dict)
+      self.fnGetRosterInfo(dict)
+    }
+  }
+  
+  
+  func fnGetWalletBondsInfo(_ dict: [AnyHashable: Any]) {
+    if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+      do {
+        // UniFFI camelCases: get_wallet_bonds -> getWalletBonds()
+        let resp = try getWalletBonds()
+        let respStr = String(resp)
+        DispatchQueue.main.async {
+          resolve(respStr)
+        }
+      } catch {
+        let err = "Error: [Native] get_wallet_bonds. \(error.localizedDescription)"
+        NSLog(err)
+        DispatchQueue.main.async {
+          resolve(err)
+        }
+      }
+    } else {
+      let err = "Error: [Native] get_wallet_bonds. Command arguments problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        DispatchQueue.main.async {
+          resolve(err)
+        }
+      }
+    }
+  }
+
+  @objc(getWalletBondsInfo:reject:)
+  func getWalletBondsInfo(
+    _ resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    let dict: [String: Any] = ["resolve": resolve]
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      guard let self = self else { return }
+      self.fnGetWalletBondsInfo(dict)
     }
   }
 

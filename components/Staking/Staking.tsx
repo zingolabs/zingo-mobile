@@ -29,7 +29,6 @@ import {
   GlobalConst,
   RouteEnum,
   ScreenEnum,
-  SnackbarDurationEnum,
   StakeType,
   ValueTransferType,
 } from '../../app/AppState';
@@ -46,7 +45,6 @@ import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import AddressItem from '../Components/AddressItem';
 import Snackbars from '../Components/Snackbars';
@@ -82,7 +80,11 @@ const getPercent = (percent: number) => {
   );
 };
 
-type StakingUiKind = 'create_bond' | 'begin_unbonding' | 'withdraw_bond' | 'redelegate';
+type StakingUiKind =
+  | 'create_bond'
+  | 'begin_unbonding'
+  | 'withdraw_bond'
+  | 'redelegate';
 
 type StakingMovement = ValueTransferType & {
   stakingUiKind: StakingUiKind;
@@ -125,14 +127,8 @@ type StakingProps = DrawerScreenProps<
 
 const Staking: React.FC<StakingProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const {
-    valueTransfers,
-    addLastSnackbar,
-    translate,
-    snackbars,
-    removeFirstSnackbar,
-    staked,
-  } = context;
+  const { valueTransfers, snackbars, removeFirstSnackbar, staked, info } =
+    context;
 
   const screenName = ScreenEnum.StakingHome;
 
@@ -190,8 +186,9 @@ const Staking: React.FC<StakingProps> = () => {
 
   useEffect(() => {
     // TODO: fetching staking day info
-    setStakingDay(true);
-  }, []);
+    const isStakingDay: boolean = info.latestBlock % 100 < 10;
+    setStakingDay(isStakingDay);
+  }, [info.latestBlock]);
 
   const movements: StakingMovement[] = useMemo(() => {
     if (!valueTransfers) {
@@ -200,8 +197,6 @@ const Staking: React.FC<StakingProps> = () => {
 
     return valueTransfers
       .map(vt => {
-        console.log('VALUE TRANSFER FOUND', vt);
-
         const action = vt.stakingAction;
 
         if (action?.kind === 'create_bond') {
@@ -234,18 +229,17 @@ const Staking: React.FC<StakingProps> = () => {
 
   const stakedData: DataType[] = useMemo(() => {
     const resultJSON: StakeType[] = staked;
-    console.log(resultJSON);
     // const randomColors = Utils.generateColorList(resultJSON.length + 10);
     const r = resultJSON
-      .filter((i: StakeType) => i.votingPower > 0 && !!i.pubKey)
+      .filter((i: StakeType) => i.votingPower > 0 && !!i.finalizer)
       .sort((a, b) => b.votingPower - a.votingPower)
       .map((item, index) => {
         return {
           value: item.votingPower,
-          finalizer: item.pubKey,
+          finalizer: item.finalizer,
           tag: '',
           svg: {
-            data: lifehashDataUrlFromStringSync(item.pubKey),
+            data: lifehashDataUrlFromStringSync(item.finalizer),
           },
           key: `pie-${index}`,
         };
@@ -257,20 +251,12 @@ const Staking: React.FC<StakingProps> = () => {
 
   const { colors } = useTheme() as unknown as ThemeType;
 
-  console.log('MOVEMENTS -> ', movements);
-
   const hasMovements = !loading && movements.length > 0;
   const hasStaked = !loading && stakedData.length > 0;
 
   const monthHeader = hasMovements
     ? formatHeaderMonth(movements[0].time)
     : undefined;
-
-  const selectExpandAddress = (index: number) => {
-    let newExpandAddress = Array(expandAddress.length).fill(false);
-    newExpandAddress[index] = true;
-    setExpandAddress(newExpandAddress);
-  };
 
   const handleScrollToTop = useCallback(() => {
     if (scrollViewRef.current && !isScrollingToTop) {
@@ -360,54 +346,40 @@ const Staking: React.FC<StakingProps> = () => {
             {!!item.tag && (
               <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>
             )}
-            <TouchableOpacity
-              onPress={() => {
-                Clipboard.setString(item.finalizer);
-                addLastSnackbar({
-                  message: translate('history.addresscopied') as string,
-                  duration: SnackbarDurationEnum.short,
-                  screenName: [screenName],
-                });
-                selectExpandAddress(index);
-                setTimeout(() => {
-                  show(item);
-                }, 100);
+
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexWrap: 'wrap',
               }}
             >
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <AddressItem
-                  address={item.finalizer}
-                  screenName={screenName}
-                  oneLine={true}
-                  onlyContact={true}
-                  withIcon={true}
-                />
-                {!expandAddress[index] && !!item.finalizer && (
-                  <RegText>
-                    {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
-                      ? Utils.trimToSmall(
-                          item.finalizer,
-                          dimensions.width < 500 ? 5 : 10,
-                        )
-                      : item.finalizer}
-                  </RegText>
-                )}
-                {expandAddress[index] &&
-                  !!item.finalizer &&
-                  Utils.splitStringIntoChunks(
-                    item.finalizer,
-                    Number(numLines.toFixed(0)),
-                  ).map((c: string, idx: number) => (
-                    <RegText key={idx}>{c}</RegText>
-                  ))}
-              </View>
-            </TouchableOpacity>
+              <AddressItem
+                address={item.finalizer}
+                screenName={screenName}
+                oneLine={true}
+                onlyContact={true}
+                withIcon={true}
+              />
+              {!expandAddress[index] && !!item.finalizer && (
+                <RegText>
+                  {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
+                    ? Utils.trimToSmall(
+                        item.finalizer,
+                        dimensions.width < 500 ? 5 : 10,
+                      )
+                    : item.finalizer}
+                </RegText>
+              )}
+              {expandAddress[index] &&
+                !!item.finalizer &&
+                Utils.splitStringIntoChunks(
+                  item.finalizer,
+                  Number(numLines.toFixed(0)),
+                ).map((c: string, idx: number) => (
+                  <RegText key={idx}>{c}</RegText>
+                ))}
+            </View>
           </View>
           <View
             style={{

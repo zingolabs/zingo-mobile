@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState, useContext, useCallback, useRef } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+  useRef,
+} from 'react';
 import {
   View,
   Text,
@@ -16,7 +22,11 @@ import {
   Alert,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
@@ -37,7 +47,7 @@ import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 
-const PRESET_AMOUNTS = [0.01, 0.1, 1, 10]; 
+const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -50,18 +60,6 @@ type AddStakeScreenProps = DrawerScreenProps<
     stakingAction: StakingActionType,
   ) => Promise<string>;
 };
-
-function reverseHexBytes(hex: string): string {
-  if (hex.length !== 64) {
-    throw new Error('Finalizer address must be 64 hex chars');
-  }
-  let out = '';
-  for (let i = 0; i < 32; i++) {
-    const byte = hex.slice(i * 2, i * 2 + 2);
-    out = byte + out; // reverse byte order
-  }
-  return out.toLowerCase();
-}
 
 const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   stakeTransaction,
@@ -95,7 +93,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   }, []);
 
   useEffect(() => {
-    // Balance check (in cTAZ / ZEC units) 
+    // Balance check (in cTAZ / ZEC units)
     const _spendable =
       totalBalance && typeof totalBalance.totalSpendableBalance === 'number'
         ? totalBalance.totalSpendableBalance
@@ -110,7 +108,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           navigation.goBack();
         }
       }
-    }, [finalizerText, navigation])
+    }, [finalizerText, navigation]),
   );
 
   useEffect(() => {
@@ -178,11 +176,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     const stakingAction: StakingActionType = {
       kind: 'create_bond',
       val: amount * 10 ** 8,
-      target: reverseHexBytes(finalizer),
+      target: finalizer,
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
     };
-
-    console.log('Staking action:', stakingAction);
 
     setModalState('sending');
 
@@ -192,7 +188,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     } catch (error) {
       console.warn('Stake tx failed:', error);
       setModalState('idle');
-      //Alert.alert('Error', 'Staking transaction failed. Please try again.');
       navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
   };

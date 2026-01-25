@@ -23,6 +23,7 @@ import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import StakeType from './types/StakeType';
+import WalletBondsType from './types/WalletBondsType';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -33,6 +34,7 @@ export default interface AppContextLoaded {
   // Staked
   staked: StakeType[];
   globalStaked: StakeType[];
+  walletBonds: WalletBondsType[];
 
   // List of all diversified addresses of the wallet
   addresses: (UnifiedAddressClass | TransparentAddressClass)[] | null;
