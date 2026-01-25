@@ -3086,7 +3086,7 @@ checksum = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084"
 [[package]]
 name = "netutils"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=3cccb11119a9aeb73b97d00ce889e7c961c92922#3cccb11119a9aeb73b97d00ce889e7c961c92922"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
 dependencies = [
  "http",
  "http-body",
@@ -3531,7 +3531,7 @@ dependencies = [
 [[package]]
 name = "pepper-sync"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=3cccb11119a9aeb73b97d00ce889e7c961c92922#3cccb11119a9aeb73b97d00ce889e7c961c92922"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
 dependencies = [
  "bip32",
  "byteorder",
@@ -8219,7 +8219,7 @@ dependencies = [
 [[package]]
 name = "zingo-memo"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=3cccb11119a9aeb73b97d00ce889e7c961c92922#3cccb11119a9aeb73b97d00ce889e7c961c92922"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
 dependencies = [
  "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
  "zcash_client_backend",
@@ -8232,7 +8232,7 @@ dependencies = [
 [[package]]
 name = "zingo-price"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=3cccb11119a9aeb73b97d00ce889e7c961c92922#3cccb11119a9aeb73b97d00ce889e7c961c92922"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
 dependencies = [
  "byteorder",
  "reqwest",
@@ -8248,7 +8248,7 @@ dependencies = [
 [[package]]
 name = "zingo-status"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=3cccb11119a9aeb73b97d00ce889e7c961c92922#3cccb11119a9aeb73b97d00ce889e7c961c92922"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
 dependencies = [
  "byteorder",
  "zcash_primitives 0.26.1",
@@ -8274,7 +8274,7 @@ dependencies = [
 [[package]]
 name = "zingolib"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=3cccb11119a9aeb73b97d00ce889e7c961c92922#3cccb11119a9aeb73b97d00ce889e7c961c92922"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
 dependencies = [
  "append-only-vec",
  "bech32",
