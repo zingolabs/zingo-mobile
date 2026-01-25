@@ -1084,9 +1084,7 @@ export default class RPC {
               : m.status === 2
                 ? 'Withdrawn'
                 : 'Active', // can be an error here
-        finalizer: globalStakedList.filter(m2 => m2.finalizer === m.finalizer).length > 0 
-                      ? m.finalizer 
-                      : reverseHex32Bytes(m.finalizer),
+        finalizer: m.finalizer,
       }));
 
       const stakedList: StakeType[] = (rosterInfo.members ?? [])
