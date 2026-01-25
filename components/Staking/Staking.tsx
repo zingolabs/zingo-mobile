@@ -136,6 +136,7 @@ const Staking: React.FC<StakingProps> = () => {
     snackbars,
     removeFirstSnackbar,
     staked,
+    info,
   } = context;
 
   const screenName = ScreenEnum.StakingHome;
@@ -193,9 +194,10 @@ const Staking: React.FC<StakingProps> = () => {
   );
 
   useEffect(() => {
-    // TODO: fetching staking day info
-    setStakingDay(true);
-  }, []);
+    // TODO: fetching staking day info 
+    const isStakingDay: boolean = info.latestBlock % 100 < 10;
+    setStakingDay(isStakingDay);
+  }, [info.latestBlock]);
 
   const movements: StakingMovement[] = useMemo(() => {
     if (!valueTransfers) {

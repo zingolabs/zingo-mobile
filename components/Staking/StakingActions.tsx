@@ -26,7 +26,7 @@ const StakingActions: React.FC<StakingActionsProps> = ({ stakingDay }) => {
         gap: 20,
       }}
     >
-      {stakingDay ? (
+      {stakingDay || true ? (
         <>
           <Pressable
             onPress={() => navigation.navigate(RouteEnum.Stake)}
