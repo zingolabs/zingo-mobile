@@ -83,7 +83,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   const amountColor = Utils.valueTransferKindColor(colors.text, vt);
 
   const icon =
-      vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
+      vt.kind === ValueTransferKindEnum.Received || 
+      vt.kind === ValueTransferKindEnum.Shield || 
+      vt.stakingAction?.kind === 'withdraw_bond'
         ? faArrowDown
         : faArrowUp;
 
@@ -343,7 +345,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     )}
                     {vt.stakingAction && 
                       (vt.stakingAction.kind === 'begin_unbonding' || 
-                        vt.stakingAction.kind === 'withdraw_bond' ||
                         vt.stakingAction.kind === 'redelegate') && (
                       <Unstake width={20} height={20} />
                     )}
@@ -440,7 +441,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 color={amountColor}
                 amtZec={
                   vt.kind === ValueTransferKindEnum.Received ||
-                  vt.kind === ValueTransferKindEnum.Shield
+                  vt.kind === ValueTransferKindEnum.Shield ||
+                  vt.stakingAction?.kind === 'withdraw_bond'
                     ? vt.amount
                     : Number(
                           Utils.splitZecAmountIntoBigSmall(vt.amount).bigPart,

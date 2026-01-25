@@ -555,7 +555,6 @@ export default class Utils {
       ? '#0091FF80'
       : vt.stakingAction &&
           (vt.stakingAction.kind === 'begin_unbonding' ||
-            vt.stakingAction.kind === 'withdraw_bond' ||
             vt.stakingAction.kind === 'redelegate')
         ? '#FFAF0E80'
         : color;

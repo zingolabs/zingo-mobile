@@ -1470,7 +1470,7 @@ export default class RPC {
       const valueTransfersJSON: RPCValueTransfersType =
         await JSON.parse(valueTransfersStr);
 
-      console.log(valueTransfersJSON.value_transfers);
+      //console.log(valueTransfersJSON.value_transfers);
 
       let vtList: ValueTransferType[] = [];
 
