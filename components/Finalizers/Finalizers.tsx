@@ -244,7 +244,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
               icon={faCircle}
               color={randomColors[index]}
             />
-            <TouchableOpacity onPress={() => {}}>
+            <View>
               <View
                 style={{
                   display: 'flex',
@@ -299,7 +299,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
                   currencyName={info.currencyName}
                 />
               </View>
-            </TouchableOpacity>
+            </View>
           </View>
           <View
             style={{
