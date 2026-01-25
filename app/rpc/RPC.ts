@@ -1063,6 +1063,13 @@ export default class RPC {
         bonds: Array<RPCWalletBondsType>;
       };
 
+      const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
+        m => ({
+          finalizer: m.pub_key, // TODO: RENAME PLS
+          votingPower: (m.voting_power || 0) / 10 ** 8,
+        }),
+      );
+
       const walletBondsList: WalletBondsType[] = (
         walletBondsJSON.bonds ?? []
       ).map(m => ({
@@ -1077,15 +1084,10 @@ export default class RPC {
               : m.status === 2
                 ? 'Withdrawn'
                 : 'Active', // can be an error here
-        finalizer: reverseHex32Bytes(m.finalizer),
+        finalizer: globalStakedList.filter(m2 => m2.finalizer === m.finalizer).length > 0 
+                      ? m.finalizer 
+                      : reverseHex32Bytes(m.finalizer),
       }));
-
-      const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
-        m => ({
-          finalizer: m.pub_key, // TODO: RENAME PLS
-          votingPower: (m.voting_power || 0) / 10 ** 8,
-        }),
-      );
 
       const stakedList: StakeType[] = (rosterInfo.members ?? [])
         .filter(
