@@ -107,15 +107,15 @@ const Unstake: React.FC<UnstakeProps> = ({
   const context = useContext(ContextAppLoaded);
   const { walletBonds, valueTransfers } = context;
 
-  const movements = walletBonds.filter(
-    b => {
+  const movements = walletBonds
+    .filter(b => {
       if (b.status === 'Withdrawn') return false;
-      if (!!finalizerFromText && b.finalizer === finalizerFromText) return true
+      if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
       if (!finalizerFromText) return true;
       return false;
-    }
-  ).sort((a, b) => b.amount - a.amount);
+    })
+    .sort((a, b) => b.amount - a.amount);
 
   const selectedBond = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedBond;

@@ -98,11 +98,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    console.log('SCOPE', scope);
-
     let base: StakeType[] = scope === 'my' ? staked : globalStaked;
-
-    console.log('BASE', base, staked, globalStaked, scope);
 
     if (exclude) base = base.filter(i => i.finalizer !== exclude);
 

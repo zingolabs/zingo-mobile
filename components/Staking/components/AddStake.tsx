@@ -61,18 +61,6 @@ type AddStakeScreenProps = DrawerScreenProps<
   ) => Promise<string>;
 };
 
-function reverseHexBytes(hex: string): string {
-  if (hex.length !== 64) {
-    throw new Error('Finalizer address must be 64 hex chars');
-  }
-  let out = '';
-  for (let i = 0; i < 32; i++) {
-    const byte = hex.slice(i * 2, i * 2 + 2);
-    out = byte + out; // reverse byte order
-  }
-  return out.toLowerCase();
-}
-
 const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   stakeTransaction,
 }) => {
@@ -188,11 +176,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     const stakingAction: StakingActionType = {
       kind: 'create_bond',
       val: amount * 10 ** 8,
-      target: reverseHexBytes(finalizer),
+      target: finalizer,
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
     };
-
-    console.log('Staking action:', stakingAction);
 
     setModalState('sending');
 

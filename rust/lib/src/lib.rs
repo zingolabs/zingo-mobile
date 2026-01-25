@@ -28,7 +28,7 @@ use std::sync::RwLock;
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use bip0039::Mnemonic;
-use json::object;
+use json::{JsonValue, object};
 use once_cell::sync::Lazy;
 use rustls::crypto::{CryptoProvider, ring::default_provider};
 
@@ -732,11 +732,7 @@ pub fn get_roster() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 match lightclient.get_roster_info().await {
-                    Ok(roster_info) => {
-                        serde_json::to_string_pretty(&roster_info).unwrap_or_else(|_| {
-                            "Error: get_roster_info. failed to serialize".to_string()
-                        })
-                    }
+                    Ok(roster_info) => JsonValue::from(roster_info).pretty(2).to_string(),
                     Err(e) => {
                         format!("Error: {e}")
                     }

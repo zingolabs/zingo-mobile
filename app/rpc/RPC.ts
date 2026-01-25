@@ -40,9 +40,9 @@ import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 import { LoadingAppNavigationState } from '../types';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
-import { reverseHex32Bytes } from '../utils/hex';
 import RPCWalletBondsType from './types/RPCWalletBondsType';
 import { RPCStakedType } from './types/RPCStakedType';
+import { reverseHex32Bytes } from '../utils/hex';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -1033,7 +1033,7 @@ export default class RPC {
       }
 
       const rosterInfo = JSON.parse(rosterInfoStr) as {
-        members: Array<RPCStakedType>;
+        roster_members: Array<RPCStakedType>;
       };
 
       const start3 = Date.now();
@@ -1063,12 +1063,12 @@ export default class RPC {
         bonds: Array<RPCWalletBondsType>;
       };
 
-      const globalStakedList: StakeType[] = (rosterInfo.members ?? []).map(
-        m => ({
-          finalizer: m.pub_key, // TODO: RENAME PLS
-          votingPower: (m.voting_power || 0) / 10 ** 8,
-        }),
-      );
+      const globalStakedList: StakeType[] = (
+        rosterInfo.roster_members ?? []
+      ).map(m => ({
+        finalizer: m.pubkey, // TODO: RENAME PLS
+        votingPower: (m.voting_power || 0) / 10 ** 8,
+      }));
 
       const walletBondsList: WalletBondsType[] = (
         walletBondsJSON.bonds ?? []
@@ -1087,28 +1087,33 @@ export default class RPC {
         finalizer: m.finalizer,
       }));
 
-      const stakedList: StakeType[] = (rosterInfo.members ?? [])
+      const stakedList: StakeType[] = (rosterInfo.roster_members ?? [])
         .filter(
-          m => walletBondsList
-            .filter(b => m.pub_key === b.finalizer && 
-                   (b.status === 'Active' || 
-                    b.status === 'Unbonding')).length > 0,
+          m =>
+            walletBondsList.filter(
+              b =>
+                m.pubkey === b.finalizer &&
+                (b.status === 'Active' || b.status === 'Unbonding'),
+            ).length > 0,
         )
         .map(m => {
           const amount = walletBondsList
-            .filter(b => m.pub_key === b.finalizer && 
-                   (b.status === 'Active' || 
-                    b.status === 'Unbonding'))
+            .filter(
+              b =>
+                m.pubkey === b.finalizer &&
+                (b.status === 'Active' || b.status === 'Unbonding'),
+            )
             .reduce((acc, curr) => acc + curr.amount, 0);
           return {
-            finalizer: m.pub_key,
-            votingPower: (amount || 0),
+            finalizer: m.pubkey,
+            votingPower: amount || 0,
           };
         });
 
       console.log('GLOBAL STAKED', globalStakedList);
       console.log('STAKED', stakedList);
       console.log('BONDS', walletBondsList);
+      console.log('ROSTER', rosterInfo);
 
       this.fnSetStaked(stakedList);
       this.fnSetGlobalStaked(globalStakedList);
@@ -1538,7 +1543,7 @@ export default class RPC {
                 val:
                   (!vt.staking_action?.val ? 0 : vt.staking_action.val) /
                   10 ** 8,
-                target: reverseHex32Bytes(vt.staking_action?.target),
+                target: vt.staking_action?.target,
               } as StakingActionType;
             }
 
@@ -1795,11 +1800,9 @@ export default class RPC {
 
         if (action.kind === 'create_bond') {
           const payload = {
-            amount_zats: action.val, // must be integer zats
-            finalizer_address: action.target, // 32-byte hex string
+            amount_zats: action.val,
+            finalizer_address: reverseHex32Bytes(action.target), // ONLY PLACE WHERE IT SHOULD BE USED
           };
-
-          console.log('HEEEEEEEEEEREREREREE');
 
           proposeStr = await RPCModule.stakeProcess(JSON.stringify(payload));
         } else {
