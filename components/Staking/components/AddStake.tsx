@@ -202,7 +202,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     } catch (error) {
       console.warn('Stake tx failed:', error);
       setModalState('idle');
-      //Alert.alert('Error', 'Staking transaction failed. Please try again.');
       navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
   };

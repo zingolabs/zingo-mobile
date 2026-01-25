@@ -35,6 +35,7 @@ import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
+  GlobalConst,
   RouteEnum,
   SendPageStateClass,
   WalletBondsType,
@@ -47,6 +48,7 @@ import Utils from '../../../app/utils';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
+import Refresh from '../../../assets/icons/refresh.svg';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -103,7 +105,7 @@ const Unstake: React.FC<UnstakeProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { walletBonds } = context;
+  const { walletBonds, valueTransfers } = context;
 
   const movements = walletBonds.filter(
     b => {
@@ -168,7 +170,7 @@ const Unstake: React.FC<UnstakeProps> = ({
             continue;
           }
 
-          if (resp.toLowerCase().startsWith('error:')) {
+          if (resp.toLowerCase().startsWith(GlobalConst.error)) {
             console.warn(
               '[Unstake] getAccumulatedStakeForTxidInfo error for',
               m.txid,
@@ -220,6 +222,17 @@ const Unstake: React.FC<UnstakeProps> = ({
       return;
     }
 
+    if (valueTransfers?.filter(v => v.txid === bondTxid).length === 0) {
+      Alert.alert('Error', 'Could not determine the original bond txid as a existent Transaction.');
+      return;
+    } else {
+      const confirmations = (valueTransfers?.filter(v => v.txid === bondTxid)[0].confirmations) || 0;
+      if (confirmations <= 0) {
+        Alert.alert('Error', 'This bond is still processing, wait for confirmations.');
+        return;
+      }
+    }
+
     console.log('bondTxid', bondTxid);
     console.log('selectedKind', selectedKind);
 
@@ -243,7 +256,6 @@ const Unstake: React.FC<UnstakeProps> = ({
     } catch (error) {
       console.warn('Staking tx failed:', error);
       setModalState('idle');
-      //Alert.alert('Error', 'Staking transaction failed. Please try again.');
       navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
   };
@@ -272,16 +284,15 @@ const Unstake: React.FC<UnstakeProps> = ({
     const isSelected = item.txid === selectedTxid;
 
     let displayAmount = item.amount.toFixed(5);
+    let confirmations = valueTransfers && 
+                        valueTransfers.filter(v => v.txid === item.txid).length > 0 
+                          ? valueTransfers.filter(v => v.txid === item.txid)[0].confirmations
+                          : 0;
 
     return (
       <Pressable
         onPress={() => {
           setSelectedTxid(item.txid);
-          //if (item.stakingAction?.target) {
-          //  setFinalizerFromText(item.stakingAction.target);
-          // TODO: find the staked amount for this finalizer.
-          //  setStakedFrom(0);
-          //}
         }}
         style={[
           styles.txRow,
@@ -292,18 +303,21 @@ const Unstake: React.FC<UnstakeProps> = ({
         ]}
       >
         <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              color: colors.text,
-              fontSize: 13,
-              fontWeight: '500',
-            }}
-            numberOfLines={1}
-          >
-            {item.status === 'Unbonding'
-              ? 'Inactive'
-              : item.status || 'unknown'}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {!confirmations && <Refresh width={15} height={15} style= {{ marginRight: 5 }} />}
+            <Text
+              style={{
+                color: colors.text,
+                fontSize: 13,
+                fontWeight: '500',
+              }}
+              numberOfLines={1}
+            >
+              {item.status === 'Unbonding'
+                ? 'Inactive'
+                : item.status || 'unknown'}
+            </Text>
+          </View>
           <Text
             style={{
               color: colors.placeholder,

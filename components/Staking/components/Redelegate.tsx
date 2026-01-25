@@ -29,6 +29,7 @@ import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
   ChainNameEnum,
+  GlobalConst,
   RouteEnum,
   SendPageStateClass,
   ToAddrClass,
@@ -209,7 +210,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
             continue;
           }
 
-          if (resp.toLowerCase().startsWith('error:')) {
+          if (resp.toLowerCase().startsWith(GlobalConst.error)) {
             console.warn(
               '[Unstake] getAccumulatedStakeForTxidInfo error for',
               m.txid,
@@ -322,7 +323,6 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
     } catch (error) {
       console.warn('Unstake tx failed:', error);
       setModalState('idle');
-      //Alert.alert('Error', 'Staking transaction failed. Please try again.');
       navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
   };
