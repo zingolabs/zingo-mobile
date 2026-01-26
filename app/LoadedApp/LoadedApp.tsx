@@ -1293,6 +1293,17 @@ export class LoadedAppClass extends Component<
     }
   };
 
+  redelegateTransaction = async (createBondTxid: string): Promise<string> => {
+    try {
+      //const txid = await this.rpc.sendWithdrawBondTx(createBondTxid);
+      const txid = createBondTxid; // TODO: ffi for redelagate
+      return txid;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+
   requestFaucetFunds = async (address: string): Promise<string> => {
     try {
       const resp = await this.rpc.requestFaucetFunds(address);

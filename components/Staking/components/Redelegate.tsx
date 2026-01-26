@@ -28,8 +28,9 @@ import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
   //ChainNameEnum,
-  GlobalConst,
+  //GlobalConst,
   RouteEnum,
+  ValueTransferKindEnum,
   //SendPageStateClass,
   //ToAddrClass,
   ValueTransferType,
