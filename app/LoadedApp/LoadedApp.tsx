@@ -2121,7 +2121,6 @@ export class LoadedAppClass extends Component<
                 {props => (
                   <Unstake
                     {...props}
-                    stakeTransaction={this.stakeTransaction}
                     beginUnstakeTransaction={this.beginUnstakeTransaction}
                     withdrawBondTransaction={this.withdrawBondTransaction}
                   />
@@ -2132,7 +2131,7 @@ export class LoadedAppClass extends Component<
                 {props => (
                   <Redelegate
                     {...props}
-                    stakeTransaction={this.stakeTransaction}
+                    redelegateTransaction={this.redelegateTransaction}
                   />
                 )}
               </InnerStack.Screen>

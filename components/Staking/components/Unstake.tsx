@@ -35,13 +35,11 @@ import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
   RouteEnum,
-  SendPageStateClass,
   WalletBondsType,
 } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
-import { StakingActionType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
@@ -51,10 +49,6 @@ import Refresh from '../../../assets/icons/refresh.svg';
 type ModalState = 'idle' | 'sending' | 'success';
 
 type UnstakeProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Unstake> & {
-  stakeTransaction: (
-    sendPageState: SendPageStateClass,
-    stakingAction: StakingActionType,
-  ) => Promise<string>;
   beginUnstakeTransaction: (txid: string) => Promise<string>;
   withdrawBondTransaction: (txid: string) => Promise<string>;
 };
