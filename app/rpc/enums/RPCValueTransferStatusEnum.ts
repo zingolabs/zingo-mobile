@@ -1,4 +1,4 @@
-export enum RPCValueTransfersStatusEnum {
+export enum RPCValueTransferStatusEnum {
   //pending = 'pending', deprecated / splitted
   calculated = 'calculated',
   transmitted = 'transmitted',

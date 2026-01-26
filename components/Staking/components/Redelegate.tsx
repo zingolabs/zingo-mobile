@@ -31,6 +31,7 @@ import {
   RouteEnum,
   SendPageStateClass,
   ToAddrClass,
+  ValueTransferKindEnum,
   ValueTransferType,
 } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
@@ -93,18 +94,16 @@ const Redelegate: React.FC<RedelegateProps> = ({ stakeTransaction, route }) => {
 
     const createBonds = valueTransfers.filter(vt => {
       if (vt.confirmations === 0) return false;
-      const sa = vt.stakingAction;
-      if (!sa || sa.kind !== 'create_bond') return false;
+      if (vt.kind !== ValueTransferKindEnum.CreateBond) return false;
 
       if (!finalizerFromText) return true;
-      return sa.target === finalizerFromText;
+      return vt.stakingAction && vt.stakingAction.target === finalizerFromText;
     });
 
     const beginByBondKey = new Map<string, ValueTransferType>();
     for (const vt of valueTransfers) {
       if (vt.confirmations === 0) continue;
-      const sa = vt.stakingAction;
-      if (!sa || sa.kind !== 'begin_unbonding') continue;
+      if (vt.kind !== ValueTransferKindEnum.beginUnbond) continue;
 
       const k = bondKeyOf(vt);
       if (!k) continue;

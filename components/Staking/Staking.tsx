@@ -30,6 +30,7 @@ import {
   RouteEnum,
   ScreenEnum,
   StakeType,
+  ValueTransferKindEnum,
   ValueTransferType,
 } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
@@ -197,21 +198,19 @@ const Staking: React.FC<StakingProps> = () => {
 
     return valueTransfers
       .map(vt => {
-        const action = vt.stakingAction;
-
-        if (action?.kind === 'create_bond') {
+        if (vt.kind === ValueTransferKindEnum.CreateBond) {
           return { ...vt, stakingUiKind: 'create_bond' };
         }
 
-        if (action?.kind === 'begin_unbonding') {
+        if (vt.kind === ValueTransferKindEnum.beginUnbond) {
           return { ...vt, stakingUiKind: 'begin_unbonding' };
         }
 
-        if (action?.kind === 'withdraw_bond') {
+        if (vt.kind === ValueTransferKindEnum.WithdrawBond) {
           return { ...vt, stakingUiKind: 'withdraw_bond' };
         }
 
-        if (action?.kind === 'redelegate') {
+        if (vt.kind === ValueTransferKindEnum.RetargetDelegationBond) {
           return { ...vt, stakingUiKind: 'redelegate' };
         }
 

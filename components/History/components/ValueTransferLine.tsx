@@ -28,7 +28,7 @@ import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 
 import { ContextAppLoaded } from '../../../app/context';
-import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransferStatusEnum } from '../../../app/rpc/enums/RPCValueTransferStatusEnum';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import Stake from '../../../assets/icons/stake-blue.svg';
@@ -85,7 +85,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   const icon =
       vt.kind === ValueTransferKindEnum.Received || 
       vt.kind === ValueTransferKindEnum.Shield || 
-      vt.stakingAction?.kind === 'withdraw_bond'
+      vt.kind === ValueTransferKindEnum.WithdrawBond
         ? faArrowDown
         : faArrowUp;
 
@@ -249,21 +249,21 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
 
   //if (index === 0) {
   //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.calculated;
+  //  vt.status = RPCValueTransferStatusEnum.calculated;
   //  vt.address = "aydelaymanianero";
   //}
   //if (index === 1 ) {
   //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.transmitted;
+  //  vt.status = RPCValueTransferStatusEnum.transmitted;
   //  vt.address = "pepeillo";
   //}
   //if (index === 2) {
   //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.mempool;
+  //  vt.status = RPCValueTransferStatusEnum.mempool;
   //}
   //if (index === 3 ) {
   //  vt.confirmations = 1;
-  //  vt.status = RPCValueTransfersStatusEnum.confirmed;
+  //  vt.status = RPCValueTransferStatusEnum.confirmed;
   //}
 
   return (
@@ -340,12 +340,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   />
                 ) : (
                   <>
-                    {vt.stakingAction && 
-                      vt.stakingAction.kind === 'create_bond' ? (
+                    {vt.kind === ValueTransferKindEnum.CreateBond ? (
                       <Stake width={20} height={20} />
-                    ) : vt.stakingAction && 
-                      (vt.stakingAction.kind === 'begin_unbonding' || 
-                        vt.stakingAction.kind === 'redelegate') ? 
+                    ) :(vt.kind === ValueTransferKindEnum.beginUnbond || 
+                        vt.kind === ValueTransferKindEnum.RetargetDelegationBond) ? 
                       (
                         <Unstake width={20} height={20} />
                       ) : (
@@ -410,10 +408,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                           style={{
                             color:
                               vt.status ===
-                                RPCValueTransfersStatusEnum.transmitted ||
+                                RPCValueTransferStatusEnum.transmitted ||
                               vt.status ===
-                                RPCValueTransfersStatusEnum.calculated ||
-                              vt.status === RPCValueTransfersStatusEnum.mempool
+                                RPCValueTransferStatusEnum.calculated ||
+                              vt.status === RPCValueTransferStatusEnum.mempool
                                 ? colors.primary
                                 : colors.primaryDisabled,
                             fontSize: 12,
@@ -443,7 +441,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 amtZec={
                   vt.kind === ValueTransferKindEnum.Received ||
                   vt.kind === ValueTransferKindEnum.Shield ||
-                  vt.stakingAction?.kind === 'withdraw_bond'
+                  vt.kind === ValueTransferKindEnum.WithdrawBond
                     ? vt.amount
                     : Number(
                           Utils.splitZecAmountIntoBigSmall(vt.amount).bigPart,

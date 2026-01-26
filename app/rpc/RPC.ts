@@ -26,9 +26,9 @@ import { RPCSeedType } from './types/RPCSeedType';
 import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCSendType } from './types/RPCSendType';
 import { RPCValueTransfersType } from './types/RPCValueTransfersType';
-import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
+import { RPCValueTransferKindEnum } from './enums/RPCValueTransferKindEnum';
 import { RPCValueTransferType } from './types/RPCValueTransferType';
-import { RPCValueTransfersStatusEnum } from './enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransferStatusEnum } from './enums/RPCValueTransferStatusEnum';
 import { RPCSendProposeType } from './types/RPCSendProposeType';
 import { RPCSyncPollType } from './types/RPCSyncPollType';
 import { RPCZecPriceType } from './types/RPCZecPriceType';
@@ -1486,31 +1486,39 @@ export default class RPC {
             currentValueTransferList.txid = vt.txid;
             currentValueTransferList.time = vt.datetime;
             currentValueTransferList.kind =
-              vt.kind === RPCValueTransfersKindEnum.memoToSelf
+              vt.kind === RPCValueTransferKindEnum.memoToSelf
                 ? ValueTransferKindEnum.MemoToSelf
-                : vt.kind === RPCValueTransfersKindEnum.sendToSelf
+                : vt.kind === RPCValueTransferKindEnum.sendToSelf
                   ? ValueTransferKindEnum.SendToSelf
-                  : vt.kind === RPCValueTransfersKindEnum.received
+                  : vt.kind === RPCValueTransferKindEnum.received
                     ? ValueTransferKindEnum.Received
-                    : vt.kind === RPCValueTransfersKindEnum.sent
+                    : vt.kind === RPCValueTransferKindEnum.sent
                       ? ValueTransferKindEnum.Sent
-                      : vt.kind === RPCValueTransfersKindEnum.shield
+                      : vt.kind === RPCValueTransferKindEnum.shield
                         ? ValueTransferKindEnum.Shield
-                        : vt.kind === RPCValueTransfersKindEnum.rejection
+                        : vt.kind === RPCValueTransferKindEnum.rejection
                           ? ValueTransferKindEnum.Rejection
-                          : vt.kind;
+                          : vt.kind === RPCValueTransferKindEnum.createBond
+                            ? ValueTransferKindEnum.CreateBond
+                            : vt.kind === RPCValueTransferKindEnum.beginUnbond
+                              ? ValueTransferKindEnum.beginUnbond
+                              : vt.kind === RPCValueTransferKindEnum.withdrawBond
+                                ? ValueTransferKindEnum.WithdrawBond
+                                : vt.kind === RPCValueTransferKindEnum.retargetDelegationBond
+                                  ? ValueTransferKindEnum.RetargetDelegationBond
+                                  : ValueTransferKindEnum.Unknown; // error
             currentValueTransferList.fee =
               (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
             currentValueTransferList.zecPrice = !vt.zec_price
               ? 0
               : vt.zec_price;
             if (
-              vt.status === RPCValueTransfersStatusEnum.calculated ||
-              vt.status === RPCValueTransfersStatusEnum.transmitted ||
-              vt.status === RPCValueTransfersStatusEnum.mempool
+              vt.status === RPCValueTransferStatusEnum.calculated ||
+              vt.status === RPCValueTransferStatusEnum.transmitted ||
+              vt.status === RPCValueTransferStatusEnum.mempool
             ) {
               currentValueTransferList.confirmations = 0;
-            } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
+            } else if (vt.status === RPCValueTransferStatusEnum.confirmed) {
               currentValueTransferList.confirmations =
                 this.lastServerBlockHeight &&
                 this.lastServerBlockHeight >= this.lastWalletBlockHeight
@@ -1554,11 +1562,11 @@ export default class RPC {
               console.log('valuetransfer zingo', currentValueTransferList);
               console.log('--------------------------------------------------');
             }
-            //if (vt.status === RPCValueTransfersStatusEnum.calculated) {
+            //if (vt.status === RPCValueTransferStatusEnum.calculated) {
             //  console.log('CALCULATED ))))))))))))))))))))))))))))))))))');
             //  console.log(vt);
             //}
-            //if (vt.status === RPCValueTransfersStatusEnum.transmitted) {
+            //if (vt.status === RPCValueTransferStatusEnum.transmitted) {
             //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
             //  console.log(vt);
             //}
@@ -1628,29 +1636,37 @@ export default class RPC {
           currentMessageList.txid = m.txid;
           currentMessageList.time = m.datetime;
           currentMessageList.kind =
-            m.kind === RPCValueTransfersKindEnum.memoToSelf
+            m.kind === RPCValueTransferKindEnum.memoToSelf
               ? ValueTransferKindEnum.MemoToSelf
-              : m.kind === RPCValueTransfersKindEnum.sendToSelf
+              : m.kind === RPCValueTransferKindEnum.sendToSelf
                 ? ValueTransferKindEnum.SendToSelf
-                : m.kind === RPCValueTransfersKindEnum.received
+                : m.kind === RPCValueTransferKindEnum.received
                   ? ValueTransferKindEnum.Received
-                  : m.kind === RPCValueTransfersKindEnum.sent
+                  : m.kind === RPCValueTransferKindEnum.sent
                     ? ValueTransferKindEnum.Sent
-                    : m.kind === RPCValueTransfersKindEnum.shield
+                    : m.kind === RPCValueTransferKindEnum.shield
                       ? ValueTransferKindEnum.Shield
-                      : m.kind === RPCValueTransfersKindEnum.rejection
-                        ? ValueTransferKindEnum.Rejection
-                        : m.kind;
+                        : m.kind === RPCValueTransferKindEnum.rejection
+                          ? ValueTransferKindEnum.Rejection
+                          : m.kind === RPCValueTransferKindEnum.createBond
+                            ? ValueTransferKindEnum.CreateBond
+                            : m.kind === RPCValueTransferKindEnum.beginUnbond
+                              ? ValueTransferKindEnum.beginUnbond
+                              : m.kind === RPCValueTransferKindEnum.withdrawBond
+                                ? ValueTransferKindEnum.WithdrawBond
+                                : m.kind === RPCValueTransferKindEnum.retargetDelegationBond
+                                  ? ValueTransferKindEnum.RetargetDelegationBond
+                                  : ValueTransferKindEnum.Unknown; // error
           currentMessageList.fee =
             (!m.transaction_fee ? 0 : m.transaction_fee) / 10 ** 8;
           currentMessageList.zecPrice = !m.zec_price ? 0 : m.zec_price;
           if (
-            m.status === RPCValueTransfersStatusEnum.calculated ||
-            m.status === RPCValueTransfersStatusEnum.transmitted ||
-            m.status === RPCValueTransfersStatusEnum.mempool
+            m.status === RPCValueTransferStatusEnum.calculated ||
+            m.status === RPCValueTransferStatusEnum.transmitted ||
+            m.status === RPCValueTransferStatusEnum.mempool
           ) {
             currentMessageList.confirmations = 0;
-          } else if (m.status === RPCValueTransfersStatusEnum.confirmed) {
+          } else if (m.status === RPCValueTransferStatusEnum.confirmed) {
             currentMessageList.confirmations =
               this.lastServerBlockHeight &&
               this.lastServerBlockHeight >= this.lastWalletBlockHeight
@@ -1679,11 +1695,11 @@ export default class RPC {
             console.log('valuetransfer messages zingo', currentMessageList);
             console.log('--------------------------------------------------');
           }
-          //if (m.status === RPCValueTransfersStatusEnum.calculated) {
+          //if (m.status === RPCValueTransferStatusEnum.calculated) {
           //  console.log('CALCULATED ))))))))))))))))))))))))))))))))))');
           //  console.log(m);
           //}
-          //if (m.status === RPCValueTransfersStatusEnum.transmitted) {
+          //if (m.status === RPCValueTransferStatusEnum.transmitted) {
           //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
           //  console.log(m);
           //}

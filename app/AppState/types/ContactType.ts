@@ -1,4 +1,4 @@
-import { RPCValueTransfersStatusEnum } from '../../rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransferStatusEnum } from '../../rpc/enums/RPCValueTransferStatusEnum';
 import { ValueTransferKindEnum } from '../enums/ValueTransferKindEnum';
 
 export default interface ContactType {
@@ -14,7 +14,7 @@ export default interface ContactType {
   time: number;
   memos: string[];
   confirmations: number;
-  status?: RPCValueTransfersStatusEnum;
+  status?: RPCValueTransferStatusEnum;
   kind?: ValueTransferKindEnum;
 
    

@@ -26,7 +26,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Stake from '../../../assets/icons/stake-white.svg';
 import Unstake from '../../../assets/icons/unstake-white.svg';
 import { faChevronDown, faChevronUp, faRefresh, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
-import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransferStatusEnum } from '../../../app/rpc/enums/RPCValueTransferStatusEnum';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -70,7 +70,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const icon =
       valueTransfer.kind === ValueTransferKindEnum.Received || 
       valueTransfer.kind === ValueTransferKindEnum.Shield ||
-      valueTransfer.stakingAction?.kind === 'withdraw_bond'
+      valueTransfer.kind === ValueTransferKindEnum.WithdrawBond
         ? faArrowDown
         : faArrowUp;
 
@@ -132,7 +132,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
 
   //console.log('render History Detail', valueTransferIndex, valueTransfer);
 
-  //if (valueTransfer.status === RPCValueTransfersStatusEnum.calculated || valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) {
+  //if (valueTransfer.status === RPCValueTransferStatusEnum.calculated || valueTransfer.status === RPCValueTransferStatusEnum.transmitted) {
   //  console.log('server', info.latestBlock, 'VT', valueTransfer.blockheight, 'expire', GlobalConst.expireBlocks);
   //  console.log(info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks);
   //} 
@@ -232,12 +232,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                   />
                 ) : (
                   <>
-                    {valueTransfer.stakingAction && 
-                      valueTransfer.stakingAction.kind === 'create_bond' ? (
+                    {valueTransfer.kind === ValueTransferKindEnum.CreateBond ? (
                       <Stake width={30} height={30} />
-                    ) : valueTransfer.stakingAction && 
-                      (valueTransfer.stakingAction.kind === 'begin_unbonding' || 
-                        valueTransfer.stakingAction.kind === 'redelegate') ? (
+                    ) : (valueTransfer.kind === ValueTransferKindEnum.beginUnbond || 
+                         valueTransfer.kind === ValueTransferKindEnum.RetargetDelegationBond) ? (
                       <Unstake width={30} height={30} />
                     ) : (
                       <FontAwesomeIcon
@@ -275,9 +273,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           {valueTransfer.confirmations >= 0 &&
             valueTransfer.confirmations < GlobalConst.minConfirmations && (
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              {(valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
-                valueTransfer.status === RPCValueTransfersStatusEnum.mempool) && (
+              {(valueTransfer.status === RPCValueTransferStatusEnum.transmitted ||
+                valueTransfer.status === RPCValueTransferStatusEnum.calculated ||
+                valueTransfer.status === RPCValueTransferStatusEnum.mempool) && (
                 <FadeText
                   style={{
                     color: colors.text,
@@ -289,7 +287,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                   {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
                 </FadeText>
               )}
-              {valueTransfer.status === RPCValueTransfersStatusEnum.confirmed &&
+              {valueTransfer.status === RPCValueTransferStatusEnum.confirmed &&
                 valueTransfer.confirmations >= 0 &&
                 valueTransfer.confirmations < GlobalConst.minConfirmations && (
                 <FadeText
@@ -318,8 +316,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               borderRadius: 30,
               backgroundColor: colors.secondary,
           }}>
-            {valueTransfer.stakingAction && 
-              valueTransfer.stakingAction.kind === 'create_bond' && (
+            {valueTransfer.kind === ValueTransferKindEnum.CreateBond && (
               <>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
                   <FadeText>{'Target'}</FadeText>
@@ -334,12 +331,12 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         });
                       }
                     }}>
-                    <RegText>{Utils.trimToSmall(valueTransfer.stakingAction.target, 10)}</RegText>
+                    <RegText>{Utils.trimToSmall(valueTransfer.stakingAction ? valueTransfer.stakingAction.target : '', 10)}</RegText>
                   </TouchableOpacity>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
                   <FadeText>{'Val'}</FadeText>
-                  <RegText>{valueTransfer.stakingAction.val.toString()}</RegText>
+                  <RegText>{valueTransfer.stakingAction ? valueTransfer.stakingAction.val.toString() : ''}</RegText>
                 </View>
               </>
             )}

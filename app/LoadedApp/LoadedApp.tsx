@@ -996,7 +996,8 @@ export class LoadedAppClass extends Component<
               let message: string = '';
               let title: string = '';
               if (
-                vtNew[0].kind === ValueTransferKindEnum.Received &&
+                (vtNew[0].kind === ValueTransferKindEnum.Received ||
+                 vtNew[0].kind === ValueTransferKindEnum.WithdrawBond) &&
                 vtNew[0].amount > 0
               ) {
                 message =
@@ -1028,7 +1029,8 @@ export class LoadedAppClass extends Component<
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
               } else if (
-                vtNew[0].kind === ValueTransferKindEnum.SendToSelf &&
+                (vtNew[0].kind === ValueTransferKindEnum.SendToSelf ||
+                 vtNew[0].kind === ValueTransferKindEnum.CreateBond)  &&
                 vtNew[0].fee &&
                 vtNew[0].fee > 0
               ) {

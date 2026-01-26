@@ -487,31 +487,6 @@ export default class Utils {
     translate: (key: string) => TranslateType,
     vt: ValueTransferType,
   ): string => {
-    if (!!vt.stakingAction && !!vt.stakingAction.kind) {
-      return vt.stakingAction.kind === 'create_bond' && vt.confirmations === 0
-        ? '...Staking...'
-        : vt.stakingAction.kind === 'create_bond' && vt.confirmations !== 0
-          ? 'Bond'
-          : vt.stakingAction.kind === 'begin_unbonding' &&
-              vt.confirmations === 0
-            ? '...Unbonding...'
-            : vt.stakingAction.kind === 'begin_unbonding' &&
-                vt.confirmations !== 0
-              ? 'Unbond'
-              : vt.stakingAction.kind === 'withdraw_bond' &&
-                  vt.confirmations === 0
-                ? '...Withdrawing...'
-                : vt.stakingAction.kind === 'withdraw_bond' &&
-                    vt.confirmations !== 0
-                  ? 'Withdraw'
-                  : vt.stakingAction.kind === 'redelegate' &&
-                      vt.confirmations === 0
-                    ? '...Retargeting...'
-                    : vt.stakingAction.kind !== 'redelegate' &&
-                        vt.confirmations !== 0
-                      ? 'Retarget'
-                      : '';
-    }
     return vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
       ? (translate('history.sending') as string)
       : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations !== 0
@@ -521,41 +496,64 @@ export default class Utils {
           : vt.kind === ValueTransferKindEnum.Received && vt.confirmations !== 0
             ? (translate('history.received') as string)
             : vt.kind === ValueTransferKindEnum.MemoToSelf &&
-                vt.confirmations === 0
+              vt.confirmations === 0
               ? (translate('history.sendingtoself') as string)
               : vt.kind === ValueTransferKindEnum.MemoToSelf &&
-                  vt.confirmations !== 0
+                vt.confirmations !== 0
                 ? (translate('history.memotoself') as string)
                 : vt.kind === ValueTransferKindEnum.SendToSelf &&
-                    vt.confirmations === 0
+                  vt.confirmations === 0
                   ? (translate('history.sendingtoself') as string)
                   : vt.kind === ValueTransferKindEnum.SendToSelf &&
-                      vt.confirmations !== 0
+                    vt.confirmations !== 0
                     ? (translate('history.sendtoself') as string)
                     : vt.kind === ValueTransferKindEnum.Shield &&
-                        vt.confirmations === 0
+                      vt.confirmations === 0
                       ? (translate('history.shielding') as string)
                       : vt.kind === ValueTransferKindEnum.Shield &&
-                          vt.confirmations !== 0
+                        vt.confirmations !== 0
                         ? (translate('history.shield') as string)
                         : vt.kind === ValueTransferKindEnum.Rejection &&
-                            vt.confirmations === 0
+                          vt.confirmations === 0
                           ? (translate('history.sending') as string)
                           : vt.kind === ValueTransferKindEnum.Rejection &&
-                              vt.confirmations !== 0
+                            vt.confirmations !== 0
                             ? (translate('history.rejection') as string)
-                            : '';
+                            : vt.kind === ValueTransferKindEnum.CreateBond && 
+                              vt.confirmations === 0
+                              ? '...Staking...'
+                              : vt.kind === ValueTransferKindEnum.CreateBond && 
+                                vt.confirmations !== 0
+                                ? 'Bond'
+                                : vt.kind === ValueTransferKindEnum.beginUnbond &&
+                                    vt.confirmations === 0
+                                  ? '...Unbonding...'
+                                  : vt.kind === ValueTransferKindEnum.beginUnbond &&
+                                      vt.confirmations !== 0
+                                    ? 'Unbond'
+                                    : vt.kind === ValueTransferKindEnum.WithdrawBond &&
+                                        vt.confirmations === 0
+                                      ? '...Withdrawing...'
+                                      : vt.kind === ValueTransferKindEnum.WithdrawBond &&
+                                          vt.confirmations !== 0
+                                        ? 'Withdraw'
+                                        : vt.kind === ValueTransferKindEnum.RetargetDelegationBond &&
+                                            vt.confirmations === 0
+                                          ? '...Retargeting...'
+                                          : vt.kind !== ValueTransferKindEnum.RetargetDelegationBond &&
+                                              vt.confirmations !== 0
+                                            ? 'Retarget'
+                                            : vt.kind;  
   };
 
   static valueTransferKindColor = (
     color: string,
     vt: ValueTransferType,
   ): string => {
-    return vt.stakingAction && vt.stakingAction.kind === 'create_bond'
+    return vt.kind === ValueTransferKindEnum.CreateBond
       ? '#0091FF80'
-      : vt.stakingAction &&
-          (vt.stakingAction.kind === 'begin_unbonding' ||
-            vt.stakingAction.kind === 'redelegate')
+      : (vt.kind === ValueTransferKindEnum.beginUnbond ||
+        vt.kind === ValueTransferKindEnum.RetargetDelegationBond)
         ? '#FFAF0E80'
         : color;
   };
