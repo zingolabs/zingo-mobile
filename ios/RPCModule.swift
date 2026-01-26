@@ -2175,7 +2175,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     }
   }
   
-  func fnRequestFaucetFunds(_ dict: [AnyHashable: Any]) {
+  func fnRequestFaucetFundsProcess(_ dict: [AnyHashable: Any]) {
     if let resolve = dict["resolve"] as? RCTPromiseResolveBlock,
        let address = dict["address"] as? String {
 
@@ -2197,8 +2197,8 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     }
   }
 
-  @objc(requestFaucetFunds:resolve:reject:)
-  func requestFaucetFundsRN(
+  @objc(requestFaucetFundsProcess:resolve:reject:)
+  func requestFaucetFundsProcess(
     _ address: String,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
@@ -2206,7 +2206,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     let dict: [String: Any] = ["resolve": resolve, "address": address]
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
       guard let self = self else { return }
-      self.fnRequestFaucetFunds(dict)
+      self.fnRequestFaucetFundsProcess(dict)
     }
   }
 

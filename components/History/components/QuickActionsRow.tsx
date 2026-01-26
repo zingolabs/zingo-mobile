@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { RouteEnum } from '../../../app/AppState';
+import { GlobalConst, RouteEnum } from '../../../app/AppState';
 import FadeText from '../../Components/FadeText';
 import PaperPlane from '../../../assets/icons/paper-plane.svg';
 import QrCode from '../../../assets/icons/qr.svg';
@@ -80,8 +80,19 @@ const QuickActionsRow: React.FC = () => {
       <ActionButton
         icon={<FaucetIcon width={30} height={30} color={'#8FBFFA'} />}
         label={'Faucet'}
-        onPress={() => {
-          requestFaucetFunds(defaultUnifiedAddress);
+        onPress={async () => {
+          const resp = await requestFaucetFunds(defaultUnifiedAddress);
+          if (resp.toLowerCase().startsWith(GlobalConst.error)) {
+            Alert.alert(
+              "Faucet Error",
+              resp,
+            );
+          } else {
+            Alert.alert(
+              "Faucet",
+              "Funds sent to this wallet successfully.",
+            );
+          }
         }}
       />
     </View>

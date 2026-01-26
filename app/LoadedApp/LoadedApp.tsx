@@ -1295,10 +1295,11 @@ export class LoadedAppClass extends Component<
 
   requestFaucetFunds = async (address: string): Promise<string> => {
     try {
-      const txid = await this.rpc.requestFaucetFunds(address);
-      return txid;
+      const resp = await this.rpc.requestFaucetFunds(address);
+      return resp;
     } catch (err) {
-      throw err;
+      console.log(`Error: ${err}`);
+      return `Error: ${err}`;
     }
   };
 
