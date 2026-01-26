@@ -1740,7 +1740,7 @@ dependencies = [
 [[package]]
 name = "equihash"
 version = "0.2.2"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "blake2b_simd",
  "core2",
@@ -1786,7 +1786,7 @@ dependencies = [
 [[package]]
 name = "f4jumble"
 version = "0.1.1"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "blake2b_simd",
 ]
@@ -3086,7 +3086,7 @@ checksum = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084"
 [[package]]
 name = "netutils"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=2195eac14073fc7ffc0658e778e8b04f19dfe712#2195eac14073fc7ffc0658e778e8b04f19dfe712"
 dependencies = [
  "http",
  "http-body",
@@ -3531,7 +3531,7 @@ dependencies = [
 [[package]]
 name = "pepper-sync"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=2195eac14073fc7ffc0658e778e8b04f19dfe712#2195eac14073fc7ffc0658e778e8b04f19dfe712"
 dependencies = [
  "bip32",
  "byteorder",
@@ -3552,9 +3552,9 @@ dependencies = [
  "tokio",
  "tonic",
  "tracing",
- "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_client_backend",
- "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_keys",
  "zcash_note_encryption",
  "zcash_primitives 0.26.1",
@@ -7660,20 +7660,20 @@ dependencies = [
 [[package]]
 name = "zcash_address"
 version = "0.10.1"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "bech32",
  "bs58",
  "core2",
- "f4jumble 0.1.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
- "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "f4jumble 0.1.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_protocol 0.7.1",
 ]
 
 [[package]]
 name = "zcash_client_backend"
 version = "0.21.0"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "arti-client",
  "base64",
@@ -7724,8 +7724,8 @@ dependencies = [
  "trait-variant",
  "webpki-roots 1.0.5",
  "which",
- "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
- "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_keys",
  "zcash_note_encryption",
  "zcash_primitives 0.26.1",
@@ -7749,17 +7749,7 @@ dependencies = [
 [[package]]
 name = "zcash_encoding"
 version = "0.3.0"
-source = "git+https://github.com/dorianvp/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
-dependencies = [
- "core2",
- "hex",
- "nonempty",
-]
-
-[[package]]
-name = "zcash_encoding"
-version = "0.3.0"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "core2",
  "hex",
@@ -7780,7 +7770,7 @@ dependencies = [
 [[package]]
 name = "zcash_keys"
 version = "0.12.0"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "bech32",
  "bip32",
@@ -7799,8 +7789,8 @@ dependencies = [
  "secrecy",
  "subtle",
  "tracing",
- "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
- "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_protocol 0.7.1",
  "zcash_transparent 0.6.1",
  "zip32",
@@ -7822,7 +7812,7 @@ dependencies = [
 [[package]]
 name = "zcash_primitives"
 version = "0.26.1"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "bip32",
  "blake2b_simd",
@@ -7832,7 +7822,7 @@ dependencies = [
  "crypto-common 0.2.0-rc.1",
  "document-features",
  "ed25519-zebra",
- "equihash 0.2.2 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "equihash 0.2.2 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "ff",
  "fpe",
  "getset",
@@ -7854,8 +7844,8 @@ dependencies = [
  "sha2 0.10.9",
  "subtle",
  "tracing",
- "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
- "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_note_encryption",
  "zcash_protocol 0.7.1",
  "zcash_script",
@@ -7910,7 +7900,7 @@ dependencies = [
 [[package]]
 name = "zcash_proofs"
 version = "0.26.1"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "bellman",
  "blake2b_simd",
@@ -7932,13 +7922,13 @@ dependencies = [
 [[package]]
 name = "zcash_protocol"
 version = "0.7.1"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "core2",
  "document-features",
  "hex",
  "memuse",
- "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
 ]
 
 [[package]]
@@ -7982,7 +7972,7 @@ dependencies = [
 [[package]]
 name = "zcash_transparent"
 version = "0.6.1"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "bip32",
  "blake2b_simd",
@@ -7995,8 +7985,8 @@ dependencies = [
  "secp256k1",
  "sha2 0.10.9",
  "subtle",
- "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
- "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_protocol 0.7.1",
  "zcash_script",
  "zcash_spec",
@@ -8090,18 +8080,18 @@ dependencies = [
 
 [[package]]
 name = "zerocopy"
-version = "0.8.33"
+version = "0.8.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "668f5168d10b9ee831de31933dc111a459c97ec93225beb307aed970d1372dfd"
+checksum = "71ddd76bcebeed25db614f82bf31a9f4222d3fbba300e6fb6c00afa26cbd4d9d"
 dependencies = [
  "zerocopy-derive",
 ]
 
 [[package]]
 name = "zerocopy-derive"
-version = "0.8.33"
+version = "0.8.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c7962b26b0a8685668b671ee4b54d007a67d4eaf05fda79ac0ecf41e32270f1"
+checksum = "d8187381b52e32220d50b255276aa16a084ec0a9017a0ca2152a1f55c539758d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -8203,9 +8193,9 @@ dependencies = [
  "tokio",
  "uniffi",
  "uniffi_build",
- "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_client_backend",
- "zcash_encoding 0.3.0 (git+https://github.com/dorianvp/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_keys",
  "zcash_note_encryption",
  "zcash_primitives 0.26.1",
@@ -8219,11 +8209,11 @@ dependencies = [
 [[package]]
 name = "zingo-memo"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=2195eac14073fc7ffc0658e778e8b04f19dfe712#2195eac14073fc7ffc0658e778e8b04f19dfe712"
 dependencies = [
- "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_client_backend",
- "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_keys",
  "zcash_primitives 0.26.1",
  "zcash_protocol 0.7.1",
@@ -8232,7 +8222,7 @@ dependencies = [
 [[package]]
 name = "zingo-price"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=2195eac14073fc7ffc0658e778e8b04f19dfe712#2195eac14073fc7ffc0658e778e8b04f19dfe712"
 dependencies = [
  "byteorder",
  "reqwest",
@@ -8242,13 +8232,13 @@ dependencies = [
  "serde_json",
  "thiserror 2.0.18",
  "zcash_client_backend",
- "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
 ]
 
 [[package]]
 name = "zingo-status"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=2195eac14073fc7ffc0658e778e8b04f19dfe712#2195eac14073fc7ffc0658e778e8b04f19dfe712"
 dependencies = [
  "byteorder",
  "zcash_primitives 0.26.1",
@@ -8274,7 +8264,7 @@ dependencies = [
 [[package]]
 name = "zingolib"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=a63deb384b07bf684b62a5fba1f688ca254202eb#a63deb384b07bf684b62a5fba1f688ca254202eb"
+source = "git+https://github.com/zingolabs/zingolib-crosslink?rev=2195eac14073fc7ffc0658e778e8b04f19dfe712#2195eac14073fc7ffc0658e778e8b04f19dfe712"
 dependencies = [
  "append-only-vec",
  "bech32",
@@ -8321,9 +8311,9 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "webpki-roots 0.25.4",
- "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_client_backend",
- "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_encoding 0.3.0 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_keys",
  "zcash_primitives 0.26.1",
  "zcash_proofs",
@@ -8354,12 +8344,12 @@ dependencies = [
 [[package]]
 name = "zip321"
 version = "0.6.0"
-source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac#4fac1abf052732f2839bcbec8682b29eaed96bac"
+source = "git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57#315b72497f9611267c0c6d9d44ad893af8c17d57"
 dependencies = [
  "base64",
  "nom",
  "percent-encoding",
- "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=4fac1abf052732f2839bcbec8682b29eaed96bac)",
+ "zcash_address 0.10.1 (git+https://github.com/ShieldedLabs/crosslink_monolith.git?rev=315b72497f9611267c0c6d9d44ad893af8c17d57)",
  "zcash_protocol 0.7.1",
 ]
 

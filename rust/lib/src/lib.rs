@@ -744,6 +744,28 @@ pub fn get_roster() -> Result<String, ZingolibError> {
     })
 }
 
+#[uniffi::export]
+pub fn request_faucet_funds(address: String) -> Result<String, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+
+        if let Some(lightclient) = &mut *guard {
+            Ok(RT.block_on(async move {
+                match lightclient.request_faucet_funds(address).await {
+                    Ok(faucet_info) => JsonValue::from(faucet_info).pretty(2).to_string(),
+                    Err(e) => {
+                        format!("Error: {e}")
+                    }
+                }
+            }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
 // TODO: rename "get_seed_phrase" or "get_mnemonic_phrase"
 // or if other recovery info is being used could rename "get_recovery_info" ?
 #[uniffi::export]

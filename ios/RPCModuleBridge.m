@@ -229,5 +229,8 @@ RCT_EXTERN_METHOD(beginUnstakeProcess:
     (NSString *)txid
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(requestFaucetFunds:(NSString *)address
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end
