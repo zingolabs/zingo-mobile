@@ -1292,6 +1292,15 @@ export class LoadedAppClass extends Component<
     }
   };
 
+  requestFaucetFunds = async (address: string): Promise<string> => {
+    try {
+      const txid = await this.rpc.requestFaucetFunds(address);
+      return txid;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   doRefresh = (screen: ScreenEnum) => {
     //console.log('================== MANUAL REFRESH ================== ', screen);
     if (screen === ScreenEnum.History || screen === ScreenEnum.ContactList) {

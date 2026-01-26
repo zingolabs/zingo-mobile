@@ -2007,6 +2007,16 @@ export default class RPC {
     });
   }
 
+  async requestFaucetFunds(address: string) {
+    const response = await RPCModule.requestFaucetDonation(address);
+
+    if (response && response !== GlobalConst.false) {
+      return response;
+    } else {
+      return 'Error: Internal RPC Error: requestfaucetdonation';
+    }
+  }
+
   async changeWallet() {
     const exists = await RPCModule.walletExists();
 

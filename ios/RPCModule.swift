@@ -2174,5 +2174,41 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       self.fnGetWalletBondsInfo(dict)
     }
   }
+  
+  func fnRequestFaucetFunds(_ dict: [AnyHashable: Any]) {
+    if let resolve = dict["resolve"] as? RCTPromiseResolveBlock,
+       let address = dict["address"] as? String {
+
+      do {
+        // UniFFI global function
+        let resp = try requestFaucetFunds(address: address)
+        DispatchQueue.main.async { resolve(String(resp)) }
+      } catch {
+        let err = "Error: [Native] request_faucet_funds. \(error.localizedDescription)"
+        NSLog(err)
+        DispatchQueue.main.async { resolve(err) }
+      }
+
+    } else {
+      let err = "Error: [Native] request_faucet_funds. Command arguments problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        DispatchQueue.main.async { resolve(err) }
+      }
+    }
+  }
+
+  @objc(requestFaucetFundsInfo:resolve:reject:)
+  func requestFaucetFundsInfo(
+    _ address: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    let dict: [String: Any] = ["resolve": resolve, "address": address]
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      guard let self = self else { return }
+      self.fnRequestFaucetFunds(dict)
+    }
+  }
 
 }
