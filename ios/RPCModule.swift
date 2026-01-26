@@ -2188,7 +2188,6 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
         NSLog(err)
         DispatchQueue.main.async { resolve(err) }
       }
-
     } else {
       let err = "Error: [Native] request_faucet_funds. Command arguments problem."
       NSLog(err)
@@ -2198,8 +2197,8 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     }
   }
 
-  @objc(requestFaucetFundsInfo:resolve:reject:)
-  func requestFaucetFundsInfo(
+  @objc(requestFaucetFunds:resolve:reject:)
+  func requestFaucetFundsRN(
     _ address: String,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock

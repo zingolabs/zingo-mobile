@@ -53,7 +53,8 @@ const ActionButton = ({
 const QuickActionsRow: React.FC = () => {
   const navigation: any = useNavigation();
 
-  const { defaultUnifiedAddress, indexerServer } = useContext(ContextAppLoaded);
+  const { defaultUnifiedAddress, requestFaucetFunds } =
+    useContext(ContextAppLoaded);
 
   return (
     <View
@@ -80,7 +81,7 @@ const QuickActionsRow: React.FC = () => {
         icon={<FaucetIcon width={30} height={30} color={'#8FBFFA'} />}
         label={'Faucet'}
         onPress={() => {
-          requestFaucetDonation(defaultUnifiedAddress, indexerServer.uri); // TODO: dynamic rpcURL
+          requestFaucetFunds(defaultUnifiedAddress);
         }}
       />
     </View>
@@ -93,7 +94,7 @@ export async function requestFaucetDonation(
   address: string,
   rpcUrl: string = 'http://45.76.30.90:8232',
 ): Promise<any> {
-  const rpcUrlTransformed = `${rpcUrl.split(':')[0]}:${rpcUrl.split(':')[1]}:8232`; 
+  const rpcUrlTransformed = `${rpcUrl.split(':')[0]}:${rpcUrl.split(':')[1]}:8232`;
   console.log('faucet start', rpcUrl, rpcUrlTransformed, address);
   const resp = await fetch(rpcUrlTransformed, {
     method: 'POST',

@@ -2008,7 +2008,7 @@ export default class RPC {
   }
 
   async requestFaucetFunds(address: string) {
-    const response = await RPCModule.requestFaucetDonation(address);
+    const response = await RPCModule.requestFaucetFunds(address);
 
     if (response && response !== GlobalConst.false) {
       return response;

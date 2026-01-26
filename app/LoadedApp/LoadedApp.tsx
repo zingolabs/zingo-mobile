@@ -524,6 +524,7 @@ export class LoadedAppClass extends Component<
       zenniesDonationAddress: props.zenniesDonationAddress,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
+      requestFaucetFunds: this.requestFaucetFunds,
 
       // context settings
       indexerServer: props.indexerServer,
@@ -1967,6 +1968,7 @@ export class LoadedAppClass extends Component<
       zenniesDonationAddress: this.state.zenniesDonationAddress,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
+      requestFaucetFunds: this.requestFaucetFunds,
 
       // context settings
       indexerServer: this.state.indexerServer,
