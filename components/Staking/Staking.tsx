@@ -661,21 +661,21 @@ const Staking: React.FC<StakingProps> = () => {
                     case 'begin_unbonding': {
                       label = 'Begin unbonding';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      amountLabel = `-${item.stakingAction?.val.toFixed(5)} cTAZ`;
+                      amountLabel = `${item.stakingAction?.val.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case 'withdraw_bond': {
                       label = 'Withdraw bond';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
+                      amountLabel = `-${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case 'redelegate': {
                       label = 'Redelegate bond';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
+                      amountLabel = `${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
                   }

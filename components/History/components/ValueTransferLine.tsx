@@ -245,7 +245,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     );
   };
 
-  //console.log('render ValueTransferLine - 5', month, vt);
+  console.log('render ValueTransferLine - 5', vt);
 
   //if (index === 0) {
   //  vt.confirmations = 0;
@@ -340,22 +340,23 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   />
                 ) : (
                   <>
-                    {vt.stakingAction && vt.stakingAction.kind === 'create_bond' && (
-                      <Stake width={20} height={20} />
-                    )}
                     {vt.stakingAction && 
+                      vt.stakingAction.kind === 'create_bond' ? (
+                      <Stake width={20} height={20} />
+                    ) : vt.stakingAction && 
                       (vt.stakingAction.kind === 'begin_unbonding' || 
-                        vt.stakingAction.kind === 'redelegate') && (
-                      <Unstake width={20} height={20} />
-                    )}
-                    {vt.stakingAction === null && (
-                      <FontAwesomeIcon
-                        style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
-                        size={20}
-                        icon={icon}
-                        color={amountColor}
-                      />
-                    )}
+                        vt.stakingAction.kind === 'redelegate') ? 
+                      (
+                        <Unstake width={20} height={20} />
+                      ) : (
+                        <FontAwesomeIcon
+                          style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
+                          size={20}
+                          icon={icon}
+                          color={amountColor}
+                        />
+                      )
+                    }
                   </>
                 )}
               </View>

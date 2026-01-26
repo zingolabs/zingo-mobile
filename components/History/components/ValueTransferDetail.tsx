@@ -68,7 +68,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const iconColor = Utils.valueTransferKindColor(colors.text, valueTransfer);
 
   const icon =
-      valueTransfer.kind === ValueTransferKindEnum.Received || valueTransfer.kind === ValueTransferKindEnum.Shield
+      valueTransfer.kind === ValueTransferKindEnum.Received || 
+      valueTransfer.kind === ValueTransferKindEnum.Shield ||
+      valueTransfer.stakingAction?.kind === 'withdraw_bond'
         ? faArrowDown
         : faArrowUp;
 
@@ -231,16 +233,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 ) : (
                   <>
                     {valueTransfer.stakingAction && 
-                      valueTransfer.stakingAction.kind === 'create_bond' && (
+                      valueTransfer.stakingAction.kind === 'create_bond' ? (
                       <Stake width={30} height={30} />
-                    )}
-                    {valueTransfer.stakingAction && 
+                    ) : valueTransfer.stakingAction && 
                       (valueTransfer.stakingAction.kind === 'begin_unbonding' || 
-                        valueTransfer.stakingAction.kind === 'withdraw_bond' ||
-                        valueTransfer.stakingAction.kind === 'redelegate') && (
+                        valueTransfer.stakingAction.kind === 'redelegate') ? (
                       <Unstake width={30} height={30} />
-                    )}
-                    {valueTransfer.stakingAction === null && (
+                    ) : (
                       <FontAwesomeIcon
                         style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
                         size={30}
