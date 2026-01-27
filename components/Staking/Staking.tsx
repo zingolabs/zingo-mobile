@@ -188,7 +188,7 @@ const Staking: React.FC<StakingProps> = () => {
   useEffect(() => {
     // TODO: fetching staking day info
     const isStakingDay: boolean = info.latestBlock
-      ? info.latestBlock % 100 < 30
+      ? info.latestBlock % 150 < 70
       : false;
     setStakingDay(isStakingDay);
   }, [info.latestBlock]);
