@@ -2096,6 +2096,57 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     }
   }
   
+  func fnRetargetBond(_ dict: [AnyHashable: Any]) {
+    if let txid = dict["txid"] as? String,
+       let newFinalizer = dict["newFinalizer"] as? String,
+       let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+
+      guard let payload = makeJsonString([
+        "bond_key": txid,
+        "new_finalizer": newFinalizer
+      ]) else {
+        let err = "Error: [Native] retarget_bond. Could not build JSON."
+        NSLog(err)
+        DispatchQueue.main.async { resolve(err) }
+        return
+      }
+
+      do {
+        let resp = try ZingoDelegator.retargetBond(retargetBondJson: payload)
+        DispatchQueue.main.async { resolve(String(resp)) }
+      } catch {
+        let err = "Error: [Native] retarget_bond. \(error.localizedDescription)"
+        NSLog(err)
+        DispatchQueue.main.async { resolve(err) }
+      }
+
+    } else {
+      let err = "Error: [Native] retarget_bond. Command arguments problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        DispatchQueue.main.async { resolve(err) }
+      }
+    }
+  }
+
+  @objc(retargetBond:finalizer:resolve:reject:)
+  func retargetBond(
+    _ txid: String,
+    finalizer: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    let dict: [String: Any] = [
+      "txid": txid,
+      "newFinalizer": finalizer,
+      "resolve": resolve
+    ]
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      guard let self = self else { return }
+      self.fnRetargetBond(dict)
+    }
+  }
+  
   func fnGetRosterInfo(_ dict: [AnyHashable: Any]) {
     if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       do {

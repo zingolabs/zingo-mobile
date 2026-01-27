@@ -1900,6 +1900,60 @@ pub fn begin_unstake(begin_unstake_json: String) -> Result<String, ZingolibError
     })
 }
 
+/// `retarget_bond_json` is a JSON object with the following schema:
+/// {
+///   "bond_key": "...",
+///   "new_finalizer": "..."
+/// }
+#[uniffi::export]
+pub fn retarget_bond(retarget_bond_json: String) -> Result<String, ZingolibError> {
+    with_panic_guard(|| {
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lightclient) = &mut *guard {
+            Ok(RT.block_on(async move {
+                let json_args = match json::parse(&retarget_bond_json) {
+                    Ok(parsed) => parsed,
+                    Err(_) => return "Error: it is not a valid JSON".to_string(),
+                };
+
+                let bond_key = parse_hex_32(json_args["bond_key"].as_str().unwrap()).unwrap();
+
+                // This should be reversed by now!!!
+                let new_finalizer_address =
+                    parse_hex_32(json_args["new_finalizer"].as_str().unwrap()).unwrap();
+
+                let request = match transaction_request_from_receivers(vec![]) {
+                    Ok(request) => request,
+                    Err(e) => return format!("Error: Request Error: {e}"),
+                };
+
+                match lightclient
+                    .propose_retarget_bond(
+                        request,
+                        new_finalizer_address,
+                        bond_key,
+                        AccountId::ZERO,
+                    )
+                    .await
+                {
+                    Ok(proposal) => {
+                        let fee = match total_fee(&proposal.proportional_fee_proposal()) {
+                            Ok(fee) => fee,
+                            Err(e) => return object! { "error" => e.to_string() }.pretty(2),
+                        };
+                        object! { "fee" => fee.into_u64() }.pretty(2)
+                    }
+                    Err(e) => object! { "error" => e.to_string() }.pretty(2),
+                }
+            }))
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
+    })
+}
+
 fn parse_hex_32(s: &str) -> Result<[u8; 32], String> {
     let bytes = Vec::from_hex(s).map_err(|e| format!("Error: invalid 32-byte hex string: {e}"))?;
     if bytes.len() != 32 {

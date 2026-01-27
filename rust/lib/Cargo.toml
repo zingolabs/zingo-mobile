@@ -9,10 +9,10 @@ ci = []
 regchest = []
 
 [dependencies]
-zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "2195eac14073fc7ffc0658e778e8b04f19dfe712", default-features = true, features = [
+zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "18169857bcf5c21f5b7bfae1a2ab63a04995de36", default-features = true, features = [
     "testutils",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "2195eac14073fc7ffc0658e778e8b04f19dfe712" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "18169857bcf5c21f5b7bfae1a2ab63a04995de36" }
 
 zcash_encoding = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "315b72497f9611267c0c6d9d44ad893af8c17d57", features = [
     "std",

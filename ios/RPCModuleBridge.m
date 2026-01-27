@@ -234,5 +234,9 @@ RCT_EXTERN_METHOD(requestFaucetFundsProcess:
     (NSString *)address
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(retargetBond:(NSString *)txid
+                  finalizer:(NSString *)finalizer
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

@@ -83,15 +83,9 @@ const QuickActionsRow: React.FC = () => {
         onPress={async () => {
           const resp = await requestFaucetFunds(defaultUnifiedAddress);
           if (resp.toLowerCase().startsWith(GlobalConst.error)) {
-            Alert.alert(
-              "Faucet Error",
-              resp,
-            );
+            Alert.alert('Faucet Error', resp);
           } else {
-            Alert.alert(
-              "Faucet",
-              "Funds sent to this wallet successfully.",
-            );
+            Alert.alert('Faucet', 'Request sent to faucet!');
           }
         }}
       />
