@@ -77,6 +77,7 @@ const Unstake: React.FC<UnstakeProps> = ({
 
   const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
   const [stakedFrom, setStakedFrom] = useState<number>(staked);
+
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
@@ -86,7 +87,10 @@ const Unstake: React.FC<UnstakeProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { walletBonds, valueTransfers } = context;
+  const { 
+    walletBonds, 
+    valueTransfers, 
+  } = context;
 
   const movements = walletBonds
     .filter(b => {
@@ -100,7 +104,8 @@ const Unstake: React.FC<UnstakeProps> = ({
 
   const selectedBond = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedBond;
-  const isValidForm = hasSelectedTx;
+  const hasFinalizerFrom = !!finalizerFromText;
+  const isValidForm = hasSelectedTx && hasFinalizerFrom;
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -27,37 +27,40 @@ import {
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
-  //ChainNameEnum,
-  //GlobalConst,
   RouteEnum,
-  ValueTransferKindEnum,
-  //SendPageStateClass,
-  //ToAddrClass,
-  ValueTransferType,
+  WalletBondsType,
 } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
-//import { StakingActionType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
-//import {
-//  MINER_ADDRESS_REGTEST,
-//  MINER_ADDRESS_TESTNET,
-//} from '../../../app/utils/constants';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
+import Refresh from '../../../assets/icons/refresh.svg';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
 type RedelegateProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Redelegate> & {
-  redelegateTransaction: (txid: string) => Promise<string>;
+  redelegateTransaction: (txid: string, finalizer: string) => Promise<string>;
 };
 
-const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
-  const finalizer = !!route.params && route.params.finalizer !== undefined ? route.params.finalizer : '';
-  const staked = !!route.params && route.params.staked !== undefined ? route.params.staked : 0;
-  const closeSheet = !!route.params && route.params.closeSheet !== undefined ? route.params.closeSheet : () => {};
+const Redelegate: React.FC<RedelegateProps> = ({ 
+  redelegateTransaction, 
+  route 
+}) => {
+  const finalizer =
+    !!route.params && route.params.finalizer !== undefined
+      ? route.params.finalizer
+      : '';
+  const staked =
+    !!route.params && route.params.staked !== undefined
+      ? route.params.staked
+      : 0;
+  const closeSheet =
+    !!route.params && route.params.closeSheet !== undefined
+      ? route.params.closeSheet
+      : () => {};
 
   const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
@@ -72,87 +75,32 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
 
+  const launchedSelectorRef = useRef<boolean>(false);
+  
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
   const { 
+    walletBonds,
     valueTransfers, 
-    //indexerServer,
   } = context;
 
-  const movements: ValueTransferType[] = useMemo(() => {
-    if (!valueTransfers) return [];
-
-    const bondKeyOf = (vt: ValueTransferType): string | null => {
-      if (vt.confirmations === 0) return null;
-      const sa = vt.stakingAction;
-      if (!sa) return null;
-      const k = sa.unique_public_key ?? null;
-      return typeof k === 'string' && /^[0-9a-fA-F]{64}$/.test(k)
-        ? k.toLowerCase()
-        : null;
-    };
-
-    const createBonds = valueTransfers.filter(vt => {
-      if (vt.confirmations === 0) return false;
-      if (vt.kind !== ValueTransferKindEnum.CreateBond) return false;
-
+  const movements = walletBonds
+    .filter(b => {
+      if (b.status === 'Withdrawn') return false;
+      if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
+      // no finalizer selected, all bonds visible. Impossible case for now.
       if (!finalizerFromText) return true;
-      return vt.stakingAction && vt.stakingAction.target === finalizerFromText;
-    });
+      return false;
+    })
+    .sort((a, b) => b.amount - a.amount);
 
-    const beginByBondKey = new Map<string, ValueTransferType>();
-    for (const vt of valueTransfers) {
-      if (vt.confirmations === 0) continue;
-      if (vt.kind !== ValueTransferKindEnum.beginUnbond) continue;
-
-      const k = bondKeyOf(vt);
-      if (!k) continue;
-
-      const prev = beginByBondKey.get(k);
-      if (!prev || vt.time > prev.time) beginByBondKey.set(k, vt);
-    }
-
-    const out: ValueTransferType[] = [];
-    const seen = new Set<string>();
-
-    for (const bond of createBonds) {
-      const k = bondKeyOf(bond);
-
-      const begin = k ? beginByBondKey.get(k) : undefined;
-
-      const row: ValueTransferType = begin
-        ? ({
-            ...begin,
-            fee: bond.fee,
-            stakingAction: begin.stakingAction
-              ? {
-                  ...begin.stakingAction,
-                  val: bond.stakingAction?.val ?? begin.stakingAction.val,
-                  target:
-                    bond.stakingAction?.target ?? begin.stakingAction.target,
-                  unique_public_key:
-                    bond.stakingAction?.unique_public_key ??
-                    begin.stakingAction.unique_public_key,
-                }
-              : begin.stakingAction,
-          } as ValueTransferType)
-        : bond;
-
-      if (!seen.has(row.txid)) {
-        out.push(row);
-        seen.add(row.txid);
-      }
-    }
-
-    return out.sort((a, b) => b.time - a.time);
-  }, [finalizerFromText, valueTransfers]);
-
-  const selectedTx = movements.find(tx => tx.txid === selectedTxid);
-  const hasSelectedTx = !!selectedTx;
-  const hasFinalizetTo = !!finalizerToText && finalizerToText !== finalizerFromText;
-  // selected a tx & selected a 'to' finalizer & different finalizers.
-  const isValidForm = hasSelectedTx && hasFinalizetTo;
+  const selectedBond = movements.find(tx => tx.txid === selectedTxid);
+  const hasSelectedTx = !!selectedBond;
+  const hasFinalizerFrom = !!finalizerFromText;
+  const hasFinalizerTo = !!finalizerToText && finalizerToText !== finalizerFromText;
+  // selected a tx & selected a 'to' finalizer & different finalizers
+  const isValidForm = hasSelectedTx && hasFinalizerFrom && hasFinalizerTo;
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -163,23 +111,38 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
     };
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (launchedSelectorRef.current && !finalizerFromText) {
+        if (navigation.canGoBack) {
+          navigation.goBack();
+        }
+      }
+    }, [finalizerFromText, navigation]),
+  );
+
+  useEffect(() => {
+    if (!!finalizerFromText && !!finalizerToText && finalizerFromText === finalizerToText ) {
+      setFinalizerToText('');
+      setStakedTo(0);
+    }
+  }, [finalizerFromText, finalizerToText]);
+
   useEffect(() => {
     if (!finalizerFromText) {
-      navigation.navigate(
-        RouteEnum.Finalizers, 
-        {
-          setFinalizer: (f: string, s: number) => {
-            setFinalizerFromText(f);
-            setStakedFrom(s);
-          },
-          scope: 'my',
-          exclude: finalizerToText,
-        }
-      );
+      launchedSelectorRef.current = true;
+      navigation.navigate(RouteEnum.Finalizers, {
+        setFinalizer: (f: string, s: number) => {
+          setFinalizerFromText(f);
+          setStakedFrom(s);
+        },
+        scope: 'my',
+        exclude: '', // with 2 finalizers is imposible to change anything.
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   const shortenTxid = (txid: string) => {
     if (txid.length <= 16) {
       return txid;
@@ -187,60 +150,56 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
     return `${txid.slice(0, 10)}…${txid.slice(-8)}`;
   };
 
-  const handleUnstakePress = async () => {
-    if (!isValidForm || !selectedTx) {
+  const handleRedelegatePress = async () => {
+    if (!isValidForm || !selectedBond) return;
+
+    const selectedKind = selectedBond.status;
+
+    const bondTxid = selectedBond.txid;
+    if (!bondTxid) {
+      Alert.alert('Error', 'Could not determine the original bond txid.');
       return;
     }
 
-    Alert.alert(
-      "Redelegate",
-      "Functionallity under construction.",
-    );
-    return;
-
-  /*
-    const miner = selectedTx.address;
-
-    if (!miner) {
-      Alert.alert(
-        'Missing miner address',
-        'Could not determine the miner address from the selected transaction.',
-      );
+    if (valueTransfers?.filter(v => v.txid === bondTxid).length === 0) {
+      Alert.alert('Error', 'Could not determine the original bond txid as a existent Transaction.');
       return;
+    } else {
+      const confirmations = (valueTransfers?.filter(v => v.txid === bondTxid)[0].confirmations) || 0;
+      if (confirmations <= 0) {
+        Alert.alert('Error', 'This bond is still processing, wait for confirmations.');
+        return;
+      }
     }
+
+    console.log('bondTxid', bondTxid);
+    console.log('selectedKind', selectedKind);
 
     setModalState('sending');
 
-    const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-    sendPageState.toaddr.to =
-      indexerServer.chainName === ChainNameEnum.regtestChainName
-        ? MINER_ADDRESS_REGTEST
-        : MINER_ADDRESS_TESTNET;
-    sendPageState.toaddr.memo = ''; // No memo. This is just a plain unstake request
-    // 0-value tx. The staking action captures the amount in zats
-    sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(0, 8);
-
-    const stakingAction: StakingActionType = {
-      kind: 'begin_unbonding',
-      unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
-      // use the backend value in zats directly
-      val: 0, // incorredt - need to fix.
-      target:
-        (selectedTx.stakingAction && selectedTx.stakingAction?.target) || '',
-    };
-
-    console.log('UNSTAKING action:', stakingAction);
-
     try {
-      //await redelegateTransaction(txid);
+      if (selectedKind === 'Active') {
+        await redelegateTransaction(bondTxid, finalizerToText);
+      } else {
+        Alert.alert(
+          'Error',
+          `Unsupported selection kind: ${selectedKind ?? 'none'}`,
+        );
+        setModalState('idle');
+        return;
+      }
+
       setModalState('success');
     } catch (error) {
-      console.warn('Unstake tx failed:', error);
+      console.warn('Redelegating tx failed:', error);
       setModalState('idle');
       navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
     }
-  */
   };
+
+  const actionVerb = useMemo(() => {
+    return 'Redelegate';
+  }, []);
 
   const handleViewMovements = () => {
     setModalState('idle');
@@ -252,20 +211,20 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
 
   const renderSeparator = () => <View style={{ height: 8 }} />;
 
-  const renderStakedTxItem = ({ item }: { item: ValueTransferType }) => {
+  const renderStakedTxItem = ({ item }: { item: WalletBondsType }) => {
+    console.log('item', item);
     const isSelected = item.txid === selectedTxid;
 
-    let displayAmount = String(item.amount);
+    let displayAmount = item.amount.toFixed(5);
+    let confirmations = valueTransfers && 
+                        valueTransfers.filter(v => v.txid === item.txid).length > 0 
+                          ? valueTransfers.filter(v => v.txid === item.txid)[0].confirmations
+                          : 0;
 
     return (
       <Pressable
         onPress={() => {
           setSelectedTxid(item.txid);
-          //if (item.stakingAction?.target) {
-          //  setFinalizerFromText(item.stakingAction.target);
-            // TODO: find the staked amount for this finalizer
-          //  setStakedFrom(0);
-          //}
         }}
         style={[
           styles.txRow,
@@ -276,16 +235,21 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
         ]}
       >
         <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              color: colors.text,
-              fontSize: 13,
-              fontWeight: '500',
-            }}
-            numberOfLines={1}
-          >
-            {shortenTxid(item.txid)}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {!confirmations && <Refresh width={15} height={15} style= {{ marginRight: 5 }} />}
+            <Text
+              style={{
+                color: colors.text,
+                fontSize: 13,
+                fontWeight: '500',
+              }}
+              numberOfLines={1}
+            >
+              {item.status === 'Unbonding'
+                ? 'Inactive'
+                : item.status || 'unknown'}
+            </Text>
+          </View>
           <Text
             style={{
               color: colors.placeholder,
@@ -293,7 +257,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
               marginTop: 2,
             }}
           >
-            {item.txid}
+            {shortenTxid(item.pubKey)}
           </Text>
         </View>
         <Text
@@ -322,8 +286,9 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-
-        <HeaderTitle title='Redelegate' goBack={() => {
+        <HeaderTitle 
+          title='Redelegate' 
+          goBack={() => {
           if (navigation.canGoBack()) {
             navigation.goBack();
           }
@@ -339,7 +304,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
             marginHorizontal: 20
           }}
         >
-          Finalizer addresses
+          Finalizers addresses
         </Text>
 
         <TouchableOpacity
@@ -352,7 +317,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
                   setStakedFrom(s);
                 },
                 scope: 'my',
-                exclude: finalizerToText,
+                exclude: '',
               }
             )
           }
@@ -493,7 +458,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
               marginBottom: 8,
             }}
           >
-            Choose stake to remove (TXID)
+            Bonds
           </Text>
 
           <Text
@@ -503,7 +468,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
               marginBottom: 8,
             }}
           >
-            Select the original staking transaction. The unstake amount will be
+            Select the original staking transaction. The redelegate amount will be
             the value from that transaction.
           </Text>
 
@@ -527,33 +492,11 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
                     marginTop: 16,
                   }}
                 >
-                  You don&apos;t have any staked positions to unstake.
+                  You don&apos;t have any delegation bonds active.
                 </Text>
               }
             />
           </View>
-
-          {selectedTx && (
-            <Text
-              style={{
-                fontSize: 13,
-                color: colors.placeholder,
-                marginBottom: 8,
-              }}
-            >
-              Amount to unstake:{' '}
-              <Text
-                style={{
-                  color: colors.text,
-                  fontWeight: '500',
-                }}
-              >
-                {(() => {
-                    return `${selectedTx.amount} cTAZ`;
-                })()}
-              </Text>
-            </Text>
-          )}
         </View>
 
         {/* Bottom CTA */}
@@ -567,9 +510,9 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
           }}
         >
           <LiquidPrimaryButton
-            title="Unstake"
+            title={actionVerb}
             disabled={!isValidForm || modalState === 'sending'}
-            onPress={handleUnstakePress}
+            onPress={handleRedelegatePress}
             style={{ alignSelf: 'stretch' }}
           />
         </View>
@@ -589,7 +532,10 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
             <View
               style={[
                 styles.modalCard,
-                { backgroundColor: colors.background, borderColor: colors.border },
+                { 
+                  backgroundColor: colors.background, 
+                  borderColor: colors.border 
+                },
               ]}
             >
               {modalState === 'sending' && (
@@ -603,7 +549,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
                       textAlign: 'center',
                     }}
                   >
-                    Sending unstaking transaction…
+                    Sending redelegate transaction…
                   </Text>
                 </>
               )}
@@ -624,7 +570,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
                       textAlign: 'center',
                     }}
                   >
-                    Unstaking request transaction sent!
+                    Redelegate request transaction sent!
                   </Text>
 
                   <View style={{ marginTop: 24, alignSelf: 'stretch' }}>

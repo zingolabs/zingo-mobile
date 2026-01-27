@@ -2007,6 +2007,68 @@ export default class RPC {
     });
   }
 
+    async sendRetargetBondTx(bondCreateTxid: string, finalizer: string): Promise<string> {
+    return new Promise<string>(async (resolve, reject) => {
+      await this.clearTimers();
+      this.setInSend(true);
+      this.keepAwake(true);
+
+      let sendError = '';
+      let sendTxids = '';
+
+      try {
+        if (!/^[0-9a-fA-F]{64}$/.test(bondCreateTxid)) {
+          sendError = 'Error: Retarget_Bond requires a 64-hex create bond txid';
+        }
+
+        // 1) propose Retarget_Bond
+        let proposeStr = '';
+        if (!sendError) {
+          proposeStr = await RPCModule.retargetBondProcess(bondCreateTxid, finalizer);
+
+          if (!proposeStr) {
+            sendError = 'Error: Internal RPC Error: Retarget_Bond propose';
+          } else if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+            sendError = proposeStr;
+          } else {
+            const proposeJSON: RPCSendProposeType = JSON.parse(proposeStr);
+            if (proposeJSON.error) sendError = proposeJSON.error;
+          }
+        }
+
+        // 2) confirm
+        if (!sendError) {
+          const sendStr: string = await RPCModule.confirmProcess();
+
+          if (!sendStr) {
+            sendError = 'Error: Internal RPC Error: confirm';
+          } else if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
+            sendError = sendStr;
+          } else {
+            const sendJSON: RPCSendType = JSON.parse(sendStr);
+            if (sendJSON.error) {
+              sendError = sendJSON.error;
+            } else if (sendJSON.txids?.length) {
+              sendTxids = sendJSON.txids.join(', ');
+            } else {
+              sendError = 'Error: confirm returned no txids';
+            }
+          }
+        }
+      } catch (e) {
+        sendError = `Error: Retarget_Bond ${e}`;
+      }
+
+      await this.configure();
+      this.setInSend(false);
+
+      await this.refreshSync();
+
+      if (sendTxids) return resolve(sendTxids);
+      return reject(sendError || 'Error: Retarget_Bond failed');
+    });
+  }
+
   async requestFaucetFunds(address: string) {
     const response = await RPCModule.requestFaucetFundsProcess(address);
 

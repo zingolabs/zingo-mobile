@@ -1293,10 +1293,9 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  redelegateTransaction = async (createBondTxid: string): Promise<string> => {
+  redelegateTransaction = async (createBondTxid: string, finalizer: string): Promise<string> => {
     try {
-      //const txid = await this.rpc.sendWithdrawBondTx(createBondTxid);
-      const txid = createBondTxid; // TODO: ffi for redelagate
+      const txid = await this.rpc.sendRetargetBondTx(createBondTxid, finalizer);
       return txid;
     } catch (err) {
       throw err;
