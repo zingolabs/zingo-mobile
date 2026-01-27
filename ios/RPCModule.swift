@@ -2096,7 +2096,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     }
   }
   
-  func fnRetargetBond(_ dict: [AnyHashable: Any]) {
+  func fnRetargetBondProcess(_ dict: [AnyHashable: Any]) {
     if let txid = dict["txid"] as? String,
        let newFinalizer = dict["newFinalizer"] as? String,
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
@@ -2112,7 +2112,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
 
       do {
-        let resp = try ZingoDelegator.retargetBond(retargetBondJson: payload)
+        let resp = try retargetBond(retargetBondJson: payload)
         DispatchQueue.main.async { resolve(String(resp)) }
       } catch {
         let err = "Error: [Native] retarget_bond. \(error.localizedDescription)"
@@ -2129,8 +2129,8 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     }
   }
 
-  @objc(retargetBond:finalizer:resolve:reject:)
-  func retargetBond(
+  @objc(retargetBondProcess:finalizer:resolve:reject:)
+  func retargetBondProcess(
     _ txid: String,
     finalizer: String,
     resolve: @escaping RCTPromiseResolveBlock,
@@ -2143,7 +2143,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     ]
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
       guard let self = self else { return }
-      self.fnRetargetBond(dict)
+      self.fnRetargetBondProcess(dict)
     }
   }
   
