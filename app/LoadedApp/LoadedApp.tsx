@@ -1300,8 +1300,8 @@ export class LoadedAppClass extends Component<
   ): Promise<string> => {
     try {
       const txid = await this.rpc.sendRetargetBondTx(
-        reverseHex32Bytes(createBondTxid),
-        finalizer,
+        createBondTxid,
+        reverseHex32Bytes(finalizer),
       );
       return txid;
     } catch (err) {
