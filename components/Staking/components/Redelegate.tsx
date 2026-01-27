@@ -33,11 +33,11 @@ import {
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
-import Utils from '../../../app/utils';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
 import Refresh from '../../../assets/icons/refresh.svg';
+import RegText from '../../Components/RegText';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -336,27 +336,60 @@ const Redelegate: React.FC<RedelegateProps> = ({
               borderColor: colors.text,
             }}
           >
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexGrow: 1, flexShrink: 1 }}>
               <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='rgba(143, 191, 250, 1)' />
-              <View style={{ justifyContent: 'center', alignItems: 'flex-start', gap: 0 }}>
-                <TextInput
-                  style={{
-                    color: colors.text,
-                    fontSize: 17,
-                    fontWeight: '400',
-                  }}
-                  placeholder="Tap here for finalizer address" 
-                  placeholderTextColor={colors.placeholder}
-                  value={Utils.trimToSmall(finalizerFromText, 7)}
-                  editable={false}
-                />
+              <View style={{ justifyContent: 'center', alignItems: 'flex-start', flexGrow: 1, flexShrink: 1, gap: 0 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <TextInput
+                    style={{
+                      flexGrow: 1,
+                      flexShrink: 1,
+                      color: colors.text,
+                      fontSize: 17,
+                      fontWeight: '400',
+                    }}
+                    placeholder="Tap here for finalizer address" 
+                    placeholderTextColor={colors.placeholder}
+                    value={finalizerFromText}
+                    editable={true}
+                    onChangeText={setFinalizerFromText}
+                  />
+                  {!!finalizerFromText && (
+                    <TouchableOpacity
+                      style={{ marginLeft: 5 }}
+                      onPress={() => {
+                        launchedSelectorRef.current = false;
+                        setFinalizerFromText('');
+                        setStakedFrom(0);
+                      }}
+                    >
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: colors.zingo,
+                          borderRadius: 11,
+                          height: 22,
+                          width: 22,
+                          padding: 0,
+                        }}
+                      >
+                        <RegText
+                          style={{ color: colors.background, marginTop: -3 }}
+                        >
+                          x
+                        </RegText>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                </View>
                 {!!stakedFrom && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${stakedFrom}`}</FadeText>}
               </View>
             </View>
             <ChevronDown
               width={30}
               height={30}
-              style={{ transform: [{ rotate: '-90deg' }] }}
+              style={{ marginLeft: 5, transform: [{ rotate: '-90deg' }] }}
               color={colors.text}
             />
           </View>
@@ -415,27 +448,60 @@ const Redelegate: React.FC<RedelegateProps> = ({
               marginTop: -15,
             }}
           >
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexGrow: 1, flexShrink: 1 }}>
               <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='#FC0' />
-              <View style={{ justifyContent: 'center', alignItems: 'flex-start', gap: 0 }}>
-                <TextInput
-                  style={{
-                    color: colors.text,
-                    fontSize: 17,
-                    fontWeight: '400',
-                  }}
-                  placeholder="Tap here for finalizer address" 
-                  placeholderTextColor={colors.placeholder}
-                  value={Utils.trimToSmall(finalizerToText, 7)}
-                  editable={false}
-                />
+              <View style={{ justifyContent: 'center', alignItems: 'flex-start', flexGrow: 1, flexShrink: 1, gap: 0 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <TextInput
+                    style={{
+                      flexGrow: 1,
+                      flexShrink: 1,
+                      color: colors.text,
+                      fontSize: 17,
+                      fontWeight: '400',
+                    }}
+                    placeholder="Tap here for finalizer address" 
+                    placeholderTextColor={colors.placeholder}
+                    value={finalizerToText}
+                    editable={true}
+                    onChangeText={setFinalizerToText}
+                  />
+                  {!!finalizerToText && (
+                    <TouchableOpacity
+                      style={{ marginLeft: 5 }}
+                      onPress={() => {
+                        launchedSelectorRef.current = false;
+                        setFinalizerToText('');
+                        setStakedTo(0);
+                      }}
+                    >
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: colors.zingo,
+                          borderRadius: 11,
+                          height: 22,
+                          width: 22,
+                          padding: 0,
+                        }}
+                      >
+                        <RegText
+                          style={{ color: colors.background, marginTop: -3 }}
+                        >
+                          x
+                        </RegText>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                </View>
                 {!!stakedTo && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${stakedTo}`}</FadeText>}
               </View>
             </View>
             <ChevronDown
               width={30}
               height={30}
-              style={{ transform: [{ rotate: '-90deg' }] }}
+              style={{ marginLeft: 5, transform: [{ rotate: '-90deg' }] }}
               color={colors.text}
             />
           </View>

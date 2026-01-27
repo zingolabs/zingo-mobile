@@ -259,7 +259,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               currencyName={info.currencyName}
               size={45}
               amtZec={valueTransfer.kind === ValueTransferKindEnum.Received ||
-                      valueTransfer.kind === ValueTransferKindEnum.Shield
+                      valueTransfer.kind === ValueTransferKindEnum.Shield ||
+                      valueTransfer.kind === ValueTransferKindEnum.WithdrawBond
                         ? valueTransfer.amount
                         : (Number(Utils.splitZecAmountIntoBigSmall(valueTransfer.amount).bigPart) === 0
                           ? valueTransfer.amount 

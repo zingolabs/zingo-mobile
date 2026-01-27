@@ -40,11 +40,11 @@ import {
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
-import Utils from '../../../app/utils';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
 import Refresh from '../../../assets/icons/refresh.svg';
+import RegText from '../../Components/RegText';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -344,6 +344,8 @@ const Unstake: React.FC<UnstakeProps> = ({
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
+                flexGrow: 1,
+                flexShrink: 1,
               }}
             >
               <FontAwesomeIcon
@@ -356,20 +358,55 @@ const Unstake: React.FC<UnstakeProps> = ({
                 style={{
                   justifyContent: 'center',
                   alignItems: 'flex-start',
+                  flexGrow: 1,
+                  flexShrink: 1,
                   gap: 0,
                 }}
               >
-                <TextInput
-                  style={{
-                    color: colors.text,
-                    fontSize: 17,
-                    fontWeight: '400',
-                  }}
-                  placeholder="Tap here for finalizer address"
-                  placeholderTextColor={colors.placeholder}
-                  value={Utils.trimToSmall(finalizerFromText, 7)}
-                  editable={false}
-                />
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <TextInput
+                    style={{
+                      flexGrow: 1,
+                      flexShrink: 1,
+                      color: colors.text,
+                      fontSize: 17,
+                      fontWeight: '400',
+                    }}
+                    placeholder="Tap here for finalizer address"
+                    placeholderTextColor={colors.placeholder}
+                    value={finalizerFromText}
+                    editable={true}
+                    onChangeText={setFinalizerFromText}
+                  />
+                  {!!finalizerFromText && (
+                    <TouchableOpacity
+                      style={{ marginLeft: 5 }}
+                      onPress={() => {
+                        launchedSelectorRef.current = false;
+                        setFinalizerFromText('');
+                        setStakedFrom(0);
+                      }}
+                    >
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: colors.zingo,
+                          borderRadius: 11,
+                          height: 22,
+                          width: 22,
+                          padding: 0,
+                        }}
+                      >
+                        <RegText
+                          style={{ color: colors.background, marginTop: -3 }}
+                        >
+                          x
+                        </RegText>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                </View>
                 {!!stakedFrom && (
                   <FadeText
                     style={{ marginLeft: 5, marginBottom: 10 }}
@@ -380,7 +417,7 @@ const Unstake: React.FC<UnstakeProps> = ({
             <ChevronDown
               width={30}
               height={30}
-              style={{ transform: [{ rotate: '-90deg' }] }}
+              style={{ marginLeft: 5, transform: [{ rotate: '-90deg' }] }}
               color={colors.text}
             />
           </View>

@@ -245,7 +245,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     );
   };
 
-  console.log('render ValueTransferLine - 5', vt);
+  //console.log('render ValueTransferLine - 5', vt);
 
   //if (index === 0) {
   //  vt.confirmations = 0;
