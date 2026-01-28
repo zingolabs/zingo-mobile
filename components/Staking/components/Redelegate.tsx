@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   View,
   Text,
@@ -16,7 +23,11 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -26,10 +37,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
-import {
-  RouteEnum,
-  WalletBondsType,
-} from '../../../app/AppState';
+import { RouteEnum, WalletBondsType } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
@@ -41,13 +49,16 @@ import RegText from '../../Components/RegText';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
-type RedelegateProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Redelegate> & {
+type RedelegateProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Redelegate
+> & {
   redelegateTransaction: (txid: string, finalizer: string) => Promise<string>;
 };
 
-const Redelegate: React.FC<RedelegateProps> = ({ 
-  redelegateTransaction, 
-  route 
+const Redelegate: React.FC<RedelegateProps> = ({
+  redelegateTransaction,
+  route,
 }) => {
   const finalizer =
     !!route.params && route.params.finalizer !== undefined
@@ -70,20 +81,17 @@ const Redelegate: React.FC<RedelegateProps> = ({
   const [stakedFrom, setStakedFrom] = useState<number>(staked);
   const [finalizerToText, setFinalizerToText] = useState<string>('');
   const [stakedTo, setStakedTo] = useState<number>(0);
-  
+
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
 
   const launchedSelectorRef = useRef<boolean>(false);
-  
+
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { 
-    walletBonds,
-    valueTransfers, 
-  } = context;
+  const { walletBonds, valueTransfers } = context;
 
   const movements = walletBonds
     .filter(b => {
@@ -98,7 +106,8 @@ const Redelegate: React.FC<RedelegateProps> = ({
   const selectedBond = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedBond;
   const hasFinalizerFrom = !!finalizerFromText;
-  const hasFinalizerTo = !!finalizerToText && finalizerToText !== finalizerFromText;
+  const hasFinalizerTo =
+    !!finalizerToText && finalizerToText !== finalizerFromText;
   // selected a tx & selected a 'to' finalizer & different finalizers
   const isValidForm = hasSelectedTx && hasFinalizerFrom && hasFinalizerTo;
 
@@ -122,7 +131,11 @@ const Redelegate: React.FC<RedelegateProps> = ({
   );
 
   useEffect(() => {
-    if (!!finalizerFromText && !!finalizerToText && finalizerFromText === finalizerToText ) {
+    if (
+      !!finalizerFromText &&
+      !!finalizerToText &&
+      finalizerFromText === finalizerToText
+    ) {
       setFinalizerToText('');
       setStakedTo(0);
     }
@@ -162,24 +175,33 @@ const Redelegate: React.FC<RedelegateProps> = ({
     }
 
     if (valueTransfers?.filter(v => v.txid === bondTxid).length === 0) {
-      Alert.alert('Error', 'Could not determine the original bond txid as a existent Transaction.');
+      Alert.alert(
+        'Error',
+        'Could not determine the original bond txid as a existent Transaction.',
+      );
       return;
     } else {
-      const confirmations = (valueTransfers?.filter(v => v.txid === bondTxid)[0].confirmations) || 0;
+      const confirmations =
+        valueTransfers?.filter(v => v.txid === bondTxid)[0].confirmations || 0;
       if (confirmations <= 0) {
-        Alert.alert('Error', 'This bond is still processing, wait for confirmations.');
+        Alert.alert(
+          'Error',
+          'This bond is still processing, wait for confirmations.',
+        );
         return;
       }
     }
 
     console.log('bondTxid', bondTxid);
+
+    let bondKey = selectedBond.pubKey;
     console.log('selectedKind', selectedKind);
 
     setModalState('sending');
 
     try {
       if (selectedKind === 'Active') {
-        await redelegateTransaction(bondTxid, finalizerToText);
+        await redelegateTransaction(bondKey, finalizerToText);
       } else {
         Alert.alert(
           'Error',
@@ -216,10 +238,11 @@ const Redelegate: React.FC<RedelegateProps> = ({
     const isSelected = item.txid === selectedTxid;
 
     let displayAmount = item.amount.toFixed(5);
-    let confirmations = valueTransfers && 
-                        valueTransfers.filter(v => v.txid === item.txid).length > 0 
-                          ? valueTransfers.filter(v => v.txid === item.txid)[0].confirmations
-                          : 0;
+    let confirmations =
+      valueTransfers &&
+      valueTransfers.filter(v => v.txid === item.txid).length > 0
+        ? valueTransfers.filter(v => v.txid === item.txid)[0].confirmations
+        : 0;
 
     return (
       <Pressable
@@ -236,7 +259,9 @@ const Redelegate: React.FC<RedelegateProps> = ({
       >
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            {!confirmations && <Refresh width={15} height={15} style= {{ marginRight: 5 }} />}
+            {!confirmations && (
+              <Refresh width={15} height={15} style={{ marginRight: 5 }} />
+            )}
             <Text
               style={{
                 color: colors.text,
@@ -286,13 +311,14 @@ const Redelegate: React.FC<RedelegateProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <HeaderTitle 
-          title='Redelegate' 
+        <HeaderTitle
+          title="Redelegate"
           goBack={() => {
-          if (navigation.canGoBack()) {
-            navigation.goBack();
-          }
-        }} />
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
+          }}
+        />
 
         <Text
           style={{
@@ -301,25 +327,22 @@ const Redelegate: React.FC<RedelegateProps> = ({
             color: colors.text,
             marginBottom: 8,
             marginTop: 15,
-            marginHorizontal: 20
+            marginHorizontal: 20,
           }}
         >
           Finalizers addresses
         </Text>
 
         <TouchableOpacity
-          onPress={() => 
-            navigation.navigate(
-              RouteEnum.Finalizers, 
-              {
-                setFinalizer: (f: string, s: number) => {
-                  setFinalizerFromText(f);
-                  setStakedFrom(s);
-                },
-                scope: 'my',
-                exclude: '',
-              }
-            )
+          onPress={() =>
+            navigation.navigate(RouteEnum.Finalizers, {
+              setFinalizer: (f: string, s: number) => {
+                setFinalizerFromText(f);
+                setStakedFrom(s);
+              },
+              scope: 'my',
+              exclude: '',
+            })
           }
         >
           <View
@@ -336,9 +359,30 @@ const Redelegate: React.FC<RedelegateProps> = ({
               borderColor: colors.text,
             }}
           >
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexGrow: 1, flexShrink: 1 }}>
-              <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='rgba(143, 191, 250, 1)' />
-              <View style={{ justifyContent: 'center', alignItems: 'flex-start', flexGrow: 1, flexShrink: 1, gap: 0 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexGrow: 1,
+                flexShrink: 1,
+              }}
+            >
+              <FontAwesomeIcon
+                style={{ marginRight: 15 }}
+                size={20}
+                icon={faCircle}
+                color="rgba(143, 191, 250, 1)"
+              />
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  gap: 0,
+                }}
+              >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <TextInput
                     style={{
@@ -348,7 +392,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
                       fontSize: 17,
                       fontWeight: '400',
                     }}
-                    placeholder="Tap here for finalizer address" 
+                    placeholder="Tap here for finalizer address"
                     placeholderTextColor={colors.placeholder}
                     value={finalizerFromText}
                     editable={true}
@@ -383,7 +427,11 @@ const Redelegate: React.FC<RedelegateProps> = ({
                     </TouchableOpacity>
                   )}
                 </View>
-                {!!stakedFrom && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${stakedFrom}`}</FadeText>}
+                {!!stakedFrom && (
+                  <FadeText
+                    style={{ marginLeft: 5, marginBottom: 10 }}
+                  >{`Staked: ${stakedFrom}`}</FadeText>
+                )}
               </View>
             </View>
             <ChevronDown
@@ -396,8 +444,8 @@ const Redelegate: React.FC<RedelegateProps> = ({
         </TouchableOpacity>
 
         <View>
-          <View 
-            style={{ 
+          <View
+            style={{
               padding: 10,
               paddingHorizontal: 12,
               borderColor: colors.text,
@@ -410,27 +458,20 @@ const Redelegate: React.FC<RedelegateProps> = ({
               alignSelf: 'center',
             }}
           >
-            <FontAwesomeIcon
-              icon={faArrowDown}
-              size={25}
-              color={colors.text}
-            />
+            <FontAwesomeIcon icon={faArrowDown} size={25} color={colors.text} />
           </View>
         </View>
 
         <TouchableOpacity
-          onPress={() => 
-            navigation.navigate(
-              RouteEnum.Finalizers, 
-              {
-                setFinalizer: (f: string, s: number) => {
-                  setFinalizerToText(f);
-                  setStakedTo(s);
-                },
-                scope: 'network',
-                exclude: finalizerFromText,
-              }
-            )
+          onPress={() =>
+            navigation.navigate(RouteEnum.Finalizers, {
+              setFinalizer: (f: string, s: number) => {
+                setFinalizerToText(f);
+                setStakedTo(s);
+              },
+              scope: 'network',
+              exclude: finalizerFromText,
+            })
           }
         >
           <View
@@ -448,9 +489,30 @@ const Redelegate: React.FC<RedelegateProps> = ({
               marginTop: -15,
             }}
           >
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexGrow: 1, flexShrink: 1 }}>
-              <FontAwesomeIcon style={{ marginRight: 15 }} size={20} icon={faCircle} color='#FC0' />
-              <View style={{ justifyContent: 'center', alignItems: 'flex-start', flexGrow: 1, flexShrink: 1, gap: 0 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexGrow: 1,
+                flexShrink: 1,
+              }}
+            >
+              <FontAwesomeIcon
+                style={{ marginRight: 15 }}
+                size={20}
+                icon={faCircle}
+                color="#FC0"
+              />
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  gap: 0,
+                }}
+              >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <TextInput
                     style={{
@@ -460,7 +522,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
                       fontSize: 17,
                       fontWeight: '400',
                     }}
-                    placeholder="Tap here for finalizer address" 
+                    placeholder="Tap here for finalizer address"
                     placeholderTextColor={colors.placeholder}
                     value={finalizerToText}
                     editable={true}
@@ -495,7 +557,11 @@ const Redelegate: React.FC<RedelegateProps> = ({
                     </TouchableOpacity>
                   )}
                 </View>
-                {!!stakedTo && <FadeText style={{ marginLeft: 5, marginBottom: 10 }}>{`Staked: ${stakedTo}`}</FadeText>}
+                {!!stakedTo && (
+                  <FadeText
+                    style={{ marginLeft: 5, marginBottom: 10 }}
+                  >{`Staked: ${stakedTo}`}</FadeText>
+                )}
               </View>
             </View>
             <ChevronDown
@@ -534,8 +600,8 @@ const Redelegate: React.FC<RedelegateProps> = ({
               marginBottom: 8,
             }}
           >
-            Select the original staking transaction. The redelegate amount will be
-            the value from that transaction.
+            Select the original staking transaction. The redelegate amount will
+            be the value from that transaction.
           </Text>
 
           <View
@@ -598,9 +664,9 @@ const Redelegate: React.FC<RedelegateProps> = ({
             <View
               style={[
                 styles.modalCard,
-                { 
-                  backgroundColor: colors.background, 
-                  borderColor: colors.border 
+                {
+                  backgroundColor: colors.background,
+                  borderColor: colors.border,
                 },
               ]}
             >

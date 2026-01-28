@@ -496,54 +496,60 @@ export default class Utils {
           : vt.kind === ValueTransferKindEnum.Received && vt.confirmations !== 0
             ? (translate('history.received') as string)
             : vt.kind === ValueTransferKindEnum.MemoToSelf &&
-              vt.confirmations === 0
+                vt.confirmations === 0
               ? (translate('history.sendingtoself') as string)
               : vt.kind === ValueTransferKindEnum.MemoToSelf &&
-                vt.confirmations !== 0
+                  vt.confirmations !== 0
                 ? (translate('history.memotoself') as string)
                 : vt.kind === ValueTransferKindEnum.SendToSelf &&
-                  vt.confirmations === 0
+                    vt.confirmations === 0
                   ? (translate('history.sendingtoself') as string)
                   : vt.kind === ValueTransferKindEnum.SendToSelf &&
-                    vt.confirmations !== 0
+                      vt.confirmations !== 0
                     ? (translate('history.sendtoself') as string)
                     : vt.kind === ValueTransferKindEnum.Shield &&
-                      vt.confirmations === 0
+                        vt.confirmations === 0
                       ? (translate('history.shielding') as string)
                       : vt.kind === ValueTransferKindEnum.Shield &&
-                        vt.confirmations !== 0
+                          vt.confirmations !== 0
                         ? (translate('history.shield') as string)
                         : vt.kind === ValueTransferKindEnum.Rejection &&
-                          vt.confirmations === 0
+                            vt.confirmations === 0
                           ? (translate('history.sending') as string)
                           : vt.kind === ValueTransferKindEnum.Rejection &&
-                            vt.confirmations !== 0
+                              vt.confirmations !== 0
                             ? (translate('history.rejection') as string)
-                            : vt.kind === ValueTransferKindEnum.CreateBond && 
-                              vt.confirmations === 0
+                            : vt.kind === ValueTransferKindEnum.CreateBond &&
+                                vt.confirmations === 0
                               ? '...Staking...'
-                              : vt.kind === ValueTransferKindEnum.CreateBond && 
-                                vt.confirmations !== 0
-                                ? 'Bond'
-                                : vt.kind === ValueTransferKindEnum.beginUnbond &&
+                              : vt.kind === ValueTransferKindEnum.CreateBond &&
+                                  vt.confirmations !== 0
+                                ? 'Stake'
+                                : vt.kind ===
+                                      ValueTransferKindEnum.beginUnbond &&
                                     vt.confirmations === 0
-                                  ? '...Unbonding...'
-                                  : vt.kind === ValueTransferKindEnum.beginUnbond &&
+                                  ? '...Unstaking...'
+                                  : vt.kind ===
+                                        ValueTransferKindEnum.beginUnbond &&
                                       vt.confirmations !== 0
-                                    ? 'Unbond'
-                                    : vt.kind === ValueTransferKindEnum.WithdrawBond &&
+                                    ? 'Unstake'
+                                    : vt.kind ===
+                                          ValueTransferKindEnum.WithdrawBond &&
                                         vt.confirmations === 0
                                       ? '...Withdrawing...'
-                                      : vt.kind === ValueTransferKindEnum.WithdrawBond &&
+                                      : vt.kind ===
+                                            ValueTransferKindEnum.WithdrawBond &&
                                           vt.confirmations !== 0
                                         ? 'Withdraw'
-                                        : vt.kind === ValueTransferKindEnum.RetargetDelegationBond &&
+                                        : vt.kind ===
+                                              ValueTransferKindEnum.RetargetDelegationBond &&
                                             vt.confirmations === 0
-                                          ? '...Retargeting...'
-                                          : vt.kind !== ValueTransferKindEnum.RetargetDelegationBond &&
+                                          ? '...Redelegating...'
+                                          : vt.kind !==
+                                                ValueTransferKindEnum.RetargetDelegationBond &&
                                               vt.confirmations !== 0
-                                            ? 'Retarget'
-                                            : vt.kind;  
+                                            ? 'Redelegate'
+                                            : vt.kind;
   };
 
   static valueTransferKindColor = (
@@ -552,8 +558,8 @@ export default class Utils {
   ): string => {
     return vt.kind === ValueTransferKindEnum.CreateBond
       ? '#0091FF80'
-      : (vt.kind === ValueTransferKindEnum.beginUnbond ||
-        vt.kind === ValueTransferKindEnum.RetargetDelegationBond)
+      : vt.kind === ValueTransferKindEnum.beginUnbond ||
+          vt.kind === ValueTransferKindEnum.RetargetDelegationBond
         ? '#FFAF0E80'
         : color;
   };

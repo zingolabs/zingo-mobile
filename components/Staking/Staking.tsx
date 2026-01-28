@@ -652,7 +652,7 @@ const Staking: React.FC<StakingProps> = () => {
 
                   switch (item.stakingUiKind) {
                     case 'create_bond': {
-                      label = 'Bond created';
+                      label = 'Stake';
                       Icon = item.confirmations === 0 ? Refresh : Stake;
                       const fee = item.fee ?? 0;
                       amountLabel = `+${(fee - 0.0001).toFixed(2)} cTAZ`;
@@ -660,21 +660,21 @@ const Staking: React.FC<StakingProps> = () => {
                     }
 
                     case 'begin_unbonding': {
-                      label = 'Begin unbonding';
+                      label = 'Unstake';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
                       amountLabel = `${item.stakingAction?.val.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case 'withdraw_bond': {
-                      label = 'Withdraw bond';
+                      label = 'Withdraw';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
                       amountLabel = `-${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case 'redelegate': {
-                      label = 'Redelegate bond';
+                      label = 'Redelegate';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
                       amountLabel = `${item.amount.toFixed(5)} cTAZ`;
                       break;

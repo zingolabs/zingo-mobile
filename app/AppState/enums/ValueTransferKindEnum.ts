@@ -7,10 +7,10 @@ export enum ValueTransferKindEnum {
   Rejection = 'Rejection',
 
   // new for staking
-  CreateBond = 'CreateBond',
-  beginUnbond = 'BeginUnbond',
-  WithdrawBond  = 'WithdrawBond',
-  RetargetDelegationBond = 'RetargetDelegationBond',
+  CreateBond = 'Stake',
+  beginUnbond = 'Unstake',
+  WithdrawBond = 'Withdraw',
+  RetargetDelegationBond = 'Redelegate',
 
   // error
   Unknown = 'Unknown',

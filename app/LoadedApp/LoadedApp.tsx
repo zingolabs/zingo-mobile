@@ -1295,12 +1295,12 @@ export class LoadedAppClass extends Component<
   };
 
   redelegateTransaction = async (
-    createBondTxid: string,
+    bondKey: string,
     finalizer: string,
   ): Promise<string> => {
     try {
       const txid = await this.rpc.sendRetargetBondTx(
-        createBondTxid,
+        bondKey,
         reverseHex32Bytes(finalizer),
       );
       return txid;
