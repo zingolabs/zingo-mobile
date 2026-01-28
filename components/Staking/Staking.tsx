@@ -51,8 +51,6 @@ import AddressItem from '../Components/AddressItem';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
-import ClockActive from '../../assets/icons/clock-active.svg';
-import ClockInactive from '../../assets/icons/clock-inactive.svg';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -60,6 +58,8 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import FinalizerDetail from './components/FinalizerDetail';
 import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
+import { Layers3Icon } from 'lucide-react-native';
+import { SpinningLoaderIcon } from '../Components/Icons/SpinningLoaderIcon';
 
 type DataType = {
   svg: {
@@ -142,6 +142,8 @@ const Staking: React.FC<StakingProps> = () => {
   const [heightLayout, setHeightLayout] = useState<number>(10);
   const [currentItem, setCurrentItem] = useState<DataType | null>(null);
 
+  const [timeToStakingDay, setTimeToStakingDay] = useState<number>(0);
+
   const bottomSheetRef = useRef<BottomSheet>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -186,11 +188,18 @@ const Staking: React.FC<StakingProps> = () => {
   );
 
   useEffect(() => {
-    // TODO: fetching staking day info
-    const isStakingDay: boolean = info.latestBlock
-      ? info.latestBlock % 150 < 70
-      : false;
+    const latest = info.latestBlock ?? 0;
+
+    const cycle = 150;
+    const activeWindow = 70;
+
+    const mod = latest % cycle;
+    const isStakingDay = mod < activeWindow;
+
     setStakingDay(isStakingDay);
+
+    const remaining = isStakingDay ? 0 : cycle - mod;
+    setTimeToStakingDay(remaining);
   }, [info.latestBlock]);
 
   const movements: StakingMovement[] = useMemo(() => {
@@ -424,11 +433,16 @@ const Staking: React.FC<StakingProps> = () => {
           <SettingsButton screenName={screenName} />
         </View>
 
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 10,
+          }}
+        >
           <View
             style={{
               minWidth: '50%',
-              maxWidth: '60%',
               marginTop: 30,
               paddingHorizontal: 15,
               paddingRight: 20,
@@ -437,8 +451,10 @@ const Staking: React.FC<StakingProps> = () => {
               alignItems: 'center',
               backgroundColor: stakingDay
                 ? 'rgba(52, 199, 89, 0.2)'
-                : 'rgba(65, 65, 65, 1)',
+                : '#222223',
+              borderColor: stakingDay ? '#1E532B' : '#414141',
               borderRadius: 25,
+              borderWidth: 1,
             }}
           >
             <View
@@ -450,15 +466,18 @@ const Staking: React.FC<StakingProps> = () => {
               }}
             >
               {stakingDay ? (
-                <ClockActive width={24} height={24} />
+                <Layers3Icon width={20} height={20} color={'#34C759'} />
               ) : (
-                <ClockInactive width={24} height={24} />
+                <SpinningLoaderIcon size={20} color="#8E8E93" />
               )}
               <View>
-                <RegText>{`Staking day ${stakingDay ? 'active' : 'inactive'}`}</RegText>
-                {/* <FadeText
-                  style={{ color: stakingDay ? '#34c759' : '#8e8e93' }}
-                >{`${stakingDay ? 'Permitted actions' : 'Opening in 2 days'}`}</FadeText> */}
+                {stakingDay ? (
+                  <RegText>Staking day</RegText>
+                ) : (
+                  <RegText style={{ fontSize: 14 }}>
+                    Opening in {String(timeToStakingDay)} blocks
+                  </RegText>
+                )}
               </View>
             </View>
           </View>

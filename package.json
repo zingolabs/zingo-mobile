@@ -43,6 +43,7 @@
     "js-base64": "^3.7.8",
     "lifehash": "^0.0.2",
     "lodash": "^4.17.21",
+    "lucide-react-native": "^0.563.0",
     "moment": "^2.30.1",
     "patch-package": "^8.0.0",
     "prop-types": "^15.8.1",
