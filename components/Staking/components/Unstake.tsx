@@ -177,7 +177,7 @@ const Unstake: React.FC<UnstakeProps> = ({
       }
 
       setModalState('success');
-    } catch (error) {
+    } catch (error: any) {
       console.warn('Staking tx failed:', error);
       setModalState('idle');
       if (error.includes('window')) {

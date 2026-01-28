@@ -171,7 +171,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     try {
       await stakeTransaction(sendPageState, stakingAction);
       setModalState('success');
-    } catch (error) {
+    } catch (error: any) {
       console.warn('Stake tx failed:', error);
       setModalState('idle');
       if (error.includes('window')) {
