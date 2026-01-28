@@ -524,7 +524,7 @@ export default class Utils {
                               ? '...Staking...'
                               : vt.kind === ValueTransferKindEnum.CreateBond &&
                                   vt.confirmations !== 0
-                                ? 'Bond'
+                                ? 'Stake'
                                 : vt.kind ===
                                       ValueTransferKindEnum.beginUnbond &&
                                     vt.confirmations === 0
