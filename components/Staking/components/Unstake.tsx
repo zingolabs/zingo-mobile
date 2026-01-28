@@ -33,10 +33,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
-import {
-  RouteEnum,
-  WalletBondsType,
-} from '../../../app/AppState';
+import { RouteEnum, WalletBondsType } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
@@ -87,17 +84,15 @@ const Unstake: React.FC<UnstakeProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { 
-    walletBonds, 
-    valueTransfers, 
-  } = context;
+  const { walletBonds, valueTransfers } = context;
+
+  console.log('FINALIZER', finalizerFromText);
 
   const movements = walletBonds
     .filter(b => {
       if (b.status === 'Withdrawn') return false;
       if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
-      if (!finalizerFromText) return true;
       return false;
     })
     .sort((a, b) => b.amount - a.amount);
@@ -126,21 +121,6 @@ const Unstake: React.FC<UnstakeProps> = ({
     }, [finalizerFromText, navigation]),
   );
 
-  useEffect(() => {
-    if (!finalizerFromText) {
-      launchedSelectorRef.current = true;
-      navigation.navigate(RouteEnum.Finalizers, {
-        setFinalizer: (f: string, s: number) => {
-          setFinalizerFromText(f);
-          setStakedFrom(s);
-        },
-        scope: 'my',
-        exclude: '',
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const shortenTxid = (txid: string) => {
     if (txid.length <= 16) {
       return txid;
@@ -160,12 +140,19 @@ const Unstake: React.FC<UnstakeProps> = ({
     }
 
     if (valueTransfers?.filter(v => v.txid === bondTxid).length === 0) {
-      Alert.alert('Error', 'Could not determine the original bond txid as a existent Transaction.');
+      Alert.alert(
+        'Error',
+        'Could not determine the original bond txid as a existent Transaction.',
+      );
       return;
     } else {
-      const confirmations = (valueTransfers?.filter(v => v.txid === bondTxid)[0].confirmations) || 0;
+      const confirmations =
+        valueTransfers?.filter(v => v.txid === bondTxid)[0].confirmations || 0;
       if (confirmations <= 0) {
-        Alert.alert('Error', 'This bond is still processing, wait for confirmations.');
+        Alert.alert(
+          'Error',
+          'This bond is still processing, wait for confirmations.',
+        );
         return;
       }
     }
@@ -221,10 +208,11 @@ const Unstake: React.FC<UnstakeProps> = ({
     const isSelected = item.txid === selectedTxid;
 
     let displayAmount = item.amount.toFixed(5);
-    let confirmations = valueTransfers && 
-                        valueTransfers.filter(v => v.txid === item.txid).length > 0 
-                          ? valueTransfers.filter(v => v.txid === item.txid)[0].confirmations
-                          : 0;
+    let confirmations =
+      valueTransfers &&
+      valueTransfers.filter(v => v.txid === item.txid).length > 0
+        ? valueTransfers.filter(v => v.txid === item.txid)[0].confirmations
+        : 0;
 
     return (
       <Pressable
@@ -241,7 +229,9 @@ const Unstake: React.FC<UnstakeProps> = ({
       >
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            {!confirmations && <Refresh width={15} height={15} style= {{ marginRight: 5 }} />}
+            {!confirmations && (
+              <Refresh width={15} height={15} style={{ marginRight: 5 }} />
+            )}
             <Text
               style={{
                 color: colors.text,
@@ -313,115 +303,112 @@ const Unstake: React.FC<UnstakeProps> = ({
           Finalizer address
         </Text>
 
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate(RouteEnum.Finalizers, {
-              setFinalizer: (f: string, s: number) => {
-                setFinalizerFromText(f);
-                setStakedFrom(s);
-              },
-              scope: 'my',
-              exclude: '',
-            })
-          }
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: 20,
+            marginBottom: 10,
+            backgroundColor: colors.secondary,
+            padding: 16,
+            marginHorizontal: 10,
+            borderWidth: 0.5,
+            borderColor: colors.text,
+          }}
         >
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               alignItems: 'center',
-              borderRadius: 20,
-              marginBottom: 10,
-              backgroundColor: colors.secondary,
-              padding: 16,
-              marginHorizontal: 10,
-              borderWidth: 0.5,
-              borderColor: colors.text,
+              flexGrow: 1,
+              flexShrink: 1,
             }}
           >
+            <FontAwesomeIcon
+              style={{ marginRight: 15 }}
+              size={20}
+              icon={faCircle}
+              color="#FC0"
+            />
             <View
               style={{
-                flexDirection: 'row',
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 flexGrow: 1,
                 flexShrink: 1,
+                gap: 0,
               }}
             >
-              <FontAwesomeIcon
-                style={{ marginRight: 15 }}
-                size={20}
-                icon={faCircle}
-                color="#FC0"
-              />
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'flex-start',
-                  flexGrow: 1,
-                  flexShrink: 1,
-                  gap: 0,
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <TextInput
-                    style={{
-                      flexGrow: 1,
-                      flexShrink: 1,
-                      color: colors.text,
-                      fontSize: 17,
-                      fontWeight: '400',
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TextInput
+                  style={{
+                    flexGrow: 1,
+                    flexShrink: 1,
+                    color: colors.text,
+                    fontSize: 17,
+                    fontWeight: '400',
+                  }}
+                  placeholder="Tap here for finalizer address"
+                  placeholderTextColor={colors.placeholder}
+                  value={finalizerFromText}
+                  editable={true}
+                  onChangeText={setFinalizerFromText}
+                />
+                {!!finalizerFromText && (
+                  <TouchableOpacity
+                    style={{ marginLeft: 5 }}
+                    onPress={() => {
+                      launchedSelectorRef.current = false;
+                      setFinalizerFromText('');
+                      setStakedFrom(0);
                     }}
-                    placeholder="Tap here for finalizer address"
-                    placeholderTextColor={colors.placeholder}
-                    value={finalizerFromText}
-                    editable={true}
-                    onChangeText={setFinalizerFromText}
-                  />
-                  {!!finalizerFromText && (
-                    <TouchableOpacity
-                      style={{ marginLeft: 5 }}
-                      onPress={() => {
-                        launchedSelectorRef.current = false;
-                        setFinalizerFromText('');
-                        setStakedFrom(0);
+                  >
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: colors.zingo,
+                        borderRadius: 11,
+                        height: 22,
+                        width: 22,
+                        padding: 0,
                       }}
                     >
-                      <View
-                        style={{
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          backgroundColor: colors.zingo,
-                          borderRadius: 11,
-                          height: 22,
-                          width: 22,
-                          padding: 0,
-                        }}
+                      <RegText
+                        style={{ color: colors.background, marginTop: -3 }}
                       >
-                        <RegText
-                          style={{ color: colors.background, marginTop: -3 }}
-                        >
-                          x
-                        </RegText>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                </View>
-                {!!stakedFrom && (
-                  <FadeText
-                    style={{ marginLeft: 5, marginBottom: 10 }}
-                  >{`Voting power: ${stakedFrom.toFixed(5)}`}</FadeText>
+                        x
+                      </RegText>
+                    </View>
+                  </TouchableOpacity>
                 )}
               </View>
+              {!!stakedFrom && (
+                <FadeText
+                  style={{ marginLeft: 5, marginBottom: 10 }}
+                >{`Voting power: ${stakedFrom.toFixed(5)}`}</FadeText>
+              )}
             </View>
-            <ChevronDown
-              width={30}
-              height={30}
-              style={{ marginLeft: 5, transform: [{ rotate: '-90deg' }] }}
-              color={colors.text}
-            />
           </View>
-        </TouchableOpacity>
+          <ChevronDown
+            onPress={() =>
+              navigation.navigate(RouteEnum.Finalizers, {
+                setFinalizer: (f: string, s: number) => {
+                  setFinalizerFromText(f);
+                  setStakedFrom(s);
+                },
+                scope: 'my',
+                exclude: '',
+              })
+            }
+            width={30}
+            height={30}
+            style={{ marginLeft: 5 }}
+            color={colors.text}
+          />
+        </View>
 
         {/* Content */}
         <View
@@ -440,7 +427,7 @@ const Unstake: React.FC<UnstakeProps> = ({
               marginBottom: 8,
             }}
           >
-            Bonds
+            Staking positions
           </Text>
 
           <Text
@@ -474,7 +461,8 @@ const Unstake: React.FC<UnstakeProps> = ({
                     marginTop: 16,
                   }}
                 >
-                  You don&apos;t have any delegation bonds active.
+                  You don&apos;t have any staking positions that match the
+                  currently selected filters.
                 </Text>
               }
             />
