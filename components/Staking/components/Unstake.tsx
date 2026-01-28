@@ -180,7 +180,13 @@ const Unstake: React.FC<UnstakeProps> = ({
     } catch (error) {
       console.warn('Staking tx failed:', error);
       setModalState('idle');
-      navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
+      if (error.includes('window')) {
+        navigation.navigate(RouteEnum.ComputingError, {
+          error: `Transaction outside of staking window :(. Try again later.`,
+        });
+      } else {
+        navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
+      }
     }
   };
 

@@ -174,7 +174,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     } catch (error) {
       console.warn('Stake tx failed:', error);
       setModalState('idle');
-      if (error.includes) {
+      if (error.includes('window')) {
         navigation.navigate(RouteEnum.ComputingError, {
           error: `Transaction outside of staking window :(. Try again later.`,
         });
