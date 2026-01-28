@@ -115,6 +115,7 @@ export default interface AppContextLoaded {
 
   // Change the privacy everywhere
   setPrivacyOption: (value: boolean) => Promise<void>;
+  requestFaucetFunds: (address: string) => Promise<string>;
 
   // settings
   indexerServer: ServerType;

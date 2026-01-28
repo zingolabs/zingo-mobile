@@ -30,6 +30,7 @@ import {
   RouteEnum,
   ScreenEnum,
   StakeType,
+  ValueTransferKindEnum,
   ValueTransferType,
 } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
@@ -186,7 +187,9 @@ const Staking: React.FC<StakingProps> = () => {
 
   useEffect(() => {
     // TODO: fetching staking day info
-    const isStakingDay: boolean = info.latestBlock % 100 < 10;
+    const isStakingDay: boolean = info.latestBlock
+      ? info.latestBlock % 150 < 70
+      : false;
     setStakingDay(isStakingDay);
   }, [info.latestBlock]);
 
@@ -197,21 +200,19 @@ const Staking: React.FC<StakingProps> = () => {
 
     return valueTransfers
       .map(vt => {
-        const action = vt.stakingAction;
-
-        if (action?.kind === 'create_bond') {
+        if (vt.kind === ValueTransferKindEnum.CreateBond) {
           return { ...vt, stakingUiKind: 'create_bond' };
         }
 
-        if (action?.kind === 'begin_unbonding') {
+        if (vt.kind === ValueTransferKindEnum.beginUnbond) {
           return { ...vt, stakingUiKind: 'begin_unbonding' };
         }
 
-        if (action?.kind === 'withdraw_bond') {
+        if (vt.kind === ValueTransferKindEnum.WithdrawBond) {
           return { ...vt, stakingUiKind: 'withdraw_bond' };
         }
 
-        if (action?.kind === 'redelegate') {
+        if (vt.kind === ValueTransferKindEnum.RetargetDelegationBond) {
           return { ...vt, stakingUiKind: 'redelegate' };
         }
 
@@ -661,21 +662,21 @@ const Staking: React.FC<StakingProps> = () => {
                     case 'begin_unbonding': {
                       label = 'Begin unbonding';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      amountLabel = `-${item.stakingAction?.val.toFixed(5)} cTAZ`;
+                      amountLabel = `${item.stakingAction?.val.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case 'withdraw_bond': {
                       label = 'Withdraw bond';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
+                      amountLabel = `-${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case 'redelegate': {
                       label = 'Redelegate bond';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
+                      amountLabel = `${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
                   }

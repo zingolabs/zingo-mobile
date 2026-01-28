@@ -110,6 +110,7 @@ import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 import Distribution from '../../components/Distribution';
 import Redelegate from '../../components/Staking/components/Redelegate';
 import Finalizers from '../../components/Finalizers/Finalizers';
+import { reverseHex32Bytes } from '../utils/hex';
 
 const InnerStack = createNativeStackNavigator<InnerStackParamList>();
 
@@ -524,6 +525,7 @@ export class LoadedAppClass extends Component<
       zenniesDonationAddress: props.zenniesDonationAddress,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
+      requestFaucetFunds: this.requestFaucetFunds,
 
       // context settings
       indexerServer: props.indexerServer,
@@ -996,7 +998,8 @@ export class LoadedAppClass extends Component<
               let message: string = '';
               let title: string = '';
               if (
-                vtNew[0].kind === ValueTransferKindEnum.Received &&
+                (vtNew[0].kind === ValueTransferKindEnum.Received ||
+                  vtNew[0].kind === ValueTransferKindEnum.WithdrawBond) &&
                 vtNew[0].amount > 0
               ) {
                 message =
@@ -1028,7 +1031,8 @@ export class LoadedAppClass extends Component<
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
               } else if (
-                vtNew[0].kind === ValueTransferKindEnum.SendToSelf &&
+                (vtNew[0].kind === ValueTransferKindEnum.SendToSelf ||
+                  vtNew[0].kind === ValueTransferKindEnum.CreateBond) &&
                 vtNew[0].fee &&
                 vtNew[0].fee > 0
               ) {
@@ -1290,13 +1294,28 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  redelegateTransaction = async (createBondTxid: string): Promise<string> => {
+  redelegateTransaction = async (
+    createBondTxid: string,
+    finalizer: string,
+  ): Promise<string> => {
     try {
-      //const txid = await this.rpc.sendWithdrawBondTx(createBondTxid);
-      const txid = createBondTxid; // TODO: ffi for redelagate
+      const txid = await this.rpc.sendRetargetBondTx(
+        createBondTxid,
+        reverseHex32Bytes(finalizer),
+      );
       return txid;
     } catch (err) {
       throw err;
+    }
+  };
+
+  requestFaucetFunds = async (address: string): Promise<string> => {
+    try {
+      const resp = await this.rpc.requestFaucetFunds(address);
+      return resp;
+    } catch (err) {
+      console.log(`Error: ${err}`);
+      return `Error: ${err}`;
     }
   };
 
@@ -1966,6 +1985,7 @@ export class LoadedAppClass extends Component<
       zenniesDonationAddress: this.state.zenniesDonationAddress,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
+      requestFaucetFunds: this.requestFaucetFunds,
 
       // context settings
       indexerServer: this.state.indexerServer,

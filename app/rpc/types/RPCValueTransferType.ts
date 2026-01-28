@@ -1,15 +1,15 @@
 import { PoolEnum, StakingActionType } from '../../AppState';
-import { RPCValueTransfersStatusEnum } from '../enums/RPCValueTransfersStatusEnum';
-import { RPCValueTransfersKindEnum } from '../enums/RPCValueTransfersKindEnum';
+import { RPCValueTransferStatusEnum } from '../enums/RPCValueTransferStatusEnum';
+import { RPCValueTransferKindEnum } from '../enums/RPCValueTransferKindEnum';
 
 export type RPCValueTransferType = {
   txid: string;
   datetime: number;
-  status: RPCValueTransfersStatusEnum;
+  status: RPCValueTransferStatusEnum;
   blockheight: number;
   transaction_fee?: number;
   zec_price?: number;
-  kind: RPCValueTransfersKindEnum;
+  kind: RPCValueTransferKindEnum;
   value: number;
   recipient_address?: string;
   pool_received?: PoolEnum;

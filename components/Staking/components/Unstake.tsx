@@ -20,7 +20,6 @@ import {
   KeyboardAvoidingView,
   FlatList,
   Alert,
-  NativeModules,
   TextInput,
   TouchableOpacity,
 } from 'react-native';
@@ -35,18 +34,17 @@ import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types/ThemeType';
 import {
-  GlobalConst,
   RouteEnum,
   WalletBondsType,
 } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
-import Utils from '../../../app/utils';
 import { HeaderTitle } from '../../Header';
 import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
 import Refresh from '../../../assets/icons/refresh.svg';
+import RegText from '../../Components/RegText';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -77,29 +75,22 @@ const Unstake: React.FC<UnstakeProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
 
-  const { RPCModule } = NativeModules as {
-    RPCModule: {
-      // Promise resolves to a string (either "Error: ..." or the u64 value in zats)
-      getAccumulatedStakeForTxidInfo(txid: string): Promise<string>;
-    };
-  };
-
   const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
   const [stakedFrom, setStakedFrom] = useState<number>(staked);
+
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
 
   const launchedSelectorRef = useRef<boolean>(false);
 
-  const [_accumulatedStakeByTxid, setAccumulatedStakeByTxid] = useState<
-    Record<string, string>
-  >({});
-
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { walletBonds, valueTransfers } = context;
+  const { 
+    walletBonds, 
+    valueTransfers, 
+  } = context;
 
   const movements = walletBonds
     .filter(b => {
@@ -113,7 +104,8 @@ const Unstake: React.FC<UnstakeProps> = ({
 
   const selectedBond = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedBond;
-  const isValidForm = hasSelectedTx;
+  const hasFinalizerFrom = !!finalizerFromText;
+  const isValidForm = hasSelectedTx && hasFinalizerFrom;
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -148,55 +140,6 @@ const Unstake: React.FC<UnstakeProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Fetch accumulated stake for each txid shown in the list
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchAccumulatedStake = async () => {
-      const updates: Record<string, string> = {};
-
-      for (const m of movements) {
-        try {
-          const resp = await RPCModule.getAccumulatedStakeForTxidInfo(m.txid);
-
-          if (typeof resp !== 'string') {
-            continue;
-          }
-
-          if (resp.toLowerCase().startsWith(GlobalConst.error)) {
-            console.warn(
-              '[Unstake] getAccumulatedStakeForTxidInfo error for',
-              m.txid,
-              resp,
-            );
-            continue;
-          }
-
-          // resp is the u64 number (zats) converted to string on Swift side
-          updates[m.txid] = resp;
-        } catch (e) {
-          console.warn(
-            '[Unstake] getAccumulatedStakeForTxidInfo failed for',
-            m.txid,
-            e,
-          );
-        }
-      }
-
-      if (!cancelled && Object.keys(updates).length > 0) {
-        setAccumulatedStakeByTxid(prev => ({ ...prev, ...updates }));
-      }
-    };
-
-    if (movements.length > 0) {
-      fetchAccumulatedStake();
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [movements, RPCModule]);
 
   const shortenTxid = (txid: string) => {
     if (txid.length <= 16) {
@@ -401,6 +344,8 @@ const Unstake: React.FC<UnstakeProps> = ({
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
+                flexGrow: 1,
+                flexShrink: 1,
               }}
             >
               <FontAwesomeIcon
@@ -413,20 +358,55 @@ const Unstake: React.FC<UnstakeProps> = ({
                 style={{
                   justifyContent: 'center',
                   alignItems: 'flex-start',
+                  flexGrow: 1,
+                  flexShrink: 1,
                   gap: 0,
                 }}
               >
-                <TextInput
-                  style={{
-                    color: colors.text,
-                    fontSize: 17,
-                    fontWeight: '400',
-                  }}
-                  placeholder="Tap here for finalizer address"
-                  placeholderTextColor={colors.placeholder}
-                  value={Utils.trimToSmall(finalizerFromText, 7)}
-                  editable={false}
-                />
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <TextInput
+                    style={{
+                      flexGrow: 1,
+                      flexShrink: 1,
+                      color: colors.text,
+                      fontSize: 17,
+                      fontWeight: '400',
+                    }}
+                    placeholder="Tap here for finalizer address"
+                    placeholderTextColor={colors.placeholder}
+                    value={finalizerFromText}
+                    editable={true}
+                    onChangeText={setFinalizerFromText}
+                  />
+                  {!!finalizerFromText && (
+                    <TouchableOpacity
+                      style={{ marginLeft: 5 }}
+                      onPress={() => {
+                        launchedSelectorRef.current = false;
+                        setFinalizerFromText('');
+                        setStakedFrom(0);
+                      }}
+                    >
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: colors.zingo,
+                          borderRadius: 11,
+                          height: 22,
+                          width: 22,
+                          padding: 0,
+                        }}
+                      >
+                        <RegText
+                          style={{ color: colors.background, marginTop: -3 }}
+                        >
+                          x
+                        </RegText>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                </View>
                 {!!stakedFrom && (
                   <FadeText
                     style={{ marginLeft: 5, marginBottom: 10 }}
@@ -437,7 +417,7 @@ const Unstake: React.FC<UnstakeProps> = ({
             <ChevronDown
               width={30}
               height={30}
-              style={{ transform: [{ rotate: '-90deg' }] }}
+              style={{ marginLeft: 5, transform: [{ rotate: '-90deg' }] }}
               color={colors.text}
             />
           </View>
@@ -460,7 +440,7 @@ const Unstake: React.FC<UnstakeProps> = ({
               marginBottom: 8,
             }}
           >
-            Active bonds
+            Bonds
           </Text>
 
           <Text

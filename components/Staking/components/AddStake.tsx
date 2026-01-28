@@ -46,6 +46,7 @@ import FadeText from '../../Components/FadeText';
 import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
+import RegText from '../../Components/RegText';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -264,6 +265,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
+                flexGrow: 1,
+                flexShrink: 1,
               }}
             >
               <FontAwesomeIcon
@@ -276,20 +279,55 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                 style={{
                   justifyContent: 'center',
                   alignItems: 'flex-start',
+                  flexGrow: 1,
+                  flexShrink: 1,
                   gap: 0,
                 }}
               >
-                <TextInput
-                  style={{
-                    color: colors.text,
-                    fontSize: 17,
-                    fontWeight: '400',
-                  }}
-                  placeholder="Tap here for finalizer address"
-                  placeholderTextColor={colors.placeholder}
-                  value={Utils.trimToSmall(finalizerText, 7)}
-                  editable={false}
-                />
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <TextInput
+                    style={{
+                      flexGrow: 1,
+                      flexShrink: 1,
+                      color: colors.text,
+                      fontSize: 17,
+                      fontWeight: '400',
+                    }}
+                    placeholder="Tap here for finalizer address"
+                    placeholderTextColor={colors.placeholder}
+                    value={finalizerText}
+                    editable={true}
+                    onChangeText={setFinalizerText}
+                  />
+                  {!!finalizerText && (
+                    <TouchableOpacity
+                      style={{ marginLeft: 5 }}
+                      onPress={() => {
+                        launchedSelectorRef.current = false;
+                        setFinalizerText('');
+                        setStaked(0);
+                      }}
+                    >
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: colors.zingo,
+                          borderRadius: 11,
+                          height: 22,
+                          width: 22,
+                          padding: 0,
+                        }}
+                      >
+                        <RegText
+                          style={{ color: colors.background, marginTop: -3 }}
+                        >
+                          x
+                        </RegText>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                </View>
                 {!!staked && (
                   <FadeText
                     style={{ marginLeft: 5, marginBottom: 10 }}
@@ -300,7 +338,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
             <ChevronDown
               width={30}
               height={30}
-              style={{ transform: [{ rotate: '-90deg' }] }}
+              style={{ marginLeft: 5, transform: [{ rotate: '-90deg' }] }}
               color={colors.text}
             />
           </View>

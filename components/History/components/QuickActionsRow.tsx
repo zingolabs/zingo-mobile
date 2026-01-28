@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { RouteEnum } from '../../../app/AppState';
+import { GlobalConst, RouteEnum } from '../../../app/AppState';
 import FadeText from '../../Components/FadeText';
 import PaperPlane from '../../../assets/icons/paper-plane.svg';
 import QrCode from '../../../assets/icons/qr.svg';
@@ -53,7 +53,8 @@ const ActionButton = ({
 const QuickActionsRow: React.FC = () => {
   const navigation: any = useNavigation();
 
-  const { defaultUnifiedAddress } = useContext(ContextAppLoaded);
+  const { defaultUnifiedAddress, requestFaucetFunds } =
+    useContext(ContextAppLoaded);
 
   return (
     <View
@@ -79,8 +80,13 @@ const QuickActionsRow: React.FC = () => {
       <ActionButton
         icon={<FaucetIcon width={30} height={30} color={'#8FBFFA'} />}
         label={'Faucet'}
-        onPress={() => {
-          requestFaucetDonation(defaultUnifiedAddress); // TODO: dynamic rpcURL
+        onPress={async () => {
+          const resp = await requestFaucetFunds(defaultUnifiedAddress);
+          if (resp.toLowerCase().startsWith(GlobalConst.error)) {
+            Alert.alert('Faucet Error', resp);
+          } else {
+            Alert.alert('Faucet', 'Request sent to faucet!');
+          }
         }}
       />
     </View>
@@ -91,10 +97,11 @@ export default QuickActionsRow;
 
 export async function requestFaucetDonation(
   address: string,
-  rpcUrl: string = 'http://127.0.0.1:8232',
+  rpcUrl: string = 'http://45.76.30.90:8232',
 ): Promise<any> {
-  console.log('faucet start', address);
-  const resp = await fetch(rpcUrl, {
+  const rpcUrlTransformed = `${rpcUrl.split(':')[0]}:${rpcUrl.split(':')[1]}:8232`;
+  console.log('faucet start', rpcUrl, rpcUrlTransformed, address);
+  const resp = await fetch(rpcUrlTransformed, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

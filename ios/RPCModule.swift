@@ -2096,6 +2096,57 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     }
   }
   
+  func fnRetargetBondProcess(_ dict: [AnyHashable: Any]) {
+    if let txid = dict["txid"] as? String,
+       let newFinalizer = dict["newFinalizer"] as? String,
+       let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+
+      guard let payload = makeJsonString([
+        "bond_key": txid,
+        "new_finalizer": newFinalizer
+      ]) else {
+        let err = "Error: [Native] retarget_bond. Could not build JSON."
+        NSLog(err)
+        DispatchQueue.main.async { resolve(err) }
+        return
+      }
+
+      do {
+        let resp = try retargetBond(retargetBondJson: payload)
+        DispatchQueue.main.async { resolve(String(resp)) }
+      } catch {
+        let err = "Error: [Native] retarget_bond. \(error.localizedDescription)"
+        NSLog(err)
+        DispatchQueue.main.async { resolve(err) }
+      }
+
+    } else {
+      let err = "Error: [Native] retarget_bond. Command arguments problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        DispatchQueue.main.async { resolve(err) }
+      }
+    }
+  }
+
+  @objc(retargetBondProcess:finalizer:resolve:reject:)
+  func retargetBondProcess(
+    _ txid: String,
+    finalizer: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    let dict: [String: Any] = [
+      "txid": txid,
+      "newFinalizer": finalizer,
+      "resolve": resolve
+    ]
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      guard let self = self else { return }
+      self.fnRetargetBondProcess(dict)
+    }
+  }
+  
   func fnGetRosterInfo(_ dict: [AnyHashable: Any]) {
     if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       do {
@@ -2172,6 +2223,41 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
       guard let self = self else { return }
       self.fnGetWalletBondsInfo(dict)
+    }
+  }
+  
+  func fnRequestFaucetFundsProcess(_ dict: [AnyHashable: Any]) {
+    if let resolve = dict["resolve"] as? RCTPromiseResolveBlock,
+       let address = dict["address"] as? String {
+
+      do {
+        // UniFFI global function
+        let resp = try requestFaucetFunds(address: address)
+        DispatchQueue.main.async { resolve(String(resp)) }
+      } catch {
+        let err = "Error: [Native] request_faucet_funds. \(error.localizedDescription)"
+        NSLog(err)
+        DispatchQueue.main.async { resolve(err) }
+      }
+    } else {
+      let err = "Error: [Native] request_faucet_funds. Command arguments problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        DispatchQueue.main.async { resolve(err) }
+      }
+    }
+  }
+
+  @objc(requestFaucetFundsProcess:resolve:reject:)
+  func requestFaucetFundsProcess(
+    _ address: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    let dict: [String: Any] = ["resolve": resolve, "address": address]
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      guard let self = self else { return }
+      self.fnRequestFaucetFundsProcess(dict)
     }
   }
 

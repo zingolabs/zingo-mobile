@@ -1,6 +1,6 @@
 import { ValueTransferKindEnum } from '../enums/ValueTransferKindEnum';
 import { PoolEnum } from '../enums/PoolEnum';
-import { RPCValueTransfersStatusEnum } from '../../rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransferStatusEnum } from '../../rpc/enums/RPCValueTransferStatusEnum';
 import StakingActionType from './StakingActionType';
 
 export default interface ValueTransferType {
@@ -15,7 +15,7 @@ export default interface ValueTransferType {
   amount: number;
   memos?: string[];
   poolType?: PoolEnum;
-  status: RPCValueTransfersStatusEnum;
+  status: RPCValueTransferStatusEnum;
   stakingAction: StakingActionType | null;
 }
 

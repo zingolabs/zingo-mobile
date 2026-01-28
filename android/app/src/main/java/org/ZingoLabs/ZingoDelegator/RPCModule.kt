@@ -1594,4 +1594,55 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    @ReactMethod
+    fun requestFaucetFundsProcess(address: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.requestFaucetFunds(address)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] request faucet funds: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun retargetBondProcess(txid: String, finalizer: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val payload = makeJsonString(mapOf("bond_key" to txid, "new_finalizer" to finalizer))
+                if (payload == null) {
+                    val err = "Error: [Native] Retarget bond. Could not build JSON."
+                    Log.i("MAIN", err)
+                    withContext(Dispatchers.Main) {
+                        promise.resolve(err)
+                    }
+                } else {
+                    val resp = uniffi.zingo.retargetBond(payload)
+
+                    withContext(Dispatchers.Main) {
+                        promise.resolve(resp.toString())
+                    }
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] Retarget bond: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
 }

@@ -28,7 +28,7 @@ import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 
 import { ContextAppLoaded } from '../../../app/context';
-import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransferStatusEnum } from '../../../app/rpc/enums/RPCValueTransferStatusEnum';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import Stake from '../../../assets/icons/stake-blue.svg';
@@ -83,7 +83,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   const amountColor = Utils.valueTransferKindColor(colors.text, vt);
 
   const icon =
-      vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
+      vt.kind === ValueTransferKindEnum.Received || 
+      vt.kind === ValueTransferKindEnum.Shield || 
+      vt.kind === ValueTransferKindEnum.WithdrawBond
         ? faArrowDown
         : faArrowUp;
 
@@ -243,25 +245,25 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     );
   };
 
-  //console.log('render ValueTransferLine - 5', month, vt);
+  //console.log('render ValueTransferLine - 5', vt);
 
   //if (index === 0) {
   //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.calculated;
+  //  vt.status = RPCValueTransferStatusEnum.calculated;
   //  vt.address = "aydelaymanianero";
   //}
   //if (index === 1 ) {
   //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.transmitted;
+  //  vt.status = RPCValueTransferStatusEnum.transmitted;
   //  vt.address = "pepeillo";
   //}
   //if (index === 2) {
   //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.mempool;
+  //  vt.status = RPCValueTransferStatusEnum.mempool;
   //}
   //if (index === 3 ) {
   //  vt.confirmations = 1;
-  //  vt.status = RPCValueTransfersStatusEnum.confirmed;
+  //  vt.status = RPCValueTransferStatusEnum.confirmed;
   //}
 
   return (
@@ -338,23 +340,21 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   />
                 ) : (
                   <>
-                    {vt.stakingAction && vt.stakingAction.kind === 'create_bond' && (
+                    {vt.kind === ValueTransferKindEnum.CreateBond ? (
                       <Stake width={20} height={20} />
-                    )}
-                    {vt.stakingAction && 
-                      (vt.stakingAction.kind === 'begin_unbonding' || 
-                        vt.stakingAction.kind === 'withdraw_bond' ||
-                        vt.stakingAction.kind === 'redelegate') && (
-                      <Unstake width={20} height={20} />
-                    )}
-                    {vt.stakingAction === null && (
-                      <FontAwesomeIcon
-                        style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
-                        size={20}
-                        icon={icon}
-                        color={amountColor}
-                      />
-                    )}
+                    ) :(vt.kind === ValueTransferKindEnum.beginUnbond || 
+                        vt.kind === ValueTransferKindEnum.RetargetDelegationBond) ? 
+                      (
+                        <Unstake width={20} height={20} />
+                      ) : (
+                        <FontAwesomeIcon
+                          style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
+                          size={20}
+                          icon={icon}
+                          color={amountColor}
+                        />
+                      )
+                    }
                   </>
                 )}
               </View>
@@ -408,10 +408,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                           style={{
                             color:
                               vt.status ===
-                                RPCValueTransfersStatusEnum.transmitted ||
+                                RPCValueTransferStatusEnum.transmitted ||
                               vt.status ===
-                                RPCValueTransfersStatusEnum.calculated ||
-                              vt.status === RPCValueTransfersStatusEnum.mempool
+                                RPCValueTransferStatusEnum.calculated ||
+                              vt.status === RPCValueTransferStatusEnum.mempool
                                 ? colors.primary
                                 : colors.primaryDisabled,
                             fontSize: 12,
@@ -440,7 +440,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 color={amountColor}
                 amtZec={
                   vt.kind === ValueTransferKindEnum.Received ||
-                  vt.kind === ValueTransferKindEnum.Shield
+                  vt.kind === ValueTransferKindEnum.Shield ||
+                  vt.kind === ValueTransferKindEnum.WithdrawBond
                     ? vt.amount
                     : Number(
                           Utils.splitZecAmountIntoBigSmall(vt.amount).bigPart,

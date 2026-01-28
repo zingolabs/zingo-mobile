@@ -80,6 +80,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
+  requestFaucetFunds: async () => '',
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);
@@ -89,6 +90,13 @@ type ContextProviderProps = {
   value: AppContextLoaded;
 };
 
-export const ContextAppLoadedProvider = ({ children, value }: ContextProviderProps) => {
-  return <ContextAppLoaded.Provider value={value}>{children}</ContextAppLoaded.Provider>;
+export const ContextAppLoadedProvider = ({
+  children,
+  value,
+}: ContextProviderProps) => {
+  return (
+    <ContextAppLoaded.Provider value={value}>
+      {children}
+    </ContextAppLoaded.Provider>
+  );
 };

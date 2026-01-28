@@ -2194,7 +2194,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                   }
                 }
                 testID="settings.custom-server-field"
-                value="http://45.76.30.90:18233"
+                value="http://45.76.30.90:18234"
               />
             </View>
             <View
