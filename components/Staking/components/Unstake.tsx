@@ -59,7 +59,7 @@ const Unstake: React.FC<UnstakeProps> = ({
     !!route.params && route.params.finalizer !== undefined
       ? route.params.finalizer
       : '';
-  const staked =
+  const stakedFrom =
     !!route.params && route.params.staked !== undefined
       ? route.params.staked
       : 0;
@@ -73,7 +73,7 @@ const Unstake: React.FC<UnstakeProps> = ({
   const insets = useSafeAreaInsets();
 
   const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
-  const [stakedFrom, setStakedFrom] = useState<number>(staked);
+  const [stakedFromNumber, setStakedFromNumber] = useState<number>(stakedFrom);
 
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -84,7 +84,7 @@ const Unstake: React.FC<UnstakeProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { walletBonds, valueTransfers } = context;
+  const { walletBonds, valueTransfers, staked } = context;
 
   console.log('FINALIZER', finalizerFromText);
 
@@ -120,6 +120,16 @@ const Unstake: React.FC<UnstakeProps> = ({
       }
     }, [finalizerFromText, navigation]),
   );
+
+  useEffect(() => {
+    // looking for the voting power of the finalizer
+    if (staked.filter(g => g.finalizer === finalizerFromText).length === 1) {
+      setStakedFromNumber(staked.filter(g => g.finalizer === finalizerFromText)[0].votingPower);
+    } else {
+      setStakedFromNumber(0);
+    }
+  }, [finalizerFromText, staked]);
+
 
   const shortenTxid = (txid: string) => {
     if (txid.length <= 16) {
@@ -178,9 +188,13 @@ const Unstake: React.FC<UnstakeProps> = ({
 
       setModalState('success');
     } catch (error: any) {
-      console.warn('Staking tx failed:', error);
+      console.warn('Unstaking tx failed:', error);
       setModalState('idle');
-      if (error.includes('window')) {
+      if (JSON.stringify(error).toLowerCase().includes('window')) {
+        navigation.navigate(RouteEnum.ComputingError, {
+          error: `Transaction outside of staking window :(. Try again later.`,
+        });
+      } else if (JSON.stringify(error).toLowerCase().includes('staking action delay')) {
         navigation.navigate(RouteEnum.ComputingError, {
           error: `Transaction outside of staking window :(. Try again later.`,
         });
@@ -194,7 +208,6 @@ const Unstake: React.FC<UnstakeProps> = ({
     const k = selectedBond?.status;
 
     if (k === 'Unbonding') return 'Withdraw';
-    if (k === 'Active') return 'Unbond';
 
     return 'Unstake';
   }, [selectedBond]);
@@ -368,7 +381,7 @@ const Unstake: React.FC<UnstakeProps> = ({
                     onPress={() => {
                       launchedSelectorRef.current = false;
                       setFinalizerFromText('');
-                      setStakedFrom(0);
+                      setStakedFromNumber(0);
                     }}
                   >
                     <View
@@ -391,10 +404,10 @@ const Unstake: React.FC<UnstakeProps> = ({
                   </TouchableOpacity>
                 )}
               </View>
-              {!!stakedFrom && (
+              {!!stakedFromNumber && (
                 <FadeText
-                  style={{ marginLeft: 5, marginBottom: 10 }}
-                >{`Voting power: ${stakedFrom.toFixed(5)}`}</FadeText>
+                  style={{ marginLeft: 15, marginBottom: 5 }}
+                >{`Staked: ${stakedFromNumber.toFixed(5)}`}</FadeText>
               )}
             </View>
           </View>
@@ -403,7 +416,7 @@ const Unstake: React.FC<UnstakeProps> = ({
               navigation.navigate(RouteEnum.Finalizers, {
                 setFinalizer: (f: string, s: number) => {
                   setFinalizerFromText(f);
-                  setStakedFrom(s);
+                  setStakedFromNumber(s);
                 },
                 scope: 'my',
                 exclude: '',
@@ -444,7 +457,7 @@ const Unstake: React.FC<UnstakeProps> = ({
             }}
           >
             These are the currently-active delegation bonds, which includes
-            bonded and unbonded positions.
+            bonded and unstaked positions.
           </Text>
 
           <View
