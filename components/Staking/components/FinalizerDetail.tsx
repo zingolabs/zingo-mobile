@@ -12,6 +12,7 @@ import { useToast } from 'react-native-toastier';
 import { HeaderTitle } from '../../Header';
 import Utils from '../../../app/utils';
 import ZecAmount from '../../Components/ZecAmount';
+import { TriangleAlertIcon } from 'lucide-react-native';
 
 type DataType = {
   svg: {
@@ -27,11 +28,13 @@ type FinalizerDetailProps = {
   item: DataType | null;
   closeSheet: () => void;
   setHeightLayout: (h: number) => void;
+  stakingDay: boolean;
 };
 const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
   item,
   closeSheet,
   setHeightLayout,
+  stakingDay,
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
@@ -93,44 +96,104 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
           </View>
         </View>
 
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-            marginTop: 30,
-          }}
-        >
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={'Redelegate'}
-            onPress={() => {
-              clear();
-              navigation.navigate(RouteEnum.Redelegate, {
-                finalizer: item?.finalizer,
-                staked: item?.value,
-                closeSheet: closeSheet,
-              });
+
+        {stakingDay ? (
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginVertical: 5,
+              marginTop: 20,
+              marginBottom: 20,
             }}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Secondary}
-            title={'Unstake'}
-            style={{ marginLeft: 10 }}
-            onPress={() => {
-              clear();
-              navigation.navigate(RouteEnum.Unstake, {
-                finalizer: item?.finalizer,
-                staked: item?.value,
-                closeSheet: closeSheet,
-              });
-            }}
-            twoButtons={true}
-          />
-        </View>
+          >
+            <Button
+              type={ButtonTypeEnum.Primary}
+              title={'Redelegate'}
+              onPress={() => {
+                clear();
+                navigation.navigate(RouteEnum.Redelegate, {
+                  finalizer: item?.finalizer,
+                  staked: item?.value,
+                  closeSheet: closeSheet,
+                });
+              }}
+              twoButtons={true}
+            />
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={'Unstake'}
+              style={{ marginLeft: 10 }}
+              onPress={() => {
+                clear();
+                navigation.navigate(RouteEnum.Unstake, {
+                  finalizer: item?.finalizer,
+                  staked: item?.value,
+                  closeSheet: closeSheet,
+                });
+              }}
+              twoButtons={true}
+            />
+          </View>
+        ) : (
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                marginTop: 20,
+                marginBottom: 20,
+                paddingHorizontal: 15,
+                paddingVertical: 7,
+                backgroundColor: '#222223',
+                borderColor: '#414141',
+                borderWidth: 1,
+                borderRadius: 16,
+                marginHorizontal: 25,
+                alignSelf: 'stretch',
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'column',
+                  gap: 10,
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  flexShrink: 1,
+                  paddingVertical: 10,
+                  paddingHorizontal: 5,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <TriangleAlertIcon color={'#FFFFFF'} size={20} />
+                  <RegText
+                    style={{ fontSize: 16, marginLeft: 5, fontWeight: '400' }}
+                  >
+                    {' '}
+                    Staking actions are currently disabled
+                  </RegText>
+                </View>
+  
+                <RegText
+                  style={{
+                    color: '#8E8E93',
+                    marginLeft: 30,
+                    fontSize: 14,
+                    fontWeight: '400',
+                  }}
+                >
+                  They will only be available during the next staking day
+                </RegText>
+              </View>
+            </View>
+          </View>
+        )}
       </View>
     </View>
   );
