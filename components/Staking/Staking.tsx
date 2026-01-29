@@ -213,7 +213,7 @@ const Staking: React.FC<StakingProps> = () => {
           return { ...vt, stakingUiKind: 'create_bond' };
         }
 
-        if (vt.kind === ValueTransferKindEnum.beginUnbond) {
+        if (vt.kind === ValueTransferKindEnum.BeginUnbond) {
           return { ...vt, stakingUiKind: 'begin_unbonding' };
         }
 
@@ -633,7 +633,6 @@ const Staking: React.FC<StakingProps> = () => {
                 ListHeaderComponent={
                   <View
                     style={{
-                      marginTop: 20,
                       borderTopLeftRadius: 25,
                       borderTopRightRadius: 25,
                       paddingVertical: 10,
@@ -768,6 +767,7 @@ const Staking: React.FC<StakingProps> = () => {
                 >
                   <View
                     style={{
+                      marginTop: 5,
                       display: 'flex',
                       marginHorizontal: 10,
                       padding: 5,

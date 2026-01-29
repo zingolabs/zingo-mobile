@@ -526,11 +526,11 @@ export default class Utils {
                                   vt.confirmations !== 0
                                 ? 'Stake'
                                 : vt.kind ===
-                                      ValueTransferKindEnum.beginUnbond &&
+                                      ValueTransferKindEnum.BeginUnbond &&
                                     vt.confirmations === 0
                                   ? '...Unstaking...'
                                   : vt.kind ===
-                                        ValueTransferKindEnum.beginUnbond &&
+                                        ValueTransferKindEnum.BeginUnbond &&
                                       vt.confirmations !== 0
                                     ? 'Unstake'
                                     : vt.kind ===
@@ -545,11 +545,11 @@ export default class Utils {
                                               ValueTransferKindEnum.RetargetDelegationBond &&
                                             vt.confirmations === 0
                                           ? '...Redelegating...'
-                                          : vt.kind !==
+                                          : vt.kind ===
                                                 ValueTransferKindEnum.RetargetDelegationBond &&
                                               vt.confirmations !== 0
                                             ? 'Redelegate'
-                                            : vt.kind;
+                                            : `Unknown-${vt.kind}`;
   };
 
   static valueTransferKindColor = (
@@ -558,7 +558,7 @@ export default class Utils {
   ): string => {
     return vt.kind === ValueTransferKindEnum.CreateBond
       ? '#0091FF80'
-      : vt.kind === ValueTransferKindEnum.beginUnbond ||
+      : vt.kind === ValueTransferKindEnum.BeginUnbond ||
           vt.kind === ValueTransferKindEnum.RetargetDelegationBond
         ? '#FFAF0E80'
         : color;

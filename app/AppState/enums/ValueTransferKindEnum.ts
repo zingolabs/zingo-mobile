@@ -8,7 +8,7 @@ export enum ValueTransferKindEnum {
 
   // new for staking
   CreateBond = 'CreateBond',
-  beginUnbond = 'beginUnbond',
+  BeginUnbond = 'BeginUnbond',
   WithdrawBond = 'WithdrawBond',
   RetargetDelegationBond = 'RetargetDelegationBond',
 

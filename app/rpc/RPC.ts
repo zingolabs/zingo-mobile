@@ -1501,7 +1501,7 @@ export default class RPC {
                           : vt.kind === RPCValueTransferKindEnum.createBond
                             ? ValueTransferKindEnum.CreateBond
                             : vt.kind === RPCValueTransferKindEnum.beginUnbond
-                              ? ValueTransferKindEnum.beginUnbond
+                              ? ValueTransferKindEnum.BeginUnbond
                               : vt.kind === RPCValueTransferKindEnum.withdrawBond
                                 ? ValueTransferKindEnum.WithdrawBond
                                 : vt.kind === RPCValueTransferKindEnum.retargetDelegationBond
@@ -1570,6 +1570,11 @@ export default class RPC {
             //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
             //  console.log(vt);
             //}
+            if (currentValueTransferList.kind === ValueTransferKindEnum.RetargetDelegationBond) {
+              console.log('RETARGET ))))))))))))))))))))))))))))))))))');
+              console.log(vt);
+              console.log(currentValueTransferList);
+            }
 
             //console.log(currentValueTransferList);
             vtList.push(currentValueTransferList);
@@ -1651,7 +1656,7 @@ export default class RPC {
                           : m.kind === RPCValueTransferKindEnum.createBond
                             ? ValueTransferKindEnum.CreateBond
                             : m.kind === RPCValueTransferKindEnum.beginUnbond
-                              ? ValueTransferKindEnum.beginUnbond
+                              ? ValueTransferKindEnum.BeginUnbond
                               : m.kind === RPCValueTransferKindEnum.withdrawBond
                                 ? ValueTransferKindEnum.WithdrawBond
                                 : m.kind === RPCValueTransferKindEnum.retargetDelegationBond

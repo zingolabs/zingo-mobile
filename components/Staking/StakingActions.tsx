@@ -63,7 +63,6 @@ const StakingActions: React.FC<StakingActionsProps> = ({ stakingDay }) => {
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
             style={{
-              marginTop: 30,
               paddingHorizontal: 15,
               paddingVertical: 7,
               backgroundColor: '#222223',

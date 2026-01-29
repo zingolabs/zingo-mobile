@@ -234,7 +234,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                   <>
                     {valueTransfer.kind === ValueTransferKindEnum.CreateBond ? (
                       <Stake width={30} height={30} />
-                    ) : (valueTransfer.kind === ValueTransferKindEnum.beginUnbond || 
+                    ) : (valueTransfer.kind === ValueTransferKindEnum.BeginUnbond || 
                          valueTransfer.kind === ValueTransferKindEnum.RetargetDelegationBond) ? (
                       <Unstake width={30} height={30} />
                     ) : (

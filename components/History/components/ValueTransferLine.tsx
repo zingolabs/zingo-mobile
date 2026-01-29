@@ -342,7 +342,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   <>
                     {vt.kind === ValueTransferKindEnum.CreateBond ? (
                       <Stake width={20} height={20} />
-                    ) :(vt.kind === ValueTransferKindEnum.beginUnbond || 
+                    ) :(vt.kind === ValueTransferKindEnum.BeginUnbond || 
                         vt.kind === ValueTransferKindEnum.RetargetDelegationBond) ? 
                       (
                         <Unstake width={20} height={20} />
