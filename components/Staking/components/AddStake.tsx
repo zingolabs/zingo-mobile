@@ -68,12 +68,12 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const navigation: any = useNavigation();
   const { colors } = useTheme() as unknown as ThemeType;
   const insets = useSafeAreaInsets();
-  const { totalBalance, info, privacy } = useContext(ContextAppLoaded);
+  const { totalBalance, info, privacy, globalStaked } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [finalizerText, setFinalizerText] = useState<string>('');
-  const [staked, setStaked] = useState<number>(0);
+  const [stakedNumber, setStakedNumber] = useState<number>(0);
   const [kbOpen, setKbOpen] = useState<boolean>(false);
   const [spendable, setSpendable] = useState<number>(0);
 
@@ -112,6 +112,15 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     }, [finalizerText, navigation]),
   );
 
+  useEffect(() => {
+    // looking for the voting power of the finalizer.
+    if (globalStaked.filter(g => g.finalizer === finalizerText).length === 1) {
+      setStakedNumber(globalStaked.filter(g => g.finalizer === finalizerText)[0].votingPower);
+    } else {
+      setStakedNumber(0);
+    }
+  }, [finalizerText, globalStaked]);
+
   const handleConfirmStake = async () => {
     if (!hasSelection) {
       return;
@@ -146,7 +155,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       );
       return;
     }
-    // Build a minimal SendPageState to reuse existing plumbing
+    // Build a minimal SendPageState to reuse existing plumbing 
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
 
     // sendPageState.toaddr.to =
@@ -174,7 +183,11 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     } catch (error: any) {
       console.warn('Stake tx failed:', error);
       setModalState('idle');
-      if (error.includes('window')) {
+      if (JSON.stringify(error).toLowerCase().includes('window')) {
+        navigation.navigate(RouteEnum.ComputingError, {
+          error: `Transaction outside of staking window :(. Try again later.`,
+        });
+      } else if (JSON.stringify(error).toLowerCase().includes('staking action delay')) {
         navigation.navigate(RouteEnum.ComputingError, {
           error: `Transaction outside of staking window :(. Try again later.`,
         });
@@ -284,7 +297,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                     onPress={() => {
                       launchedSelectorRef.current = false;
                       setFinalizerText('');
-                      setStaked(0);
+                      setStakedNumber(0);
                     }}
                   >
                     <View
@@ -307,10 +320,10 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                   </TouchableOpacity>
                 )}
               </View>
-              {!!staked && (
+              {!!stakedNumber && (
                 <FadeText
-                  style={{ marginLeft: 5, marginBottom: 10 }}
-                >{`Staked: ${staked}`}</FadeText>
+                  style={{ marginLeft: 15, marginBottom: 5 }}
+                >{`Voting power: ${stakedNumber.toFixed(5)}`}</FadeText>
               )}
             </View>
           </View>
@@ -319,7 +332,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
               navigation.navigate(RouteEnum.Finalizers, {
                 setFinalizer: (f: string, s: number) => {
                   setFinalizerText(f);
-                  setStaked(s);
+                  setStakedNumber(s);
                 },
                 scope: 'network',
                 exclude: '',
