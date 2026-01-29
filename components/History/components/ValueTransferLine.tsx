@@ -333,7 +333,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               <View style={{ display: 'flex', marginHorizontal: 5 }}>
                 {vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations ? (
                   <FontAwesomeIcon
-                    style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
+                    style={{ transform: [{ rotate: '45deg' }] }}
                     size={20}
                     icon={faRefresh}
                     color={amountColor}
@@ -348,7 +348,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                         <Unstake width={20} height={20} />
                       ) : (
                         <FontAwesomeIcon
-                          style={{ marginLeft: 5, marginRight: 5, marginTop: 0, transform: [{ rotate: '45deg' }] }}
+                          style={{ transform: [{ rotate: '45deg' }] }}
                           size={20}
                           icon={icon}
                           color={amountColor}
