@@ -1,5 +1,6 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useCallback, useState, useRef } from 'react';
-import { View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { SnackbarDurationEnum, SnackbarType, ScreenEnum } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import { useTheme } from '@react-navigation/native';
@@ -54,6 +55,14 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
         message: currentSnackbar.message,
         animation: 'zoomIn',
         duration,
+        right: ((
+          <Pressable
+            onPress={() => toast.clear()}
+            style={{ padding: 10 }}
+          >
+            <Text style={{ fontSize: 18 }}>✕</Text>
+          </Pressable>
+        )),
         textContainerStyle: {
           padding: 0,
           margin: 0,
