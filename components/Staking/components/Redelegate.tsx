@@ -64,7 +64,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
     !!route.params && route.params.finalizer !== undefined
       ? route.params.finalizer
       : '';
-  const staked =
+  const stakedFrom =
     !!route.params && route.params.staked !== undefined
       ? route.params.staked
       : 0;
@@ -78,9 +78,9 @@ const Redelegate: React.FC<RedelegateProps> = ({
   const insets = useSafeAreaInsets();
 
   const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
-  const [stakedFrom, setStakedFrom] = useState<number>(staked);
+  const [stakedFromNumber, setStakedFromNumber] = useState<number>(stakedFrom);
   const [finalizerToText, setFinalizerToText] = useState<string>('');
-  const [stakedTo, setStakedTo] = useState<number>(0);
+  const [stakedToNumber, setStakedToNumber] = useState<number>(0);
 
   const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -91,11 +91,12 @@ const Redelegate: React.FC<RedelegateProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { walletBonds, valueTransfers } = context;
+  const { walletBonds, valueTransfers, staked, globalStaked } = context;
 
   const movements = walletBonds
     .filter(b => {
-      if (b.status === 'Withdrawn') return false;
+      // only active bonds.
+      if (b.status === 'Withdrawn' || b.status === 'Unbonding') return false;
       if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
       if (!finalizerFromText) return true;
@@ -137,24 +138,27 @@ const Redelegate: React.FC<RedelegateProps> = ({
       finalizerFromText === finalizerToText
     ) {
       setFinalizerToText('');
-      setStakedTo(0);
+      setStakedToNumber(0);
     }
   }, [finalizerFromText, finalizerToText]);
 
   useEffect(() => {
-    if (!finalizerFromText) {
-      launchedSelectorRef.current = true;
-      navigation.navigate(RouteEnum.Finalizers, {
-        setFinalizer: (f: string, s: number) => {
-          setFinalizerFromText(f);
-          setStakedFrom(s);
-        },
-        scope: 'my',
-        exclude: '', // with 2 finalizers is imposible to change anything.
-      });
+    // looking for the voting power of the finalizer
+    if (staked.filter(g => g.finalizer === finalizerFromText).length === 1) {
+      setStakedFromNumber(staked.filter(g => g.finalizer === finalizerFromText)[0].votingPower);
+    } else {
+      setStakedFromNumber(0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [finalizerFromText, staked]);
+
+  useEffect(() => {
+    // looking for the voting power of the finalizer
+    if (globalStaked.filter(g => g.finalizer === finalizerToText).length === 1) {
+      setStakedToNumber(globalStaked.filter(g => g.finalizer === finalizerToText)[0].votingPower);
+    } else {
+      setStakedToNumber(0);
+    }
+  }, [finalizerToText, globalStaked]);
 
   const shortenTxid = (txid: string) => {
     if (txid.length <= 16) {
@@ -338,7 +342,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
             navigation.navigate(RouteEnum.Finalizers, {
               setFinalizer: (f: string, s: number) => {
                 setFinalizerFromText(f);
-                setStakedFrom(s);
+                setStakedFromNumber(s);
               },
               scope: 'my',
               exclude: '',
@@ -404,7 +408,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
                       onPress={() => {
                         launchedSelectorRef.current = false;
                         setFinalizerFromText('');
-                        setStakedFrom(0);
+                        setStakedFromNumber(0);
                       }}
                     >
                       <View
@@ -427,10 +431,10 @@ const Redelegate: React.FC<RedelegateProps> = ({
                     </TouchableOpacity>
                   )}
                 </View>
-                {!!stakedFrom && (
+                {!!stakedFromNumber && (
                   <FadeText
-                    style={{ marginLeft: 5, marginBottom: 10 }}
-                  >{`Staked: ${stakedFrom}`}</FadeText>
+                    style={{ marginLeft: 15, marginBottom: 5 }}
+                  >{`Staked: ${stakedFromNumber.toFixed(5)}`}</FadeText>
                 )}
               </View>
             </View>
@@ -467,7 +471,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
             navigation.navigate(RouteEnum.Finalizers, {
               setFinalizer: (f: string, s: number) => {
                 setFinalizerToText(f);
-                setStakedTo(s);
+                setStakedToNumber(s);
               },
               scope: 'network',
               exclude: finalizerFromText,
@@ -534,7 +538,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
                       onPress={() => {
                         launchedSelectorRef.current = false;
                         setFinalizerToText('');
-                        setStakedTo(0);
+                        setStakedToNumber(0);
                       }}
                     >
                       <View
@@ -557,10 +561,10 @@ const Redelegate: React.FC<RedelegateProps> = ({
                     </TouchableOpacity>
                   )}
                 </View>
-                {!!stakedTo && (
+                {!!stakedToNumber && (
                   <FadeText
-                    style={{ marginLeft: 5, marginBottom: 10 }}
-                  >{`Staked: ${stakedTo}`}</FadeText>
+                    style={{ marginLeft: 15, marginBottom: 5 }}
+                  >{`Voting power: ${stakedToNumber.toFixed(5)}`}</FadeText>
                 )}
               </View>
             </View>
