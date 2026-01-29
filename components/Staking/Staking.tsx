@@ -848,6 +848,7 @@ const Staking: React.FC<StakingProps> = () => {
                 item={currentItem}
                 closeSheet={hide}
                 setHeightLayout={setHeightLayout}
+                stakingDay={stakingDay}
               />
               <View
                 style={{
