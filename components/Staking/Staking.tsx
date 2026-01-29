@@ -143,6 +143,7 @@ const Staking: React.FC<StakingProps> = () => {
   const [currentItem, setCurrentItem] = useState<DataType | null>(null);
 
   const [timeToStakingDay, setTimeToStakingDay] = useState<number>(0);
+  const [timeLeftStakingDay, setTimeLeftStakingDay] = useState<number>(0);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -200,6 +201,9 @@ const Staking: React.FC<StakingProps> = () => {
 
     const remaining = isStakingDay ? 0 : cycle - mod;
     setTimeToStakingDay(remaining);
+
+    const left = isStakingDay ? activeWindow - mod : 0;
+    setTimeLeftStakingDay(left);
   }, [info.latestBlock]);
 
   const movements: StakingMovement[] = useMemo(() => {
@@ -405,7 +409,7 @@ const Staking: React.FC<StakingProps> = () => {
     );
   };
 
-  //console.log('movements', movements);
+  //console.log('movements', movements); 
 
   return (
     <ToastProvider>
@@ -472,7 +476,14 @@ const Staking: React.FC<StakingProps> = () => {
               )}
               <View>
                 {stakingDay ? (
-                  <RegText>Staking day</RegText>
+                  <>
+                    <RegText>
+                      Staking day
+                    </RegText>
+                    <RegText style={{ fontSize: 14 }}>
+                      Closing in {String(timeLeftStakingDay)} blocks
+                    </RegText>
+                  </>
                 ) : (
                   <RegText style={{ fontSize: 14 }}>
                     Opening in {String(timeToStakingDay)} blocks
