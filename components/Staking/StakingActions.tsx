@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import { RouteEnum } from '../../app/AppState';
 import RegText from '../Components/RegText';
-import { TriangleAlert } from '../Components/Icons/TriangleAlert';
+import { TriangleAlertIcon } from 'lucide-react-native';
 
 type StakingActionsProps = {
   stakingDay: boolean;
@@ -26,7 +26,7 @@ const StakingActions: React.FC<StakingActionsProps> = ({ stakingDay }) => {
         gap: 20,
       }}
     >
-      {stakingDay || true ? (
+      {stakingDay ? (
         <>
           <Pressable
             onPress={() => navigation.navigate(RouteEnum.Stake)}
@@ -65,32 +65,52 @@ const StakingActions: React.FC<StakingActionsProps> = ({ stakingDay }) => {
             style={{
               marginTop: 30,
               paddingHorizontal: 15,
-              paddingRight: 20,
               paddingVertical: 7,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: 'rgba(65, 65, 65, 1)',
-              borderRadius: 25,
-              margin: 25,
+              backgroundColor: '#222223',
+              borderColor: '#414141',
+              borderWidth: 1,
+              borderRadius: 16,
+              marginHorizontal: 25,
+              alignSelf: 'stretch',
             }}
           >
             <View
               style={{
-                flexDirection: 'row',
+                flexDirection: 'column',
                 gap: 10,
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 flexShrink: 1,
-                padding: 10,
+                paddingVertical: 10,
+                paddingHorizontal: 5,
               }}
             >
-              <TriangleAlert color={'#8e8e93'} size={24} />
-              <View>
-                <RegText>Staking actions are currently disabled.</RegText>
-                <RegText style={{ color: '#8e8e93' }}>
-                  They will only be available during the next staking day.
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                }}
+              >
+                <TriangleAlertIcon color={'#FFFFFF'} size={20} />
+                <RegText
+                  style={{ fontSize: 16, marginLeft: 5, fontWeight: '400' }}
+                >
+                  {' '}
+                  Staking actions are currently disabled
                 </RegText>
               </View>
+
+              <RegText
+                style={{
+                  color: '#8E8E93',
+                  marginLeft: 30,
+                  fontSize: 14,
+                  fontWeight: '400',
+                }}
+              >
+                They will only be available during the next staking day
+              </RegText>
             </View>
           </View>
         </View>
