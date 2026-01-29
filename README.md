@@ -1,6 +1,6 @@
 # Zingo Delegator Android and iOS apps
-App Store: [https://apps.apple.com/app/zingodelegator/](https://apps.apple.com/app/zingodelegator/)
-Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.ZingoDelegator](https://play.google.com/store/apps/details?id=org.ZingoLabs.ZingoDelegator)
+App Store: [TestFlight link App](https://testflight.apple.com/join/DsT9zcBD)
+Google Play: [Beta Android App](https://play.google.com/store/apps/details?id=org.ZingoLabs.ZingoDelegator)
 
 # Security Vulnerability Disclosure
 
