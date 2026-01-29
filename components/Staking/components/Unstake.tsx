@@ -42,6 +42,7 @@ import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
 import Refresh from '../../../assets/icons/refresh.svg';
 import RegText from '../../Components/RegText';
+import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -90,7 +91,7 @@ const Unstake: React.FC<UnstakeProps> = ({
 
   const movements = walletBonds
     .filter(b => {
-      if (b.status === 'Withdrawn') return false;
+      if (b.status === WalletBondsStatusEnum.Withdrawn) return false;
       if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
       return false;
@@ -173,9 +174,9 @@ const Unstake: React.FC<UnstakeProps> = ({
     setModalState('sending');
 
     try {
-      if (selectedKind === 'Active') {
+      if (selectedKind === WalletBondsStatusEnum.Active) {
         await beginUnstakeTransaction(bondTxid);
-      } else if (selectedKind === 'Unbonding') {
+      } else if (selectedKind === WalletBondsStatusEnum.Unbonding) {
         await withdrawBondTransaction(selectedBond.txid);
       } else {
         Alert.alert(
@@ -207,7 +208,7 @@ const Unstake: React.FC<UnstakeProps> = ({
   const actionVerb = useMemo(() => {
     const k = selectedBond?.status;
 
-    if (k === 'Unbonding') return 'Withdraw';
+    if (k === WalletBondsStatusEnum.Unbonding) return 'Withdraw';
 
     return 'Unstake';
   }, [selectedBond]);
@@ -259,9 +260,9 @@ const Unstake: React.FC<UnstakeProps> = ({
               }}
               numberOfLines={1}
             >
-              {item.status === 'Unbonding'
+              {item.status === WalletBondsStatusEnum.Unbonding
                 ? 'Inactive'
-                : item.status || 'unknown'}
+                : item.status}
             </Text>
           </View>
           <Text

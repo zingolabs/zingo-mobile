@@ -46,6 +46,7 @@ import { ChevronDown } from '../../Components/Icons/Chevron';
 import FadeText from '../../Components/FadeText';
 import Refresh from '../../../assets/icons/refresh.svg';
 import RegText from '../../Components/RegText';
+import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -96,7 +97,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
   const movements = walletBonds
     .filter(b => {
       // only active bonds.
-      if (b.status === 'Withdrawn' || b.status === 'Unbonding') return false;
+      if (b.status === WalletBondsStatusEnum.Withdrawn || b.status === WalletBondsStatusEnum.Unbonding) return false;
       if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
       if (!finalizerFromText) return true;
@@ -204,7 +205,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
     setModalState('sending');
 
     try {
-      if (selectedKind === 'Active') {
+      if (selectedKind === WalletBondsStatusEnum.Active) {
         await redelegateTransaction(bondKey, finalizerToText);
       } else {
         Alert.alert(
@@ -274,9 +275,9 @@ const Redelegate: React.FC<RedelegateProps> = ({
               }}
               numberOfLines={1}
             >
-              {item.status === 'Unbonding'
+              {item.status === WalletBondsStatusEnum.Unbonding
                 ? 'Inactive'
-                : item.status || 'unknown'}
+                : item.status}
             </Text>
           </View>
           <Text

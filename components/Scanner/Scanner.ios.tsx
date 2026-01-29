@@ -31,8 +31,8 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ active, onRead, onClos
     },
   });
 
-  console.log('active', active);
-  console.log('permission', hasPermission);
+  console.log('active...', active);
+  console.log('permission...', hasPermission);
   //console.log('device', device);
 
   return (

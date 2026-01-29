@@ -318,28 +318,22 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               backgroundColor: colors.secondary,
           }}>
             {valueTransfer.kind === ValueTransferKindEnum.CreateBond && (
-              <>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
-                  <FadeText>{'Target'}</FadeText>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (valueTransfer.stakingAction?.target) {
-                        Clipboard.setString(valueTransfer.stakingAction.target);
-                        addLastSnackbar({
-                          message: translate('history.addresscopied') as string,
-                          duration: SnackbarDurationEnum.short,
-                          screenName: [screenName],
-                        });
-                      }
-                    }}>
-                    <RegText>{Utils.trimToSmall(valueTransfer.stakingAction ? valueTransfer.stakingAction.target : '', 10)}</RegText>
-                  </TouchableOpacity>
-                </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
-                  <FadeText>{'Val'}</FadeText>
-                  <RegText>{valueTransfer.stakingAction ? valueTransfer.stakingAction.val.toString() : ''}</RegText>
-                </View>
-              </>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
+                <FadeText>{'Target'}</FadeText>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (valueTransfer.stakingAction?.target) {
+                      Clipboard.setString(valueTransfer.stakingAction.target);
+                      addLastSnackbar({
+                        message: translate('history.addresscopied') as string,
+                        duration: SnackbarDurationEnum.short,
+                        screenName: [screenName],
+                      });
+                    }
+                  }}>
+                  <RegText>{Utils.trimToSmall(valueTransfer.stakingAction ? valueTransfer.stakingAction.target : '', 10)}</RegText>
+                </TouchableOpacity>
+              </View>
             )}
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
@@ -410,7 +404,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             {!!valueTransfer.fee && valueTransfer.fee > 0 && (
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%' }}>
                 <FadeText>{translate('history.txfee') as string}</FadeText>
-                <ZecAmount amtZec={valueTransfer.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
+                <ZecAmount amtZec={valueTransfer.kind === ValueTransferKindEnum.CreateBond ? valueTransfer.fee - valueTransfer.amount : valueTransfer.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
               </View>
             )}
 

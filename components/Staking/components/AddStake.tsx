@@ -37,6 +37,7 @@ import { AppDrawerParamList } from '../../../app/types';
 import {
   RouteEnum,
   SendPageStateClass,
+  StakingActionKindEnum,
   ToAddrClass,
 } from '../../../app/AppState';
 import { StakingActionType } from '../../../app/AppState';
@@ -169,7 +170,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     );
 
     const stakingAction: StakingActionType = {
-      kind: 'create_bond',
+      kind: StakingActionKindEnum.CreateBond,
       val: amount * 10 ** 8,
       target: finalizer,
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',

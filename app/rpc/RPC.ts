@@ -16,6 +16,7 @@ import {
   StakeType,
   StakingActionType,
   WalletBondsType,
+  StakingActionKindEnum,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCUnifiedAddressType } from './types/RPCUnifiedAddressType';
@@ -43,6 +44,7 @@ import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 import RPCWalletBondsType from './types/RPCWalletBondsType';
 import { RPCStakedType } from './types/RPCStakedType';
 import { reverseHex32Bytes } from '../utils/hex';
+import { WalletBondsStatusEnum } from '../AppState/enums/WalletBondsStatusEnum';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -1090,12 +1092,12 @@ export default class RPC {
         amount: (m.amount_zats || 0) / 10 ** 8,
         status:
           m.status === 0
-            ? 'Active'
+            ? WalletBondsStatusEnum.Active
             : m.status === 1
-              ? 'Unbonding'
+              ? WalletBondsStatusEnum.Unbonding
               : m.status === 2
-                ? 'Withdrawn'
-                : 'Active', // can be an error here
+                ? WalletBondsStatusEnum.Withdrawn
+                : WalletBondsStatusEnum.Active, // can be an error here
         finalizer: m.finalizer,
       }));
 
@@ -1105,7 +1107,7 @@ export default class RPC {
             walletBondsList.filter(
               b =>
                 m.pubkey === b.finalizer &&
-                (b.status === 'Active' || b.status === 'Unbonding'),
+                (b.status === WalletBondsStatusEnum.Active || b.status === WalletBondsStatusEnum.Unbonding),
             ).length > 0,
         )
         .map(m => {
@@ -1113,7 +1115,7 @@ export default class RPC {
             .filter(
               b =>
                 m.pubkey === b.finalizer &&
-                (b.status === 'Active' || b.status === 'Unbonding'),
+                (b.status === WalletBondsStatusEnum.Active || b.status === WalletBondsStatusEnum.Unbonding),
             )
             .reduce((acc, curr) => acc + curr.amount, 0);
           return {
@@ -1583,7 +1585,7 @@ export default class RPC {
             //  console.log(vt);
             //}
             if (currentValueTransferList.kind === ValueTransferKindEnum.RetargetDelegationBond) {
-              console.log('RETARGET ))))))))))))))))))))))))))))))))))');
+              console.log('))))))))))))))))))))))))))))))))))');
               console.log(vt);
               console.log(currentValueTransferList);
             }
@@ -1831,7 +1833,7 @@ export default class RPC {
 
         let proposeStr = '';
 
-        if (action.kind === 'create_bond') {
+        if (action.kind === StakingActionKindEnum.CreateBond) {
           const payload = {
             amount_zats: action.val,
             finalizer_address: reverseHex32Bytes(action.target), // ONLY PLACE WHERE IT SHOULD BE USED

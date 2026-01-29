@@ -30,6 +30,7 @@ import {
   RouteEnum,
   ScreenEnum,
   StakeType,
+  StakingActionKindEnum,
   ValueTransferKindEnum,
   ValueTransferType,
 } from '../../app/AppState';
@@ -81,14 +82,8 @@ const getPercent = (percent: number) => {
   );
 };
 
-type StakingUiKind =
-  | 'create_bond'
-  | 'begin_unbonding'
-  | 'withdraw_bond'
-  | 'redelegate';
-
 type StakingMovement = ValueTransferType & {
-  stakingUiKind: StakingUiKind;
+  stakingUiKind: StakingActionKindEnum;
 };
 
 const formatMovementDate = (unixSeconds: number) => {
@@ -214,19 +209,19 @@ const Staking: React.FC<StakingProps> = () => {
     return valueTransfers
       .map(vt => {
         if (vt.kind === ValueTransferKindEnum.CreateBond) {
-          return { ...vt, stakingUiKind: 'create_bond' };
+          return { ...vt, stakingUiKind: StakingActionKindEnum.CreateBond };
         }
 
         if (vt.kind === ValueTransferKindEnum.BeginUnbond) {
-          return { ...vt, stakingUiKind: 'begin_unbonding' };
+          return { ...vt, stakingUiKind: StakingActionKindEnum.BeginUnbonding };
         }
 
         if (vt.kind === ValueTransferKindEnum.WithdrawBond) {
-          return { ...vt, stakingUiKind: 'withdraw_bond' };
+          return { ...vt, stakingUiKind: StakingActionKindEnum.WithdrawBond };
         }
 
         if (vt.kind === ValueTransferKindEnum.RetargetDelegationBond) {
-          return { ...vt, stakingUiKind: 'redelegate' };
+          return { ...vt, stakingUiKind: StakingActionKindEnum.Redelegate };
         }
 
         if (vt.amount <= 0) {
@@ -680,7 +675,7 @@ const Staking: React.FC<StakingProps> = () => {
                   }> | null = null;
 
                   switch (item.stakingUiKind) {
-                    case 'create_bond': {
+                    case StakingActionKindEnum.CreateBond: {
                       label = 'Stake';
                       Icon = item.confirmations === 0 ? Refresh : Stake;
                       const fee = item.fee ?? 0;
@@ -688,21 +683,21 @@ const Staking: React.FC<StakingProps> = () => {
                       break;
                     }
 
-                    case 'begin_unbonding': {
+                    case StakingActionKindEnum.BeginUnbonding: {
                       label = 'Unstake';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
                       amountLabel = `${item.stakingAction?.val.toFixed(5)} cTAZ`;
                       break;
                     }
 
-                    case 'withdraw_bond': {
+                    case StakingActionKindEnum.WithdrawBond: {
                       label = 'Withdraw';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
                       amountLabel = `-${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
 
-                    case 'redelegate': {
+                    case StakingActionKindEnum.Redelegate: {
                       label = 'Redelegate';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
                       amountLabel = `${item.amount.toFixed(5)} cTAZ`;
