@@ -738,7 +738,6 @@ export default class RPC {
         let result: string = await RPCModule.loadExistingWallet(
           this.indexerServer.uri,
           this.indexerServer.chainName,
-          // 'regtest',
           this.performanceLevel,
           GlobalConst.minConfirmations.toString(),
         );
@@ -759,15 +758,28 @@ export default class RPC {
           this.walletBirthday,
           this.walletSeed,
         );
-        this.fnOnClickOKChangeWallet({
-          screen: 0,
-          startingApp: false,
-          walletSeed: this.walletSeed,
-          walletBirthday:
-            this.walletBirthday > this.lastServerBlockHeight
-              ? 1
-              : this.walletBirthday,
-        });
+        if (this.walletSeed) {
+          this.fnOnClickOKChangeWallet({
+            screen: 0,
+            startingApp: false,
+            walletSeed: this.walletSeed,
+            walletBirthday:
+              this.walletBirthday > this.lastServerBlockHeight
+                ? 1
+                : this.walletBirthday,
+          });
+        } else {
+          let result: string = await RPCModule.loadExistingWallet(
+            this.indexerServer.uri,
+            this.indexerServer.chainName,
+            this.performanceLevel,
+            GlobalConst.minConfirmations.toString(),
+          );
+          console.log('100 BLOCKS AHEAD RECOVERY RECOVERY', result);
+          setTimeout(async () => {
+            await this.refreshSync(true);
+          }, 0);
+        }
       } else {
         // This command have an error, fine. It's worthy to try running the sync process juat in case.
         setTimeout(async () => {
