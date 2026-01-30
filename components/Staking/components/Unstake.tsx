@@ -1,10 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {
-  useCallback,
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import {
@@ -24,7 +22,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {
-  useFocusEffect,
   useNavigation,
   useTheme,
 } from '@react-navigation/native';
@@ -80,8 +77,6 @@ const Unstake: React.FC<UnstakeProps> = ({
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
 
-  const launchedSelectorRef = useRef<boolean>(false);
-
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
@@ -111,16 +106,6 @@ const Unstake: React.FC<UnstakeProps> = ({
       s2.remove();
     };
   }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (launchedSelectorRef.current && !finalizerFromText) {
-        if (navigation.canGoBack) {
-          navigation.goBack();
-        }
-      }
-    }, [finalizerFromText, navigation]),
-  );
 
   useEffect(() => {
     // looking for the voting power of the finalizer
@@ -380,7 +365,6 @@ const Unstake: React.FC<UnstakeProps> = ({
                   <TouchableOpacity
                     style={{ marginLeft: 5 }}
                     onPress={() => {
-                      launchedSelectorRef.current = false;
                       setFinalizerFromText('');
                       setStakedFromNumber(0);
                     }}

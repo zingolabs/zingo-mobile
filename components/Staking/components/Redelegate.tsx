@@ -1,10 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {
-  useCallback,
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import {
@@ -24,7 +22,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {
-  useFocusEffect,
   useNavigation,
   useTheme,
 } from '@react-navigation/native';
@@ -87,8 +84,6 @@ const Redelegate: React.FC<RedelegateProps> = ({
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
 
-  const launchedSelectorRef = useRef<boolean>(false);
-
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
@@ -121,16 +116,6 @@ const Redelegate: React.FC<RedelegateProps> = ({
       s2.remove();
     };
   }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (launchedSelectorRef.current && !finalizerFromText) {
-        if (navigation.canGoBack) {
-          navigation.goBack();
-        }
-      }
-    }, [finalizerFromText, navigation]),
-  );
 
   useEffect(() => {
     if (
@@ -407,7 +392,6 @@ const Redelegate: React.FC<RedelegateProps> = ({
                     <TouchableOpacity
                       style={{ marginLeft: 5 }}
                       onPress={() => {
-                        launchedSelectorRef.current = false;
                         setFinalizerFromText('');
                         setStakedFromNumber(0);
                       }}
@@ -537,7 +521,6 @@ const Redelegate: React.FC<RedelegateProps> = ({
                     <TouchableOpacity
                       style={{ marginLeft: 5 }}
                       onPress={() => {
-                        launchedSelectorRef.current = false;
                         setFinalizerToText('');
                         setStakedToNumber(0);
                       }}

@@ -995,7 +995,7 @@ export default class RPC {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
-      console.log('balance:', balanceJSON);
+      //console.log('balance:', balanceJSON);
 
       // Total Balance
       const balance: TotalBalanceClass = {
@@ -1124,10 +1124,10 @@ export default class RPC {
           };
         });
 
-      console.log('GLOBAL STAKED', globalStakedList);
-      console.log('STAKED', stakedList);
-      console.log('BONDS', walletBondsList);
-      console.log('ROSTER', rosterInfo);
+      //console.log('GLOBAL STAKED', globalStakedList);
+      //console.log('STAKED', stakedList);
+      //console.log('BONDS', walletBondsList);
+      //console.log('ROSTER', rosterInfo);
 
       this.fnSetStaked(stakedList);
       this.fnSetGlobalStaked(globalStakedList);
@@ -1584,11 +1584,11 @@ export default class RPC {
             //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
             //  console.log(vt);
             //}
-            if (currentValueTransferList.kind === ValueTransferKindEnum.RetargetDelegationBond) {
-              console.log('))))))))))))))))))))))))))))))))))');
-              console.log(vt);
-              console.log(currentValueTransferList);
-            }
+            //if (currentValueTransferList.kind === ValueTransferKindEnum.RetargetDelegationBond) {
+            //  console.log('))))))))))))))))))))))))))))))))))');
+            //  console.log(vt);
+            //  console.log(currentValueTransferList);
+            //}
 
             //console.log(currentValueTransferList);
             vtList.push(currentValueTransferList);
@@ -1827,7 +1827,7 @@ export default class RPC {
       let sendTxids = '';
 
       try {
-        console.log('stake JSON', stakeJson);
+        //console.log('stake JSON', stakeJson);
 
         const action = stakeJson.stakingAction;
 

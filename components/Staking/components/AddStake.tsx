@@ -3,8 +3,6 @@ import React, {
   useEffect,
   useState,
   useContext,
-  useCallback,
-  useRef,
 } from 'react';
 import {
   View,
@@ -23,7 +21,6 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {
-  useFocusEffect,
   useNavigation,
   useTheme,
 } from '@react-navigation/native';
@@ -78,8 +75,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const [kbOpen, setKbOpen] = useState<boolean>(false);
   const [spendable, setSpendable] = useState<number>(0);
 
-  const launchedSelectorRef = useRef<boolean>(false);
-
   const hasSelection = selectedAmount !== null;
   const displayAmount = selectedAmount ?? 0;
 
@@ -102,16 +97,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         : 0;
     setSpendable(_spendable);
   }, [totalBalance, totalBalance?.totalSpendableBalance]);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (launchedSelectorRef.current && !finalizerText) {
-        if (navigation.canGoBack) {
-          navigation.goBack();
-        }
-      }
-    }, [finalizerText, navigation]),
-  );
 
   useEffect(() => {
     // looking for the voting power of the finalizer.
@@ -296,7 +281,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                   <TouchableOpacity
                     style={{ marginLeft: 5 }}
                     onPress={() => {
-                      launchedSelectorRef.current = false;
                       setFinalizerText('');
                       setStakedNumber(0);
                     }}
