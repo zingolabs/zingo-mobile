@@ -61,6 +61,7 @@ import FinalizerDetail from './components/FinalizerDetail';
 import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
 import { Layers3Icon } from 'lucide-react-native';
 import { SpinningLoaderIcon } from '../Components/Icons/SpinningLoaderIcon';
+import ZecAmount from '../Components/ZecAmount';
 
 type DataType = {
   svg: {
@@ -123,7 +124,7 @@ type StakingProps = DrawerScreenProps<
 
 const Staking: React.FC<StakingProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers, snackbars, removeFirstSnackbar, staked, info } =
+  const { valueTransfers, snackbars, removeFirstSnackbar, staked, info, privacy } =
     context;
 
   const screenName = ScreenEnum.StakingHome;
@@ -668,7 +669,6 @@ const Staking: React.FC<StakingProps> = () => {
                 }
                 renderItem={({ item }: { item: StakingMovement }) => {
                   let label: string = '';
-                  let amountLabel: string = '';
                   let Icon: React.ComponentType<{
                     width: number;
                     height: number;
@@ -678,28 +678,24 @@ const Staking: React.FC<StakingProps> = () => {
                     case StakingActionKindEnum.CreateBond: {
                       label = 'Stake';
                       Icon = item.confirmations === 0 ? Refresh : Stake;
-                      amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case StakingActionKindEnum.BeginUnbonding: {
                       label = 'Unstake';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      amountLabel = `${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case StakingActionKindEnum.WithdrawBond: {
                       label = 'Withdraw';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      amountLabel = `-${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case StakingActionKindEnum.Move: {
                       label = 'Redelegate';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      amountLabel = `${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
                   }
@@ -744,15 +740,24 @@ const Staking: React.FC<StakingProps> = () => {
                         </View>
                       </View>
 
-                      <Text
+                      <ZecAmount
                         style={{
-                          color: colors.text,
-                          fontSize: 14,
-                          fontWeight: '500',
+                          flexGrow: 1,
+                          alignSelf: 'auto',
+                          justifyContent: 'flex-end',
                         }}
-                      >
-                        {amountLabel}
-                      </Text>
+                        size={14}
+                        currencyName={info.currencyName}
+                        color={colors.text}
+                        amtZec={item.amount}
+                        privacy={privacy}
+                        prefix= {item.kind === ValueTransferKindEnum.CreateBond 
+                          ? '+' 
+                          : item.kind === ValueTransferKindEnum.WithdrawBond 
+                            ? '-' 
+                            : undefined}
+                      />
+
                     </View>
                   );
                 }}

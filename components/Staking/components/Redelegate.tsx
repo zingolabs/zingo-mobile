@@ -44,6 +44,7 @@ import FadeText from '../../Components/FadeText';
 import Refresh from '../../../assets/icons/refresh.svg';
 import RegText from '../../Components/RegText';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
+import ZecAmount from '../../Components/ZecAmount';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -87,7 +88,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { walletBonds, valueTransfers, staked, globalStaked } = context;
+  const { walletBonds, valueTransfers, staked, globalStaked, info, privacy } = context;
 
   const movements = walletBonds
     .filter(b => {
@@ -227,7 +228,6 @@ const Redelegate: React.FC<RedelegateProps> = ({
     console.log('item', item);
     const isSelected = item.txid === selectedTxid;
 
-    let displayAmount = item.amount.toFixed(5);
     let confirmations =
       valueTransfers &&
       valueTransfers.filter(v => v.txid === item.txid).length > 0
@@ -275,16 +275,17 @@ const Redelegate: React.FC<RedelegateProps> = ({
             {shortenTxid(item.pubKey)}
           </Text>
         </View>
-        <Text
+        <ZecAmount
           style={{
-            color: colors.text,
-            fontSize: 14,
-            fontWeight: '600',
+            alignSelf: 'center',
             marginLeft: 12,
           }}
-        >
-          {displayAmount} cTAZ
-        </Text>
+          size={14}
+          currencyName={info.currencyName}
+          color={colors.text}
+          amtZec={item.amount}
+          privacy={privacy}
+        />
       </Pressable>
     );
   };
@@ -419,7 +420,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
                 {!!stakedFromNumber && (
                   <FadeText
                     style={{ marginLeft: 15, marginBottom: 5 }}
-                  >{`Staked: ${stakedFromNumber.toFixed(5)}`}</FadeText>
+                  >{`Staked: ${stakedFromNumber.toFixed(5)} ${info.currencyName}`}</FadeText>
                 )}
               </View>
             </View>
@@ -548,7 +549,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
                 {!!stakedToNumber && (
                   <FadeText
                     style={{ marginLeft: 15, marginBottom: 5 }}
-                  >{`Voting power: ${stakedToNumber.toFixed(5)}`}</FadeText>
+                  >{`Voting power: ${stakedToNumber.toFixed(5)} ${info.currencyName}`}</FadeText>
                 )}
               </View>
             </View>

@@ -18,6 +18,7 @@ type ZecAmountProps = {
   privacy?: boolean;
   smallPrefix?: boolean;
   testID?: string;
+  prefix?: '+' | '-';
 };
 
 const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
@@ -29,6 +30,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
   privacy,
   smallPrefix,
   testID,
+  prefix,
 }) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
@@ -101,7 +103,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 margin: 0,
                 padding: 0,
               }}>
-              {splits.bigPart}
+              {`${prefix ? prefix : ''}${splits.bigPart}`}
             </Text>
           )}
           {!!currencyName && currencyName === CurrencyNameEnum.ZEC ? (

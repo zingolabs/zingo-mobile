@@ -40,6 +40,7 @@ import FadeText from '../../Components/FadeText';
 import Refresh from '../../../assets/icons/refresh.svg';
 import RegText from '../../Components/RegText';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
+import ZecAmount from '../../Components/ZecAmount';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -80,7 +81,7 @@ const Unstake: React.FC<UnstakeProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { walletBonds, valueTransfers, staked } = context;
+  const { walletBonds, valueTransfers, staked, info, privacy } = context;
 
   console.log('FINALIZER', finalizerFromText);
 
@@ -212,7 +213,6 @@ const Unstake: React.FC<UnstakeProps> = ({
     console.log('item', item);
     const isSelected = item.txid === selectedTxid;
 
-    let displayAmount = item.amount.toFixed(5);
     let confirmations =
       valueTransfers &&
       valueTransfers.filter(v => v.txid === item.txid).length > 0
@@ -260,16 +260,17 @@ const Unstake: React.FC<UnstakeProps> = ({
             {shortenTxid(item.pubKey)}
           </Text>
         </View>
-        <Text
+        <ZecAmount
           style={{
-            color: colors.text,
-            fontSize: 14,
-            fontWeight: '600',
+            alignSelf: 'center',
             marginLeft: 12,
           }}
-        >
-          {displayAmount} cTAZ
-        </Text>
+          size={14}
+          currencyName={info.currencyName}
+          color={colors.text}
+          amtZec={item.amount}
+          privacy={privacy}
+        />
       </Pressable>
     );
   };
@@ -392,7 +393,7 @@ const Unstake: React.FC<UnstakeProps> = ({
               {!!stakedFromNumber && (
                 <FadeText
                   style={{ marginLeft: 15, marginBottom: 5 }}
-                >{`Staked: ${stakedFromNumber.toFixed(5)}`}</FadeText>
+                >{`Staked: ${stakedFromNumber.toFixed(5)} ${info.currencyName}`}</FadeText>
               )}
             </View>
           </View>

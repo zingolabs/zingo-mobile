@@ -76,7 +76,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const [spendable, setSpendable] = useState<number>(0);
 
   const hasSelection = selectedAmount !== null;
-  const displayAmount = selectedAmount ?? 0;
 
   const modalVisible = modalState !== 'idle';
 
@@ -137,7 +136,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     if (amount > spendable) {
       Alert.alert(
         'Insufficient balance',
-        `You can stake up to ${spendable} cTAZ.`,
+        `You can stake up to ${spendable.toFixed(5)} ${info.currencyName}.`,
       );
       return;
     }
@@ -308,7 +307,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
               {!!stakedNumber && (
                 <FadeText
                   style={{ marginLeft: 15, marginBottom: 5 }}
-                >{`Voting power: ${stakedNumber.toFixed(5)}`}</FadeText>
+                >{`Voting power: ${stakedNumber.toFixed(5)} ${info.currencyName}`}</FadeText>
               )}
             </View>
           </View>
@@ -340,16 +339,16 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         >
           <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24 }}>
             <View style={{ marginBottom: 32 }}>
-              <Text
+              <ZecAmount
                 style={{
-                  fontSize: 36,
-                  fontWeight: '700',
-                  textAlign: 'center',
-                  color: hasSelection ? colors.text : colors.placeholder,
+                  alignSelf: 'center',
                 }}
-              >
-                {displayAmount} cTAZ
-              </Text>
+                size={36}
+                currencyName={info.currencyName}
+                color={hasSelection ? colors.text : colors.placeholder}
+                amtZec={selectedAmount ?? 0}
+                privacy={privacy}
+              />
             </View>
 
             <View style={styles.grid}>
@@ -386,7 +385,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                         },
                       ]}
                     >
-                      cTAZ
+                      {info.currencyName}
                     </Text>
                   </Pressable>
                 );
