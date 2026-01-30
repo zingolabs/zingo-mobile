@@ -221,7 +221,7 @@ const Staking: React.FC<StakingProps> = () => {
         }
 
         if (vt.kind === ValueTransferKindEnum.RetargetDelegationBond) {
-          return { ...vt, stakingUiKind: StakingActionKindEnum.Redelegate };
+          return { ...vt, stakingUiKind: StakingActionKindEnum.Move };
         }
 
         if (vt.amount <= 0) {
@@ -678,15 +678,14 @@ const Staking: React.FC<StakingProps> = () => {
                     case StakingActionKindEnum.CreateBond: {
                       label = 'Stake';
                       Icon = item.confirmations === 0 ? Refresh : Stake;
-                      const fee = item.fee ?? 0;
-                      amountLabel = `+${(fee - 0.0001).toFixed(2)} cTAZ`;
+                      amountLabel = `+${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
 
                     case StakingActionKindEnum.BeginUnbonding: {
                       label = 'Unstake';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      amountLabel = `${item.stakingAction?.val.toFixed(5)} cTAZ`;
+                      amountLabel = `${item.amount.toFixed(5)} cTAZ`;
                       break;
                     }
 
@@ -697,7 +696,7 @@ const Staking: React.FC<StakingProps> = () => {
                       break;
                     }
 
-                    case StakingActionKindEnum.Redelegate: {
+                    case StakingActionKindEnum.Move: {
                       label = 'Redelegate';
                       Icon = item.confirmations === 0 ? Refresh : Unstake;
                       amountLabel = `${item.amount.toFixed(5)} cTAZ`;

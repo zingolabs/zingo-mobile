@@ -1584,7 +1584,7 @@ export default class RPC {
             //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
             //  console.log(vt);
             //}
-            //if (currentValueTransferList.kind === ValueTransferKindEnum.RetargetDelegationBond) {
+            //if (currentValueTransferList.kind === ValueTransferKindEnum.WithdrawBond) {
             //  console.log('))))))))))))))))))))))))))))))))))');
             //  console.log(vt);
             //  console.log(currentValueTransferList);

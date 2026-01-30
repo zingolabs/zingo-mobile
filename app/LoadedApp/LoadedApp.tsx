@@ -1092,14 +1092,13 @@ export class LoadedAppClass extends Component<
                 title = this.state.translate('loadedapp.send-menu') as string;
               } else if (
                 vtNew[0].kind === ValueTransferKindEnum.CreateBond &&
-                vtNew[0].stakingAction &&
-                vtNew[0].stakingAction?.val > 0
+                vtNew[0].amount > 0
               ) {
                 message =
                   (this.state.translate('loadedapp.payment-made') as string) +
                   ('Staked') +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(vtNew[0].stakingAction.val, 8) +
+                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate('loadedapp.send-menu') as string;

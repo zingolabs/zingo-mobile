@@ -317,7 +317,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               borderRadius: 30,
               backgroundColor: colors.secondary,
           }}>
-            {valueTransfer.kind === ValueTransferKindEnum.CreateBond && (
+            {(valueTransfer.kind === ValueTransferKindEnum.CreateBond ||
+              valueTransfer.kind === ValueTransferKindEnum.RetargetDelegationBond) && (
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%', borderBottomColor: colors.zingo, borderBottomWidth: 1 }}>
                 <FadeText>{'Target'}</FadeText>
                 <TouchableOpacity
