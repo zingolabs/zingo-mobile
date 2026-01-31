@@ -124,7 +124,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     shieldingAmount,
     selectServer,
     setZecPrice,
-    background,
+    backgroundSyncInfo,
     lastError,
   } = context;
 
@@ -729,7 +729,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               addLastSnackbar &&
               noBalance &&
               privacyComponent()}
-            {!noSyncingStatus && !!background.error && mode === ModeEnum.advanced && (
+            {!noSyncingStatus && !!backgroundSyncInfo.error && mode === ModeEnum.advanced && (
               <View
                 style={{
                   alignItems: 'center',
