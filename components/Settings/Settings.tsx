@@ -114,6 +114,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setBackgroundError,
     zingolibVersion,
     lastError,
+    setLastError,
   } = context;
 
   const currenciesArray = translate('settings.currencies');
@@ -646,6 +647,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       sendEmail,
       zingolibVersion,
     );
+    setLastError('');
   };
   
   return (

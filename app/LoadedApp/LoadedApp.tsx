@@ -148,7 +148,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
-  const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
+  const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
@@ -306,8 +306,8 @@ export default function LoadedApp(props: LoadedAppProps) {
       }
 
       // reading background task info
-      const backgroundJson = await BackgroundFileImpl.readBackground();
-      setBackground(backgroundJson);
+      const backgroundSyncInfoJson = await BackgroundFileImpl.readBackground();
+      setBackgroundSyncInfo(backgroundSyncInfoJson);
 
       let sort: boolean = false;
       const zenniesAddress = await Utils.getZenniesDonationAddress(server.chainName);
@@ -442,7 +442,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         donation={donation}
         privacy={privacy}
         mode={mode}
-        background={background}
+        backgroundSyncInfo={backgroundSyncInfo}
         readOnly={readOnly}
         orchardPool={orchardPool}
         saplingPool={saplingPool}
@@ -493,7 +493,7 @@ type LoadedAppClassProps = {
   donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
-  background: BackgroundType;
+  backgroundSyncInfo: BackgroundType;
   readOnly: boolean;
   orchardPool: boolean;
   saplingPool: boolean;
@@ -546,12 +546,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         zecPrice: 0,
         date: 0,
       } as ZecPriceType,
-      background: props.background,
       translate: props.translate,
+      readOnly: props.readOnly,
+      backgroundSyncInfo: props.backgroundSyncInfo,
+      setBackgroundSyncErrorInfo: this.setBackgroundSyncErrorInfo,
       backgroundError: {} as BackgroundErrorType,
       setBackgroundError: this.setBackgroundError,
-      readOnly: props.readOnly,
       lastError: '',
+      setLastError: this.setLastError,
       orchardPool: props.orchardPool,
       saplingPool: props.saplingPool,
       transparentPool: props.transparentPool,
@@ -704,7 +706,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           this.navigateToLoadingApp({ startingApp: true, biometricsFailed: true });
         } else {
           // reading background task info
-          await this.fetchBackgroundSyncing();
+          await this.fetchBackgroundSyncInfo();
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
           //console.log('&&&&& background no in storage &&&&&');
@@ -863,12 +865,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  fetchBackgroundSyncing = async () => {
-    const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
-    if (!isEqual(this.state.background, backgroundJson)) {
+  fetchBackgroundSyncInfo = async () => {
+    const backgroundSyncInfoJson: BackgroundType = await BackgroundFileImpl.readBackground();
+    if (!isEqual(this.state.backgroundSyncInfo, backgroundSyncInfoJson)) {
       //console.log('fetch background sync info');
-      this.setState({ background: backgroundJson });
+      this.setState({ backgroundSyncInfo: backgroundSyncInfoJson });
     }
+  };
+
+  setBackgroundSyncErrorInfo = async (error: string) => {
+    const newBackgroundSyncInfo = this.state.backgroundSyncInfo;
+    newBackgroundSyncInfo.error = error;
+    this.setState({ backgroundSyncInfo: newBackgroundSyncInfo });
+    await BackgroundFileImpl.writeBackground(newBackgroundSyncInfo);
   };
 
   setShieldingAmount = (value: number) => {
@@ -892,7 +901,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
     // here is a good place to fetch the background task info
-    this.fetchBackgroundSyncing();
+    this.fetchBackgroundSyncInfo();
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
       //console.log('fetch syncing status report');
       //const start = Date.now();
@@ -1821,12 +1830,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       defaultUnifiedAddress: this.state.defaultUnifiedAddress,
       sendPageState: this.state.sendPageState,
       setSendPageState: this.state.setSendPageState,
-      background: this.state.background,
       translate: this.state.translate,
+      backgroundSyncInfo: this.state.backgroundSyncInfo,
+      setBackgroundSyncErrorInfo: this.state.setBackgroundSyncErrorInfo,
       backgroundError: this.state.backgroundError,
       setBackgroundError: this.state.setBackgroundError,
       readOnly: this.state.readOnly,
       lastError: this.state.lastError,
+      setLastError: this.state.setLastError,
       orchardPool: this.state.orchardPool,
       saplingPool: this.state.saplingPool,
       transparentPool: this.state.transparentPool,

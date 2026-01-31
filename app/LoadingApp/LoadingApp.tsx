@@ -107,7 +107,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum.basic | ModeEnum.advanced>(ModeEnum.advanced); // by default advanced
-  const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
+  const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<LaunchingModeEnum>(LaunchingModeEnum.opening);
   const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
@@ -299,8 +299,8 @@ export default function LoadingApp(props: LoadingAppProps) {
       //await delay(5000);
 
       // reading background task info
-      const backgroundJson = await BackgroundFileImpl.readBackground();
-      setBackground(backgroundJson);
+      const backgroundSyncInfoJson = await BackgroundFileImpl.readBackground();
+      setBackgroundSyncInfo(backgroundSyncInfoJson);
 
       setLoading(false);
     })();
@@ -325,7 +325,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         donation={donation}
         privacy={privacy}
         mode={mode}
-        background={background}
+        backgroundSyncInfo={backgroundSyncInfo}
         firstLaunchingMessage={firstLaunchingMessage}
         security={security}
         selectServer={selectServer}
@@ -351,7 +351,7 @@ type LoadingAppClassProps = {
   donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
-  background: BackgroundType;
+  backgroundSyncInfo: BackgroundType;
   firstLaunchingMessage: LaunchingModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
@@ -377,7 +377,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
       zecPrice: {} as ZecPriceType,
-      background: props.background,
+      backgroundSyncInfo: props.backgroundSyncInfo,
       translate: props.translate,
       backgroundError: {} as BackgroundErrorType,
       setBackgroundError: this.setBackgroundError,
@@ -685,7 +685,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       ) {
         //console.log('App LOADING has come to the foreground!');
         // reading background task info
-        this.fetchBackgroundSyncing();
+        this.fetchBackgroundSyncInfo();
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
         //console.log('&&&&& background no in storage &&&&&');
@@ -963,9 +963,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
   };
 
-  fetchBackgroundSyncing = async () => {
-    const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
-    this.setState({ background: backgroundJson });
+  fetchBackgroundSyncInfo = async () => {
+    const backgroundSyncInfoJson: BackgroundType = await BackgroundFileImpl.readBackground();
+    this.setState({ backgroundSyncInfo: backgroundSyncInfoJson });
   };
 
   setCustomServerUri = (customServerUri: string) => {
@@ -1458,7 +1458,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
       zecPrice: this.state.zecPrice,
-      background: this.state.background,
+      backgroundSyncInfo: this.state.backgroundSyncInfo,
       translate: this.state.translate,
       backgroundError: this.state.backgroundError,
       setBackgroundError: this.state.setBackgroundError,

@@ -38,7 +38,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     syncingStatus, 
     wallet, 
     translate, 
-    background, 
+    backgroundSyncInfo, 
     language, 
     netInfo, 
     snackbars, 
@@ -47,6 +47,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     zingolibVersion,
     setBackgroundError,
     addLastSnackbar,
+    setBackgroundSyncErrorInfo,
   } = context; //mode
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
@@ -184,6 +185,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       sendEmail,
       zingolibVersion,
     );
+    setBackgroundSyncErrorInfo('');
   };
 
   //console.log('render sync report. background:', background);
@@ -595,7 +597,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
-          {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message || !!background.error) && (
+          {(Number(backgroundSyncInfo.date) > 0 || Number(backgroundSyncInfo.dateEnd) > 0 || !!backgroundSyncInfo.message || !!backgroundSyncInfo.error) && (
               <View
                 style={{
                   display: 'flex',
@@ -610,25 +612,25 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                   value={
                     //background.batches.toString() +
                     //translate('report.batches-date') +
-                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
-                    (Number(background.dateEnd) > 0 && Number(background.date) !== Number(background.dateEnd)
+                    moment(Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
+                    (Number(backgroundSyncInfo.dateEnd) > 0 && Number(backgroundSyncInfo.date) !== Number(backgroundSyncInfo.dateEnd)
                       ? (
-                        moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D') ===
-                        moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D')
-                          ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('h:mm:ss a')
-                          : ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
+                        moment(Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000).format('YYYY MMM D') ===
+                        moment(Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D')
+                          ? ' - ' + moment(Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) * 1000).format('h:mm:ss a')
+                          : ' - ' + moment(Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
                         )
                       : '')
                   }
                   screenName={screenName}
                 />
-                {!!background.message && <RegText style={{ marginBottom: 20}} color={colors.text}>{background.message}</RegText>}
-                {!!background.error && (
+                {!!backgroundSyncInfo.message && <RegText style={{ marginBottom: 20}} color={colors.text}>{backgroundSyncInfo.message}</RegText>}
+                {!!backgroundSyncInfo.error && (
                   <Button
                     type={ButtonTypeEnum.Primary}
                     title={translate('view-error') as string}
                     onPress={() => {
-                      reportError(background.error ? background.error : '');
+                      reportError(backgroundSyncInfo.error ? backgroundSyncInfo.error : '');
                     }}
                     twoButtons={true}
                   />

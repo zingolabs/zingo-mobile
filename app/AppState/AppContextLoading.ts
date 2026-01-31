@@ -20,8 +20,8 @@ export default interface AppContextLoading {
   netInfo: NetInfoType;
   wallet: WalletType;
   zecPrice: ZecPriceType;
-  background: BackgroundType;
   translate: (key: string) => TranslateType;
+  backgroundSyncInfo: BackgroundType;
   backgroundError: BackgroundErrorType;
   setBackgroundError: (title: string, error: string) => void;
   readOnly: boolean;
@@ -46,7 +46,5 @@ export default interface AppContextLoading {
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
-  performanceLevel: RPCPerformanceLevelEnum;
-
-   
+  performanceLevel: RPCPerformanceLevelEnum;   
 }
