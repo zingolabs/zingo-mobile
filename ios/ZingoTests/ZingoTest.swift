@@ -76,18 +76,18 @@ struct ScanRanges: Codable {
 }
 
 struct SyncStatus: Codable {
-    let scan_ranges: [ScanRanges]
-    let sync_start_height: UInt64
-    let session_blocks_scanned: UInt64
-    let total_blocks_scanned: UInt64
-    let percentage_session_blocks_scanned: Double
-    let percentage_total_blocks_scanned: Double
-    let session_sapling_outputs_scanned: UInt64
-    let total_sapling_outputs_scanned: UInt64
-    let session_orchard_outputs_scanned: UInt64
-    let total_orchard_outputs_scanned: UInt64
-    let percentage_session_outputs_scanned: Double
-    let percentage_total_outputs_scanned: Double
+    let scan_ranges: [ScanRanges]?
+    let sync_start_height: UInt64?
+    let session_blocks_scanned: UInt64?
+    let total_blocks_scanned: UInt64?
+    let percentage_session_blocks_scanned: Double?
+    let percentage_total_blocks_scanned: Double?
+    let session_sapling_outputs_scanned: UInt64?
+    let total_sapling_outputs_scanned: UInt64?
+    let session_orchard_outputs_scanned: UInt64?
+    let total_orchard_outputs_scanned: UInt64?
+    let percentage_session_outputs_scanned: Double?
+    let percentage_total_outputs_scanned: Double?
 }
 
 struct Balance: Codable {
@@ -162,11 +162,13 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
                 XCTFail("\nSync status error:\n\(statusJson)")
                 return
             }
-            if let status: SyncStatus = try? decodeJSON(statusJson),
-            let percent =
-              status.percentage_total_outputs_scanned
-              ?? status.percentage_total_blocks_scanned
-              ?? 0
+            let data = statusJson.data(using: .utf8)!
+            let syncStatus: SyncStatus = try JSONDecoder().decode(SyncStatus.self, from: data)
+
+            let percent: Double =
+              syncStatus.percentage_total_outputs_scanned
+              ?? syncStatus.percentage_total_blocks_scanned
+              ?? 0.0
 
             if percent >= 100.0 {
               return
