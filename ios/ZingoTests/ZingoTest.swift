@@ -163,8 +163,13 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
                 return
             }
             if let status: SyncStatus = try? decodeJSON(statusJson),
-            status.percentage_total_outputs_scanned >= 100.0 {
-                return
+            let percent =
+              status.percentage_total_outputs_scanned
+              ?? status.percentage_total_blocks_scanned
+              ?? 0
+
+            if percent >= 100.0 {
+              return
             }
         } catch {
             XCTFail("\nSync status error:\n\(error.localizedDescription)")

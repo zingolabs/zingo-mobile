@@ -7,4 +7,5 @@ export enum RPCSyncScanRangePriorityStatusEnum {
   FoundNote = 'FoundNote',
   ChainTip = 'ChainTip',
   Verify = 'Verify',
+  RefetchingNullifiers = 'RefetchingNullifiers',
 }

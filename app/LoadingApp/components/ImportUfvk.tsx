@@ -59,7 +59,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     if (seedufvkText) {
       if (
         seedufvkText.toLowerCase().startsWith(GlobalConst.uview) ||
-        seedufvkText.toLowerCase().startsWith(GlobalConst.utestview)
+        seedufvkText.toLowerCase().startsWith(GlobalConst.uviewtest)
       ) {
         // if it is a ufvk
         const seedufvkTextArray: string[] = seedufvkText.replaceAll('\n', ' ').trim().replaceAll('  ', ' ').split(' ');

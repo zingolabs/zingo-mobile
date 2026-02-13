@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.16 (301)",
+  "version": "zingo-2.0.17 (302)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -709,6 +709,7 @@
     "legend": "Legend",
     "scanned": "Scanned",
     "scanning": "Scanning...",
+    "refetching": "Refetching spends...",
     "lowpriority": "Low priority",
     "highpriority": "High priority"
   },

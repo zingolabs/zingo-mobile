@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.16 (301)",
+  "version": "zingo-2.0.17 (302)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
@@ -709,6 +709,7 @@
     "legend": "Açıklama",
     "scanned": "Tarandı",
     "scanning": "Taranıyor...",
+    "refetching": "Masraflar yeniden yükleniyor...",
     "lowpriority": "Düşük öncelikli",
     "highpriority": "Yüksek oncelikli"
   },

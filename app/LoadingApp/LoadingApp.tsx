@@ -1146,7 +1146,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     if (
       (seedUfvk.toLowerCase().startsWith(GlobalConst.uview) &&
         this.state.server.chainName !== ChainNameEnum.mainChainName) ||
-      (seedUfvk.toLowerCase().startsWith(GlobalConst.utestview) &&
+      (seedUfvk.toLowerCase().startsWith(GlobalConst.uviewtest) &&
         this.state.server.chainName === ChainNameEnum.mainChainName)
     ) {
       createAlert(
@@ -1175,7 +1175,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
     if (
       seedUfvk.toLowerCase().startsWith(GlobalConst.uview) ||
-      seedUfvk.toLowerCase().startsWith(GlobalConst.utestview)
+      seedUfvk.toLowerCase().startsWith(GlobalConst.uviewtest)
     ) {
       // this is a UFVK
       type = RestoreFromTypeEnum.ufvkRestoreFrom;
