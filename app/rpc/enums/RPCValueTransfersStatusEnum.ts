@@ -4,4 +4,5 @@ export enum RPCValueTransfersStatusEnum {
   transmitted = 'transmitted',
   mempool = 'mempool',
   confirmed = 'confirmed',
+  failed = 'failed',
 }

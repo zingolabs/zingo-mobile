@@ -797,6 +797,39 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                 <View
                   style={
                     {
+                      "backgroundColor": "darkorange",
+                      "display": "flex",
+                      "flexDirection": "row",
+                      "height": 10,
+                      "justifyContent": "flex-start",
+                      "margin": 5,
+                      "width": 10,
+                    }
+                  }
+                />
+                <Text
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "marginRight": 10,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "flexWrap": "nowrap",
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
                       "backgroundColor": "gray",
                       "display": "flex",
                       "flexDirection": "row",

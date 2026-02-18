@@ -1190,7 +1190,8 @@ export default class RPC {
           if (
             vt.status === RPCValueTransfersStatusEnum.calculated ||
             vt.status === RPCValueTransfersStatusEnum.transmitted ||
-            vt.status === RPCValueTransfersStatusEnum.mempool
+            vt.status === RPCValueTransfersStatusEnum.mempool ||
+            vt.status === RPCValueTransfersStatusEnum.failed
           ) {
             currentValueTransferList.confirmations = 0;
           } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
@@ -1305,7 +1306,8 @@ export default class RPC {
           if (
             m.status === RPCValueTransfersStatusEnum.calculated ||
             m.status === RPCValueTransfersStatusEnum.transmitted ||
-            m.status === RPCValueTransfersStatusEnum.mempool
+            m.status === RPCValueTransfersStatusEnum.mempool ||
+            m.status === RPCValueTransfersStatusEnum.failed
           ) {
             currentMessageList.confirmations = 0;
           } else if (m.status === RPCValueTransfersStatusEnum.confirmed) {

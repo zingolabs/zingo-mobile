@@ -85,20 +85,23 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   //const maxWidthHit = useRef<boolean>(false);
 
   const amountColor =
-    vt.confirmations >= 0 &&
-    vt.confirmations < GlobalConst.minConfirmations
-      ? colors.primaryDisabled
-      : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
-      ? colors.primary
-      : colors.text;
+    vt.status === RPCValueTransfersStatusEnum.failed
+      ? colors.zingo
+      : vt.confirmations >= 0 &&
+        vt.confirmations < GlobalConst.minConfirmations
+        ? colors.primaryDisabled
+        : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
+          ? colors.primary
+          : colors.text;
 
   const icon =
-    vt.confirmations >= 0 &&
-    vt.confirmations < GlobalConst.minConfirmations
-      ? faRefresh
-      : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
-      ? faArrowDown
-      : faArrowUp;
+      vt.confirmations >= 0 &&
+        vt.confirmations < GlobalConst.minConfirmations &&
+        vt.status !== RPCValueTransfersStatusEnum.failed
+        ? faRefresh
+        : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
+          ? faArrowDown
+          : faArrowUp;
 
   const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
 
@@ -240,7 +243,13 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
 
   //if (index === 0) {
   //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.calculated;
+  //  vt.status = RPCValueTransfersStatusEnum.failed;
+  //  vt.kind = ValueTransferKindEnum.Shield;
+  //}
+  //if (index === 1) {
+  //  vt.confirmations = 0;
+  //  vt.status = RPCValueTransfersStatusEnum.failed;
+  //  vt.kind = ValueTransferKindEnum.Sent;
   //}
   //if (index === 0) {
   //  vt.confirmations = 0;
@@ -343,12 +352,22 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   }}>
                   <FadeText
                     style={{
-                      opacity: 1,
+                      opacity: vt.status === RPCValueTransfersStatusEnum.failed
+                              ? undefined
+                              : 1,
                       fontWeight: 'bold',
-                      color: amountColor,
+                      color: vt.status === RPCValueTransfersStatusEnum.failed
+                              ? colors.zingo
+                              : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
+                                ? colors.primary
+                                : colors.text,
                       fontSize: vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations ? 14 : 18,
                     }}>
-                    {vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
+                    {vt.status === RPCValueTransfersStatusEnum.failed && vt.kind === ValueTransferKindEnum.Sent
+                      ? (translate('history.sent-failed') as string)
+                      : vt.status === RPCValueTransfersStatusEnum.failed && vt.kind === ValueTransferKindEnum.Shield
+                      ? (translate('history.shield-failed') as string)
+                      : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
                       ? (translate('history.sending') as string)
                       : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations !== 0
                       ? (translate('history.sent') as string)
@@ -381,17 +400,17 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                         style={{ marginLeft: 10 }}
                         size={15}
                         icon={faComment}
-                        color={colors.primaryDisabled}
+                        color={vt.status === RPCValueTransfersStatusEnum.failed ? colors.zingo : colors.primaryDisabled}
                       />
                     )}
                   </View>
                 </View>
               </View>
               <ZecAmount
-                style={{ flexGrow: 1, alignSelf: 'auto', justifyContent: 'flex-end', paddingRight: 5 }}
+                style={{ flexGrow: 1, alignSelf: 'auto', justifyContent: 'flex-end', paddingRight: 5, opacity: vt.status === RPCValueTransfersStatusEnum.failed ?  0.7 : 1 }}
                 size={18}
                 currencyName={info.currencyName}
-                color={amountColor}
+                color={vt.status === RPCValueTransfersStatusEnum.failed ? colors.zingo : amountColor}
                 amtZec={vt.amount}
                 privacy={privacy}
               />
@@ -410,10 +429,12 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 <FadeText
                   style={{
                     color:
-                      vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                      vt.status === RPCValueTransfersStatusEnum.calculated
-                        ? colors.primary
-                        : colors.primaryDisabled,
+                      vt.status === RPCValueTransfersStatusEnum.failed
+                        ? 'coral'
+                        : vt.status === RPCValueTransfersStatusEnum.transmitted ||
+                          vt.status === RPCValueTransfersStatusEnum.calculated
+                          ? colors.primary
+                          : colors.primaryDisabled,
                     fontSize: 12,
                     opacity: 1,
                     fontWeight: '700',
