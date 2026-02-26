@@ -114,6 +114,8 @@
     "readingwallet-label": "Cüzdan okunurken hata oluştu",
     "invalidseedufvk-label": "Geçersiz Tohum İfadesi / Görüntüleme Anahtarı",
     "invalidseedufvk-error": "Tohum İfadesi / Görüntüleme Anahtarı geçersizdi. Lütfen değeri gözden geçirin ve düzeltin.",
+    "invalidbirthday-label": "Geçersiz doğum günü",
+    "invalidbirthday-error": "Doğum günü geçersiz. Değeri gözden geçirin ve düzeltin.",
     "emptyseedufvk-label": "Geçersiz Tohum İfadesi / Görüntüleme Anahtarı",
     "emptyseedufvk-error": " Tohum İfadesi  / Görüntüleme Anahtarı boş bırakıldı. Lütfen değeri kontrol edin ve düzeltin.\"",
     "custom": "Özel Sunucu...",

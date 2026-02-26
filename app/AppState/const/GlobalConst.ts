@@ -9,6 +9,7 @@ export const GlobalConst = {
   serverPlaceHolder: 'https://------.---:---',
   uview: 'uview',
   uviewtest: 'uviewtest',
+  uviewregtest: 'uviewregtest',
   success: 'success',
   true: 'true',
   false: 'false',

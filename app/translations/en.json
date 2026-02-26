@@ -114,6 +114,8 @@
     "readingwallet-label": "Error reading Wallet",
     "invalidseedufvk-label": "Invalid Seed Phrase / Viewing Key",
     "invalidseedufvk-error": "The Seed Phrase / Viewing Key was invalid. Review the value and fix it.",
+    "invalidbirthday-label": "Invalid Birthday",
+    "invalidbirthday-error": "The Birthday was invalid. Review the value and fix it.",
     "emptyseedufvk-label": "Invalid Seed Phrase / Viewing Key",
     "emptyseedufvk-error": "The Seed Phrase / Viewing Key was empty. Review the value and fix it.",
     "custom": "Custom Server...",

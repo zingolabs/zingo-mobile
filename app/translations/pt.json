@@ -114,6 +114,8 @@
     "readingwallet-label": "Erro ao ler a Carteira",
     "invalidseedufvk-label": "Frases de Recuperação / Chave de Visualização invalidas",
     "invalidseedufvk-error": "As Frases de Recuperação / Chave de Visualização estavam invalidas. Revise o valor e corrija-o.",
+    "invalidbirthday-label": "Data de nascimento inválida",
+    "invalidbirthday-error": "A data de nascimento é inválida. Revise o valor e corrija-o.",
     "emptyseedufvk-label": "Frases de Recuperação / Chave de Visualização invalidas",
     "emptyseedufvk-error": "As Frases de Recuperação / Chave de Visualização estavam vazias. Revise o valor e corrija-o.",
     "custom": "Servidor Personalizado...",

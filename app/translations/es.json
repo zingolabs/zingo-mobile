@@ -114,6 +114,8 @@
     "readingwallet-label": "Error Leyendo el Monedero",
     "invalidseedufvk-label": "Semilla / Clave de Visualización incorrecta",
     "invalidseedufvk-error": "La semilla / Clave de Visualización proporcionada no es correcta. Revisa el contenido y corrigelo.",
+    "invalidbirthday-label": "Cumpleaños no válido",
+    "invalidbirthday-error": "El cumpleaños no es válido. Revise el valor y corríjalo.",
     "emptyseedufvk-label": "Semilla / Clave de Visualización incorrecta",
     "emptyseedufvk-error": "La semilla / Clave de Visualización proporcionada está vacia. Revisa el contenido y corrigelo.",
     "custom": "Otro Servidor...",

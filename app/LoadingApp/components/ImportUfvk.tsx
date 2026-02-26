@@ -26,6 +26,13 @@ import { ButtonTypeEnum, GlobalConst, ScreenEnum, SelectServerEnum } from '../..
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 
+const activationHeight = {
+  "main": 419200,
+  "test": 280000,
+  "regtest": 1,
+  "": 1,
+};
+
 type ImportUfvkProps = {
   onClickCancel: () => void;
   onClickOK: (keyText: string, birthday: number) => void;
@@ -243,7 +250,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
                 }}>
                 <TextInput
                   testID="import.birthdayinput"
-                  placeholder={'#'}
+                  placeholder={`>= ${activationHeight[server.chainName]}`}
                   placeholderTextColor={colors.placeholder}
                   style={{
                     color: colors.text,
