@@ -64,7 +64,8 @@ jobs:
     container:
       image: zingodevops/android_builder:017
     env:
-      RUSTUP_HOME: /root/.rustup
+      RUSTUP_HOME: ${{ github.workspace }}/.rustup
+      CARGO_HOME:  ${{ github.workspace }}/.cargo
     steps:
       - name: Install libraries
         run: |

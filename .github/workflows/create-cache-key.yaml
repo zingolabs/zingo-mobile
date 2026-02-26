@@ -15,7 +15,8 @@ jobs:
     name: Create cache key
     runs-on: ubuntu-24.04
     env:
-      RUSTUP_HOME: /root/.rustup
+      RUSTUP_HOME: ${{ github.workspace }}/.rustup
+      CARGO_HOME:  ${{ github.workspace }}/.cargo
     outputs:
       cache-key: ${{ steps.create-cache-key.outputs.cache-key }}
     steps:
