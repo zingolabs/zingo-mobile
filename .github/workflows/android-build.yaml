@@ -92,9 +92,20 @@ jobs:
       - name: Cargo update for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: |
-          echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
-          sed -i "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/Cargo.toml"
-          if cat rust/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
+          set -euo pipefail
+
+          TOML="rust/Cargo.toml"
+          REV="${GITHUB_SHA}"
+
+          sed -i -E "/^zingolib[[:space:]]*=/ s/(rev[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${REV}\2/" "$TOML"
+
+          sed -i -E "/^zingolib[[:space:]]*=/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" "$TOML"
+
+          first_line="$(grep -E '^zingolib[[:space:]]*=' "$TOML")"
+          echo "zingolib first line => $first_line"
+          echo "$first_line" | grep -q "rev = \"${REV}\""
+          echo "$first_line" | grep -vqE '\b(branch|tag)[[:space:]]*='
+
           cd rust
           cargo update -p zingolib -p regchest_utils --aggressive
 
