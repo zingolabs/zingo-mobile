@@ -65,9 +65,13 @@ jobs:
           TOML="rust/Cargo.toml"
           REV="${GITHUB_SHA}"
 
-          sudo sed -i -E "/^zingolib[[:space:]]*=/ s/(rev[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${REV}\2/" "$TOML"
+          sed -i '' -E \
+            "/^zingolib[[:space:]]*=/ s/rev[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
+            "$TOML"
 
-          sudo sed -i -E "/^zingolib[[:space:]]*=/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" "$TOML"
+          sed -i '' -E \
+            "/^zingolib[[:space:]]*=/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
+            "$TOML"
 
           first_line="$(grep -E '^zingolib[[:space:]]*=' "$TOML")"
           echo "zingolib first line => $first_line"

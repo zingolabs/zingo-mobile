@@ -93,7 +93,7 @@ jobs:
       - name: Cargo update for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: |
-          set -euo pipefail
+          set -eu pipefail
 
           TOML="rust/Cargo.toml"
           REV="${GITHUB_SHA}"
