@@ -108,6 +108,7 @@ jobs:
           echo "$first_line" | grep -vqE '\b(branch|tag)[[:space:]]*='
 
           cd rust
+          rustup default stable
           cargo update -p zingolib -p regchest_utils --aggressive
 
       - name: Cargo default nightly
