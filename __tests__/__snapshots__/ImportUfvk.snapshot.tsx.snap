@@ -387,7 +387,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                 editable={false}
                 keyboardType="numeric"
                 onChangeText={[Function]}
-                placeholder="#"
+                placeholder=">= undefined"
                 placeholderTextColor="#888888"
                 style={
                   {
