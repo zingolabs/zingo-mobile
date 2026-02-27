@@ -99,7 +99,9 @@ jobs:
           cargo update -p zingolib -p regchest_utils --aggressive
 
       - name: Cargo default nightly
-        run: rustup default nightly
+        run: |
+          rustup toolchain install nightly --profile minimal --component rust-src
+          rustup default nightly
 
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli
