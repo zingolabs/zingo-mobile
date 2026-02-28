@@ -231,7 +231,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
               <FadeText>{translate('import.birthday') as string}</FadeText>
               {selectServer !== SelectServerEnum.offline && (
                 <FadeText style={{ textAlign: 'center' }}>
-                  {translate('seed.birthday-no-readonly') + ' (1, ' + (latestBlock ? latestBlock.toString() : '--') + ')'}
+                  {translate('seed.birthday-no-readonly') + ` (${activationHeight[server.chainName]}, ` + (latestBlock ? latestBlock.toString() : '--') + ')'}
                 </FadeText>
               )}
               <View
@@ -250,7 +250,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
                 }}>
                 <TextInput
                   testID="import.birthdayinput"
-                  placeholder={`>= ${activationHeight[server.chainName]}`}
+                  placeholder={'#'}
                   placeholderTextColor={colors.placeholder}
                   style={{
                     color: colors.text,
