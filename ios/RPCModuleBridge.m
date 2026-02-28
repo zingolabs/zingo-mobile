@@ -143,10 +143,6 @@ RCT_EXTERN_METHOD(zecPriceInfo:
     (NSString)tor 
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(resendTransactionProcess:
-    (NSString)txid 
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(removeTransactionProcess:
     (NSString)txid 
                   resolve:(RCTPromiseResolveBlock)resolve

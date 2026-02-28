@@ -98,6 +98,13 @@ const SERVER_DEFAULT_0: ServerType = {
   chainName: serverUris(() => {})[0].chainName,
 } as ServerType;
 
+const activationHeight = {
+  "main": 419200,
+  "test": 280000,
+  "regtest": 1,
+  "": 1,
+};
+
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as ThemeType;
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
@@ -1143,18 +1150,60 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       );
       return;
     }
-    if (
-      (seedUfvk.toLowerCase().startsWith(GlobalConst.uview) &&
-        this.state.server.chainName !== ChainNameEnum.mainChainName) ||
-      (seedUfvk.toLowerCase().startsWith(GlobalConst.uviewtest) &&
-        this.state.server.chainName === ChainNameEnum.mainChainName)
-    ) {
+    if (seedUfvk.startsWith(GlobalConst.uview)) {
+      // it is a UFVK
+      let parsingError: boolean = false;
+      if (this.state.server.chainName === ChainNameEnum.mainChainName && 
+          (seedUfvk.startsWith(GlobalConst.uviewtest) ||
+            seedUfvk.startsWith(GlobalConst.uviewregtest))
+      ) {
+        // the ufvk is not correct
+        parsingError = true;
+      }
+      if (this.state.server.chainName === ChainNameEnum.testChainName && 
+          !seedUfvk.startsWith(GlobalConst.uviewtest)
+      ) {
+        // the ufvk is not correct
+        parsingError = true;
+      }
+      if (this.state.server.chainName === ChainNameEnum.regtestChainName && 
+          !seedUfvk.startsWith(GlobalConst.uviewregtest)
+      ) {
+        // the ufvk is not correct
+        parsingError = true;
+      }
+      if (parsingError) {
+        createAlert(
+          this.setBackgroundError,
+          this.addLastSnackbar,
+          [this.screenName],
+          this.state.translate('loadingapp.invalidseedufvk-label') as string,
+          this.state.translate('loadingapp.invalidseedufvk-error') as string,
+          false,
+          this.state.translate,
+          sendEmail,
+          this.state.zingolibVersion,
+        );
+        return;
+      }
+    }
+
+    let walletBirthday = birthday.toString() || '0';
+    if (parseInt(walletBirthday, 10) < 0) {
+      walletBirthday = '0';
+    }
+    if (isNaN(parseInt(walletBirthday, 10))) {
+      walletBirthday = '0';
+    }
+
+    // birthday cannot be lower than sapling activation height
+    if (Number(walletBirthday) < activationHeight[this.state.server.chainName]) {
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
         [this.screenName],
-        this.state.translate('loadingapp.invalidseedufvk-label') as string,
-        this.state.translate('loadingapp.invalidseedufvk-error') as string,
+        this.state.translate('loadingapp.invalidbirthday-label') as string,
+        this.state.translate('loadingapp.invalidbirthday-error') as string,
         false,
         this.state.translate,
         sendEmail,
@@ -1164,18 +1213,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
 
     this.setState({ actionButtonsDisabled: true });
-    let walletBirthday = birthday.toString() || '0';
-    if (parseInt(walletBirthday, 10) < 0) {
-      walletBirthday = '0';
-    }
-    if (isNaN(parseInt(walletBirthday, 10))) {
-      walletBirthday = '0';
-    }
-
     let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
     if (
       seedUfvk.toLowerCase().startsWith(GlobalConst.uview) ||
-      seedUfvk.toLowerCase().startsWith(GlobalConst.uviewtest)
+      seedUfvk.toLowerCase().startsWith(GlobalConst.uviewtest) ||
+      seedUfvk.toLowerCase().startsWith(GlobalConst.uviewregtest)
     ) {
       // this is a UFVK
       type = RestoreFromTypeEnum.ufvkRestoreFrom;

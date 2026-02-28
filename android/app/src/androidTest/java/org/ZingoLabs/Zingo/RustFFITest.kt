@@ -371,8 +371,8 @@ class ExecuteSendFromOrchard {
             }
             syncStatusBefore = mapper.readValue(syncStatusBeforeJson)
 
-            val progress = syncStatus.percentage_total_outputs_scanned
-               ?: syncStatus.percentage_total_blocks_scanned
+            val progress = syncStatusBefore.percentage_total_outputs_scanned
+               ?: syncStatusBefore.percentage_total_blocks_scanned
 
             if (progress != null && progress >= 100.0) {
                 println("Sync completed!")

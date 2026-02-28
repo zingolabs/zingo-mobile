@@ -125,7 +125,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     selectServer,
     setZecPrice,
     backgroundSyncInfo,
-    lastError,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
@@ -926,7 +925,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 }}>
                 <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
               </TouchableOpacity>
-              {!!lastError && <FontAwesomeIcon style={{ alignSelf: 'flex-end' }} icon={faGear} size={5} color={colors.warning.primary} />}
             </>
           ) : (
             <Image

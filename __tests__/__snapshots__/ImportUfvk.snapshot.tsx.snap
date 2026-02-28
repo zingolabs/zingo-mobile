@@ -364,7 +364,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                 }
               }
             >
-               (1, --)
+               (undefined, --)
             </Text>
             <View
               accessibilityLabel=""
