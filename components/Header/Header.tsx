@@ -173,17 +173,18 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     } else {
       setPercentageOutputsScanned(
         syncingStatus.percentage_total_outputs_scanned 
-        ? syncingStatus.percentage_total_outputs_scanned
-        : 0,
+          ?? syncingStatus.percentage_total_blocks_scanned
+          ?? 0,
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
         syncingStatus.scan_ranges.length > 0 &&
-        !!syncingStatus.percentage_total_outputs_scanned &&
-        syncingStatus.percentage_total_outputs_scanned < 100,
+        (syncingStatus.percentage_total_outputs_scanned 
+          ?? syncingStatus.percentage_total_blocks_scanned 
+          ?? 0) < 100,
       );
     }
-  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
+  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.percentage_total_blocks_scanned, syncingStatus.scan_ranges]);
 
   useEffect(() => {
     // when the App is syncing this can fired a lot of times

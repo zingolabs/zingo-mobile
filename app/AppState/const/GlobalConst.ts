@@ -8,7 +8,7 @@ export const GlobalConst = {
   https: 'https:',
   serverPlaceHolder: 'https://------.---:---',
   uview: 'uview',
-  utestview: 'utestview',
+  uviewtest: 'uviewtest',
   success: 'success',
   true: 'true',
   false: 'false',

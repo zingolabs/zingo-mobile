@@ -1,6 +1,6 @@
 {
   "name": "zingo-mobile",
-  "version": "2.0.16",
+  "version": "2.0.17",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -17,7 +17,8 @@
     "build:debug": "cd android && ./gradlew assembleDebug && cd ..",
     "build:debug:split": "cd android && ./gradlew assembleDebug -PsplitApk=true && cd ..",
     "cargo:update": "cd rust && cargo update -p zingolib -p regchest_utils --aggressive && cd ..",
-    "cargo:clean": "cd rust && cargo clean && cd .."
+    "cargo:clean": "cd rust && cargo clean && cd ..",
+    "cargo:check": "cd rust && cargo check && cd .."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.0.1",
