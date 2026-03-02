@@ -77,6 +77,7 @@ import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
+import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -132,6 +133,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
+  const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(BlockExplorerEnum.Zcashexplorer);
   const file = useMemo(
     () => ({
       en: en,
@@ -287,6 +289,15 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.performanceLevel, performanceLevel);
       }
+      if (
+        settings.blockExplorer === BlockExplorerEnum.Cipherscan ||
+        settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
+        settings.blockExplorer === BlockExplorerEnum.Zypherscan
+      ) {
+        setBlockExplorer(settings.blockExplorer);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.blockExplorer, blockExplorer);
+      }
 
       // if server uri is empty, fix this.
       // it is a weird edge case
@@ -340,6 +351,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         performanceLevel={performanceLevel}
+        blockExplorer={blockExplorer}
       />
     );
   }
@@ -366,6 +378,7 @@ type LoadingAppClassProps = {
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
+  blockExplorer: BlockExplorerEnum;
 };
 
 type LoadingAppClassState = AppStateLoading & AppContextLoading;
@@ -411,6 +424,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
+      blockExplorer: props.blockExplorer,
 
       // state
       appStateStatus: AppState.currentState,
@@ -1137,6 +1151,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
   doRestore = async (seedUfvk: string, birthday: number) => {
     if (!seedUfvk) {
+      // no reporting button, no needed.
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -1145,8 +1160,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.state.translate('loadingapp.emptyseedufvk-error') as string,
         false,
         this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
       );
       return;
     }
@@ -1173,6 +1186,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         parsingError = true;
       }
       if (parsingError) {
+        // no reporting button, no needed.
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
@@ -1181,8 +1195,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.state.translate('loadingapp.invalidseedufvk-error') as string,
           false,
           this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
         );
         return;
       }
@@ -1198,6 +1210,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     // birthday cannot be lower than sapling activation height
     if (Number(walletBirthday) < activationHeight[this.state.server.chainName]) {
+      // no reporting button, no needed.
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -1206,8 +1219,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.state.translate('loadingapp.invalidbirthday-error') as string,
         false,
         this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
       );
       return;
     }
@@ -1527,6 +1538,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
+      blockExplorer: this.state.blockExplorer,
     };
 
     return (

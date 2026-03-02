@@ -2000,6 +2000,346 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 onStartShouldSetResponder={[Function]}
                 style={
                   {
+                    "marginBottom": 5,
+                    "marginRight": 10,
+                    "maxHeight": 50,
+                    "minHeight": 48,
+                    "opacity": 1,
+                  }
+                }
+                testID="settings.blockexplorer-Cipherscan"
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
+                      "marginTop": 10,
+                    }
+                  }
+                >
+                  <
+                    color="#ffffff"
+                    icon={
+                      {
+                        "icon": [
+                          512,
+                          512,
+                          [
+                            128308,
+                            128309,
+                            128992,
+                            128993,
+                            128994,
+                            128995,
+                            128996,
+                            9679,
+                            9898,
+                            9899,
+                            11044,
+                            61708,
+                            61915,
+                          ],
+                          "f111",
+                          "M464 256a208 208 0 1 0 -416 0 208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0 256 256 0 1 1 -512 0z",
+                        ],
+                        "iconName": "circle",
+                        "prefix": "far",
+                      }
+                    }
+                    size={20}
+                  />
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "marginLeft": 10,
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    text translated
+                  </Text>
+                </View>
+              </View>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                text Cipherscan
+              </Text>
+            </View>
+            <View>
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "marginBottom": 5,
+                    "marginRight": 10,
+                    "maxHeight": 50,
+                    "minHeight": 48,
+                    "opacity": 1,
+                  }
+                }
+                testID="settings.blockexplorer-Zcashexplorer"
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
+                      "marginTop": 10,
+                    }
+                  }
+                >
+                  <
+                    color="#ffffff"
+                    icon={
+                      {
+                        "icon": [
+                          512,
+                          512,
+                          [
+                            128280,
+                            "dot-circle",
+                          ],
+                          "f192",
+                          "M256 512a256 256 0 1 0 0-512 256 256 0 1 0 0 512zm0-352a96 96 0 1 1 0 192 96 96 0 1 1 0-192z",
+                        ],
+                        "iconName": "circle-dot",
+                        "prefix": "fas",
+                      }
+                    }
+                    size={20}
+                  />
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "marginLeft": 10,
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    text translated
+                  </Text>
+                </View>
+              </View>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                text Zcashexplorer
+              </Text>
+            </View>
+            <View>
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "marginBottom": 5,
+                    "marginRight": 10,
+                    "maxHeight": 50,
+                    "minHeight": 48,
+                    "opacity": 1,
+                  }
+                }
+                testID="settings.blockexplorer-Zypherscan"
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
+                      "marginTop": 10,
+                    }
+                  }
+                >
+                  <
+                    color="#ffffff"
+                    icon={
+                      {
+                        "icon": [
+                          512,
+                          512,
+                          [
+                            128308,
+                            128309,
+                            128992,
+                            128993,
+                            128994,
+                            128995,
+                            128996,
+                            9679,
+                            9898,
+                            9899,
+                            11044,
+                            61708,
+                            61915,
+                          ],
+                          "f111",
+                          "M464 256a208 208 0 1 0 -416 0 208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0 256 256 0 1 1 -512 0z",
+                        ],
+                        "iconName": "circle",
+                        "prefix": "far",
+                      }
+                    }
+                    size={20}
+                  />
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "marginLeft": 10,
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    text translated
+                  </Text>
+                </View>
+              </View>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                text Zypherscan
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "display": "flex",
+                "margin": 10,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 18,
+                  "fontWeight": "bold",
+                  "opacity": 0.87,
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "display": "flex",
+                "marginLeft": 25,
+              }
+            }
+          >
+            <View>
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
                     "marginBottom": 0,
                     "marginRight": 10,
                     "maxHeight": 50,

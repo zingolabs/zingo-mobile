@@ -1,4 +1,5 @@
 import { CurrencyEnum, LanguageEnum } from '../../app/AppState';
+import { BlockExplorerEnum } from '../../app/AppState/enums/BlockExplorerEnum';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
 
 export const mockTranslate = (p: string) => {
@@ -118,6 +119,21 @@ export const mockTranslate = (p: string) => {
       {
         value: RPCPerformanceLevelEnum.Medium,
         text: 'text medium',
+      },
+    ];
+  } else if (p === 'settings.blockexplorers') {
+    return [
+      {
+        value: BlockExplorerEnum.Cipherscan,
+        text: 'text Cipherscan',
+      },
+      {
+        value: BlockExplorerEnum.Zcashexplorer,
+        text: 'text Zcashexplorer',
+      },
+      {
+        value: BlockExplorerEnum.Zypherscan,
+        text: 'text Zypherscan',
       },
     ];
   } else {

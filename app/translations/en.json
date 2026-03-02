@@ -330,6 +330,20 @@
         "text": "For old devices."
       }
     ],
+    "blockexplorers": [
+      {
+        "value": "Zcashexplorer",
+        "text": "ZcashExplorer.App"
+      },
+      {
+        "value": "Cipherscan",
+        "text": "CipherScan.App"
+      },
+      {
+        "value": "Zypherscan",
+        "text": "ZypherScan.Com"
+      }
+    ],
     "nochanges": "No changes registered.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -364,6 +378,7 @@
     "rescanmenu-title": "THE RESCAN MENU OPTION",
     "recoverywalletinfoondevice-title": "Store Wallet Recovery Info in the Device",
     "performancelevel-title": "Zingolib Performance Level",
+    "blockexplorer-title": "Switch between Block Explorers",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
     "value-currency-USDTOR": "US Dollar with Tor",
@@ -391,6 +406,9 @@
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
     "value-performancelevel-Low": "Low",
+    "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
+    "value-blockexplorer-Cipherscan": "Cipherscan",
+    "value-blockexplorer-Zypherscan": "Zypherscan",
     "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
     "security-startapp": "When the App starts",
     "security-foregroundapp": "When the App go to the Foreground",
