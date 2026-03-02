@@ -22,6 +22,7 @@ import {
 
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
@@ -83,6 +84,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
+  blockExplorer: BlockExplorerEnum.Zcashexplorer,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

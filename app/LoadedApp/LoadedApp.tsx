@@ -105,6 +105,7 @@ import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -165,6 +166,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
+  const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(BlockExplorerEnum.Zcashexplorer);
   const [zenniesDonationAddress, setZenniesDonationAddress] = useState<string>('');
   const file = useMemo(
     () => ({
@@ -303,6 +305,15 @@ export default function LoadedApp(props: LoadedAppProps) {
         setPerformanceLevel(settings.performanceLevel);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.performanceLevel, performanceLevel);
+      }
+      if (
+        settings.blockExplorer === BlockExplorerEnum.Cipherscan ||
+        settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
+        settings.blockExplorer === BlockExplorerEnum.Zypherscan
+      ) {
+        setBlockExplorer(settings.blockExplorer);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.blockExplorer, blockExplorer);
       }
 
       // reading background task info
@@ -455,6 +466,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         zenniesDonationAddress={zenniesDonationAddress}
         firstLaunchingMessage={firstLaunchingMessage}
         performanceLevel={performanceLevel}
+        blockExplorer={blockExplorer}
       />
     );
   }
@@ -506,6 +518,7 @@ type LoadedAppClassProps = {
   zenniesDonationAddress: string;
   firstLaunchingMessage: LaunchingModeEnum;
   performanceLevel: RPCPerformanceLevelEnum;
+  blockExplorer: BlockExplorerEnum;
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
@@ -585,6 +598,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
+      blockExplorer: props.blockExplorer,
 
       // state
       navigationHome: null,
@@ -1037,19 +1051,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 );
               }
             }
-            // the ValueTransfer is gone -> Likely Reverted by the server
-            // this is really confusing...
-            //if (vtNew.length === 0) {
-            //  createAlert(
-            //    this.setBackgroundError,
-            //    this.addLastSnackbar,
-            //    [this.screenName],
-            //    this.state.translate('loadedapp.send-menu') as string,
-            //    this.state.translate('loadedapp.valuetransfer-reverted') as string,
-            //    true,
-            //    this.state.translate,
-            //  );
-            //}
           });
       // if some tx is confirmed the UI needs some time to
       // acomodate the bottom tabs.
@@ -1559,6 +1560,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
+  setBlockExplorerOption = async (value: BlockExplorerEnum): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.blockExplorer, value);
+    this.setState({
+      blockExplorer: value as BlockExplorerEnum,
+    });
+  };
+
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
@@ -1869,6 +1877,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
+      blockExplorer: this.state.blockExplorer,
     };
 
     const fnTabBarIcon = (route: { name: string; key: string }, focused: boolean) => {
@@ -2071,6 +2080,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     setRescanMenuOption={this.setRescanMenuOption}
                     setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
                     setPerformanceLevelOption={this.setPerformanceLevelOption}
+                    setBlockExplorerOption={this.setBlockExplorerOption}
                     toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                   />
                 }

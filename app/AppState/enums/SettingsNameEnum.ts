@@ -12,6 +12,7 @@ export enum SettingsNameEnum {
   rescanMenu = 'rescanMenu',
   recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',
   performanceLevel = 'performanceLevel',
+  blockExplorer = 'blockExplorer',
 
   // internal management
   firstInstall = 'firstInstall',

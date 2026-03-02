@@ -69,6 +69,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     netInfo,
     selectServer,
     setPrivacyOption,
+    blockExplorer,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
@@ -133,7 +134,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       return;
     }
 
-    const url = Utils.getBlockExplorerTxIDURL(txid, server.chainName);
+    const url = Utils.getBlockExplorerTxIDURL(txid, server.chainName, blockExplorer);
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);

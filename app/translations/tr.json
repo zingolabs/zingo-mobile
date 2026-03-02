@@ -330,6 +330,20 @@
         "text": "For old devices."
       }
     ],
+    "blockexplorers": [
+      {
+        "value": "Zcashexplorer",
+        "text": "ZcashExplorer.App"
+      },
+      {
+        "value": "Cipherscan",
+        "text": "CipherScan.App"
+      },
+      {
+        "value": "Zypherscan",
+        "text": "ZypherScan.Com"
+      }
+    ],
     "nochanges": "Herhangi bir değişiklik kaydedilmedi.",
     "ismemo": "Kaydetmek için notları indirme seçeneğini seçmeniz gerekiyor.",
     "isthreshold": "Kaydetmek için işlem filtre eşiği seçeneğini seçmeniz gerekiyor.",
@@ -364,6 +378,7 @@
     "rescanmenu-title": "YENİDEN TARA SEÇENEĞİ",
     "recoverywalletinfoondevice-title": "Cüzdan Kurtarma Bilgilerini Cihaza Kaydet",
     "performancelevel-title": "Zingolib Performance Level",
+    "blockexplorer-title": "Blok Gezgini Uygulamaları Arasında Geçiş Yap",
     "value-currency-": "Para birimi yok",
     "value-currency-USD": "Amerikan doları",
     "value-currency-USDTOR": "Tor ağı üzerinden ABD Doları",
@@ -391,6 +406,9 @@
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
     "value-performancelevel-Low": "Low",
+    "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
+    "value-blockexplorer-Cipherscan": "Cipherscan",
+    "value-blockexplorer-Zypherscan": "Zypherscan",
     "security-title": "Ekranlara/Ayarlara Cihaz Güvenliğini Uygula",
     "security-startapp": "Uygulama başladığında",
     "security-foregroundapp": "Uygulama ön plana geçtiğinde",

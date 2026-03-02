@@ -330,6 +330,20 @@
         "text": "For old devices."
       }
     ],
+    "blockexplorers": [
+      {
+        "value": "Zcashexplorer",
+        "text": "ZcashExplorer.App"
+      },
+      {
+        "value": "Cipherscan",
+        "text": "CipherScan.App"
+      },
+      {
+        "value": "Zypherscan",
+        "text": "ZypherScan.Com"
+      }
+    ],
     "nochanges": "Изменения не зарегистрированы.",
     "ismemo": "Вам необходимо выбрать опцию сохранения заметок для загрузки.",
     "isthreshold": "Вам необходимо выбрать порог фильтрации транзакций для сохранения.",
@@ -364,6 +378,7 @@
     "rescanmenu-title": "ОТПРАВЛЕНИЕ РЕШЕНУ",
     "recoverywalletinfoondevice-title": "Сохраните данные для восстановления кошелька на устройстве",
     "performancelevel-title": "Zingolib Performance Level",
+    "blockexplorer-title": "Переключаться между обозревателями блоков",
     "value-currency-": "Без указания валюты",
     "value-currency-USD": "Доллар США",
     "value-currency-USDTOR": "Доллар США с Tor",
@@ -391,6 +406,9 @@
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
     "value-performancelevel-Low": "Low",
+    "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
+    "value-blockexplorer-Cipherscan": "Cipherscan",
+    "value-blockexplorer-Zypherscan": "Zypherscan",
     "security-title": "ПРИМЕНИТЬ ЗАЩИТУ ДЛЯ ЭКРАНОВ И ОПЦИЙ УСТРОЙСТВА",
     "security-startapp": "При запуске приложения",
     "security-foregroundapp": "Когда приложение переходит в активный режим",

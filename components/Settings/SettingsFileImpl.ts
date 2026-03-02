@@ -14,6 +14,7 @@ import {
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
+import { BlockExplorerEnum } from '../../app/AppState/enums/BlockExplorerEnum';
 
 export default class SettingsFileImpl {
   static async getFileName() {
@@ -201,6 +202,10 @@ export default class SettingsFileImpl {
       if (!settings.hasOwnProperty(SettingsNameEnum.performanceLevel)) {
         // by default medium
         settings.performanceLevel = RPCPerformanceLevelEnum.Medium;
+      }
+      if (!settings.hasOwnProperty(SettingsNameEnum.blockExplorer)) {
+        // by default medium
+        settings.blockExplorer = BlockExplorerEnum.Zcashexplorer;
       }
       return settings;
     } catch (err) {
