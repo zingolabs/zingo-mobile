@@ -14,14 +14,15 @@ import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
 export default interface AppContextLoading {
   // context
   netInfo: NetInfoType;
   wallet: WalletType;
   zecPrice: ZecPriceType;
-  background: BackgroundType;
   translate: (key: string) => TranslateType;
+  backgroundSyncInfo: BackgroundType;
   backgroundError: BackgroundErrorType;
   setBackgroundError: (title: string, error: string) => void;
   readOnly: boolean;
@@ -47,6 +48,5 @@ export default interface AppContextLoading {
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
-
-   
+  blockExplorer: BlockExplorerEnum;
 }

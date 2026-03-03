@@ -16,6 +16,7 @@ import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+import { BlockExplorerEnum } from '../app/AppState/enums/BlockExplorerEnum';
 
 function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Settings> {
   return {
@@ -38,6 +39,7 @@ describe('Component Settings - test', () => {
   state.currency = CurrencyEnum.USDCurrency;
   state.language = LanguageEnum.en;
   state.sendAll = false;
+  state.blockExplorer = BlockExplorerEnum.Zcashexplorer;
   state.rescanMenu = false;
   state.recoveryWalletInfoOnDevice = true;
   state.donation = false;
@@ -59,6 +61,7 @@ describe('Component Settings - test', () => {
           setRescanMenuOption={onSetOption}
           setRecoveryWalletInfoOnDeviceOption={onSetOption}
           setPerformanceLevelOption={onSetOption}
+          setBlockExplorerOption={onSetOption}
           toggleMenuDrawer={toggle}
         />
       </ContextAppLoadedProvider>,

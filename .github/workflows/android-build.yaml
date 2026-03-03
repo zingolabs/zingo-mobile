@@ -64,7 +64,8 @@ jobs:
     container:
       image: zingodevops/android_builder:017
     env:
-      RUSTUP_HOME: /root/.rustup
+      RUSTUP_HOME: ${{ github.workspace }}/.rustup
+      CARGO_HOME:  ${{ github.workspace }}/.cargo
     steps:
       - name: Install libraries
         run: |
@@ -92,14 +93,28 @@ jobs:
       - name: Cargo update for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: |
-          echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
-          sed -i "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
-          if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
+          set -eu pipefail
+
+          TOML="rust/Cargo.toml"
+          REV="${GITHUB_SHA}"
+
+          sed -i -E "/^zingolib[[:space:]]*=/ s/(rev[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${REV}\2/" "$TOML"
+
+          sed -i -E "/^zingolib[[:space:]]*=/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" "$TOML"
+
+          first_line="$(grep -E '^zingolib[[:space:]]*=' "$TOML")"
+          echo "zingolib first line => $first_line"
+          echo "$first_line" | grep -q "rev = \"${REV}\""
+          echo "$first_line" | grep -vqE '\b(branch|tag)[[:space:]]*='
+
           cd rust
+          rustup default stable
           cargo update -p zingolib -p regchest_utils --aggressive
 
       - name: Cargo default nightly
-        run: rustup default nightly
+        run: |
+          rustup toolchain install nightly --profile minimal --component rust-src
+          rustup default nightly
 
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli

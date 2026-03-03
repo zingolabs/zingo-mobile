@@ -22,6 +22,7 @@ import {
 
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
@@ -46,18 +47,20 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   } as ZecPriceType,
   sendAll: false,
   donation: false,
-  background: {
+  privacy: false,
+  readOnly: false,
+  translate: () => '',
+  backgroundSyncInfo: {
     batches: 0,
     message: '',
     date: 0,
     dateEnd: 0,
   } as BackgroundType,
-  translate: () => '',
+  setBackgroundSyncErrorInfo: () => {},
   backgroundError: {} as BackgroundErrorType,
   setBackgroundError: () => {},
-  privacy: false,
-  readOnly: false,
   lastError: '',
+  setLastError: () => {},
   orchardPool: true,
   saplingPool: true,
   transparentPool: true,
@@ -81,6 +84,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
+  blockExplorer: BlockExplorerEnum.Zcashexplorer,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

@@ -49,6 +49,7 @@ import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevel
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
+import { BlockExplorerEnum } from '../../app/AppState/enums/BlockExplorerEnum';
 
 type SettingsProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Settings> & {
   setServerOption: (
@@ -67,6 +68,7 @@ type SettingsProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Settings> &
   setRescanMenuOption: (value: boolean) => Promise<void>;
   setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
   setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
+  setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
   toggleMenuDrawer: () => void;
 };
 
@@ -88,6 +90,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setRescanMenuOption,
   setRecoveryWalletInfoOnDeviceOption,
   setPerformanceLevelOption,
+  setBlockExplorerOption,
   toggleMenuDrawer,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -107,6 +110,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     rescanMenu: rescanMenuContext,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
+    blockExplorer: blockExplorerContext,
     readOnly,
     snackbars,
     removeFirstSnackbar,
@@ -114,6 +118,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setBackgroundError,
     zingolibVersion,
     lastError,
+    setLastError,
   } = context;
 
   const currenciesArray = translate('settings.currencies');
@@ -170,6 +175,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     PERFORMANCELEVELMENU = performanceLevelsArray as Options[];
   }
 
+  const blockExplorersArray = translate('settings.blockexplorers');
+  let BLOCKEXPLORERMENU: Options[] = [];
+  if (typeof blockExplorersArray === 'object') {
+    BLOCKEXPLORERMENU = blockExplorersArray as Options[];
+  }
+
   const { colors } = useTheme()  as ThemeType;
   const screenName = ScreenEnum.Settings;
 
@@ -203,6 +214,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     recoveryWalletInfoOnDeviceContext,
   );
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(performanceLevelContext);
+  const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(blockExplorerContext);
 
   const [autoIcon, setAutoIcon] = useState<IconDefinition>(farCircle);
   const [listIcon, setListIcon] = useState<IconDefinition>(farCircle);
@@ -323,7 +335,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       selectServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
-      performanceLevelContext === performanceLevel
+      performanceLevelContext === performanceLevel &&
+      blockExplorerContext === blockExplorer
     ) {
       setDisabledButton(true);
     } else {
@@ -353,6 +366,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     rescanMenuContext,
     performanceLevel,
     performanceLevelContext,
+    blockExplorer,
+    blockExplorerContext,
     securityContext,
     selectServer,
     selectServerContext,
@@ -394,7 +409,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       selectServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
-      performanceLevelContext === performanceLevel
+      performanceLevelContext === performanceLevel &&
+      blockExplorerContext === blockExplorer
     ) {
       addLastSnackbar({ message: translate('settings.nochanges') as string, screenName: [screenName] });
       return;
@@ -506,6 +522,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (performanceLevelContext !== performanceLevel) {
       await setPerformanceLevelOption(performanceLevel);
     }
+    if (blockExplorerContext !== blockExplorer) {
+      await setBlockExplorerOption(blockExplorer);
+    }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
@@ -557,6 +576,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setRestoreWalletBackupScreen(securityContext.restoreWalletBackupScreen);
       setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
       setPerformanceLevel(performanceLevelContext);
+      setBlockExplorer(blockExplorerContext);
     }
     navigation.navigate(RouteEnum.HomeStack);
   };
@@ -646,6 +666,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       sendEmail,
       zingolibVersion,
     );
+    setLastError('');
   };
   
   return (
@@ -796,6 +817,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     Boolean,
                     rescanMenu,
                     'rescanmenu',
+                  )}
+                </View>
+
+                <View style={{ display: 'flex', margin: 10 }}>
+                  <BoldText>{translate('settings.blockexplorer-title') as string}</BoldText>
+                </View>
+
+                <View style={{ display: 'flex', marginLeft: 25 }}>
+                  {optionsRadio(
+                    BLOCKEXPLORERMENU,
+                    setBlockExplorer as React.Dispatch<React.SetStateAction<string | boolean>>,
+                    String,
+                    blockExplorer,
+                    'blockexplorer',
                   )}
                 </View>
 

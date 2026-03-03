@@ -1,6 +1,6 @@
 {
   "name": "zingo-mobile",
-  "version": "2.0.16",
+  "version": "2.0.17",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -17,7 +17,8 @@
     "build:debug": "cd android && ./gradlew assembleDebug && cd ..",
     "build:debug:split": "cd android && ./gradlew assembleDebug -PsplitApk=true && cd ..",
     "cargo:update": "cd rust && cargo update -p zingolib -p regchest_utils --aggressive && cd ..",
-    "cargo:clean": "cd rust && cargo clean && cd .."
+    "cargo:clean": "cd rust && cargo clean && cd ..",
+    "cargo:check": "cd rust && cargo check && cd .."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.0.1",
@@ -27,7 +28,7 @@
     "@gorhom/bottom-sheet": "^5.2.6",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-clipboard/clipboard": "^1.16.3",
-    "@react-native-community/netinfo": "github:j-piasecki/react-native-netinfo#@jpiasecki/new-arch",
+    "@react-native-community/netinfo": "^12.0.1",
     "@react-native-picker/picker": "2.11.2",
     "@react-navigation/bottom-tabs": "^7.4.7",
     "@react-navigation/drawer": "^7.5.8",

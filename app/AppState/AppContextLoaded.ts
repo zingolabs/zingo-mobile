@@ -24,6 +24,7 @@ import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -61,21 +62,23 @@ export default interface AppContextLoaded {
   // zec price in USD from internet
   zecPrice: ZecPriceType;
 
-  // info about background syncing
-  background: BackgroundType;
-
   // helper to get text tranalated to the active language
   translate: (key: string) => TranslateType;
+
+  // info about background syncing
+  backgroundSyncInfo: BackgroundType;
+  setBackgroundSyncErrorInfo: (e: string) => void;
 
   // Error from the App when is in background
   backgroundError: BackgroundErrorType;
   setBackgroundError: (title: string, error: string) => void;
 
-  // this wallet is watch-only (Readonly)
-  readOnly: boolean;
-
   // Last fetching error
   lastError: string;
+  setLastError: (e: string) => void;
+
+  // this wallet is watch-only (Readonly)
+  readOnly: boolean;
 
   // pools available
   orchardPool: boolean;
@@ -133,4 +136,5 @@ export default interface AppContextLoaded {
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
+  blockExplorer: BlockExplorerEnum;
 }

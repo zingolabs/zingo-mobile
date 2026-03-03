@@ -26,6 +26,7 @@ import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import { RPCParseAddressStatusEnum } from '../rpc/enums/RPCParseAddressStatusEnum';
 import { RPCAddressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../rpc/enums/RPCReceiversEnum';
+import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -198,11 +199,27 @@ export default class Utils {
     return stringValue.replace(new RegExp('\\.'), `${decimalSeparator}`);
   }
 
-  static getBlockExplorerTxIDURL(txid: string, chainName: ChainNameEnum): string {
-    if (chainName === ChainNameEnum.testChainName) {
-      return `https://testnet.zcashexplorer.app/transactions/${txid}`;
+  static getBlockExplorerTxIDURL(txid: string, chainName: ChainNameEnum, blockExplorer: BlockExplorerEnum): string {
+    if (blockExplorer === BlockExplorerEnum.Zcashexplorer) {
+      if (chainName === ChainNameEnum.testChainName) {
+        return `https://testnet.zcashexplorer.app/transactions/${txid}`;
+      } else {
+        return `https://mainnet.zcashexplorer.app/transactions/${txid}`;
+      }
+    } else if (blockExplorer === BlockExplorerEnum.Cipherscan) {
+      if (chainName === ChainNameEnum.testChainName) {
+        return `https://testnet.cipherscan.app/tx/${txid}`;
+      } else {
+        return `https://cipherscan.app/tx/${txid}`;
+      }
+    } else if (blockExplorer === BlockExplorerEnum.Zypherscan) {
+      if (chainName === ChainNameEnum.testChainName) {
+        return `https://testnet.zypherscan.com/tx/${txid}`;
+      } else {
+        return `https://www.zypherscan.com/tx/${txid}`;
+      }
     } else {
-      return `https://mainnet.zcashexplorer.app/transactions/${txid}`;
+      return '';
     }
   }
 

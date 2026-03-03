@@ -68,8 +68,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     setBackgroundError,
     netInfo,
     selectServer,
-    readOnly,
     setPrivacyOption,
+    blockExplorer,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
@@ -111,14 +111,16 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   
   useEffect(() => {
     const spendCo =
-      valueTransfer.confirmations >= 0 &&
-      valueTransfer.confirmations < GlobalConst.minConfirmations
+    valueTransfer.status === RPCValueTransfersStatusEnum.failed
+      ? colors.zingo
+      : valueTransfer.confirmations >= 0 &&
+        valueTransfer.confirmations < GlobalConst.minConfirmations
         ? colors.primaryDisabled
         : valueTransfer.kind === ValueTransferKindEnum.Received || valueTransfer.kind === ValueTransferKindEnum.Shield
-        ? colors.primary
-        : colors.text;
+          ? colors.primary
+          : colors.text;
     setSpendColor(spendCo);
-  }, [colors.primary, colors.primaryDisabled, colors.text, valueTransfer.confirmations, valueTransfer.kind]);
+  }, [colors.primary, colors.primaryDisabled, colors.text, colors.zingo, valueTransfer.confirmations, valueTransfer.kind, valueTransfer.status]);
 
   useEffect(() => {
     (async () => {
@@ -132,7 +134,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       return;
     }
 
-    const url = Utils.getBlockExplorerTxIDURL(txid, server.chainName);
+    const url = Utils.getBlockExplorerTxIDURL(txid, server.chainName, blockExplorer);
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
@@ -198,14 +200,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     // not use await here.
     navigation.navigate(RouteEnum.Computing);
 
-    let actionStr: string;
-    if (action === TransactionActionEnum.resend) {
-      actionStr = await RPCModule.resendTransactionProcess(valueTransfer.txid);
-    } else {
-      actionStr = await RPCModule.removeTransactionProcess(valueTransfer.txid);
-    }
+    let actionStr: string = await RPCModule.removeTransactionProcess(valueTransfer.txid);
 
-    //console.log(actionStr);
+    console.log('REMOVE', actionStr);
 
     if (actionStr) {
       if (actionStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -215,7 +212,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           [screenName],
           translate(`history.${action}-title`) as string,
           `${translate(`history.${action}-error`)} ${actionStr}`,
-          true,
+          false,
           translate,
         );
       } else {
@@ -334,10 +331,14 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               padding: 10,
               borderWidth: 1,
               borderRadius: 10,
-              borderColor: colors.border,
+              borderColor: valueTransfer.status === RPCValueTransfersStatusEnum.failed ? 'coral' : colors.border,
             }}>
             <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-              {valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations === 0
+              {valueTransfer.status === RPCValueTransfersStatusEnum.failed && valueTransfer.kind === ValueTransferKindEnum.Sent
+                ? (translate('history.sent-failed') as string)
+                : valueTransfer.status === RPCValueTransfersStatusEnum.failed && valueTransfer.kind === ValueTransferKindEnum.Shield
+                ? (translate('history.shield-failed') as string)
+                : valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations === 0
                 ? (translate('history.sending') as string)
                 : valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations !== 0
                 ? (translate('history.sent') as string)
@@ -364,6 +365,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 : ''}
             </BoldText>
             <ZecAmount
+              style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}
               currencyName={info.currencyName}
               size={36}
               amtZec={valueTransfer.amount}
@@ -377,9 +379,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
 
           {valueTransfer.confirmations === 0 && ( /* not min confirmations applied */
             <>
-              {(valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
-                valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                valueTransfer.status === RPCValueTransfersStatusEnum.mempool) && (
+              {(valueTransfer.status === RPCValueTransfersStatusEnum.failed) && (
                 <>
                   <View
                     style={{
@@ -389,50 +389,15 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       alignItems: 'center',
                       marginBottom: 10,
                     }}>
-                    {(valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
-                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
-                      info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks &&
-                      !readOnly && (
-                      <Button
-                        type={ButtonTypeEnum.Secondary}
-                        title={translate('history.resend') as string}
-                        style={{ marginRight: 10 }}
-                        onPress={() => {
-                          actionOnPress(TransactionActionEnum.resend);
-                        }}
-                        twoButtons={
-                          valueTransfer.kind !== ValueTransferKindEnum.Received
-                        }
-                      />
-                    )}
-                    {valueTransfer.kind !== ValueTransferKindEnum.Received && (
-                      <Button
-                        type={ButtonTypeEnum.Primary}
-                        title={translate('history.remove') as string}
-                        onPress={() => {
-                          actionOnPress(TransactionActionEnum.remove);
-                        }}
-                        twoButtons={
-                          (valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
-                          valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
-                          info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks &&
-                          !readOnly
-                        }
-                      />
-                    )}
+                    <Button
+                      type={ButtonTypeEnum.Primary}
+                      title={translate('history.remove') as string}
+                      onPress={() => {
+                        actionOnPress(TransactionActionEnum.remove);
+                      }}
+                      twoButtons={false}
+                    />
                   </View>
-                  {valueTransfer.kind !== ValueTransferKindEnum.Received && (
-                    <View
-                      style={{
-                        flexGrow: 1,
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginBottom: 10,
-                      }}>
-                      <FadeText style={{ fontSize: 11 }}>{translate('history.remove-legend') as string}</FadeText>
-                    </View>
-                  )}
                 </>
               )}
             </>
@@ -452,14 +417,17 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               )}
               {(valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
                 valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
-                valueTransfer.status === RPCValueTransfersStatusEnum.mempool) && (
+                valueTransfer.status === RPCValueTransfersStatusEnum.mempool ||
+                valueTransfer.status === RPCValueTransfersStatusEnum.failed) && (
                 <FadeText
                   style={{
                     color:
-                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                      valueTransfer.status === RPCValueTransfersStatusEnum.calculated
-                        ? colors.primary
-                        : colors.primaryDisabled,
+                      valueTransfer.status === RPCValueTransfersStatusEnum.failed
+                        ? 'coral'
+                        : valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                          valueTransfer.status === RPCValueTransfersStatusEnum.calculated
+                          ? colors.primary
+                          : colors.primaryDisabled,
                     fontSize: 12,
                     opacity: 1,
                     fontWeight: '700',
@@ -501,11 +469,11 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
               <View style={{ display: 'flex' }}>
                 <FadeText>{translate('history.time') as string}</FadeText>
-                <RegText>{valueTransfer.time ? moment((valueTransfer.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
+                <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{valueTransfer.time ? moment((valueTransfer.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
               </View>
               <View style={{ display: 'flex', alignItems: 'flex-end' }}>
                 <FadeText>{translate('history.confirmations') as string}</FadeText>
-                <RegText>{valueTransfer.confirmations >= 0 ? valueTransfer.confirmations.toString() : '-'}</RegText>
+                <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{valueTransfer.confirmations >= 0 ? valueTransfer.confirmations.toString() : '-'}</RegText>
               </View>
             </View>
 
@@ -523,12 +491,12 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                     setExpandTxid(true);
                   }
                 }}>
-                {!valueTransfer.txid && <RegText>{'Unknown'}</RegText>}
-                {!expandTxid && !!valueTransfer.txid && <RegText>{Utils.trimToSmall(valueTransfer.txid, 10)}</RegText>}
+                {!valueTransfer.txid && <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{'Unknown'}</RegText>}
+                {!expandTxid && !!valueTransfer.txid && <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{Utils.trimToSmall(valueTransfer.txid, 10)}</RegText>}
                 {expandTxid && !!valueTransfer.txid && (
                   <>
-                    <RegText>{valueTransfer.txid}</RegText>
-                    {server.chainName !== ChainNameEnum.regtestChainName && (
+                    <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{valueTransfer.txid}</RegText>
+                    {server.chainName !== ChainNameEnum.regtestChainName && valueTransfer.status !== RPCValueTransfersStatusEnum.failed && (
                       <TouchableOpacity onPress={() => handleTxIDClick(valueTransfer.txid)}>
                         <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                           {translate('history.viewexplorer') as string}
@@ -544,7 +512,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               <View style={{ display: 'flex', marginTop: 10 }}>
                 <FadeText>{translate('history.txfee') as string}</FadeText>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <ZecAmount amtZec={valueTransfer.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
+                  <ZecAmount style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }} amtZec={valueTransfer.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
                 </View>
               </View>
             )}
@@ -565,14 +533,14 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             {!!valueTransfer.poolType && (
               <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
                 <FadeText>{translate('history.pool') as string}</FadeText>
-                <RegText>{valueTransfer.poolType}</RegText>
+                <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{valueTransfer.poolType}</RegText>
               </View>
             )}
 
             <View style={{ marginTop: 10 }}>
               <FadeText>{translate('history.amount') as string}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount amtZec={valueTransfer.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
+                <ZecAmount style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }} amtZec={valueTransfer.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
                 {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
                   <CurrencyAmount price={valueTransfer.zecPrice} amtZec={valueTransfer.amount} currency={currency} privacy={privacy} />
                 )}

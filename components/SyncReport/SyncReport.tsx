@@ -38,7 +38,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     syncingStatus, 
     wallet, 
     translate, 
-    background, 
+    backgroundSyncInfo, 
     language, 
     netInfo, 
     snackbars, 
@@ -47,6 +47,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     zingolibVersion,
     setBackgroundError,
     addLastSnackbar,
+    setBackgroundSyncErrorInfo,
   } = context; //mode
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
@@ -112,9 +113,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
   useEffect(() => {
     if (
-      !syncingStatus || 
-      isEqual(syncingStatus, {} as RPCSyncStatusType) || 
-      (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) || 
+      !syncingStatus ||
+      isEqual(syncingStatus, {} as RPCSyncStatusType) ||
+      (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) ||
       syncingStatus.percentage_total_outputs_scanned === 0
     ) {
       // if the App is waiting for the first fetching, let's put 0.
@@ -123,17 +124,18 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     } else {
       setPercentageOutputsScanned(
         syncingStatus.percentage_total_outputs_scanned 
-        ? syncingStatus.percentage_total_outputs_scanned
-        : 0,
+          ?? syncingStatus.percentage_total_blocks_scanned
+          ?? 0,
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
         syncingStatus.scan_ranges.length > 0 &&
-        !!syncingStatus.percentage_total_outputs_scanned &&
-        syncingStatus.percentage_total_outputs_scanned < 100,
+        (syncingStatus.percentage_total_outputs_scanned 
+          ?? syncingStatus.percentage_total_blocks_scanned 
+          ?? 0) < 100,
       );
     }
-  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
+  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.percentage_total_blocks_scanned, syncingStatus.scan_ranges]);
 
   useEffect(() => {
     /*
@@ -184,6 +186,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       sendEmail,
       zingolibVersion,
     );
+    setBackgroundSyncErrorInfo('');
   };
 
   //console.log('render sync report. background:', background);
@@ -480,6 +483,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                                   ? 'blue'   /* High priority */
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.Verify
                                   ? 'blue'   /* High priority */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.RefetchingNullifiers
+                                  ? 'darkorange'   /* Refetching spends */
                                   : 'red',   /* error somehow */
                             }}
                           />;
@@ -555,6 +560,27 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               width: 10,
                               height: 10,
                               justifyContent: 'flex-start',
+                              backgroundColor: 'darkorange',
+                              margin: 5,
+                            }}
+                          />
+                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                            {translate('report.refetching') as string}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            flexWrap: 'nowrap',
+                            }}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              width: 10,
+                              height: 10,
+                              justifyContent: 'flex-start',
                               backgroundColor: 'gray',
                               margin: 5,
                             }}
@@ -595,7 +621,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
-          {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message || !!background.error) && (
+          {(Number(backgroundSyncInfo.date) > 0 || Number(backgroundSyncInfo.dateEnd) > 0 || !!backgroundSyncInfo.message || !!backgroundSyncInfo.error) && (
               <View
                 style={{
                   display: 'flex',
@@ -610,25 +636,25 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                   value={
                     //background.batches.toString() +
                     //translate('report.batches-date') +
-                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
-                    (Number(background.dateEnd) > 0 && Number(background.date) !== Number(background.dateEnd)
+                    moment(Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
+                    (Number(backgroundSyncInfo.dateEnd) > 0 && Number(backgroundSyncInfo.date) !== Number(backgroundSyncInfo.dateEnd)
                       ? (
-                        moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D') ===
-                        moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D')
-                          ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('h:mm:ss a')
-                          : ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
+                        moment(Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000).format('YYYY MMM D') ===
+                        moment(Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D')
+                          ? ' - ' + moment(Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) * 1000).format('h:mm:ss a')
+                          : ' - ' + moment(Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
                         )
                       : '')
                   }
                   screenName={screenName}
                 />
-                {!!background.message && <RegText style={{ marginBottom: 20}} color={colors.text}>{background.message}</RegText>}
-                {!!background.error && (
+                {!!backgroundSyncInfo.message && <RegText style={{ marginBottom: 20}} color={colors.text}>{backgroundSyncInfo.message}</RegText>}
+                {!!backgroundSyncInfo.error && (
                   <Button
                     type={ButtonTypeEnum.Primary}
                     title={translate('view-error') as string}
                     onPress={() => {
-                      reportError(background.error ? background.error : '');
+                      reportError(backgroundSyncInfo.error ? backgroundSyncInfo.error : '');
                     }}
                     twoButtons={true}
                   />

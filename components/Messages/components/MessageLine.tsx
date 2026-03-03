@@ -3,7 +3,7 @@ import React, { useContext, useEffect } from 'react';
 import { View, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faTriangleExclamation, faCircleCheck as faCircleCheckSolid } from '@fortawesome/free-solid-svg-icons';
+import { faTriangleExclamation, faCircleCheck as faCircleCheckSolid, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { faCircleCheck as faCircleCheckRegular } from '@fortawesome/free-regular-svg-icons';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -82,6 +82,17 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
 
   //console.log('render ValueTransferLine - 5', index, nextLineWithSameTxid);
 
+  //if (index === 0) {
+  //  vt.confirmations = 0;
+  //  vt.status = RPCValueTransfersStatusEnum.failed;
+  //  vt.kind = ValueTransferKindEnum.Shield;
+  //}
+  //if (index === 1) {
+  //  vt.confirmations = 0;
+  //  vt.status = RPCValueTransfersStatusEnum.failed;
+  //  vt.kind = ValueTransferKindEnum.Sent;
+  //}
+
   return (
     <View testID={`m-${index + 1}`} style={{ display: 'flex', flexDirection: 'column', marginHorizontal: 10 }}>
       {month !== '' && (
@@ -118,6 +129,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             borderBottomStartRadius: vt.kind === ValueTransferKindEnum.Received ? 0 : 20,
             backgroundColor:
               vt.kind === ValueTransferKindEnum.Received ? colors.primaryDisabled : colors.secondaryDisabled,
+            opacity: vt.status === RPCValueTransfersStatusEnum.failed ? 0.5 : 1,
           }}>
           {!!vt.address && !messageAddress && (
             <View style={{ marginTop: -10, marginBottom: 10, marginLeft: 30 }}>
@@ -189,10 +201,25 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
               alignItems: 'center',
               alignSelf: 'flex-end',
             }}>
+            {vt.status === RPCValueTransfersStatusEnum.failed && (
+              <FadeText
+                style={{
+                  color: colors.danger.primary,
+                  alignSelf: 'center',
+                  fontSize: 12,
+                  opacity: 1,
+                  fontWeight: '700',
+                  marginRight: 10,
+                  marginTop: 2,
+                }}>
+                {translate(`history.${vt.status}`) as string}
+              </FadeText>
+            )}
             {vt.amount >= Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount()) && (
               <ZecAmount
                 style={{
                   paddingRight: 5,
+                  opacity: vt.status === RPCValueTransfersStatusEnum.failed ? 0.5 : 1,
                 }}
                 size={12}
                 currencyName={info.currencyName}
@@ -206,6 +233,14 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             </View>
             <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                {(vt.status === RPCValueTransfersStatusEnum.failed) && (
+                  <FontAwesomeIcon
+                    style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
+                    size={12}
+                    icon={faCircleXmark}
+                    color={colors.danger.primary}
+                  />
+                )}
                 {(vt.status === RPCValueTransfersStatusEnum.calculated ||
                   vt.status === RPCValueTransfersStatusEnum.transmitted) && (
                   <FontAwesomeIcon
@@ -224,7 +259,8 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     color={colors.primary}
                   />
                 )}
-                {vt.status !== RPCValueTransfersStatusEnum.confirmed && (
+                {vt.status !== RPCValueTransfersStatusEnum.confirmed && 
+                  vt.status !== RPCValueTransfersStatusEnum.failed && (
                   <FontAwesomeIcon
                     style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
                     size={12}
@@ -240,7 +276,8 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     color={colors.primary}
                   />
                 )}
-                {vt.status !== RPCValueTransfersStatusEnum.confirmed && (
+                {vt.status !== RPCValueTransfersStatusEnum.confirmed &&
+                  vt.status !== RPCValueTransfersStatusEnum.failed && (
                   <View style={{ marginLeft: 2, marginTop: 2 }}>
                     <ActivityIndicator
                       size={Platform.OS === GlobalConst.platformOSios ? 'small' : 12}

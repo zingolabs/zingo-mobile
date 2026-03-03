@@ -77,6 +77,7 @@ import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
+import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -98,6 +99,13 @@ const SERVER_DEFAULT_0: ServerType = {
   chainName: serverUris(() => {})[0].chainName,
 } as ServerType;
 
+const activationHeight = {
+  "main": 419200,
+  "test": 280000,
+  "regtest": 1,
+  "": 1,
+};
+
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as ThemeType;
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
@@ -107,7 +115,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum.basic | ModeEnum.advanced>(ModeEnum.advanced); // by default advanced
-  const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
+  const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<LaunchingModeEnum>(LaunchingModeEnum.opening);
   const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
@@ -125,6 +133,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
+  const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(BlockExplorerEnum.Zcashexplorer);
   const file = useMemo(
     () => ({
       en: en,
@@ -280,6 +289,15 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.performanceLevel, performanceLevel);
       }
+      if (
+        settings.blockExplorer === BlockExplorerEnum.Cipherscan ||
+        settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
+        settings.blockExplorer === BlockExplorerEnum.Zypherscan
+      ) {
+        setBlockExplorer(settings.blockExplorer);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.blockExplorer, blockExplorer);
+      }
 
       // if server uri is empty, fix this.
       // it is a weird edge case
@@ -299,8 +317,8 @@ export default function LoadingApp(props: LoadingAppProps) {
       //await delay(5000);
 
       // reading background task info
-      const backgroundJson = await BackgroundFileImpl.readBackground();
-      setBackground(backgroundJson);
+      const backgroundSyncInfoJson = await BackgroundFileImpl.readBackground();
+      setBackgroundSyncInfo(backgroundSyncInfoJson);
 
       setLoading(false);
     })();
@@ -325,7 +343,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         donation={donation}
         privacy={privacy}
         mode={mode}
-        background={background}
+        backgroundSyncInfo={backgroundSyncInfo}
         firstLaunchingMessage={firstLaunchingMessage}
         security={security}
         selectServer={selectServer}
@@ -333,6 +351,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         performanceLevel={performanceLevel}
+        blockExplorer={blockExplorer}
       />
     );
   }
@@ -351,7 +370,7 @@ type LoadingAppClassProps = {
   donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
-  background: BackgroundType;
+  backgroundSyncInfo: BackgroundType;
   firstLaunchingMessage: LaunchingModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
@@ -359,6 +378,7 @@ type LoadingAppClassProps = {
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
+  blockExplorer: BlockExplorerEnum;
 };
 
 type LoadingAppClassState = AppStateLoading & AppContextLoading;
@@ -377,7 +397,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
       zecPrice: {} as ZecPriceType,
-      background: props.background,
+      backgroundSyncInfo: props.backgroundSyncInfo,
       translate: props.translate,
       backgroundError: {} as BackgroundErrorType,
       setBackgroundError: this.setBackgroundError,
@@ -404,6 +424,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
+      blockExplorer: props.blockExplorer,
 
       // state
       appStateStatus: AppState.currentState,
@@ -685,7 +706,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       ) {
         //console.log('App LOADING has come to the foreground!');
         // reading background task info
-        this.fetchBackgroundSyncing();
+        this.fetchBackgroundSyncInfo();
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
         //console.log('&&&&& background no in storage &&&&&');
@@ -963,9 +984,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
   };
 
-  fetchBackgroundSyncing = async () => {
-    const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
-    this.setState({ background: backgroundJson });
+  fetchBackgroundSyncInfo = async () => {
+    const backgroundSyncInfoJson: BackgroundType = await BackgroundFileImpl.readBackground();
+    this.setState({ backgroundSyncInfo: backgroundSyncInfoJson });
   };
 
   setCustomServerUri = (customServerUri: string) => {
@@ -1130,6 +1151,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
   doRestore = async (seedUfvk: string, birthday: number) => {
     if (!seedUfvk) {
+      // no reporting button, no needed.
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -1138,32 +1160,46 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.state.translate('loadingapp.emptyseedufvk-error') as string,
         false,
         this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
       );
       return;
     }
-    if (
-      (seedUfvk.toLowerCase().startsWith(GlobalConst.uview) &&
-        this.state.server.chainName !== ChainNameEnum.mainChainName) ||
-      (seedUfvk.toLowerCase().startsWith(GlobalConst.utestview) &&
-        this.state.server.chainName === ChainNameEnum.mainChainName)
-    ) {
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        [this.screenName],
-        this.state.translate('loadingapp.invalidseedufvk-label') as string,
-        this.state.translate('loadingapp.invalidseedufvk-error') as string,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
-      return;
+    if (seedUfvk.startsWith(GlobalConst.uview)) {
+      // it is a UFVK
+      let parsingError: boolean = false;
+      if (this.state.server.chainName === ChainNameEnum.mainChainName && 
+          (seedUfvk.startsWith(GlobalConst.uviewtest) ||
+            seedUfvk.startsWith(GlobalConst.uviewregtest))
+      ) {
+        // the ufvk is not correct
+        parsingError = true;
+      }
+      if (this.state.server.chainName === ChainNameEnum.testChainName && 
+          !seedUfvk.startsWith(GlobalConst.uviewtest)
+      ) {
+        // the ufvk is not correct
+        parsingError = true;
+      }
+      if (this.state.server.chainName === ChainNameEnum.regtestChainName && 
+          !seedUfvk.startsWith(GlobalConst.uviewregtest)
+      ) {
+        // the ufvk is not correct
+        parsingError = true;
+      }
+      if (parsingError) {
+        // no reporting button, no needed.
+        createAlert(
+          this.setBackgroundError,
+          this.addLastSnackbar,
+          [this.screenName],
+          this.state.translate('loadingapp.invalidseedufvk-label') as string,
+          this.state.translate('loadingapp.invalidseedufvk-error') as string,
+          false,
+          this.state.translate,
+        );
+        return;
+      }
     }
 
-    this.setState({ actionButtonsDisabled: true });
     let walletBirthday = birthday.toString() || '0';
     if (parseInt(walletBirthday, 10) < 0) {
       walletBirthday = '0';
@@ -1172,10 +1208,27 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       walletBirthday = '0';
     }
 
+    // birthday cannot be lower than sapling activation height
+    if (Number(walletBirthday) < activationHeight[this.state.server.chainName]) {
+      // no reporting button, no needed.
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        [this.screenName],
+        this.state.translate('loadingapp.invalidbirthday-label') as string,
+        this.state.translate('loadingapp.invalidbirthday-error') as string,
+        false,
+        this.state.translate,
+      );
+      return;
+    }
+
+    this.setState({ actionButtonsDisabled: true });
     let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
     if (
       seedUfvk.toLowerCase().startsWith(GlobalConst.uview) ||
-      seedUfvk.toLowerCase().startsWith(GlobalConst.utestview)
+      seedUfvk.toLowerCase().startsWith(GlobalConst.uviewtest) ||
+      seedUfvk.toLowerCase().startsWith(GlobalConst.uviewregtest)
     ) {
       // this is a UFVK
       type = RestoreFromTypeEnum.ufvkRestoreFrom;
@@ -1458,7 +1511,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
       zecPrice: this.state.zecPrice,
-      background: this.state.background,
+      backgroundSyncInfo: this.state.backgroundSyncInfo,
       translate: this.state.translate,
       backgroundError: this.state.backgroundError,
       setBackgroundError: this.state.setBackgroundError,
@@ -1485,6 +1538,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
+      blockExplorer: this.state.blockExplorer,
     };
 
     return (

@@ -16,6 +16,7 @@ import {
   SnackbarType,
 } from '../AppState';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
@@ -29,7 +30,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   } as ZecPriceType,
   sendAll: false,
   donation: false,
-  background: {
+  backgroundSyncInfo: {
     batches: 0,
     message: '',
     date: 0,
@@ -54,6 +55,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
+  blockExplorer: BlockExplorerEnum.Zcashexplorer,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppContextLoading);

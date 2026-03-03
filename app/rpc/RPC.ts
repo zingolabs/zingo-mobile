@@ -449,14 +449,17 @@ export default class RPC {
   //sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
   async pauseSyncProcess(): Promise<void> {
-    let returnPause: string = await RPCModule.pauseSyncProcess();
-    if (returnPause && returnPause.toLowerCase().startsWith(GlobalConst.error)) {
-      console.log('SYNC PAUSE ERROR', returnPause);
-      this.fnSetLastError(`Error sync pause: ${returnPause}`);
-      return;
-    } else {
-      console.log('pause sync process. PAUSED', returnPause);
-    }
+    try {
+      let returnPause: string = await RPCModule.pauseSyncProcess();
+      if (returnPause && returnPause.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log('SYNC PAUSE ERROR', returnPause);
+        this.fnSetLastError(`Error sync pause: ${returnPause}`);
+      } else {
+        console.log('pause sync process. PAUSED', returnPause);
+      }
+    } catch (error) {
+      console.log(`Critical Error pause sync ${error}`);
+    } 
   }
 
   async clearTimers(): Promise<void> {
@@ -493,204 +496,229 @@ export default class RPC {
   }
 
   async refreshSync(fullRescan?: boolean) {
-    //console.log('WALLET', this.lastWalletBlockHeight, 'SERVER', this.lastServerBlockHeight);
-
-    if (this.refreshSyncLock && !fullRescan) {
-      //console.log('REFRESH ----> in execution already');
-      return;
-    }
-    this.refreshSyncLock = true;
-
-    // the App can called `sync run` no matter what
-    // this is handy to have the wallet fully synced
-    // anytime.
-    this.keepAwake(true);
-
-    // This is async, so when it is done, we finish the refresh.
-    if (fullRescan) {
-      await this.clearTimers();
-      // clean the ValueTransfer list before.
-      this.fnSetValueTransfersList([], 0);
-      this.fnSetMessagesList([], 0);
-      this.fnSetTotalBalance({
-        totalOrchardBalance: 0,
-        totalSaplingBalance: 0,
-        totalTransparentBalance: 0,
-        confirmedTransparentBalance: 0,
-        confirmedOrchardBalance: 0,
-        confirmedSaplingBalance: 0,
-        totalSpendableBalance: 0,
-      } as TotalBalanceClass);
-      this.fnSetSyncingStatus({} as RPCSyncStatusType);
-
-      const start = Date.now();
-      const rescanStr: string = await RPCModule.runRescanProcess();
-      if (Date.now() - start > 4000) {
-        console.log('=========================================== > rescan run command - ', Date.now() - start);
+    try {
+      if (this.refreshSyncLock && !fullRescan) {
+        //console.log('REFRESH ----> in execution already');
+        return;
       }
-      //console.log('rescan RUN', rescanStr);
-      if (rescanStr && rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error rescan: ${rescanStr}`);
-        this.fnSetLastError(`Error rescan: ${rescanStr}`);
+      this.refreshSyncLock = true;
+
+      // the App can called `sync run` no matter what
+      // this is handy to have the wallet fully synced
+      // anytime.
+      this.keepAwake(true);
+
+      // This is async, so when it is done, we finish the refresh.
+      if (fullRescan) {
+        await this.clearTimers();
+        // clean the ValueTransfer list before.
+        this.fnSetValueTransfersList([], 0);
+        this.fnSetMessagesList([], 0);
+        this.fnSetTotalBalance({
+          totalOrchardBalance: 0,
+          totalSaplingBalance: 0,
+          totalTransparentBalance: 0,
+          confirmedTransparentBalance: 0,
+          confirmedOrchardBalance: 0,
+          confirmedSaplingBalance: 0,
+          totalSpendableBalance: 0,
+        } as TotalBalanceClass);
+        this.fnSetSyncingStatus({} as RPCSyncStatusType);
+
+        const start = Date.now();
+        const rescanStr: string = await RPCModule.runRescanProcess();
+        if (Date.now() - start > 4000) {
+          console.log('=========================================== > rescan run command - ', Date.now() - start);
+        }
+        //console.log('rescan RUN', rescanStr);
+        if (rescanStr && rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error rescan: ${rescanStr}`);
+          this.fnSetLastError(`Error rescan: ${rescanStr}`);
+        }
+        await this.configure();
+      } else {
+        const start = Date.now();
+        const syncStr: string = await RPCModule.runSyncProcess();
+        if (Date.now() - start > 4000) {
+          console.log('=========================================== > sync run command - ', Date.now() - start);
+        }
+        console.log('sync RUN', syncStr);
+        if (syncStr && syncStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error sync: ${syncStr}`);
+          this.fnSetLastError(`Error sync: ${syncStr}`);
+        }
       }
-      await this.configure();
-    } else {
-      const start = Date.now();
-      const syncStr: string = await RPCModule.runSyncProcess();
-      if (Date.now() - start > 4000) {
-        console.log('=========================================== > sync run command - ', Date.now() - start);
-      }
-      console.log('sync RUN', syncStr);
-      if (syncStr && syncStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error sync: ${syncStr}`);
-        this.fnSetLastError(`Error sync: ${syncStr}`);
-      }
+    } catch (error) {
+      console.log(`Critical Error sync/rescan run ${error}`);
     }
 
     this.refreshSyncLock = false;
   }
 
   async fetchSyncStatus(): Promise<void> {
-    if (this.fetchSyncStatusLock) {
-      //console.log('sync status locked');
-      return;
-    }
-    this.fetchSyncStatusLock = true;
-    const start = Date.now();
-    const returnStatus: string = await RPCModule.statusSyncInfo();
-    if (Date.now() - start > 4000) {
-      console.log('=========================================== > sync status command - ', Date.now() - start);
-    }
-    if (returnStatus && returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
-      console.log('SYNC STATUS ERROR', returnStatus);
-      this.fnSetLastError(`Error sync status: ${returnStatus}`);
-      this.fetchSyncStatusLock = false;
-      return;
-    }
-    let ss = {} as RPCSyncStatusType;
     try {
-      ss = await JSON.parse(returnStatus);
+      if (this.fetchSyncStatusLock) {
+        //console.log('sync status locked');
+        return;
+      }
+      this.fetchSyncStatusLock = true;
+      const start = Date.now();
+      const returnStatus: string = await RPCModule.statusSyncInfo();
+      if (Date.now() - start > 4000) {
+        console.log('=========================================== > sync status command - ', Date.now() - start);
+      }
+      if (returnStatus && returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log('SYNC STATUS ERROR', returnStatus);
+        this.fnSetLastError(`Error sync status: ${returnStatus}`);
+        this.fetchSyncStatusLock = false;
+        return;
+      }
+      let ss = {} as RPCSyncStatusType;
+      try {
+        ss = await JSON.parse(returnStatus);
+      } catch (error) {
+        console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus, error);
+        this.fnSetLastError(`Error sync status parse: ${error} value: ${returnStatus}`);
+        this.fetchSyncStatusLock = false;
+        return;
+      }
+
+      //console.log('SYNC STATUS', ss);
+      console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned, ss.percentage_total_blocks_scanned);
+
+      //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
+
+      // avoiding 0.00, minimum 0.01, maximun 100
+      // fixing when is:
+      // - 0.00000000123 (rounded 0)     better: 0.01  than 0
+      // - 99.9999999123 (rounded 99.99) better: 99.99 than 100.
+      ss.percentage_total_outputs_scanned = 
+        ss.percentage_total_outputs_scanned && 
+        ss.percentage_total_outputs_scanned < 0.01
+          ? 0.01
+          : ss.percentage_total_outputs_scanned &&
+            ss.percentage_total_outputs_scanned > 99.99 &&
+            ss.percentage_total_outputs_scanned < 100
+              ? 99.99
+              : Number(ss.percentage_total_outputs_scanned?.toFixed(2));
+
+      ss.percentage_total_blocks_scanned = 
+        ss.percentage_total_blocks_scanned && 
+        ss.percentage_total_blocks_scanned < 0.01
+          ? 0.01
+          : ss.percentage_total_blocks_scanned &&
+            ss.percentage_total_blocks_scanned > 99.99 &&
+            ss.percentage_total_blocks_scanned < 100
+              ? 99.99
+              : Number(ss.percentage_total_blocks_scanned?.toFixed(2));
+
+      // Close the poll timer if the sync finished(checked via promise above)
+      const inR: boolean =
+        !!ss.scan_ranges &&
+        ss.scan_ranges.length > 0 &&
+        (ss.percentage_total_outputs_scanned ?? ss.percentage_total_blocks_scanned ?? 0) < 100;
+      if (!inR) {
+        // here we can release the screen...
+        this.keepAwake(false);
+      } else {
+        this.keepAwake(true);
+      }
+
+      // store SyncStatus object for a new screen
+      this.fnSetSyncingStatus(ss as RPCSyncStatusType);
     } catch (error) {
-      console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus, error);
-      this.fnSetLastError(`Error sync status parse: ${error} value: ${returnStatus}`);
-      this.fetchSyncStatusLock = false;
-      return;
+      console.log(`Critical Error sync status ${error}`);
     }
-
-    //console.log('SYNC STATUS', ss);
-    console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned);
-
-    //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
-
-    // avoiding 0.00, minimum 0.01, maximun 100
-    // fixing when is:
-    // - 0.00000000123 (rounded 0)   better: 0.01  than 0
-    // - 99.9999999123 (rounded 100)
-    ss.percentage_total_outputs_scanned = 
-      ss.percentage_total_outputs_scanned && 
-      ss.percentage_total_outputs_scanned < 0.01
-        ? 0.01
-        : Number(ss.percentage_total_outputs_scanned?.toFixed(2));
-
-    // Close the poll timer if the sync finished(checked via promise above)
-    const inR: boolean =
-      !!ss.scan_ranges &&
-      ss.scan_ranges.length > 0 &&
-      !!ss.percentage_total_outputs_scanned &&
-      ss.percentage_total_outputs_scanned < 100;
-    if (!inR) {
-      // here we can release the screen...
-      this.keepAwake(false);
-    } else {
-      this.keepAwake(true);
-    }
-
-    // store SyncStatus object for a new screen
-    this.fnSetSyncingStatus(ss as RPCSyncStatusType);
 
     this.fetchSyncStatusLock = false;
   }
 
-  // do not use it for now...
   async fetchSyncPoll(): Promise<void> {
-    if (this.fetchSyncPollLock) {
-      console.log('***************** SYNC POLL - locked');
-      return;
-    }
-    this.fetchSyncPollLock = true;
-    const start = Date.now();
-    const returnPoll: string = await RPCModule.pollSyncInfo();
-    if (Date.now() - start > 4000) {
-      console.log('=========================================== > sync poll command - ', Date.now() - start);
-    }
-    if (returnPoll && returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
-      console.log('SYNC POLL ERROR', returnPoll);
-      this.fnSetLastError(`Error sync poll: ${returnPoll}`);
-      this.fetchSyncPollLock = false;
-      return;
-    }
+    try {
+      if (this.fetchSyncPollLock) {
+        console.log('***************** SYNC POLL - locked');
+        return;
+      }
+      this.fetchSyncPollLock = true;
+      const start = Date.now();
+      const returnPoll: string = await RPCModule.pollSyncInfo();
+      if (Date.now() - start > 4000) {
+        console.log('=========================================== > sync poll command - ', Date.now() - start);
+      }
+      if (returnPoll && returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log('SYNC POLL ERROR', returnPoll);
+        this.fnSetLastError(`Error sync poll: ${returnPoll}`);
+        this.fetchSyncPollLock = false;
+        return;
+      }
 
-    if (returnPoll.toLowerCase().startsWith('sync task has not been launched')) {
-      console.log('SYNC POLL -> RUN SYNC', returnPoll);
-      setTimeout(async () => {
-        await this.refreshSync();
-      }, 0);
-      this.fetchSyncPollLock = false;
-      return;
-    }
+      if (returnPoll.toLowerCase().startsWith('sync task has not been launched')) {
+        console.log('SYNC POLL -> RUN SYNC', returnPoll);
+        setTimeout(async () => {
+          await this.refreshSync();
+        }, 0);
+        this.fetchSyncPollLock = false;
+        return;
+      }
 
-    if (returnPoll.toLowerCase().startsWith('sync task is not complete')) {
-      console.log('SYNC POLL -> FETCH STATUS', returnPoll);
+      if (returnPoll.toLowerCase().startsWith('sync task is not complete')) {
+        console.log('SYNC POLL -> FETCH STATUS', returnPoll);
+        setTimeout(async () => {
+          await this.fetchSyncStatus();
+        }, 0);
+        console.log('SYNC POLL -> RUN SYNC', returnPoll);
+        // I don't trust in this message, when the tx is stuck in Trasmitted
+        // this is the message I got & after that the status says 100% complete
+        // this is not true, here Just in case, I need to run the sync again.
+        setTimeout(async () => {
+          await this.refreshSync();
+        }, 0);
+        this.fetchSyncPollLock = false;
+        return;
+      }
+
+      let sp = {} as RPCSyncPollType;
+      try {
+        sp = await JSON.parse(returnPoll);
+      } catch (error) {
+        console.log('SYNC POLL ERROR - PARSE JSON', returnPoll, error);
+        this.fnSetLastError(`Error sync poll parse: ${error} value: ${returnPoll}`);
+        this.fetchSyncPollLock = false;
+        return;
+      }
+
+      // avoiding 0.00, minimum 0.01, maximun 100
+      // fixing when is:
+      // - 0.00000000123 (rounded 0)     better: 0.01  than 0
+      // - 99.9999999123 (rounded 99.99) better: 99.99 than 100.
+      sp.sync_complete.percentage_total_outputs_scanned = 
+        sp.sync_complete.percentage_total_outputs_scanned && 
+        sp.sync_complete.percentage_total_outputs_scanned < 0.01
+          ? 0.01
+          : sp.sync_complete.percentage_total_outputs_scanned &&
+            sp.sync_complete.percentage_total_outputs_scanned > 99.99 &&
+            sp.sync_complete.percentage_total_outputs_scanned < 100
+              ? 99.99
+              : Number(sp.sync_complete.percentage_total_outputs_scanned?.toFixed(2));
+
+      const inR: boolean =
+        (sp.sync_complete.percentage_total_outputs_scanned ?? 0) < 100;
+      if (!inR) {
+        // here we can release the screen...
+        this.keepAwake(false);
+      } else {
+        this.keepAwake(true);
+      }
+
+      console.log('SYNC POLL', sp);
+
+      console.log('SYNC POLL -> FETCH STATUS');
       setTimeout(async () => {
         await this.fetchSyncStatus();
       }, 0);
-      console.log('SYNC POLL -> RUN SYNC', returnPoll);
-      // I don't trust in this message, when the tx is stuck in Trasmitted
-      // this is the message I got & after that the status says 100% complete
-      // this is not true, here Just in case, I need to run the sync again.
-      setTimeout(async () => {
-        await this.refreshSync();
-      }, 0);
-      this.fetchSyncPollLock = false;
-      return;
-    }
-
-    let sp = {} as RPCSyncPollType;
-    try {
-      sp = await JSON.parse(returnPoll);
     } catch (error) {
-      console.log('SYNC POLL ERROR - PARSE JSON', returnPoll, error);
-      this.fnSetLastError(`Error sync poll parse: ${error} value: ${returnPoll}`);
-      this.fetchSyncPollLock = false;
-      return;
+      console.log(`Critical Error sync poll ${error}`);
     }
-
-    // avoiding 0.00, minimum 0.01, maximun 100
-    // fixing when is:
-    // - 0.00000000123 (rounded 0)   better: 0.01  than 0
-    // - 99.9999999123 (rounded 100)
-    sp.sync_complete.percentage_total_outputs_scanned = 
-      sp.sync_complete.percentage_total_outputs_scanned && 
-      sp.sync_complete.percentage_total_outputs_scanned < 0.01
-        ? 0.01
-        : Number(sp.sync_complete.percentage_total_outputs_scanned?.toFixed(2));
-
-    const inR: boolean =
-      !!sp.sync_complete.percentage_total_outputs_scanned &&
-      sp.sync_complete.percentage_total_outputs_scanned < 100;
-    if (!inR) {
-      // here we can release the screen...
-      this.keepAwake(false);
-    } else {
-      this.keepAwake(true);
-    }
-
-    console.log('SYNC POLL', sp);
-
-    console.log('SYNC POLL -> FETCH STATUS');
-    setTimeout(async () => {
-      await this.fetchSyncStatus();
-    }, 0);
 
     this.fetchSyncPollLock = false;
   }
@@ -1162,7 +1190,8 @@ export default class RPC {
           if (
             vt.status === RPCValueTransfersStatusEnum.calculated ||
             vt.status === RPCValueTransfersStatusEnum.transmitted ||
-            vt.status === RPCValueTransfersStatusEnum.mempool
+            vt.status === RPCValueTransfersStatusEnum.mempool ||
+            vt.status === RPCValueTransfersStatusEnum.failed
           ) {
             currentValueTransferList.confirmations = 0;
           } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
@@ -1277,7 +1306,8 @@ export default class RPC {
           if (
             m.status === RPCValueTransfersStatusEnum.calculated ||
             m.status === RPCValueTransfersStatusEnum.transmitted ||
-            m.status === RPCValueTransfersStatusEnum.mempool
+            m.status === RPCValueTransfersStatusEnum.mempool ||
+            m.status === RPCValueTransfersStatusEnum.failed
           ) {
             currentMessageList.confirmations = 0;
           } else if (m.status === RPCValueTransfersStatusEnum.confirmed) {

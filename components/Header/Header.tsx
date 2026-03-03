@@ -124,8 +124,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     shieldingAmount,
     selectServer,
     setZecPrice,
-    background,
-    lastError,
+    backgroundSyncInfo,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
@@ -173,17 +172,18 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     } else {
       setPercentageOutputsScanned(
         syncingStatus.percentage_total_outputs_scanned 
-        ? syncingStatus.percentage_total_outputs_scanned
-        : 0,
+          ?? syncingStatus.percentage_total_blocks_scanned
+          ?? 0,
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
         syncingStatus.scan_ranges.length > 0 &&
-        !!syncingStatus.percentage_total_outputs_scanned &&
-        syncingStatus.percentage_total_outputs_scanned < 100,
+        (syncingStatus.percentage_total_outputs_scanned 
+          ?? syncingStatus.percentage_total_blocks_scanned 
+          ?? 0) < 100,
       );
     }
-  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
+  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.percentage_total_blocks_scanned, syncingStatus.scan_ranges]);
 
   useEffect(() => {
     // when the App is syncing this can fired a lot of times
@@ -729,7 +729,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               addLastSnackbar &&
               noBalance &&
               privacyComponent()}
-            {!noSyncingStatus && !!background.error && mode === ModeEnum.advanced && (
+            {!noSyncingStatus && !!backgroundSyncInfo.error && mode === ModeEnum.advanced && (
               <View
                 style={{
                   alignItems: 'center',
@@ -925,7 +925,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 }}>
                 <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
               </TouchableOpacity>
-              {!!lastError && <FontAwesomeIcon style={{ alignSelf: 'flex-end' }} icon={faGear} size={5} color={colors.warning.primary} />}
             </>
           ) : (
             <Image

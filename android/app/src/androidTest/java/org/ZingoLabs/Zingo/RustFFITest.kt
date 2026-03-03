@@ -311,7 +311,10 @@ class ExecuteSyncFromSeed {
             }
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_total_outputs_scanned >= 100.0) {
+            val progress = syncStatus.percentage_total_outputs_scanned
+               ?: syncStatus.percentage_total_blocks_scanned
+
+            if (progress != null && progress >= 100.0) {
                 println("Sync completed!")
                 break
             }
@@ -368,7 +371,10 @@ class ExecuteSendFromOrchard {
             }
             syncStatusBefore = mapper.readValue(syncStatusBeforeJson)
 
-            if (syncStatusBefore.percentage_total_outputs_scanned >= 100.0) {
+            val progress = syncStatusBefore.percentage_total_outputs_scanned
+               ?: syncStatusBefore.percentage_total_blocks_scanned
+
+            if (progress != null && progress >= 100.0) {
                 println("Sync completed!")
                 break
             }
@@ -413,7 +419,10 @@ class ExecuteSendFromOrchard {
             }
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_total_outputs_scanned >= 100.0) {
+            val progress = syncStatus.percentage_total_outputs_scanned
+               ?: syncStatus.percentage_total_blocks_scanned
+
+            if (progress != null && progress >= 100.0) {
                 println("Sync completed!")
                 break
             }
@@ -478,7 +487,10 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
             }
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_total_outputs_scanned >= 100.0) {
+            val progress = syncStatus.percentage_total_outputs_scanned
+               ?: syncStatus.percentage_total_blocks_scanned
+
+            if (progress != null && progress >= 100.0) {
                 println("Sync completed!")
                 break
             }
@@ -559,7 +571,10 @@ class ExecuteSaplingBalanceFromSeed {
             }
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_total_outputs_scanned >= 100.0) {
+            val progress = syncStatus.percentage_total_outputs_scanned
+               ?: syncStatus.percentage_total_blocks_scanned
+
+            if (progress != null && progress >= 100.0) {
                 println("Sync completed!")
                 break
             }

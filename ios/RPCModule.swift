@@ -1281,43 +1281,6 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  func fnResendTransactionProcess(_ dict: [AnyHashable: Any]) {
-      if let txid = dict["txid"] as? String,
-          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try resendTransaction(txid: txid)
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] resend transaction. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] resend transaction. Command arguments problem."
-          NSLog(err)
-          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      }
-  }
-
-  @objc(resendTransactionProcess:resolve:reject:)
-  func resendTransactionProcess(_ txid: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["txid": txid, "resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnResendTransactionProcess(dict)
-        }
-      }
-  }
-
   func fnRemoveTransactionProcess(_ dict: [AnyHashable: Any]) {
       if let txid = dict["txid"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {

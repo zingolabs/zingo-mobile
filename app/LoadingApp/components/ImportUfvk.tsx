@@ -26,6 +26,13 @@ import { ButtonTypeEnum, GlobalConst, ScreenEnum, SelectServerEnum } from '../..
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 
+const activationHeight = {
+  "main": 419200,
+  "test": 280000,
+  "regtest": 1,
+  "": 1,
+};
+
 type ImportUfvkProps = {
   onClickCancel: () => void;
   onClickOK: (keyText: string, birthday: number) => void;
@@ -59,7 +66,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     if (seedufvkText) {
       if (
         seedufvkText.toLowerCase().startsWith(GlobalConst.uview) ||
-        seedufvkText.toLowerCase().startsWith(GlobalConst.utestview)
+        seedufvkText.toLowerCase().startsWith(GlobalConst.uviewtest)
       ) {
         // if it is a ufvk
         const seedufvkTextArray: string[] = seedufvkText.replaceAll('\n', ' ').trim().replaceAll('  ', ' ').split(' ');
@@ -224,7 +231,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
               <FadeText>{translate('import.birthday') as string}</FadeText>
               {selectServer !== SelectServerEnum.offline && (
                 <FadeText style={{ textAlign: 'center' }}>
-                  {translate('seed.birthday-no-readonly') + ' (1, ' + (latestBlock ? latestBlock.toString() : '--') + ')'}
+                  {translate('seed.birthday-no-readonly') + ` (${activationHeight[server.chainName]}, ` + (latestBlock ? latestBlock.toString() : '--') + ')'}
                 </FadeText>
               )}
               <View
