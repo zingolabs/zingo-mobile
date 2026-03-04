@@ -64,6 +64,7 @@ import {
   AddressBookFileClassObsolete,
   ScreenEnum,
   LaunchingModeEnum,
+  BlockExplorerEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -105,7 +106,6 @@ import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));

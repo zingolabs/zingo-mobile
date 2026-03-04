@@ -10,11 +10,11 @@ import {
   ServerUrisType,
   SettingsFileClass,
   SettingsNameEnum,
+  BlockExplorerEnum,
 } from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
-import { BlockExplorerEnum } from '../../app/AppState/enums/BlockExplorerEnum';
 
 export default class SettingsFileImpl {
   static async getFileName() {

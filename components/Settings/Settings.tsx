@@ -37,6 +37,7 @@ import {
   GlobalConst,
   RouteEnum,
   ScreenEnum,
+  BlockExplorerEnum,
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
@@ -49,7 +50,6 @@ import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevel
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
-import { BlockExplorerEnum } from '../../app/AppState/enums/BlockExplorerEnum';
 
 type SettingsProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Settings> & {
   setServerOption: (

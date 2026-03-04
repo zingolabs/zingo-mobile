@@ -44,6 +44,7 @@ import {
   RestoreFromTypeEnum,
   ScreenEnum,
   LaunchingModeEnum,
+  BlockExplorerEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -77,7 +78,6 @@ import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
-import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');

@@ -14,9 +14,9 @@ import {
   CurrencyEnum,
   SelectServerEnum,
   SnackbarType,
+  BlockExplorerEnum,
 } from '../AppState';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
-import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,

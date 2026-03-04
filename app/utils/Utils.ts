@@ -17,6 +17,7 @@ import {
   ToAddrClass,
   TranslateType,
   ValueTransferType,
+  BlockExplorerEnum,
 } from '../AppState';
 
 import randomColor from 'randomcolor';
@@ -26,7 +27,6 @@ import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import { RPCParseAddressStatusEnum } from '../rpc/enums/RPCParseAddressStatusEnum';
 import { RPCAddressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../rpc/enums/RPCReceiversEnum';
-import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {

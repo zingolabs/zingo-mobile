@@ -18,11 +18,11 @@ import {
   SelectServerEnum,
   SnackbarType,
   AppContextLoaded,
+  BlockExplorerEnum,
 } from '../AppState';
 
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
-import { BlockExplorerEnum } from '../AppState/enums/BlockExplorerEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
