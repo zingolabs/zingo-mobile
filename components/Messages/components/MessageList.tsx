@@ -424,7 +424,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             fasterServer = server;
             // likely here there is a internet conection problem
             // all of the servers return an error because they are unreachable probably.
-            // the 30 seconds timout was fired.
+            // the 15 seconds timout was fired.
           }
           console.log(serverChecked);
           console.log(fasterServer);

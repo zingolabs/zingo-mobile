@@ -174,7 +174,7 @@
     "zcash-url": "Você já possui um endereço na tela de envio",
     "connection-error": "Esta opção requer uma conexão com a Internet para ser executada.",
     "tryingnewserver": "Tentando conectar-se ao novo servidor... Pode levar alguns segundos.",
-    "tryingnewserver-error": "Após 30 segundos o novo servidor não responde.",
+    "tryingnewserver-error": "Após 15 segundos o novo servidor não responde.",
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
     "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação.",

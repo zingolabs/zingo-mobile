@@ -19,8 +19,8 @@ const calculateLatency = async (server: ServerUrisType, _index: number) => {
 const selectingServer = async (serverUris: ServerUrisType[]): Promise<ServerUrisType | null> => {
   const servers: ServerUrisType[] = serverUris;
 
-  // 30 seconds max.
-  const timeoutPromise = new Promise<null>(resolve => setTimeout(() => resolve(null), 30 * 1000));
+  // 15 seconds max.
+  const timeoutPromise = new Promise<null>(resolve => setTimeout(() => resolve(null), 15 * 1000));
 
   const validServersPromises = servers.map(
     (server: ServerUrisType) =>

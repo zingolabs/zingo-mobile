@@ -174,7 +174,7 @@
     "zcash-url": "Gönderme ekranında zaten bir adresiniz var",
     "connection-error": "Bu seçenek yalnızca internet bağlantısı olduğunda çalıştırılabilir.",
     "tryingnewserver": "Yeni sunucuya bağlanılmaya çalışılıyor... Bu işlem birkaç saniye sürebilir.",
-    "tryingnewserver-error": "Yeni sunucu 30 saniye içinde yanıt vermedi.",
+    "tryingnewserver-error": "Yeni sunucu 15 saniye içinde yanıt vermedi.",
     "readingwallet": "Cüzdan sunucuyla başarıyla okundu:",
     "restorewallet-title": "Gelişmiş Seçenekler",
     "restorewallet-alert": "Yeni bir cüzdanı kurtarma ifadenizle geri yüklemek üzeresiniz. Devam etmek istiyor musunuz?",

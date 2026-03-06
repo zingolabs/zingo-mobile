@@ -473,7 +473,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       }
       const { result, timeout, newChainName } = await checkServerURI(serverUriParsed, serverContext.uri);
       if (!result) {
-        // if the server checking takes more then 30 seconds.
+        // if the server checking takes more then 15 seconds.
         if (timeout === true) {
           addLastSnackbar({ message: translate('loadedapp.tryingnewserver-error') as string, screenName: [screenName] });
         } else {
