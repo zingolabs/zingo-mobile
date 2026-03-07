@@ -278,7 +278,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     };
     const inter = setInterval(() => {
       showIt();
-    }, 30 * 1000);
+    }, 29 * 1000);
 
     return () => clearInterval(inter);
   }, []);

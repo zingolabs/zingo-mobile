@@ -822,7 +822,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       fasterServer = actualServer;
       // likely here there is a internet/wifi conection problem
       // all of the servers return an error because they are unreachable probably.
-      // the 30 seconds timout was fired.
+      // the 15 seconds timout was fired.
       someServerIsWorking = false;
     }
     //console.log(server);

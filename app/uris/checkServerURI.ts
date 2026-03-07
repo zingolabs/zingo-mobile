@@ -15,8 +15,8 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
     const resultStrServerPromise = await RPCModule.changeServerProcess(uri);
     const timeoutServerPromise = new Promise((_, reject) => {
       setTimeout(() => {
-        reject(new Error('Promise changeserver Timeout 30 seconds'));
-      }, 30 * 1000);
+        reject(new Error('Promise changeserver Timeout 15 seconds'));
+      }, 15 * 1000);
     });
 
     const resultStrServer: string = await Promise.race([resultStrServerPromise, timeoutServerPromise]);
@@ -35,8 +35,8 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         const infoStrPromise = await RPCModule.infoServerInfo();
         const timeoutInfoPromise = new Promise((resolve, reject) => {
           setTimeout(() => {
-            reject(new Error('Promise info Timeout 30 seconds'));
-          }, 30 * 1000);
+            reject(new Error('Promise info Timeout 15 seconds'));
+          }, 15 * 1000);
         });
 
         const infoStr: string = await Promise.race([infoStrPromise, timeoutInfoPromise]);
@@ -65,8 +65,8 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         const balanceStrPromise = await RPCModule.getBalanceInfo();
         const timeoutInfoPromise = new Promise((resolve, reject) => {
           setTimeout(() => {
-            reject(new Error('Promise info Timeout 30 seconds'));
-          }, 30 * 1000);
+            reject(new Error('Promise info Timeout 15 seconds'));
+          }, 15 * 1000);
         });
 
         const balanceStr: string = await Promise.race([balanceStrPromise, timeoutInfoPromise]);
