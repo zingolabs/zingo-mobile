@@ -11,7 +11,7 @@ import {
 import moment from 'moment';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faSliders } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
@@ -43,6 +43,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { RPCValueTransfersStatusEnum } from '../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
+import { FiltersIcon } from '../Components/Icons/FiltersIcon';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -463,11 +464,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
               paddingHorizontal: 1,
               paddingVertical: 4,
             }}>
-            <FontAwesomeIcon
+            <FiltersIcon 
               style={{ marginLeft: 5, marginRight: 5 }}
-              size={25}
-              icon={faSliders}
-              color={colors.zingo}
+              color={colors.zingo} 
+              size={24}
             />
             {(!!filterKind || filterFailed || filterMemos || filterWithFunds) && (
               <View style={{

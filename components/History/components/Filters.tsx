@@ -96,14 +96,15 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                 alignItems: 'center',
                 justifyContent: 'flex-start',
               }}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
+            <View
+              style={{
                 width: '90%',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
                 marginTop: 10,
                 alignItems: 'center',
                 justifyContent: 'flex-start',
+                rowGap: 10,
               }}>
               <TouchableOpacity
                 onPress={() => {
@@ -174,16 +175,6 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   </FadeText>
                 </View>
               </TouchableOpacity>
-            </ScrollView>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                width: '90%',
-                marginTop: 20,
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-              }}>
               <TouchableOpacity
                 onPress={() => {
                   setFilterFailedLocal(!filterFailedLocal);
@@ -252,7 +243,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   </FadeText>
                 </View>
               </TouchableOpacity>
-            </ScrollView>
+            </View>
           </ScrollView>
         <View
           style={{
