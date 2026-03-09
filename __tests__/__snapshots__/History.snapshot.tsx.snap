@@ -809,147 +809,87 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         {
           "alignItems": "center",
           "flexDirection": "row",
-          "justifyContent": "center",
+          "justifyContent": "space-between",
           "marginBottom": 2,
           "marginHorizontal": 5,
           "width": "100%",
         }
       }
     >
-      <RCTScrollView
-        contentContainerStyle={
+      <View
+        style={
           {
-            "alignItems": "center",
-            "justifyContent": "center",
-            "marginTop": 10,
-            "width": "100%",
+            "width": 20,
           }
         }
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
+      />
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignSelf": "flex-start",
+            "flexDirection": "row",
+            "marginRight": 20,
+            "marginTop": -35,
+            "paddingHorizontal": 1,
+            "paddingVertical": 4,
+          }
+        }
       >
-        <View>
-          <View
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": undefined,
-              }
+        <
+          color="#888888"
+          icon={
+            {
+              "icon": [
+                512,
+                512,
+                [
+                  "sliders-h",
+                ],
+                "f1de",
+                "M32 64C14.3 64 0 78.3 0 96s14.3 32 32 32l86.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 128c17.7 0 32-14.3 32-32s-14.3-32-32-32L265.3 64C253 35.7 224.8 16 192 16s-61 19.7-73.3 48L32 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l246.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48l54.7 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-54.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 224zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l54.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 448c17.7 0 32-14.3 32-32s-14.3-32-32-32l-246.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 384z",
+              ],
+              "iconName": "sliders",
+              "prefix": "fas",
             }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
+          }
+          size={25}
+          style={
+            {
+              "marginLeft": 5,
+              "marginRight": 5,
             }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              {
-                "opacity": 1,
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "backgroundColor": "#18bd18",
-                  "borderColor": "#18bd18",
-                  "borderRadius": 15,
-                  "borderWidth": 1,
-                  "marginRight": 10,
-                  "paddingHorizontal": 10,
-                  "paddingVertical": 5,
-                }
-              }
-            >
-              <Text
-                style={
-                  {
-                    "color": "#040C17",
-                    "fontWeight": "bold",
-                    "opacity": 0.65,
-                  }
-                }
-              >
-                text translated
-              </Text>
-            </View>
-          </View>
-          <View
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": undefined,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              {
-                "opacity": 1,
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "backgroundColor": "#040C17",
-                  "borderColor": "#888888",
-                  "borderRadius": 15,
-                  "borderWidth": 1,
-                  "paddingHorizontal": 10,
-                  "paddingVertical": 5,
-                }
-              }
-            >
-              <Text
-                style={
-                  {
-                    "color": "#888888",
-                    "fontWeight": "bold",
-                    "opacity": 0.65,
-                  }
-                }
-              >
-                text translated
-              </Text>
-            </View>
-          </View>
-        </View>
-      </RCTScrollView>
+          }
+        />
+      </View>
     </View>
     <ActivityIndicator
       color="#18bd18"
@@ -1441,147 +1381,87 @@ exports[`Component History - test History no currency, privacy normal & mode bas
         {
           "alignItems": "center",
           "flexDirection": "row",
-          "justifyContent": "center",
+          "justifyContent": "space-between",
           "marginBottom": 2,
           "marginHorizontal": 5,
           "width": "100%",
         }
       }
     >
-      <RCTScrollView
-        contentContainerStyle={
+      <View
+        style={
           {
-            "alignItems": "center",
-            "justifyContent": "center",
-            "marginTop": 10,
-            "width": "100%",
+            "width": 20,
           }
         }
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
+      />
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignSelf": "flex-start",
+            "flexDirection": "row",
+            "marginRight": 20,
+            "marginTop": -35,
+            "paddingHorizontal": 1,
+            "paddingVertical": 4,
+          }
+        }
       >
-        <View>
-          <View
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": undefined,
-              }
+        <
+          color="#888888"
+          icon={
+            {
+              "icon": [
+                512,
+                512,
+                [
+                  "sliders-h",
+                ],
+                "f1de",
+                "M32 64C14.3 64 0 78.3 0 96s14.3 32 32 32l86.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 128c17.7 0 32-14.3 32-32s-14.3-32-32-32L265.3 64C253 35.7 224.8 16 192 16s-61 19.7-73.3 48L32 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l246.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48l54.7 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-54.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 224zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l54.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 448c17.7 0 32-14.3 32-32s-14.3-32-32-32l-246.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 384z",
+              ],
+              "iconName": "sliders",
+              "prefix": "fas",
             }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
+          }
+          size={25}
+          style={
+            {
+              "marginLeft": 5,
+              "marginRight": 5,
             }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              {
-                "opacity": 1,
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "backgroundColor": "#18bd18",
-                  "borderColor": "#18bd18",
-                  "borderRadius": 15,
-                  "borderWidth": 1,
-                  "marginRight": 10,
-                  "paddingHorizontal": 10,
-                  "paddingVertical": 5,
-                }
-              }
-            >
-              <Text
-                style={
-                  {
-                    "color": "#040C17",
-                    "fontWeight": "bold",
-                    "opacity": 0.65,
-                  }
-                }
-              >
-                text translated
-              </Text>
-            </View>
-          </View>
-          <View
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": undefined,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              {
-                "opacity": 1,
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "backgroundColor": "#040C17",
-                  "borderColor": "#888888",
-                  "borderRadius": 15,
-                  "borderWidth": 1,
-                  "paddingHorizontal": 10,
-                  "paddingVertical": 5,
-                }
-              }
-            >
-              <Text
-                style={
-                  {
-                    "color": "#888888",
-                    "fontWeight": "bold",
-                    "opacity": 0.65,
-                  }
-                }
-              >
-                text translated
-              </Text>
-            </View>
-          </View>
-        </View>
-      </RCTScrollView>
+          }
+        />
+      </View>
     </View>
     <ActivityIndicator
       color="#18bd18"
