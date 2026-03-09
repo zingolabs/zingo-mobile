@@ -2,9 +2,7 @@
 import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
-  ScrollView,
   RefreshControl,
-  TouchableOpacity,
   ActivityIndicator,
   Dimensions,
   Platform,
@@ -13,7 +11,7 @@ import {
 import moment from 'moment';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faSliders } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
@@ -21,6 +19,7 @@ import {
   GlobalConst,
   RouteEnum,
   ScreenEnum,
+  ValueTransferKindEnum,
   //SelectServerEnum,
   //SendPageStateClass,
   //ServerType,
@@ -41,6 +40,9 @@ import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { Swipeable } from 'react-native-gesture-handler';
+import { RPCValueTransfersStatusEnum } from '../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
+import Filters from './components/Filters';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -50,7 +52,7 @@ const ViewTypes = {
 };
 
 type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> &  {
-  // side menu
+  // side menu 
   toggleMenuDrawer: () => void;
   // privacy
   // addLastSnackbar from context
@@ -106,10 +108,16 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
+  const [filterWithFunds, setFilterWithFunds] = useState<boolean>(false);
+  const [filterKind, setFilterKind] = useState<FilterEnum | null>(null);
+  const [filterFailed, setFilterFailed] = useState<boolean>(false);
+  const [filterMemos, setFilterMemos] = useState<boolean>(false);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
   const [showFooter, setShowFooter] = useState<boolean>(false);
-  const scrollViewRef = useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(null);
+  const [heightLayout, setHeightLayout] = useState<number>(10);
 
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const scrollViewRef = useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(null);
   const swipeablesRef = new Map<number, Swipeable>();
 
   const registerSwipeable = (key: number) => (ref: Swipeable) => {
@@ -187,13 +195,65 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
 
+  const snapPoints = useMemo(() => {
+    let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
+    if (snap1 < 1) {
+      snap1 = 1;
+    }
+    let snap2: number = 80;
+    if (snap1 < 80) {
+      snap2 = snap1 + 20;
+    }
+    return [
+      `${snap1}%`,
+      `${snap2}%`,
+    ]
+  }, [heightLayout]);
+  
   const fetchValueTransfersFiltered = useMemo(() => {
     if (!valueTransfers) {
       return [] as ValueTransferType[];
     }
-    // strictly show VT's with some amount on funds.
-    return valueTransfers.filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true));
-  }, [valueTransfers, filter]);
+    if (!filterKind && !filterFailed && !filterMemos && !filterWithFunds) {
+      return valueTransfers;
+    }
+    return valueTransfers.filter((vt: ValueTransferType) => {
+      let selectedKind: boolean = true;
+      let selectedFailed: boolean = true;
+      let selectedMemos: boolean = true;
+      let selectedWithFunds: boolean = true;
+      if (filterKind) {
+        selectedKind = false;
+        if (filterKind === FilterEnum.sent && (vt.kind === ValueTransferKindEnum.Sent || vt.kind === ValueTransferKindEnum.SendToSelf || vt.kind === ValueTransferKindEnum.MemoToSelf || vt.kind === ValueTransferKindEnum.Rejection)) {
+          selectedKind = true;
+        } else if (filterKind === FilterEnum.received && vt.kind === ValueTransferKindEnum.Received) {
+          selectedKind = true;
+        } else if (filterKind === FilterEnum.shielded && vt.kind === ValueTransferKindEnum.Shield) {
+          selectedKind = true;
+        }
+      }
+      if (filterFailed) {
+        selectedFailed = false;
+        if (vt.status === RPCValueTransfersStatusEnum.failed) {
+          selectedFailed = true;
+        }
+      }
+      if (filterMemos) {
+        selectedMemos = false;
+        const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
+        if (haveMemo) {
+          selectedMemos = true;
+        }
+      }
+      if (filterWithFunds) {
+        selectedWithFunds = false;
+        if (vt.amount > 0) {
+          selectedWithFunds = true;
+        }
+      }
+      return selectedKind && selectedFailed && selectedMemos && selectedWithFunds;
+    });
+  }, [filterFailed, filterKind, filterMemos, filterWithFunds, valueTransfers]);
 
   useEffect(() => {
     Utils.setMomentLocale(language)
@@ -340,7 +400,18 @@ const History: React.FunctionComponent<HistoryProps> = ({
     );
   };
 
-  //console.log('render History - 4', valueTransfersSliced.length);
+  const renderBackdrop = (props: BottomSheetBackdropProps) => (
+    <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" />
+  );
+
+  const hide = useCallback(() => {
+    bottomSheetRef.current?.snapToIndex(-1);
+    bottomSheetRef.current?.close();
+    setShowFilters(false);
+    setHeightLayout(10);
+  }, []);
+
+  console.log('render History - 4', filterKind, filterFailed, filterMemos, filterWithFunds);
   //console.log(valueTransfersSliced[0]);
 
   return (
@@ -372,70 +443,45 @@ const History: React.FunctionComponent<HistoryProps> = ({
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             width: '100%',
             marginHorizontal: 5,
             marginBottom: 2,
           }}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              width: '100%',
-              marginTop: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
+          <View style={{ width: 20 }} />
+
+          <Pressable
+            onPress={() => {
+              setShowFilters(true);
+              bottomSheetRef.current?.snapToIndex(0);
+            }}
+            style={{
+              marginTop: -35,
+              marginRight: 20,
+              flexDirection: 'row',
+              alignSelf: 'flex-start',
+              paddingHorizontal: 1,
+              paddingVertical: 4,
             }}>
-            <TouchableOpacity
-              onPress={() => {
-                setFilter(FilterEnum.all);
-                setLoading(true);
-                setShowFooter(false);
-              }}>
-              <View
-                style={{
-                  backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  marginRight: 10,
-                }}>
-                <FadeText
-                  style={{
-                    color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
-                    fontWeight: 'bold',
-                  }}>
-                  {translate('messages.filter-all') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setFilter(FilterEnum.withFunds);
-                setLoading(true);
-                setShowFooter(false);
-              }}>
-              <View
-                style={{
-                  backgroundColor: filter === FilterEnum.withFunds ? colors.primary : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor: filter === FilterEnum.withFunds ? colors.primary : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                }}>
-                <FadeText
-                  style={{
-                    color: filter === FilterEnum.withFunds ? colors.sideMenuBackground : colors.zingo,
-                    fontWeight: 'bold',
-                  }}>
-                  {translate('history.filter-withfunds') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
-          </ScrollView>
+            <FontAwesomeIcon
+              style={{ marginLeft: 5, marginRight: 5 }}
+              size={25}
+              icon={faSliders}
+              color={colors.zingo}
+            />
+            {(!!filterKind || filterFailed || filterMemos || filterWithFunds) && (
+              <View style={{
+                backgroundColor: colors.text,
+                width: 7,
+                height: 7,
+                borderRadius: 7,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: -3,
+                marginLeft: -5,
+              }} />
+            )}
+          </Pressable>
         </View>
         {loading ? (
           <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
@@ -551,6 +597,38 @@ const History: React.FunctionComponent<HistoryProps> = ({
           </>
         )}
       </View>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enableDynamicSizing={false}
+        enablePanDownToClose
+        keyboardBehavior={'interactive'}
+        handleStyle={{ display: 'none' }}
+        backgroundStyle={{ backgroundColor: colors.background }}
+        onChange={(index) => {
+          if (index === -1) {
+            setShowFilters(false);
+          }
+        }}
+        backdropComponent={renderBackdrop}>
+        <BottomSheetView style={{ backgroundColor: colors.background, height: '100%' }}>
+          {showFilters && (
+            <Filters
+              closeSheet={hide}
+              setHeightLayout={setHeightLayout}
+              filterKind={filterKind}
+              setFilterKind={setFilterKind}
+              filterFailed={filterFailed}
+              setFilterFailed={setFilterFailed}
+              filterMemos={filterMemos}
+              setFilterMemos={setFilterMemos}
+              filterWithFunds={filterWithFunds}
+              setFilterWithFunds={setFilterWithFunds}
+            />
+          )}
+        </BottomSheetView>
+      </BottomSheet>
     </ToastProvider>
   );
 };

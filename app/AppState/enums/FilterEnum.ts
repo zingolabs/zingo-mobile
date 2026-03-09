@@ -4,4 +4,12 @@ export enum FilterEnum {
   noContacts = 'no contacts',
   withFunds = 'withFunds',
   wallet = 'wallet',
+  // new ones - kind
+  sent = 'sent',
+  received = 'received',
+  shielded = 'shielded',
+  // new one - Status
+  failed = 'failed',
+  // new one
+  memos = 'memos',
 }
