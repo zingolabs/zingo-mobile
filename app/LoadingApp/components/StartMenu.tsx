@@ -200,7 +200,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              {selectServer !== SelectServerEnum.offline && (
+              {true && (
                 <View
                   style={{
                     alignItems: 'center',
@@ -266,22 +266,25 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               )}
               <View style={{ flexDirection: 'row' }}>
                 <Button
-                  type={ButtonTypeEnum.Primary}
-                  title={translate('save') as string}
+                  type={ButtonTypeEnum.Secondary}
+                  title={translate('cancel') as string}
                   disabled={actionButtonsDisabled}
                   onPress={() => {
-                    usingCustomServer();
+                    onPressServerOffline(false);
+                    onPressServerChainName(ChainNameEnum.mainChainName);
+                    setCustomServerUri('');
+                    setCustomServerShow(false);
                     Keyboard.dismiss();
                   }}
                   style={{ marginBottom: 10 }}
                   twoButtons={true}
                 />
                 <Button
-                  type={ButtonTypeEnum.Secondary}
-                  title={translate('cancel') as string}
+                  type={ButtonTypeEnum.Primary}
+                  title={translate('save') as string}
                   disabled={actionButtonsDisabled}
                   onPress={() => {
-                    setCustomServerShow(false);
+                    usingCustomServer();
                     Keyboard.dismiss();
                   }}
                   style={{ marginBottom: 10, marginLeft: 10 }}
@@ -403,7 +406,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             </View>
           )}
 
-          {(!netInfo.isConnected || selectServer === SelectServerEnum.offline) && !walletExists && (
+          {!netInfo.isConnected && !walletExists && (
             <View
               style={{
                 display: 'flex',
@@ -423,6 +426,31 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 }}>
                 <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
                   {translate('loadingapp.nointernet-message') as string}
+                </BoldText>
+              </View>
+            </View>
+          )}
+
+          {selectServer === SelectServerEnum.offline && !walletExists && (
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                marginHorizontal: 20,
+              }}>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  marginTop: 20,
+                  borderColor: colors.primary,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  padding: 5,
+                }}>
+                <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
+                  {translate('loadingapp.offline-message') as string}
                 </BoldText>
               </View>
             </View>

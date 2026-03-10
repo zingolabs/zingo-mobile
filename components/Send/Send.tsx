@@ -1631,10 +1631,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                   marginBottom: 20,
                 }}>
                 <Button
+                  type={ButtonTypeEnum.Secondary}
+                  title={translate('send.clear') as string}
+                  onPress={() => {
+                    defaultValueFee();
+                    defaultValuesSpendableMaxAmount();
+                    clearState();
+                    setPickerTempSelectedAddress('');
+                    Keyboard.dismiss();
+                  }}
+                  twoButtons={true}
+                />
+                <Button
                   testID={sendButtonEnabled ? 'send.button' : 'send.button-disabled'}
                   accessible={true}
                   accessibilityLabel={'title ' + translate('send.button')}
                   type={ButtonTypeEnum.Primary}
+                  style={{ marginLeft: 10 }}
                   title={
                     validAmount === 1 &&
                     amountText &&
@@ -1697,19 +1710,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     setConfirmModalShow(parseAddressInfoJSON);
                     Keyboard.dismiss();
                     setSendButtonEnabled(true);
-                  }}
-                  twoButtons={true}
-                />
-                <Button
-                  type={ButtonTypeEnum.Secondary}
-                  style={{ marginLeft: 10 }}
-                  title={translate('send.clear') as string}
-                  onPress={() => {
-                    defaultValueFee();
-                    defaultValuesSpendableMaxAmount();
-                    clearState();
-                    setPickerTempSelectedAddress('');
-                    Keyboard.dismiss();
                   }}
                   twoButtons={true}
                 />

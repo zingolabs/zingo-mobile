@@ -1764,6 +1764,82 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               }
             >
               <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#011401",
+                    "borderColor": "#18bd18",
+                    "borderRadius": 10,
+                    "borderWidth": 2,
+                    "justifyContent": "center",
+                    "maxWidth": "90%",
+                    "minHeight": 48,
+                    "minWidth": "30%",
+                    "opacity": 1,
+                    "padding": 0,
+                    "paddingLeft": 20,
+                    "paddingRight": 20,
+                    "width": "40%",
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                      "margin": 0,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#18bd18",
+                        "fontSize": 16,
+                        "fontWeight": "bold",
+                        "textAlign": "center",
+                        "textTransform": "uppercase",
+                      }
+                    }
+                  >
+                    text translated
+                  </Text>
+                </View>
+              </View>
+              <View
                 accessibilityLabel="title text translated"
                 accessibilityState={
                   {
@@ -1800,6 +1876,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     "borderRadius": 10,
                     "borderWidth": 2,
                     "justifyContent": "center",
+                    "marginLeft": 10,
                     "maxWidth": "90%",
                     "minHeight": 48,
                     "minWidth": "30%",
@@ -1830,83 +1907,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     style={
                       {
                         "color": "#011401",
-                        "fontSize": 16,
-                        "fontWeight": "bold",
-                        "textAlign": "center",
-                        "textTransform": "uppercase",
-                      }
-                    }
-                  >
-                    text translated
-                  </Text>
-                </View>
-              </View>
-              <View
-                accessibilityState={
-                  {
-                    "busy": undefined,
-                    "checked": undefined,
-                    "disabled": undefined,
-                    "expanded": undefined,
-                    "selected": undefined,
-                  }
-                }
-                accessibilityValue={
-                  {
-                    "max": undefined,
-                    "min": undefined,
-                    "now": undefined,
-                    "text": undefined,
-                  }
-                }
-                accessible={true}
-                collapsable={false}
-                focusable={true}
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
-                style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "#011401",
-                    "borderColor": "#18bd18",
-                    "borderRadius": 10,
-                    "borderWidth": 2,
-                    "justifyContent": "center",
-                    "marginLeft": 10,
-                    "maxWidth": "90%",
-                    "minHeight": 48,
-                    "minWidth": "30%",
-                    "opacity": 1,
-                    "padding": 0,
-                    "paddingLeft": 20,
-                    "paddingRight": 20,
-                    "width": "40%",
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "alignItems": "center",
-                      "display": "flex",
-                      "flexDirection": "row",
-                      "justifyContent": "center",
-                      "margin": 0,
-                      "minHeight": 48,
-                      "minWidth": 48,
-                      "padding": 0,
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      {
-                        "color": "#18bd18",
                         "fontSize": 16,
                         "fontWeight": "bold",
                         "textAlign": "center",
@@ -3112,6 +3112,82 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               }
             >
               <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#011401",
+                    "borderColor": "#18bd18",
+                    "borderRadius": 10,
+                    "borderWidth": 2,
+                    "justifyContent": "center",
+                    "maxWidth": "90%",
+                    "minHeight": 48,
+                    "minWidth": "30%",
+                    "opacity": 1,
+                    "padding": 0,
+                    "paddingLeft": 20,
+                    "paddingRight": 20,
+                    "width": "40%",
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                      "margin": 0,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#18bd18",
+                        "fontSize": 16,
+                        "fontWeight": "bold",
+                        "textAlign": "center",
+                        "textTransform": "uppercase",
+                      }
+                    }
+                  >
+                    text translated
+                  </Text>
+                </View>
+              </View>
+              <View
                 accessibilityLabel="title text translated"
                 accessibilityState={
                   {
@@ -3148,6 +3224,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     "borderRadius": 10,
                     "borderWidth": 2,
                     "justifyContent": "center",
+                    "marginLeft": 10,
                     "maxWidth": "90%",
                     "minHeight": 48,
                     "minWidth": "30%",
@@ -3178,83 +3255,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     style={
                       {
                         "color": "#011401",
-                        "fontSize": 16,
-                        "fontWeight": "bold",
-                        "textAlign": "center",
-                        "textTransform": "uppercase",
-                      }
-                    }
-                  >
-                    text translated
-                  </Text>
-                </View>
-              </View>
-              <View
-                accessibilityState={
-                  {
-                    "busy": undefined,
-                    "checked": undefined,
-                    "disabled": undefined,
-                    "expanded": undefined,
-                    "selected": undefined,
-                  }
-                }
-                accessibilityValue={
-                  {
-                    "max": undefined,
-                    "min": undefined,
-                    "now": undefined,
-                    "text": undefined,
-                  }
-                }
-                accessible={true}
-                collapsable={false}
-                focusable={true}
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
-                style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "#011401",
-                    "borderColor": "#18bd18",
-                    "borderRadius": 10,
-                    "borderWidth": 2,
-                    "justifyContent": "center",
-                    "marginLeft": 10,
-                    "maxWidth": "90%",
-                    "minHeight": 48,
-                    "minWidth": "30%",
-                    "opacity": 1,
-                    "padding": 0,
-                    "paddingLeft": 20,
-                    "paddingRight": 20,
-                    "width": "40%",
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "alignItems": "center",
-                      "display": "flex",
-                      "flexDirection": "row",
-                      "justifyContent": "center",
-                      "margin": 0,
-                      "minHeight": 48,
-                      "minWidth": 48,
-                      "padding": 0,
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      {
-                        "color": "#18bd18",
                         "fontSize": 16,
                         "fontWeight": "bold",
                         "textAlign": "center",

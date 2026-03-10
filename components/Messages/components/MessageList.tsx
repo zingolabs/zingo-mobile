@@ -121,7 +121,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [disableSend, setDisableSend] = useState<boolean>(false);
-  const [anonymous, setAnonymous] = useState<boolean>(false);
   const [memoFieldHeight, setMemoFieldHeight] = useState<number>(48 + 30);
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [spendable, setSpendable] = useState<number>(0);
@@ -175,19 +174,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     [address],
   );
 
-  const anonymousFilter = useMemo(
-    () => (addr: string | undefined, memos: string[] | undefined) => {
-      if (!memos || memos.length === 0) {
-        return false;
-      }
-      const { memoUA } = Utils.splitMemo(memos);
-      // checking address
-      // from the same contact in the Address Book.
-      return !addr && !memoUA;
-    },
-    [],
-  );
-
   const fetchMessagesFiltered = useMemo(() => {
     if (!messages) {
       return [] as ValueTransferType[];
@@ -195,13 +181,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     if (address) {
       // filtering for this address
       return messages.filter((a: ValueTransferType) => addressFilter(a.address, a.memos));
-    } else if (anonymous) {
-      // filtering for anonymous messages
-      return messages.filter((a: ValueTransferType) => anonymousFilter(a.address, a.memos));
     } else {
       return messages;
     }
-  }, [messages, address, anonymous, addressFilter, anonymousFilter]);
+  }, [messages, address, addressFilter]);
 
   useEffect(() => {
     Utils.setMomentLocale(language);
@@ -556,7 +539,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               setPrivacyOption={setPrivacyOption}
               addLastSnackbar={addLastSnackbar /* context */}
             />
-            {address ? (
+            {!!address && ( 
               <>
                 <View
                   style={{
@@ -601,59 +584,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                     )}
                   </View>
                   <AddressItem address={address} screenName={screenName} oneLine={true} withIcon={true} />
-                </View>
-              </>
-            ) : (
-              <>
-                <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center', margin: 10 }}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setAnonymous(false);
-                      setLoading(true);
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: !anonymous ? colors.primary : colors.sideMenuBackground,
-                        borderRadius: 15,
-                        borderColor: !anonymous ? colors.primary : colors.zingo,
-                        borderWidth: 1,
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        marginHorizontal: 10,
-                      }}>
-                      <FadeText
-                        style={{
-                          color: !anonymous ? colors.sideMenuBackground : colors.zingo,
-                          fontWeight: 'bold',
-                        }}>
-                        {translate('messages.link-all') as string}
-                      </FadeText>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setAnonymous(true);
-                      setLoading(true);
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: anonymous ? colors.primary : colors.sideMenuBackground,
-                        borderRadius: 15,
-                        borderColor: anonymous ? colors.primary : colors.zingo,
-                        borderWidth: 1,
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        marginHorizontal: 0,
-                      }}>
-                      <FadeText
-                        style={{
-                          color: anonymous ? colors.sideMenuBackground : colors.zingo,
-                          fontWeight: 'bold',
-                        }}>
-                        {translate('messages.link-anonymous') as string}
-                      </FadeText>
-                    </View>
-                  </TouchableOpacity>
                 </View>
               </>
             )}
