@@ -254,13 +254,13 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
             marginTop: 30,
           }}>
           <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('save') as string}
+            type={ButtonTypeEnum.Secondary}
+            title={translate('clear') as string}
             onPress={() => {
-              setFilterWithFunds(filterWithFundsLocal);
-              setFilterKind(filterKindLocal);
-              setFilterFailed(filterFailedLocal);
-              setFilterMemos(filterMemosLocal);
+              setFilterWithFunds(false);
+              setFilterKind(null);
+              setFilterFailed(false);
+              setFilterMemos(false);
               clearLocal();
               clear();
               closeSheet();
@@ -268,14 +268,14 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
             twoButtons={true}
           />
           <Button
-            type={ButtonTypeEnum.Secondary}
-            title={translate('clear') as string}
+            type={ButtonTypeEnum.Primary}
+            title={translate('save') as string}
             style={{ marginLeft: 10 }}
             onPress={() => {
-              setFilterWithFunds(false);
-              setFilterKind(null);
-              setFilterFailed(false);
-              setFilterMemos(false);
+              setFilterWithFunds(filterWithFundsLocal);
+              setFilterKind(filterKindLocal);
+              setFilterFailed(filterFailedLocal);
+              setFilterMemos(filterMemosLocal);
               clearLocal();
               clear();
               closeSheet();

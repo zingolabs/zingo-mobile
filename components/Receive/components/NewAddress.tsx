@@ -266,17 +266,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             marginTop: 30,
           }}>
           <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('save') as string}
-            onPress={() => {
-              createAddress();
-            }}
-            twoButtons={true}
-          />
-          <Button
             type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
-            style={{ marginLeft: 10 }}
             onPress={() => {
               setLabel('');
               Keyboard.dismiss();
@@ -284,6 +275,15 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
               setTimeout(() => {
                 closeSheet();
               }, 100);
+            }}
+            twoButtons={true}
+          />
+          <Button
+            type={ButtonTypeEnum.Primary}
+            title={translate('save') as string}
+            style={{ marginLeft: 10 }}
+            onPress={() => {
+              createAddress();
             }}
             twoButtons={true}
           />

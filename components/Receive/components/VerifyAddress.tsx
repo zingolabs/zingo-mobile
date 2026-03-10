@@ -179,18 +179,8 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             marginTop: 30,
           }}>
           <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('verify') as string}
-            onPress={() => {
-              verifyAddress();
-            }}
-            twoButtons={true}
-            disabled={!address || !!errorAddress}
-          />
-          <Button
             type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
-            style={{ marginLeft: 10 }}
             onPress={() => {
               setAddress('');
               Keyboard.dismiss();
@@ -200,6 +190,16 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }, 100);
             }}
             twoButtons={true}
+          />
+          <Button
+            type={ButtonTypeEnum.Primary}
+            title={translate('verify') as string}
+            style={{ marginLeft: 10 }}
+            onPress={() => {
+              verifyAddress();
+            }}
+            twoButtons={true}
+            disabled={!address || !!errorAddress}
           />
         </View>
       </View>

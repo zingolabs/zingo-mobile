@@ -213,9 +213,19 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           marginVertical: 5,
         }}>
         <Button
+          type={ButtonTypeEnum.Secondary}
+          title={translate('cancel') as string}
+          onPress={() => {
+            cancel();
+            Keyboard.dismiss();
+          }}
+          twoButtons={true}
+        />
+        <Button
           testID="addressbook.button.action"
           type={ButtonTypeEnum.Primary}
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
+          style={{ marginLeft: 10 }}
           onPress={() => {
             doAction(action, label.trim(), address, item.color ? item.color : '');
             Keyboard.dismiss();
@@ -227,16 +237,6 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
               ? true
               : false
           }
-          twoButtons={true}
-        />
-        <Button
-          type={ButtonTypeEnum.Secondary}
-          title={translate('cancel') as string}
-          style={{ marginLeft: 10 }}
-          onPress={() => {
-            cancel();
-            Keyboard.dismiss();
-          }}
           twoButtons={true}
         />
       </View>

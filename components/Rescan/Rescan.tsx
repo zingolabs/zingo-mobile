@@ -105,7 +105,11 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
             alignItems: 'center',
             marginVertical: 5,
           }}>
-          <Button type={ButtonTypeEnum.Primary} title={translate('rescan.button') as string} onPress={doRescanAndClose} />
+          <Button 
+            type={ButtonTypeEnum.Primary} 
+            title={translate('rescan.button') as string} 
+            onPress={doRescanAndClose} 
+          />
         </View>
       </View>
     </ToastProvider>

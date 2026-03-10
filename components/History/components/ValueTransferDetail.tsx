@@ -395,7 +395,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       onPress={() => {
                         actionOnPress(TransactionActionEnum.remove);
                       }}
-                      twoButtons={false}
                     />
                   </View>
                 </>

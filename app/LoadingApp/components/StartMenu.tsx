@@ -266,22 +266,22 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               )}
               <View style={{ flexDirection: 'row' }}>
                 <Button
-                  type={ButtonTypeEnum.Primary}
-                  title={translate('save') as string}
+                  type={ButtonTypeEnum.Secondary}
+                  title={translate('cancel') as string}
                   disabled={actionButtonsDisabled}
                   onPress={() => {
-                    usingCustomServer();
+                    setCustomServerShow(false);
                     Keyboard.dismiss();
                   }}
                   style={{ marginBottom: 10 }}
                   twoButtons={true}
                 />
                 <Button
-                  type={ButtonTypeEnum.Secondary}
-                  title={translate('cancel') as string}
+                  type={ButtonTypeEnum.Primary}
+                  title={translate('save') as string}
                   disabled={actionButtonsDisabled}
                   onPress={() => {
-                    setCustomServerShow(false);
+                    usingCustomServer();
                     Keyboard.dismiss();
                   }}
                   style={{ marginBottom: 10, marginLeft: 10 }}

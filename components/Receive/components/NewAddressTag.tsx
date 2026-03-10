@@ -138,18 +138,8 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             marginTop: 30,
           }}>
           <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('save') as string}
-            onPress={() => {
-              createAddressTag();
-            }}
-            twoButtons={true}
-            disabled={!label}
-          />
-          <Button
             type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
-            style={{ marginLeft: 10 }}
             onPress={() => {
               setLabel('');
               Keyboard.dismiss();
@@ -159,6 +149,16 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
               }, 100);
             }}
             twoButtons={true}
+          />
+          <Button
+            type={ButtonTypeEnum.Primary}
+            title={translate('save') as string}
+            style={{ marginLeft: 10 }}
+            onPress={() => {
+              createAddressTag();
+            }}
+            twoButtons={true}
+            disabled={!label}
           />
         </View>
       </View>
