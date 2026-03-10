@@ -121,6 +121,7 @@
     "emptyseedufvk-error": "The Seed Phrase / Viewing Key was empty. Review the value and fix it.",
     "custom": "Custom Server...",
     "nointernet-message": "There is no established internet connection. Please fix this issue.",
+    "offline-message": "There is no active wallet. In offline mode, you cannot create or restore a wallet. Choose a server to continue.",
     "basicmode": "Change to Basic Mode",
     "advancedmode": "Change to Advanced Mode",
     "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",

@@ -121,6 +121,7 @@
     "emptyseedufvk-error": "La semilla / Clave de Visualización proporcionada está vacia. Revisa el contenido y corrigelo.",
     "custom": "Otro Servidor...",
     "nointernet-message": "No hay una conexión a internet establecida. Por favor solucione esta incidencia.",
+    "offline-message": "No hay una billetera activa. En modo offline no se puede crear ni restaurar una billetera. Elige un servidor para continuar.",
     "basicmode": "Cambiar a Modo Básico",
     "advancedmode": "Cambiar a Modo Avanzado",
     "noopenwallet-message": "Ha ocurrido un error mientras la App estaba intentando abrir el monedero activo.",
