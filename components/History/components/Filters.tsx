@@ -222,7 +222,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                setFilterWithFundsLocal(!filterWithFunds);
+                setFilterWithFundsLocal(!filterWithFundsLocal);
               }}>
               <View
                 style={{
