@@ -111,10 +111,12 @@ jobs:
           rustup default stable
           cargo update -p zingolib -p regchest_utils --aggressive
 
-      - name: Cargo default nightly
+      - name: Cargo default stable
         run: |
-          rustup toolchain install nightly --profile minimal --component rust-src
-          rustup default nightly
+          sudo rustup update
+          sudo rustup upgrade
+          rustup toolchain install stable --profile minimal --component rust-src
+          rustup default stable
 
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli
@@ -168,7 +170,7 @@ jobs:
         run: |
           cargo ndk \
           --target ${{ env.TARGET }} build \
-          --release -Z build-std
+          --release
         env:
           AR: llvm-ar
           LD: ld
