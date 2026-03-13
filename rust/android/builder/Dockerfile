@@ -34,7 +34,7 @@ ENV CARGO_HOME=$HOME/.cargo
 ENV RUSTUP_HOME=$HOME/.rustup
 ENV PATH=$PATH:$CARGO_HOME/bin
 RUN rustup toolchain install stable --profile minimal
-RUN rustup toolchain install nightly --component rust-src
+RUN rustup toolchain install stable --component rust-src
 RUN rustup update \
     && rustup default stable
 RUN rustup target add \

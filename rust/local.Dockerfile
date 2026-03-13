@@ -20,7 +20,7 @@ COPY Cargo.lock /opt/zingo/rust/Cargo.lock
 COPY Cargo.toml /opt/zingo/rust/Cargo.toml
 COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
 
-RUN rustup default nightly
+RUN rustup default stable
 
 RUN cargo install --force --locked bindgen-cli
 
@@ -35,7 +35,7 @@ ENV LIBCLANG_PATH=/usr/lib/llvm-18/lib
 ENV CARGO_NDK_PLATFORM=24
 ENV CARGO_NDK_ANDROID_PLATFORM=24
 
-RUN cargo ndk --target x86_64-linux-android build --release -Z build-std
+RUN cargo ndk --target x86_64-linux-android build --release
 RUN llvm-strip --strip-all ../target/x86_64-linux-android/release/libzingo.so
 RUN llvm-objcopy \
     --remove-section .comment \
