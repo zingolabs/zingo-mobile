@@ -21,7 +21,7 @@ COPY Cargo.lock /opt/zingo/rust/Cargo.lock
 COPY Cargo.toml /opt/zingo/rust/Cargo.toml
 COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
 
-RUN rustup default nightly
+RUN rustup default stable
 
 RUN cargo install --force --locked bindgen-cli
 
@@ -46,7 +46,7 @@ ENV CC=aarch64-linux-android24-clang
 
 ENV CFLAGS_aarch64_linux_android="-mno-outline-atomics"
 ENV CXXFLAGS_aarch64_linux_android="-mno-outline-atomics"
-RUN cargo ndk --target aarch64-linux-android build --release -Z build-std
+RUN cargo ndk --target aarch64-linux-android build --release
 RUN llvm-strip --strip-all ../target/aarch64-linux-android/release/libzingo.so
 RUN llvm-objcopy \
     --remove-section .comment \
@@ -57,7 +57,7 @@ RUN sha256sum ../target/aarch64-linux-android/release/libzingo.so
 ENV CARGO_FEATURE_STD=false
 ENV CC=armv7a-linux-androideabi24-clang
 
-RUN cargo ndk --target armv7-linux-androideabi build --release -Z build-std
+RUN cargo ndk --target armv7-linux-androideabi build --release
 RUN llvm-strip --strip-all ../target/armv7-linux-androideabi/release/libzingo.so
 RUN llvm-objcopy \
     --remove-section .comment \
@@ -69,7 +69,7 @@ ENV CARGO_FEATURE_STD=false
 ENV CC=i686-linux-android24-clang
 
 #-DBROKEN_CLANG_ATOMICS
-RUN cargo ndk --target i686-linux-android build --release -Z build-std
+RUN cargo ndk --target i686-linux-android build --release
 RUN llvm-strip --strip-all ../target/i686-linux-android/release/libzingo.so
 RUN llvm-objcopy \
     --remove-section .comment \
@@ -80,7 +80,7 @@ RUN sha256sum ../target/i686-linux-android/release/libzingo.so
 ENV CARGO_FEATURE_STD=false
 ENV CC=x86_64-linux-android24-clang
 
-RUN cargo ndk --target x86_64-linux-android build --release -Z build-std
+RUN cargo ndk --target x86_64-linux-android build --release
 RUN llvm-strip --strip-all ../target/x86_64-linux-android/release/libzingo.so
 RUN llvm-objcopy \
     --remove-section .comment \

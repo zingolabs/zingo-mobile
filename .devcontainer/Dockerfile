@@ -89,7 +89,7 @@ USER myuser
 # Verify all components
 RUN node -v
 RUN npm -v
-RUN rustup default nightly
+RUN rustup default stable
 RUN rustc --version
 RUN cargo nextest --version
 RUN sdkmanager --list
