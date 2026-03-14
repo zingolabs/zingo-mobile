@@ -32,7 +32,6 @@ use zcash_protocol::consensus::BlockHeight;
 use zcash_protocol::consensus::NetworkType;
 use zip32::AccountId;
 
-use pepper_sync::config::{PerformanceLevel, SyncConfig, TransparentAddressDiscovery};
 use pepper_sync::keys::transparent;
 use pepper_sync::wallet::{KeyIdInterface, SyncMode};
 use tokio::runtime::Runtime;
@@ -51,8 +50,9 @@ use zingolib::wallet::keys::{
     unified::{ReceiverSelection, UnifiedKeyStore},
 };
 use zingolib::wallet::{LightWallet, WalletBase, WalletSettings};
+use zingolib::wallet::{PerformanceLevel, SyncConfig, TransparentAddressDiscovery};
 
-use zingo_common_components::protocol::activation_heights::for_test::all_height_one_nus;
+use zingo_common_components::protocol::ActivationHeights;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ZingolibError {
@@ -239,7 +239,7 @@ fn construct_uri_load_config(
     let chaintype = match chain_hint.as_str() {
         "main" => ChainType::Mainnet,
         "test" => ChainType::Testnet,
-        "regtest" => ChainType::Regtest(all_height_one_nus()),
+        "regtest" => ChainType::Regtest(ActivationHeights::default()),
         _ => return Err("Error: Not a valid chain hint!".to_string()),
     };
     let performancetype = match performance_level.as_str() {
@@ -249,25 +249,19 @@ fn construct_uri_load_config(
         "Low" => PerformanceLevel::Low,
         _ => return Err("Error: Not a valid performance level!".to_string()),
     };
-    let config = match zingolib::config::load_clientconfig(
-        lightwalletd_uri.clone(),
-        None,
-        chaintype,
-        WalletSettings {
+    let config = ZingoConfig::builder()
+        .set_indexer_uri(lightwalletd_uri.clone())
+        .set_network_type(chaintype)
+        .set_wallet_settings(WalletSettings {
             sync_config: SyncConfig {
                 transparent_address_discovery: TransparentAddressDiscovery::minimal(),
                 performance_level: performancetype,
             },
             min_confirmations: NonZeroU32::try_from(min_confirmations).unwrap(),
-        },
-        NonZeroU32::try_from(1).expect("hard-coded integer"),
-        "".to_string(),
-    ) {
-        Ok(c) => c,
-        Err(e) => {
-            return Err(format!("Error: Config load: {e}"));
-        }
-    };
+        })
+        .set_no_of_accounts(NonZeroU32::try_from(1).expect("hard-coded non-zero integer"))
+        .set_wallet_name("".to_string())
+        .build();
 
     Ok((config, lightwalletd_uri))
 }
@@ -347,13 +341,13 @@ pub fn init_from_seed(
             Err(e) => return Ok(format!("Error: {e}")),
         };
         let wallet = match LightWallet::new(
-            config.chain,
+            config.network_type(),
             WalletBase::Mnemonic {
                 mnemonic,
-                no_of_accounts: config.no_of_accounts,
+                no_of_accounts: config.no_of_accounts(),
             },
             BlockHeight::from_u32(birthday),
-            config.wallet_settings.clone(),
+            config.wallet_settings().clone(),
         ) {
             Ok(w) => w,
             Err(e) => return Ok(format!("Error: {e}")),
@@ -388,10 +382,10 @@ pub fn init_from_ufvk(
             Err(e) => return Ok(format!("Error: {e}")),
         };
         let wallet = match LightWallet::new(
-            config.chain,
+            config.network_type(),
             WalletBase::Ufvk(ufvk),
             BlockHeight::from_u32(birthday),
-            config.wallet_settings.clone(),
+            config.wallet_settings().clone(),
         ) {
             Ok(w) => w,
             Err(e) => return Ok(format!("Error: {e}")),
@@ -436,7 +430,7 @@ pub fn init_from_b64(
             }
         };
 
-        let wallet = match LightWallet::read(&decoded_bytes[..], config.chain) {
+        let wallet = match LightWallet::read(&decoded_bytes[..], config.network_type()) {
             Ok(w) => w,
             Err(e) => return Ok(format!("Error: {e}")),
         };
@@ -728,12 +722,12 @@ pub fn change_server(server_uri: String) -> Result<String, ZingolibError> {
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
             if server_uri.is_empty() {
-                lightclient.set_server(http::Uri::default());
+                lightclient.set_indexer_uri(http::Uri::default());
                 Ok("server set (default)".to_string())
             } else {
                 match http::Uri::from_str(&server_uri) {
                     Ok(uri) => {
-                        lightclient.set_server(uri);
+                        lightclient.set_indexer_uri(uri);
                         Ok("server set".to_string())
                     }
                     Err(_) => Ok("Error: invalid server uri".to_string()),
@@ -807,7 +801,7 @@ pub fn parse_address(address: String) -> Result<String, ZingolibError> {
                 [
                     ChainType::Mainnet,
                     ChainType::Testnet,
-                    ChainType::Regtest(all_height_one_nus()),
+                    ChainType::Regtest(ActivationHeights::default()),
                 ]
                 .iter()
                 .find_map(|chain| Address::decode(chain, address).zip(Some(*chain)))
