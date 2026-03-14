@@ -4,11 +4,7 @@ import { View, TouchableOpacity, Alert } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
-import {
-  AppDrawerParamList,
-  LoadingAppNavigationState,
-  ThemeType,
-} from '../../app/types';
+import { AppDrawerParamList, LoadingAppNavigationState } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -26,6 +22,7 @@ import RegText from '../Components/RegText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../Components/Button';
 import { HeaderTitle } from '../Header';
+import { ColorsType } from '../../app/types/ColorsType';
 
 type SettingsMenuProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -40,7 +37,7 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { snackbars, removeFirstSnackbar, translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme() as unknown as { colors: ColorsType };
   const { clear } = useToast();
   const screenName = ScreenEnum.SettingsMenu;
 
@@ -135,14 +132,14 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
                 backgroundColor: colors.secondary,
                 width: '100%',
                 marginTop: 20,
-                paddingVertical: 10,
+                paddingVertical: 5,
               }}
             >
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'center',
-                  marginVertical: 20,
+                  marginVertical: 18,
                   marginHorizontal: 40,
                   width: '80%',
                 }}
@@ -171,12 +168,12 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
                   />
                 </TouchableOpacity>
               </View>
-              <View style={{ height: 1, backgroundColor: colors.zingo }} />
+              <View style={{ height: 1, backgroundColor: colors.border }} />
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'center',
-                  marginVertical: 20,
+                  marginVertical: 18,
                   marginHorizontal: 40,
                   width: '80%',
                 }}
@@ -207,12 +204,12 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
                   />
                 </TouchableOpacity>
               </View>
-              <View style={{ height: 1, backgroundColor: colors.zingo }} />
+              <View style={{ height: 1, backgroundColor: colors.border }} />
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'center',
-                  marginVertical: 20,
+                  marginVertical: 18,
                   marginHorizontal: 40,
                   width: '80%',
                 }}
