@@ -8,12 +8,7 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import {
-  Dimensions,
-  Keyboard,
-  ScrollView,
-  View,
-} from 'react-native';
+import { Dimensions, Keyboard, ScrollView, View } from 'react-native';
 import {
   TabView,
   SceneRendererProps,
@@ -29,7 +24,6 @@ import { ContextAppLoaded } from '../../app/context';
 
 import {
   AddressKindEnum,
-  ModeEnum,
   SecurityType,
   UnifiedAddressClass,
   TransparentAddressClass,
@@ -73,7 +67,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = (
     translate,
     addresses,
     defaultUnifiedAddress,
-    mode,
     snackbars,
     removeFirstSnackbar,
     addLastSnackbar,
@@ -186,15 +179,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = (
   }, [addresses]);
 
   useEffect(() => {
-    const basicModeRoutes = [
-      { key: 'uaddr', title: translate('receive.u-title') as string },
-    ];
     const advancedModeRoutes = [
       { key: 'uaddr', title: translate('receive.u-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
     ];
-    setRoutes(mode === ModeEnum.basic ? basicModeRoutes : advancedModeRoutes);
-  }, [mode, translate]);
+    setRoutes(advancedModeRoutes);
+  }, [translate]);
 
   const renderScene: (
     props: SceneRendererProps & {
@@ -299,12 +289,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = (
     },
   ) => ReactNode = () => {
     return (
-      <HeaderTitle title='Receive' goBack={() => {
-        clear();
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        }
-      }} />
+      <HeaderTitle
+        title="Receive"
+        goBack={() => {
+          clear();
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
+      />
     );
   };
 

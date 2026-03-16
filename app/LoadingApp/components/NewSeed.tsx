@@ -11,7 +11,6 @@ import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
 import {
-  ModeEnum,
   SnackbarDurationEnum,
   ButtonTypeEnum,
   ScreenEnum,
@@ -33,22 +32,19 @@ type TextsType = {
 type NewSeedProps = {
   onClickOK: () => void;
 };
-const NewSeed: React.FunctionComponent<NewSeedProps> = ({
-  onClickOK,
-}) => {
+const NewSeed: React.FunctionComponent<NewSeedProps> = ({ onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { 
+  const {
     wallet,
-    translate, 
-    netInfo, 
-    privacy, 
-    mode, 
-    addLastSnackbar, 
-    snackbars, 
+    translate,
+    netInfo,
+    privacy,
+    addLastSnackbar,
+    snackbars,
     removeFirstSnackbar,
     setPrivacyOption,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.Seed;
 
@@ -111,7 +107,8 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
         <Header
           title={translate('seed.title') + ' (' + translate(`seed.new`) + ')'}
           screenName={screenName}
@@ -123,7 +120,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           addLastSnackbar={addLastSnackbar}
           translate={translate}
           netInfo={netInfo}
-          mode={mode}
           privacy={privacy}
           closeScreen={onClickOKHide}
         />
@@ -134,9 +130,17 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
             flexDirection: 'column',
             alignItems: 'stretch',
             justifyContent: 'flex-start',
-          }}>
-          <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
-            {(translate('seed.text-readonly') as string)}
+          }}
+        >
+          <RegText
+            style={{
+              marginTop: 0,
+              padding: 20,
+              textAlign: 'center',
+              fontWeight: '900',
+            }}
+          >
+            {translate('seed.text-readonly') as string}
           </RegText>
           <View
             style={{
@@ -146,7 +150,8 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
               borderRadius: 10,
               borderColor: colors.text,
               maxHeight: '45%',
-            }}>
+            }}
+          >
             <TouchableOpacity
               onPress={() => {
                 if (seedPhrase) {
@@ -165,16 +170,20 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
                     }, 5 * 1000);
                   }
                 }
-              }}>
+              }}
+            >
               <RegText
                 color={colors.text}
                 style={{
                   textAlign: 'center',
-                }}>
+                }}
+              >
                 {!expandSeed ? Utils.trimToSmall(seedPhrase, 5) : seedPhrase}
               </RegText>
             </TouchableOpacity>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+            >
               <View />
               <TouchableOpacity
                 onPress={() => {
@@ -182,13 +191,16 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
                     Clipboard.setString(seedPhrase);
                     if (addLastSnackbar) {
                       addLastSnackbar({
-                        message: translate('seed.tapcopy-seed-message') as string,
+                        message: translate(
+                          'seed.tapcopy-seed-message',
+                        ) as string,
                         duration: SnackbarDurationEnum.short,
                         screenName: [screenName],
                       });
                     }
                   }
-                }}>
+                }}
+              >
                 <Text
                   style={{
                     color: colors.text,
@@ -197,7 +209,8 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
                     marginTop: 0,
                     textAlign: 'center',
                     minHeight: 48,
-                  }}>
+                  }}
+                >
                   {translate('seed.tapcopy') as string}
                 </Text>
               </TouchableOpacity>
@@ -206,14 +219,18 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           </View>
 
           <View style={{ marginTop: 10, alignItems: 'center' }}>
-            <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-readonly') as string}</FadeText>
+            <FadeText style={{ textAlign: 'center' }}>
+              {translate('seed.birthday-readonly') as string}
+            </FadeText>
             <TouchableOpacity
               onPress={() => {
                 if (birthdayNumber) {
                   Clipboard.setString(birthdayNumber);
                   if (addLastSnackbar) {
                     addLastSnackbar({
-                      message: translate('seed.tapcopy-birthday-message') as string,
+                      message: translate(
+                        'seed.tapcopy-birthday-message',
+                      ) as string,
                       duration: SnackbarDurationEnum.short,
                       screenName: [screenName],
                     });
@@ -225,9 +242,12 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
                     }, 5 * 1000);
                   }
                 }
-              }}>
+              }}
+            >
               <RegText color={colors.text} style={{ textAlign: 'center' }}>
-                {!expandBirthday ? Utils.trimToSmall(birthdayNumber, 1) : birthdayNumber}
+                {!expandBirthday
+                  ? Utils.trimToSmall(birthdayNumber, 1)
+                  : birthdayNumber}
               </RegText>
             </TouchableOpacity>
           </View>
@@ -240,19 +260,14 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-          }}>
+          }}
+        >
           <Button
-            type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
+            type={ButtonTypeEnum.Primary}
             style={{
-              backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
+              backgroundColor: colors.primary,
             }}
-            title={
-              mode === ModeEnum.basic
-                ? (translate('cancel') as string)
-                : !!texts && !!texts.new
-                  ? texts.new[0]
-                  : ''
-            }
+            title={!!texts && !!texts.new ? texts.new[0] : ''}
             onPress={() => onClickOKHide()}
           />
         </View>

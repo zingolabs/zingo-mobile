@@ -13,7 +13,6 @@ import { TouchableOpacity, View } from 'react-native';
 import {
   NetInfoType,
   TranslateType,
-  ModeEnum,
   SnackbarType,
   SelectServerEnum,
   RouteEnum,
@@ -56,7 +55,6 @@ type HeaderProps = {
   // seed screen - shared between AppLoading & AppLoadad - different contexts
   translate?: (key: string) => TranslateType;
   netInfo?: NetInfoType;
-  mode?: ModeEnum;
   privacy?: boolean;
 };
 
@@ -67,7 +65,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noDrawMenu,
   translate: translateProp,
   netInfo: netInfoProp,
-  mode: modeProp,
   privacy: privacyProp,
   addLastSnackbar,
   screenName,
@@ -79,7 +76,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   let translate: (key: string) => TranslateType,
     netInfo: NetInfoType,
-    mode: ModeEnum,
     privacy: boolean;
   if (translateProp) {
     translate = translateProp;
@@ -90,11 +86,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     netInfo = netInfoProp;
   } else {
     netInfo = context.netInfo;
-  }
-  if (modeProp) {
-    mode = modeProp;
-  } else {
-    mode = context.mode;
   }
   if (privacyProp) {
     privacy = privacyProp;
@@ -413,25 +404,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           minHeight: 25,
                         }}
                       >
-                        {mode === ModeEnum.basic ? (
+                        <TouchableOpacity
+                          onPress={() => {
+                            navigation.navigate(RouteEnum.SyncReport);
+                          }}
+                        >
                           <FontAwesomeIcon
                             icon={faCloudDownload}
                             color={!netInfo.isConnected ? 'red' : 'yellow'}
                             size={20}
                           />
-                        ) : (
-                          <TouchableOpacity
-                            onPress={() => {
-                              navigation.navigate(RouteEnum.SyncReport);
-                            }}
-                          >
-                            <FontAwesomeIcon
-                              icon={faCloudDownload}
-                              color={!netInfo.isConnected ? 'red' : 'yellow'}
-                              size={20}
-                            />
-                          </TouchableOpacity>
-                        )}
+                        </TouchableOpacity>
                       </View>
                     )}
                 </View>

@@ -37,7 +37,6 @@ import {
   SecurityType,
   MenuItemEnum,
   LanguageEnum,
-  ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
@@ -171,7 +170,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [sendAll, setSendAll] = useState<boolean>(true);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({
     batches: 0,
     message: '',
@@ -267,15 +265,6 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       // for testing
       //await delay(5000);
-
-      if (
-        settings.mode === ModeEnum.basic ||
-        settings.mode === ModeEnum.advanced
-      ) {
-        setMode(settings.mode);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-      }
 
       if (
         settings.language === LanguageEnum.en ||
@@ -422,7 +411,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         sendAll={sendAll}
         donation={donation}
         privacy={privacy}
-        mode={mode}
         background={background}
         readOnly={readOnly}
         orchardPool={orchardPool}
@@ -454,7 +442,6 @@ type LoadedAppClassProps = {
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
-  mode: ModeEnum;
   background: BackgroundType;
   readOnly: boolean;
   orchardPool: boolean;
@@ -535,7 +522,6 @@ export class LoadedAppClass extends Component<
       sendAll: props.sendAll,
       donation: props.donation,
       privacy: props.privacy,
-      mode: props.mode,
       security: props.security,
       rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
@@ -940,30 +926,12 @@ export class LoadedAppClass extends Component<
     const basicFirstViewSeed = (await SettingsFileImpl.readSettings())
       .basicFirstViewSeed;
     // only for basic mode
-    if (this.state.mode === ModeEnum.basic) {
-      // only if the user doesn't see the seed the first time
-      if (!basicFirstViewSeed) {
-        // only if the App are in foreground
-        const background = await AsyncStorage.getItem(GlobalConst.background);
-        // only if the wallet have some ValueTransfers
-        if (background === GlobalConst.no && valueTransfersTotal > 0) {
-          // I need to check this out in the seed screen.
-          if (!this.state.isSeedViewModalOpen) {
-            this.setIsSeedViewModalOpen(true);
-            this.state.navigationHome?.navigate(RouteEnum.Seed, {
-              action: SeedActionEnum.view,
-            });
-          }
-        }
-      }
-    } else {
-      // for advanced mode
-      if (!basicFirstViewSeed) {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.basicFirstViewSeed,
-          true,
-        );
-      }
+
+    if (!basicFirstViewSeed) {
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.basicFirstViewSeed,
+        true,
+      );
     }
     if (
       !isEqual(this.state.valueTransfers, valueTransfers) ||
@@ -1096,7 +1064,7 @@ export class LoadedAppClass extends Component<
               ) {
                 message =
                   (this.state.translate('loadedapp.payment-made') as string) +
-                  ('Staked') +
+                  'Staked' +
                   ' ' +
                   Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
                   ' ' +
@@ -1670,14 +1638,6 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  setModeOption = async (value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, value);
-    this.setState({
-      mode: value as ModeEnum,
-    });
-    // this function change the Theme in the App component.
-  };
-
   setSecurityOption = async (value: SecurityType): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.security, value);
     this.setState({
@@ -1751,9 +1711,6 @@ export class LoadedAppClass extends Component<
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
     await this.rpc.clearTimers();
-    if (!!state.screen && state.screen === 3) {
-      await this.setModeOption(ModeEnum.advanced);
-    }
     this.props.navigationApp.reset({
       index: 0,
       routes: [
@@ -2006,7 +1963,6 @@ export class LoadedAppClass extends Component<
       sendAll: this.state.sendAll,
       donation: this.state.donation,
       privacy: this.state.privacy,
-      mode: this.state.mode,
       security: this.state.security,
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,

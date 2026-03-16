@@ -15,7 +15,6 @@ import SecurityType from './types/SecurityType';
 
 import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
-import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import ValueTransferType from './types/ValueTransferType';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
@@ -125,7 +124,6 @@ export default interface AppContextLoaded {
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
-  mode: ModeEnum;
   security: SecurityType;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;

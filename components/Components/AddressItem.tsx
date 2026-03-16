@@ -8,7 +8,6 @@ import Utils from '../../app/utils';
 import {
   SendPageStateClass,
   ToAddrClass,
-  ModeEnum,
   SnackbarDurationEnum,
   RouteEnum,
   SelectServerEnum,
@@ -46,8 +45,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     addLastSnackbar,
     privacy,
     readOnly,
-    mode,
-    totalBalance,
     selectIndexerServer,
     setSendPageState,
   } = context;
@@ -58,7 +55,11 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const numLinesAdd = address ? (address.length < 50 ? 2 : address.length / 30) : 0;
+    const numLinesAdd = address
+      ? address.length < 50
+        ? 2
+        : address.length / 30
+      : 0;
     setNumLinesAddress(numLinesAdd);
     setLoading(false);
     // the address prop make no sense that it is going to change,
@@ -80,14 +81,21 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       {loading ? (
         <ActivityIndicator size="small" color={colors.primary} />
       ) : (
-        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+          }}
+        >
           <View
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
               marginRight: onlyContact ? 0 : 10,
-            }}>
+            }}
+          >
             {!onlyContact && (
               <TouchableOpacity
                 onPress={() => {
@@ -107,15 +115,27 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                       }, 5 * 1000);
                     }
                   }
-                }}>
-                <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                }}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexWrap: 'wrap',
+                  }}
+                >
                   {!address && <RegText>{'Unknown'}</RegText>}
-                  {!expandAddress && !!address && <RegText>{Utils.trimToSmall(address, 7)}</RegText>}
+                  {!expandAddress && !!address && (
+                    <RegText>{Utils.trimToSmall(address, 7)}</RegText>
+                  )}
                   {expandAddress &&
                     !!address &&
-                    Utils.splitStringIntoChunks(address, Number(numLinesAddress.toFixed(0))).map(
-                      (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                    )}
+                    Utils.splitStringIntoChunks(
+                      address,
+                      Number(numLinesAddress.toFixed(0)),
+                    ).map((c: string, idx: number) => (
+                      <RegText key={idx}>{c}</RegText>
+                    ))}
                 </View>
               </TouchableOpacity>
             )}
@@ -123,23 +143,25 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           {withSendIcon &&
             !addressProtected &&
             !readOnly &&
-            selectIndexerServer !== SelectServerEnum.offline &&
-            !(
-              mode === ModeEnum.basic &&
-              totalBalance &&
-              // because the action is related with `send`.
-              totalBalance.totalSpendableBalance <= 0
-            ) && (
+            selectIndexerServer !== SelectServerEnum.offline && (
               <TouchableOpacity
                 style={{ marginLeft: 10 }}
                 onPress={() => {
                   // enviar
-                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                  const sendPageState = new SendPageStateClass(
+                    new ToAddrClass(0),
+                  );
                   sendPageState.toaddr.to = address;
                   setSendPageState(sendPageState);
                   navigation.navigate(RouteEnum.Send);
-                }}>
-                <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ marginTop: 3 }}
+                  size={30}
+                  icon={faPaperPlane}
+                  color={colors.primary}
+                />
               </TouchableOpacity>
             )}
         </View>
