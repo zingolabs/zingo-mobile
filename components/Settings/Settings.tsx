@@ -63,7 +63,6 @@ type SettingsProps = DrawerScreenProps<
   setLanguageOption: (value: LanguageEnum, reset: boolean) => Promise<void>;
   setSendAllOption: (value: boolean) => Promise<void>;
   setDonationOption: (value: boolean) => Promise<void>;
-  setModeOption: (value: string) => Promise<void>;
   setSecurityOption: (value: SecurityType) => Promise<void>;
   setSelectServerOption: (value: string) => Promise<void>;
   setRescanMenuOption: (value: boolean) => Promise<void>;

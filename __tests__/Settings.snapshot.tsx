@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { Settings } from '../components/Settings';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
 import { LanguageEnum, CurrencyEnum, RouteEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -17,7 +20,10 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Settings> {
+function makeDrawerProps(): DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Settings
+> {
   return {
     navigation: mockNavigation,
     route: {
@@ -47,13 +53,13 @@ describe('Component Settings - test', () => {
   test('Settings - snapshot', () => {
     const settings = render(
       <ContextAppLoadedProvider value={state}>
-        <Settings {...props}
+        <Settings
+          {...props}
           setServerOption={onSetOption}
           setCurrencyOption={onSetOption}
           setLanguageOption={onSetOption}
           setSendAllOption={onSetOption}
           setDonationOption={onSetOption}
-          setModeOption={onSetOption}
           setSecurityOption={onSetOption}
           setSelectServerOption={onSetOption}
           setRescanMenuOption={onSetOption}
