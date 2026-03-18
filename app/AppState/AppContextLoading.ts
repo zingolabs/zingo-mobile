@@ -10,7 +10,6 @@ import SecurityType from './types/SecurityType';
 
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
-import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
@@ -42,9 +41,8 @@ export default interface AppContextLoading {
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
-  mode: ModeEnum;
   security: SecurityType;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
-  performanceLevel: RPCPerformanceLevelEnum;   
+  performanceLevel: RPCPerformanceLevelEnum;
 }

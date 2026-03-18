@@ -27,7 +27,6 @@ import WalletBondsType from './types/WalletBondsType';
 
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
-import { ModeEnum } from './enums/ModeEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
@@ -96,7 +95,6 @@ export {
   WalletBondsType,
   MenuItemEnum,
   LanguageEnum,
-  ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,

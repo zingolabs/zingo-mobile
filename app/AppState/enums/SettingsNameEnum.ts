@@ -7,7 +7,6 @@ export enum SettingsNameEnum {
   sendAll = 'sendAll',
   donation = 'donation',
   privacy = 'privacy',
-  mode = 'mode',
   security = 'security',
   rescanMenu = 'rescanMenu',
   recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',

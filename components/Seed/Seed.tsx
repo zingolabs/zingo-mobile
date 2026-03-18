@@ -10,9 +10,7 @@ import FadeText from '../Components/FadeText';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
-  ModeEnum,
   SnackbarDurationEnum,
-  SettingsNameEnum,
   ScreenEnum,
   RouteEnum,
 } from '../../app/AppState';
@@ -41,13 +39,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     wallet,
     translate,
     privacy,
-    mode,
     addLastSnackbar,
     snackbars,
     removeFirstSnackbar,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
-  // when this screen is open from LoadingApp (new wallet) 
+  const { colors } = useTheme() as ThemeType;
+  // when this screen is open from LoadingApp (new wallet)
   // is using the standard modal from react-native
   const { clear } = useToast();
   const screenName = ScreenEnum.Seed;
@@ -58,18 +55,17 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   const insets = useSafeAreaInsets();
 
-  const maxW = 520; //tablets -> landscape. 
+  const maxW = 520; //tablets -> landscape.
 
   const [expandSeed, setExpandSeed] = useState<boolean>(true);
   const [expandBirthday, setExpandBithday] = useState<boolean>(true);
-  const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
-  
+  const [, setBasicFirstViewSeed] = useState<boolean>(true);
+
   const seedPhrase = wallet.seed || '';
   const birthdayNumber = (wallet.birthday && wallet.birthday.toString()) || '';
 
   useEffect(() => {
-    const seedTextArray: string[] = seedPhrase
-      .split(' ');
+    const seedTextArray: string[] = seedPhrase.split(' ');
 
     //console.log(seedTextArray);
     const _words = seedTextArray.slice(0, SEED_LENGTH);
@@ -82,11 +78,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       setRows(_rows);
     }
   }, [seedPhrase]);
-  
+
   useEffect(() => {
     if (keepAwake) {
       (async () => {
-        const bfvs: boolean = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
+        const bfvs: boolean = (await SettingsFileImpl.readSettings())
+          .basicFirstViewSeed;
         setBasicFirstViewSeed(bfvs);
         if (!bfvs) {
           // keep the screen awake while the user is writting the seed
@@ -128,17 +125,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     // when this screen is open from LoadingApp (new wallet)
     // is using the standard modal from react-native
     setIsSeedViewModalOpen && setIsSeedViewModalOpen(false);
-    // the user just see the seed for the first time.
-    if (mode === ModeEnum.basic && !basicFirstViewSeed) {
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
-      setBasicFirstViewSeed(true);
-      keepAwake && keepAwake(false);
-      // redirect to history screen
-      navigation.navigate(RouteEnum.MainTabs, { screen: RouteEnum.History });
-    } else {
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      }
+
+    if (navigation.canGoBack()) {
+      navigation.goBack();
     }
   };
 
@@ -154,9 +143,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         screenName={screenName}
       />
 
-      <HeaderTitle title='Seed phrase' goBack={() => {
-        onClickCancelHide();
-      }} />
+      <HeaderTitle
+        title="Seed phrase"
+        goBack={() => {
+          onClickCancelHide();
+        }}
+      />
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
@@ -164,16 +156,19 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           flexGrow: 1,
           paddingBottom: insets.bottom + 8,
           paddingHorizontal: 10,
-      }}>
+        }}
+      >
         <View
           style={{
             flexGrow: 1,
             alignItems: 'center',
             justifyContent: 'center',
-        }}>
-
+          }}
+        >
           <FadeText style={{ padding: 10, textAlign: 'center', fontSize: 17 }}>
-            {'Your seed phrase is the key to your wallet. Back it up so you can restore your wallet if you lose or damage your device '}
+            {
+              'Your seed phrase is the key to your wallet. Back it up so you can restore your wallet if you lose or damage your device '
+            }
           </FadeText>
 
           {rows.length > 0 && (
@@ -200,7 +195,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                           alignItems: 'center',
                           paddingHorizontal: 15,
                           paddingVertical: 0,
-                        }}>
+                        }}
+                      >
                         <FadeText>{`${index + 1}`}.</FadeText>
                         <TextInput
                           style={{
@@ -226,14 +222,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 </View>
               ))}
               {true && (
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={{ alignSelf: 'flex-end' }}
                   onPress={() => {
                     if (seedPhrase) {
                       Clipboard.setString(seedPhrase);
                       if (addLastSnackbar) {
                         addLastSnackbar({
-                          message: translate('seed.tapcopy-seed-message') as string,
+                          message: translate(
+                            'seed.tapcopy-seed-message',
+                          ) as string,
                           duration: SnackbarDurationEnum.short,
                           screenName: [screenName],
                         });
@@ -245,55 +243,69 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                         }, 5 * 1000);
                       }
                     }
-                  }}>
-                  <View 
+                  }}
+                >
+                  <View
                     style={{
                       justifyContent: 'center',
                       alignItems: 'center',
                       width: '30%',
                       height: 30,
                       padding: 0,
-                  }}>
-                    <RegText style={{ color: colors.primary, textDecorationStyle: 'solid', textDecorationLine: 'underline' }}>Copy</RegText>
+                    }}
+                  >
+                    <RegText
+                      style={{
+                        color: colors.primary,
+                        textDecorationStyle: 'solid',
+                        textDecorationLine: 'underline',
+                      }}
+                    >
+                      Copy
+                    </RegText>
                   </View>
                 </TouchableOpacity>
-              ) }
+              )}
             </View>
           )}
 
-            <View
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              borderColor: colors.border,
+              borderWidth: 1,
+              borderRadius: 25,
+              marginTop: 10,
+              marginBottom: 10,
+              backgroundColor: colors.secondary,
+              width: '100%',
+              maxWidth: maxW,
+              minWidth: '50%',
+              minHeight: 48,
+              alignItems: 'center',
+              paddingHorizontal: 25,
+              paddingVertical: 15,
+            }}
+          >
+            <FadeText
               style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                borderColor: colors.border,
-                borderWidth: 1,
-                borderRadius: 25,
-                marginTop: 10,
-                marginBottom: 10,
-                backgroundColor: colors.secondary,
-                width: '100%',
-                maxWidth: maxW,
-                minWidth: '50%',
-                minHeight: 48,
-                alignItems: 'center',
-                paddingHorizontal: 25,
-                paddingVertical: 15,
-              }}>
-              <FadeText 
-                style={{ 
-                  flexGrow: 1,
-                  flexShrink: 1,
-                  fontSize: 20, 
-              }}>
-                Birthday
-              </FadeText>
+                flexGrow: 1,
+                flexShrink: 1,
+                fontSize: 20,
+              }}
+            >
+              Birthday
+            </FadeText>
             <TouchableOpacity
               onPress={() => {
                 if (birthdayNumber) {
                   Clipboard.setString(birthdayNumber);
                   if (addLastSnackbar) {
                     addLastSnackbar({
-                      message: translate('seed.tapcopy-birthday-message') as string,
+                      message: translate(
+                        'seed.tapcopy-birthday-message',
+                      ) as string,
                       duration: SnackbarDurationEnum.short,
                       screenName: [screenName],
                     });
@@ -305,12 +317,15 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     }, 5 * 1000);
                   }
                 }
-              }}>
+              }}
+            >
               <RegText color={colors.text} style={{ textAlign: 'center' }}>
-                {!expandBirthday ? Utils.trimToSmall(birthdayNumber, 1) : birthdayNumber}
+                {!expandBirthday
+                  ? Utils.trimToSmall(birthdayNumber, 1)
+                  : birthdayNumber}
               </RegText>
             </TouchableOpacity>
-            </View>
+          </View>
         </View>
       </ScrollView>
     </ToastProvider>

@@ -30,7 +30,6 @@ import {
   ServerUrisType,
   LanguageEnum,
   CurrencyEnum,
-  ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
   SnackbarDurationEnum,
@@ -117,7 +116,6 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [sendAll, setSendAll] = useState<boolean>(true);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({
     batches: 0,
     message: '',
@@ -190,15 +188,6 @@ export default function LoadingApp(props: LoadingAppProps) {
       }
 
       if (
-        settings.mode === ModeEnum.basic ||
-        settings.mode === ModeEnum.advanced
-      ) {
-        setMode(settings.mode);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-      }
-
-      if (
         settings.language === LanguageEnum.en ||
         settings.language === LanguageEnum.es ||
         settings.language === LanguageEnum.pt ||
@@ -237,8 +226,13 @@ export default function LoadingApp(props: LoadingAppProps) {
       // lightwallet server
       if (settings.indexerServer) {
         // check the server info, just in case...
-        if (serverUris().filter(s => s.uri === settings.indexerServer.uri).length > 0) {
-          settings.indexerServer.chainName = serverUris().filter(s => s.uri === settings.indexerServer.uri)[0].chainName;
+        if (
+          serverUris().filter(s => s.uri === settings.indexerServer.uri)
+            .length > 0
+        ) {
+          settings.indexerServer.chainName = serverUris().filter(
+            s => s.uri === settings.indexerServer.uri,
+          )[0].chainName;
         }
         setIndexerServer(settings.indexerServer);
       } else {
@@ -357,7 +351,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         sendAll={sendAll}
         donation={donation}
         privacy={privacy}
-        mode={mode}
         background={background}
         firstLaunchingMessage={firstLaunchingMessage}
         security={security}
@@ -384,7 +377,6 @@ type LoadingAppClassProps = {
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
-  mode: ModeEnum;
   background: BackgroundType;
   firstLaunchingMessage: LaunchingModeEnum;
   security: SecurityType;
@@ -435,7 +427,6 @@ export class LoadingAppClass extends Component<
       sendAll: props.sendAll,
       donation: props.donation,
       privacy: props.privacy,
-      mode: props.mode,
       security: props.security,
       rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
@@ -676,66 +667,21 @@ export class LoadingAppClass extends Component<
         );
       }
     } else {
-      //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
-      if (this.state.mode === ModeEnum.basic) {
-        // setting the prop basicFirstViewSeed to false.
-        // this means when the user have funds, the seed screen will show up.
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.basicFirstViewSeed,
-          false,
-        );
-        if (this.state.hasRecoveryWalletInfoSaved) {
-          // but first we need to check if exists some key stored in the device from a previous installation (IOS)
-          await this.recoverRecoveryWalletInfo(false);
-          // go to the initial menu, giving the opportunity to the user
-          // to use the seed & birthday recovered from the device.
-          this.setState({
-            screen: 1,
-            walletExists: false,
-            actionButtonsDisabled: false,
-          });
-        } else {
-          // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
-          // no seed screen.
-          if (
-            !netInfoState.isConnected ||
-            this.state.selectIndexerServer === SelectServerEnum.offline
-          ) {
-            this.setState({
-              screen: 1,
-              walletExists: false,
-              actionButtonsDisabled: false,
-            });
-          } else {
-            await this.createNewWallet();
-            this.setState({ actionButtonsDisabled: false });
-            this.navigateToLoadedApp(
-              false,
-              true,
-              true,
-              true,
-              this.state.firstLaunchingMessage,
-            );
-            //console.log('navigate to LoadedApp');
-          }
-        }
+      // Go to initial menu
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.basicFirstViewSeed,
+        true,
+      );
+      // walletSeed/walletBirthday have value
+      // go directly to run restore...
+      if (!this.state.startingApp && !!this.state.walletSeed) {
+        this.doRestore(this.state.walletSeed, this.state.walletBirthday);
       } else {
-        // if no wallet file & advanced mode -> go to the initial menu.
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.basicFirstViewSeed,
-          true,
-        );
-        // walletSeed/walletBirthday have value
-        // go directly to run restore...
-        if (!this.state.startingApp && !!this.state.walletSeed) {
-          this.doRestore(this.state.walletSeed, this.state.walletBirthday);
-        } else {
-          this.setState(state => ({
-            screen: state.screen === 3 ? 3 : 1,
-            walletExists: false,
-            actionButtonsDisabled: false,
-          }));
-        }
+        this.setState(state => ({
+          screen: state.screen === 3 ? 3 : 1,
+          walletExists: false,
+          actionButtonsDisabled: false,
+        }));
       }
     }
 
@@ -860,7 +806,7 @@ export class LoadingAppClass extends Component<
       SelectServerEnum.list,
     );
     // message with the result only for advanced users
-    if (this.state.mode === ModeEnum.advanced && someServerIsWorking) {
+    if (someServerIsWorking) {
       if (isEqual(actualServer, fasterServer)) {
         this.addLastSnackbar({
           message: this.state.translate(
@@ -1056,7 +1002,10 @@ export class LoadingAppClass extends Component<
     this.setState({ background: backgroundJson });
   };
 
-  setIndexerServer = async (indexerServerUri: string, indexerServerChainName: ChainNameEnum) => {
+  setIndexerServer = async (
+    indexerServerUri: string,
+    indexerServerChainName: ChainNameEnum,
+  ) => {
     const NewIndexerServer: ServerType = {
       uri: indexerServerUri,
       chainName: indexerServerChainName,
@@ -1084,8 +1033,8 @@ export class LoadingAppClass extends Component<
 
   checkIndexerServer = async (indexerServerUri: string) => {
     if (!indexerServerUri) {
-      return { 
-        result: false, 
+      return {
+        result: false,
         indexerServerUriParsed: indexerServerUri,
       };
     }
@@ -1099,8 +1048,8 @@ export class LoadingAppClass extends Component<
       );
 
       if (!uri || uri.toLowerCase().startsWith(GlobalConst.error)) {
-        return { 
-          result: false, 
+        return {
+          result: false,
           indexerServerUriParsed: indexerServerUri,
         };
       }
@@ -1108,14 +1057,14 @@ export class LoadingAppClass extends Component<
       const latency = await pingIndexerServer(uri);
 
       if (latency !== null) {
-        return { 
-          result: true, 
+        return {
+          result: true,
           indexerServerUriParsed: uri,
-         };
+        };
       }
 
-      return { 
-        result: false, 
+      return {
+        result: false,
         indexerServerUriParsed: indexerServerUri,
       };
     } finally {
@@ -1475,15 +1424,6 @@ export class LoadingAppClass extends Component<
     this.setState({ snackbars: newSnackbars });
   };
 
-  changeMode = async (mode: ModeEnum) => {
-    this.setState({ mode, screen: 0 });
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-    // if the user selects advanced mode & wants to change to another wallet
-    // and then the user wants to go to basic mode in the first screen
-    // the result will be the same -> create a new wallet.
-    this.componentDidMount();
-  };
-
   recoverRecoveryWalletInfo = async (security: boolean) => {
     // recover the wallet keys from the device
     const wallet = await getRecoveryWalletInfo();
@@ -1611,7 +1551,6 @@ export class LoadingAppClass extends Component<
       sendAll: this.state.sendAll,
       donation: this.state.donation,
       privacy: this.state.privacy,
-      mode: this.state.mode,
       security: this.state.security,
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,

@@ -31,7 +31,6 @@ import Button from '../Components/Button';
 import {
   SendPageStateClass,
   ToAddrClass,
-  ModeEnum,
   ChainNameEnum,
   ButtonTypeEnum,
   GlobalConst,
@@ -96,7 +95,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     indexerServer,
     setBackgroundError,
     addLastSnackbar,
-    mode,
     somePending,
     donation,
     addresses,
@@ -503,7 +501,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (!addressText || validAddress !== 1) {
       setTitle('Send to');
     }
-  }, [addressText, validAddress]); 
+  }, [addressText, validAddress]);
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -791,7 +789,9 @@ const Send: React.FunctionComponent<SendProps> = ({
     //  );
     //}, 1 * 1000);
 
-    navigation.navigate(RouteEnum.ComputingError, { error: `${customError ? customError : error}` });
+    navigation.navigate(RouteEnum.ComputingError, {
+      error: `${customError ? customError : error}`,
+    });
   };
 
   const interceptCustomError = (error: string) => {
@@ -851,16 +851,19 @@ const Send: React.FunctionComponent<SendProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <HeaderTitle title={title} goBack={() => {
-          if (title === 'Send') {
-            setTitle('Send to');
-          } else {
-            clear();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
+        <HeaderTitle
+          title={title}
+          goBack={() => {
+            if (title === 'Send') {
+              setTitle('Send to');
+            } else {
+              clear();
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
             }
-          }
-        }} />
+          }}
+        />
 
         <ScrollView
           keyboardShouldPersistTaps="handled"
@@ -877,7 +880,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               alignItems: 'center',
             }}
           >
-            { title === 'Send to' && (
+            {title === 'Send to' && (
               <>
                 <View
                   style={{
@@ -965,7 +968,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                           padding: 0,
                         }}
                       >
-                        <XIcon color={colors.background} width={20} height={20} />
+                        <XIcon
+                          color={colors.background}
+                          width={20}
+                          height={20}
+                        />
                       </View>
                     </TouchableOpacity>
                   )}
@@ -999,16 +1006,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                   }}
                 >
                   {validAmount === -1 && (
-                    <ErrorText
-                      style={{ marginHorizontal: 10 }}
-                    >
+                    <ErrorText style={{ marginHorizontal: 10 }}>
                       {translate('send.invalidnumber') as string}
                     </ErrorText>
                   )}
                   {validAmount === -2 && (
-                    <ErrorText
-                      style={{ marginHorizontal: 10 }}
-                    >
+                    <ErrorText style={{ marginHorizontal: 10 }}>
                       {translate('send.invalidamount') as string}
                     </ErrorText>
                   )}
@@ -1048,7 +1051,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}
                       value={amountText}
                       onChangeText={(text: string) =>
-                        updateToField(null, text.substring(0, 20), null, null, null)
+                        updateToField(
+                          null,
+                          text.substring(0, 20),
+                          null,
+                          null,
+                          null,
+                        )
                       }
                       onEndEditing={(
                         e: NativeSyntheticEvent<TextInputEndEditingEventData>,
@@ -1091,16 +1100,27 @@ const Send: React.FunctionComponent<SendProps> = ({
                             padding: 0,
                           }}
                         >
-                          <XIcon color={colors.background} width={20} height={20} />
+                          <XIcon
+                            color={colors.background}
+                            width={20}
+                            height={20}
+                          />
                         </View>
                       </TouchableOpacity>
                     )}
 
-                    <View style={{ flexDirection: 'column', justifyContent: 'flex-end' }}>
-                      <View style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
-                        <View 
-                          style={{ 
-                            flexDirection: 'row', 
+                    <View
+                      style={{
+                        flexDirection: 'column',
+                        justifyContent: 'flex-end',
+                      }}
+                    >
+                      <View
+                        style={{ flexDirection: 'row', alignSelf: 'flex-end' }}
+                      >
+                        <View
+                          style={{
+                            flexDirection: 'row',
                             borderColor: colors.text,
                             borderWidth: 1,
                             borderRadius: 20,
@@ -1111,22 +1131,28 @@ const Send: React.FunctionComponent<SendProps> = ({
                             alignItems: 'center',
                           }}
                         >
-                          <Image 
+                          <Image
                             source={require('../../assets/icons/zcash.png')}
-                            style={{ width: 22, height: 22 }} />
+                            style={{ width: 22, height: 22 }}
+                          />
                           <RegText style={{ fontSize: 15 }}>
-                            {' ' + (info.currencyName ? info.currencyName : '---')}
+                            {' ' +
+                              (info.currencyName ? info.currencyName : '---')}
                           </RegText>
                         </View>
                       </View>
 
-                      <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'flex-end', marginTop: 5 }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'baseline',
+                          justifyContent: 'flex-end',
+                          marginTop: 5,
+                        }}
+                      >
                         <TouchableOpacity
                           onPress={() => {
-                            if (
-                              spendableBalanceLastError &&
-                              mode === ModeEnum.advanced
-                            ) {
+                            if (spendableBalanceLastError) {
                               Alert.alert(
                                 'Available',
                                 spendableBalanceLastError,
@@ -1155,8 +1181,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               color={
                                 stillConfirming ||
                                 negativeMaxAmount ||
-                                (spendableBalanceLastError &&
-                                  mode === ModeEnum.advanced)
+                                spendableBalanceLastError
                                   ? 'red'
                                   : colors.text
                               }
@@ -1172,14 +1197,20 @@ const Send: React.FunctionComponent<SendProps> = ({
                             //if (fee > 0) {
                             updateToField(
                               null,
-                              Utils.parseNumberFloatToStringLocale(maxAmount, 5),
+                              Utils.parseNumberFloatToStringLocale(
+                                maxAmount,
+                                5,
+                              ),
                               null,
                               null,
                               null,
                             );
                             //}
                             calculateFeeWithPropose(
-                              Utils.parseNumberFloatToStringLocale(maxAmount, 5),
+                              Utils.parseNumberFloatToStringLocale(
+                                maxAmount,
+                                5,
+                              ),
                               addressText,
                               memoText,
                               includeUAMemoBoolean,
@@ -1201,7 +1232,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                               backgroundColor: colors.background,
                             }}
                           >
-                            <RegText style={{ fontSize: 14 }} color={colors.text}>
+                            <RegText
+                              style={{ fontSize: 14 }}
+                              color={colors.text}
+                            >
                               {'Max.'}
                             </RegText>
                           </View>
@@ -1211,7 +1245,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                   </View>
 
                   <View style={{ flexDirection: 'column' }}>
-
                     {validAddress !== 0 &&
                       validAmount !== 0 &&
                       (fee > 0 || !!proposeSendLastError) && (
@@ -1234,10 +1267,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <FadeText>{'( '}</FadeText>
                           <TouchableOpacity
                             onPress={() => {
-                              if (
-                                proposeSendLastError &&
-                                mode === ModeEnum.advanced
-                              ) {
+                              if (proposeSendLastError) {
                                 Alert.alert(
                                   translate('send.fee') as string,
                                   proposeSendLastError,
@@ -1254,10 +1284,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           >
                             <FadeText
                               style={{
-                                color:
-                                  proposeSendLastError && mode === ModeEnum.advanced
-                                    ? 'red'
-                                    : colors.money,
+                                color: proposeSendLastError
+                                  ? 'red'
+                                  : colors.money,
                               }}
                             >
                               {(translate('send.fee') as string) +
@@ -1299,8 +1328,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                     )}
                   </View>
                 </View>
-                <View 
-                  style={{ 
+                <View
+                  style={{
                     padding: 10,
                     paddingHorizontal: 12,
                     borderColor: colors.text,
@@ -1309,7 +1338,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     borderRadius: 30,
                     marginTop: -25,
                     zIndex: 999,
-                 }}
+                  }}
                 >
                   <FontAwesomeIcon
                     icon={faArrowDown}
@@ -1342,7 +1371,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </View>
               </>
             )}
-
 
             {memoEnabled === true && false && (
               <>
@@ -1442,7 +1470,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                           padding: 0,
                         }}
                       >
-                        <XIcon color={colors.background} width={20} height={20} />
+                        <XIcon
+                          color={colors.background}
+                          width={20}
+                          height={20}
+                        />
                       </View>
                     </TouchableOpacity>
                   )}
@@ -1500,14 +1532,15 @@ const Send: React.FunctionComponent<SendProps> = ({
 
           {title === 'Send' && (
             <Button
-              testID={sendButtonEnabled ? 'send.button' : 'send.button-disabled'}
+              testID={
+                sendButtonEnabled ? 'send.button' : 'send.button-disabled'
+              }
               accessible={true}
               accessibilityLabel={'title ' + translate('send.button')}
               type={ButtonTypeEnum.Primary}
               title={
                 validAmount === 1 &&
                 amountText &&
-                mode !== ModeEnum.basic &&
                 Utils.parseStringLocaleToNumberFloat(amountText) ===
                   Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
                   ? (translate('send.button-all') as string)
@@ -1552,7 +1585,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                 if (
                   validAmount === 1 &&
                   amountText &&
-                  mode !== ModeEnum.basic &&
                   Utils.parseStringLocaleToNumberFloat(amountText) ===
                     Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
                 ) {

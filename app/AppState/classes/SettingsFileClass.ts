@@ -1,7 +1,6 @@
 import { RPCPerformanceLevelEnum } from '../../rpc/enums/RPCPerformanceLevelEnum';
 import { CurrencyEnum } from '../enums/CurrencyEnum';
 import { LanguageEnum } from '../enums/LanguageEnum';
-import { ModeEnum } from '../enums/ModeEnum';
 import { SelectServerEnum } from '../enums/SelectServerEnum';
 import SecurityType from '../types/SecurityType';
 import ServerType from '../types/ServerType';
@@ -14,7 +13,6 @@ export default class SettingsFileClass {
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
-  mode: ModeEnum;
   firstInstall: boolean;
   basicFirstViewSeed: boolean;
   version: string | null;
@@ -35,7 +33,6 @@ export default class SettingsFileClass {
     sendAll: boolean,
     donation: boolean,
     privacy: boolean,
-    mode: ModeEnum,
     firstInstall: boolean,
     basicFirstViewSeed: boolean,
     version: string,
@@ -51,7 +48,6 @@ export default class SettingsFileClass {
     this.sendAll = sendAll;
     this.donation = donation;
     this.privacy = privacy;
-    this.mode = mode;
     this.firstInstall = firstInstall;
     this.basicFirstViewSeed = basicFirstViewSeed;
     this.version = version;

@@ -10,7 +10,6 @@ import {
   ServerType,
   SecurityType,
   LanguageEnum,
-  ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
   SnackbarType,
@@ -44,7 +43,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   orchardPool: true,
   saplingPool: true,
   transparentPool: true,
-  mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
   removeFirstSnackbar: () => {},
@@ -63,6 +61,13 @@ type ContextProviderProps = {
   value: AppContextLoading;
 };
 
-export const ContextAppLoadingProvider = ({ children, value }: ContextProviderProps) => {
-  return <ContextAppLoading.Provider value={value}>{children}</ContextAppLoading.Provider>;
+export const ContextAppLoadingProvider = ({
+  children,
+  value,
+}: ContextProviderProps) => {
+  return (
+    <ContextAppLoading.Provider value={value}>
+      {children}
+    </ContextAppLoading.Provider>
+  );
 };

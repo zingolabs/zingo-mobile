@@ -8,7 +8,6 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
   AddressKindEnum,
-  ModeEnum,
   ScreenEnum,
   SnackbarDurationEnum,
   TransparentAddressClass,
@@ -44,7 +43,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   setShowMoreOptions,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, mode } = context;
+  const { translate, privacy, addLastSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
@@ -54,7 +53,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const isBasic = ModeEnum.basic === mode;
   const isUnified = address?.addressKind === AddressKindEnum.u;
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -88,7 +86,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const doCopy = () => {
     Clipboard.setString(address ? address.address : '');
     addLastSnackbar({
-      message: (translate('history.addresscopied') as string),
+      message: translate('history.addresscopied') as string,
       duration: SnackbarDurationEnum.short,
       screenName: [screenName],
     });
@@ -102,10 +100,12 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         contentContainerStyle={{
           alignItems: 'center',
           paddingBottom: 20,
-        }}>
-        {address && address.address !== (translate('receive.noaddress') as string) ? (
+        }}
+      >
+        {address &&
+        address.address !== (translate('receive.noaddress') as string) ? (
           <>
-            {address && !isBasic && !isUnified && (
+            {address && !isUnified && (
               <View
                 style={{
                   width: '95%',
@@ -119,15 +119,37 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   borderWidth: 1,
                   padding: 10,
                   marginTop: 10,
-                }}>
-                <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                  <TriangleAlert color={colors.warning.primary} size={24} style={{ marginRight: 10 }} />
-                  <Text style={{ color: colors.warning.title, fontWeight: 'bold', fontSize: 16 }}>
+                }}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 5,
+                  }}
+                >
+                  <TriangleAlert
+                    color={colors.warning.primary}
+                    size={24}
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text
+                    style={{
+                      color: colors.warning.title,
+                      fontWeight: 'bold',
+                      fontSize: 16,
+                    }}
+                  >
                     {translate('receive.transparent.warning.title') as string}
                   </Text>
                 </View>
                 <Text style={{ color: colors.warning.text }}>
-                  {translate('receive.transparent.warning.description') as string}
+                  {
+                    translate(
+                      'receive.transparent.warning.description',
+                    ) as string
+                  }
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
@@ -143,16 +165,35 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     padding: 10,
                     borderRadius: 5,
                     marginTop: 10,
-                  }}>
-                  <ShieldIcon color={colors.background} size={24} style={{ marginRight: 5 }} />
-                  <Text style={{ color: colors.background, fontWeight: 'bold', fontSize: 14 }}>
+                  }}
+                >
+                  <ShieldIcon
+                    color={colors.background}
+                    size={24}
+                    style={{ marginRight: 5 }}
+                  />
+                  <Text
+                    style={{
+                      color: colors.background,
+                      fontWeight: 'bold',
+                      fontSize: 14,
+                    }}
+                  >
                     {translate('receive.transparent.warning.button') as string}
                   </Text>
                 </TouchableOpacity>
               </View>
             )}
 
-            <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text, borderRadius: 15 }}>
+            <View
+              style={{
+                marginTop: 20,
+                marginHorizontal: 20,
+                padding: 10,
+                backgroundColor: colors.text,
+                borderRadius: 15,
+              }}
+            >
               <QRCode
                 value={address ? address.address : ''}
                 size={200}
@@ -161,12 +202,12 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 logo={require('../../assets/img/logobig-zingo-delegator.png')}
                 logoSize={30}
                 logoBackgroundColor={colors.text}
-                logoBorderRadius={5} /* android not soported */ 
+                logoBorderRadius={5} /* android not soported */
                 logoMargin={3}
               />
             </View>
 
-            <View 
+            <View
               style={{
                 marginTop: 40,
                 backgroundColor: colors.secondary,
@@ -188,7 +229,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   flexDirection: 'row',
                   justifyContent: 'center',
                   alignItems: 'center',
-                }}>
+                }}
+              >
                 <TouchableOpacity onPress={doCopy}>
                   <View
                     style={{
@@ -197,8 +239,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       paddingHorizontal: 5,
                       paddingVertical: 5,
                       marginHorizontal: 10,
-                    }}>
-                    <CopyIcon color={colors.money} size={24} opacity={0.9} style={{ margin: 3 }} />
+                    }}
+                  >
+                    <CopyIcon
+                      color={colors.money}
+                      size={24}
+                      opacity={0.9}
+                      style={{ margin: 3 }}
+                    />
                   </View>
                 </TouchableOpacity>
               </View>
@@ -212,7 +260,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               justifyContent: 'center',
               marginTop: 50,
               marginBottom: 30,
-            }}>
+            }}
+          >
             <RegText>{address ? address.address : ''}</RegText>
           </View>
         )}

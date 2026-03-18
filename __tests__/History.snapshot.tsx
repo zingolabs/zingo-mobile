@@ -7,8 +7,11 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyEnum, ModeEnum, RouteEnum } from '../app/AppState';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
+import { CurrencyEnum, RouteEnum } from '../app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -18,7 +21,10 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.History> {
+function makeDrawerProps(): DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.History
+> {
   return {
     navigation: mockNavigation,
     route: {
@@ -48,11 +54,11 @@ describe('Component History - test', () => {
     // privacy normal
     state.privacy = false;
     // mode basic
-    state.mode = ModeEnum.advanced;
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History {...props}
+        <History
+          {...props}
           toggleMenuDrawer={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
@@ -70,11 +76,11 @@ describe('Component History - test', () => {
     // privacy normal
     state.privacy = true;
     // mode basic
-    state.mode = ModeEnum.advanced;
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History {...props}
+        <History
+          {...props}
           toggleMenuDrawer={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
