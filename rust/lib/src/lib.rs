@@ -1074,19 +1074,26 @@ pub fn get_messages(address: String) -> Result<String, ZingolibError> {
 #[uniffi::export]
 pub fn get_balance() -> Result<String, ZingolibError> {
     with_panic_guard(|| {
-        let mut guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &mut *guard {
-            Ok(RT.block_on(async move {
-                match lightclient.account_balance(AccountId::ZERO).await {
-                    Ok(bal) => json::JsonValue::from(bal).pretty(2),
-                    Err(e) => format!("Error: {e}"),
-                }
-            }))
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
-        }
+        let guard = match LIGHTCLIENT.read() {
+            Ok(g) => g,
+            Err(poisoned) => {
+                log::warn!("LIGHTCLIENT RwLock poisoned; recovering read lock");
+                let g = poisoned.into_inner();
+                LIGHTCLIENT.clear_poison();
+                g
+            }
+        };
+
+        let lightclient = guard
+            .as_ref()
+            .ok_or(ZingolibError::LightclientNotInitialized)?;
+
+        Ok(RT.block_on(async {
+            match lightclient.account_balance(AccountId::ZERO).await {
+                Ok(bal) => json::JsonValue::from(bal).pretty(2),
+                Err(e) => format!("Error: {e}"),
+            }
+        }))
     })
 }
 
