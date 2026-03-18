@@ -790,12 +790,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   return (
     <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
-
       <KeyboardAvoidingView
         style={{
           flex: 1,
