@@ -41,7 +41,6 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import { ToastProvider } from 'react-native-toastier';
-import Snackbars from '../Components/Snackbars';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { createAlert } from '../../app/createAlert';
@@ -106,8 +105,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
     readOnly,
-    snackbars,
-    removeFirstSnackbar,
     setPrivacyOption,
     setBackgroundError,
     zingolibVersion,
