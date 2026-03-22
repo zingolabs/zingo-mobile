@@ -196,7 +196,7 @@ jobs:
   #     - name: Rust toolchain
   #       uses: actions-rust-lang/setup-rust-toolchain@v1
   #       with:
-  #         toolchain: nightly
+  #         toolchain: stable
   #         cache-workspaces: rust -> rust/target
 
   #     - name: Install nextest
@@ -234,8 +234,8 @@ jobs:
   #         xcrun simctl list runtimes
   #         xcrun simctl list devices
 
-  #     - name: rust default nightly
-  #       run: rustup default nightly
+  #     - name: rust default stable
+  #       run: rustup default stable
 
   #     - name: Run IOS integration tests
   #       working-directory: ./rust

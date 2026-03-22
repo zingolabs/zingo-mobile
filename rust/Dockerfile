@@ -18,7 +18,7 @@ WORKDIR /opt/zingo/rust/
 
 ENV CARGO_TARGET_DIR=/opt/zingo/rust/target
 
-RUN rustup default nightly
+RUN rustup default stable
 
 RUN rustup target add \
     aarch64-linux-android armv7-linux-androideabi \
