@@ -93,31 +93,29 @@ import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Send from '../../components/Send';
 import Receive from '../../components/Receive';
-import { SettingsMenu } from '../../components/Settings';
 import Faucet from '../../components/Faucet';
 import { MainTabs } from './components/MainTabs';
 import Computing from './components/Computing';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
 import ScannerAddress from '../../components/Send/components/ScannerAddress';
-import Seed from '../../components/Seed';
 import ComputingOK from './components/ComputingOK';
 import ComputingError from './components/ComputingError';
 import { Staking, AddStakeScreen, Unstake } from '../../components/Staking';
-import SettingsServers from '../../components/Settings/components/SettingsServers';
-import DebugInfo from '../../components/Settings/components/DebugInfo';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 import Distribution from '../../components/Distribution';
 import Redelegate from '../../components/Staking/components/Redelegate';
 import Finalizers from '../../components/Finalizers/Finalizers';
 import { reverseHex32Bytes } from '../utils/hex';
+import SettingsNavigator from '../../components/Settings/SettingsNavigator';
 
-const InnerStack = createNativeStackNavigator<InnerStackParamList>();
+const LoadedAppStack = createNativeStackNavigator<LoadedAppStackParamList>();
 
-type InnerStackParamList = {
+type LoadedAppStackParamList = {
   [RouteEnum.MainTabs]: undefined;
-  [RouteEnum.SettingsMenu]: undefined;
-  [RouteEnum.SettingsServers]: undefined;
-  [RouteEnum.DebugInfo]: undefined;
+  [RouteEnum.SettingsStack]: undefined;
+  // [RouteEnum.SettingsMenu]: undefined;
+  // [RouteEnum.SettingsServers]: undefined;
+  // [RouteEnum.DebugInfo]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Faucet]: undefined;
@@ -126,7 +124,7 @@ type InnerStackParamList = {
   [RouteEnum.ComputingError]: undefined;
   [RouteEnum.ValueTransferDetail]: undefined;
   [RouteEnum.ScannerAddress]: undefined;
-  [RouteEnum.Seed]: undefined;
+  // [RouteEnum.Seed]: undefined;
   [RouteEnum.StakingHome]: undefined;
   [RouteEnum.Stake]: undefined;
   [RouteEnum.Unstake]: undefined;
@@ -1330,7 +1328,7 @@ export class LoadedAppClass extends Component<
       this.state.navigationHome?.navigate(RouteEnum.About);
       return;
     } else if (item === MenuItemEnum.Settings) {
-      this.state.navigationHome?.navigate(RouteEnum.SettingsMenu);
+      this.state.navigationHome?.navigate(RouteEnum.SettingsStack);
       return;
     } else if (item === MenuItemEnum.Rescan) {
       this.state.navigationHome?.navigate(RouteEnum.Rescan);
@@ -1978,13 +1976,13 @@ export class LoadedAppClass extends Component<
 
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
-            <InnerStack.Navigator
+            <LoadedAppStack.Navigator
               screenOptions={{
                 headerShown: false,
                 animation: 'simple_push',
               }}
             >
-              <InnerStack.Screen name={RouteEnum.MainTabs}>
+              <LoadedAppStack.Screen name={RouteEnum.MainTabs}>
                 {() => (
                   <MainTabs
                     scrollToTop={scrollToTop}
@@ -1993,18 +1991,18 @@ export class LoadedAppClass extends Component<
                     setShieldingAmount={this.setShieldingAmount}
                   />
                 )}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.SettingsMenu}>
+              {/* <LoadedAppStack.Screen name={RouteEnum.SettingsMenu}>
                 {props => (
                   <SettingsMenu
                     {...props}
                     onClickOKChangeWallet={this.onClickOKChangeWallet}
                   />
                 )}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen> */}
 
-              <InnerStack.Screen name={RouteEnum.Send}>
+              <LoadedAppStack.Screen name={RouteEnum.Send}>
                 {props => (
                   <Send
                     toggleMenuDrawer={function (): void {
@@ -2020,9 +2018,9 @@ export class LoadedAppClass extends Component<
                     sendTransaction={this.sendTransaction}
                   />
                 )}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.Receive}>
+              <LoadedAppStack.Screen name={RouteEnum.Receive}>
                 {props => (
                   <Receive
                     toggleMenuDrawer={function (): void {
@@ -2032,74 +2030,84 @@ export class LoadedAppClass extends Component<
                     {...props}
                   />
                 )}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.SettingsServers}>
+              {/* <LoadedAppStack.Screen name={RouteEnum.SettingsServers}>
                 {props => (
                   <SettingsServers
                     {...props}
                     navigateToLoadingApp={this.navigateToLoadingApp}
                   />
                 )}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen> */}
 
-              <InnerStack.Screen name={RouteEnum.Distribution}>
+              <LoadedAppStack.Screen name={RouteEnum.Distribution}>
                 {props => <Distribution {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen
+              <LoadedAppStack.Screen
                 name={RouteEnum.Finalizers}
                 options={{ presentation: 'modal' }}
               >
                 {props => <Finalizers {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.DebugInfo}>
+              {/* <LoadedAppStack.Screen name={RouteEnum.DebugInfo}>
                 {props => <DebugInfo {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen> */}
 
-              <InnerStack.Screen name={RouteEnum.Faucet}>
+              <LoadedAppStack.Screen name={RouteEnum.Faucet}>
                 {props => <Faucet {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.Computing}>
+              <LoadedAppStack.Screen name={RouteEnum.Computing}>
                 {props => <Computing {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.ComputingOK}>
+              <LoadedAppStack.Screen name={RouteEnum.ComputingOK}>
                 {props => <ComputingOK {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.ComputingError}>
+              <LoadedAppStack.Screen name={RouteEnum.ComputingError}>
                 {props => <ComputingError {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.ValueTransferDetail}>
+              <LoadedAppStack.Screen name={RouteEnum.ValueTransferDetail}>
                 {props => <ValueTransferDetail {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.ScannerAddress}>
+              <LoadedAppStack.Screen name={RouteEnum.ScannerAddress}>
                 {props => <ScannerAddress {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.Seed}>
+              {/* <LoadedAppStack.Screen name={RouteEnum.Seed}>
                 {props => <Seed {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen> */}
 
-              <InnerStack.Screen name={RouteEnum.StakingHome}>
+              <LoadedAppStack.Screen name={RouteEnum.SettingsStack}>
+                {props => (
+                  <SettingsNavigator
+                    {...props}
+                    onClickOKChangeWallet={this.onClickOKChangeWallet}
+                    navigateToLoadingApp={this.navigateToLoadingApp}
+                  />
+                )}
+              </LoadedAppStack.Screen>
+
+              <LoadedAppStack.Screen name={RouteEnum.StakingHome}>
                 {props => <Staking {...props} />}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.Stake}>
+              <LoadedAppStack.Screen name={RouteEnum.Stake}>
                 {props => (
                   <AddStakeScreen
                     {...props}
                     stakeTransaction={this.stakeTransaction}
                   />
                 )}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.Unstake}>
+              <LoadedAppStack.Screen name={RouteEnum.Unstake}>
                 {props => (
                   <Unstake
                     {...props}
@@ -2107,17 +2115,17 @@ export class LoadedAppClass extends Component<
                     withdrawBondTransaction={this.withdrawBondTransaction}
                   />
                 )}
-              </InnerStack.Screen>
+              </LoadedAppStack.Screen>
 
-              <InnerStack.Screen name={RouteEnum.Redelegate}>
+              <LoadedAppStack.Screen name={RouteEnum.Redelegate}>
                 {props => (
                   <Redelegate
                     {...props}
                     redelegateTransaction={this.redelegateTransaction}
                   />
                 )}
-              </InnerStack.Screen>
-            </InnerStack.Navigator>
+              </LoadedAppStack.Screen>
+            </LoadedAppStack.Navigator>
           </GestureHandlerRootView>
         </ContextAppLoadedProvider>
       </ToastProvider>
