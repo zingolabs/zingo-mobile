@@ -6,7 +6,7 @@ import { useNavigation, useTheme } from '@react-navigation/native';
 
 import RegText from '../../../components/Components/RegText';
 import { AppDrawerParamList, ThemeType } from '../../types';
-import { ButtonTypeEnum, RouteEnum } from '../../AppState';
+import { RouteEnum } from '../../AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 //import { ContextAppLoaded } from '../../context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -14,8 +14,10 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Button from '../../../components/Components/Button';
 import FadeText from '../../../components/Components/FadeText';
 
-
-type ComputingErrorProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ComputingError>;
+type ComputingErrorProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.ComputingError
+>;
 
 const ComputingError: React.FunctionComponent<ComputingErrorProps> = ({
   route,
@@ -27,21 +29,26 @@ const ComputingError: React.FunctionComponent<ComputingErrorProps> = ({
 
   const [showDetails, setShowDetails] = useState<boolean>(false);
 
-  const error = !!route.params && route.params.error !== undefined ? route.params.error : '';
+  const error =
+    !!route.params && route.params.error !== undefined
+      ? route.params.error
+      : '';
 
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: colors.background,
-      }}>
+      }}
+    >
       <View
         style={{
           flexGrow: 1,
           justifyContent: 'center',
           alignItems: 'center',
-      }}>
-        <View 
+        }}
+      >
+        <View
           style={{
             backgroundColor: colors.secondary,
             paddingHorizontal: 20,
@@ -65,19 +72,17 @@ const ComputingError: React.FunctionComponent<ComputingErrorProps> = ({
                 margin: 10,
               }}
             >
-              <FontAwesomeIcon
-                icon={faXmark}
-                color='#FF383C'
-                size={50}
-              />
+              <FontAwesomeIcon icon={faXmark} color="#FF383C" size={50} />
             </View>
           </View>
-          <RegText style={{ fontSize: 30, alignSelf: 'center' }}>{'An error\noccurred'}</RegText>
+          <RegText style={{ fontSize: 30, alignSelf: 'center' }}>
+            {'An error\noccurred'}
+          </RegText>
 
           <View
             style={{
               marginTop: 50,
-              flexDirection: 'row',
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               paddingTop: 10,
@@ -85,15 +90,14 @@ const ComputingError: React.FunctionComponent<ComputingErrorProps> = ({
             }}
           >
             <Button
-              type={ButtonTypeEnum.Secondary}
+              variant="secondary"
               title={'Details'}
               onPress={() => {
                 setShowDetails(true);
               }}
-              twoButtons={true}
             />
             <Button
-              type={ButtonTypeEnum.Primary}
+              variant="primary"
               style={{ marginLeft: 10 }}
               title={'Back'}
               onPress={() => {
@@ -102,15 +106,11 @@ const ComputingError: React.FunctionComponent<ComputingErrorProps> = ({
                   navigation.goBack();
                 }
               }}
-              twoButtons={true}
             />
           </View>
 
-          {showDetails && (
-            <FadeText style={{ opacity: 1 }}>{error}</FadeText>
-          )}
+          {showDetails && <FadeText style={{ opacity: 1 }}>{error}</FadeText>}
         </View>
-
       </View>
     </View>
   );

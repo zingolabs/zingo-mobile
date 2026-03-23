@@ -10,11 +10,7 @@ import FadeText from '../../../components/Components/FadeText';
 import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
-import {
-  SnackbarDurationEnum,
-  ButtonTypeEnum,
-  ScreenEnum,
-} from '../../AppState';
+import { SnackbarDurationEnum, ScreenEnum } from '../../AppState';
 import { Header } from '../../../components/Header';
 import Utils from '../../utils';
 import Snackbars from '../../../components/Components/Snackbars';
@@ -263,7 +259,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({ onClickOK }) => {
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             style={{
               backgroundColor: colors.primary,
             }}

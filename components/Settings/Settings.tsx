@@ -30,7 +30,6 @@ import {
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
-  ButtonTypeEnum,
   GlobalConst,
   RouteEnum,
   ScreenEnum,
@@ -41,11 +40,8 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import { ToastProvider } from 'react-native-toastier';
-import Snackbars from '../Components/Snackbars';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { createAlert } from '../../app/createAlert';
-import { sendEmail } from '../../app/sendEmail';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderTitle } from '../Header';
 
@@ -106,12 +102,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
     readOnly,
-    snackbars,
-    removeFirstSnackbar,
     setPrivacyOption,
-    setBackgroundError,
-    zingolibVersion,
-    lastError,
   } = context;
 
   const currenciesArray = translate('settings.currencies');
@@ -755,20 +746,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     );
   };
 
-  const reportError = (error: string) => {
-    createAlert(
-      setBackgroundError,
-      addLastSnackbar,
-      [screenName],
-      'Last Error',
-      error,
-      false,
-      translate,
-      sendEmail,
-      zingolibVersion,
-    );
-  };
-
   return (
     <ToastProvider>
       <KeyboardAvoidingView
@@ -1397,24 +1374,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     'performancelevel',
                   )}
                 </View>
-                {!!lastError && (
-                  <>
-                    <View style={{ display: 'flex', margin: 10 }}>
-                      <BoldText>{'LAST ERROR'}</BoldText>
-                    </View>
-
-                    <View style={{ display: 'flex', marginLeft: 25 }}>
-                      <Button
-                        type={ButtonTypeEnum.Primary}
-                        title={translate('view-error') as string}
-                        onPress={() => {
-                          reportError(lastError);
-                        }}
-                        twoButtons={true}
-                      />
-                    </View>
-                  </>
-                )}
               </View>
             )}
           </>
@@ -1431,7 +1390,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           <Button
             testID="settings.button.save"
             disabled={disabled || disabledButton}
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('settings.save') as string}
             onPress={() => {
               // waiting while closing the keyboard, just in case.

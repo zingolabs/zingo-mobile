@@ -459,10 +459,11 @@ const Import: React.FunctionComponent<ImportProps> = ({
             justifyContent: 'center',
             paddingTop: 10,
             paddingBottom: 20,
+            paddingHorizontal: 15,
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('continue') as string}
             disabled={actionButtonsDisabled || buttonDisabled}
             onPress={() => {
@@ -474,7 +475,6 @@ const Import: React.FunctionComponent<ImportProps> = ({
               marginBottom: 4,
               maxWidth: maxW,
             }}
-            twoButtons={false}
           />
         </View>
       </KeyboardAvoidingView>

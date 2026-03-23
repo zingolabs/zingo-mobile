@@ -8,7 +8,7 @@ import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
-import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../../app/AppState';
+import { RouteEnum, ScreenEnum } from '../../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../Components/Button';
@@ -17,22 +17,23 @@ import { createAlert } from '../../../app/createAlert';
 import { sendEmail } from '../../../app/sendEmail';
 import { HeaderTitle } from '../../Header';
 
-type DebugInfoProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.DebugInfo>;
+type DebugInfoProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.DebugInfo
+>;
 
-const DebugInfo: React.FunctionComponent<DebugInfoProps> = ({
-  navigation,
-}) => {
+const DebugInfo: React.FunctionComponent<DebugInfoProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
-  const { 
-    snackbars, 
-    removeFirstSnackbar, 
-    lastError, 
-    setBackgroundError, 
-    addLastSnackbar, 
-    translate, 
-    zingolibVersion 
+  const {
+    snackbars,
+    removeFirstSnackbar,
+    lastError,
+    setBackgroundError,
+    addLastSnackbar,
+    translate,
+    zingolibVersion,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.DebugInfo;
 
@@ -51,7 +52,7 @@ const DebugInfo: React.FunctionComponent<DebugInfoProps> = ({
       zingolibVersion,
     );
   };
-  
+
   return (
     <ToastProvider>
       <Snackbars
@@ -60,12 +61,15 @@ const DebugInfo: React.FunctionComponent<DebugInfoProps> = ({
         screenName={screenName}
       />
 
-      <HeaderTitle title='Debug info' goBack={() => {
-        clear();
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        }
-      }} />
+      <HeaderTitle
+        title="Debug info"
+        goBack={() => {
+          clear();
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
+      />
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
@@ -73,15 +77,33 @@ const DebugInfo: React.FunctionComponent<DebugInfoProps> = ({
           flexGrow: 1,
           paddingBottom: insets.bottom + 8,
           paddingHorizontal: 16,
-      }}>
+        }}
+      >
         <View
           style={{
             flexGrow: 1,
             alignItems: 'flex-start',
             justifyContent: 'center',
-        }}>
-          <View style={{ borderRadius: 26, backgroundColor: colors.secondary, width: '100%', marginTop: 20, paddingVertical: 10 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 20, marginHorizontal: 30, width: '85%' }}>
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 26,
+              backgroundColor: colors.secondary,
+              width: '100%',
+              marginTop: 20,
+              paddingVertical: 10,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                marginVertical: 20,
+                marginHorizontal: 30,
+                width: '85%',
+              }}
+            >
               <FadeText>
                 {lastError ? lastError : 'No errors detected'}
               </FadeText>
@@ -96,18 +118,17 @@ const DebugInfo: React.FunctionComponent<DebugInfoProps> = ({
           justifyContent: 'center',
           paddingTop: 10,
           paddingBottom: 20,
-        }}>
-          {!!lastError && (
-            <Button
-              type={ButtonTypeEnum.Primary}
-              title={'Report'}
-              onPress={() => {
-                reportError(lastError);
-              }}
-              twoButtons={false}
-            />
-          )}
-
+        }}
+      >
+        {!!lastError && (
+          <Button
+            variant="primary"
+            title={'Report'}
+            onPress={() => {
+              reportError(lastError);
+            }}
+          />
+        )}
       </View>
     </ToastProvider>
   );

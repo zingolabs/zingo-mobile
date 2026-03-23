@@ -20,21 +20,30 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({
 
   return (
     <View style={styles.header}>
-      <TouchableOpacity
-        onPress={() => goBack()}
-        style={[styles.backButton, { borderColor: colors.text }]}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      >
-        <FontAwesomeIcon
-          icon={bottomSheet ? faXmark : faChevronLeft}
-          size={22}
-          color={colors.text}
-        />
-      </TouchableOpacity>
+      <View style={styles.side}>
+        <TouchableOpacity
+          onPress={goBack}
+          style={[styles.backButton, { borderColor: colors.text }]}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <FontAwesomeIcon
+            icon={bottomSheet ? faXmark : faChevronLeft}
+            size={22}
+            color={colors.text}
+          />
+        </TouchableOpacity>
+      </View>
 
-      <Text style={[styles.headerTitle, { color: colors.text }]}>{title}</Text>
+      <View pointerEvents="none" style={styles.titleContainer}>
+        <Text
+          numberOfLines={1}
+          style={[styles.headerTitle, { color: colors.text }]}
+        >
+          {title}
+        </Text>
+      </View>
 
-      <View style={{ width: 32 }} />
+      <View style={styles.side} />
     </View>
   );
 };
@@ -42,15 +51,22 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({
 const styles = StyleSheet.create({
   header: {
     height: 48,
-    flexDirection: 'row',
+    marginTop: 10,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+  },
+  side: {
+    width: 58,
+    justifyContent: 'center',
+  },
+  titleContainer: {
+    position: 'absolute',
+    left: 74,
+    right: 74,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
-    marginTop: 10,
   },
   backButton: {
-    marginTop: 5,
-    marginHorizontal: 5,
     width: 48,
     height: 48,
     justifyContent: 'center',
@@ -59,7 +75,6 @@ const styles = StyleSheet.create({
     borderWidth: 0.2,
   },
   headerTitle: {
-    flex: 1,
     textAlign: 'center',
     fontSize: 22,
     fontWeight: '600',

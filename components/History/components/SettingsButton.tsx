@@ -12,9 +12,7 @@ type SettingsButtonProps = {
   screenName: ScreenEnum;
 };
 
-const SettingsButton: React.FC<SettingsButtonProps> = ({
-  screenName,
-}) => {
+const SettingsButton: React.FC<SettingsButtonProps> = ({ screenName }) => {
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
 
@@ -35,7 +33,7 @@ const SettingsButton: React.FC<SettingsButtonProps> = ({
         style={{ marginRight: 5, padding: 5 }}
         testID="header.settings"
         onPress={() => {
-          navigation.navigate(RouteEnum.SettingsMenu);
+          navigation.navigate(RouteEnum.SettingsStack);
         }}
       >
         <SettingsIcon height={24} width={24} color={colors.text} />

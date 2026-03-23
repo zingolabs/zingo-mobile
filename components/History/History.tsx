@@ -21,13 +21,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import {
-  ButtonTypeEnum,
   GlobalConst,
   RouteEnum,
   ScreenEnum,
-  //SelectServerEnum,
-  //SendPageStateClass,
-  //ServerType,
   ValueTransferType,
 } from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
@@ -451,11 +447,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             alignItems: 'center',
                             justifyContent: 'flex-start',
                             marginTop: 5,
-                            marginBottom: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+                            marginBottom:
+                              Platform.OS === GlobalConst.platformOSios
+                                ? 100
+                                : 10,
                           }}
                         >
                           <Button
-                            type={ButtonTypeEnum.Secondary}
+                            variant="secondary"
                             title={translate('history.loadmore') as string}
                             onPress={loadMoreClicked}
                           />
@@ -466,7 +465,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             !!valueTransfersSliced.length && (
                               <View
                                 style={{
-                                  marginBottom: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+                                  marginBottom:
+                                    Platform.OS === GlobalConst.platformOSios
+                                      ? 100
+                                      : 10,
                                 }}
                               />
                             )}

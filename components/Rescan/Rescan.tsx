@@ -6,7 +6,12 @@ import RegText from '../Components/RegText';
 import Button from '../Components/Button';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, RouteEnum, ScreenEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
+import {
+  RouteEnum,
+  ScreenEnum,
+  SelectServerEnum,
+  SnackbarDurationEnum,
+} from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -17,18 +22,18 @@ type RescanProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Rescan> & {
   doRescan: () => Promise<void>;
 };
 
-const Rescan: React.FunctionComponent<RescanProps> = ({ 
+const Rescan: React.FunctionComponent<RescanProps> = ({
   navigation,
-  doRescan 
+  doRescan,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { 
-    wallet, 
-    translate, 
-    netInfo, 
-    addLastSnackbar, 
-    selectIndexerServer, 
-    snackbars, 
+  const {
+    wallet,
+    translate,
+    netInfo,
+    addLastSnackbar,
+    selectIndexerServer,
+    snackbars,
     removeFirstSnackbar,
   } = context;
   const { clear } = useToast();
@@ -37,8 +42,14 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   const insets = useSafeAreaInsets();
 
   const doRescanAndClose = async () => {
-    if (!netInfo.isConnected || selectIndexerServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
+    if (
+      !netInfo.isConnected ||
+      selectIndexerServer === SelectServerEnum.offline
+    ) {
+      addLastSnackbar({
+        message: translate('loadedapp.connection-error') as string,
+        screenName: [screenName],
+      });
       return;
     }
     // was removed the `await` here because launching the rescan can
@@ -66,12 +77,15 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
         screenName={screenName}
       />
 
-      <HeaderTitle title='Rescan wallet' goBack={() => {
-        clear();
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        }
-      }} />
+      <HeaderTitle
+        title="Rescan wallet"
+        goBack={() => {
+          clear();
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
+      />
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
@@ -80,15 +94,21 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
           paddingTop: insets.top + 8,
           paddingBottom: insets.bottom + 8,
           paddingHorizontal: 16,
-      }}>
+        }}
+      >
         <View
           style={{
             flexGrow: 1,
             alignItems: 'flex-start',
             justifyContent: 'center',
-        }}>
+          }}
+        >
           <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-            <RegText>{(translate('rescan.text-1') as string) + wallet.birthday + translate('rescan.text-2')}</RegText>
+            <RegText>
+              {(translate('rescan.text-1') as string) +
+                wallet.birthday +
+                translate('rescan.text-2')}
+            </RegText>
           </View>
         </View>
       </ScrollView>
@@ -99,8 +119,13 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
           justifyContent: 'center',
           paddingTop: 10,
           paddingBottom: 20,
-        }}>
-        <Button type={ButtonTypeEnum.Primary} title={translate('rescan.button') as string} onPress={doRescanAndClose} />
+        }}
+      >
+        <Button
+          variant="primary"
+          title={translate('rescan.button') as string}
+          onPress={doRescanAndClose}
+        />
       </View>
     </ToastProvider>
   );
