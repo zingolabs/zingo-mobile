@@ -65,11 +65,11 @@ jobs:
           cd rust
           sudo cargo update -p zingolib -p regchest_utils --aggressive
 
-      - name: Cargo default nightly
+      - name: Cargo default stable
         run: |
           sudo rustup update
           sudo rustup upgrade
-          sudo rustup default nightly
+          sudo rustup default stable
 
       - name: AWS libcrypto rust building
         run: sudo cargo install --force --locked bindgen-cli

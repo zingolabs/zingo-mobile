@@ -98,8 +98,12 @@ jobs:
           cd rust
           cargo update -p zingolib -p regchest_utils --aggressive
 
-      - name: Cargo default nightly
-        run: rustup default nightly
+      - name: Cargo default stable
+        run: |
+          rustup update
+          rustup upgrade
+          rustup toolchain install stable --profile minimal --component rust-src
+          rustup default stable
 
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli
@@ -124,6 +128,7 @@ jobs:
       - name: Set envs for x86_64
         if: ${{ env.ARCH == 'x86_64' }}
         run: |
+          rustup target add x86_64-linux-android
           echo "TARGET=x86_64-linux-android" >> $GITHUB_ENV
           echo "CC=x86_64-linux-android" >> $GITHUB_ENV
           echo "CARGO_FEATURE_STD=false" >> $GITHUB_ENV
@@ -131,6 +136,7 @@ jobs:
       - name: Set envs for x86
         if: ${{ env.ARCH == 'x86' }}
         run: |
+          rustup target add i686-linux-android
           echo "TARGET=i686-linux-android" >> $GITHUB_ENV
           echo "CC=i686-linux-android" >> $GITHUB_ENV
           echo "CARGO_FEATURE_STD=false" >> $GITHUB_ENV
@@ -138,6 +144,7 @@ jobs:
       - name: Set envs for arm64-v8a
         if: ${{ env.ARCH == 'arm64-v8a' }}
         run: |
+          rustup target add aarch64-linux-android
           echo "TARGET=aarch64-linux-android" >> $GITHUB_ENV
           echo "CC=aarch64-linux-android" >> $GITHUB_ENV
           echo "CARGO_FEATURE_STD=true" >> $GITHUB_ENV
@@ -145,6 +152,7 @@ jobs:
       - name: Set envs for armeabi-v7a
         if: ${{ env.ARCH == 'armeabi-v7a' }}
         run: |
+          rustup target add armv7-linux-androideabi
           echo "TARGET=armv7-linux-androideabi" >> $GITHUB_ENV
           echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
           echo "CARGO_FEATURE_STD=false" >> $GITHUB_ENV
@@ -157,7 +165,7 @@ jobs:
         run: |
           cargo ndk \
           --target ${{ env.TARGET }} build \
-          --release -Z build-std
+          --release
         env:
           AR: llvm-ar
           LD: ld

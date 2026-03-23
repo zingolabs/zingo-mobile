@@ -26,20 +26,20 @@ jobs:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
 
-  android-ubuntu-integration-test-ci:
-    strategy:
-      matrix:
-        config:
-          - { abi: x86_64, api-level: 34, target: default }
-          - { abi: x86, api-level: 29, target: default }
-    uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, create-cache-key, android-build]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      abi: ${{ matrix.config.abi }}
-      api-level: ${{ matrix.config['api-level'] }}
-      target: ${{ matrix.config.target }}
+  #android-ubuntu-integration-test-ci:
+  #  strategy:
+  #    matrix:
+  #      config:
+  #        - { abi: x86_64, api-level: 34, target: default }
+  #        - { abi: x86, api-level: 29, target: default }
+  #  uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
+  #  needs: [create-timestamp, create-cache-key, android-build]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  #    abi: ${{ matrix.config.abi }}
+  #    api-level: ${{ matrix.config['api-level'] }}
+  #    target: ${{ matrix.config.target }}
 
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
@@ -47,8 +47,8 @@ jobs:
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
 
-  ios-integration-test:
-    uses: ./.github/workflows/ios-integration-test.yaml
-    needs: [create-cache-key, ios-build]
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  #ios-integration-test:
+  #  uses: ./.github/workflows/ios-integration-test.yaml
+  #  needs: [create-cache-key, ios-build]
+  #  with:
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}

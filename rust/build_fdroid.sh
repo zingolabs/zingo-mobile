@@ -62,7 +62,7 @@ export CARGO_HOME="$HOME/.cargo"
 export RUSTUP_HOME="$HOME/.rustup"
 export PATH="$PATH:$CARGO_HOME/bin"
 rustup toolchain install stable --profile minimal
-rustup toolchain install nightly --component rust-src
+rustup toolchain install stable --component rust-src
 rustup update
 rustup default stable
 rustup target add \
@@ -130,7 +130,7 @@ mkdir -p /opt/openssl-3.3.2/x86 \
     && make clean > /dev/null \
     && make distclean > /dev/null
 
-rustup default nightly
+rustup default stable
 
 cargo install --force --locked bindgen-cli
 
@@ -146,7 +146,7 @@ export CARGO_NDK_ANDROID_PLATFORM=24
 
 export CARGO_FEATURE_STD="true"
 export OPENSSL_DIR=/opt/openssl-3.3.2/aarch64
-cargo ndk --target arm64-v8a build --release -Z build-std > /dev/null
+cargo ndk --target arm64-v8a build --release > /dev/null
 llvm-strip --strip-all ../target/aarch64-linux-android/release/libzingo.so
 llvm-objcopy \
     --remove-section .comment \
@@ -155,7 +155,7 @@ sha256sum ../target/aarch64-linux-android/release/libzingo.so
 export CARGO_FEATURE_STD="false"
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/armv7
-cargo ndk --target armeabi-v7a build --release -Z build-std > /dev/null
+cargo ndk --target armeabi-v7a build --release > /dev/null
 llvm-strip --strip-all ../target/armv7-linux-androideabi/release/libzingo.so
 llvm-objcopy \
     --remove-section .comment \
@@ -163,7 +163,7 @@ llvm-objcopy \
 sha256sum ../target/armv7-linux-androideabi/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/x86
-cargo ndk --target x86 build --release -Z build-std > /dev/null
+cargo ndk --target x86 build --release > /dev/null
 llvm-strip --strip-all ../target/i686-linux-android/release/libzingo.so
 llvm-objcopy \
     --remove-section .comment \
@@ -171,7 +171,7 @@ llvm-objcopy \
 sha256sum ../target/i686-linux-android/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/x86_64
-cargo ndk --target x86_64 build --release -Z build-std > /dev/null
+cargo ndk --target x86_64 build --release > /dev/null
 llvm-strip --strip-all ../target/x86_64-linux-android/release/libzingo.so
 llvm-objcopy \
     --remove-section .comment \

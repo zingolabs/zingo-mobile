@@ -24,7 +24,7 @@ ENV CARGO_NDK_ANDROID_PLATFORM=24
 ENV AR=llvm-ar
 ENV RANLIB=llvm-ranlib
 
-RUN rustup default nightly
+RUN rustup default stable
 RUN rustup target add x86_64-linux-android
 
 RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
