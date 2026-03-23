@@ -73,7 +73,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     let price: number;
     let error: string;
     // first attempt
-    ({ price, error } = await WalletSession.walletGetZecPrice(withTor));
+    ({ price, error } = await WalletSession.rpcGetZecPrice(withTor));
     //console.log('first price fetching', price, error);
     // values:
     // 0   - initial/default value
@@ -82,7 +82,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     // > 0 - real value
     if (price <= 0) {
       // second attempt
-      ({ price, error } = await WalletSession.walletGetZecPrice(withTor));
+      ({ price, error } = await WalletSession.rpcGetZecPrice(withTor));
       //console.log('second price fetching', price, error);
     }
 
