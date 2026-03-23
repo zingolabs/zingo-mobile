@@ -16,7 +16,7 @@ import RegText from '../../../components/Components/RegText';
 import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
-import { ButtonTypeEnum, ScreenEnum, SelectServerEnum } from '../../AppState';
+import { ScreenEnum, SelectServerEnum } from '../../AppState';
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

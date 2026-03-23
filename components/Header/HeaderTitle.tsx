@@ -1,4 +1,4 @@
-/* eslint-disable react-native/no-inline-styles */
+ 
 import { useTheme } from '@react-navigation/native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ThemeType } from '../../app/types';

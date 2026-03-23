@@ -41,8 +41,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         <View
           style={
             {
-              "alignItems": "center",
-              "flexDirection": "row",
               "height": 48,
               "justifyContent": "center",
               "marginTop": 10,
@@ -51,95 +49,116 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           }
         >
           <View
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": undefined,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            hitSlop={
-              {
-                "bottom": 10,
-                "left": 10,
-                "right": 10,
-                "top": 10,
-              }
-            }
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
             style={
               {
-                "alignItems": "center",
-                "borderColor": "#c3c3c3",
-                "borderRadius": 30,
-                "borderWidth": 0.2,
-                "height": 48,
                 "justifyContent": "center",
-                "marginHorizontal": 5,
-                "marginTop": 5,
-                "opacity": 1,
-                "width": 48,
+                "width": 58,
               }
             }
           >
-            <
-              color="#c3c3c3"
-              icon={
+            <View
+              accessibilityState={
                 {
-                  "icon": [
-                    320,
-                    512,
-                    [
-                      9001,
-                    ],
-                    "f053",
-                    "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
-                  ],
-                  "iconName": "chevron-left",
-                  "prefix": "fas",
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
                 }
               }
-              size={22}
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={
+                {
+                  "bottom": 10,
+                  "left": 10,
+                  "right": 10,
+                  "top": 10,
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderColor": "#c3c3c3",
+                  "borderRadius": 30,
+                  "borderWidth": 0.2,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "opacity": 1,
+                  "width": 48,
+                }
+              }
+            >
+              <
+                color="#c3c3c3"
+                icon={
+                  {
+                    "icon": [
+                      320,
+                      512,
+                      [
+                        9001,
+                      ],
+                      "f053",
+                      "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
+                    ],
+                    "iconName": "chevron-left",
+                    "prefix": "fas",
+                  }
+                }
+                size={22}
+              />
+            </View>
+          </View>
+          <View
+            pointerEvents="none"
+            style={
+              {
+                "alignItems": "center",
+                "justifyContent": "center",
+                "left": 74,
+                "position": "absolute",
+                "right": 74,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                [
+                  {
+                    "fontSize": 22,
+                    "fontWeight": "600",
+                    "textAlign": "center",
+                  },
+                  {
+                    "color": "#c3c3c3",
+                  },
+                ]
+              }
             />
           </View>
-          <Text
-            style={
-              [
-                {
-                  "flex": 1,
-                  "fontSize": 22,
-                  "fontWeight": "600",
-                  "textAlign": "center",
-                },
-                {
-                  "color": "#c3c3c3",
-                },
-              ]
-            }
-          />
           <View
             style={
               {
-                "width": 32,
+                "justifyContent": "center",
+                "width": 58,
               }
             }
           />
@@ -293,14 +312,17 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           "justifyContent": "center",
           "marginTop": "auto",
           "paddingBottom": 20,
+          "paddingHorizontal": 15,
           "paddingTop": 10,
         }
       }
     >
       <View
+        accessibilityLabel=""
+        accessibilityRole="button"
         accessibilityState={
           {
-            "busy": undefined,
+            "busy": false,
             "checked": undefined,
             "disabled": true,
             "expanded": undefined,
@@ -317,8 +339,10 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         }
         accessible={true}
         collapsable={false}
-        focusable={false}
+        focusable={true}
+        onBlur={[Function]}
         onClick={[Function]}
+        onFocus={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -326,49 +350,48 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#5a8c5a",
-            "borderRadius": 25,
-            "borderWidth": 1,
-            "justifyContent": "center",
-            "marginBottom": 4,
-            "maxWidth": 520,
-            "minHeight": 48,
-            "minWidth": "30%",
-            "opacity": 1,
-            "padding": 0,
-            "paddingLeft": 20,
-            "paddingRight": 20,
-            "width": "80%",
-          }
-        }
-      >
-        <View
-          style={
+          [
             {
               "alignItems": "center",
-              "display": "flex",
-              "flexDirection": "row",
+              "borderRadius": 20,
               "justifyContent": "center",
-              "margin": 0,
-              "minHeight": 48,
-              "minWidth": 48,
-              "padding": 0,
-            }
-          }
-        >
-          <Text
-            style={
+              "minHeight": 44,
+              "paddingHorizontal": 16,
+            },
+            {
+              "width": "100%",
+            },
+            {
+              "backgroundColor": "#18bd18",
+              "borderColor": "#18bd18",
+              "borderWidth": 1,
+            },
+            {
+              "opacity": 0.55,
+            },
+            false,
+            {
+              "marginBottom": 4,
+              "maxWidth": 520,
+            },
+          ]
+        }
+      >
+        <Text
+          style={
+            [
+              {
+                "fontSize": 16,
+                "fontWeight": "600",
+                "textAlign": "center",
+              },
               {
                 "color": "#c3c3c3",
-                "fontSize": 18,
-                "fontWeight": "normal",
-                "textAlign": "center",
-              }
-            }
-          />
-        </View>
+              },
+              undefined,
+            ]
+          }
+        />
       </View>
     </View>
   </View>
