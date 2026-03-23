@@ -20,7 +20,7 @@ import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
-import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
+import { RouteEnum, ScreenEnum } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import Button from '../Components/Button';
 import { createAlert } from '../../app/createAlert';
@@ -751,12 +751,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               )}
               {!!background.error && (
                 <Button
-                  type={ButtonTypeEnum.Primary}
+                  variant="primary"
                   title={translate('view-error') as string}
                   onPress={() => {
                     reportError(background.error ? background.error : '');
                   }}
-                  twoButtons={true}
                 />
               )}
             </View>

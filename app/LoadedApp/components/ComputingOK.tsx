@@ -5,39 +5,42 @@ import { useNavigation, useTheme } from '@react-navigation/native';
 
 import RegText from '../../../components/Components/RegText';
 import { AppDrawerParamList, ThemeType } from '../../types';
-import { ButtonTypeEnum, RouteEnum, ValueTransferType } from '../../AppState';
+import { RouteEnum, ValueTransferType } from '../../AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import Button from '../../../components/Components/Button';
 
+type ComputingOKProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.ComputingOK
+>;
 
-type ComputingOKProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ComputingOK>;
-
-const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({
-  route,
-}) => {
+const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({ route }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const { valueTransfers } = context;
   const { colors } = useTheme() as ThemeType;
 
-  const txid = !!route.params && route.params.txid !== undefined ? route.params.txid : '';
+  const txid =
+    !!route.params && route.params.txid !== undefined ? route.params.txid : '';
 
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: colors.background,
-      }}>
+      }}
+    >
       <View
         style={{
           flexGrow: 1,
           justifyContent: 'center',
           alignItems: 'center',
-      }}>
-        <View 
+        }}
+      >
+        <View
           style={{
             backgroundColor: colors.secondary,
             paddingHorizontal: 20,
@@ -61,11 +64,7 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({
                 margin: 10,
               }}
             >
-              <FontAwesomeIcon
-                icon={faCheck}
-                color='#34C759'
-                size={50}
-              />
+              <FontAwesomeIcon icon={faCheck} color="#34C759" size={50} />
             </View>
           </View>
           <RegText style={{ fontSize: 30, alignSelf: 'center' }}>Sent</RegText>
@@ -81,12 +80,15 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({
             }}
           >
             <Button
-              type={ButtonTypeEnum.Secondary}
+              variant="secondary"
               title={'Details TX'}
               onPress={() => {
                 // have to be the first element in the VT's -> index 0.
                 // we cannot be 100% sure...
-                const vt: ValueTransferType | undefined = valueTransfers?.filter((v: ValueTransferType) => v.txid === txid)[0];
+                const vt: ValueTransferType | undefined =
+                  valueTransfers?.filter(
+                    (v: ValueTransferType) => v.txid === txid,
+                  )[0];
                 navigation.navigate(RouteEnum.ValueTransferDetail, {
                   index: 0,
                   vt: vt,
@@ -95,21 +97,19 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({
                     valueTransfers !== null ? valueTransfers.length : 0,
                 });
               }}
-              twoButtons={true}
             />
             <Button
-              type={ButtonTypeEnum.Primary}
+              variant="primary"
               style={{ marginLeft: 10 }}
               title={'Back'}
               onPress={() => {
-                navigation.navigate(RouteEnum.MainTabs, { screen: RouteEnum.History });
+                navigation.navigate(RouteEnum.MainTabs, {
+                  screen: RouteEnum.History,
+                });
               }}
-              twoButtons={true}
             />
           </View>
-
         </View>
-
       </View>
     </View>
   );

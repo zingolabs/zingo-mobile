@@ -3,7 +3,11 @@ import React, { useContext, useState } from 'react';
 import { View, TouchableOpacity, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { ButtonTypeEnum, GlobalConst, ScreenEnum, SnackbarDurationEnum } from '../../../app/AppState';
+import {
+  GlobalConst,
+  ScreenEnum,
+  SnackbarDurationEnum,
+} from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
@@ -24,8 +28,8 @@ type VerifyAddressProps = {
   screenName: ScreenEnum;
   setHeightLayout: (h: number) => void;
 };
-const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ 
-  closeSheet, 
+const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
+  closeSheet,
   screenName,
   setHeightLayout,
 }) => {
@@ -56,7 +60,8 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         console.log('Internal Error new address ');
       }
 
-      const verifyAddressJSON: RPCCheckAddressType = await JSON.parse(verifyAddressStr);
+      const verifyAddressJSON: RPCCheckAddressType =
+        await JSON.parse(verifyAddressStr);
       setVerifyOK(verifyAddressJSON.is_wallet_address);
 
       //return newAddressStr;
@@ -75,8 +80,15 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       return;
     }
     // Attempt to parse as URI if it starts with zcash
-    if (addr.toLowerCase().startsWith(GlobalConst.zcash) || addr.toLowerCase().includes(':')) {
-      const { error, target } = await parseZcashURI(addr, translate, indexerServer);
+    if (
+      addr.toLowerCase().startsWith(GlobalConst.zcash) ||
+      addr.toLowerCase().includes(':')
+    ) {
+      const { error, target } = await parseZcashURI(
+        addr,
+        translate,
+        indexerServer,
+      );
       //console.log(targets);
 
       if (target) {
@@ -104,7 +116,8 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       }}
       style={{
         backgroundColor: colors.background,
-      }}>
+      }}
+    >
       <TouchableOpacity
         onPress={() => {
           setAddress('');
@@ -113,7 +126,8 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           setTimeout(() => {
             closeSheet();
           }, 100);
-        }}>
+        }}
+      >
         <FontAwesomeIcon
           size={30}
           icon={faXmark}
@@ -121,7 +135,9 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
         />
       </TouchableOpacity>
-      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
+      <RegText
+        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
+      >
         {translate('receive.verify') as string}
       </RegText>
       <TextInputAddress
@@ -140,7 +156,8 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-          }}>
+          }}
+        >
           <FadeText style={{ color: colors.primary }}>{errorAddress}</FadeText>
         </View>
       )}
@@ -152,16 +169,41 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-          }}>
+          }}
+        >
           {verifyOK ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '90%' }}>
-              <VerifyCheckIcon color={colors.primary} style={{ marginRight: 10 }} />
-              <FadeText style={{ color: colors.text }}>{translate('receive.verification-success') as string}</FadeText>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                width: '90%',
+              }}
+            >
+              <VerifyCheckIcon
+                color={colors.primary}
+                style={{ marginRight: 10 }}
+              />
+              <FadeText style={{ color: colors.text }}>
+                {translate('receive.verification-success') as string}
+              </FadeText>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '90%' }}>
-              <VerifyXIcon color={colors.danger.primary} style={{ marginRight: 10 }} />
-              <FadeText style={{ color: colors.text }}>{translate('receive.verification-failure') as string}</FadeText>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                width: '90%',
+              }}
+            >
+              <VerifyXIcon
+                color={colors.danger.primary}
+                style={{ marginRight: 10 }}
+              />
+              <FadeText style={{ color: colors.text }}>
+                {translate('receive.verification-failure') as string}
+              </FadeText>
             </View>
           )}
         </View>
@@ -175,18 +217,18 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             alignItems: 'center',
             marginVertical: 5,
             marginTop: 30,
-          }}>
+          }}
+        >
           <Button
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('verify') as string}
             onPress={() => {
               verifyAddress();
             }}
-            twoButtons={true}
             disabled={!address || !!errorAddress}
           />
           <Button
-            type={ButtonTypeEnum.Secondary}
+            variant="secondary"
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}
             onPress={() => {
@@ -197,7 +239,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
                 closeSheet();
               }, 100);
             }}
-            twoButtons={true}
           />
         </View>
       </View>

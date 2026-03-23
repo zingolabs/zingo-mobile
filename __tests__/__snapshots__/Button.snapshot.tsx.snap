@@ -2,9 +2,11 @@
 
 exports[`Component Button - test Button Primary - snapshot 1`] = `
 <View
+  accessibilityLabel="Primary button"
+  accessibilityRole="button"
   accessibilityState={
     {
-      "busy": undefined,
+      "busy": false,
       "checked": undefined,
       "disabled": false,
       "expanded": undefined,
@@ -22,7 +24,9 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
   accessible={true}
   collapsable={false}
   focusable={true}
+  onBlur={[Function]}
   onClick={[Function]}
+  onFocus={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -30,58 +34,55 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
   onResponderTerminationRequest={[Function]}
   onStartShouldSetResponder={[Function]}
   style={
-    {
-      "alignItems": "center",
-      "backgroundColor": "#18bd18",
-      "borderRadius": 25,
-      "borderWidth": 1,
-      "justifyContent": "center",
-      "maxWidth": "90%",
-      "minHeight": 48,
-      "minWidth": "30%",
-      "opacity": 1,
-      "padding": 0,
-      "paddingLeft": 20,
-      "paddingRight": 20,
-      "width": "80%",
-    }
-  }
->
-  <View
-    style={
+    [
       {
         "alignItems": "center",
-        "display": "flex",
-        "flexDirection": "row",
+        "borderRadius": 20,
         "justifyContent": "center",
-        "margin": 0,
-        "minHeight": 48,
-        "minWidth": 48,
-        "padding": 0,
-      }
-    }
-  >
-    <Text
-      style={
+        "minHeight": 44,
+        "paddingHorizontal": 16,
+      },
+      {
+        "width": "100%",
+      },
+      {
+        "backgroundColor": "#18bd18",
+        "borderColor": "#18bd18",
+        "borderWidth": 1,
+      },
+      false,
+      false,
+      {},
+    ]
+  }
+>
+  <Text
+    style={
+      [
+        {
+          "fontSize": 16,
+          "fontWeight": "600",
+          "textAlign": "center",
+        },
         {
           "color": "#c3c3c3",
-          "fontSize": 18,
-          "fontWeight": "normal",
-          "textAlign": "center",
-        }
-      }
-    >
-      Primary button
-    </Text>
-  </View>
+        },
+        undefined,
+      ]
+    }
+  >
+    Primary button
+  </Text>
 </View>
 `;
 
 exports[`Component Button - test Button Secondary - snapshot 1`] = `
 <View
+  accessibilityLabel="Secondary button"
+  accessibilityRole="button"
   accessibilityState={
     {
-      "busy": undefined,
+      "busy": false,
       "checked": undefined,
       "disabled": false,
       "expanded": undefined,
@@ -99,7 +100,9 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
   accessible={true}
   collapsable={false}
   focusable={true}
+  onBlur={[Function]}
   onClick={[Function]}
+  onFocus={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -107,50 +110,44 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
   onResponderTerminationRequest={[Function]}
   onStartShouldSetResponder={[Function]}
   style={
-    {
-      "alignItems": "center",
-      "backgroundColor": undefined,
-      "borderColor": "#ffffff",
-      "borderRadius": 25,
-      "borderWidth": 1,
-      "justifyContent": "center",
-      "maxWidth": "90%",
-      "minHeight": 48,
-      "minWidth": "30%",
-      "opacity": 1,
-      "padding": 0,
-      "paddingLeft": 20,
-      "paddingRight": 20,
-      "width": "80%",
-    }
-  }
->
-  <View
-    style={
+    [
       {
         "alignItems": "center",
-        "display": "flex",
-        "flexDirection": "row",
+        "borderRadius": 20,
         "justifyContent": "center",
-        "margin": 0,
-        "minHeight": 48,
-        "minWidth": 48,
-        "padding": 0,
-      }
-    }
-  >
-    <Text
-      style={
+        "minHeight": 44,
+        "paddingHorizontal": 16,
+      },
+      {
+        "width": "100%",
+      },
+      {
+        "backgroundColor": "transparent",
+        "borderColor": "#ffffff",
+        "borderWidth": 1,
+      },
+      false,
+      false,
+      {},
+    ]
+  }
+>
+  <Text
+    style={
+      [
+        {
+          "fontSize": 16,
+          "fontWeight": "600",
+          "textAlign": "center",
+        },
         {
           "color": "#c3c3c3",
-          "fontSize": 18,
-          "fontWeight": "normal",
-          "textAlign": "center",
-        }
-      }
-    >
-      Secondary button
-    </Text>
-  </View>
+        },
+        undefined,
+      ]
+    }
+  >
+    Secondary button
+  </Text>
 </View>
 `;

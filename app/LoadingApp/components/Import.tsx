@@ -16,7 +16,7 @@ import RegText from '../../../components/Components/RegText';
 import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
-import { ButtonTypeEnum, ScreenEnum, SelectServerEnum } from '../../AppState';
+import { ScreenEnum, SelectServerEnum } from '../../AppState';
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -459,10 +459,11 @@ const Import: React.FunctionComponent<ImportProps> = ({
             justifyContent: 'center',
             paddingTop: 10,
             paddingBottom: 20,
+            paddingHorizontal: 15,
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('continue') as string}
             disabled={actionButtonsDisabled || buttonDisabled}
             onPress={() => {
@@ -474,7 +475,6 @@ const Import: React.FunctionComponent<ImportProps> = ({
               marginBottom: 4,
               maxWidth: maxW,
             }}
-            twoButtons={false}
           />
         </View>
       </KeyboardAvoidingView>

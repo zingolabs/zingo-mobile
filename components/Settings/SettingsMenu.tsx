@@ -4,12 +4,10 @@ import { View, TouchableOpacity, Alert } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
-import { AppDrawerParamList, LoadingAppNavigationState } from '../../app/types';
+import { LoadingAppNavigationState } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
-import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { RouteEnum } from '../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faChevronRight,
@@ -23,9 +21,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../Components/Button';
 import { HeaderTitle } from '../Header';
 import { ColorsType } from '../../app/types/ColorsType';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { SettingsStackParamList } from './SettingsNavigator';
 
-type SettingsMenuProps = DrawerScreenProps<
-  AppDrawerParamList,
+type SettingsMenuProps = NativeStackScreenProps<
+  SettingsStackParamList,
   RouteEnum.SettingsMenu
 > & {
   onClickOKChangeWallet: (state: LoadingAppNavigationState) => Promise<void>;
@@ -36,10 +37,9 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { snackbars, removeFirstSnackbar, translate } = context;
+  const { translate } = context;
   const { colors } = useTheme() as unknown as { colors: ColorsType };
   const { clear } = useToast();
-  const screenName = ScreenEnum.SettingsMenu;
 
   const insets = useSafeAreaInsets();
 
@@ -59,14 +59,41 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
     );
   };
 
+  type SettingsRouteItem = {
+    label: string;
+    icon: IconProp;
+    route:
+      | RouteEnum.Seed
+      | RouteEnum.SettingsServers
+      | RouteEnum.DebugInfo
+      | RouteEnum.Notes;
+  };
+
+  const routes: SettingsRouteItem[] = [
+    {
+      label: 'Seed Phrase',
+      icon: faSeedling,
+      route: RouteEnum.Seed,
+    },
+    {
+      label: 'Server',
+      icon: faServer,
+      route: RouteEnum.SettingsServers,
+    },
+    {
+      label: 'Debug Information',
+      icon: faInfo,
+      route: RouteEnum.DebugInfo,
+    },
+    {
+      label: 'Notes',
+      icon: faInfo,
+      route: RouteEnum.Notes,
+    },
+  ];
+
   return (
     <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
-
       <HeaderTitle
         title="Settings"
         goBack={() => {
@@ -135,109 +162,49 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
                 paddingVertical: 5,
               }}
             >
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  marginVertical: 18,
-                  marginHorizontal: 40,
-                  width: '80%',
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                  }}
-                  onPress={() => navigation?.navigate(RouteEnum.Seed)}
-                >
-                  <View style={{ flexDirection: 'row', gap: 15 }}>
-                    <FontAwesomeIcon
-                      size={20}
-                      icon={faSeedling}
-                      color={colors.text}
-                    />
-                    <RegText>Seed Phrase</RegText>
+              {routes.map((item, index) => (
+                <React.Fragment key={item.label}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      marginVertical: 18,
+                      marginHorizontal: 40,
+                      width: '80%',
+                    }}
+                  >
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        width: '100%',
+                      }}
+                      onPress={() => navigation?.navigate(item.route)}
+                    >
+                      <View style={{ flexDirection: 'row', gap: 15 }}>
+                        <FontAwesomeIcon
+                          size={20}
+                          icon={item.icon}
+                          color={colors.text}
+                        />
+                        <RegText>{item.label}</RegText>
+                      </View>
+                      <FontAwesomeIcon
+                        size={20}
+                        icon={faChevronRight}
+                        color={colors.text}
+                      />
+                    </TouchableOpacity>
                   </View>
-                  <FontAwesomeIcon
-                    size={20}
-                    icon={faChevronRight}
-                    color={colors.text}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View style={{ height: 1, backgroundColor: colors.border }} />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  marginVertical: 18,
-                  marginHorizontal: 40,
-                  width: '80%',
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                  }}
-                  onPress={() =>
-                    navigation?.navigate(RouteEnum.SettingsServers)
-                  }
-                >
-                  <View style={{ flexDirection: 'row', gap: 15 }}>
-                    <FontAwesomeIcon
-                      size={20}
-                      icon={faServer}
-                      color={colors.text}
+
+                  {index < routes.length - 1 && (
+                    <View
+                      style={{ height: 1, backgroundColor: colors.border }}
                     />
-                    <RegText>Server</RegText>
-                  </View>
-                  <FontAwesomeIcon
-                    size={20}
-                    icon={faChevronRight}
-                    color={colors.text}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View style={{ height: 1, backgroundColor: colors.border }} />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  marginVertical: 18,
-                  marginHorizontal: 40,
-                  width: '80%',
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                  }}
-                  onPress={() => navigation?.navigate(RouteEnum.DebugInfo)}
-                >
-                  <View style={{ flexDirection: 'row', gap: 15 }}>
-                    <FontAwesomeIcon
-                      size={20}
-                      icon={faInfo}
-                      color={colors.text}
-                    />
-                    <RegText>Debug Information</RegText>
-                  </View>
-                  <FontAwesomeIcon
-                    size={20}
-                    icon={faChevronRight}
-                    color={colors.text}
-                  />
-                </TouchableOpacity>
-              </View>
+                  )}
+                </React.Fragment>
+              ))}
             </View>
           </View>
         </View>
@@ -252,7 +219,8 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
         }}
       >
         <Button
-          type={ButtonTypeEnum.Tertiary}
+          style={{ width: '90%' }}
+          variant="danger"
           title={'Switch to different wallet'}
           onPress={restoreWallet}
         />

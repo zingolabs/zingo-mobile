@@ -2,7 +2,6 @@
 import React from 'react';
 import { TextStyle } from 'react-native';
 import Button from '../Button';
-import { ButtonTypeEnum } from '../../../app/AppState';
 
 type AddressProps = {
   address: string;
@@ -10,7 +9,7 @@ type AddressProps = {
   endLength?: number;
   onPress?: () => void;
   style?: TextStyle;
-}
+};
 
 const Address: React.FunctionComponent<AddressProps> = ({
   address,
@@ -27,7 +26,8 @@ const Address: React.FunctionComponent<AddressProps> = ({
 
   return (
     <Button
-      type={ButtonTypeEnum.Ghost}
+      variant="ghost"
+      fullWidth={false}
       onPress={onPress ? onPress : () => console.log('onPress')}
       title={shortAddress}
       textStyle={{

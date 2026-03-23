@@ -7,7 +7,6 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Button from '../components/Components/Button';
-import { ButtonTypeEnum } from '../app/AppState';
 
 // test suite
 describe('Component Button - test', () => {
@@ -15,7 +14,13 @@ describe('Component Button - test', () => {
   const onPress = jest.fn();
   test('Button Primary - snapshot', () => {
     const button = render(
-      <Button type={ButtonTypeEnum.Primary} title={'Primary button'} disabled={false} onPress={onPress} style={{}} />,
+      <Button
+        variant="primary"
+        title={'Primary button'}
+        disabled={false}
+        onPress={onPress}
+        style={{}}
+      />,
     );
     expect(button.toJSON()).toMatchSnapshot();
   });
@@ -23,7 +28,7 @@ describe('Component Button - test', () => {
   test('Button Secondary - snapshot', () => {
     const button = render(
       <Button
-        type={ButtonTypeEnum.Secondary}
+        variant="secondary"
         title={'Secondary button'}
         disabled={false}
         onPress={onPress}

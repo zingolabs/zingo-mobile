@@ -1,3 +1,4 @@
+// TODO: SPLIT INTO SUB-ROUTES
 export enum RouteEnum {
   // Stack
   LoadingApp = 'LoadingApp',
@@ -36,6 +37,9 @@ export enum RouteEnum {
   Distribution = 'Distribution',
   Redelegate = 'Redelegate',
   Finalizers = 'Finalizers',
+
+  SettingsStack = 'SettingsStack',
+  Notes = 'Notes',
 
   // Drawer with params
   AddressList = 'AddressList',

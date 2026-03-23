@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { Platform, View } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../../app/AppState';
+import { GlobalConst, RouteEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
@@ -47,7 +47,9 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
         //console.log('LAYOUTTT', height);
-        setHeightLayout(height + (Platform.OS === GlobalConst.platformOSios ? 120 : 80));
+        setHeightLayout(
+          height + (Platform.OS === GlobalConst.platformOSios ? 120 : 80),
+        );
       }}
       style={{
         backgroundColor: 'rgba(36, 36, 38, 1)',
@@ -96,7 +98,6 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
           </View>
         </View>
 
-
         {stakingDay ? (
           <View
             style={{
@@ -110,7 +111,7 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
             }}
           >
             <Button
-              type={ButtonTypeEnum.Primary}
+              variant="primary"
               title={'Redelegate'}
               onPress={() => {
                 clear();
@@ -120,10 +121,9 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
                   closeSheet: closeSheet,
                 });
               }}
-              twoButtons={true}
             />
             <Button
-              type={ButtonTypeEnum.Secondary}
+              variant="secondary"
               title={'Unstake'}
               style={{ marginLeft: 10 }}
               onPress={() => {
@@ -134,7 +134,6 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
                   closeSheet: closeSheet,
                 });
               }}
-              twoButtons={true}
             />
           </View>
         ) : (
@@ -179,7 +178,7 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
                     Staking actions are currently disabled
                   </RegText>
                 </View>
-  
+
                 <RegText
                   style={{
                     color: '#8E8E93',

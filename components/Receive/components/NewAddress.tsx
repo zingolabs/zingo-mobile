@@ -1,11 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, TextInput, NativeSyntheticEvent, TouchableOpacity, Keyboard, Platform } from 'react-native';
+import {
+  View,
+  TextInput,
+  NativeSyntheticEvent,
+  TouchableOpacity,
+  Keyboard,
+  Platform,
+} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import {
   AddressKindEnum,
-  ButtonTypeEnum,
   GlobalConst,
   ReceiverEnum,
   ScreenEnum,
@@ -19,7 +25,9 @@ import { useToast } from 'react-native-toastier';
 import { AddressUnifiedTypeEnum } from '../../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
-import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context-menu-view';
+import ContextMenu, {
+  ContextMenuOnPressNativeEvent,
+} from 'react-native-context-menu-view';
 import RPCModule from '../../../app/RPCModule';
 
 type NewAddressProps = {
@@ -28,9 +36,9 @@ type NewAddressProps = {
   screenName: ScreenEnum;
   setHeightLayout: (h: number) => void;
 };
-const NewAddress: React.FunctionComponent<NewAddressProps> = ({ 
-  addressKind, 
-  closeSheet, 
+const NewAddress: React.FunctionComponent<NewAddressProps> = ({
+  addressKind,
+  closeSheet,
   screenName,
   setHeightLayout,
 }) => {
@@ -40,21 +48,27 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   const { clear } = useToast();
 
   const [label, setLabel] = useState<string>('');
-  const [type, setType] = useState<AddressUnifiedTypeEnum>(AddressUnifiedTypeEnum.orchard);
+  const [type, setType] = useState<AddressUnifiedTypeEnum>(
+    AddressUnifiedTypeEnum.orchard,
+  );
 
   const createAddress = async () => {
     const receivers: string =
-      addressKind === AddressKindEnum.u && type === AddressUnifiedTypeEnum.orchard
+      addressKind === AddressKindEnum.u &&
+      type === AddressUnifiedTypeEnum.orchard
         ? ReceiverEnum.o
-        : addressKind === AddressKindEnum.u && type === AddressUnifiedTypeEnum.sapling
-        ? ReceiverEnum.z
-        : addressKind === AddressKindEnum.u && type === AddressUnifiedTypeEnum.orchardAndSapling
-        ? ReceiverEnum.o + ReceiverEnum.z
-        : '';
+        : addressKind === AddressKindEnum.u &&
+            type === AddressUnifiedTypeEnum.sapling
+          ? ReceiverEnum.z
+          : addressKind === AddressKindEnum.u &&
+              type === AddressUnifiedTypeEnum.orchardAndSapling
+            ? ReceiverEnum.o + ReceiverEnum.z
+            : '';
     try {
       let newAddressStr: string;
       if (receivers) {
-        newAddressStr = await RPCModule.createNewUnifiedAddressProcess(receivers);
+        newAddressStr =
+          await RPCModule.createNewUnifiedAddressProcess(receivers);
       } else {
         newAddressStr = await RPCModule.createNewTransparentAddressProcess();
       }
@@ -96,9 +110,10 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
         //console.log('LAYOUTTT', height);
         setHeightLayout(height + 80);
       }}
-      style={{ 
-        backgroundColor: colors.background 
-      }}>
+      style={{
+        backgroundColor: colors.background,
+      }}
+    >
       <TouchableOpacity
         onPress={() => {
           setLabel('');
@@ -107,7 +122,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           setTimeout(() => {
             closeSheet();
           }, 100);
-        }}>
+        }}
+      >
         <FontAwesomeIcon
           size={30}
           icon={faXmark}
@@ -115,14 +131,19 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
         />
       </TouchableOpacity>
-      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
-        {(addressKind === AddressKindEnum.u
-          ? translate('receive.newu-option')
-          : translate('receive.transparent.newt-option')) as string}
+      <RegText
+        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
+      >
+        {
+          (addressKind === AddressKindEnum.u
+            ? translate('receive.newu-option')
+            : translate('receive.transparent.newt-option')) as string
+        }
       </RegText>
-      <View
-        style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
-        <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{'Tag (Optional)'}</RegText>
+      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
+        <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
+          {'Tag (Optional)'}
+        </RegText>
         <View
           style={{
             display: 'flex',
@@ -130,7 +151,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             justifyContent: 'flex-start',
             paddingHorizontal: 10,
             marginTop: 10,
-          }}>
+          }}
+        >
           <View
             accessible={true}
             style={{
@@ -141,7 +163,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
               minWidth: 48,
               minHeight: 48,
               maxHeight: 150,
-            }}>
+            }}
+          >
             <TextInput
               style={{
                 color: colors.text,
@@ -163,7 +186,9 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
 
         {addressKind === AddressKindEnum.u && (
           <>
-            <RegText style={{ marginTop: 30, paddingHorizontal: 10 }}>{'Type of Address'}</RegText>
+            <RegText style={{ marginTop: 30, paddingHorizontal: 10 }}>
+              {'Type of Address'}
+            </RegText>
             <View
               style={{
                 display: 'flex',
@@ -172,7 +197,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 alignItems: 'center',
                 paddingHorizontal: 10,
                 marginTop: 10,
-              }}>
+              }}
+            >
               <ContextMenu
                 title={translate('loadedapp.options') as string}
                 dropdownMenuMode={true}
@@ -181,10 +207,16 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 }}
                 actions={[
                   { title: translate('receive.shielded-orchard') as string },
-                  { title: translate('receive.shielded-orchard-sapling') as string },
+                  {
+                    title: translate(
+                      'receive.shielded-orchard-sapling',
+                    ) as string,
+                  },
                   { title: translate('receive.shielded-sapling') as string },
                 ]}
-                onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
+                onPress={(
+                  e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>,
+                ) => {
                   if (e.nativeEvent.index === 0) {
                     setType(AddressUnifiedTypeEnum.orchard);
                   } else if (e.nativeEvent.index === 1) {
@@ -192,7 +224,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                   } else if (e.nativeEvent.index === 2) {
                     setType(AddressUnifiedTypeEnum.sapling);
                   }
-                }}>
+                }}
+              >
                 <View
                   style={{
                     flexGrow: 1,
@@ -206,7 +239,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                     maxHeight: 48,
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                  }}>
+                  }}
+                >
                   <RegText
                     style={{
                       color: colors.text,
@@ -215,18 +249,27 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                       minHeight: 48,
                       maxHeight: 48,
                       marginLeft: 20,
-                      marginTop: Platform.OS === GlobalConst.platformOSandroid ? 17 : 25,
+                      marginTop:
+                        Platform.OS === GlobalConst.platformOSandroid ? 17 : 25,
                       backgroundColor: 'transparent',
-                    }}>
+                    }}
+                  >
                     {type === AddressUnifiedTypeEnum.orchard
                       ? (translate('receive.shielded-orchard') as string)
                       : type === AddressUnifiedTypeEnum.orchardAndSapling
-                      ? (translate('receive.shielded-orchard-sapling') as string)
-                      : type === AddressUnifiedTypeEnum.sapling
-                      ? (translate('receive.shielded-sapling') as string)
-                      : ''}
+                        ? (translate(
+                            'receive.shielded-orchard-sapling',
+                          ) as string)
+                        : type === AddressUnifiedTypeEnum.sapling
+                          ? (translate('receive.shielded-sapling') as string)
+                          : ''}
                   </RegText>
-                  <FontAwesomeIcon size={15} icon={faChevronDown} color={colors.text} style={{ marginRight: 20 }} />
+                  <FontAwesomeIcon
+                    size={15}
+                    icon={faChevronDown}
+                    color={colors.text}
+                    style={{ marginRight: 20 }}
+                  />
                 </View>
               </ContextMenu>
             </View>
@@ -241,17 +284,17 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             alignItems: 'center',
             marginVertical: 5,
             marginTop: 30,
-          }}>
+          }}
+        >
           <Button
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('save') as string}
             onPress={() => {
               createAddress();
             }}
-            twoButtons={true}
           />
           <Button
-            type={ButtonTypeEnum.Secondary}
+            variant="secondary"
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}
             onPress={() => {
@@ -262,7 +305,6 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 closeSheet();
               }, 100);
             }}
-            twoButtons={true}
           />
         </View>
       </View>

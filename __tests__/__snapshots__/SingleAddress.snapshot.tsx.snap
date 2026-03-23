@@ -51,11 +51,13 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
         }
       >
         <View
+          accessibilityLabel="UA-orchard...1234567890"
+          accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
-              "disabled": undefined,
+              "disabled": false,
               "expanded": undefined,
               "selected": undefined,
             }
@@ -71,7 +73,9 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           accessible={true}
           collapsable={false}
           focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -79,51 +83,47 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "transparent",
-              "borderRadius": 25,
-              "color": "#ffffff",
-              "justifyContent": "center",
-              "maxWidth": "90%",
-              "minHeight": 48,
-              "minWidth": "30%",
-              "opacity": 1,
-              "padding": 0,
-              "paddingLeft": 20,
-              "paddingRight": 20,
-            }
-          }
-        >
-          <View
-            style={
+            [
               {
                 "alignItems": "center",
-                "display": "flex",
-                "flexDirection": "row",
+                "borderRadius": 20,
                 "justifyContent": "center",
-                "margin": 0,
-                "minHeight": 48,
-                "minWidth": 48,
-                "padding": 0,
-              }
-            }
-          >
-            <Text
-              style={
+                "minHeight": 44,
+                "paddingHorizontal": 16,
+              },
+              false,
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              false,
+              false,
+              undefined,
+            ]
+          }
+        >
+          <Text
+            style={
+              [
+                {
+                  "fontSize": 16,
+                  "fontWeight": "600",
+                  "textAlign": "center",
+                },
+                {
+                  "color": "#c3c3c3",
+                },
                 {
                   "color": "#ffffff",
                   "fontFamily": "monospace",
                   "fontSize": 16,
-                  "fontWeight": "normal",
                   "opacity": 0.8,
-                  "textAlign": "center",
-                }
-              }
-            >
-              UA-orchard...1234567890
-            </Text>
-          </View>
+                },
+              ]
+            }
+          >
+            UA-orchard...1234567890
+          </Text>
         </View>
         <View
           style={
