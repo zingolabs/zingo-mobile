@@ -294,7 +294,7 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           #script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
-          script: ./scripts/ci/android_integration_tests_ci.sh -a ${{ env.NEXTEST-ABI }}
+          script: ../scripts/ci/android_integration_tests_ci.sh -a ${{ env.NEXTEST-ABI }}
           working-directory: ./rust
         env:
           TEST_BINARIES_DIR: ${{ env.TEST_BINARIES_DIR }}
