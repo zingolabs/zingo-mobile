@@ -9,10 +9,13 @@ ci = []
 regchest = []
 
 [dependencies]
-zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "18169857bcf5c21f5b7bfae1a2ab63a04995de36", default-features = true, features = [
+
+zingo-netutils = { workspace = true }
+zingo_common_components = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "0dd8d768a08638c2c7304ad1b4ba7bc430fe722b" }
+zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "0dd8d768a08638c2c7304ad1b4ba7bc430fe722b", default-features = true, features = [
     "testutils",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "18169857bcf5c21f5b7bfae1a2ab63a04995de36" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "0dd8d768a08638c2c7304ad1b4ba7bc430fe722b" }
 
 zcash_encoding = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "315b72497f9611267c0c6d9d44ad893af8c17d57", features = [
     "std",
@@ -43,30 +46,6 @@ zcash_protocol = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git
 zcash_transparent = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "315b72497f9611267c0c6d9d44ad893af8c17d57", features = [
     "std",
 ] }
-# zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "4d5785ce2cc347bf5a4849ce8ceb645e18b533cb", default-features = true, features = [
-#     "testutils",
-# ] }
-# pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "4d5785ce2cc347bf5a4849ce8ceb645e18b533cb" }
-
-# zcash_address = { git = "https://github.com/zingolabs/librustzcash", rev = "ab1965d62f8500449389e473a08a06de3193648c" }
-# zcash_client_backend = { git = "https://github.com/zingolabs/librustzcash", rev = "ab1965d62f8500449389e473a08a06de3193648c", features = [
-#     "lightwalletd-tonic",
-#     "orchard",
-#     "transparent-inputs",
-#     "tor",
-# ] }
-# zcash_encoding = { git = "https://github.com/zingolabs/librustzcash", rev = "ab1965d62f8500449389e473a08a06de3193648c" }
-# zcash_keys = { git = "https://github.com/zingolabs/librustzcash", rev = "ab1965d62f8500449389e473a08a06de3193648c", features = [
-#     "transparent-inputs",
-#     "sapling",
-#     "orchard",
-# ] }
-# zcash_primitives = { git = "https://github.com/zingolabs/librustzcash", rev = "ab1965d62f8500449389e473a08a06de3193648c" }
-# zcash_proofs = { git = "https://github.com/zingolabs/librustzcash", rev = "ab1965d62f8500449389e473a08a06de3193648c" }
-# zcash_protocol = { git = "https://github.com/zingolabs/librustzcash", rev = "ab1965d62f8500449389e473a08a06de3193648c" }
-# zcash_transparent = { git = "https://github.com/zingolabs/librustzcash", rev = "ab1965d62f8500449389e473a08a06de3193648c" }
-
-zingo_common_components = { git = "https://github.com/zingolabs/zingo-common.git", branch = "dev" }
 
 zcash_note_encryption = "0.4"
 http = "1"
@@ -80,7 +59,7 @@ uniffi = "0.29"
 tokio = "1"
 rustls = { version = "0.23", features = ["ring"] }
 serde_json = "1"
-bip0039 = { version = "0.12", features = ["rand"] }
+bip0039 = { version = "0.13.4", features = ["rand"] }
 thiserror = "1"
 once_cell = "1"
 
