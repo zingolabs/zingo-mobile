@@ -69,7 +69,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
       ? route.params.exclude
       : '';
 
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const context = useContext(ContextAppLoaded);
   const {
     snackbars,

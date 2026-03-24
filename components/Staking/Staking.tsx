@@ -35,7 +35,7 @@ import {
   ValueTransferType,
 } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
-import { ThemeType } from '../../app/types/ThemeType';
+import { ThemeType } from '../../app/types';
 import WalletSummaryHeader from '../History/components/WalletSummaryHeader';
 import SettingsButton from '../History/components/SettingsButton';
 import StakingActions from './StakingActions';
@@ -259,7 +259,7 @@ const Staking: React.FC<StakingProps> = () => {
     return r;
   }, [staked]);
 
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   const hasMovements = !loading && movements.length > 0;
   const hasStaked = !loading && stakedData.length > 0;

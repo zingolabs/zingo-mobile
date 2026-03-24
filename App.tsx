@@ -25,10 +25,10 @@ const zingoTheme: ThemeType = {
   colors: {
     background: '#0f0f0f',
     card: '#0f0f0f',
-    border: '#333333ff',
+    border: '#3C3C3D',
     primary: '#1c78d2',
     primaryDisabled: '#b4b4b4',
-    secondary: '#1e1e1e',
+    secondary: '#222223',
     secondaryDisabled: '#b4b4b4',
     text: '#ffffff',
     zingo: '#b4b4b4',
@@ -46,7 +46,7 @@ const zingoTheme: ThemeType = {
       text: '#FEE587',
     },
     danger: {
-      primary: '#dc2626',
+      primary: '#FE383C',
       background: '#240E0C',
       border: '#572317',
       text: '#FFB972',

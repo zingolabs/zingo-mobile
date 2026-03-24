@@ -1,20 +1,26 @@
 import { useTheme } from '@react-navigation/native';
 import React from 'react';
-import { Pressable, Text, StyleSheet, Platform } from 'react-native';
-import { ThemeType } from '../../app/types/ThemeType';
+import { Pressable, Text, StyleSheet, Platform, TextStyle, ColorValue } from 'react-native';
+import { ThemeType } from '../../../app/types';
 
 type NativePrimaryFallbackProps = {
   title: string;
   onPress: () => void;
   disabled?: boolean;
+  textStyle?: TextStyle;
+  tintColor?: ColorValue;
 };
 
 const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
   title,
   onPress,
   disabled,
+  textStyle,
+  tintColor,
 }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
+
+  const primary = disabled ? 'transparent' : (tintColor ?? colors.primary);
 
   return (
     <Pressable
@@ -24,12 +30,12 @@ const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
       accessibilityState={{ disabled }}
       style={({ pressed }) => [
         styles.primary,
-        { backgroundColor: colors.primary },
+        { backgroundColor: primary },
         pressed && !disabled && styles.primaryPressed,
         disabled && styles.primaryDisabled,
       ]}
     >
-      <Text style={styles.primaryText}>{title}</Text>
+      <Text style={[styles.primaryText, textStyle]}>{title}</Text>
     </Pressable>
   );
 };

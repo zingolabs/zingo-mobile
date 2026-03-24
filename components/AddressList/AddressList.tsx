@@ -75,7 +75,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
 
   const scrollViewRef = useRef<ScrollView>(null);
 
-  useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
+  useScrollToTop(scrollViewRef as React.RefObject<ScrollView>);
 
   useEffect(() => {
     const _addressKind =

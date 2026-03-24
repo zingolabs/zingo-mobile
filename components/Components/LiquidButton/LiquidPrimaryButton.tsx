@@ -1,5 +1,3 @@
-// TODO: Move somewhere else
-
 import React, { useState } from 'react';
 import {
   Text,
@@ -15,7 +13,7 @@ import {
   LiquidGlassView,
   isLiquidGlassSupported,
 } from '@callstack/liquid-glass';
-import { ThemeType } from '../../app/types/ThemeType';
+import { ThemeType } from '../../../app/types';
 import NativePrimaryFallback from './NativePrimaryFallback';
 
 type Props = {
@@ -35,7 +33,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
   textStyle,
   tintColor,
 }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const [, setPressed] = useState(false);
 
   const primary = disabled ? 'transparent' : (tintColor ?? colors.primary);
@@ -47,6 +45,8 @@ const LiquidPrimaryButton: React.FC<Props> = ({
           title={title}
           onPress={onPress}
           disabled={disabled}
+          textStyle={textStyle}
+          tintColor={tintColor}
         />
       </View>
     );
