@@ -27,8 +27,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
-import { ThemeType } from '../../../app/types/ThemeType';
-import LiquidPrimaryButton from '../LiquidPrimaryButton';
+import { ThemeType } from '../../../app/types';
+import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../../app/types';
 import {
@@ -64,7 +64,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   stakeTransaction,
 }) => {
   const navigation: any = useNavigation();
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
   const { totalBalance, info, privacy, globalStaked } = useContext(ContextAppLoaded);
 

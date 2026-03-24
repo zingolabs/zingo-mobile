@@ -1,7 +1,7 @@
 import { createNativeBottomTabNavigator } from '@bottom-tabs/react-navigation';
 import { RouteEnum } from '../../AppState';
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../types/ThemeType';
+import { ThemeType } from '../../types';
 import StakingScreen from '../../../components/Staking/Staking';
 import History from '../../../components/History';
 import { Platform } from 'react-native';
@@ -20,13 +20,13 @@ type MainTabsProps = {
   setShieldingAmount: (value: number) => void;
 };
 
-export const MainTabs: React.FC<MainTabsProps> = ({
+export const MainTabs: React.FunctionComponent<MainTabsProps> = ({
   scrollToTop,
   setScrollToTop,
   setScrollToBottom,
   setShieldingAmount,
 }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   return (
     <Tab.Navigator

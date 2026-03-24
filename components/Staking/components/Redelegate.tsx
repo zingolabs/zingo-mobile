@@ -32,8 +32,8 @@ import {
   faCheckCircle,
   faCircle,
 } from '@fortawesome/free-solid-svg-icons';
-import LiquidPrimaryButton from '../LiquidPrimaryButton';
-import { ThemeType } from '../../../app/types/ThemeType';
+import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
+import { ThemeType } from '../../../app/types';
 import { RouteEnum, WalletBondsType } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -73,7 +73,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
       : () => {};
 
   const navigation: any = useNavigation();
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
 
   const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);

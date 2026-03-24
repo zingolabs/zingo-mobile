@@ -31,7 +31,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import XIcon from '../../../assets/icons/x.svg';
-import LiquidPrimaryButton from '../../../components/Staking/LiquidPrimaryButton';
+import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
 import { HeaderTitle } from '../../../components/Header';
 import ChainTypeToggle from '../../../components/Components/ChainTypeToggle';
 

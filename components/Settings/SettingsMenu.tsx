@@ -18,12 +18,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import RegText from '../Components/RegText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Button from '../Components/Button';
 import { HeaderTitle } from '../Header';
-import { ColorsType } from '../../app/types/ColorsType';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SettingsStackParamList } from './SettingsNavigator';
+import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
+import { ThemeType } from '../../app/types';
 
 type SettingsMenuProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -38,7 +38,7 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
-  const { colors } = useTheme() as unknown as { colors: ColorsType };
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
 
   const insets = useSafeAreaInsets();
@@ -218,9 +218,9 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
           paddingBottom: 20,
         }}
       >
-        <Button
+        <LiquidPrimaryButton
           style={{ width: '90%' }}
-          variant="danger"
+          tintColor={colors.danger.primary}
           title={'Switch to different wallet'}
           onPress={restoreWallet}
         />
