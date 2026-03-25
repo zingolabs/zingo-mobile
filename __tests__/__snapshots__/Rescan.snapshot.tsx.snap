@@ -118,7 +118,8 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
           [
             {
               "fontSize": 22,
-              "fontWeight": "600",
+              "fontStyle": "normal",
+              "fontWeight": "400",
               "textAlign": "center",
             },
             {

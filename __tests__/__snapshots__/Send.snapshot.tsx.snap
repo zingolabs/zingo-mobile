@@ -132,7 +132,8 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             [
               {
                 "fontSize": 22,
-                "fontWeight": "600",
+                "fontStyle": "normal",
+                "fontWeight": "400",
                 "textAlign": "center",
               },
               {
@@ -626,7 +627,8 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             [
               {
                 "fontSize": 22,
-                "fontWeight": "600",
+                "fontStyle": "normal",
+                "fontWeight": "400",
                 "textAlign": "center",
               },
               {
