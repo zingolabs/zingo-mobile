@@ -77,7 +77,8 @@ const styles = StyleSheet.create({
   headerTitle: {
     textAlign: 'center',
     fontSize: 22,
-    fontWeight: '600',
+    fontStyle: 'normal',
+    fontWeight: '400',
   },
 });
 

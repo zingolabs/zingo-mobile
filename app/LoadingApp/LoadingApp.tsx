@@ -77,7 +77,7 @@ import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
-import Servers from './components/Servers';
+import SelectNetwork from './components/SelectNetwork';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -1580,7 +1580,7 @@ export class LoadingAppClass extends Component<
             />
           )}
           {screen === 0.5 && (
-            <Servers
+            <SelectNetwork
               actionButtonsDisabled={actionButtonsDisabled}
               setIndexerServer={this.setIndexerServer}
               checkIndexerServer={this.checkIndexerServer}
