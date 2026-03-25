@@ -11,11 +11,11 @@ regchest = []
 [dependencies]
 
 zingo-netutils = { workspace = true }
-zingo_common_components = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "0dd8d768a08638c2c7304ad1b4ba7bc430fe722b" }
-zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "0dd8d768a08638c2c7304ad1b4ba7bc430fe722b", default-features = true, features = [
+zingo_common_components = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "9a9d79b5f4c9deb2a508cb02c457223b8c43174d" }
+zingolib = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "9a9d79b5f4c9deb2a508cb02c457223b8c43174d", default-features = true, features = [
     "testutils",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "0dd8d768a08638c2c7304ad1b4ba7bc430fe722b" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib-crosslink", rev = "9a9d79b5f4c9deb2a508cb02c457223b8c43174d" }
 
 zcash_encoding = { git = "https://github.com/ShieldedLabs/crosslink_monolith.git", rev = "315b72497f9611267c0c6d9d44ad893af8c17d57", features = [
     "std",
