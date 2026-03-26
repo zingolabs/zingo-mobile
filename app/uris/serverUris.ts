@@ -19,14 +19,6 @@ const serverUris = (): ServerUrisType[] => {
       latency: null,
       obsolete: false,
     },
-    {
-      uri: 'http://127.0.0.1:18234',
-      region: 'CrossLink RegTest',
-      chainName: ChainNameEnum.regtestChainName,
-      default: true,
-      latency: null,
-      obsolete: false,
-    },
   ];
 };
 

@@ -32,7 +32,7 @@ const zingoTheme: ThemeType = {
     secondaryDisabled: '#b4b4b4',
     text: '#ffffff',
     zingo: '#b4b4b4',
-    placeholder: 'rgba(235, 235, 245, 0.3)',
+    placeholder: '#8D8D8D',
     money: '#b4b4b4',
     syncing: '#ebff5a', // yellow
     notification: '',

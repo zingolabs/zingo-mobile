@@ -20,7 +20,7 @@ const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
 }) => {
   const { colors } = useTheme() as ThemeType;
 
-  const primary = disabled ? 'transparent' : (tintColor ?? colors.primary);
+  const primary = disabled ? colors.secondary : (tintColor ?? colors.primary);
 
   return (
     <Pressable

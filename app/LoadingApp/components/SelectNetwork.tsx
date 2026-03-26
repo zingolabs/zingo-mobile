@@ -41,6 +41,7 @@ type SelectNetworkProps = {
   ) => Promise<{ result: boolean; indexerServerUriParsed: string }>;
   closeServers: () => void;
   fromSettings: boolean;
+  goConnectIndexer: () => void;
 };
 
 const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
@@ -49,6 +50,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
   checkIndexerServer,
   closeServers,
   fromSettings,
+  goConnectIndexer,
 }) => {
   const context = useContext(ContextAppLoading);
   const {
@@ -66,10 +68,10 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
   const [borderColor, setBorderColor] = useState<string>('transparent');
   const [kbOpen, setKbOpen] = useState(false);
   const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(
-    indexerServerContext.uri,
+    indexerServerContext.uri ? indexerServerContext.uri : serverUris()[0].uri,
   );
   const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] = useState<ChainNameEnum>(
-    indexerServerContext.chainName,
+    indexerServerContext.uri ? indexerServerContext.chainName : serverUris()[0].chainName,
   );
 
   const insets = useSafeAreaInsets();
@@ -83,7 +85,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
     };
   }, []);
 
-  //console.log('Render Servers', insets);
+  console.log('Render Select Network', indexerServerContext);
 
   return (
     <ToastProvider>
@@ -262,15 +264,17 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             onPress={() => {
               setIndexerServerUriLocal('');
               setIndexerServerChainNameLocal(ChainNameEnum.testChainName);
+              setIndexerServer('', ChainNameEnum.testChainName);
               setBorderColor('transparent');
               setConnected(null);
+              goConnectIndexer();
             }}
           >
             <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
-                borderColor: indexerServerUriLocal !== serverUris()[0].uri && indexerServerUriLocal !== serverUris()[1].uri ? colors.primary : '#494444',
+                borderColor: indexerServerUriLocal !== serverUris()[0].uri && indexerServerUriLocal !== serverUris()[1].uri && indexerServerChainNameLocal === ChainNameEnum.testChainName ? colors.primary : '#494444',
                 borderWidth: 1,
                 borderRadius: 15,
                 marginBottom: 21,
@@ -311,78 +315,50 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             </View>
           </TouchableOpacity>
 
-          <View
-            style={{
-              justifyContent: 'center',
-              marginTop: 10,
-            }}
-          >
-            <FadeText style={{ marginBottom: 21, fontSize: 14, fontStyle: 'normal', fontWeight: 400, lineHeight: 22 }}>
-              OR
-            </FadeText>
-          </View>
+          {!fromSettings && (
+            <>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  marginTop: 10,
+                }}
+              >
+                <FadeText style={{ marginBottom: 21, fontSize: 14, fontStyle: 'normal', fontWeight: 400, lineHeight: 22 }}>
+                  OR
+                </FadeText>
+              </View>
 
-          <View
-            style={{
-              justifyContent: 'center',
-              marginTop: 10,
-              backgroundColor: '#28282A',
-              borderRadius: 1000,
-              paddingVertical: 4,
-              paddingHorizontal: 10,
-              marginBottom: 21,
-            }}
-          >
-            <TouchableOpacity
-              style={{
-              }}
-              disabled={actionButtonsDisabled}
-              onPress={() => {
-                setIndexerServerUriLocal('');
-                setIndexerServerChainNameLocal(ChainNameEnum.regtestChainName);
-                setBorderColor('transparent');
-                setConnected(null);
-              }}
-            >
-              <FadeText style={{ fontSize: 15, fontStyle: 'normal', fontWeight: 400, lineHeight: 20, letterSpacing: -0.23 }}>
-                Use regtest
-              </FadeText>
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              alignSelf: 'flex-start',
-              margin: 0,
-              marginBottom: 4,
-              minWidth: 48,
-              minHeight: 48,
-              gap: 10,
-              marginLeft: 20,
-            }}
-          >
-            {actionButtonsDisabled && (
-              <ActivityIndicator size="small" color={colors.text} />
-            )}
-            {connected !== null && connected && (
-              <FontAwesomeIcon size={20} icon={faCheck} color={borderColor} />
-            )}
-            {connected !== null && !connected && (
-              <FontAwesomeIcon size={20} icon={faWarning} color={borderColor} />
-            )}
-            <RegText color={actionButtonsDisabled ? colors.text : borderColor}>
-              {actionButtonsDisabled
-                ? 'Connecting...'
-                : connected === null
-                  ? ''
-                  : connected
-                    ? 'Connected'
-                    : 'Could not connect to indexer'}
-            </RegText>
-          </View>
+              <View>
+                <TouchableOpacity
+                  style={{
+                    justifyContent: 'center',
+                    marginTop: 10,
+                    backgroundColor: '#28282A',
+                    borderColor: indexerServerUriLocal !== serverUris()[0].uri && indexerServerUriLocal !== serverUris()[1].uri && indexerServerChainNameLocal === ChainNameEnum.regtestChainName ? colors.primary : 'transparent',
+                    borderWidth: 1,
+                    borderRadius: 1000,
+                    paddingVertical: 4,
+                    paddingHorizontal: 10,
+                    marginBottom: 21,
+                  }}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  disabled={actionButtonsDisabled}
+                  onPress={() => {
+                    setIndexerServerUriLocal('');
+                    setIndexerServerChainNameLocal(ChainNameEnum.regtestChainName);
+                    setIndexerServer('', ChainNameEnum.regtestChainName);
+                    setBorderColor('transparent');
+                    setConnected(null);
+                    goConnectIndexer();
+                  }}
+                >
+                  <FadeText style={{ fontSize: 15, fontStyle: 'normal', fontWeight: 400, lineHeight: 20, letterSpacing: -0.23 }}>
+                    Use regtest
+                  </FadeText>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
 
           {(!netInfo.isConnected ||
             netInfo.type === NetInfoStateType.cellular ||
@@ -429,6 +405,40 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                 </View>
               </>
             )}
+        </View>
+
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            alignSelf: 'flex-start',
+            margin: 0,
+            marginBottom: 4,
+            minWidth: 48,
+            minHeight: 48,
+            gap: 10,
+            marginLeft: 20,
+          }}
+        >
+          {actionButtonsDisabled && (
+            <ActivityIndicator size="small" color={colors.text} />
+          )}
+          {connected !== null && connected && (
+            <FontAwesomeIcon size={20} icon={faCheck} color={borderColor} />
+          )}
+          {connected !== null && !connected && (
+            <FontAwesomeIcon size={20} icon={faWarning} color={borderColor} />
+          )}
+          <RegText color={actionButtonsDisabled ? colors.text : borderColor}>
+            {actionButtonsDisabled
+              ? 'Connecting...'
+              : connected === null
+                ? ''
+                : connected
+                  ? 'Connected'
+                  : 'Could not connect to indexer'}
+          </RegText>
         </View>
 
         <View

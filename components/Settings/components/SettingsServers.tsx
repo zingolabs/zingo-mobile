@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -17,10 +17,9 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faServer } from '@fortawesome/free-solid-svg-icons';
 import RegText from '../../Components/RegText';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Button from '../../Components/Button';
 import FadeText from '../../Components/FadeText';
 import { HeaderTitle } from '../../Header';
+import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
 
 type SettingsServersProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -39,10 +38,12 @@ const SettingsServers: React.FunctionComponent<SettingsServersProps> = ({
   const { clear } = useToast();
   const screenName = ScreenEnum.SettingsServers;
 
-  const insets = useSafeAreaInsets();
-
-  const changeServer = () => {
+  const changeServerTesnet = () => {
     navigateToLoadingApp({ screen: 0.5, startingApp: false });
+  };
+
+  const changeServerRegtest = () => {
+    navigateToLoadingApp({ screen: 0.55, startingApp: false });
   };
 
   return (
@@ -63,19 +64,15 @@ const SettingsServers: React.FunctionComponent<SettingsServersProps> = ({
         }}
       />
 
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingBottom: insets.bottom + 8,
+      <View
+        style={{
           paddingHorizontal: 16,
         }}
       >
         <View
           style={{
-            flexGrow: 1,
             alignItems: 'flex-start',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
           }}
         >
           <View
@@ -83,7 +80,7 @@ const SettingsServers: React.FunctionComponent<SettingsServersProps> = ({
               borderRadius: 26,
               backgroundColor: colors.secondary,
               width: '100%',
-              marginTop: 20,
+              marginTop: 40,
               paddingVertical: 10,
             }}
           >
@@ -221,20 +218,20 @@ const SettingsServers: React.FunctionComponent<SettingsServersProps> = ({
             </View>
           </View>
         </View>
-      </ScrollView>
+      </View>
       <View
         style={{
-          marginTop: 'auto',
+          marginTop: 31,
           alignItems: 'center',
           justifyContent: 'center',
-          paddingTop: 10,
-          paddingBottom: 20,
+          paddingHorizontal: 20,
         }}
       >
-        <Button
-          variant="primary"
+        <LiquidPrimaryButton
           title={'Switch to different server'}
-          onPress={changeServer}
+          onPress={indexerServer.chainName === ChainNameEnum.testChainName ? changeServerTesnet : changeServerRegtest}          style={{
+            alignSelf: 'stretch',
+          }}
         />
       </View>
     </ToastProvider>

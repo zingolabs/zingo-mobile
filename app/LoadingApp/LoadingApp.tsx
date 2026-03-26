@@ -78,6 +78,7 @@ import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
 import SelectNetwork from './components/SelectNetwork';
+import ConnectIndexer from './components/ConnectIndexer';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -98,7 +99,7 @@ type LoadingAppProps = {
 
 const SERVER_DEFAULT_0: ServerType = {
   uri: '',
-  chainName: ChainNameEnum.regtestChainName,
+  chainName: ChainNameEnum.testChainName,
 } as ServerType;
 
 export default function LoadingApp(props: LoadingAppProps) {
@@ -528,13 +529,13 @@ export class LoadingAppClass extends Component<
     if (
       (!this.state.indexerServer.uri &&
         this.state.selectIndexerServer === SelectServerEnum.custom) ||
-      (this.state.screen === 0.5 && !this.state.startingApp)
+      ((this.state.screen === 0.5 || this.state.screen === 0.55) && !this.state.startingApp)
     ) {
       this.setState({
-        screen: 0.5,
+        screen: this.state.screen === 0.55 ? 0.55 : 0.5,
         actionButtonsDisabled: false,
         fromSettings:
-          this.state.screen === 0.5 && !this.state.startingApp ? true : false,
+          (this.state.screen === 0.5 || this.state.screen === 0.55) && !this.state.startingApp ? true : false,
       });
       return;
     }
@@ -795,7 +796,7 @@ export class LoadingAppClass extends Component<
     console.log(fasterServer);
     this.setState({
       indexerServer: fasterServer,
-      selectIndexerServer: SelectServerEnum.list,
+      selectIndexerServer: SelectServerEnum.custom,
     });
     await SettingsFileImpl.writeSettings(
       SettingsNameEnum.indexerServer,
@@ -803,7 +804,7 @@ export class LoadingAppClass extends Component<
     );
     await SettingsFileImpl.writeSettings(
       SettingsNameEnum.selectIndexerServer,
-      SelectServerEnum.list,
+      SelectServerEnum.custom,
     );
     // message with the result only for advanced users
     if (someServerIsWorking) {
@@ -832,6 +833,7 @@ export class LoadingAppClass extends Component<
   openServers = () => {
     this.setState({
       screen: 0.5,
+      fromSettings: false,
       actionButtonsDisabled: false,
     });
   };
@@ -1031,6 +1033,18 @@ export class LoadingAppClass extends Component<
     this.componentDidMount();
   };
 
+  goConnectIndexer = () => {
+    this.setState({
+      screen: 0.55,
+    });
+  };
+
+  goSelectNetwork = () => {
+    this.setState({
+      screen: 0.5,
+    });
+  };
+
   checkIndexerServer = async (indexerServerUri: string) => {
     if (!indexerServerUri) {
       return {
@@ -1038,6 +1052,8 @@ export class LoadingAppClass extends Component<
         indexerServerUriParsed: indexerServerUri,
       };
     }
+
+    console.log(indexerServerUri);
 
     this.setState({ actionButtonsDisabled: true });
 
@@ -1586,6 +1602,17 @@ export class LoadingAppClass extends Component<
               checkIndexerServer={this.checkIndexerServer}
               closeServers={this.closeServers}
               fromSettings={fromSettings}
+              goConnectIndexer={this.goConnectIndexer}
+            />
+          )}
+          {screen === 0.55 && (
+            <ConnectIndexer
+              actionButtonsDisabled={actionButtonsDisabled}
+              setIndexerServer={this.setIndexerServer}
+              checkIndexerServer={this.checkIndexerServer}
+              closeServers={this.closeServers}
+              fromSettings={fromSettings}
+              goSelectNetwork={this.goSelectNetwork}
             />
           )}
           {screen === 1 && (
