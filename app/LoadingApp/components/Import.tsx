@@ -190,6 +190,13 @@ const Import: React.FunctionComponent<ImportProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
+        <HeaderTitle
+          title=""
+          goBack={() => {
+            clear();
+            onClickCancel();
+          }}
+        />
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
@@ -199,13 +206,6 @@ const Import: React.FunctionComponent<ImportProps> = ({
             paddingHorizontal: 10,
           }}
         >
-          <HeaderTitle
-            title=""
-            goBack={() => {
-              clear();
-              onClickCancel();
-            }}
-          />
           <View
             style={{
               flexGrow: 1,

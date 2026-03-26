@@ -262,9 +262,9 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             }}
             disabled={actionButtonsDisabled}
             onPress={() => {
-              setIndexerServerUriLocal('');
+              //setIndexerServerUriLocal('');
               setIndexerServerChainNameLocal(ChainNameEnum.testChainName);
-              setIndexerServer('', ChainNameEnum.testChainName);
+              setIndexerServer(indexerServerUriLocal, ChainNameEnum.testChainName);
               setBorderColor('transparent');
               setConnected(null);
               goConnectIndexer();
@@ -344,9 +344,9 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   disabled={actionButtonsDisabled}
                   onPress={() => {
-                    setIndexerServerUriLocal('');
+                    //setIndexerServerUriLocal('');
                     setIndexerServerChainNameLocal(ChainNameEnum.regtestChainName);
-                    setIndexerServer('', ChainNameEnum.regtestChainName);
+                    setIndexerServer(indexerServerUriLocal, ChainNameEnum.regtestChainName);
                     setBorderColor('transparent');
                     setConnected(null);
                     goConnectIndexer();
@@ -455,8 +455,16 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             <LiquidPrimaryButton
               title="Continue"
               onPress={() => {
-                // using params
-                setIndexerServer(indexerServerUriLocal, indexerServerChainNameLocal);
+                let newIndexerServerChainNameLocal: ChainNameEnum = indexerServerChainNameLocal;
+                if (
+                  serverUris().filter(s => s.uri === indexerServerUriLocal)
+                    .length > 0
+                ) {
+                  newIndexerServerChainNameLocal = serverUris().filter(
+                    s => s.uri === indexerServerUriLocal,
+                  )[0].chainName;
+                }
+                setIndexerServer(indexerServerUriLocal, newIndexerServerChainNameLocal);
                 Keyboard.dismiss();
                 clear();
                 // the App needs some time to store data.

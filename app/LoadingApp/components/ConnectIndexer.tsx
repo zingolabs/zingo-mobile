@@ -83,10 +83,11 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
   const [borderColor, setBorderColor] = useState<string>('transparent');
   const [kbOpen, setKbOpen] = useState(false);
   
+  const custom: boolean = serverUris().filter(s => s.uri === indexerServerContext.uri).length === 0;
   const { base, port } = parseUri(indexerServerContext.uri);
 
-  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(base);
-  const [indexerServerPortLocal, setIndexerServerPortLocal] = useState<string>(port);  
+  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(custom ? base : '');
+  const [indexerServerPortLocal, setIndexerServerPortLocal] = useState<string>(custom ? port : '');  
   const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] = useState<ChainNameEnum>(
     indexerServerContext.chainName,
   );
@@ -136,7 +137,7 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
       >
         <HeaderTitle title='Connect to indexer' goBack={() => {
           clear();
-          if (fromSettings) {
+          if (fromSettings && indexerServerChainNameLocal === ChainNameEnum.regtestChainName) {
             closeServers();
           } else {
             goSelectNetwork();
@@ -442,8 +443,16 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
             <LiquidPrimaryButton
               title="Continue"
               onPress={() => {
-                // using params
-                setIndexerServer(`${indexerServerUriLocal}:${indexerServerPortLocal}`, indexerServerChainNameLocal);
+                let newIndexerServerChainNameLocal: ChainNameEnum = indexerServerChainNameLocal;
+                if (
+                  serverUris().filter(s => s.uri === `${indexerServerUriLocal}:${indexerServerPortLocal}`)
+                    .length > 0
+                ) {
+                  newIndexerServerChainNameLocal = serverUris().filter(
+                    s => s.uri === `${indexerServerUriLocal}:${indexerServerPortLocal}`,
+                  )[0].chainName;
+                }
+                setIndexerServer(`${indexerServerUriLocal}:${indexerServerPortLocal}`, newIndexerServerChainNameLocal);
                 Keyboard.dismiss();
                 clear();
                 // the App needs some time to store data.

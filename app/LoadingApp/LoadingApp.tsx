@@ -234,6 +234,11 @@ export default function LoadingApp(props: LoadingAppProps) {
           settings.indexerServer.chainName = serverUris().filter(
             s => s.uri === settings.indexerServer.uri,
           )[0].chainName;
+          // if chain name changed store it in settings.
+          await SettingsFileImpl.writeSettings(
+            SettingsNameEnum.indexerServer,
+            settings.indexerServer,
+          );
         }
         setIndexerServer(settings.indexerServer);
       } else {
