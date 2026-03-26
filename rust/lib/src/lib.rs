@@ -13,7 +13,7 @@ use hex::FromHex;
 use log::Level;
 use zcash_protocol::local_consensus::LocalNetwork;
 use zcash_protocol::memo::MemoBytes;
-use zingolib::grpc_client::get_zcb_client;
+use zingo_netutils::get_client;
 use zingolib::{AccountId, ConfiguredActivationHeights};
 
 use std::any::Any;
@@ -43,7 +43,6 @@ use pepper_sync::wallet::{KeyIdInterface, SyncMode};
 use tokio::runtime::Runtime;
 use zcash_address::ZcashAddress;
 use zcash_protocol::value::Zatoshis;
-use zingo_common_components::protocol::activation_heights::for_test;
 use zingolib::config::{ChainType, ZingoConfig, construct_lightwalletd_uri};
 use zingolib::data::PollReport;
 use zingolib::data::proposal::total_fee;
@@ -662,7 +661,7 @@ pub fn get_latest_block_wallet() -> Result<String, ZingolibError> {
                 let wallet = lightclient.wallet.write().await;
                 object! {
                     "height" => json::JsonValue::from(
-                        wallet.sync_state.wallet_height().map(u32::from).unwrap_or(0)
+                        wallet.sync_state.last_known_chain_height().map(u32::from).unwrap_or(0)
                     )
                 }
                 .pretty(2)
@@ -970,7 +969,18 @@ fn make_decoded_chain_pair(
             nu6_1: None,
             nu7: None,
         }),
-        ChainType::Regtest(for_test::all_height_one_nus()),
+        ChainType::Regtest(ConfiguredActivationHeights {
+            before_overwinter: Some(1),
+            overwinter: Some(1),
+            sapling: Some(1),
+            blossom: Some(1),
+            heartwood: Some(1),
+            canopy: Some(1),
+            nu5: Some(1),
+            nu6: Some(1),
+            nu6_1: Some(1),
+            nu7: None,
+        }),
     ]
     .iter()
     .find_map(|chain| Address::decode(chain, address).zip(Some(*chain)))
@@ -1214,29 +1224,6 @@ pub fn zec_price(tor: String) -> Result<String, ZingolibError> {
 }
 
 #[uniffi::export]
-pub fn resend_transaction(txid: String) -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let mut guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &mut *guard {
-            let txid = match txid_from_hex_encoded_str(&txid) {
-                Ok(txid) => txid,
-                Err(e) => return Ok(format!("Error: {e}")),
-            };
-            Ok(RT.block_on(async move {
-                match lightclient.resend(txid).await {
-                    Ok(_) => "Successfully resent transaction.".to_string(),
-                    Err(e) => format!("Error: {e}"),
-                }
-            }))
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
-        }
-    })
-}
-
-#[uniffi::export]
 pub fn remove_transaction(txid: String) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
@@ -1249,7 +1236,7 @@ pub fn remove_transaction(txid: String) -> Result<String, ZingolibError> {
             };
             Ok(RT.block_on(async move {
                 let mut wallet = lightclient.wallet.write().await;
-                match wallet.remove_unconfirmed_transaction(txid) {
+                match wallet.remove_failed_transaction(txid) {
                     Ok(_) => "Successfully removed transaction.".to_string(),
                     Err(e) => format!("Error: {e}"),
                 }
@@ -1803,7 +1790,7 @@ pub fn withdraw_stake(withdraw_stake_json: String) -> Result<String, ZingolibErr
 
                 let bond_key: [u8; 32] = sa.arg32_0;
 
-                let mut client = match get_zcb_client(lightclient.server_uri()).await {
+                let mut client = match get_client(lightclient.server_uri()).await {
                     Ok(c) => c,
                     Err(e) => return object! { "error" => format!("grpc client: {e}") }.pretty(2),
                 };
