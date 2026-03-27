@@ -36,7 +36,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
   const { colors } = useTheme() as ThemeType;
   const [, setPressed] = useState(false);
 
-  const primary = disabled ? 'transparent' : (tintColor ?? colors.primary);
+  const primary = disabled ? colors.secondary : (tintColor ?? colors.primary);
 
   if (!isLiquidGlassSupported) {
     return (

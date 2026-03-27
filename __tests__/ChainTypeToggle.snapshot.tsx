@@ -18,7 +18,7 @@ describe('Component ChainTypeToggle - test', () => {
     const translate = mockTranslate;
     const chain = render(
       <ChainTypeToggle
-        customServerChainName={ChainNameEnum.regtestChainName}
+        customServerChainName={ChainNameEnum.testChainName}
         onPress={onPress}
         translate={translate}
       />,

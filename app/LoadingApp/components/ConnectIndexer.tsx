@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
 import { ThemeType } from '../../types';
-import { ChainNameEnum, GlobalConst, ScreenEnum } from '../../AppState';
+import { ChainNameEnum, ScreenEnum } from '../../AppState';
 import { ContextAppLoading } from '../../context';
 import BoldText from '../../../components/Components/BoldText';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -24,18 +24,30 @@ import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { serverUris } from '../../uris';
-import RNPickerSelect from 'react-native-picker-select';
 import {
   faCheck,
   faWarning,
 } from '@fortawesome/free-solid-svg-icons';
-import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import XIcon from '../../../assets/icons/x.svg';
 import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
 import { HeaderTitle } from '../../../components/Header';
-import ChainTypeToggle from '../../../components/Components/ChainTypeToggle';
 
-type ServersProps = {
+function parseUri(uri?: string) {
+  if (!uri) return { base: '', port: '' };
+
+  try {
+    const url = new URL(uri);
+
+    return {
+      base: `${url.protocol}//${url.hostname}`,
+      port: url.port,
+    };
+  } catch {
+    return { base: '', port: '' };
+  }
+}
+
+type ConnectIndexerProps = {
   actionButtonsDisabled: boolean;
   setIndexerServer: (u: string, c: ChainNameEnum) => Promise<void>;
   checkIndexerServer: (
@@ -44,14 +56,16 @@ type ServersProps = {
   ) => Promise<{ result: boolean; indexerServerUriParsed: string }>;
   closeServers: () => void;
   fromSettings: boolean;
+  goSelectNetwork: () => void;
 };
 
-const Servers: React.FunctionComponent<ServersProps> = ({
+const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
   actionButtonsDisabled,
   setIndexerServer,
   checkIndexerServer,
   closeServers,
   fromSettings,
+  goSelectNetwork,
 }) => {
   const context = useContext(ContextAppLoading);
   const {
@@ -68,16 +82,17 @@ const Servers: React.FunctionComponent<ServersProps> = ({
   const [connected, setConnected] = useState<boolean | null>(null);
   const [borderColor, setBorderColor] = useState<string>('transparent');
   const [kbOpen, setKbOpen] = useState(false);
-  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(
-    indexerServerContext.uri,
-  );
+  
+  const custom: boolean = serverUris().filter(s => s.uri === indexerServerContext.uri).length === 0;
+  const { base, port } = parseUri(indexerServerContext.uri);
+
+  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(custom ? base : '');
+  const [indexerServerPortLocal, setIndexerServerPortLocal] = useState<string>(custom ? port : '');  
   const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] = useState<ChainNameEnum>(
     indexerServerContext.chainName,
   );
 
   const insets = useSafeAreaInsets();
-
-  const maxW = 520; //tablets -> landscape.
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -92,11 +107,11 @@ const Servers: React.FunctionComponent<ServersProps> = ({
     return !chain
             ? '-'
             : chain === ChainNameEnum.mainChainName
-            ? 'Mainnet'
+            ? 'mainnet'
             : chain === ChainNameEnum.testChainName
-            ? 'Testnet'
+            ? 'testnet'
             : chain === ChainNameEnum.regtestChainName
-            ? 'Regtest'
+            ? 'regtest'
             : (translate('info.unknown') as string) + ' (' + chain + ')'
   }
 
@@ -120,175 +135,218 @@ const Servers: React.FunctionComponent<ServersProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        {fromSettings && (
-          <HeaderTitle title='' goBack={() => {
-            clear();
+        <HeaderTitle title='Connect to indexer' goBack={() => {
+          clear();
+          if (fromSettings && indexerServerChainNameLocal === ChainNameEnum.regtestChainName) {
             closeServers();
-          }} />
-        )}
+          } else {
+            goSelectNetwork();
+          }
+        }} />
 
         <View
           style={{
             flexGrow: 1,
             alignItems: 'center',
-            justifyContent: 'center',
-            paddingTop: insets.top,
+            justifyContent: 'flex-start',
             paddingBottom: insets.bottom + 8,
-            paddingHorizontal: 16,
+            paddingHorizontal: 27,
           }}
         >
-          <RegText color={colors.text} style={{ fontSize: 25 }}>
-            Indexer Server
-          </RegText>
-
-          <FadeText style={{ marginBottom: 20, marginTop: 5 }}>
-            Server URL
+          <FadeText style={{ marginTop: 14, fontSize: 17, fontStyle: 'normal', fontWeight: 600, letterSpacing: -0.43, marginBottom: 58 }}>
+            {`Enter your ${getChainName(indexerServerChainNameLocal)} indexer's details`}
           </FadeText>
 
           <View
             style={{
-              flexDirection: 'row',
               justifyContent: 'flex-start',
-              borderColor: colors.zingo,
+              borderColor: '#494444',
               borderWidth: 1,
-              borderRadius: 12,
-              marginBottom: 10,
-              backgroundColor: colors.secondary,
+              borderRadius: 15,
+              backgroundColor: '#151414',
               width: '100%',
-              maxWidth: maxW,
               minWidth: '50%',
-              height: 44,
               alignItems: 'center',
-              paddingHorizontal: 16,
+              paddingHorizontal: 30,
+              paddingVertical: 25,
             }}
           >
-            <TextInput
-              placeholder={GlobalConst.serverPlaceHolder}
-              placeholderTextColor={colors.placeholder}
-              style={{
-                flexGrow: 1,
-                flexShrink: 1,
-                color: colors.text,
-                fontWeight: '400',
-                fontSize: 17,
-                paddingVertical: 0,
-                marginLeft: 4,
-                backgroundColor: 'transparent',
-              }}
-              value={indexerServerUriLocal}
-              onChangeText={text => {
-                setConnected(null);
-                setBorderColor(colors.primary);
-                setIndexerServerUriLocal(text);
-                if (serverUris().filter(s => s.uri === text).length > 0) {
-                  setIndexerServerChainNameLocal(serverUris().filter(s => s.uri === text)[0].chainName)
-                }
-              }}
-              editable={!actionButtonsDisabled}
-              maxLength={100}
-              keyboardType="url"
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="done"
-              onFocus={() => {
-                if (connected === null) {
-                  setBorderColor(colors.primary);
-                }
-              }}
-              onBlur={() => {
-                if (connected === null) {
-                  setBorderColor('transparent');
-                }
-              }}
-            />
+
+            <FadeText style={{ marginLeft: 4, fontSize: 14, fontStyle: 'normal', fontWeight: 600, lineHeight: 22, marginBottom: 7, alignSelf: 'flex-start' }}>
+              Indexer address
+            </FadeText>
 
             <View
               style={{
-                justifyContent: 'center',
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                borderColor: '#494444',
+                borderWidth: 1,
+                borderRadius: 12,
+                marginBottom: 10,
+                backgroundColor: '#181717',
+                width: '100%',
+                minWidth: '50%',
+                height: 44,
                 alignItems: 'center',
+                paddingHorizontal: 16,
               }}
             >
-              <RNPickerSelect
-                darkTheme
+              <TextInput
+                placeholder={'127.0.0.1 or localhost'}
+                placeholderTextColor={colors.placeholder}
                 style={{
-                  modalViewBottom: {
-                    minHeight: 300,
-                  },
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  color: colors.text,
+                  fontWeight: '400',
+                  fontSize: 17,
+                  paddingVertical: 0,
+                  marginLeft: 4,
+                  backgroundColor: 'transparent',
                 }}
-                pickerProps={{
-                  mode: 'dialog',
-                  itemStyle: {
-                    color: colors.zingo,
-                  },
-                }}
-                fixAndroidTouchableBug={true}
                 value={indexerServerUriLocal}
-                items={[
-                  { label: `${serverUris()[0].uri}  [${getChainName(serverUris()[0].chainName)}]`, value: serverUris()[0].uri },
-                  { label: `${serverUris()[1].uri}  [${getChainName(serverUris()[1].chainName)}]`, value: serverUris()[1].uri },
-                  { label: `${serverUris()[2].uri}  [${getChainName(serverUris()[2].chainName)}]`, value: serverUris()[2].uri },
-                ]}
-                placeholder={{
-                  label: translate('settings.select-placeholder') as string,
-                  value: null,
-                  color: colors.primary,
-                }}
-                disabled={actionButtonsDisabled}
-                useNativeAndroidPickerStyle={false}
-                onValueChange={(itemValue: string) => {
-                  if (itemValue) {
-                    Keyboard.dismiss();
-                    setConnected(null);
-                    setBorderColor(colors.primary);
-                    setIndexerServerUriLocal(itemValue);
-                    if (serverUris().filter(s => s.uri === itemValue).length > 0) {
-                      setIndexerServerChainNameLocal(serverUris().filter(s => s.uri === itemValue)[0].chainName)
-                    }
+                onChangeText={text => {
+                  setConnected(null);
+                  setBorderColor(colors.primary);
+                  setIndexerServerUriLocal(text);
+                  if (serverUris().filter(s => s.uri === text).length > 0) {
+                    setIndexerServerChainNameLocal(serverUris().filter(s => s.uri === text)[0].chainName)
                   }
                 }}
-              >
-                <ChevronDown
-                  width={30}
-                  height={30}
-                  style={{ marginHorizontal: 15 }}
-                  color={colors.text}
-                />
-              </RNPickerSelect>
-            </View>
-
-            {!!indexerServerUriLocal && (
-              <TouchableOpacity
-                disabled={actionButtonsDisabled}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setIndexerServerUriLocal('');
-                  setBorderColor('transparent');
-                  setConnected(null);
+                editable={!actionButtonsDisabled}
+                maxLength={100}
+                keyboardType="url"
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="done"
+                onFocus={() => {
+                  if (connected === null) {
+                    setBorderColor(colors.primary);
+                  }
                 }}
-              >
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: colors.zingo,
-                    borderRadius: 11,
-                    height: 22,
-                    width: 22,
-                    padding: 0,
+                onBlur={() => {
+                  if (connected === null) {
+                    setBorderColor('transparent');
+                  }
+                }}
+              />
+
+              {!!indexerServerUriLocal && (
+                <TouchableOpacity
+                  disabled={actionButtonsDisabled}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    setIndexerServerUriLocal('');
+                    setBorderColor('transparent');
+                    setConnected(null);
                   }}
                 >
-                  <XIcon color={colors.background} width={20} height={20} />
-                </View>
-              </TouchableOpacity>
-            )}
-          </View>
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: colors.zingo,
+                      borderRadius: 11,
+                      height: 22,
+                      width: 22,
+                      padding: 0,
+                    }}
+                  >
+                    <XIcon color={colors.background} width={20} height={20} />
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
 
-          <ChainTypeToggle
-            customServerChainName={indexerServerChainNameLocal}
-            onPress={setIndexerServerChainNameLocal}
-            translate={translate}
-            disabled={serverUris().filter(s => s.uri === indexerServerUriLocal).length > 0 || actionButtonsDisabled}
-          />
+            <FadeText style={{ marginLeft: 4, fontSize: 14, fontStyle: 'normal', fontWeight: 600, lineHeight: 22, marginBottom: 7, alignSelf: 'flex-start' }}>
+              Port
+            </FadeText>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                borderColor: '#494444',
+                borderWidth: 1,
+                borderRadius: 12,
+                marginBottom: 10,
+                backgroundColor: '#181717',
+                width: '100%',
+                minWidth: '50%',
+                height: 44,
+                alignItems: 'center',
+                paddingHorizontal: 16,
+              }}
+            >
+              <TextInput
+                placeholder={'e.g. 18232'}
+                placeholderTextColor={colors.placeholder}
+                style={{
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  color: colors.text,
+                  fontWeight: '400',
+                  fontSize: 17,
+                  paddingVertical: 0,
+                  marginLeft: 4,
+                  backgroundColor: 'transparent',
+                }}
+                value={indexerServerPortLocal}
+                onChangeText={text => {
+                  setConnected(null);
+                  setBorderColor(colors.primary);
+                  setIndexerServerPortLocal(text);
+                  if (serverUris().filter(s => s.uri === text).length > 0) {
+                    setIndexerServerChainNameLocal(serverUris().filter(s => s.uri === text)[0].chainName)
+                  }
+                }}
+                editable={!actionButtonsDisabled}
+                maxLength={100}
+                keyboardType="numeric"
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="done"
+                onFocus={() => {
+                  if (connected === null) {
+                    setBorderColor(colors.primary);
+                  }
+                }}
+                onBlur={() => {
+                  if (connected === null) {
+                    setBorderColor('transparent');
+                  }
+                }}
+              />
+
+              {!!indexerServerPortLocal && (
+                <TouchableOpacity
+                  disabled={actionButtonsDisabled}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    setIndexerServerPortLocal('');
+                    setBorderColor('transparent');
+                    setConnected(null);
+                  }}
+                >
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: colors.zingo,
+                      borderRadius: 11,
+                      height: 22,
+                      width: 22,
+                      padding: 0,
+                    }}
+                  >
+                    <XIcon color={colors.background} width={20} height={20} />
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
+
+          </View>
 
           <View
             style={{
@@ -385,8 +443,16 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             <LiquidPrimaryButton
               title="Continue"
               onPress={() => {
-                // using params
-                setIndexerServer(indexerServerUriLocal, indexerServerChainNameLocal);
+                let newIndexerServerChainNameLocal: ChainNameEnum = indexerServerChainNameLocal;
+                if (
+                  serverUris().filter(s => s.uri === `${indexerServerUriLocal}:${indexerServerPortLocal}`)
+                    .length > 0
+                ) {
+                  newIndexerServerChainNameLocal = serverUris().filter(
+                    s => s.uri === `${indexerServerUriLocal}:${indexerServerPortLocal}`,
+                  )[0].chainName;
+                }
+                setIndexerServer(`${indexerServerUriLocal}:${indexerServerPortLocal}`, newIndexerServerChainNameLocal);
                 Keyboard.dismiss();
                 clear();
                 // the App needs some time to store data.
@@ -401,17 +467,19 @@ const Servers: React.FunctionComponent<ServersProps> = ({
           ) : (
             <LiquidPrimaryButton
               title={connected === null ? 'Test Connection' : 'Retry'}
-              disabled={actionButtonsDisabled || !indexerServerUriLocal || !indexerServerChainNameLocal}
+              disabled={actionButtonsDisabled || !indexerServerUriLocal || !indexerServerPortLocal || !indexerServerChainNameLocal || indexerServerUriLocal.replace('://', '').includes(':')}
               onPress={async () => {
                 setConnected(null);
                 setBorderColor('transparent');
                 const {
                   result: _connected,
                   indexerServerUriParsed: _indexerServerUri,
-                } = await checkIndexerServer(indexerServerUriLocal, indexerServerChainNameLocal);
+                } = await checkIndexerServer(`${indexerServerUriLocal}:${indexerServerPortLocal}`, indexerServerChainNameLocal);
                 setConnected(_connected);
                 // using local state
-                setIndexerServerUriLocal(_indexerServerUri);
+                const { base: basee, port: portt } = parseUri(_indexerServerUri);
+                setIndexerServerUriLocal(basee);
+                setIndexerServerPortLocal(portt);
                 if (_connected) {
                   setBorderColor('#0E9634');
                 } else {
@@ -430,4 +498,4 @@ const Servers: React.FunctionComponent<ServersProps> = ({
   );
 };
 
-export default Servers;
+export default ConnectIndexer;
