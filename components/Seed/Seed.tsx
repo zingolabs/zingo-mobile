@@ -15,23 +15,16 @@ import {
   RouteEnum,
 } from '../../app/AppState';
 import Utils from '../../app/utils';
-import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderTitle } from '../Header';
+import { BlurView } from '@react-native-community/blur';
 
-type SeedProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
-  onClickOK?: (seedPhrase: string, birthdayNumber: number) => void;
-  onClickCancel?: () => void;
-  keepAwake?: (v: boolean) => void;
-  setIsSeedViewModalOpen?: (v: boolean) => void;
-};
+type SeedProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed>;
+
 const Seed: React.FunctionComponent<SeedProps> = ({
-  onClickCancel,
-  keepAwake,
-  setIsSeedViewModalOpen,
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
@@ -55,11 +48,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   const insets = useSafeAreaInsets();
 
-  const maxW = 520; //tablets -> landscape.
-
   const [expandSeed, setExpandSeed] = useState<boolean>(true);
   const [expandBirthday, setExpandBithday] = useState<boolean>(true);
-  const [, setBasicFirstViewSeed] = useState<boolean>(true);
+  const [seedBlurred, setSeedBlurred] = useState<boolean>(true);
 
   const seedPhrase = wallet.seed || '';
   const birthdayNumber = (wallet.birthday && wallet.birthday.toString()) || '';
@@ -78,20 +69,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       setRows(_rows);
     }
   }, [seedPhrase]);
-
-  useEffect(() => {
-    if (keepAwake) {
-      (async () => {
-        const bfvs: boolean = (await SettingsFileImpl.readSettings())
-          .basicFirstViewSeed;
-        setBasicFirstViewSeed(bfvs);
-        if (!bfvs) {
-          // keep the screen awake while the user is writting the seed
-          keepAwake(true);
-        }
-      })();
-    }
-  }, [keepAwake]);
 
   useEffect(() => {
     if (privacy) {
@@ -116,16 +93,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   }, [expandBirthday, privacy]);
 
   const onClickCancelHide = () => {
-    onClickCancel && onClickCancel();
     clear();
     hiding();
   };
 
   const hiding = async () => {
-    // when this screen is open from LoadingApp (new wallet)
-    // is using the standard modal from react-native
-    setIsSeedViewModalOpen && setIsSeedViewModalOpen(false);
-
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -162,7 +134,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           style={{
             flexGrow: 1,
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
           }}
         >
           <FadeText style={{ padding: 10, textAlign: 'center', fontSize: 17 }}>
@@ -172,9 +144,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           </FadeText>
 
           {rows.length > 0 && (
-            <View style={{ marginTop: 10 }}>
+            <View
+              style={{
+                marginTop: 10,
+                position: 'relative',
+                borderRadius: 20,
+                overflow: 'hidden',
+              }}
+            >
               {rows.map((row, rowIndex) => (
-                <View key={rowIndex} style={{ flexDirection: 'row', gap: 8 }}>
+                <View key={rowIndex} style={{ flexDirection: 'row', columnGap: 8 }}>
                   {row.map((word, colIndex) => {
                     const index = rowIndex * 3 + colIndex;
                     return (
@@ -186,15 +165,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                           borderColor: colors.border,
                           borderWidth: 1,
                           borderRadius: 25,
-                          marginBottom: 10,
                           backgroundColor: colors.secondary,
                           width: '30%',
-                          maxWidth: maxW,
                           minWidth: '30%',
-                          minHeight: 48,
                           alignItems: 'center',
-                          paddingHorizontal: 15,
+                          paddingHorizontal: 10,
                           paddingVertical: 0,
+                          marginBottom: 5,
                         }}
                       >
                         <FadeText>{`${index + 1}`}.</FadeText>
@@ -203,10 +180,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                             flexGrow: 1,
                             flexShrink: 1,
                             color: colors.text,
-                            fontWeight: '600',
+                            fontWeight: '400',
                             fontSize: 15,
-                            minHeight: 48,
-                            marginLeft: 5,
+                            lineHeight: 15,
                             backgroundColor: 'transparent',
                           }}
                           value={word}
@@ -221,53 +197,115 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   })}
                 </View>
               ))}
-              {true && (
-                <TouchableOpacity
-                  style={{ alignSelf: 'flex-end' }}
-                  onPress={() => {
-                    if (seedPhrase) {
-                      Clipboard.setString(seedPhrase);
-                      if (addLastSnackbar) {
-                        addLastSnackbar({
-                          message: translate(
-                            'seed.tapcopy-seed-message',
-                          ) as string,
-                          duration: SnackbarDurationEnum.short,
-                          screenName: [screenName],
-                        });
-                      }
-                      setExpandSeed(true);
-                      if (privacy) {
-                        setTimeout(() => {
-                          setExpandSeed(false);
-                        }, 5 * 1000);
-                      }
-                    }
+
+              {seedBlurred && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
                 >
+                  <BlurView
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                    }}
+                    blurType="dark"
+                    blurAmount={2}
+                    reducedTransparencyFallbackColor="rgba(0,0,0,0.3)"
+                  />
+
                   <View
                     style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      width: '30%',
-                      height: 30,
-                      padding: 0,
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                    }}
+                  />
+
+                  <TouchableOpacity
+                    onPress={() => setSeedBlurred(false)}
+                    style={{
+                      backgroundColor: colors.primary,
+                      borderRadius: 20,
+                      paddingHorizontal: 18,
+                      paddingVertical: 10,
+                      alignSelf: 'center',
                     }}
                   >
                     <RegText
                       style={{
-                        color: colors.primary,
-                        textDecorationStyle: 'solid',
-                        textDecorationLine: 'underline',
+                        color: 'white',
+                        fontSize: 16,
+                        fontWeight: 600,
                       }}
                     >
-                      Copy
+                      View seed phrase
                     </RegText>
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                </View>
               )}
+
             </View>
           )}
+
+          <TouchableOpacity
+            style={{ alignSelf: 'center' }}
+            onPress={() => {
+              if (seedPhrase) {
+                Clipboard.setString(seedPhrase);
+                if (addLastSnackbar) {
+                  addLastSnackbar({
+                    message: translate(
+                      'seed.tapcopy-seed-message',
+                    ) as string,
+                    duration: SnackbarDurationEnum.short,
+                    screenName: [screenName],
+                  });
+                }
+                setExpandSeed(true);
+                if (privacy) {
+                  setTimeout(() => {
+                    setExpandSeed(false);
+                  }, 5 * 1000);
+                }
+              }
+            }}
+          >
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 16,
+                backgroundColor: colors.secondary,
+                borderColor: colors.border,
+                borderWidth: 1,
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                marginVertical: 10,
+              }}
+            >
+              <RegText
+                style={{
+                  color: colors.text,
+                  fontSize: 16,
+                  fontWeight: 600,
+                }}
+              >
+                Copy
+              </RegText>
+            </View>
+          </TouchableOpacity>
 
           <View
             style={{
@@ -280,7 +318,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               marginBottom: 10,
               backgroundColor: colors.secondary,
               width: '100%',
-              maxWidth: maxW,
               minWidth: '50%',
               minHeight: 48,
               alignItems: 'center',

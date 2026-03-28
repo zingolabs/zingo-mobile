@@ -44,12 +44,11 @@ describe('Component Seed - test', () => {
   stateLoaded.info = mockInfo;
   stateLoaded.totalBalance = mockTotalBalance;
   const onOk = jest.fn();
-  const onCancel = jest.fn();
   let props = makeDrawerProps(SeedActionEnum.view);
   test('Seed View - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed {...props} onClickOK={onOk} onClickCancel={onCancel} />
+        <Seed {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -58,7 +57,7 @@ describe('Component Seed - test', () => {
   test('Seed Change - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed {...props} onClickOK={onOk} onClickCancel={onCancel} />
+        <Seed {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -67,7 +66,7 @@ describe('Component Seed - test', () => {
   test('Seed Server - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed {...props} onClickOK={onOk} onClickCancel={onCancel} />
+        <Seed {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -76,7 +75,7 @@ describe('Component Seed - test', () => {
   test('Seed Backup - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed {...props} onClickOK={onOk} onClickCancel={onCancel} />
+        <Seed {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();

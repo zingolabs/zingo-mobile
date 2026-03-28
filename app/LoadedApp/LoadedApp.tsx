@@ -2080,10 +2080,6 @@ export class LoadedAppClass extends Component<
                 {props => <ScannerAddress {...props} />}
               </LoadedAppStack.Screen>
 
-              {/* <LoadedAppStack.Screen name={RouteEnum.Seed}>
-                {props => <Seed {...props} />}
-              </LoadedAppStack.Screen> */}
-
               <LoadedAppStack.Screen name={RouteEnum.SettingsStack}>
                 {props => (
                   <SettingsNavigator
