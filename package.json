@@ -30,6 +30,7 @@
     "@noble/hashes": "^2.0.1",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-clipboard/clipboard": "^1.16.3",
+    "@react-native-community/blur": "^4.4.1",
     "@react-native-community/netinfo": "github:j-piasecki/react-native-netinfo#@jpiasecki/new-arch",
     "@react-native-picker/picker": "^2.11.2",
     "@react-navigation/drawer": "^7.5.8",
