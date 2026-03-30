@@ -191,7 +191,7 @@ const Import: React.FunctionComponent<ImportProps> = ({
         }
       >
         <HeaderTitle
-          title=""
+          title="Import wallet"
           goBack={() => {
             clear();
             onClickCancel();
@@ -201,7 +201,6 @@ const Import: React.FunctionComponent<ImportProps> = ({
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
             flexGrow: 1,
-            paddingTop: insets.top,
             paddingBottom: insets.bottom + 8,
             paddingHorizontal: 10,
           }}
@@ -210,13 +209,9 @@ const Import: React.FunctionComponent<ImportProps> = ({
             style={{
               flexGrow: 1,
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'flex-start',
             }}
           >
-            <RegText color={colors.text} style={{ fontSize: 25 }}>
-              Import wallet
-            </RegText>
-
             <FadeText style={{ marginBottom: 15, marginTop: 5 }}>
               Enter your recovery phrase
             </FadeText>

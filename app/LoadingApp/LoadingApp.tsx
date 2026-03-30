@@ -836,10 +836,15 @@ export class LoadingAppClass extends Component<
   };
 
   openServers = () => {
+    // reset the custom server, if any. To the fist one
     this.setState({
       screen: 0.5,
       fromSettings: false,
       actionButtonsDisabled: false,
+      indexerServer: { 
+        uri: serverUris()[0].uri, 
+        chainName: serverUris()[0].chainName
+      } as ServerType,
     });
   };
 

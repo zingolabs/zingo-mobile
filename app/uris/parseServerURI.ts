@@ -3,17 +3,18 @@ import { GlobalConst, TranslateType } from '../AppState';
 
 const parseServerURI = (uri: string, translate: (key: string) => TranslateType): string => {
   if (!uri || uri === '') {
-    return translate('uris.baduri') as string;
+    return `error: ${translate('uris.baduri')}`;
   }
 
   const parsedUri = new Url(uri, true);
+  console.log('PARSED URI ->', parsedUri);
   if (
     !parsedUri ||
     !parsedUri.hostname ||
     !parsedUri.protocol ||
     (parsedUri.protocol !== GlobalConst.http && parsedUri.protocol !== GlobalConst.https)
   ) {
-    return translate('uris.baduri') as string;
+    return `error: ${translate('uris.baduri')}`;
   }
 
   let port = parsedUri.port;
