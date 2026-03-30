@@ -29,6 +29,13 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     <View
       style={
         {
+          "marginTop": undefined,
+        }
+      }
+    />
+    <View
+      style={
+        {
           "height": 48,
           "justifyContent": "center",
           "marginTop": 10,
@@ -258,7 +265,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                 "flexDirection": "row",
                 "justifyContent": "flex-start",
                 "marginBottom": 10,
-                "maxWidth": 520,
+                "marginTop": 10,
                 "minHeight": 48,
                 "minWidth": "50%",
                 "paddingHorizontal": 25,
@@ -283,7 +290,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                   "color": "#c3c3c3",
                   "flexGrow": 1,
                   "flexShrink": 1,
-                  "fontSize": 18,
+                  "fontSize": 16,
                   "fontWeight": "600",
                   "marginLeft": 5,
                   "minHeight": 48,

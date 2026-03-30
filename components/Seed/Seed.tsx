@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext } from 'react';
-import { View, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, ScrollView, TouchableOpacity, TextInput, Platform } from 'react-native';
 
 import { useNavigation, useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -13,6 +13,7 @@ import {
   SnackbarDurationEnum,
   ScreenEnum,
   RouteEnum,
+  GlobalConst,
 } from '../../app/AppState';
 import Utils from '../../app/utils';
 import Snackbars from '../Components/Snackbars';
@@ -170,7 +171,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                           minWidth: '30%',
                           alignItems: 'center',
                           paddingHorizontal: 10,
-                          paddingVertical: 0,
+                          paddingVertical: Platform.OS === GlobalConst.platformOSandroid ? 0 : 5,
                           marginBottom: 5,
                         }}
                       >
@@ -184,6 +185,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                             fontSize: 15,
                             lineHeight: 15,
                             backgroundColor: 'transparent',
+                            marginTop: Platform.OS === GlobalConst.platformOSandroid ? 0 : 5,
+                            marginLeft: Platform.OS === GlobalConst.platformOSandroid ? 0 : 3,
                           }}
                           value={word}
                           editable={false}
