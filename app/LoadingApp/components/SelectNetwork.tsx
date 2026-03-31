@@ -23,10 +23,7 @@ import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { serverUris } from '../../uris';
-import {
-  faCheck,
-  faWarning,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faWarning } from '@fortawesome/free-solid-svg-icons';
 import ComputerBlue from '../../../assets/icons/computer-blue.svg';
 import ComputerWhite from '../../../assets/icons/computer-white.svg';
 import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
@@ -70,9 +67,12 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
   const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(
     indexerServerContext.uri ? indexerServerContext.uri : serverUris()[0].uri,
   );
-  const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] = useState<ChainNameEnum>(
-    indexerServerContext.uri ? indexerServerContext.chainName : serverUris()[0].chainName,
-  );
+  const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] =
+    useState<ChainNameEnum>(
+      indexerServerContext.uri
+        ? indexerServerContext.chainName
+        : serverUris()[0].chainName,
+    );
 
   const insets = useSafeAreaInsets();
 
@@ -106,10 +106,13 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
         }
       >
         {fromSettings && (
-          <HeaderTitle title='Select network' goBack={() => {
-            clear();
-            closeServers();
-          }} />
+          <HeaderTitle
+            title="Select network"
+            goBack={() => {
+              clear();
+              closeServers();
+            }}
+          />
         )}
 
         <View
@@ -122,12 +125,29 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
           }}
         >
           {!fromSettings && (
-            <RegText color={colors.text} style={{ marginTop: 42, fontSize: 32, fontStyle: 'normal', fontWeight: 700 }}>
+            <RegText
+              color={colors.text}
+              style={{
+                marginTop: 42,
+                fontSize: 32,
+                fontStyle: 'normal',
+                fontWeight: 700,
+              }}
+            >
               Select network
             </RegText>
           )}
 
-          <FadeText style={{ marginTop: 14, fontSize: 14, fontStyle: 'normal', fontWeight: 600, marginBottom: 39 }}>
+          <FadeText
+            style={{
+              marginTop: 14,
+              fontSize: 14,
+              fontStyle: 'normal',
+              textAlign: 'center',
+              fontWeight: 500,
+              marginBottom: 39,
+            }}
+          >
             Choose the network this wallet will be operating on
           </FadeText>
 
@@ -147,7 +167,10 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
-                borderColor: indexerServerUriLocal === serverUris()[0].uri ? colors.primary : '#494444',
+                borderColor:
+                  indexerServerUriLocal === serverUris()[0].uri
+                    ? colors.primary
+                    : '#494444',
                 borderWidth: 1,
                 borderRadius: 15,
                 marginBottom: 21,
@@ -178,10 +201,26 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                   marginTop: 10,
                 }}
               >
-                <RegText color={colors.text} style={{ fontSize: 20, fontStyle: 'normal', fontWeight: 700, lineHeight: 22 }}>
+                <RegText
+                  color={colors.text}
+                  style={{
+                    fontSize: 20,
+                    fontStyle: 'normal',
+                    fontWeight: 700,
+                    lineHeight: 22,
+                  }}
+                >
                   Server A
                 </RegText>
-                <FadeText style={{ marginTop: 4, fontSize: 14, fontStyle: 'normal', fontWeight: 400, lineHeight: 22 }}>
+                <FadeText
+                  style={{
+                    marginTop: 4,
+                    fontSize: 14,
+                    fontStyle: 'normal',
+                    fontWeight: 400,
+                    lineHeight: 22,
+                  }}
+                >
                   {serverUris()[0].uri}
                 </FadeText>
               </View>
@@ -204,10 +243,13 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
-                borderColor: indexerServerUriLocal === serverUris()[1].uri ? colors.primary : '#494444',
+                borderColor:
+                  indexerServerUriLocal === serverUris()[1].uri
+                    ? colors.primary
+                    : '#494444',
                 borderWidth: 1,
                 borderRadius: 15,
-                marginBottom: 21,
+                marginBottom: 10,
                 backgroundColor: '#151414',
                 width: '100%',
                 alignItems: 'center',
@@ -235,10 +277,26 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                   marginTop: 10,
                 }}
               >
-                <RegText color={colors.text} style={{ fontSize: 20, fontStyle: 'normal', fontWeight: 700, lineHeight: 22 }}>
+                <RegText
+                  color={colors.text}
+                  style={{
+                    fontSize: 20,
+                    fontStyle: 'normal',
+                    fontWeight: 700,
+                    lineHeight: 22,
+                  }}
+                >
                   Server B
                 </RegText>
-                <FadeText style={{ marginTop: 4, fontSize: 14, fontStyle: 'normal', fontWeight: 400, lineHeight: 22 }}>
+                <FadeText
+                  style={{
+                    marginTop: 4,
+                    fontSize: 14,
+                    fontStyle: 'normal',
+                    fontWeight: 400,
+                    lineHeight: 22,
+                  }}
+                >
                   {serverUris()[1].uri}
                 </FadeText>
               </View>
@@ -251,7 +309,15 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
               marginTop: 10,
             }}
           >
-            <FadeText style={{ marginBottom: 21, fontSize: 14, fontStyle: 'normal', fontWeight: 400, lineHeight: 22 }}>
+            <FadeText
+              style={{
+                marginBottom: 10,
+                fontSize: 14,
+                fontStyle: 'normal',
+                fontWeight: 400,
+                lineHeight: 22,
+              }}
+            >
               OR
             </FadeText>
           </View>
@@ -264,7 +330,10 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             onPress={() => {
               //setIndexerServerUriLocal('');
               setIndexerServerChainNameLocal(ChainNameEnum.testChainName);
-              setIndexerServer(indexerServerUriLocal, ChainNameEnum.testChainName);
+              setIndexerServer(
+                indexerServerUriLocal,
+                ChainNameEnum.testChainName,
+              );
               setBorderColor('transparent');
               setConnected(null);
               goConnectIndexer();
@@ -274,10 +343,15 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
-                borderColor: indexerServerUriLocal !== serverUris()[0].uri && indexerServerUriLocal !== serverUris()[1].uri && indexerServerChainNameLocal === ChainNameEnum.testChainName ? colors.primary : '#494444',
+                borderColor:
+                  indexerServerUriLocal !== serverUris()[0].uri &&
+                  indexerServerUriLocal !== serverUris()[1].uri &&
+                  indexerServerChainNameLocal === ChainNameEnum.testChainName
+                    ? colors.primary
+                    : '#494444',
                 borderWidth: 1,
                 borderRadius: 15,
-                marginBottom: 21,
+                marginBottom: 10,
                 backgroundColor: '#151414',
                 width: '100%',
                 alignItems: 'center',
@@ -305,11 +379,27 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                   marginTop: 10,
                 }}
               >
-                <RegText color={colors.text} style={{ fontSize: 20, fontStyle: 'normal', fontWeight: 700, lineHeight: 22 }}>
+                <RegText
+                  color={colors.text}
+                  style={{
+                    fontSize: 20,
+                    fontStyle: 'normal',
+                    fontWeight: 700,
+                    lineHeight: 22,
+                  }}
+                >
                   Custom
                 </RegText>
-                <FadeText style={{ marginTop: 4, fontSize: 14, fontStyle: 'normal', fontWeight: 400, lineHeight: 22 }}>
-                  {indexerServerUriLocal !== serverUris()[0].uri && indexerServerUriLocal !== serverUris()[1].uri ? indexerServerUriLocal : ''}
+                <FadeText
+                  style={{
+                    marginTop: 4,
+                    fontSize: 14,
+                    fontStyle: 'normal',
+                    fontWeight: 400,
+                    lineHeight: 22,
+                  }}
+                >
+                  localhost
                 </FadeText>
               </View>
             </View>
@@ -323,7 +413,15 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                   marginTop: 10,
                 }}
               >
-                <FadeText style={{ marginBottom: 21, fontSize: 14, fontStyle: 'normal', fontWeight: 400, lineHeight: 22 }}>
+                <FadeText
+                  style={{
+                    marginBottom: 10,
+                    fontSize: 14,
+                    fontStyle: 'normal',
+                    fontWeight: 400,
+                    lineHeight: 22,
+                  }}
+                >
                   OR
                 </FadeText>
               </View>
@@ -334,7 +432,13 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                     justifyContent: 'center',
                     marginTop: 10,
                     backgroundColor: '#28282A',
-                    borderColor: indexerServerUriLocal !== serverUris()[0].uri && indexerServerUriLocal !== serverUris()[1].uri && indexerServerChainNameLocal === ChainNameEnum.regtestChainName ? colors.primary : 'transparent',
+                    borderColor:
+                      indexerServerUriLocal !== serverUris()[0].uri &&
+                      indexerServerUriLocal !== serverUris()[1].uri &&
+                      indexerServerChainNameLocal ===
+                        ChainNameEnum.regtestChainName
+                        ? colors.primary
+                        : 'transparent',
                     borderWidth: 1,
                     borderRadius: 1000,
                     paddingVertical: 4,
@@ -345,14 +449,27 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                   disabled={actionButtonsDisabled}
                   onPress={() => {
                     //setIndexerServerUriLocal('');
-                    setIndexerServerChainNameLocal(ChainNameEnum.regtestChainName);
-                    setIndexerServer(indexerServerUriLocal, ChainNameEnum.regtestChainName);
+                    setIndexerServerChainNameLocal(
+                      ChainNameEnum.regtestChainName,
+                    );
+                    setIndexerServer(
+                      indexerServerUriLocal,
+                      ChainNameEnum.regtestChainName,
+                    );
                     setBorderColor('transparent');
                     setConnected(null);
                     goConnectIndexer();
                   }}
                 >
-                  <FadeText style={{ fontSize: 15, fontStyle: 'normal', fontWeight: 400, lineHeight: 20, letterSpacing: -0.23 }}>
+                  <FadeText
+                    style={{
+                      fontSize: 15,
+                      fontStyle: 'normal',
+                      fontWeight: 400,
+                      lineHeight: 20,
+                      letterSpacing: -0.23,
+                    }}
+                  >
                     Use regtest
                   </FadeText>
                 </TouchableOpacity>
@@ -455,7 +572,8 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             <LiquidPrimaryButton
               title="Continue"
               onPress={() => {
-                let newIndexerServerChainNameLocal: ChainNameEnum = indexerServerChainNameLocal;
+                let newIndexerServerChainNameLocal: ChainNameEnum =
+                  indexerServerChainNameLocal;
                 if (
                   serverUris().filter(s => s.uri === indexerServerUriLocal)
                     .length > 0
@@ -464,7 +582,10 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                     s => s.uri === indexerServerUriLocal,
                   )[0].chainName;
                 }
-                setIndexerServer(indexerServerUriLocal, newIndexerServerChainNameLocal);
+                setIndexerServer(
+                  indexerServerUriLocal,
+                  newIndexerServerChainNameLocal,
+                );
                 Keyboard.dismiss();
                 clear();
                 // the App needs some time to store data.
@@ -479,14 +600,21 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
           ) : (
             <LiquidPrimaryButton
               title={connected === null ? 'Test Connection' : 'Retry'}
-              disabled={actionButtonsDisabled || !indexerServerUriLocal || !indexerServerChainNameLocal}
+              disabled={
+                actionButtonsDisabled ||
+                !indexerServerUriLocal ||
+                !indexerServerChainNameLocal
+              }
               onPress={async () => {
                 setConnected(null);
                 setBorderColor('transparent');
                 const {
                   result: _connected,
                   indexerServerUriParsed: _indexerServerUri,
-                } = await checkIndexerServer(indexerServerUriLocal, indexerServerChainNameLocal);
+                } = await checkIndexerServer(
+                  indexerServerUriLocal,
+                  indexerServerChainNameLocal,
+                );
                 setConnected(_connected);
                 // using local state
                 setIndexerServerUriLocal(_indexerServerUri);

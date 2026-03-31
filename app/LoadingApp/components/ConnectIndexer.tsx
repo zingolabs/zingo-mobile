@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
 import { ThemeType } from '../../types';
-import { ChainNameEnum, ScreenEnum } from '../../AppState';
+import { ChainNameEnum, GlobalConst, ScreenEnum } from '../../AppState';
 import { ContextAppLoading } from '../../context';
 import BoldText from '../../../components/Components/BoldText';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -471,10 +471,19 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
               onPress={async () => {
                 setConnected(null);
                 setBorderColor('transparent');
+                // add http if it not have it
+                if (!indexerServerUriLocal.toLowerCase().startsWith(GlobalConst.http)) {
+
+                }
                 const {
                   result: _connected,
                   indexerServerUriParsed: _indexerServerUri,
-                } = await checkIndexerServer(`${indexerServerUriLocal}:${indexerServerPortLocal}`, indexerServerChainNameLocal);
+                } = await checkIndexerServer(`${
+                  !indexerServerUriLocal.toLowerCase().startsWith(GlobalConst.http) &&
+                  !indexerServerUriLocal.toLowerCase().startsWith(GlobalConst.https)
+                    ? (GlobalConst.http + '//' + indexerServerUriLocal)
+                    : indexerServerUriLocal
+                  }:${indexerServerPortLocal}`, indexerServerChainNameLocal);
                 setConnected(_connected);
                 // using local state
                 const { base: basee, port: portt } = parseUri(_indexerServerUri);
