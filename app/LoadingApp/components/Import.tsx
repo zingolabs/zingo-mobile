@@ -190,7 +190,7 @@ const Import: React.FunctionComponent<ImportProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <View style={{ marginTop: insets.top }} />
+        <View style={{ marginTop: Platform.OS === GlobalConst.platformOSios ? insets.top : 0 }} />
         <HeaderTitle
           title="Import wallet"
           goBack={() => {
