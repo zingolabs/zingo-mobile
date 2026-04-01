@@ -104,9 +104,7 @@ export type ScannerAddressNavigationState = {
 };
 
 export type ValueTransferDetailNavigationState = {
-  index: number;
   vt: ValueTransferType;
-  valueTransfersSliced: ValueTransferType[];
   totalLength: number;
 };
 

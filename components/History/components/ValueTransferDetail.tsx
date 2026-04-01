@@ -82,9 +82,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   }, [
     route, 
     route.params, 
-    route.params?.index,
     route.params?.vt,
-    route.params?.valueTransfersSliced,
     route.params?.totalLength,
   ]);
   
