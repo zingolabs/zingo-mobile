@@ -30,7 +30,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types';
-import { RouteEnum, WalletBondsType } from '../../../app/AppState';
+import { RouteEnum, ScheduledActionType, StakingActionKindEnum, WalletBondsType } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
@@ -41,6 +41,7 @@ import Refresh from '../../../assets/icons/refresh.svg';
 import RegText from '../../Components/RegText';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 import ZecAmount from '../../Components/ZecAmount';
+import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -66,6 +67,10 @@ const Unstake: React.FC<UnstakeProps> = ({
     !!route.params && route.params.closeSheet !== undefined
       ? route.params.closeSheet
       : () => {};
+  const stakingDay =
+    !!route.params && route.params.stakingDay !== undefined
+      ? route.params.stakingDay
+      : false;
 
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
@@ -159,11 +164,30 @@ const Unstake: React.FC<UnstakeProps> = ({
 
     setModalState('sending');
 
+    const stakingScheduledAction = {
+      id: 0,
+      kind: selectedKind === 
+        WalletBondsStatusEnum.Active 
+          ? StakingActionKindEnum.BeginUnbonding 
+          : StakingActionKindEnum.WithdrawBond,
+      amount: (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount || 0) * 10 ** 8,
+      finalizer: finalizerFromText,
+      finalizerNew: '',
+    } as ScheduledActionType;
+      
     try {
       if (selectedKind === WalletBondsStatusEnum.Active) {
-        await beginUnstakeTransaction(bondTxid);
+        if (stakingDay) {
+          await beginUnstakeTransaction(bondTxid);
+        } else {
+          await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+        }
       } else if (selectedKind === WalletBondsStatusEnum.Unbonding) {
-        await withdrawBondTransaction(selectedBond.txid);
+        if (stakingDay) {
+          await withdrawBondTransaction(selectedBond.txid);
+        } else {
+          await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+        }
       } else {
         Alert.alert(
           'Error',

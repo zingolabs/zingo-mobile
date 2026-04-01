@@ -9,7 +9,9 @@ type StakingActionsProps = {
   stakingDay: boolean;
 };
 
-const StakingActions: React.FC<StakingActionsProps> = () => {
+const StakingActions: React.FC<StakingActionsProps> = (
+  stakingDay,
+) => {
   const navigation: any = useNavigation();
 
   return (
@@ -26,7 +28,9 @@ const StakingActions: React.FC<StakingActionsProps> = () => {
     >
       <>
         <Pressable
-          onPress={() => navigation.navigate(RouteEnum.Stake)}
+          onPress={() => navigation.navigate(RouteEnum.Stake, {
+            stakingDay,
+          })}
           style={{
             backgroundColor: '#1C78D24D',
             paddingVertical: 14,
@@ -43,6 +47,7 @@ const StakingActions: React.FC<StakingActionsProps> = () => {
             navigation.navigate(RouteEnum.Unstake, {
               finalizer: undefined,
               staked: undefined,
+              stakingDay,
             })
           }
           style={{

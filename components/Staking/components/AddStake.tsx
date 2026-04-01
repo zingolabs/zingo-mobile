@@ -33,6 +33,7 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../../app/types';
 import {
   RouteEnum,
+  ScheduledActionType,
   SendPageStateClass,
   StakingActionKindEnum,
   ToAddrClass,
@@ -45,6 +46,7 @@ import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import RegText from '../../Components/RegText';
+import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -62,7 +64,13 @@ type AddStakeScreenProps = DrawerScreenProps<
 
 const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   stakeTransaction,
+  route,
 }) => {
+  const stakingDay =
+    !!route.params && route.params.stakingDay !== undefined
+      ? route.params.stakingDay
+      : false;
+
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
@@ -153,6 +161,16 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       8,
     );
 
+    setModalState('sending');
+
+    const stakingScheduledAction = {
+      id: 0,
+      kind: StakingActionKindEnum.CreateBond,
+      amount: amount * 10 ** 8,
+      finalizer: finalizer,
+      finalizerNew: '',
+    } as ScheduledActionType;
+
     const stakingAction: StakingActionType = {
       kind: StakingActionKindEnum.CreateBond,
       val: amount * 10 ** 8,
@@ -160,10 +178,12 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
     };
 
-    setModalState('sending');
-
     try {
-      await stakeTransaction(sendPageState, stakingAction);
+      if (stakingDay) {
+        await stakeTransaction(sendPageState, stakingAction);
+      } else {
+        await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+      }
       setModalState('success');
     } catch (error: any) {
       console.warn('Stake tx failed:', error);

@@ -64,7 +64,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Faucet]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.StakingHome]: undefined;
-  [RouteEnum.Stake]: undefined;
   [RouteEnum.Distribution]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Info]: undefined;
@@ -89,6 +88,7 @@ export type AppDrawerParamList = {
   [RouteEnum.ComputingOK]: ComputingOKNavigationState | undefined;
   [RouteEnum.ComputingError]: ComputingErrorNavigationState | undefined;
   [RouteEnum.Finalizers]: FinalizersNavigationState | undefined;
+  [RouteEnum.Stake]: StakeNavigationState | undefined;
   [RouteEnum.Unstake]: UnstakeNavigationState | undefined;
   [RouteEnum.Redelegate]: RedelegateNavigationState | undefined;
 };
@@ -123,16 +123,22 @@ export type FinalizersNavigationState = {
   goBackRoute: RouteEnum;
 };
 
+export type StakeNavigationState = {
+  stakingDay: boolean;
+};
+
 export type UnstakeNavigationState = {
   finalizer: string;
   staked: number;
   closeSheet: () => void;
+  stakingDay: boolean;
 };
 
 export type RedelegateNavigationState = {
   finalizer: string;
   staked: number;
   closeSheet: () => void;
+  stakingDay: boolean;
 };
 
 export type ConfirmNavigationState = {

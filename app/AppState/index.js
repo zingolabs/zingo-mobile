@@ -24,6 +24,7 @@ import TxDetailType from './types/TxDetailType';
 import StakeType from './types/StakeType';
 import StakingActionType from './types/StakingActionType';
 import WalletBondsType from './types/WalletBondsType';
+import ScheduledActionType from './types/ScheduledActionType';
 
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
@@ -92,6 +93,7 @@ export {
   StakeType,
   StakingActionType,
   WalletBondsType,
+  ScheduledActionType,
   MenuItemEnum,
   LanguageEnum,
   CurrencyEnum,

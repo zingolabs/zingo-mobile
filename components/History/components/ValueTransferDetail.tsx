@@ -21,11 +21,10 @@ import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
 import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
-import BoldText from '../../Components/BoldText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Stake from '../../../assets/icons/stake-white.svg';
 import Unstake from '../../../assets/icons/unstake-white.svg';
-import { faChevronDown, faChevronUp, faRefresh, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faRefresh, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { RPCValueTransferStatusEnum } from '../../../app/rpc/enums/RPCValueTransferStatusEnum';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -56,10 +55,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const insets = useSafeAreaInsets();
 
   const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(!!route.params && route.params.vt !== undefined ? route.params.vt : {} as ValueTransferType);
-  const [valueTransferIndex, setValueTransferIndex] = useState<number>(!!route.params && route.params.index !== undefined ? route.params.index : 0);
-  const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>(!!route.params && route.params.valueTransfersSliced !== undefined ? route.params.valueTransfersSliced : [] as ValueTransferType[]);
   const [totalLength, setTotalLength] = useState<number>(!!route.params && route.params.totalLength !== undefined ? route.params.totalLength : 0);
-  const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [showNavigator, setShowNavigator] = useState<boolean>(true); // by default
   const isTheFirstMount = useRef(true);
 
@@ -79,13 +75,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   }, [language]);
 
   useEffect(() => {
-    const _index = !!route.params && route.params.index !== undefined ? route.params.index : 0;
     const _vt = !!route.params && route.params.vt !== undefined ? route.params.vt : {} as ValueTransferType;
-    const _valueTransfersSliced = !!route.params && route.params.valueTransfersSliced !== undefined ? route.params.valueTransfersSliced : [] as ValueTransferType[];
     const _totalLength = !!route.params && route.params.totalLength !== undefined ? route.params.totalLength : 0;
-    setValueTransferIndex(_index);
     setValueTransfer(_vt);
-    setValueTransfersSliced(_valueTransfersSliced);
     setTotalLength(_totalLength);
   }, [
     route, 
@@ -96,16 +88,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     route.params?.totalLength,
   ]);
   
-  useEffect(() => {
-    const spendCo =
-      valueTransfer.confirmations >= 0 &&
-      valueTransfer.confirmations < GlobalConst.minConfirmations
-        ? colors.primaryDisabled
-        : colors.text;
-    setSpendColor(spendCo);
-  }, [colors.primary, colors.primaryDisabled, colors.text, valueTransfer.confirmations, valueTransfer.kind]);
-
-  // if the App is syncing, the VT list will change (new items).
+  // if the App is syncing, the VT list will change (new items). 
   // Hide the navigator is the solution because the current index
   // will be associated to other item.
   useEffect(() => {
@@ -118,17 +101,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalLength]);
-
-  const moveValueTransferDetail = (indexParm: number, typeParm: number) => {
-    // -1 -> Previous ValueTransfer
-    //  1 -> Next ValueTransfer
-    if ((indexParm > 0 && typeParm === -1) ||
-        (indexParm < valueTransfersSliced.length - 1 && typeParm === 1)) {
-      const newIndex = indexParm + typeParm;
-      setValueTransfer(valueTransfersSliced[newIndex]);
-      setValueTransferIndex(newIndex);
-    }
-  };
 
   //console.log('render History Detail', valueTransferIndex, valueTransfer);
 
@@ -160,39 +132,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             navigation.goBack();
           }
         }} />
-
-        {showNavigator && (
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-              marginRight: 30,
-              marginTop: 0,
-            }}>
-            <TouchableOpacity
-              onPress={() => moveValueTransferDetail(valueTransferIndex, -1)}
-              style={{ marginRight: 25 }}
-              disabled={valueTransferIndex === 0}>
-              <FontAwesomeIcon
-                icon={faChevronUp}
-                color={valueTransferIndex === 0 ? colors.primaryDisabled : colors.primary}
-                size={30}
-              />
-            </TouchableOpacity>
-            <FadeText>{(valueTransferIndex + 1).toString()}</FadeText>
-            <TouchableOpacity
-              onPress={() => moveValueTransferDetail(valueTransferIndex, 1)}
-              style={{ marginLeft: 25 }}
-              disabled={valueTransferIndex === valueTransfersSliced.length - 1}>
-              <FontAwesomeIcon
-                icon={faChevronDown}
-                color={valueTransferIndex === valueTransfersSliced.length - 1 ? colors.primaryDisabled : colors.primary}
-                size={30}
-              />
-            </TouchableOpacity>
-          </View>
-        )}
 
         <ScrollView
           keyboardShouldPersistTaps="handled"
@@ -250,11 +189,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               </View>
             </View>
 
-            {true && (
-              <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-                {Utils.valueTransferKindText(translate, valueTransfer)}
-              </BoldText>
-            )}
             <ZecAmount
               currencyName={info.currencyName}
               size={45}

@@ -98,7 +98,7 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
           </View>
         </View>
 
-        {stakingDay ? (
+        {true ? (
           <View
             style={{
               flexGrow: 1,
@@ -119,6 +119,7 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
                   finalizer: item?.finalizer,
                   staked: item?.value,
                   closeSheet: closeSheet,
+                  stakingDay,
                 });
               }}
             />
@@ -132,6 +133,7 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
                   finalizer: item?.finalizer,
                   staked: item?.value,
                   closeSheet: closeSheet,
+                  stakingDay,
                 });
               }}
             />

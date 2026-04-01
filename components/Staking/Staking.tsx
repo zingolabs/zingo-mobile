@@ -28,6 +28,7 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import {
   GlobalConst,
   RouteEnum,
+  ScheduledActionType,
   ScreenEnum,
   StakeType,
   StakingActionKindEnum,
@@ -62,6 +63,7 @@ import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
 import { Layers3Icon } from 'lucide-react-native';
 import { SpinningLoaderIcon } from '../Components/Icons/SpinningLoaderIcon';
 import ZecAmount from '../Components/ZecAmount';
+import ScheduledActionsFileImpl from '../ScheduledActions/ScheduledActionsFileImpl';
 
 type DataType = {
   svg: {
@@ -237,6 +239,10 @@ const Staking: React.FC<StakingProps> = () => {
       .sort((a, b) => b.time - a.time);
   }, [valueTransfers]);
 
+  const scheduledActionsList: Promise<ScheduledActionType[]> = useMemo(async () => {
+    return await ScheduledActionsFileImpl.listSA();
+  }, []);
+
   const stakedData: DataType[] = useMemo(() => {
     const resultJSON: StakeType[] = staked;
     // const randomColors = Utils.generateColorList(resultJSON.length + 10);
@@ -405,7 +411,9 @@ const Staking: React.FC<StakingProps> = () => {
     );
   };
 
-  //console.log('movements', movements); 
+  (async () => {
+    console.log('scheduled actions', await scheduledActionsList); 
+  })();
 
   return (
     <ToastProvider>

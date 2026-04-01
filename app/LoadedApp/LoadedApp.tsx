@@ -107,6 +107,7 @@ import Redelegate from '../../components/Staking/components/Redelegate';
 import Finalizers from '../../components/Finalizers/Finalizers';
 import { reverseHex32Bytes } from '../utils/hex';
 import SettingsNavigator from '../../components/Settings/SettingsNavigator';
+import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
 
 const LoadedAppStack = createNativeStackNavigator<LoadedAppStackParamList>();
 
@@ -1748,6 +1749,8 @@ export class LoadedAppClass extends Component<
       return;
     }
 
+    await ScheduledActionsFileImpl.resetSA();
+
     this.keepAwake(false);
     this.navigateToLoadingApp(state);
   };
@@ -1769,6 +1772,8 @@ export class LoadedAppClass extends Component<
       );
       return;
     }
+
+    await ScheduledActionsFileImpl.resetSA();
 
     this.keepAwake(false);
     this.navigateToLoadingApp({ startingApp: false });
@@ -1851,6 +1856,8 @@ export class LoadedAppClass extends Component<
         );
         //return;
       }
+
+      await ScheduledActionsFileImpl.resetSA();
 
       // no need to restart the tasks because is about to restart the app.
       this.navigateToLoadingApp({ startingApp: false });

@@ -34,7 +34,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
 import { ThemeType } from '../../../app/types';
-import { RouteEnum, WalletBondsType } from '../../../app/AppState';
+import { RouteEnum, ScheduledActionType, StakingActionKindEnum, WalletBondsType } from '../../../app/AppState';
 import { AppDrawerParamList } from '../../../app/types';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../../app/context';
@@ -45,6 +45,7 @@ import Refresh from '../../../assets/icons/refresh.svg';
 import RegText from '../../Components/RegText';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 import ZecAmount from '../../Components/ZecAmount';
+import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -71,6 +72,10 @@ const Redelegate: React.FC<RedelegateProps> = ({
     !!route.params && route.params.closeSheet !== undefined
       ? route.params.closeSheet
       : () => {};
+  const stakingDay =
+    !!route.params && route.params.stakingDay !== undefined
+      ? route.params.stakingDay
+      : false;
 
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
@@ -190,9 +195,21 @@ const Redelegate: React.FC<RedelegateProps> = ({
 
     setModalState('sending');
 
+    const stakingScheduledAction = {
+      id: 0,
+      kind: StakingActionKindEnum.Move,
+      amount: (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount || 0) * 10 ** 8,
+      finalizer: finalizerFromText,
+      finalizerNew: '',
+    } as ScheduledActionType;
+    
     try {
       if (selectedKind === WalletBondsStatusEnum.Active) {
-        await redelegateTransaction(bondKey, finalizerToText);
+        if (stakingDay) {
+          await redelegateTransaction(bondKey, finalizerToText);
+        } else {
+          await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+        }
       } else {
         Alert.alert(
           'Error',
