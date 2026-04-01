@@ -15,10 +15,13 @@ type ScannerUfvkProps = {
   setUfvkText: (k: string) => void;
   closeModal: () => void;
 };
-const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, closeModal }) => {
+const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({
+  setUfvkText,
+  closeModal,
+}) => {
   const context = useContext(ContextAppLoading);
   const { translate, snackbars, removeFirstSnackbar } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.ScannerUfvk;
 
   const onRead = async (scandata: string) => {
@@ -40,7 +43,8 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
         <Header
           title={translate('scanner.text') as string}
           screenName={screenName}

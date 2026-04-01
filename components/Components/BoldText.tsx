@@ -10,7 +10,12 @@ type BoldTextProps = {
   selectable?: boolean;
 };
 
-const BoldText: React.FunctionComponent<BoldTextProps> = ({ style, children, testID, selectable }) => {
+const BoldText: React.FunctionComponent<BoldTextProps> = ({
+  style,
+  children,
+  testID,
+  selectable,
+}) => {
   const { colors } = useTheme() as ThemeType;
   const totalStyle: TextStyle = {
     color: colors.text,

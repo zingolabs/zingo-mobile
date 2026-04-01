@@ -14,5 +14,4 @@ export default interface TxDetailType {
   amount: number;
   memos?: string[];
   poolType?: PoolEnum;
-   
 }

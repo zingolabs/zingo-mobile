@@ -18,7 +18,9 @@ describe('Renders wallet data correctly.', () => {
       .withTimeout(5000);
 
     await expect(element(by.id('send.memo-field'))).toBeVisible();
-    await element(by.id('send.memo-field')).replaceText('1\n2\n3\n4\n5\n6\n7\n8');
+    await element(by.id('send.memo-field')).replaceText(
+      '1\n2\n3\n4\n5\n6\n7\n8',
+    );
     await element(by.id('send.scroll-view')).scrollTo('bottom');
 
     await waitFor(element(by.id('send.button')))

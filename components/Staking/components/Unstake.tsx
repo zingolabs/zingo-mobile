@@ -1,10 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -21,10 +16,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import {
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
@@ -111,12 +103,13 @@ const Unstake: React.FC<UnstakeProps> = ({
   useEffect(() => {
     // looking for the voting power of the finalizer
     if (staked.filter(g => g.finalizer === finalizerFromText).length === 1) {
-      setStakedFromNumber(staked.filter(g => g.finalizer === finalizerFromText)[0].votingPower);
+      setStakedFromNumber(
+        staked.filter(g => g.finalizer === finalizerFromText)[0].votingPower,
+      );
     } else {
       setStakedFromNumber(0);
     }
   }, [finalizerFromText, staked]);
-
 
   const shortenTxid = (txid: string) => {
     if (txid.length <= 16) {
@@ -181,7 +174,9 @@ const Unstake: React.FC<UnstakeProps> = ({
         navigation.navigate(RouteEnum.ComputingError, {
           error: `Transaction outside of staking window :(. Try again later.`,
         });
-      } else if (JSON.stringify(error).toLowerCase().includes('staking action delay')) {
+      } else if (
+        JSON.stringify(error).toLowerCase().includes('staking action delay')
+      ) {
         navigation.navigate(RouteEnum.ComputingError, {
           error: `Transaction outside of staking window :(. Try again later.`,
         });

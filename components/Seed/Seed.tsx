@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext } from 'react';
-import { View, ScrollView, TouchableOpacity, TextInput, Platform } from 'react-native';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Platform,
+} from 'react-native';
 
 import { useNavigation, useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -25,8 +31,7 @@ import { BlurView } from '@react-native-community/blur';
 
 type SeedProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed>;
 
-const Seed: React.FunctionComponent<SeedProps> = ({
-}) => {
+const Seed: React.FunctionComponent<SeedProps> = ({}) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
@@ -154,7 +159,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               }}
             >
               {rows.map((row, rowIndex) => (
-                <View key={rowIndex} style={{ flexDirection: 'row', columnGap: 8 }}>
+                <View
+                  key={rowIndex}
+                  style={{ flexDirection: 'row', columnGap: 8 }}
+                >
                   {row.map((word, colIndex) => {
                     const index = rowIndex * 3 + colIndex;
                     return (
@@ -171,7 +179,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                           minWidth: '30%',
                           alignItems: 'center',
                           paddingHorizontal: 10,
-                          paddingVertical: Platform.OS === GlobalConst.platformOSandroid ? 0 : 5,
+                          paddingVertical:
+                            Platform.OS === GlobalConst.platformOSandroid
+                              ? 0
+                              : 5,
                           marginBottom: 5,
                         }}
                       >
@@ -185,8 +196,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                             fontSize: 15,
                             lineHeight: 15,
                             backgroundColor: 'transparent',
-                            marginTop: Platform.OS === GlobalConst.platformOSandroid ? 0 : 5,
-                            marginLeft: Platform.OS === GlobalConst.platformOSandroid ? 0 : 3,
+                            marginTop:
+                              Platform.OS === GlobalConst.platformOSandroid
+                                ? 0
+                                : 5,
+                            marginLeft:
+                              Platform.OS === GlobalConst.platformOSandroid
+                                ? 0
+                                : 3,
                           }}
                           value={word}
                           editable={false}
@@ -258,7 +275,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   </TouchableOpacity>
                 </View>
               )}
-
             </View>
           )}
 
@@ -269,9 +285,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 Clipboard.setString(seedPhrase);
                 if (addLastSnackbar) {
                   addLastSnackbar({
-                    message: translate(
-                      'seed.tapcopy-seed-message',
-                    ) as string,
+                    message: translate('seed.tapcopy-seed-message') as string,
                     duration: SnackbarDurationEnum.short,
                     screenName: [screenName],
                   });

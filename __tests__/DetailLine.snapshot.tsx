@@ -14,12 +14,20 @@ import { ScreenEnum } from '../app/AppState';
 describe('Component DetailLine - test', () => {
   //snapshot test
   test('DetailLine value - snapshot', () => {
-    const detail = render(<DetailLine label="label" value="value" screenName={ScreenEnum.About} />);
+    const detail = render(
+      <DetailLine label="label" value="value" screenName={ScreenEnum.About} />,
+    );
     expect(detail.toJSON()).toMatchSnapshot();
   });
   test('DetailLine children - snapshot', () => {
     const children = <RegText>{'Hello'}</RegText>;
-    const detail = render(<DetailLine label="label" children={children} screenName={ScreenEnum.About} />);
+    const detail = render(
+      <DetailLine
+        label="label"
+        children={children}
+        screenName={ScreenEnum.About}
+      />,
+    );
     expect(detail.toJSON()).toMatchSnapshot();
   });
 });

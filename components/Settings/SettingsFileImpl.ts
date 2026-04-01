@@ -14,7 +14,10 @@ export default class SettingsFileImpl {
   }
 
   // Write the server setting
-  static async writeSettings(name: SettingsNameEnum, value: string | boolean | ServerType | SecurityType) {
+  static async writeSettings(
+    name: SettingsNameEnum,
+    value: string | boolean | ServerType | SecurityType,
+  ) {
     const fileName = await this.getFileName();
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
@@ -25,7 +28,7 @@ export default class SettingsFileImpl {
       .then(() => {
         //console.log('FILE WRITTEN!')
       })
-      .catch((err) => {
+      .catch(err => {
         console.log('settings write file:', err.message);
       });
   }
@@ -37,18 +40,26 @@ export default class SettingsFileImpl {
       const fileExits: boolean = await RNFS.exists(fileName);
       if (!fileExits) {
         console.log('settings read file: The file does not exists');
-        const settings: SettingsFileClass = { firstInstall: true, version: null } as SettingsFileClass;
+        const settings: SettingsFileClass = {
+          firstInstall: true,
+          version: null,
+        } as SettingsFileClass;
         return settings;
       }
 
-      const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8)).toString());
-      
+      const settings: SettingsFileClass = await JSON.parse(
+        (await RNFS.readFile(fileName, GlobalConst.utf8)).toString(),
+      );
+
       return settings;
     } catch (err) {
       // The File doesn't exist, so return nothing
       // Here I know 100% it is a fresh install or the user cleaned the device staorage
       console.log('settings read file:', err);
-      const settings: SettingsFileClass = { firstInstall: true, version: null } as SettingsFileClass;
+      const settings: SettingsFileClass = {
+        firstInstall: true,
+        version: null,
+      } as SettingsFileClass;
       return settings;
     }
   }

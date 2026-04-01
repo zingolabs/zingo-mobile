@@ -33,8 +33,8 @@ export const MainTabs: React.FunctionComponent<MainTabsProps> = ({
       screenOptions={{
         tabBarActiveTintColor: colors.zingo,
       }}
-      tabBarStyle={{ 
-        backgroundColor: colors.background 
+      tabBarStyle={{
+        backgroundColor: colors.background,
       }}
     >
       <Tab.Screen
@@ -45,7 +45,7 @@ export const MainTabs: React.FunctionComponent<MainTabsProps> = ({
             Platform.select({
               ios: { sfSymbol: 'house' },
               android: require('../../../assets/icons/house.png'),
-          }),
+            }),
           tabBarActiveTintColor: colors.primary,
         }}
       >
@@ -70,7 +70,7 @@ export const MainTabs: React.FunctionComponent<MainTabsProps> = ({
             Platform.select({
               ios: { sfSymbol: 'square.stack.3d.up.fill' },
               android: require('../../../assets/icons/layers.png'),
-          }),
+            }),
           tabBarActiveTintColor: colors.primary,
         }}
       />

@@ -24,13 +24,15 @@ const Faucet: React.FunctionComponent<FaucetProps> = ({ navigation }) => {
         screenName={screenName}
       />
 
-      <HeaderTitle title='Faucet' goBack={() => {
-        clear();
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        }
-      }} />
-
+      <HeaderTitle
+        title="Faucet"
+        goBack={() => {
+          clear();
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
+      />
     </ToastProvider>
   );
 };

@@ -5,9 +5,13 @@ jest.mock('react-native', () => {
     getLatestBlockServerInfo: jest.fn(() => '{}'),
     getLatestBlockWalletInfo: jest.fn(() => '{}'),
     walletExists: jest.fn(() => 'false'),
-    getValueTransfersList: jest.fn(() => '{ "value_transfers": [], "total": 0 }'),
+    getValueTransfersList: jest.fn(
+      () => '{ "value_transfers": [], "total": 0 }',
+    ),
     setCryptoDefaultProvider: jest.fn(() => 'true'),
-    createNewWallet: jest.fn(() => '{ "seed": "seed phrase test", "birthday": 0 }'),
+    createNewWallet: jest.fn(
+      () => '{ "seed": "seed phrase test", "birthday": 0 }',
+    ),
     doSave: jest.fn(),
     pollSyncInfo: jest.fn(() => '{}'),
     runSyncProcess: jest.fn(() => '{}'),

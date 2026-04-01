@@ -229,7 +229,12 @@ const SettingsServers: React.FunctionComponent<SettingsServersProps> = ({
       >
         <LiquidPrimaryButton
           title={'Switch to different server'}
-          onPress={indexerServer.chainName === ChainNameEnum.testChainName ? changeServerTesnet : changeServerRegtest}          style={{
+          onPress={
+            indexerServer.chainName === ChainNameEnum.testChainName
+              ? changeServerTesnet
+              : changeServerRegtest
+          }
+          style={{
             alignSelf: 'stretch',
           }}
         />

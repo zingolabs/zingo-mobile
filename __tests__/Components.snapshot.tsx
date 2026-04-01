@@ -70,24 +70,38 @@ describe('Component Components - test', () => {
   });
 
   test('BoldText - snapshot', () => {
-    const boldText = render(<BoldText style={{ backgroundColor: 'red' }} children={'bold text'} />);
+    const boldText = render(
+      <BoldText style={{ backgroundColor: 'red' }} children={'bold text'} />,
+    );
     expect(boldText).toMatchSnapshot();
   });
 
   test('FadeText - snapshot', () => {
-    const fadeText = render(<FadeText style={{ backgroundColor: 'red' }} children={'fade text'} />);
+    const fadeText = render(
+      <FadeText style={{ backgroundColor: 'red' }} children={'fade text'} />,
+    );
     expect(fadeText).toMatchSnapshot();
   });
 
   test('ErrorText - snapshot', () => {
-    const errorText = render(<ErrorText style={{ backgroundColor: 'white' }} children={'error text'} />);
+    const errorText = render(
+      <ErrorText
+        style={{ backgroundColor: 'white' }}
+        children={'error text'}
+      />,
+    );
     expect(errorText).toMatchSnapshot();
   });
 
   test('RegText - snapshot', () => {
     const onPress = jest.fn();
     const regText = render(
-      <RegText style={{ backgroundColor: 'white' }} color={'red'} onPress={onPress} children={'reg text'} />,
+      <RegText
+        style={{ backgroundColor: 'white' }}
+        color={'red'}
+        onPress={onPress}
+        children={'reg text'}
+      />,
     );
     expect(regText).toMatchSnapshot();
   });

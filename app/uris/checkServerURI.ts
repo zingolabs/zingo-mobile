@@ -8,7 +8,10 @@ type checkServerURIReturn = {
   newChainName?: ChainNameEnum;
 };
 
-const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerURIReturn> => {
+const checkServerURI = async (
+  uri: string,
+  oldUri: string,
+): Promise<checkServerURIReturn> => {
   let newChainName: ChainNameEnum | undefined;
 
   try {
@@ -19,10 +22,16 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
       }, 30 * 1000);
     });
 
-    const resultStrServer: string = await Promise.race([resultStrServerPromise, timeoutServerPromise]);
+    const resultStrServer: string = await Promise.race([
+      resultStrServerPromise,
+      timeoutServerPromise,
+    ]);
     //console.log(resultStrServer);
 
-    if (resultStrServer && resultStrServer.toLowerCase().startsWith(GlobalConst.error)) {
+    if (
+      resultStrServer &&
+      resultStrServer.toLowerCase().startsWith(GlobalConst.error)
+    ) {
       // I have to restore the old server again. Just in case.
       //console.log('changeserver', resultStrServer);
       await RPCModule.changeServerProcess(oldUri);
@@ -39,7 +48,10 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
           }, 30 * 1000);
         });
 
-        const infoStr: string = await Promise.race([infoStrPromise, timeoutInfoPromise]);
+        const infoStr: string = await Promise.race([
+          infoStrPromise,
+          timeoutInfoPromise,
+        ]);
         //console.log(infoStr);
 
         if (infoStr && infoStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -69,10 +81,16 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
           }, 30 * 1000);
         });
 
-        const balanceStr: string = await Promise.race([balanceStrPromise, timeoutInfoPromise]);
+        const balanceStr: string = await Promise.race([
+          balanceStrPromise,
+          timeoutInfoPromise,
+        ]);
         //console.log(balanceStr);
 
-        if (balanceStr && balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
+        if (
+          balanceStr &&
+          balanceStr.toLowerCase().startsWith(GlobalConst.error)
+        ) {
           //console.log('info', infoStr);
           // I have to restore the old server again.
           await RPCModule.changeServerProcess(oldUri);

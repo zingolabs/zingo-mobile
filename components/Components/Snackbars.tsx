@@ -1,7 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { SnackbarDurationEnum, SnackbarType, ScreenEnum } from '../../app/AppState';
+import {
+  SnackbarDurationEnum,
+  SnackbarType,
+  ScreenEnum,
+} from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import { useTheme } from '@react-navigation/native';
 import { useToast } from 'react-native-toastier';
@@ -12,13 +16,19 @@ type SnackbarProps = {
   screenName: ScreenEnum;
 };
 
-const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFirstSnackbar, screenName }) => {
-  const { colors } = useTheme()  as ThemeType;
+const Snackbars: React.FunctionComponent<SnackbarProps> = ({
+  snackbars,
+  removeFirstSnackbar,
+  screenName,
+}) => {
+  const { colors } = useTheme() as ThemeType;
   const snacking = useRef<boolean>(false);
   const snackingMessage = useRef<string>(undefined);
   const [duration, setDuration] = useState<number>(4000);
   const toast = useToast();
-  const snackbarsFiltered = snackbars.filter((s: SnackbarType) => s.screenName.includes(screenName));
+  const snackbarsFiltered = snackbars.filter((s: SnackbarType) =>
+    s.screenName.includes(screenName),
+  );
 
   const handleSnackbarClose = useCallback(() => {
     if (snackbarsFiltered[0]?.message !== snackingMessage.current) {
@@ -47,22 +57,19 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
         currentSnackbar.duration === SnackbarDurationEnum.longer
           ? 8000
           : currentSnackbar.duration === SnackbarDurationEnum.short
-          ? 1000
-          : 4000,
+            ? 1000
+            : 4000,
       );
       //console.log('show snackbar', currentSnackbar);
       toast.show({
         message: currentSnackbar.message,
         animation: 'zoomIn',
         duration,
-        right: ((
-          <Pressable
-            onPress={() => toast.clear()}
-            style={{ padding: 10 }}
-          >
+        right: (
+          <Pressable onPress={() => toast.clear()} style={{ padding: 10 }}>
             <Text style={{ fontSize: 18 }}>✕</Text>
           </Pressable>
-        )),
+        ),
         textContainerStyle: {
           padding: 0,
           margin: 0,
@@ -108,7 +115,12 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       }, duration + 500);
       return () => clearTimeout(timer);
     }
-  }, [duration, handleSnackbarClose, snackbarsFiltered, snackbarsFiltered.length]);
+  }, [
+    duration,
+    handleSnackbarClose,
+    snackbarsFiltered,
+    snackbarsFiltered.length,
+  ]);
 
   useEffect(() => {
     //console.log('MOUNTING - snackbar');

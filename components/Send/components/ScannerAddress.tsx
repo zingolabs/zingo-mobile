@@ -13,34 +13,40 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { HeaderTitle } from '../../Header';
 
-type ScannerAddressProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ScannerAddress>;
+type ScannerAddressProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.ScannerAddress
+>;
 
-const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ 
+const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
   navigation,
   route,
- }) => {
-  const setAddress = !!route.params && route.params.setAddress !== undefined ? route.params.setAddress : () => {};
+}) => {
+  const setAddress =
+    !!route.params && route.params.setAddress !== undefined
+      ? route.params.setAddress
+      : () => {};
   const context = useContext(ContextAppLoaded);
   const { snackbars, removeFirstSnackbar } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.ScannerAddress;
 
   const goBackExecutedAlready = useRef<boolean>(false);
 
   const [active, setActive] = useState<boolean>(
-    !!route.params && route.params.active !== undefined ? route.params.active : false
+    !!route.params && route.params.active !== undefined
+      ? route.params.active
+      : false,
   );
 
   useEffect(() => {
-    const _active = 
-      !!route.params && route.params.active !== undefined ? route.params.active : false;
+    const _active =
+      !!route.params && route.params.active !== undefined
+        ? route.params.active
+        : false;
     setActive(_active);
-  }, [
-    route, 
-    route.params, 
-    route.params?.active
-  ]);
+  }, [route, route.params, route.params?.active]);
 
   const validateAddress = (scannedAddress: string) => {
     if (scannedAddress.toLowerCase().startsWith(GlobalConst.zcash)) {
@@ -83,17 +89,18 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
         screenName={screenName}
       />
 
-      <HeaderTitle title='Scan zcash address' goBack={() => onCloseScreen()} />
+      <HeaderTitle title="Scan zcash address" goBack={() => onCloseScreen()} />
 
       <View
         style={{
           flex: 1,
           backgroundColor: colors.background,
           marginTop: 15,
-        }}>
-        <Scanner 
+        }}
+      >
+        <Scanner
           active={active}
-          onRead={onRead} 
+          onRead={onRead}
           onClose={() => onCloseScreen()}
         />
       </View>

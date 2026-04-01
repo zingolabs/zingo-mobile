@@ -1,6 +1,13 @@
 import { useTheme } from '@react-navigation/native';
 import React from 'react';
-import { Pressable, Text, StyleSheet, Platform, TextStyle, ColorValue } from 'react-native';
+import {
+  Pressable,
+  Text,
+  StyleSheet,
+  Platform,
+  TextStyle,
+  ColorValue,
+} from 'react-native';
 import { ThemeType } from '../../../app/types';
 
 type NativePrimaryFallbackProps = {
