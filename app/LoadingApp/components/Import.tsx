@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   View,
-  ScrollView,
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
@@ -190,7 +189,12 @@ const Import: React.FunctionComponent<ImportProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <View style={{ marginTop: Platform.OS === GlobalConst.platformOSios ? insets.top : 0 }} />
+        <View
+          style={{
+            marginTop:
+              Platform.OS === GlobalConst.platformOSios ? insets.top : 0,
+          }}
+        />
         <HeaderTitle
           title="Import wallet"
           goBack={() => {
@@ -198,9 +202,8 @@ const Import: React.FunctionComponent<ImportProps> = ({
             onClickCancel();
           }}
         />
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
+        <View
+          style={{
             flexGrow: 1,
             paddingBottom: insets.bottom + 8,
             paddingHorizontal: 10,
@@ -290,7 +293,10 @@ const Import: React.FunctionComponent<ImportProps> = ({
             {rows.length > 0 && (
               <View style={{ marginTop: 10 }}>
                 {rows.map((row, rowIndex) => (
-                  <View key={rowIndex} style={{ flexDirection: 'row', columnGap: 8 }}>
+                  <View
+                    key={rowIndex}
+                    style={{ flexDirection: 'row', columnGap: 8 }}
+                  >
                     {row.map((word, colIndex) => {
                       const index = rowIndex * 3 + colIndex;
                       return (
@@ -307,7 +313,10 @@ const Import: React.FunctionComponent<ImportProps> = ({
                             minWidth: '30%',
                             alignItems: 'center',
                             paddingHorizontal: 10,
-                            paddingVertical: Platform.OS === GlobalConst.platformOSandroid ? 0 : 5,
+                            paddingVertical:
+                              Platform.OS === GlobalConst.platformOSandroid
+                                ? 0
+                                : 5,
                             marginBottom: 5,
                           }}
                         >
@@ -324,8 +333,14 @@ const Import: React.FunctionComponent<ImportProps> = ({
                               fontSize: 15,
                               lineHeight: 15,
                               backgroundColor: 'transparent',
-                              marginTop: Platform.OS === GlobalConst.platformOSandroid ? 0 : 5,
-                              marginLeft: Platform.OS === GlobalConst.platformOSandroid ? 0 : 3,
+                              marginTop:
+                                Platform.OS === GlobalConst.platformOSandroid
+                                  ? 0
+                                  : 5,
+                              marginLeft:
+                                Platform.OS === GlobalConst.platformOSandroid
+                                  ? 0
+                                  : 3,
                             }}
                             value={word}
                             onChangeText={txt => handleWordChange(index, txt)}
@@ -450,7 +465,7 @@ const Import: React.FunctionComponent<ImportProps> = ({
               )}
             </View>
           </View>
-        </ScrollView>
+        </View>
         <View
           style={{
             marginTop: 'auto',
