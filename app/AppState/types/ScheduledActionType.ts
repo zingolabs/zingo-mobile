@@ -5,5 +5,6 @@ export default interface ScheduledActionType {
   kind: StakingActionKindEnum;
   amount: number;
   finalizer: string;
-  finalizerNew: string;
+  finalizerTo: string;
+  txid: string;
 }

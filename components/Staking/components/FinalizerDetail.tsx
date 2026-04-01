@@ -28,13 +28,11 @@ type FinalizerDetailProps = {
   item: DataType | null;
   closeSheet: () => void;
   setHeightLayout: (h: number) => void;
-  stakingDay: boolean;
 };
 const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
   item,
   closeSheet,
   setHeightLayout,
-  stakingDay,
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
@@ -119,7 +117,6 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
                   finalizer: item?.finalizer,
                   staked: item?.value,
                   closeSheet: closeSheet,
-                  stakingDay,
                 });
               }}
             />
@@ -133,7 +130,6 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
                   finalizer: item?.finalizer,
                   staked: item?.value,
                   closeSheet: closeSheet,
-                  stakingDay,
                 });
               }}
             />

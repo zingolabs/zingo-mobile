@@ -8,6 +8,7 @@
     "start": "react-native start",
     "test": "jest --verbose",
     "lint": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
+    "prettier": "yarn prettier './**/*.{js,jsx,ts,tsx}' -w",
     "coverage": "jest --coverage",
     "postinstall": "patch-package",
     "build:bundle": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && rimraf --glob android/app/src/main/res/drawable* && cd android && ./gradlew assembleRelease -PsplitApk=true && cd ..",

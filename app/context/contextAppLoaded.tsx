@@ -79,6 +79,12 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
   requestFaucetFunds: async () => '',
+  stakingDay: false,
+  timeToStakingDay: 0,
+  timeLeftStakingDay: 0,
+  scheduledActions: [],
+  setScheduledActions: () => {},
+ 
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

@@ -23,6 +23,7 @@ import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import StakeType from './types/StakeType';
 import WalletBondsType from './types/WalletBondsType';
+import ScheduledActionType from './types/ScheduledActionType';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -115,6 +116,15 @@ export default interface AppContextLoaded {
   // Change the privacy everywhere
   setPrivacyOption: (value: boolean) => Promise<void>;
   requestFaucetFunds: (address: string) => Promise<string>;
+
+  // staking day info
+  stakingDay: boolean;
+  timeToStakingDay: number;
+  timeLeftStakingDay: number;
+
+  // scheduled Actions
+  scheduledActions: ScheduledActionType[];
+  setScheduledActions: (list: ScheduledActionType[]) => void;
 
   // settings
   indexerServer: ServerType;

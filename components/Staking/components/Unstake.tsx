@@ -67,10 +67,6 @@ const Unstake: React.FC<UnstakeProps> = ({
     !!route.params && route.params.closeSheet !== undefined
       ? route.params.closeSheet
       : () => {};
-  const stakingDay =
-    !!route.params && route.params.stakingDay !== undefined
-      ? route.params.stakingDay
-      : false;
 
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
@@ -86,7 +82,7 @@ const Unstake: React.FC<UnstakeProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { walletBonds, valueTransfers, staked, info, privacy } = context;
+  const { walletBonds, valueTransfers, staked, info, privacy, stakingDay, setScheduledActions } = context;
 
   console.log('FINALIZER', finalizerFromText);
 
@@ -164,7 +160,7 @@ const Unstake: React.FC<UnstakeProps> = ({
 
     setModalState('sending');
 
-    const stakingScheduledAction = {
+    const stakingScheduledAction: ScheduledActionType = {
       id: 0,
       kind: selectedKind === 
         WalletBondsStatusEnum.Active 
@@ -172,21 +168,24 @@ const Unstake: React.FC<UnstakeProps> = ({
           : StakingActionKindEnum.WithdrawBond,
       amount: (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount || 0) * 10 ** 8,
       finalizer: finalizerFromText,
-      finalizerNew: '',
-    } as ScheduledActionType;
+      finalizerTo: '',
+      txid: bondTxid,
+    };
       
     try {
       if (selectedKind === WalletBondsStatusEnum.Active) {
         if (stakingDay) {
           await beginUnstakeTransaction(bondTxid);
         } else {
-          await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+          const list = await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+          setScheduledActions(list);
         }
       } else if (selectedKind === WalletBondsStatusEnum.Unbonding) {
         if (stakingDay) {
           await withdrawBondTransaction(selectedBond.txid);
         } else {
-          await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+          const list = await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+          setScheduledActions(list);
         }
       } else {
         Alert.alert(

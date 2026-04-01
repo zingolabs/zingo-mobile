@@ -64,17 +64,11 @@ type AddStakeScreenProps = DrawerScreenProps<
 
 const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   stakeTransaction,
-  route,
 }) => {
-  const stakingDay =
-    !!route.params && route.params.stakingDay !== undefined
-      ? route.params.stakingDay
-      : false;
-
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
-  const { totalBalance, info, privacy, globalStaked } = useContext(ContextAppLoaded);
+  const { totalBalance, info, privacy, globalStaked, stakingDay, setScheduledActions } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -163,13 +157,14 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
 
     setModalState('sending');
 
-    const stakingScheduledAction = {
+    const stakingScheduledAction: ScheduledActionType = {
       id: 0,
       kind: StakingActionKindEnum.CreateBond,
       amount: amount * 10 ** 8,
       finalizer: finalizer,
-      finalizerNew: '',
-    } as ScheduledActionType;
+      finalizerTo: '',
+      txid: '',
+    };
 
     const stakingAction: StakingActionType = {
       kind: StakingActionKindEnum.CreateBond,
@@ -182,7 +177,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       if (stakingDay) {
         await stakeTransaction(sendPageState, stakingAction);
       } else {
-        await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+        const list = await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+        setScheduledActions(list);
       }
       setModalState('success');
     } catch (error: any) {

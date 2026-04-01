@@ -122,21 +122,18 @@ export type FinalizersNavigationState = {
 };
 
 export type StakeNavigationState = {
-  stakingDay: boolean;
 };
 
 export type UnstakeNavigationState = {
   finalizer: string;
   staked: number;
   closeSheet: () => void;
-  stakingDay: boolean;
 };
 
 export type RedelegateNavigationState = {
   finalizer: string;
   staked: number;
   closeSheet: () => void;
-  stakingDay: boolean;
 };
 
 export type ConfirmNavigationState = {

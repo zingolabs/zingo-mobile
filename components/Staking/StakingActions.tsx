@@ -6,11 +6,9 @@ import { useNavigation } from '@react-navigation/native';
 import { RouteEnum } from '../../app/AppState';
 
 type StakingActionsProps = {
-  stakingDay: boolean;
 };
 
 const StakingActions: React.FC<StakingActionsProps> = (
-  stakingDay,
 ) => {
   const navigation: any = useNavigation();
 
@@ -28,9 +26,7 @@ const StakingActions: React.FC<StakingActionsProps> = (
     >
       <>
         <Pressable
-          onPress={() => navigation.navigate(RouteEnum.Stake, {
-            stakingDay,
-          })}
+          onPress={() => navigation.navigate(RouteEnum.Stake)}
           style={{
             backgroundColor: '#1C78D24D',
             paddingVertical: 14,
@@ -47,7 +43,6 @@ const StakingActions: React.FC<StakingActionsProps> = (
             navigation.navigate(RouteEnum.Unstake, {
               finalizer: undefined,
               staked: undefined,
-              stakingDay,
             })
           }
           style={{

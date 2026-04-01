@@ -2,7 +2,6 @@
 import React, {
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -63,7 +62,6 @@ import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
 import { Layers3Icon } from 'lucide-react-native';
 import { SpinningLoaderIcon } from '../Components/Icons/SpinningLoaderIcon';
 import ZecAmount from '../Components/ZecAmount';
-import ScheduledActionsFileImpl from '../ScheduledActions/ScheduledActionsFileImpl';
 
 type DataType = {
   svg: {
@@ -119,14 +117,15 @@ function Separator() {
   );
 }
 
-type StakingProps = DrawerScreenProps<
+type StakingProps = DrawerScreenProps< 
   AppDrawerParamList,
   RouteEnum.StakingHome
 >;
 
-const Staking: React.FC<StakingProps> = () => {
+const Staking: React.FC<StakingProps> = ({
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers, snackbars, removeFirstSnackbar, staked, info, privacy } =
+  const { valueTransfers, snackbars, removeFirstSnackbar, staked, info, privacy, stakingDay, timeToStakingDay, timeLeftStakingDay, scheduledActions } =
     context;
 
   const screenName = ScreenEnum.StakingHome;
@@ -134,14 +133,10 @@ const Staking: React.FC<StakingProps> = () => {
   const [loading] = useState(false);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [tab, setTab] = useState<'movements' | 'staked'>('movements');
-  const [stakingDay, setStakingDay] = useState<boolean>(true);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const [heightLayout, setHeightLayout] = useState<number>(10);
   const [currentItem, setCurrentItem] = useState<DataType | null>(null);
-
-  const [timeToStakingDay, setTimeToStakingDay] = useState<number>(0);
-  const [timeLeftStakingDay, setTimeLeftStakingDay] = useState<number>(0);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -186,24 +181,6 @@ const Staking: React.FC<StakingProps> = () => {
     />
   );
 
-  useEffect(() => {
-    const latest = info.latestBlock ?? 0;
-
-    const cycle = 150;
-    const activeWindow = 70;
-
-    const mod = latest % cycle;
-    const isStakingDay = mod < activeWindow;
-
-    setStakingDay(isStakingDay);
-
-    const remaining = isStakingDay ? 0 : cycle - mod;
-    setTimeToStakingDay(remaining);
-
-    const left = isStakingDay ? activeWindow - mod : 0;
-    setTimeLeftStakingDay(left);
-  }, [info.latestBlock]);
-
   const movements: StakingMovement[] = useMemo(() => {
     if (!valueTransfers) {
       return [];
@@ -239,10 +216,6 @@ const Staking: React.FC<StakingProps> = () => {
       .sort((a, b) => b.time - a.time);
   }, [valueTransfers]);
 
-  const scheduledActionsList: Promise<ScheduledActionType[]> = useMemo(async () => {
-    return await ScheduledActionsFileImpl.listSA();
-  }, []);
-
   const stakedData: DataType[] = useMemo(() => {
     const resultJSON: StakeType[] = staked;
     // const randomColors = Utils.generateColorList(resultJSON.length + 10);
@@ -267,8 +240,9 @@ const Staking: React.FC<StakingProps> = () => {
 
   const { colors } = useTheme() as ThemeType;
 
-  const hasMovements = !loading && movements.length > 0;
-  const hasStaked = !loading && stakedData.length > 0;
+  const hasMovements = movements.length > 0;
+  const hasStaked = stakedData.length > 0;
+  const hasScheduledActions = scheduledActions.length > 0;
 
   const monthHeader = hasMovements
     ? formatHeaderMonth(movements[0].time)
@@ -411,9 +385,9 @@ const Staking: React.FC<StakingProps> = () => {
     );
   };
 
-  (async () => {
-    console.log('scheduled actions', await scheduledActionsList); 
-  })();
+  console.log('scheduled actions', scheduledActions); 
+
+  console.log('render staking', stakingDay, timeToStakingDay, timeLeftStakingDay);
 
   return (
     <ToastProvider>
@@ -508,7 +482,7 @@ const Staking: React.FC<StakingProps> = () => {
         >
           <WalletSummaryHeader show_staked={true} />
 
-          <StakingActions stakingDay={stakingDay} />
+          <StakingActions />
         </View>
 
         <View
@@ -637,12 +611,146 @@ const Staking: React.FC<StakingProps> = () => {
               </View>
             )}
 
+            {!loading && hasScheduledActions && tab === 'movements' && (
+              <FlatList
+                onScroll={handleScroll}
+                data={scheduledActions}
+                keyExtractor={item => `scheduledActions-${item.id}`}
+                contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
+                ItemSeparatorComponent={Separator}
+                ListHeaderComponent={
+                  <View
+                    style={{
+                      borderTopLeftRadius: 25,
+                      borderTopRightRadius: 25,
+                      paddingVertical: 10,
+                      paddingHorizontal: 25,
+                      backgroundColor: '#78788029',
+                    }}
+                  >
+                    {monthHeader && (
+                      <Text
+                        style={{
+                          color: colors.placeholder,
+                          fontSize: 12,
+                        }}
+                      >
+                        {monthHeader}
+                      </Text>
+                    )}
+                  </View>
+                }
+                ListFooterComponent={
+                  <View
+                    style={{
+                      height:
+                        Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+                    }}
+                  />
+                }
+                renderItem={({ item }: { item: ScheduledActionType }) => {
+                  let label: string = '';
+                  let Icon: React.ComponentType<{
+                    width: number;
+                    height: number;
+                  }> | null = null;
+
+                  switch (item.kind) {
+                    case StakingActionKindEnum.CreateBond: {
+                      label = 'Stake';
+                      Icon = Stake;
+                      break;
+                    }
+
+                    case StakingActionKindEnum.BeginUnbonding: {
+                      label = 'Unstake';
+                      Icon = Unstake;
+                      break;
+                    }
+
+                    case StakingActionKindEnum.WithdrawBond: {
+                      label = 'Withdraw';
+                      Icon = Unstake;
+                      break;
+                    }
+
+                    case StakingActionKindEnum.Move: {
+                      label = 'Redelegate';
+                      Icon = Unstake;
+                      break;
+                    }
+                  }
+
+                  return (
+                    <View
+                      style={{
+                        backgroundColor: colors.secondary,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingVertical: 10,
+                        paddingHorizontal: 10,
+                      }}
+                    >
+                      <View
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                      >
+                        {Icon && <Icon width={20} height={20} />}
+
+                        <View>
+                          <Text
+                            style={{
+                              color: colors.text,
+                              fontWeight: '500',
+                              fontSize: 14,
+                              marginBottom: 2,
+                              marginLeft: 5,
+                            }}
+                          >
+                            {label}
+                          </Text>
+                          <Text
+                            style={{
+                              color: colors.placeholder,
+                              fontSize: 12,
+                              marginLeft: 5,
+                            }}
+                          >
+                            {item.finalizer}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <ZecAmount
+                        style={{
+                          flexGrow: 1,
+                          alignSelf: 'auto',
+                          justifyContent: 'flex-end',
+                        }}
+                        size={14}
+                        currencyName={info.currencyName}
+                        color={colors.text}
+                        amtZec={item.amount}
+                        privacy={privacy}
+                        prefix= {item.kind === StakingActionKindEnum.CreateBond 
+                          ? '+' 
+                          : item.kind === StakingActionKindEnum.WithdrawBond 
+                            ? '-' 
+                            : undefined}
+                      />
+
+                    </View>
+                  );
+                }}
+              />
+            )}
+
             {!loading && hasMovements && tab === 'movements' && (
               <FlatList
                 ref={scrollViewRef}
                 onScroll={handleScroll}
                 data={movements}
-                keyExtractor={item => item.txid}
+                keyExtractor={item => `movements-${item.txid}`}
                 contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
                 ItemSeparatorComponent={Separator}
                 ListHeaderComponent={
@@ -866,7 +974,6 @@ const Staking: React.FC<StakingProps> = () => {
                 item={currentItem}
                 closeSheet={hide}
                 setHeightLayout={setHeightLayout}
-                stakingDay={stakingDay}
               />
               <View
                 style={{
