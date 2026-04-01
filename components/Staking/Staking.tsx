@@ -132,7 +132,7 @@ const Staking: React.FC<StakingProps> = ({
 
   const [loading] = useState(false);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
-  const [tab, setTab] = useState<'movements' | 'staked'>('movements');
+  const [tab, setTab] = useState<'scheduled' | 'active' | 'my'>('active');
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const [heightLayout, setHeightLayout] = useState<number>(10);
@@ -146,7 +146,7 @@ const Staking: React.FC<StakingProps> = ({
     height: Dimensions.get('window').height,
   };
 
-  const scrollViewRef = useRef<ScrollView & FlatList<StakingMovement>>(null);
+  const scrollViewRef = useRef<ScrollView & FlatList<StakingMovement & ScheduledActionType>>(null);
 
   const snapPoints = useMemo(() => {
     let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
@@ -504,20 +504,20 @@ const Staking: React.FC<StakingProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 20,
-              backgroundColor: tab === 'movements' ? '#6C6C71' : 'transparent',
+              backgroundColor: tab === 'scheduled' ? '#6C6C71' : 'transparent',
               padding: 5,
               overflow: 'hidden',
             }}
           >
-            <TouchableOpacity onPress={() => setTab('movements')}>
+            <TouchableOpacity onPress={() => setTab('scheduled')}>
               <RegText
                 style={{
-                  fontWeight: tab === 'movements' ? 'bold' : 'normal',
+                  fontWeight: tab === 'scheduled' ? 'bold' : 'normal',
                   fontSize: 15,
                   color: colors.text,
                 }}
               >
-                {'Movements'}
+                {'Scheduled'}
               </RegText>
             </TouchableOpacity>
           </View>
@@ -528,20 +528,44 @@ const Staking: React.FC<StakingProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 20,
-              backgroundColor: tab === 'staked' ? '#6C6C71' : 'transparent',
+              backgroundColor: tab === 'active' ? '#6C6C71' : 'transparent',
               padding: 5,
               overflow: 'hidden',
             }}
           >
-            <TouchableOpacity onPress={() => setTab('staked')}>
+            <TouchableOpacity onPress={() => setTab('active')}>
               <RegText
                 style={{
-                  fontWeight: tab === 'staked' ? 'bold' : 'normal',
+                  fontWeight: tab === 'active' ? 'bold' : 'normal',
                   fontSize: 15,
                   color: colors.text,
                 }}
               >
-                {'Staked'}
+                {'Active Stake'}
+              </RegText>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+              backgroundColor: tab === 'my' ? '#6C6C71' : 'transparent',
+              padding: 5,
+              overflow: 'hidden',
+            }}
+          >
+            <TouchableOpacity onPress={() => setTab('my')}>
+              <RegText
+                style={{
+                  fontWeight: tab === 'my' ? 'bold' : 'normal',
+                  fontSize: 15,
+                  color: colors.text,
+                }}
+              >
+                {'My Finalizers'}
               </RegText>
             </TouchableOpacity>
           </View>
@@ -565,7 +589,7 @@ const Staking: React.FC<StakingProps> = ({
               </View>
             )}
 
-            {!loading && !hasMovements && tab === 'movements' && (
+            {!loading && !hasScheduledActions && tab === 'scheduled' && (
               <View style={styles.centerContent}>
                 <View
                   style={{
@@ -583,12 +607,12 @@ const Staking: React.FC<StakingProps> = ({
                     fontSize: 14,
                   }}
                 >
-                  There are no movements yet.
+                  There are no scheduled actions yet.
                 </Text>
               </View>
             )}
 
-            {!loading && !hasStaked && tab === 'staked' && (
+            {!loading && !hasMovements && tab === 'active' && (
               <View style={styles.centerContent}>
                 <View
                   style={{
@@ -606,13 +630,37 @@ const Staking: React.FC<StakingProps> = ({
                     fontSize: 14,
                   }}
                 >
-                  There are no finalizers yet.
+                  There are no active stake yet.
                 </Text>
               </View>
             )}
 
-            {!loading && hasScheduledActions && tab === 'movements' && (
+            {!loading && !hasStaked && tab === 'my' && (
+              <View style={styles.centerContent}>
+                <View
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    borderWidth: 2,
+                    borderStyle: 'dashed',
+                    borderColor: colors.placeholder,
+                  }}
+                />
+                <Text
+                  style={{
+                    color: colors.placeholder,
+                    fontSize: 14,
+                  }}
+                >
+                  There are no active finalizers yet.
+                </Text>
+              </View>
+            )}
+
+            {!loading && hasScheduledActions && tab === 'scheduled' && (
               <FlatList
+                ref={scrollViewRef}
                 onScroll={handleScroll}
                 data={scheduledActions}
                 keyExtractor={item => `scheduledActions-${item.id}`}
@@ -628,16 +676,14 @@ const Staking: React.FC<StakingProps> = ({
                       backgroundColor: '#78788029',
                     }}
                   >
-                    {monthHeader && (
-                      <Text
-                        style={{
-                          color: colors.placeholder,
-                          fontSize: 12,
-                        }}
-                      >
-                        {monthHeader}
-                      </Text>
-                    )}
+                    <Text
+                      style={{
+                        color: colors.placeholder,
+                        fontSize: 12,
+                      }}
+                    >
+                      {'Scheduled'}
+                    </Text>
                   </View>
                 }
                 ListFooterComponent={
@@ -745,7 +791,7 @@ const Staking: React.FC<StakingProps> = ({
               />
             )}
 
-            {!loading && hasMovements && tab === 'movements' && (
+            {!loading && hasMovements && tab === 'active' && (
               <FlatList
                 ref={scrollViewRef}
                 onScroll={handleScroll}
@@ -880,7 +926,7 @@ const Staking: React.FC<StakingProps> = ({
               />
             )}
 
-            {!loading && hasStaked && tab === 'staked' && (
+            {!loading && hasStaked && tab === 'my' && (
               <>
                 <ScrollView
                   ref={scrollViewRef}
@@ -968,7 +1014,7 @@ const Staking: React.FC<StakingProps> = ({
             borderTopRightRadius: 38,
           }}
         >
-          {tab === 'staked' && currentItem && (
+          {tab === 'my' && currentItem && (
             <>
               <FinalizerDetail
                 item={currentItem}
