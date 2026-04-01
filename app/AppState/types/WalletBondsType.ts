@@ -1,4 +1,4 @@
-import { WalletBondsStatusEnum } from "../enums/WalletBondsStatusEnum";
+import { WalletBondsStatusEnum } from '../enums/WalletBondsStatusEnum';
 
 export default interface WalletBondsType {
   txid: string;

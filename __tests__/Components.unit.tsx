@@ -19,39 +19,84 @@ describe('Component Components - test', () => {
   // CurrencyAmount tests
   test('CurrencyAmount - High Privacy - should display privacy placeholder', () => {
     render(
-      <CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USDCurrency} privacy={true} />,
+      <CurrencyAmount
+        price={2.9826}
+        amtZec={1.00098}
+        style={{}}
+        currency={CurrencyEnum.USDCurrency}
+        privacy={true}
+      />,
     );
     expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
   test('CurrencyAmount - price undefined should display placeholder', () => {
-    render(<CurrencyAmount amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />);
+    render(
+      <CurrencyAmount
+        amtZec={1}
+        style={{}}
+        currency={CurrencyEnum.USDCurrency}
+      />,
+    );
     expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
   test('CurrencyAmount - price 0 should display placeholder', () => {
-    render(<CurrencyAmount price={0} amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />);
+    render(
+      <CurrencyAmount
+        price={0}
+        amtZec={1}
+        style={{}}
+        currency={CurrencyEnum.USDCurrency}
+      />,
+    );
     expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
   test('CurrencyAmount - amtZec undefined should display placeholder', () => {
-    render(<CurrencyAmount price={1} style={{}} currency={CurrencyEnum.USDCurrency} />);
+    render(
+      <CurrencyAmount
+        price={1}
+        style={{}}
+        currency={CurrencyEnum.USDCurrency}
+      />,
+    );
     expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
   test('CurrencyAmount - very small amount should display < 0.01', () => {
-    render(<CurrencyAmount price={0.001} amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />);
+    render(
+      <CurrencyAmount
+        price={0.001}
+        amtZec={1}
+        style={{}}
+        currency={CurrencyEnum.USDCurrency}
+      />,
+    );
     expect(screen.getByText('$ < 0.01')).toBeTruthy();
   });
 
   test('CurrencyAmount - valid amount should display calculated value', () => {
-    render(<CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USDCurrency} />);
+    render(
+      <CurrencyAmount
+        price={2.9826}
+        amtZec={1.00098}
+        style={{}}
+        currency={CurrencyEnum.USDCurrency}
+      />,
+    );
     expect(screen.getByText('$ 2.99')).toBeTruthy();
   });
 
   // ZecAmount tests
   test('ZecAmount - High Privacy should display privacy placeholder', () => {
-    render(<ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} privacy={true} />);
+    render(
+      <ZecAmount
+        amtZec={-1.123456789}
+        currencyName={CurrencyNameEnum.ZEC}
+        privacy={true}
+      />,
+    );
     expect(screen.getByText('-.-----')).toBeTruthy();
   });
 
@@ -66,12 +111,16 @@ describe('Component Components - test', () => {
   });
 
   test('ZecAmount - negative amount should display formatted value', () => {
-    render(<ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} />);
+    render(
+      <ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} />,
+    );
     expect(screen.getByText('-1.12346')).toBeTruthy();
   });
 
   test('ZecAmount - positive amount should display formatted value', () => {
-    render(<ZecAmount amtZec={1.123456781} currencyName={CurrencyNameEnum.ZEC} />);
+    render(
+      <ZecAmount amtZec={1.123456781} currencyName={CurrencyNameEnum.ZEC} />,
+    );
     expect(screen.getByText('1.12346')).toBeTruthy();
   });
 
@@ -103,37 +152,55 @@ describe('Component Components - test', () => {
 
   // Style prop tests
   test('BoldText - should accept style props', () => {
-    const { getByText } = render(<BoldText style={{ backgroundColor: 'red' }}>Bold Text</BoldText>);
+    const { getByText } = render(
+      <BoldText style={{ backgroundColor: 'red' }}>Bold Text</BoldText>,
+    );
     const element = getByText('Bold Text');
     expect(element).toBeTruthy();
-    expect(element.props.style).toEqual(expect.objectContaining({ backgroundColor: 'red' }));
+    expect(element.props.style).toEqual(
+      expect.objectContaining({ backgroundColor: 'red' }),
+    );
   });
 
   test('FadeText - should accept style props', () => {
-    const { getByText } = render(<FadeText style={{ backgroundColor: 'red' }}>Fade Text</FadeText>);
+    const { getByText } = render(
+      <FadeText style={{ backgroundColor: 'red' }}>Fade Text</FadeText>,
+    );
     const element = getByText('Fade Text');
     expect(element).toBeTruthy();
-    expect(element.props.style).toEqual(expect.objectContaining({ backgroundColor: 'red' }));
+    expect(element.props.style).toEqual(
+      expect.objectContaining({ backgroundColor: 'red' }),
+    );
   });
 
   test('ErrorText - should accept style props', () => {
-    const { getByText } = render(<ErrorText style={{ backgroundColor: 'red' }}>Error Text</ErrorText>);
+    const { getByText } = render(
+      <ErrorText style={{ backgroundColor: 'red' }}>Error Text</ErrorText>,
+    );
     const element = getByText('Error Text');
     expect(element).toBeTruthy();
-    expect(element.props.style).toEqual(expect.objectContaining({ backgroundColor: 'red' }));
+    expect(element.props.style).toEqual(
+      expect.objectContaining({ backgroundColor: 'red' }),
+    );
   });
 
   test('RegText - should accept style props', () => {
-    const { getByText } = render(<RegText style={{ backgroundColor: 'red' }}>Reg Text</RegText>);
+    const { getByText } = render(
+      <RegText style={{ backgroundColor: 'red' }}>Reg Text</RegText>,
+    );
     const element = getByText('Reg Text');
     expect(element).toBeTruthy();
-    expect(element.props.style).toEqual(expect.objectContaining({ backgroundColor: 'red' }));
+    expect(element.props.style).toEqual(
+      expect.objectContaining({ backgroundColor: 'red' }),
+    );
   });
 
   test('RegText - should accept color prop', () => {
     const { getByText } = render(<RegText color={'red'}>Reg Text</RegText>);
     const element = getByText('Reg Text');
     expect(element).toBeTruthy();
-    expect(element.props.style).toEqual(expect.objectContaining({ color: 'red' }));
+    expect(element.props.style).toEqual(
+      expect.objectContaining({ color: 'red' }),
+    );
   });
 });

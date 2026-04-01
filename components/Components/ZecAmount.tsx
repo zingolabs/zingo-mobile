@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import { Text, View, Platform, TextStyle, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  View,
+  Platform,
+  TextStyle,
+  TouchableOpacity,
+} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 
@@ -34,7 +40,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
 }) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { decimalSeparator } = getNumberFormatSettings();
 
   useEffect(() => {
@@ -81,7 +87,8 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
             alignItems: 'baseline',
             margin: 0,
             padding: 0,
-          }}>
+          }}
+        >
           {privacyHigh ? (
             <Text
               style={{
@@ -90,7 +97,8 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 color,
                 margin: 0,
                 padding: 0,
-              }}>
+              }}
+            >
               {' -' + decimalSeparator + '-----'}
             </Text>
           ) : (
@@ -102,7 +110,8 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 color,
                 margin: 0,
                 padding: 0,
-              }}>
+              }}
+            >
               {`${prefix ? prefix : ''}${splits.bigPart}`}
             </Text>
           )}
@@ -126,7 +135,8 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 color,
                 margin: 0,
                 padding: 0,
-              }}>
+              }}
+            >
               {' ' + (currencyName ? currencyName : '---')}
             </Text>
           )}

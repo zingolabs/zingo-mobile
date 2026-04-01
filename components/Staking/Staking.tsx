@@ -125,8 +125,18 @@ type StakingProps = DrawerScreenProps<
 const Staking: React.FC<StakingProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers, snackbars, removeFirstSnackbar, staked, info, privacy, stakingDay, timeToStakingDay, timeLeftStakingDay, scheduledActions } =
-    context;
+  const {
+    valueTransfers,
+    snackbars,
+    removeFirstSnackbar,
+    staked,
+    info,
+    privacy,
+    stakingDay,
+    timeToStakingDay,
+    timeLeftStakingDay,
+    scheduledActions,
+  } = context;
 
   const screenName = ScreenEnum.StakingHome;
 
@@ -455,9 +465,7 @@ const Staking: React.FC<StakingProps> = ({
               <View>
                 {stakingDay ? (
                   <>
-                    <RegText>
-                      Staking day
-                    </RegText>
+                    <RegText>Staking day</RegText>
                     <RegText style={{ fontSize: 14 }}>
                       Closing in {String(timeLeftStakingDay)} blocks
                     </RegText>
@@ -913,13 +921,14 @@ const Staking: React.FC<StakingProps> = ({
                         color={colors.text}
                         amtZec={item.amount}
                         privacy={privacy}
-                        prefix= {item.kind === ValueTransferKindEnum.CreateBond 
-                          ? '+' 
-                          : item.kind === ValueTransferKindEnum.WithdrawBond 
-                            ? '-' 
-                            : undefined}
+                        prefix={
+                          item.kind === ValueTransferKindEnum.CreateBond
+                            ? '+'
+                            : item.kind === ValueTransferKindEnum.WithdrawBond
+                              ? '-'
+                              : undefined
+                        }
                       />
-
                     </View>
                   );
                 }}

@@ -15,11 +15,10 @@ import { HeaderTitle } from '../Header';
 
 type AboutProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.About>;
 
-const About: React.FunctionComponent<AboutProps> = ({
-  navigation,
-}) => {
+const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
-  const { zingolibVersion, translate, snackbars, removeFirstSnackbar } = context;
+  const { zingolibVersion, translate, snackbars, removeFirstSnackbar } =
+    context;
   const { clear } = useToast();
   const screenName = ScreenEnum.About;
 
@@ -39,12 +38,15 @@ const About: React.FunctionComponent<AboutProps> = ({
         screenName={screenName}
       />
 
-      <HeaderTitle title='About' goBack={() => {
-        clear();
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        }
-      }} />
+      <HeaderTitle
+        title="About"
+        goBack={() => {
+          clear();
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
+      />
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
@@ -53,20 +55,32 @@ const About: React.FunctionComponent<AboutProps> = ({
           paddingTop: insets.top + 8,
           paddingBottom: insets.bottom + 8,
           paddingHorizontal: 16,
-      }}>
+        }}
+      >
         <View
           style={{
             flexGrow: 1,
             alignItems: 'flex-start',
             justifyContent: 'center',
-        }}>
+          }}
+        >
           <FadeText style={{ marginTop: 20 }}>{arrayTxt[0]}</FadeText>
-          <DetailLine label={'Zingo Delegator Version'} value={translate('version') as string} screenName={screenName} />
-          <DetailLine label={translate('info.zingolib') as string} value={zingolibVersion} screenName={screenName} />
+          <DetailLine
+            label={'Zingo Delegator Version'}
+            value={translate('version') as string}
+            screenName={screenName}
+          />
+          <DetailLine
+            label={translate('info.zingolib') as string}
+            value={zingolibVersion}
+            screenName={screenName}
+          />
           <View style={{ marginTop: 20 }}>
             {arrayTxt.map((txt: string, ind: number) => (
               <View key={txt.substring(0, 10)}>
-                {ind !== 0 && <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>}
+                {ind !== 0 && (
+                  <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>
+                )}
               </View>
             ))}
           </View>

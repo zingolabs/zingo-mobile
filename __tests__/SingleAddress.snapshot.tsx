@@ -16,7 +16,14 @@ describe('Component SingleAddress - test', () => {
   test('SingleAddress - snapshot', () => {
     const set = jest.fn();
     const single = render(
-      <SingleAddress address={mockAddresses[0]} screenName={ScreenEnum.Receive} index={0} setIndex={set} total={1} show={set} />,
+      <SingleAddress
+        address={mockAddresses[0]}
+        screenName={ScreenEnum.Receive}
+        index={0}
+        setIndex={set}
+        total={1}
+        show={set}
+      />,
     );
     expect(single.toJSON()).toMatchSnapshot();
   });

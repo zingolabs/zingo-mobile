@@ -72,7 +72,8 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({ route }) => {
           <View
             style={{
               marginTop: 50,
-              flexDirection: 'row',
+              gap: 10,
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               paddingTop: 10,
@@ -98,7 +99,6 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({ route }) => {
             />
             <Button
               variant="primary"
-              style={{ marginLeft: 10 }}
               title={'Back'}
               onPress={() => {
                 navigation.navigate(RouteEnum.MainTabs, {

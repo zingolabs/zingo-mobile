@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
 import ValueTransferDetail from '../components/History/components/ValueTransferDetail';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -17,7 +20,9 @@ import { AppDrawerParamList } from '../app/types';
 import { RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(i: number): DrawerScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail> {
+function makeDrawerProps(
+  i: number,
+): DrawerScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail> {
   return {
     navigation: mockNavigation,
     route: {

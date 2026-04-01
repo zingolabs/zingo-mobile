@@ -9,5 +9,4 @@ export default interface TransactionType {
   time: number;
   zecPrice?: number;
   txDetails: TxDetailType[];
-   
 }

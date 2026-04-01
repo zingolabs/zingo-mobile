@@ -535,13 +535,17 @@ export class LoadingAppClass extends Component<
     if (
       (!this.state.indexerServer.uri &&
         this.state.selectIndexerServer === SelectServerEnum.custom) ||
-      ((this.state.screen === 0.5 || this.state.screen === 0.55) && !this.state.startingApp)
+      ((this.state.screen === 0.5 || this.state.screen === 0.55) &&
+        !this.state.startingApp)
     ) {
       this.setState({
         screen: this.state.screen === 0.55 ? 0.55 : 0.5,
         actionButtonsDisabled: false,
         fromSettings:
-          (this.state.screen === 0.5 || this.state.screen === 0.55) && !this.state.startingApp ? true : false,
+          (this.state.screen === 0.5 || this.state.screen === 0.55) &&
+          !this.state.startingApp
+            ? true
+            : false,
       });
       return;
     }
@@ -842,9 +846,9 @@ export class LoadingAppClass extends Component<
       screen: 0.5,
       fromSettings: false,
       actionButtonsDisabled: false,
-      indexerServer: { 
-        uri: serverUris()[0].uri, 
-        chainName: serverUris()[0].chainName
+      indexerServer: {
+        uri: serverUris()[0].uri,
+        chainName: serverUris()[0].chainName,
       } as ServerType,
     });
   };

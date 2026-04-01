@@ -17,8 +17,10 @@ type circularProgressProps = {
   progressPercent: number;
 };
 
-const CircularProgress: React.FunctionComponent<circularProgressProps> = props => {
-  const { colors } = useTheme()  as ThemeType;
+const CircularProgress: React.FunctionComponent<
+  circularProgressProps
+> = props => {
+  const { colors } = useTheme() as ThemeType;
   const { size, strokeWidth, text, progressPercent } = props;
   const radius = (size - strokeWidth) / 2;
   const circum = radius * 2 * Math.PI;
@@ -54,7 +56,8 @@ const CircularProgress: React.FunctionComponent<circularProgressProps> = props =
           x={size / 2}
           y={size / 2 + (props.textSize ? props.textSize / 2 - 1 : 5)}
           textAnchor="middle"
-          fill={props.textColor ? props.textColor : colors.text}>
+          fill={props.textColor ? props.textColor : colors.text}
+        >
           {text}
         </SVGText>
       </Svg>

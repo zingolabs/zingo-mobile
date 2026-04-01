@@ -29,7 +29,9 @@ export const sendEmail = async (
       '\n' +
       zingoVersionEmail +
       '\n' +
-      (zingolibVersionEmail ? GlobalConst.zingolib + ': ' + zingolibVersionEmail : '') +
+      (zingolibVersionEmail
+        ? GlobalConst.zingolib + ': ' + zingolibVersionEmail
+        : '') +
       '\n\n' +
       bodyEmail,
   )}`;
@@ -39,7 +41,10 @@ export const sendEmail = async (
       console.log('Email client opened', url);
     })
     .catch((err: unknown) => {
-      console.log('Error opening email client:', err instanceof Error ? err.message : String(err));
+      console.log(
+        'Error opening email client:',
+        err instanceof Error ? err.message : String(err),
+      );
       Alert.alert(
         translate('loadedapp.email-error-title') as string,
         translate('loadedapp.email-error-body') as string,

@@ -1,10 +1,8 @@
 import React from 'react';
 
-type ScannerProps = {
-};
+type ScannerProps = {};
 
-const Scanner: React.FunctionComponent<ScannerProps> = ({ }) => {
-
+const Scanner: React.FunctionComponent<ScannerProps> = ({}) => {
   return null;
 };
 

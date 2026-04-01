@@ -1,21 +1,32 @@
 import { Base64 } from 'js-base64';
 import Url from 'url-parse';
 import ZcashURITargetClass from './classes/ZcashURITargetClass';
-import { ServerType, TranslateType, GlobalConst, ZcashUriFieldEnum } from '../AppState';
+import {
+  ServerType,
+  TranslateType,
+  GlobalConst,
+  ZcashUriFieldEnum,
+} from '../AppState';
 import Utils from '../utils';
 
 const parseZcashURI = async (
   uri: string,
   translate: (key: string) => TranslateType,
   server: ServerType,
-): Promise<{ error: string, target: ZcashURITargetClass }> => {
+): Promise<{ error: string; target: ZcashURITargetClass }> => {
   if (!uri || uri === '') {
-    return { error: translate('uris.baduri') as string, target: new ZcashURITargetClass() };
+    return {
+      error: translate('uris.baduri') as string,
+      target: new ZcashURITargetClass(),
+    };
   }
 
   const parsedUri = new Url(uri, true);
   if (!parsedUri || parsedUri.protocol.toLowerCase() !== GlobalConst.zcash) {
-    return { error: translate('uris.baduri') as string, target: new ZcashURITargetClass() };
+    return {
+      error: translate('uris.baduri') as string,
+      target: new ZcashURITargetClass(),
+    };
   }
 
   //console.log(parsedUri);
@@ -31,10 +42,8 @@ const parseZcashURI = async (
   const t = new ZcashURITargetClass();
   if (address) {
     t.address = address;
-    const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
-      address,
-      server.chainName,
-    );
+    const validAddress: { isValid: boolean; onlyOrchardUA: string } =
+      await Utils.isValidAddress(address, server.chainName);
 
     if (!validAddress.isValid) {
       errors.push(`${translate('uris.notvalid')}`);
@@ -75,10 +84,8 @@ const parseZcashURI = async (
           errors.push(`${translate('uris.duplicateparameter')} "${qName}"`);
           break;
         }
-        const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
-          value,
-          server.chainName,
-        );
+        const validAddress: { isValid: boolean; onlyOrchardUA: string } =
+          await Utils.isValidAddress(value, server.chainName);
 
         if (!validAddress.isValid) {
           errors.push(`${translate('uris.notvalid')}`);
@@ -134,7 +141,7 @@ const parseZcashURI = async (
 
   if (!firstTarget) {
     errors.push(translate('uris.oneentry') as string);
-    return { error: errors.join(', '), target: new ZcashURITargetClass()};
+    return { error: errors.join(', '), target: new ZcashURITargetClass() };
   }
 
   // If there is only 1 entry, make sure it has at least an address

@@ -12,13 +12,31 @@ type RegTextProps = {
   selectable?: boolean;
 };
 
-const RegText: React.FunctionComponent<RegTextProps> = ({ style, color, onPress, testID, children, selectable }) => {
+const RegText: React.FunctionComponent<RegTextProps> = ({
+  style,
+  color,
+  onPress,
+  testID,
+  children,
+  selectable,
+}) => {
   const { colors } = useTheme() as ThemeType;
 
-  const styleSum: TextStyle = { color: color || colors.text, fontSize: 18, fontWeight: '600', opacity: 1, ...style };
+  const styleSum: TextStyle = {
+    color: color || colors.text,
+    fontSize: 18,
+    fontWeight: '600',
+    opacity: 1,
+    ...style,
+  };
 
   return (
-    <Text testID={testID} style={styleSum} onPress={onPress} selectable={selectable}>
+    <Text
+      testID={testID}
+      style={styleSum}
+      onPress={onPress}
+      selectable={selectable}
+    >
       {children}
     </Text>
   );

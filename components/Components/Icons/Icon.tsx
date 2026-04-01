@@ -8,7 +8,13 @@ interface IconSvgProps extends SvgProps {
   children?: React.ReactNode;
 }
 
-export function Icon({ size = 24, color = 'currentColor', strokeWidth = 2, children, ...rest }: IconSvgProps) {
+export function Icon({
+  size = 24,
+  color = 'currentColor',
+  strokeWidth = 2,
+  children,
+  ...rest
+}: IconSvgProps) {
   return (
     <Svg
       width={size}
@@ -19,7 +25,8 @@ export function Icon({ size = 24, color = 'currentColor', strokeWidth = 2, child
       strokeLinecap="round"
       strokeLinejoin="round"
       viewBox="0 0 24 24"
-      {...rest}>
+      {...rest}
+    >
       {children}
     </Svg>
   );
