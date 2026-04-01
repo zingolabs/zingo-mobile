@@ -32,8 +32,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Stake from '../../../assets/icons/stake-white.svg';
 import Unstake from '../../../assets/icons/unstake-white.svg';
 import {
-  faChevronDown,
-  faChevronUp,
   faRefresh,
   faArrowDown,
   faArrowUp,
@@ -75,12 +73,10 @@ const ValueTransferDetail: React.FunctionComponent<
       ? route.params.vt
       : ({} as ValueTransferType),
   );
-  const [valueTransferIndex, setValueTransferIndex] = useState<number>(
+  const [, setValueTransferIndex] = useState<number>(
     !!route.params && route.params.index !== undefined ? route.params.index : 0,
   );
-  const [valueTransfersSliced, setValueTransfersSliced] = useState<
-    ValueTransferType[]
-  >(
+  const [, setValueTransfersSliced] = useState<ValueTransferType[]>(
     !!route.params && route.params.valueTransfersSliced !== undefined
       ? route.params.valueTransfersSliced
       : ([] as ValueTransferType[]),
@@ -168,19 +164,6 @@ const ValueTransferDetail: React.FunctionComponent<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalLength]);
 
-  const moveValueTransferDetail = (indexParm: number, typeParm: number) => {
-    // -1 -> Previous ValueTransfer
-    //  1 -> Next ValueTransfer
-    if (
-      (indexParm > 0 && typeParm === -1) ||
-      (indexParm < valueTransfersSliced.length - 1 && typeParm === 1)
-    ) {
-      const newIndex = indexParm + typeParm;
-      setValueTransfer(valueTransfersSliced[newIndex]);
-      setValueTransferIndex(newIndex);
-    }
-  };
-
   //console.log('render History Detail', valueTransferIndex, valueTransfer);
 
   //if (valueTransfer.status === RPCValueTransferStatusEnum.calculated || valueTransfer.status === RPCValueTransferStatusEnum.transmitted) {
@@ -213,50 +196,6 @@ const ValueTransferDetail: React.FunctionComponent<
             }
           }}
         />
-
-        {showNavigator && (
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-              marginRight: 30,
-              marginTop: 0,
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => moveValueTransferDetail(valueTransferIndex, -1)}
-              style={{ marginRight: 25 }}
-              disabled={valueTransferIndex === 0}
-            >
-              <FontAwesomeIcon
-                icon={faChevronUp}
-                color={
-                  valueTransferIndex === 0
-                    ? colors.primaryDisabled
-                    : colors.primary
-                }
-                size={30}
-              />
-            </TouchableOpacity>
-            <FadeText>{(valueTransferIndex + 1).toString()}</FadeText>
-            <TouchableOpacity
-              onPress={() => moveValueTransferDetail(valueTransferIndex, 1)}
-              style={{ marginLeft: 25 }}
-              disabled={valueTransferIndex === valueTransfersSliced.length - 1}
-            >
-              <FontAwesomeIcon
-                icon={faChevronDown}
-                color={
-                  valueTransferIndex === valueTransfersSliced.length - 1
-                    ? colors.primaryDisabled
-                    : colors.primary
-                }
-                size={30}
-              />
-            </TouchableOpacity>
-          </View>
-        )}
 
         <ScrollView
           keyboardShouldPersistTaps="handled"

@@ -1523,7 +1523,7 @@ pub fn set_config_wallet_to_test() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 let mut wallet = lightclient.wallet.write().await;
-                wallet.wallet_settings.min_confirmations = NonZeroU32::try_from(1).unwrap();
+                wallet.wallet_settings.min_confirmations = NonZeroU32::try_from(3).unwrap();
                 wallet.wallet_settings.sync_config.performance_level = PerformanceLevel::Medium;
                 wallet.save_required = true;
                 "Successfully set config wallet to test. (1 - Medium)".to_string()
