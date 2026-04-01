@@ -5,10 +5,10 @@ const Animated = class Animated {
 };
 
 const useAnimatedStyle = jest.fn(() => ({}));
-const useSharedValue = jest.fn((v) => ({ value: v }));
+const useSharedValue = jest.fn(v => ({ value: v }));
 const useAnimatedGestureHandler = jest.fn(() => ({}));
-const withTiming = jest.fn((v) => v);
-const withSpring = jest.fn((v) => v);
+const withTiming = jest.fn(v => v);
+const withSpring = jest.fn(v => v);
 
 export default Animated;
 

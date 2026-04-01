@@ -23,7 +23,9 @@ import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import NewSeed from '../app/LoadingApp/components/NewSeed';
 
-function makeDrawerProps(a: SeedActionEnum): DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed> {
+function makeDrawerProps(
+  a: SeedActionEnum,
+): DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed> {
   return {
     navigation: mockNavigation,
     route: {

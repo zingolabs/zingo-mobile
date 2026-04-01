@@ -124,8 +124,14 @@ type StakingProps = DrawerScreenProps<
 
 const Staking: React.FC<StakingProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers, snackbars, removeFirstSnackbar, staked, info, privacy } =
-    context;
+  const {
+    valueTransfers,
+    snackbars,
+    removeFirstSnackbar,
+    staked,
+    info,
+    privacy,
+  } = context;
 
   const screenName = ScreenEnum.StakingHome;
 
@@ -405,7 +411,7 @@ const Staking: React.FC<StakingProps> = () => {
     );
   };
 
-  //console.log('movements', movements); 
+  //console.log('movements', movements);
 
   return (
     <ToastProvider>
@@ -473,9 +479,7 @@ const Staking: React.FC<StakingProps> = () => {
               <View>
                 {stakingDay ? (
                   <>
-                    <RegText>
-                      Staking day
-                    </RegText>
+                    <RegText>Staking day</RegText>
                     <RegText style={{ fontSize: 14 }}>
                       Closing in {String(timeLeftStakingDay)} blocks
                     </RegText>
@@ -751,13 +755,14 @@ const Staking: React.FC<StakingProps> = () => {
                         color={colors.text}
                         amtZec={item.amount}
                         privacy={privacy}
-                        prefix= {item.kind === ValueTransferKindEnum.CreateBond 
-                          ? '+' 
-                          : item.kind === ValueTransferKindEnum.WithdrawBond 
-                            ? '-' 
-                            : undefined}
+                        prefix={
+                          item.kind === ValueTransferKindEnum.CreateBond
+                            ? '+'
+                            : item.kind === ValueTransferKindEnum.WithdrawBond
+                              ? '-'
+                              : undefined
+                        }
                       />
-
                     </View>
                   );
                 }}

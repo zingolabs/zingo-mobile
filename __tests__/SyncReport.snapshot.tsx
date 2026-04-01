@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import SyncReport from '../components/SyncReport';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -19,7 +22,10 @@ import { AppDrawerParamList } from '../app/types';
 import { RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.SyncReport> {
+function makeDrawerProps(): DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.SyncReport
+> {
   return {
     navigation: mockNavigation,
     route: {

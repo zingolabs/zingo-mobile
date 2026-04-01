@@ -14,7 +14,13 @@ describe('Component PriceFetcher - test', () => {
   //snapshot test
   test('PriceFetcher - snapshot', () => {
     const setZecPrice = jest.fn();
-    const price = render(<PriceFetcher setZecPrice={setZecPrice} screenName={ScreenEnum.Send} textBefore="text before" />);
+    const price = render(
+      <PriceFetcher
+        setZecPrice={setZecPrice}
+        screenName={ScreenEnum.Send}
+        textBefore="text before"
+      />,
+    );
     expect(price.toJSON()).toMatchSnapshot();
   });
 });

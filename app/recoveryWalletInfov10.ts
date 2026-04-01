@@ -8,25 +8,27 @@ const service = GlobalConst.serviceKeyChain;
 const buildSetOptions = async (): Promise<Keychain.SetOptions> => {
   const biometrics = await Keychain.getSupportedBiometryType();
 
-  const iosPart = Platform.OS === 'ios'
-    ? {
-        accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-        accessControl: biometrics
-          ? Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE
-          : Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
-      }
-    : {};
+  const iosPart =
+    Platform.OS === 'ios'
+      ? {
+          accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+          accessControl: biometrics
+            ? Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE
+            : Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
+        }
+      : {};
 
-  const androidPart = Platform.OS === 'android'
-    ? {
-        securityLevel: biometrics
-          ? Keychain.SECURITY_LEVEL.SECURE_HARDWARE
-          : Keychain.SECURITY_LEVEL.SECURE_SOFTWARE,
-        storage: biometrics
-          ? Keychain.STORAGE_TYPE.RSA
-          : Keychain.STORAGE_TYPE.AES_GCM_NO_AUTH,
-      }
-    : {};
+  const androidPart =
+    Platform.OS === 'android'
+      ? {
+          securityLevel: biometrics
+            ? Keychain.SECURITY_LEVEL.SECURE_HARDWARE
+            : Keychain.SECURITY_LEVEL.SECURE_SOFTWARE,
+          storage: biometrics
+            ? Keychain.STORAGE_TYPE.RSA
+            : Keychain.STORAGE_TYPE.AES_GCM_NO_AUTH,
+        }
+      : {};
 
   return { service, ...iosPart, ...androidPart };
 };
@@ -34,13 +36,14 @@ const buildSetOptions = async (): Promise<Keychain.SetOptions> => {
 const buildGetOptions = async (): Promise<Keychain.GetOptions> => {
   const biometrics = await Keychain.getSupportedBiometryType();
 
-  const iosPart = Platform.OS === 'ios'
-    ? {
-        accessControl: biometrics
-          ? Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE
-          : Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
-      }
-    : {};
+  const iosPart =
+    Platform.OS === 'ios'
+      ? {
+          accessControl: biometrics
+            ? Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE
+            : Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
+        }
+      : {};
 
   return {
     service,
@@ -55,7 +58,9 @@ const buildBaseOptions = async (): Promise<Keychain.BaseOptions> => {
   };
 };
 
-export const saveRecoveryWalletInfo = async (keys: WalletType): Promise<void> => {
+export const saveRecoveryWalletInfo = async (
+  keys: WalletType,
+): Promise<void> => {
   if (!keys.seed && !keys.ufvk) {
     console.log('no seed or ufvk to store');
     return;
@@ -64,7 +69,7 @@ export const saveRecoveryWalletInfo = async (keys: WalletType): Promise<void> =>
     await Keychain.setGenericPassword(
       GlobalConst.keyKeyChain,
       JSON.stringify(keys),
-      await buildSetOptions()
+      await buildSetOptions(),
     );
   } catch (error) {
     console.log('Error saving keys', error);
@@ -73,9 +78,14 @@ export const saveRecoveryWalletInfo = async (keys: WalletType): Promise<void> =>
 
 export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
   try {
-    const credentials = await Keychain.getGenericPassword(await buildGetOptions());
+    const credentials = await Keychain.getGenericPassword(
+      await buildGetOptions(),
+    );
     if (credentials) {
-      if (credentials.username === GlobalConst.keyKeyChain && credentials.service === service) {
+      if (
+        credentials.username === GlobalConst.keyKeyChain &&
+        credentials.service === service
+      ) {
         return JSON.parse(credentials.password) as WalletType;
       } else {
         console.log('no match the key');
@@ -93,13 +103,17 @@ export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
   return await Keychain.hasGenericPassword(await buildBaseOptions());
 };
 
-export const createUpdateRecoveryWalletInfo = async (keys: WalletType): Promise<void> => {
+export const createUpdateRecoveryWalletInfo = async (
+  keys: WalletType,
+): Promise<void> => {
   await saveRecoveryWalletInfo(keys);
 };
 
 export const removeRecoveryWalletInfo = async (): Promise<void> => {
   if (await hasRecoveryWalletInfo()) {
-    const removed = await Keychain.resetGenericPassword(await buildBaseOptions());
+    const removed = await Keychain.resetGenericPassword(
+      await buildBaseOptions(),
+    );
     if (!removed) {
       console.log('error removing keys');
     } else {

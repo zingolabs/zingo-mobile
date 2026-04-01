@@ -1107,7 +1107,8 @@ export default class RPC {
             walletBondsList.filter(
               b =>
                 m.pubkey === b.finalizer &&
-                (b.status === WalletBondsStatusEnum.Active || b.status === WalletBondsStatusEnum.Unbonding),
+                (b.status === WalletBondsStatusEnum.Active ||
+                  b.status === WalletBondsStatusEnum.Unbonding),
             ).length > 0,
         )
         .map(m => {
@@ -1115,7 +1116,8 @@ export default class RPC {
             .filter(
               b =>
                 m.pubkey === b.finalizer &&
-                (b.status === WalletBondsStatusEnum.Active || b.status === WalletBondsStatusEnum.Unbonding),
+                (b.status === WalletBondsStatusEnum.Active ||
+                  b.status === WalletBondsStatusEnum.Unbonding),
             )
             .reduce((acc, curr) => acc + curr.amount, 0);
           return {
@@ -1516,9 +1518,11 @@ export default class RPC {
                             ? ValueTransferKindEnum.CreateBond
                             : vt.kind === RPCValueTransferKindEnum.beginUnbond
                               ? ValueTransferKindEnum.BeginUnbond
-                              : vt.kind === RPCValueTransferKindEnum.withdrawBond
+                              : vt.kind ===
+                                  RPCValueTransferKindEnum.withdrawBond
                                 ? ValueTransferKindEnum.WithdrawBond
-                                : vt.kind === RPCValueTransferKindEnum.retargetDelegationBond
+                                : vt.kind ===
+                                    RPCValueTransferKindEnum.retargetDelegationBond
                                   ? ValueTransferKindEnum.RetargetDelegationBond
                                   : ValueTransferKindEnum.Unknown; // error
             currentValueTransferList.fee =
@@ -1665,17 +1669,18 @@ export default class RPC {
                     ? ValueTransferKindEnum.Sent
                     : m.kind === RPCValueTransferKindEnum.shield
                       ? ValueTransferKindEnum.Shield
-                        : m.kind === RPCValueTransferKindEnum.rejection
-                          ? ValueTransferKindEnum.Rejection
-                          : m.kind === RPCValueTransferKindEnum.createBond
-                            ? ValueTransferKindEnum.CreateBond
-                            : m.kind === RPCValueTransferKindEnum.beginUnbond
-                              ? ValueTransferKindEnum.BeginUnbond
-                              : m.kind === RPCValueTransferKindEnum.withdrawBond
-                                ? ValueTransferKindEnum.WithdrawBond
-                                : m.kind === RPCValueTransferKindEnum.retargetDelegationBond
-                                  ? ValueTransferKindEnum.RetargetDelegationBond
-                                  : ValueTransferKindEnum.Unknown; // error
+                      : m.kind === RPCValueTransferKindEnum.rejection
+                        ? ValueTransferKindEnum.Rejection
+                        : m.kind === RPCValueTransferKindEnum.createBond
+                          ? ValueTransferKindEnum.CreateBond
+                          : m.kind === RPCValueTransferKindEnum.beginUnbond
+                            ? ValueTransferKindEnum.BeginUnbond
+                            : m.kind === RPCValueTransferKindEnum.withdrawBond
+                              ? ValueTransferKindEnum.WithdrawBond
+                              : m.kind ===
+                                  RPCValueTransferKindEnum.retargetDelegationBond
+                                ? ValueTransferKindEnum.RetargetDelegationBond
+                                : ValueTransferKindEnum.Unknown; // error
           currentMessageList.fee =
             (!m.transaction_fee ? 0 : m.transaction_fee) / 10 ** 8;
           currentMessageList.zecPrice = !m.zec_price ? 0 : m.zec_price;
@@ -2026,7 +2031,10 @@ export default class RPC {
     });
   }
 
-    async sendRetargetBondTx(bondCreateTxid: string, finalizer: string): Promise<string> {
+  async sendRetargetBondTx(
+    bondCreateTxid: string,
+    finalizer: string,
+  ): Promise<string> {
     return new Promise<string>(async (resolve, reject) => {
       await this.clearTimers();
       this.setInSend(true);
@@ -2043,7 +2051,10 @@ export default class RPC {
         // 1) propose Retarget_Bond
         let proposeStr = '';
         if (!sendError) {
-          proposeStr = await RPCModule.retargetBondProcess(bondCreateTxid, finalizer);
+          proposeStr = await RPCModule.retargetBondProcess(
+            bondCreateTxid,
+            finalizer,
+          );
 
           if (!proposeStr) {
             sendError = 'Error: Internal RPC Error: Retarget_Bond propose';
@@ -2093,7 +2104,7 @@ export default class RPC {
 
     if (response && response.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('Error: request faucet funds', response);
-      return response
+      return response;
     }
 
     if (response && response !== GlobalConst.false) {

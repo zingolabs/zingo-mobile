@@ -10,39 +10,46 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import RegText from '../../Components/RegText';
 
-
 type TransparentWarningProps = {
   onSuccess: () => void;
   closeSheet: () => void;
   setHeightLayout: (h: number) => void;
 };
 
-const TransparentWarning = ({ onSuccess, closeSheet, setHeightLayout }: TransparentWarningProps) => {
+const TransparentWarning = ({
+  onSuccess,
+  closeSheet,
+  setHeightLayout,
+}: TransparentWarningProps) => {
   const { colors } = useTheme() as ThemeType;
   const { translate } = useContext(ContextAppLoaded);
 
   return (
-    <View 
+    <View
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
         //console.log('LAYOUTTT', height);
         setHeightLayout(height + 70);
       }}
-      style={{ 
+      style={{
         backgroundColor: colors.background,
-      }}>
+      }}
+    >
       <TouchableOpacity
         onPress={() => {
           closeSheet();
-        }}>
+        }}
+      >
         <FontAwesomeIcon
-            size={30}
-            icon={faXmark}
-            color={colors.text}
-            style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
+          size={30}
+          icon={faXmark}
+          color={colors.text}
+          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
         />
       </TouchableOpacity>
-      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
+      <RegText
+        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
+      >
         {translate('receive.modal-transparent.title') as string}
       </RegText>
       <View
@@ -52,7 +59,8 @@ const TransparentWarning = ({ onSuccess, closeSheet, setHeightLayout }: Transpar
           borderRadius: 8,
           backgroundColor: colors.background,
           alignSelf: 'center',
-        }}>
+        }}
+      >
         <View>
           <Text style={{ color: colors.money, fontSize: 16, marginBottom: 12 }}>
             {translate('receive.modal-transparent.message') as string}
@@ -75,8 +83,13 @@ const TransparentWarning = ({ onSuccess, closeSheet, setHeightLayout }: Transpar
             onPress={() => {
               onSuccess();
               closeSheet();
-            }}>
-            <TriangleAlert size={15} style={{ marginRight: 8 }} color={colors.warning.title} />
+            }}
+          >
+            <TriangleAlert
+              size={15}
+              style={{ marginRight: 8 }}
+              color={colors.warning.title}
+            />
 
             <Text style={{ color: colors.warning.title, fontSize: 12 }}>
               {translate('receive.modal-transparent.button') as string}

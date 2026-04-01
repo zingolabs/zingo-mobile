@@ -1,9 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useEffect,
-  useState,
-  useContext,
-} from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -20,10 +16,7 @@ import {
   Alert,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
@@ -66,7 +59,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
-  const { totalBalance, info, privacy, globalStaked } = useContext(ContextAppLoaded);
+  const { totalBalance, info, privacy, globalStaked } =
+    useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -100,7 +94,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   useEffect(() => {
     // looking for the voting power of the finalizer.
     if (globalStaked.filter(g => g.finalizer === finalizerText).length === 1) {
-      setStakedNumber(globalStaked.filter(g => g.finalizer === finalizerText)[0].votingPower);
+      setStakedNumber(
+        globalStaked.filter(g => g.finalizer === finalizerText)[0].votingPower,
+      );
     } else {
       setStakedNumber(0);
     }
@@ -140,7 +136,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       );
       return;
     }
-    // Build a minimal SendPageState to reuse existing plumbing 
+    // Build a minimal SendPageState to reuse existing plumbing
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
 
     // sendPageState.toaddr.to =
@@ -172,7 +168,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         navigation.navigate(RouteEnum.ComputingError, {
           error: `Transaction outside of staking window :(. Try again later.`,
         });
-      } else if (JSON.stringify(error).toLowerCase().includes('staking action delay')) {
+      } else if (
+        JSON.stringify(error).toLowerCase().includes('staking action delay')
+      ) {
         navigation.navigate(RouteEnum.ComputingError, {
           error: `Transaction outside of staking window :(. Try again later.`,
         });

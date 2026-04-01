@@ -24,10 +24,7 @@ import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { serverUris } from '../../uris';
-import {
-  faCheck,
-  faWarning,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faWarning } from '@fortawesome/free-solid-svg-icons';
 import XIcon from '../../../assets/icons/x.svg';
 import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
 import { HeaderTitle } from '../../../components/Header';
@@ -82,15 +79,19 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
   const [connected, setConnected] = useState<boolean | null>(null);
   const [borderColor, setBorderColor] = useState<string>('transparent');
   const [kbOpen, setKbOpen] = useState(false);
-  
-  const custom: boolean = serverUris().filter(s => s.uri === indexerServerContext.uri).length === 0;
+
+  const custom: boolean =
+    serverUris().filter(s => s.uri === indexerServerContext.uri).length === 0;
   const { base, port } = parseUri(indexerServerContext.uri);
 
-  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(custom ? base : '');
-  const [indexerServerPortLocal, setIndexerServerPortLocal] = useState<string>(custom ? port : '');  
-  const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] = useState<ChainNameEnum>(
-    indexerServerContext.chainName,
+  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(
+    custom ? base : '',
   );
+  const [indexerServerPortLocal, setIndexerServerPortLocal] = useState<string>(
+    custom ? port : '',
+  );
+  const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] =
+    useState<ChainNameEnum>(indexerServerContext.chainName);
 
   const insets = useSafeAreaInsets();
 
@@ -105,15 +106,15 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
 
   const getChainName = (chain: ChainNameEnum) => {
     return !chain
-            ? '-'
-            : chain === ChainNameEnum.mainChainName
-            ? 'mainnet'
-            : chain === ChainNameEnum.testChainName
-            ? 'testnet'
-            : chain === ChainNameEnum.regtestChainName
+      ? '-'
+      : chain === ChainNameEnum.mainChainName
+        ? 'mainnet'
+        : chain === ChainNameEnum.testChainName
+          ? 'testnet'
+          : chain === ChainNameEnum.regtestChainName
             ? 'regtest'
-            : (translate('info.unknown') as string) + ' (' + chain + ')'
-  }
+            : (translate('info.unknown') as string) + ' (' + chain + ')';
+  };
 
   //console.log('Render Servers', insets);
 
@@ -135,14 +136,20 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
           Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
         }
       >
-        <HeaderTitle title='Connect to indexer' goBack={() => {
-          clear();
-          if (fromSettings && indexerServerChainNameLocal === ChainNameEnum.regtestChainName) {
-            closeServers();
-          } else {
-            goSelectNetwork();
-          }
-        }} />
+        <HeaderTitle
+          title="Connect to indexer"
+          goBack={() => {
+            clear();
+            if (
+              fromSettings &&
+              indexerServerChainNameLocal === ChainNameEnum.regtestChainName
+            ) {
+              closeServers();
+            } else {
+              goSelectNetwork();
+            }
+          }}
+        />
 
         <View
           style={{
@@ -153,7 +160,16 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
             paddingHorizontal: 27,
           }}
         >
-          <FadeText style={{ marginTop: 14, fontSize: 17, fontStyle: 'normal', fontWeight: 600, letterSpacing: -0.43, marginBottom: 58 }}>
+          <FadeText
+            style={{
+              marginTop: 14,
+              fontSize: 17,
+              fontStyle: 'normal',
+              fontWeight: 600,
+              letterSpacing: -0.43,
+              marginBottom: 58,
+            }}
+          >
             {`Enter your ${getChainName(indexerServerChainNameLocal)} indexer's details`}
           </FadeText>
 
@@ -171,8 +187,17 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
               paddingVertical: 25,
             }}
           >
-
-            <FadeText style={{ marginLeft: 4, fontSize: 14, fontStyle: 'normal', fontWeight: 600, lineHeight: 22, marginBottom: 7, alignSelf: 'flex-start' }}>
+            <FadeText
+              style={{
+                marginLeft: 4,
+                fontSize: 14,
+                fontStyle: 'normal',
+                fontWeight: 600,
+                lineHeight: 22,
+                marginBottom: 7,
+                alignSelf: 'flex-start',
+              }}
+            >
               Indexer address
             </FadeText>
 
@@ -211,7 +236,9 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
                   setBorderColor(colors.primary);
                   setIndexerServerUriLocal(text);
                   if (serverUris().filter(s => s.uri === text).length > 0) {
-                    setIndexerServerChainNameLocal(serverUris().filter(s => s.uri === text)[0].chainName)
+                    setIndexerServerChainNameLocal(
+                      serverUris().filter(s => s.uri === text)[0].chainName,
+                    );
                   }
                 }}
                 editable={!actionButtonsDisabled}
@@ -259,7 +286,17 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
               )}
             </View>
 
-            <FadeText style={{ marginLeft: 4, fontSize: 14, fontStyle: 'normal', fontWeight: 600, lineHeight: 22, marginBottom: 7, alignSelf: 'flex-start' }}>
+            <FadeText
+              style={{
+                marginLeft: 4,
+                fontSize: 14,
+                fontStyle: 'normal',
+                fontWeight: 600,
+                lineHeight: 22,
+                marginBottom: 7,
+                alignSelf: 'flex-start',
+              }}
+            >
               Port
             </FadeText>
 
@@ -298,7 +335,9 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
                   setBorderColor(colors.primary);
                   setIndexerServerPortLocal(text);
                   if (serverUris().filter(s => s.uri === text).length > 0) {
-                    setIndexerServerChainNameLocal(serverUris().filter(s => s.uri === text)[0].chainName)
+                    setIndexerServerChainNameLocal(
+                      serverUris().filter(s => s.uri === text)[0].chainName,
+                    );
                   }
                 }}
                 editable={!actionButtonsDisabled}
@@ -345,7 +384,6 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
                 </TouchableOpacity>
               )}
             </View>
-
           </View>
 
           <View
@@ -443,16 +481,25 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
             <LiquidPrimaryButton
               title="Continue"
               onPress={() => {
-                let newIndexerServerChainNameLocal: ChainNameEnum = indexerServerChainNameLocal;
+                let newIndexerServerChainNameLocal: ChainNameEnum =
+                  indexerServerChainNameLocal;
                 if (
-                  serverUris().filter(s => s.uri === `${indexerServerUriLocal}:${indexerServerPortLocal}`)
-                    .length > 0
+                  serverUris().filter(
+                    s =>
+                      s.uri ===
+                      `${indexerServerUriLocal}:${indexerServerPortLocal}`,
+                  ).length > 0
                 ) {
                   newIndexerServerChainNameLocal = serverUris().filter(
-                    s => s.uri === `${indexerServerUriLocal}:${indexerServerPortLocal}`,
+                    s =>
+                      s.uri ===
+                      `${indexerServerUriLocal}:${indexerServerPortLocal}`,
                   )[0].chainName;
                 }
-                setIndexerServer(`${indexerServerUriLocal}:${indexerServerPortLocal}`, newIndexerServerChainNameLocal);
+                setIndexerServer(
+                  `${indexerServerUriLocal}:${indexerServerPortLocal}`,
+                  newIndexerServerChainNameLocal,
+                );
                 Keyboard.dismiss();
                 clear();
                 // the App needs some time to store data.
@@ -467,26 +514,43 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
           ) : (
             <LiquidPrimaryButton
               title={connected === null ? 'Test Connection' : 'Retry'}
-              disabled={actionButtonsDisabled || !indexerServerUriLocal || !indexerServerPortLocal || !indexerServerChainNameLocal || indexerServerUriLocal.replace('://', '').includes(':')}
+              disabled={
+                actionButtonsDisabled ||
+                !indexerServerUriLocal ||
+                !indexerServerPortLocal ||
+                !indexerServerChainNameLocal ||
+                indexerServerUriLocal.replace('://', '').includes(':')
+              }
               onPress={async () => {
                 setConnected(null);
                 setBorderColor('transparent');
                 // add http if it not have it
-                if (!indexerServerUriLocal.toLowerCase().startsWith(GlobalConst.http)) {
-
+                if (
+                  !indexerServerUriLocal
+                    .toLowerCase()
+                    .startsWith(GlobalConst.http)
+                ) {
                 }
                 const {
                   result: _connected,
                   indexerServerUriParsed: _indexerServerUri,
-                } = await checkIndexerServer(`${
-                  !indexerServerUriLocal.toLowerCase().startsWith(GlobalConst.http) &&
-                  !indexerServerUriLocal.toLowerCase().startsWith(GlobalConst.https)
-                    ? (GlobalConst.http + '//' + indexerServerUriLocal)
-                    : indexerServerUriLocal
-                  }:${indexerServerPortLocal}`, indexerServerChainNameLocal);
+                } = await checkIndexerServer(
+                  `${
+                    !indexerServerUriLocal
+                      .toLowerCase()
+                      .startsWith(GlobalConst.http) &&
+                    !indexerServerUriLocal
+                      .toLowerCase()
+                      .startsWith(GlobalConst.https)
+                      ? GlobalConst.http + '//' + indexerServerUriLocal
+                      : indexerServerUriLocal
+                  }:${indexerServerPortLocal}`,
+                  indexerServerChainNameLocal,
+                );
                 setConnected(_connected);
                 // using local state
-                const { base: basee, port: portt } = parseUri(_indexerServerUri);
+                const { base: basee, port: portt } =
+                  parseUri(_indexerServerUri);
                 setIndexerServerUriLocal(basee);
                 setIndexerServerPortLocal(portt);
                 if (_connected) {

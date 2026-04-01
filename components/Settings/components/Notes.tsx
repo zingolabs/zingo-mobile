@@ -65,7 +65,7 @@ export const Notes: React.FunctionComponent = () => {
                 width: '85%',
               }}
             >
-              <FadeText>Hello Notes</FadeText>
+              <FadeText>Under construction</FadeText>
             </View>
           </View>
         </View>

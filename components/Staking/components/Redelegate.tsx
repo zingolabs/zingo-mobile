@@ -1,10 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -21,10 +16,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import {
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -88,12 +80,17 @@ const Redelegate: React.FC<RedelegateProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { walletBonds, valueTransfers, staked, globalStaked, info, privacy } = context;
+  const { walletBonds, valueTransfers, staked, globalStaked, info, privacy } =
+    context;
 
   const movements = walletBonds
     .filter(b => {
       // only active bonds.
-      if (b.status === WalletBondsStatusEnum.Withdrawn || b.status === WalletBondsStatusEnum.Unbonding) return false;
+      if (
+        b.status === WalletBondsStatusEnum.Withdrawn ||
+        b.status === WalletBondsStatusEnum.Unbonding
+      )
+        return false;
       if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
       if (!finalizerFromText) return true;
@@ -132,7 +129,9 @@ const Redelegate: React.FC<RedelegateProps> = ({
   useEffect(() => {
     // looking for the voting power of the finalizer
     if (staked.filter(g => g.finalizer === finalizerFromText).length === 1) {
-      setStakedFromNumber(staked.filter(g => g.finalizer === finalizerFromText)[0].votingPower);
+      setStakedFromNumber(
+        staked.filter(g => g.finalizer === finalizerFromText)[0].votingPower,
+      );
     } else {
       setStakedFromNumber(0);
     }
@@ -140,8 +139,13 @@ const Redelegate: React.FC<RedelegateProps> = ({
 
   useEffect(() => {
     // looking for the voting power of the finalizer
-    if (globalStaked.filter(g => g.finalizer === finalizerToText).length === 1) {
-      setStakedToNumber(globalStaked.filter(g => g.finalizer === finalizerToText)[0].votingPower);
+    if (
+      globalStaked.filter(g => g.finalizer === finalizerToText).length === 1
+    ) {
+      setStakedToNumber(
+        globalStaked.filter(g => g.finalizer === finalizerToText)[0]
+          .votingPower,
+      );
     } else {
       setStakedToNumber(0);
     }

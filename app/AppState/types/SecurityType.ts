@@ -11,6 +11,4 @@ export default interface SecurityType {
   // obsolete options
   seedScreen?: boolean;
   ufvkScreen?: boolean;
-
-   
 }

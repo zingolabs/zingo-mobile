@@ -13,31 +13,36 @@ import { ContextAppLoaded } from '../../context';
 import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
+type ComputingProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Computing
+>;
 
-type ComputingProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Computing>;
-
-const Computing: React.FunctionComponent<ComputingProps> = ({
-  route,
-}) => {
+const Computing: React.FunctionComponent<ComputingProps> = ({ route }) => {
   const context = useContext(ContextAppLoaded);
   const { info, privacy } = context;
   const { colors } = useTheme() as ThemeType;
 
-  const sendPageStatePar = !!route.params && route.params.sendPageStatePar !== undefined ? route.params.sendPageStatePar : {} as SendPageStateClass;
+  const sendPageStatePar =
+    !!route.params && route.params.sendPageStatePar !== undefined
+      ? route.params.sendPageStatePar
+      : ({} as SendPageStateClass);
 
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: colors.background,
-      }}>
+      }}
+    >
       <View
         style={{
           flexGrow: 1,
           justifyContent: 'center',
           alignItems: 'center',
-      }}>
-        <View 
+        }}
+      >
+        <View
           style={{
             backgroundColor: colors.secondary,
             padding: 50,
@@ -60,17 +65,19 @@ const Computing: React.FunctionComponent<ComputingProps> = ({
                 margin: 10,
               }}
             >
-              <FontAwesomeIcon
-                icon={faPaperPlane}
-                color='#1C78D2'
-                size={50}
-              />
+              <FontAwesomeIcon icon={faPaperPlane} color="#1C78D2" size={50} />
             </View>
           </View>
-          <RegText style={{ fontSize: 30, alignSelf: 'center' }}>Sending</RegText>
-          <ActivityIndicator size="large" color={colors.text} style={{ marginVertical: 20 }} />
+          <RegText style={{ fontSize: 30, alignSelf: 'center' }}>
+            Sending
+          </RegText>
+          <ActivityIndicator
+            size="large"
+            color={colors.text}
+            style={{ marginVertical: 20 }}
+          />
         </View>
-        <View 
+        <View
           style={{
             marginTop: 20,
             backgroundColor: colors.secondary,
@@ -85,7 +92,9 @@ const Computing: React.FunctionComponent<ComputingProps> = ({
             currencyName={info.currencyName}
             color={colors.text}
             size={20}
-            amtZec={Utils.parseStringLocaleToNumberFloat(sendPageStatePar.toaddr.amount)}
+            amtZec={Utils.parseStringLocaleToNumberFloat(
+              sendPageStatePar.toaddr.amount,
+            )}
             privacy={privacy}
             style={{ fontWeight: '900', marginBottom: 20 }}
           />

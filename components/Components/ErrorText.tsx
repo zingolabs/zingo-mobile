@@ -10,11 +10,20 @@ type ErrorTextProps = {
   selectable?: boolean;
 };
 
-const ErrorText: React.FunctionComponent<ErrorTextProps> = ({ style, children, testID, selectable }) => {
+const ErrorText: React.FunctionComponent<ErrorTextProps> = ({
+  style,
+  children,
+  testID,
+  selectable,
+}) => {
   const { colors } = useTheme() as ThemeType;
 
   return (
-    <Text testID={testID} style={{ color: colors.primary, ...style }} selectable={selectable}>
+    <Text
+      testID={testID}
+      style={{ color: colors.primary, ...style }}
+      selectable={selectable}
+    >
       {children}
     </Text>
   );

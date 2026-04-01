@@ -21,14 +21,17 @@ jest.mock('@noble/hashes/utils.js', () => ({
 }));
 
 jest.mock('react-native-localize', () => ({
-  findBestLanguageTag: jest.fn().mockImplementation((supportedLocales) => {
+  findBestLanguageTag: jest.fn().mockImplementation(supportedLocales => {
     return { languageTag: supportedLocales?.[0] || 'en', isRTL: false };
   }),
 }));
 
 jest.mock('i18n-js');
 
-function makeDrawerProps(): StackScreenProps<AppStackParamList, RouteEnum.LoadedApp> {
+function makeDrawerProps(): StackScreenProps<
+  AppStackParamList,
+  RouteEnum.LoadedApp
+> {
   return {
     navigation: mockNavigation,
     route: {
@@ -49,9 +52,7 @@ describe('Component LoadedApp - test', () => {
   //snapshot test
   test('LoadedApp - snapshot', () => {
     const props = makeDrawerProps();
-    const loadedapp = render(
-      <LoadedApp {...props} />,
-    );
+    const loadedapp = render(<LoadedApp {...props} />);
     expect(loadedapp.toJSON()).toMatchSnapshot();
   });
 });

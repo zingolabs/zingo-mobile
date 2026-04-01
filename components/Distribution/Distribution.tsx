@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Dimensions,
+} from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 import { PieChart, pieDataItem } from 'react-native-gifted-charts';
@@ -18,7 +24,12 @@ import FadeText from '../Components/FadeText';
 import { HeaderTitle } from '../Header';
 //import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum, StakeType } from '../../app/AppState';
+import {
+  RouteEnum,
+  ScreenEnum,
+  SnackbarDurationEnum,
+  StakeType,
+} from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -34,21 +45,30 @@ type DataType = {
 } & pieDataItem;
 
 const getPercent = (percent: number) => {
-  return (percent < 1 ? '<1' : percent < 100 && percent >= 99 ? '99' : percent.toFixed(0)) + '%';
+  return (
+    (percent < 1
+      ? '<1'
+      : percent < 100 && percent >= 99
+        ? '99'
+        : percent.toFixed(0)) + '%'
+  );
 };
 
-type DistributionProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Distribution>;
+type DistributionProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Distribution
+>;
 
 const Distribution: React.FunctionComponent<DistributionProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { 
-    info, 
-    translate, 
-    privacy, 
-    addLastSnackbar, 
-    snackbars, 
+  const {
+    info,
+    translate,
+    privacy,
+    addLastSnackbar,
+    snackbars,
     removeFirstSnackbar,
     staked,
     globalStaked,
@@ -84,7 +104,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
           break;
       }
       console.log(resultJSON);
-      if (randomColors.length < resultJSON.length) { 
+      if (randomColors.length < resultJSON.length) {
         const rc2 = Utils.generateColorList(resultJSON.length + 10);
         setRandomColors(rc2);
       }
@@ -120,10 +140,15 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
   };
 
   const lineMy = (item: DataType, index: number, last: boolean) => {
-    const totalValue = pieAmounts ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0) : 0;
+    const totalValue = pieAmounts
+      ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0)
+      : 0;
     const percent = (100 * item.value) / totalValue;
-    // 30 characters per line 
-    const numLines = item.finalizer.length < 40 ? 2 : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
+    // 30 characters per line
+    const numLines =
+      item.finalizer.length < 40
+        ? 2
+        : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <View style={{ width: '100%' }} key={`tag-${index}`}>
         <View
@@ -134,15 +159,24 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
             paddingVertical: 15,
             borderBottomColor: '#333333',
             borderBottomWidth: last ? 0 : 1,
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
-            <FontAwesomeIcon style={{ marginRight: 15 }} size={15} icon={faCircle} color={item.svg.fill} />
-            {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
+            }}
+          >
+            <FontAwesomeIcon
+              style={{ marginRight: 15 }}
+              size={15}
+              icon={faCircle}
+              color={item.svg.fill}
+            />
+            {!!item.tag && (
+              <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>
+            )}
             <TouchableOpacity
               onPress={() => {
                 Clipboard.setString(item.finalizer);
@@ -152,30 +186,40 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
                   screenName: [screenName],
                 });
                 selectExpandAddress(index);
-              }}>
+              }}
+            >
               <View
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   flexWrap: 'wrap',
-                }}>
-                <AddressItem address={item.finalizer} screenName={screenName} oneLine={true} onlyContact={true} withIcon={true} />
+                }}
+              >
+                <AddressItem
+                  address={item.finalizer}
+                  screenName={screenName}
+                  oneLine={true}
+                  onlyContact={true}
+                  withIcon={true}
+                />
                 {!expandAddress[index] && !!item.finalizer && (
                   <RegText>
                     {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
-                      ? Utils.trimToSmall(item.finalizer, dimensions.width < 500 ? 5 : 10)
+                      ? Utils.trimToSmall(
+                          item.finalizer,
+                          dimensions.width < 500 ? 5 : 10,
+                        )
                       : item.finalizer}
                   </RegText>
                 )}
                 {expandAddress[index] &&
                   !!item.finalizer &&
-                  Utils.splitStringIntoChunks(item.finalizer, Number(numLines.toFixed(0))).map(
-                    (c: string, idx: number) => (
-                      <RegText key={idx}>
-                        {c}
-                      </RegText>
-                    ),
-                  )}
+                  Utils.splitStringIntoChunks(
+                    item.finalizer,
+                    Number(numLines.toFixed(0)),
+                  ).map((c: string, idx: number) => (
+                    <RegText key={idx}>{c}</RegText>
+                  ))}
               </View>
             </TouchableOpacity>
           </View>
@@ -184,19 +228,25 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               flexDirection: 'column-reverse',
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
-            <FadeText >{getPercent(percent)}</FadeText>
+            }}
+          >
+            <FadeText>{getPercent(percent)}</FadeText>
           </View>
         </View>
       </View>
     );
   };
 
-    const lineNetwork = (item: DataType, index: number, last: boolean) => {
-    const totalValue = pieAmounts ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0) : 0;
+  const lineNetwork = (item: DataType, index: number, last: boolean) => {
+    const totalValue = pieAmounts
+      ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0)
+      : 0;
     const percent = (100 * item.value) / totalValue;
     // 30 characters per line
-    const numLines = item.finalizer.length < 40 ? 2 : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
+    const numLines =
+      item.finalizer.length < 40
+        ? 2
+        : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <View style={{ width: '100%' }} key={`tag-${index}`}>
         <View
@@ -207,15 +257,21 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
             paddingVertical: 15,
             borderBottomColor: '#333333',
             borderBottomWidth: last ? 0 : 1,
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
-            <FadeText style={{ marginRight: 15 }}>{`#${(index + 1).toString()}`}</FadeText>
-            {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
+            }}
+          >
+            <FadeText
+              style={{ marginRight: 15 }}
+            >{`#${(index + 1).toString()}`}</FadeText>
+            {!!item.tag && (
+              <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>
+            )}
             <TouchableOpacity
               onPress={() => {
                 Clipboard.setString(item.finalizer);
@@ -225,30 +281,40 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
                   screenName: [screenName],
                 });
                 selectExpandAddress(index);
-              }}>
+              }}
+            >
               <View
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   flexWrap: 'wrap',
-                }}>
-                <AddressItem address={item.finalizer} screenName={screenName} oneLine={true} onlyContact={true} withIcon={true} />
+                }}
+              >
+                <AddressItem
+                  address={item.finalizer}
+                  screenName={screenName}
+                  oneLine={true}
+                  onlyContact={true}
+                  withIcon={true}
+                />
                 {!expandAddress[index] && !!item.finalizer && (
                   <RegText>
                     {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
-                      ? Utils.trimToSmall(item.finalizer, dimensions.width < 500 ? 5 : 10)
+                      ? Utils.trimToSmall(
+                          item.finalizer,
+                          dimensions.width < 500 ? 5 : 10,
+                        )
                       : item.finalizer}
                   </RegText>
                 )}
                 {expandAddress[index] &&
                   !!item.finalizer &&
-                  Utils.splitStringIntoChunks(item.finalizer, Number(numLines.toFixed(0))).map(
-                    (c: string, idx: number) => (
-                      <RegText key={idx}>
-                        {c}
-                      </RegText>
-                    ),
-                  )}
+                  Utils.splitStringIntoChunks(
+                    item.finalizer,
+                    Number(numLines.toFixed(0)),
+                  ).map((c: string, idx: number) => (
+                    <RegText key={idx}>{c}</RegText>
+                  ))}
               </View>
             </TouchableOpacity>
           </View>
@@ -258,7 +324,8 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               flexGrow: 1,
               justifyContent: 'flex-end',
               alignItems: 'center',
-            }}>
+            }}
+          >
             <View
               style={{
                 justifyContent: 'flex-end',
@@ -286,7 +353,7 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
                 }}
               />
             </View>
-            <FadeText >{getPercent(percent)}</FadeText>
+            <FadeText>{getPercent(percent)}</FadeText>
           </View>
         </View>
       </View>
@@ -316,26 +383,30 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
+        <HeaderTitle
+          title="Distribution"
+          goBack={() => {
+            clear();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
+          }}
+        />
 
-        <HeaderTitle title='Distribution' goBack={() => {
-          clear();
-          if (navigation.canGoBack()) {
-            navigation.goBack();
-          }
-        }} />
-
-        <View 
-          style={{ 
+        <View
+          style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginTop: 20, 
+            marginTop: 20,
             borderRadius: 20,
-            backgroundColor: 'rgba(118, 118, 128, 0.24)', 
+            backgroundColor: 'rgba(118, 118, 128, 0.24)',
             padding: 5,
             marginHorizontal: 20,
-          }}>
+          }}
+        >
           <View
             style={{
               flexGrow: 1,
@@ -346,18 +417,22 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               backgroundColor: tab === 'my' ? '#6C6C71' : 'transparent',
               padding: 5,
               overflow: 'hidden',
-            }}>
-            <TouchableOpacity onPress={() => {
-              const rc3 = Utils.generateColorList(pieAmounts.length + 10);
-              setRandomColors(rc3);
-              setTab('my');
-            }}>
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                const rc3 = Utils.generateColorList(pieAmounts.length + 10);
+                setRandomColors(rc3);
+                setTab('my');
+              }}
+            >
               <RegText
                 style={{
                   fontWeight: tab === 'my' ? 'bold' : 'normal',
                   fontSize: 15,
                   color: colors.text,
-                }}>
+                }}
+              >
                 {'My Staking'}
               </RegText>
             </TouchableOpacity>
@@ -372,18 +447,22 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
               backgroundColor: tab === 'network' ? '#6C6C71' : 'transparent',
               padding: 5,
               overflow: 'hidden',
-            }}>
-            <TouchableOpacity onPress={() => {
-              const rc4 = Utils.generateColorList(pieAmounts.length + 10);
-              setRandomColors(rc4);
-              setTab('network');
-            }}>
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                const rc4 = Utils.generateColorList(pieAmounts.length + 10);
+                setRandomColors(rc4);
+                setTab('network');
+              }}
+            >
               <RegText
                 style={{
                   fontWeight: tab === 'network' ? 'bold' : 'normal',
                   fontSize: 15,
-                  color: colors.text
-                }}>
+                  color: colors.text,
+                }}
+              >
                 {'Global Network'}
               </RegText>
             </TouchableOpacity>
@@ -394,15 +473,26 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
           persistentScrollbar={true}
           indicatorStyle={'white'}
           style={{ maxHeight: '90%' }}
-          contentContainerStyle={{}}>
+          contentContainerStyle={{}}
+        >
           <View style={{ display: 'flex' }}>
             {!loading && (!pieAmounts || !pieAmounts.length) && (
-              <View style={{ alignItems: 'center', marginTop: 100, marginHorizontal: 20 }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                  marginTop: 100,
+                  marginHorizontal: 20,
+                }}
+              >
                 <RegText>{translate('insight.no-data') as string}</RegText>
               </View>
             )}
             {loading ? (
-              <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 100 }} />
+              <ActivityIndicator
+                size="large"
+                color={colors.primary}
+                style={{ marginTop: 100 }}
+              />
             ) : (
               <View style={{ width: '100%', alignItems: 'center' }}>
                 {!!pieAmounts && !!pieAmounts.length && (
@@ -426,25 +516,57 @@ const Distribution: React.FunctionComponent<DistributionProps> = ({
                       data={pieAmounts}
                       innerRadius={dimensions.width * 0.14}
                     />
-                    <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 30 }}>
-                      <RegText>{tab === 'my' ? 'Total Stake' : 'Total amount Staked'}</RegText>
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginBottom: 30,
+                      }}
+                    >
+                      <RegText>
+                        {tab === 'my' ? 'Total Stake' : 'Total amount Staked'}
+                      </RegText>
                       <ZecAmount
                         currencyName={info.currencyName}
                         size={20}
-                        amtZec={pieAmounts.reduce((sum, item) => sum + item.value, 0)}
+                        amtZec={pieAmounts.reduce(
+                          (sum, item) => sum + item.value,
+                          0,
+                        )}
                         style={{ marginHorizontal: 5 }}
                         privacy={privacy}
                       />
                     </View>
-                    <RegText style={{ marginHorizontal: 10, marginBottom: 10 }}>{tab === 'my' ? 'Staking Position' : 'Finalizers'}</RegText>
-                    <View style={{ display: 'flex', marginHorizontal: 10, padding: 5, alignItems: 'flex-start', backgroundColor: 'rgba(118, 118, 128, 0.24)', borderRadius: 26, width: '90%' }}>
+                    <RegText style={{ marginHorizontal: 10, marginBottom: 10 }}>
+                      {tab === 'my' ? 'Staking Position' : 'Finalizers'}
+                    </RegText>
+                    <View
+                      style={{
+                        display: 'flex',
+                        marginHorizontal: 10,
+                        padding: 5,
+                        alignItems: 'flex-start',
+                        backgroundColor: 'rgba(118, 118, 128, 0.24)',
+                        borderRadius: 26,
+                        width: '90%',
+                      }}
+                    >
                       <View style={{ width: '100%' }}>
                         {!loading && !!pieAmounts && !!pieAmounts.length && (
                           <>
-                            {pieAmounts
-                              .map((item, index) => {
-                                return tab === 'my' ? lineMy(item, index, (index + 1) === pieAmounts.length ) : lineNetwork(item, index, (index + 1) === pieAmounts.length );
-                              })}
+                            {pieAmounts.map((item, index) => {
+                              return tab === 'my'
+                                ? lineMy(
+                                    item,
+                                    index,
+                                    index + 1 === pieAmounts.length,
+                                  )
+                                : lineNetwork(
+                                    item,
+                                    index,
+                                    index + 1 === pieAmounts.length,
+                                  );
+                            })}
                           </>
                         )}
                       </View>

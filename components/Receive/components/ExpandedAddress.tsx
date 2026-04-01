@@ -27,27 +27,31 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
   const { colors } = useTheme() as ThemeType;
 
   return (
-    <View 
+    <View
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
         //console.log('LAYOUTTT', height);
         setHeightLayout(height + 70);
       }}
-      style={{ 
-        backgroundColor: colors.background  
-      }}>
+      style={{
+        backgroundColor: colors.background,
+      }}
+    >
       <TouchableOpacity
         onPress={() => {
           closeSheet();
-        }}>
+        }}
+      >
         <FontAwesomeIcon
-            size={30}
-            icon={faXmark}
-            color={colors.text}
-            style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
+          size={30}
+          icon={faXmark}
+          color={colors.text}
+          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
         />
       </TouchableOpacity>
-      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
+      <RegText
+        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
+      >
         {title ? title : ''}
       </RegText>
       <View
@@ -57,10 +61,12 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
           borderRadius: 8,
           backgroundColor: colors.background,
           alignSelf: 'center',
-        }}>
-
+        }}
+      >
         <View style={{ alignItems: 'flex-start' }}>
-          <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 20 }}>{address}</Text>
+          <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 20 }}>
+            {address}
+          </Text>
           <TouchableOpacity
             onPress={() => {
               onCopy && onCopy();
@@ -74,7 +80,8 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
               borderRadius: 5,
               borderWidth: 1,
               alignSelf: 'center',
-            }}>
+            }}
+          >
             <Text style={{ color: '#ccc', fontSize: 16 }}>{button}</Text>
           </TouchableOpacity>
         </View>

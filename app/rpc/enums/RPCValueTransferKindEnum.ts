@@ -9,6 +9,6 @@ export enum RPCValueTransferKindEnum {
   // new for staking
   createBond = 'create-bond',
   beginUnbond = 'begin-unbond',
-  withdrawBond  = 'withdraw-bond',
+  withdrawBond = 'withdraw-bond',
   retargetDelegationBond = 'retarget-delegation-bond',
 }

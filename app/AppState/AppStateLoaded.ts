@@ -20,6 +20,4 @@ export default interface AppStateLoaded {
 
   // to know if the modal is open or not
   isSeedViewModalOpen: boolean;
-
-   
 }
