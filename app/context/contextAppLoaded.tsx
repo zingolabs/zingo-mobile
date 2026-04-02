@@ -84,7 +84,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   timeLeftStakingDay: 0,
   scheduledActions: [],
   setScheduledActions: () => {},
- 
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

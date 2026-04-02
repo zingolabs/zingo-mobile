@@ -5,11 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 
 import { RouteEnum } from '../../app/AppState';
 
-type StakingActionsProps = {
-};
+type StakingActionsProps = {};
 
-const StakingActions: React.FC<StakingActionsProps> = (
-) => {
+const StakingActions: React.FC<StakingActionsProps> = () => {
   const navigation: any = useNavigation();
 
   return (

@@ -1202,7 +1202,7 @@ export class LoadingAppClass extends Component<
       }
 
       await ScheduledActionsFileImpl.resetSA();
-      
+
       this.navigateToLoadedApp(
         false,
         true,
@@ -1401,7 +1401,7 @@ export class LoadingAppClass extends Component<
           }
 
           await ScheduledActionsFileImpl.resetSA();
-          
+
           this.navigateToLoadedApp(
             readOnly,
             orchardPool,

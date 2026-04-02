@@ -117,13 +117,12 @@ function Separator() {
   );
 }
 
-type StakingProps = DrawerScreenProps< 
+type StakingProps = DrawerScreenProps<
   AppDrawerParamList,
   RouteEnum.StakingHome
 >;
 
-const Staking: React.FC<StakingProps> = ({
-}) => {
+const Staking: React.FC<StakingProps> = ({}) => {
   const context = useContext(ContextAppLoaded);
   const {
     valueTransfers,
@@ -156,7 +155,9 @@ const Staking: React.FC<StakingProps> = ({
     height: Dimensions.get('window').height,
   };
 
-  const scrollViewRef = useRef<ScrollView & FlatList<StakingMovement & ScheduledActionType>>(null);
+  const scrollViewRef = useRef<
+    ScrollView & FlatList<StakingMovement & ScheduledActionType>
+  >(null);
 
   const snapPoints = useMemo(() => {
     let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
@@ -395,9 +396,14 @@ const Staking: React.FC<StakingProps> = ({
     );
   };
 
-  console.log('scheduled actions', scheduledActions); 
+  console.log('scheduled actions', scheduledActions);
 
-  console.log('render staking', stakingDay, timeToStakingDay, timeLeftStakingDay);
+  console.log(
+    'render staking',
+    stakingDay,
+    timeToStakingDay,
+    timeLeftStakingDay,
+  );
 
   return (
     <ToastProvider>
@@ -786,13 +792,14 @@ const Staking: React.FC<StakingProps> = ({
                         color={colors.text}
                         amtZec={item.amount}
                         privacy={privacy}
-                        prefix= {item.kind === StakingActionKindEnum.CreateBond 
-                          ? '+' 
-                          : item.kind === StakingActionKindEnum.WithdrawBond 
-                            ? '-' 
-                            : undefined}
+                        prefix={
+                          item.kind === StakingActionKindEnum.CreateBond
+                            ? '+'
+                            : item.kind === StakingActionKindEnum.WithdrawBond
+                              ? '-'
+                              : undefined
+                        }
                       />
-
                     </View>
                   );
                 }}

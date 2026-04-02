@@ -7,14 +7,14 @@ export default class ScheduledActionsFileImpl {
     return RNFS.DocumentDirectoryPath + '/scheduledActions.json';
   }
 
-  static async writeSA( newFile: ScheduledActionType[]) {
+  static async writeSA(newFile: ScheduledActionType[]) {
     const fileName = await this.getFileName();
 
     RNFS.writeFile(fileName, JSON.stringify(newFile), GlobalConst.utf8)
       .then(() => {
         //console.log('FILE WRITTEN!');
       })
-      .catch((err) => {
+      .catch(err => {
         console.log('Scheduled Actions write file:', err.message);
       });
   }
@@ -44,12 +44,12 @@ export default class ScheduledActionsFileImpl {
     }
   }
 
-  static async addSA(item: ScheduledActionType): Promise<ScheduledActionType[]> {
+  static async addSA(
+    item: ScheduledActionType,
+  ): Promise<ScheduledActionType[]> {
     try {
       const list: ScheduledActionType[] = await this.listSA();
-      const maxId = list.length > 0
-        ? Math.max(...list.map(a => a.id))
-        : 0;
+      const maxId = list.length > 0 ? Math.max(...list.map(a => a.id)) : 0;
       let newItem: ScheduledActionType = item;
       newItem.id = maxId + 1;
       list.push(newItem);

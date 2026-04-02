@@ -61,7 +61,14 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
-  const { totalBalance, info, privacy, globalStaked, stakingDay, setScheduledActions } = useContext(ContextAppLoaded);
+  const {
+    totalBalance,
+    info,
+    privacy,
+    globalStaked,
+    stakingDay,
+    setScheduledActions,
+  } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -172,7 +179,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       if (stakingDay) {
         await stakeTransaction(sendPageState, stakingAction);
       } else {
-        const list = await ScheduledActionsFileImpl.addSA(stakingScheduledAction);
+        const list = await ScheduledActionsFileImpl.addSA(
+          stakingScheduledAction,
+        );
         setScheduledActions(list);
       }
       setModalState('success');

@@ -572,23 +572,22 @@ export class LoadedAppClass extends Component<
   }
 
   stakingDayCalculation = () => {
-      const latest = this.state.info.latestBlock ?? 0;
-  
-      const cycle = 150;
-      const activeWindow = 70;
-  
-      const mod = latest % cycle;
-      const isStakingDay = mod < activeWindow;
-      const remaining = isStakingDay ? 0 : cycle - mod;
-      const left = isStakingDay ? activeWindow - mod : 0;
+    const latest = this.state.info.latestBlock ?? 0;
 
-      this.setState({
-        stakingDay: isStakingDay,
-        timeToStakingDay: remaining,
-        timeLeftStakingDay: left,
-      });
-    };
-  
+    const cycle = 150;
+    const activeWindow = 70;
+
+    const mod = latest % cycle;
+    const isStakingDay = mod < activeWindow;
+    const remaining = isStakingDay ? 0 : cycle - mod;
+    const left = isStakingDay ? activeWindow - mod : 0;
+
+    this.setState({
+      stakingDay: isStakingDay,
+      timeToStakingDay: remaining,
+      timeLeftStakingDay: left,
+    });
+  };
 
   componentDidMount = async () => {
     this.stakingDayCalculation();
@@ -798,7 +797,10 @@ export class LoadedAppClass extends Component<
     );
   };
 
-  componentDidUpdate(_prevProps: Readonly<LoadedAppClassProps>, prevState: Readonly<LoadedAppClassState>): void {
+  componentDidUpdate(
+    _prevProps: Readonly<LoadedAppClassProps>,
+    prevState: Readonly<LoadedAppClassState>,
+  ): void {
     if (prevState.info.latestBlock !== this.state.info.latestBlock) {
       this.stakingDayCalculation();
     }
@@ -1947,7 +1949,7 @@ export class LoadedAppClass extends Component<
     this.setState({
       scheduledActions,
     });
-  }
+  };
 
   setNavigationHome = (
     navigationHome: DrawerContentComponentProps['navigation'],
@@ -2149,11 +2151,7 @@ export class LoadedAppClass extends Component<
               </LoadedAppStack.Screen>
 
               <LoadedAppStack.Screen name={RouteEnum.StakingHome}>
-                {props => (
-                  <Staking 
-                    {...props} 
-                  />
-                )}
+                {props => <Staking {...props} />}
               </LoadedAppStack.Screen>
 
               <LoadedAppStack.Screen name={RouteEnum.Stake}>

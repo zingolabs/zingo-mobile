@@ -106,14 +106,9 @@ const ValueTransferDetail: React.FunctionComponent<
         : 0;
     setValueTransfer(_vt);
     setTotalLength(_totalLength);
-  }, [
-    route,
-    route.params,
-    route.params?.vt,
-    route.params?.totalLength,
-  ]);
-  
-  // if the App is syncing, the VT list will change (new items). 
+  }, [route, route.params, route.params?.vt, route.params?.totalLength]);
+
+  // if the App is syncing, the VT list will change (new items).
   // Hide the navigator is the solution because the current index
   // will be associated to other item.
   useEffect(() => {

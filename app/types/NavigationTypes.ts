@@ -121,8 +121,7 @@ export type FinalizersNavigationState = {
   goBackRoute: RouteEnum;
 };
 
-export type StakeNavigationState = {
-};
+export type StakeNavigationState = {};
 
 export type UnstakeNavigationState = {
   finalizer: string;

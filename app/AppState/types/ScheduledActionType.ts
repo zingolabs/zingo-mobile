@@ -1,4 +1,4 @@
-import { StakingActionKindEnum } from "../enums/StakingActionKindEnum";
+import { StakingActionKindEnum } from '../enums/StakingActionKindEnum';
 
 export default interface ScheduledActionType {
   id: number;
