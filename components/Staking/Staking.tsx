@@ -47,8 +47,7 @@ import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
-import AddressItem from '../Components/AddressItem';
+import { faAngleUp, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
@@ -71,16 +70,6 @@ type DataType = {
   key: string;
   finalizer: string;
   tag: string;
-};
-
-const getPercent = (percent: number) => {
-  return (
-    (percent < 1
-      ? '<1'
-      : percent < 100 && percent >= 99
-        ? '99'
-        : percent.toFixed(0)) + '%'
-  );
 };
 
 type StakingMovement = ValueTransferType & {
@@ -140,7 +129,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
   const screenName = ScreenEnum.StakingHome;
 
   const [loading] = useState(false);
-  const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [tab, setTab] = useState<'scheduled' | 'active' | 'my'>('active');
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
@@ -155,9 +143,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
     height: Dimensions.get('window').height,
   };
 
-  const scrollViewRef = useRef<
-    ScrollView & FlatList<StakingMovement & ScheduledActionType>
-  >(null);
+  const scrollViewRef = useRef<ScrollView & FlatList<any>>(null);
 
   const snapPoints = useMemo(() => {
     let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
@@ -244,8 +230,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
           key: `pie-${index}`,
         };
       });
-    const newExpandAddress = Array(r.length).fill(false);
-    setExpandAddress(newExpandAddress);
     return r;
   }, [staked]);
 
@@ -302,15 +286,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
   );
 
   const line = (item: DataType, index: number, last: boolean) => {
-    const totalValue = stakedData
-      ? stakedData.reduce((acc, curr) => acc + curr.value, 0)
-      : 0;
-    const percent = (100 * item.value) / totalValue;
-    // 30 characters per line
-    const numLines =
-      item.finalizer.length < 40
-        ? 2
-        : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <TouchableOpacity
         style={{ width: '100%' }}
@@ -355,41 +330,43 @@ const Staking: React.FC<StakingProps> = ({}) => {
                 flexWrap: 'wrap',
               }}
             >
-              <AddressItem
-                address={item.finalizer}
-                screenName={screenName}
-                oneLine={true}
-                onlyContact={true}
-                withIcon={true}
-              />
-              {!expandAddress[index] && !!item.finalizer && (
-                <RegText>
-                  {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
-                    ? Utils.trimToSmall(
-                        item.finalizer,
-                        dimensions.width < 500 ? 5 : 10,
-                      )
-                    : item.finalizer}
-                </RegText>
-              )}
-              {expandAddress[index] &&
-                !!item.finalizer &&
-                Utils.splitStringIntoChunks(
-                  item.finalizer,
-                  Number(numLines.toFixed(0)),
-                ).map((c: string, idx: number) => (
-                  <RegText key={idx}>{c}</RegText>
-                ))}
+              <RegText>
+                {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
+                  ? Utils.trimToSmall(
+                      item.finalizer,
+                      dimensions.width < 500 ? 5 : 10,
+                    )
+                  : item.finalizer}
+              </RegText>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                <Stake width={15} height={15} style={{ opacity: 0.7 }} />
+                <ZecAmount
+                  amtZec={item.value}
+                  size={14}
+                  currencyName={info.currencyName}
+                />
+              </View>
             </View>
           </View>
           <View
             style={{
-              flexDirection: 'column-reverse',
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <FadeText>{getPercent(percent)}</FadeText>
+            <FontAwesomeIcon
+              style={{ marginRight: 10, marginLeft: 15 }}
+              size={15}
+              icon={faChevronRight}
+              color={colors.text}
+            />
           </View>
         </View>
       </TouchableOpacity>
