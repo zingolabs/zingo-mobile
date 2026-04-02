@@ -96,7 +96,7 @@ const Unstake: React.FC<UnstakeProps> = ({
       if (b.status === WalletBondsStatusEnum.Withdrawn) return false;
       if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
-      return false;
+      if (!finalizerFromText) return false;
     })
     .sort((a, b) => b.amount - a.amount);
 
