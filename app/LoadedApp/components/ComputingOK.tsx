@@ -91,9 +91,7 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({ route }) => {
                     (v: ValueTransferType) => v.txid === txid,
                   )[0];
                 navigation.navigate(RouteEnum.ValueTransferDetail, {
-                  index: 0,
                   vt: vt,
-                  valueTransfersSliced: valueTransfers,
                   totalLength:
                     valueTransfers !== null ? valueTransfers.length : 0,
                 });

@@ -29,9 +29,7 @@ function makeDrawerProps(
       key: 'Key-1',
       name: RouteEnum.ValueTransferDetail,
       params: {
-        index: i,
         vt: mockValueTransfers[i],
-        valueTransfersSliced: mockValueTransfers,
         totalLength: mockValueTransfers.length,
       },
     },

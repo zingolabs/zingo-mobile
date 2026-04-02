@@ -27,7 +27,6 @@ import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
 import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
-import BoldText from '../../Components/BoldText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Stake from '../../../assets/icons/stake-white.svg';
 import Unstake from '../../../assets/icons/unstake-white.svg';
@@ -73,20 +72,11 @@ const ValueTransferDetail: React.FunctionComponent<
       ? route.params.vt
       : ({} as ValueTransferType),
   );
-  const [, setValueTransferIndex] = useState<number>(
-    !!route.params && route.params.index !== undefined ? route.params.index : 0,
-  );
-  const [, setValueTransfersSliced] = useState<ValueTransferType[]>(
-    !!route.params && route.params.valueTransfersSliced !== undefined
-      ? route.params.valueTransfersSliced
-      : ([] as ValueTransferType[]),
-  );
   const [totalLength, setTotalLength] = useState<number>(
     !!route.params && route.params.totalLength !== undefined
       ? route.params.totalLength
       : 0,
   );
-  const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [showNavigator, setShowNavigator] = useState<boolean>(true); // by default
   const isTheFirstMount = useRef(true);
 
@@ -106,49 +96,17 @@ const ValueTransferDetail: React.FunctionComponent<
   }, [language]);
 
   useEffect(() => {
-    const _index =
-      !!route.params && route.params.index !== undefined
-        ? route.params.index
-        : 0;
     const _vt =
       !!route.params && route.params.vt !== undefined
         ? route.params.vt
         : ({} as ValueTransferType);
-    const _valueTransfersSliced =
-      !!route.params && route.params.valueTransfersSliced !== undefined
-        ? route.params.valueTransfersSliced
-        : ([] as ValueTransferType[]);
     const _totalLength =
       !!route.params && route.params.totalLength !== undefined
         ? route.params.totalLength
         : 0;
-    setValueTransferIndex(_index);
     setValueTransfer(_vt);
-    setValueTransfersSliced(_valueTransfersSliced);
     setTotalLength(_totalLength);
-  }, [
-    route,
-    route.params,
-    route.params?.index,
-    route.params?.vt,
-    route.params?.valueTransfersSliced,
-    route.params?.totalLength,
-  ]);
-
-  useEffect(() => {
-    const spendCo =
-      valueTransfer.confirmations >= 0 &&
-      valueTransfer.confirmations < GlobalConst.minConfirmations
-        ? colors.primaryDisabled
-        : colors.text;
-    setSpendColor(spendCo);
-  }, [
-    colors.primary,
-    colors.primaryDisabled,
-    colors.text,
-    valueTransfer.confirmations,
-    valueTransfer.kind,
-  ]);
+  }, [route, route.params, route.params?.vt, route.params?.totalLength]);
 
   // if the App is syncing, the VT list will change (new items).
   // Hide the navigator is the solution because the current index
@@ -275,17 +233,6 @@ const ValueTransferDetail: React.FunctionComponent<
               </View>
             </View>
 
-            {true && (
-              <BoldText
-                style={{
-                  textAlign: 'center',
-                  textTransform: 'capitalize',
-                  color: spendColor,
-                }}
-              >
-                {Utils.valueTransferKindText(translate, valueTransfer)}
-              </BoldText>
-            )}
             <ZecAmount
               currencyName={info.currencyName}
               size={45}

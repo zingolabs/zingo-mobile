@@ -79,6 +79,7 @@ import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
 import SelectNetwork from './components/SelectNetwork';
 import ConnectIndexer from './components/ConnectIndexer';
+import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -1199,6 +1200,9 @@ export class LoadingAppClass extends Component<
       ) {
         await RPCModule.createTorClientProcess();
       }
+
+      await ScheduledActionsFileImpl.resetSA();
+
       this.navigateToLoadedApp(
         false,
         true,
@@ -1395,6 +1399,9 @@ export class LoadingAppClass extends Component<
           ) {
             await RPCModule.createTorClientProcess();
           }
+
+          await ScheduledActionsFileImpl.resetSA();
+
           this.navigateToLoadedApp(
             readOnly,
             orchardPool,

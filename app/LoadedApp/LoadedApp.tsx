@@ -63,6 +63,7 @@ import {
   StakeType,
   StakingActionType,
   WalletBondsType,
+  ScheduledActionType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -107,6 +108,7 @@ import Redelegate from '../../components/Staking/components/Redelegate';
 import Finalizers from '../../components/Finalizers/Finalizers';
 import { reverseHex32Bytes } from '../utils/hex';
 import SettingsNavigator from '../../components/Settings/SettingsNavigator';
+import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
 
 const LoadedAppStack = createNativeStackNavigator<LoadedAppStackParamList>();
 
@@ -511,6 +513,11 @@ export class LoadedAppClass extends Component<
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
       requestFaucetFunds: this.requestFaucetFunds,
+      stakingDay: false,
+      timeToStakingDay: 0,
+      timeLeftStakingDay: 0,
+      scheduledActions: [] as ScheduledActionType[],
+      setScheduledActions: this.setScheduledActions,
 
       // context settings
       indexerServer: props.indexerServer,
@@ -564,7 +571,29 @@ export class LoadedAppClass extends Component<
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
+  stakingDayCalculation = () => {
+    const latest = this.state.info.latestBlock ?? 0;
+
+    const cycle = 150;
+    const activeWindow = 70;
+
+    const mod = latest % cycle;
+    const isStakingDay = mod < activeWindow;
+    const remaining = isStakingDay ? 0 : cycle - mod;
+    const left = isStakingDay ? activeWindow - mod : 0;
+
+    this.setState({
+      stakingDay: isStakingDay,
+      timeToStakingDay: remaining,
+      timeLeftStakingDay: left,
+    });
+  };
+
   componentDidMount = async () => {
+    this.stakingDayCalculation();
+
+    this.setScheduledActions(await ScheduledActionsFileImpl.listSA());
+
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -767,6 +796,15 @@ export class LoadedAppClass extends Component<
       },
     );
   };
+
+  componentDidUpdate(
+    _prevProps: Readonly<LoadedAppClassProps>,
+    prevState: Readonly<LoadedAppClassState>,
+  ): void {
+    if (prevState.info.latestBlock !== this.state.info.latestBlock) {
+      this.stakingDayCalculation();
+    }
+  }
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
@@ -1748,6 +1786,9 @@ export class LoadedAppClass extends Component<
       return;
     }
 
+    await ScheduledActionsFileImpl.resetSA();
+    this.setScheduledActions([]);
+
     this.keepAwake(false);
     this.navigateToLoadingApp(state);
   };
@@ -1769,6 +1810,9 @@ export class LoadedAppClass extends Component<
       );
       return;
     }
+
+    await ScheduledActionsFileImpl.resetSA();
+    this.setScheduledActions([]);
 
     this.keepAwake(false);
     this.navigateToLoadingApp({ startingApp: false });
@@ -1852,6 +1896,9 @@ export class LoadedAppClass extends Component<
         //return;
       }
 
+      await ScheduledActionsFileImpl.resetSA();
+      this.setScheduledActions([]);
+
       // no need to restart the tasks because is about to restart the app.
       this.navigateToLoadingApp({ startingApp: false });
     }
@@ -1895,6 +1942,12 @@ export class LoadedAppClass extends Component<
   setScrollToBottom = (value: boolean) => {
     this.setState({
       scrollToBottom: value,
+    });
+  };
+
+  setScheduledActions = (scheduledActions: ScheduledActionType[]) => {
+    this.setState({
+      scheduledActions,
     });
   };
 
@@ -1951,6 +2004,11 @@ export class LoadedAppClass extends Component<
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
       requestFaucetFunds: this.requestFaucetFunds,
+      stakingDay: this.state.stakingDay,
+      timeToStakingDay: this.state.timeToStakingDay,
+      timeLeftStakingDay: this.state.timeLeftStakingDay,
+      scheduledActions: this.state.scheduledActions,
+      setScheduledActions: this.state.setScheduledActions,
 
       // context settings
       indexerServer: this.state.indexerServer,
@@ -1965,6 +2023,8 @@ export class LoadedAppClass extends Component<
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
     };
+
+    //console.log('render LoadedApp');
 
     return (
       <ToastProvider>

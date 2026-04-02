@@ -26,6 +26,7 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../../app/types';
 import {
   RouteEnum,
+  ScheduledActionType,
   SendPageStateClass,
   StakingActionKindEnum,
   ToAddrClass,
@@ -38,6 +39,7 @@ import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import RegText from '../../Components/RegText';
+import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -59,8 +61,14 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
-  const { totalBalance, info, privacy, globalStaked } =
-    useContext(ContextAppLoaded);
+  const {
+    totalBalance,
+    info,
+    privacy,
+    globalStaked,
+    stakingDay,
+    setScheduledActions,
+  } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -149,6 +157,17 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       8,
     );
 
+    setModalState('sending');
+
+    const stakingScheduledAction: ScheduledActionType = {
+      id: 0,
+      kind: StakingActionKindEnum.CreateBond,
+      amount: amount * 10 ** 8,
+      finalizer: finalizer,
+      finalizerTo: '',
+      txid: '',
+    };
+
     const stakingAction: StakingActionType = {
       kind: StakingActionKindEnum.CreateBond,
       val: amount * 10 ** 8,
@@ -156,10 +175,15 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
     };
 
-    setModalState('sending');
-
     try {
-      await stakeTransaction(sendPageState, stakingAction);
+      if (stakingDay) {
+        await stakeTransaction(sendPageState, stakingAction);
+      } else {
+        const list = await ScheduledActionsFileImpl.addSA(
+          stakingScheduledAction,
+        );
+        setScheduledActions(list);
+      }
       setModalState('success');
     } catch (error: any) {
       console.warn('Stake tx failed:', error);

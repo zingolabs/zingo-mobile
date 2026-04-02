@@ -2,7 +2,6 @@
 import React, {
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -28,6 +27,7 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import {
   GlobalConst,
   RouteEnum,
+  ScheduledActionType,
   ScreenEnum,
   StakeType,
   StakingActionKindEnum,
@@ -47,8 +47,7 @@ import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
-import AddressItem from '../Components/AddressItem';
+import { faAngleUp, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
@@ -71,16 +70,6 @@ type DataType = {
   key: string;
   finalizer: string;
   tag: string;
-};
-
-const getPercent = (percent: number) => {
-  return (
-    (percent < 1
-      ? '<1'
-      : percent < 100 && percent >= 99
-        ? '99'
-        : percent.toFixed(0)) + '%'
-  );
 };
 
 type StakingMovement = ValueTransferType & {
@@ -122,7 +111,7 @@ type StakingProps = DrawerScreenProps<
   RouteEnum.StakingHome
 >;
 
-const Staking: React.FC<StakingProps> = () => {
+const Staking: React.FC<StakingProps> = ({}) => {
   const context = useContext(ContextAppLoaded);
   const {
     valueTransfers,
@@ -131,21 +120,20 @@ const Staking: React.FC<StakingProps> = () => {
     staked,
     info,
     privacy,
+    stakingDay,
+    timeToStakingDay,
+    timeLeftStakingDay,
+    scheduledActions,
   } = context;
 
   const screenName = ScreenEnum.StakingHome;
 
   const [loading] = useState(false);
-  const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
-  const [tab, setTab] = useState<'movements' | 'staked'>('movements');
-  const [stakingDay, setStakingDay] = useState<boolean>(true);
+  const [tab, setTab] = useState<'scheduled' | 'active' | 'my'>('active');
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const [heightLayout, setHeightLayout] = useState<number>(10);
   const [currentItem, setCurrentItem] = useState<DataType | null>(null);
-
-  const [timeToStakingDay, setTimeToStakingDay] = useState<number>(0);
-  const [timeLeftStakingDay, setTimeLeftStakingDay] = useState<number>(0);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -155,7 +143,7 @@ const Staking: React.FC<StakingProps> = () => {
     height: Dimensions.get('window').height,
   };
 
-  const scrollViewRef = useRef<ScrollView & FlatList<StakingMovement>>(null);
+  const scrollViewRef = useRef<ScrollView & FlatList<any>>(null);
 
   const snapPoints = useMemo(() => {
     let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
@@ -189,24 +177,6 @@ const Staking: React.FC<StakingProps> = () => {
       pressBehavior="close"
     />
   );
-
-  useEffect(() => {
-    const latest = info.latestBlock ?? 0;
-
-    const cycle = 150;
-    const activeWindow = 70;
-
-    const mod = latest % cycle;
-    const isStakingDay = mod < activeWindow;
-
-    setStakingDay(isStakingDay);
-
-    const remaining = isStakingDay ? 0 : cycle - mod;
-    setTimeToStakingDay(remaining);
-
-    const left = isStakingDay ? activeWindow - mod : 0;
-    setTimeLeftStakingDay(left);
-  }, [info.latestBlock]);
 
   const movements: StakingMovement[] = useMemo(() => {
     if (!valueTransfers) {
@@ -260,15 +230,14 @@ const Staking: React.FC<StakingProps> = () => {
           key: `pie-${index}`,
         };
       });
-    const newExpandAddress = Array(r.length).fill(false);
-    setExpandAddress(newExpandAddress);
     return r;
   }, [staked]);
 
   const { colors } = useTheme() as ThemeType;
 
-  const hasMovements = !loading && movements.length > 0;
-  const hasStaked = !loading && stakedData.length > 0;
+  const hasMovements = movements.length > 0;
+  const hasStaked = stakedData.length > 0;
+  const hasScheduledActions = scheduledActions.length > 0;
 
   const monthHeader = hasMovements
     ? formatHeaderMonth(movements[0].time)
@@ -317,15 +286,6 @@ const Staking: React.FC<StakingProps> = () => {
   );
 
   const line = (item: DataType, index: number, last: boolean) => {
-    const totalValue = stakedData
-      ? stakedData.reduce((acc, curr) => acc + curr.value, 0)
-      : 0;
-    const percent = (100 * item.value) / totalValue;
-    // 30 characters per line
-    const numLines =
-      item.finalizer.length < 40
-        ? 2
-        : item.finalizer.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <TouchableOpacity
         style={{ width: '100%' }}
@@ -370,48 +330,57 @@ const Staking: React.FC<StakingProps> = () => {
                 flexWrap: 'wrap',
               }}
             >
-              <AddressItem
-                address={item.finalizer}
-                screenName={screenName}
-                oneLine={true}
-                onlyContact={true}
-                withIcon={true}
-              />
-              {!expandAddress[index] && !!item.finalizer && (
-                <RegText>
-                  {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
-                    ? Utils.trimToSmall(
-                        item.finalizer,
-                        dimensions.width < 500 ? 5 : 10,
-                      )
-                    : item.finalizer}
-                </RegText>
-              )}
-              {expandAddress[index] &&
-                !!item.finalizer &&
-                Utils.splitStringIntoChunks(
-                  item.finalizer,
-                  Number(numLines.toFixed(0)),
-                ).map((c: string, idx: number) => (
-                  <RegText key={idx}>{c}</RegText>
-                ))}
+              <RegText>
+                {item.finalizer.length > (dimensions.width < 500 ? 10 : 20)
+                  ? Utils.trimToSmall(
+                      item.finalizer,
+                      dimensions.width < 500 ? 5 : 10,
+                    )
+                  : item.finalizer}
+              </RegText>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                <Stake width={15} height={15} style={{ opacity: 0.7 }} />
+                <ZecAmount
+                  amtZec={item.value}
+                  size={14}
+                  currencyName={info.currencyName}
+                />
+              </View>
             </View>
           </View>
           <View
             style={{
-              flexDirection: 'column-reverse',
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <FadeText>{getPercent(percent)}</FadeText>
+            <FontAwesomeIcon
+              style={{ marginRight: 10, marginLeft: 15 }}
+              size={15}
+              icon={faChevronRight}
+              color={colors.text}
+            />
           </View>
         </View>
       </TouchableOpacity>
     );
   };
 
-  //console.log('movements', movements);
+  console.log('scheduled actions', scheduledActions);
+
+  console.log(
+    'render staking',
+    stakingDay,
+    timeToStakingDay,
+    timeLeftStakingDay,
+  );
 
   return (
     <ToastProvider>
@@ -504,7 +473,7 @@ const Staking: React.FC<StakingProps> = () => {
         >
           <WalletSummaryHeader show_staked={true} />
 
-          <StakingActions stakingDay={stakingDay} />
+          <StakingActions />
         </View>
 
         <View
@@ -526,20 +495,20 @@ const Staking: React.FC<StakingProps> = () => {
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 20,
-              backgroundColor: tab === 'movements' ? '#6C6C71' : 'transparent',
+              backgroundColor: tab === 'scheduled' ? '#6C6C71' : 'transparent',
               padding: 5,
               overflow: 'hidden',
             }}
           >
-            <TouchableOpacity onPress={() => setTab('movements')}>
+            <TouchableOpacity onPress={() => setTab('scheduled')}>
               <RegText
                 style={{
-                  fontWeight: tab === 'movements' ? 'bold' : 'normal',
+                  fontWeight: tab === 'scheduled' ? 'bold' : 'normal',
                   fontSize: 15,
                   color: colors.text,
                 }}
               >
-                {'Movements'}
+                {'Scheduled'}
               </RegText>
             </TouchableOpacity>
           </View>
@@ -550,20 +519,44 @@ const Staking: React.FC<StakingProps> = () => {
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 20,
-              backgroundColor: tab === 'staked' ? '#6C6C71' : 'transparent',
+              backgroundColor: tab === 'active' ? '#6C6C71' : 'transparent',
               padding: 5,
               overflow: 'hidden',
             }}
           >
-            <TouchableOpacity onPress={() => setTab('staked')}>
+            <TouchableOpacity onPress={() => setTab('active')}>
               <RegText
                 style={{
-                  fontWeight: tab === 'staked' ? 'bold' : 'normal',
+                  fontWeight: tab === 'active' ? 'bold' : 'normal',
                   fontSize: 15,
                   color: colors.text,
                 }}
               >
-                {'Staked'}
+                {'Active Stake'}
+              </RegText>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+              backgroundColor: tab === 'my' ? '#6C6C71' : 'transparent',
+              padding: 5,
+              overflow: 'hidden',
+            }}
+          >
+            <TouchableOpacity onPress={() => setTab('my')}>
+              <RegText
+                style={{
+                  fontWeight: tab === 'my' ? 'bold' : 'normal',
+                  fontSize: 15,
+                  color: colors.text,
+                }}
+              >
+                {'My Finalizers'}
               </RegText>
             </TouchableOpacity>
           </View>
@@ -587,7 +580,7 @@ const Staking: React.FC<StakingProps> = () => {
               </View>
             )}
 
-            {!loading && !hasMovements && tab === 'movements' && (
+            {!loading && !hasScheduledActions && tab === 'scheduled' && (
               <View style={styles.centerContent}>
                 <View
                   style={{
@@ -605,12 +598,12 @@ const Staking: React.FC<StakingProps> = () => {
                     fontSize: 14,
                   }}
                 >
-                  There are no movements yet.
+                  There are no scheduled actions yet.
                 </Text>
               </View>
             )}
 
-            {!loading && !hasStaked && tab === 'staked' && (
+            {!loading && !hasMovements && tab === 'active' && (
               <View style={styles.centerContent}>
                 <View
                   style={{
@@ -628,17 +621,174 @@ const Staking: React.FC<StakingProps> = () => {
                     fontSize: 14,
                   }}
                 >
-                  There are no finalizers yet.
+                  There are no active stake yet.
                 </Text>
               </View>
             )}
 
-            {!loading && hasMovements && tab === 'movements' && (
+            {!loading && !hasStaked && tab === 'my' && (
+              <View style={styles.centerContent}>
+                <View
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    borderWidth: 2,
+                    borderStyle: 'dashed',
+                    borderColor: colors.placeholder,
+                  }}
+                />
+                <Text
+                  style={{
+                    color: colors.placeholder,
+                    fontSize: 14,
+                  }}
+                >
+                  There are no active finalizers yet.
+                </Text>
+              </View>
+            )}
+
+            {!loading && hasScheduledActions && tab === 'scheduled' && (
+              <FlatList
+                ref={scrollViewRef}
+                onScroll={handleScroll}
+                data={scheduledActions}
+                keyExtractor={item => `scheduledActions-${item.id}`}
+                contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
+                ItemSeparatorComponent={Separator}
+                ListHeaderComponent={
+                  <View
+                    style={{
+                      borderTopLeftRadius: 25,
+                      borderTopRightRadius: 25,
+                      paddingVertical: 10,
+                      paddingHorizontal: 25,
+                      backgroundColor: '#78788029',
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: colors.placeholder,
+                        fontSize: 12,
+                      }}
+                    >
+                      {'Scheduled'}
+                    </Text>
+                  </View>
+                }
+                ListFooterComponent={
+                  <View
+                    style={{
+                      height:
+                        Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+                    }}
+                  />
+                }
+                renderItem={({ item }: { item: ScheduledActionType }) => {
+                  let label: string = '';
+                  let Icon: React.ComponentType<{
+                    width: number;
+                    height: number;
+                  }> | null = null;
+
+                  switch (item.kind) {
+                    case StakingActionKindEnum.CreateBond: {
+                      label = 'Stake';
+                      Icon = Stake;
+                      break;
+                    }
+
+                    case StakingActionKindEnum.BeginUnbonding: {
+                      label = 'Unstake';
+                      Icon = Unstake;
+                      break;
+                    }
+
+                    case StakingActionKindEnum.WithdrawBond: {
+                      label = 'Withdraw';
+                      Icon = Unstake;
+                      break;
+                    }
+
+                    case StakingActionKindEnum.Move: {
+                      label = 'Redelegate';
+                      Icon = Unstake;
+                      break;
+                    }
+                  }
+
+                  return (
+                    <View
+                      style={{
+                        backgroundColor: colors.secondary,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingVertical: 10,
+                        paddingHorizontal: 10,
+                      }}
+                    >
+                      <View
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                      >
+                        {Icon && <Icon width={20} height={20} />}
+
+                        <View>
+                          <Text
+                            style={{
+                              color: colors.text,
+                              fontWeight: '500',
+                              fontSize: 14,
+                              marginBottom: 2,
+                              marginLeft: 5,
+                            }}
+                          >
+                            {label}
+                          </Text>
+                          <Text
+                            style={{
+                              color: colors.placeholder,
+                              fontSize: 12,
+                              marginLeft: 5,
+                            }}
+                          >
+                            {item.finalizer}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <ZecAmount
+                        style={{
+                          flexGrow: 1,
+                          alignSelf: 'auto',
+                          justifyContent: 'flex-end',
+                        }}
+                        size={14}
+                        currencyName={info.currencyName}
+                        color={colors.text}
+                        amtZec={item.amount}
+                        privacy={privacy}
+                        prefix={
+                          item.kind === StakingActionKindEnum.CreateBond
+                            ? '+'
+                            : item.kind === StakingActionKindEnum.WithdrawBond
+                              ? '-'
+                              : undefined
+                        }
+                      />
+                    </View>
+                  );
+                }}
+              />
+            )}
+
+            {!loading && hasMovements && tab === 'active' && (
               <FlatList
                 ref={scrollViewRef}
                 onScroll={handleScroll}
                 data={movements}
-                keyExtractor={item => item.txid}
+                keyExtractor={item => `movements-${item.txid}`}
                 contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
                 ItemSeparatorComponent={Separator}
                 ListHeaderComponent={
@@ -769,7 +919,7 @@ const Staking: React.FC<StakingProps> = () => {
               />
             )}
 
-            {!loading && hasStaked && tab === 'staked' && (
+            {!loading && hasStaked && tab === 'my' && (
               <>
                 <ScrollView
                   ref={scrollViewRef}
@@ -857,13 +1007,12 @@ const Staking: React.FC<StakingProps> = () => {
             borderTopRightRadius: 38,
           }}
         >
-          {tab === 'staked' && currentItem && (
+          {tab === 'my' && currentItem && (
             <>
               <FinalizerDetail
                 item={currentItem}
                 closeSheet={hide}
                 setHeightLayout={setHeightLayout}
-                stakingDay={stakingDay}
               />
               <View
                 style={{

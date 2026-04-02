@@ -64,7 +64,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Faucet]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.StakingHome]: undefined;
-  [RouteEnum.Stake]: undefined;
   [RouteEnum.Distribution]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Info]: undefined;
@@ -89,6 +88,7 @@ export type AppDrawerParamList = {
   [RouteEnum.ComputingOK]: ComputingOKNavigationState | undefined;
   [RouteEnum.ComputingError]: ComputingErrorNavigationState | undefined;
   [RouteEnum.Finalizers]: FinalizersNavigationState | undefined;
+  [RouteEnum.Stake]: StakeNavigationState | undefined;
   [RouteEnum.Unstake]: UnstakeNavigationState | undefined;
   [RouteEnum.Redelegate]: RedelegateNavigationState | undefined;
 };
@@ -104,9 +104,7 @@ export type ScannerAddressNavigationState = {
 };
 
 export type ValueTransferDetailNavigationState = {
-  index: number;
   vt: ValueTransferType;
-  valueTransfersSliced: ValueTransferType[];
   totalLength: number;
 };
 
@@ -122,6 +120,8 @@ export type FinalizersNavigationState = {
   exclude: string;
   goBackRoute: RouteEnum;
 };
+
+export type StakeNavigationState = {};
 
 export type UnstakeNavigationState = {
   finalizer: string;
