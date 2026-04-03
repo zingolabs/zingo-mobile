@@ -49,6 +49,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 import RegText from '../Components/RegText';
 import EmptyList from '../../assets/icons/empty-cardboard-box.svg';
+import { RPCValueTransferStatusEnum } from '../../app/rpc/enums/RPCValueTransferStatusEnum';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -211,8 +212,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
     if (!valueTransfers) {
       return [] as ValueTransferType[];
     }
-    // strictly show VT's with some amount on funds.
-    return valueTransfers;
+    // excludinf failed transactions
+    return valueTransfers.filter(
+      vt => vt.status !== RPCValueTransferStatusEnum.failed,
+    );
   }, [valueTransfers]);
 
   useEffect(() => {

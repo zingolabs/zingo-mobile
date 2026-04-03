@@ -7,4 +7,5 @@ export default interface ScheduledActionType {
   finalizer: string;
   finalizerTo: string;
   txid: string;
+  bondKey: string; // for redelegating only
 }

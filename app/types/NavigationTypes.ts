@@ -2,6 +2,7 @@ import {
   AddressKindEnum,
   LaunchingModeEnum,
   RouteEnum,
+  ScheduledActionType,
   SeedActionEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -91,6 +92,9 @@ export type AppDrawerParamList = {
   [RouteEnum.Stake]: StakeNavigationState | undefined;
   [RouteEnum.Unstake]: UnstakeNavigationState | undefined;
   [RouteEnum.Redelegate]: RedelegateNavigationState | undefined;
+  [RouteEnum.ScheduledActionDetail]:
+    | ScheduledActionDetailNavigationState
+    | undefined;
 };
 
 export type AddressListNavigationState = {
@@ -133,6 +137,10 @@ export type RedelegateNavigationState = {
   finalizer: string;
   staked: number;
   closeSheet: () => void;
+};
+
+export type ScheduledActionDetailNavigationState = {
+  item: ScheduledActionType;
 };
 
 export type ConfirmNavigationState = {

@@ -87,6 +87,7 @@ const Unstake: React.FC<UnstakeProps> = ({
     privacy,
     stakingDay,
     setScheduledActions,
+    scheduledActions,
   } = context;
 
   console.log('FINALIZER', finalizerFromText);
@@ -96,7 +97,7 @@ const Unstake: React.FC<UnstakeProps> = ({
       if (b.status === WalletBondsStatusEnum.Withdrawn) return false;
       if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
-      return false;
+      if (!finalizerFromText) return false;
     })
     .sort((a, b) => b.amount - a.amount);
 
@@ -161,6 +162,18 @@ const Unstake: React.FC<UnstakeProps> = ({
       }
     }
 
+    if (!stakingDay) {
+      const isScheduled: boolean =
+        scheduledActions.filter(sa => sa.txid === bondTxid).length > 0;
+      if (isScheduled) {
+        Alert.alert(
+          'Error',
+          'This bond is already scheduled, chose another one.',
+        );
+        return;
+      }
+    }
+
     console.log('bondTxid', bondTxid);
     console.log('selectedKind', selectedKind);
 
@@ -178,6 +191,7 @@ const Unstake: React.FC<UnstakeProps> = ({
       finalizer: finalizerFromText,
       finalizerTo: '',
       txid: bondTxid,
+      bondKey: '',
     };
 
     try {
@@ -206,6 +220,13 @@ const Unstake: React.FC<UnstakeProps> = ({
         );
         setModalState('idle');
         return;
+      }
+
+      if (stakingDay && scheduledActions.filter(sa => sa.txid === bondTxid).length > 0) {
+        const list = await ScheduledActionsFileImpl.removeSA(
+          scheduledActions.filter(sa => sa.txid === bondTxid)[0].id,
+        );
+        setScheduledActions(list);
       }
 
       setModalState('success');

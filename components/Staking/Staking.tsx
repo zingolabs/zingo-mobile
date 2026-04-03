@@ -21,7 +21,7 @@ import {
   NativeScrollEvent,
   Image,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 import {
@@ -31,8 +31,7 @@ import {
   ScreenEnum,
   StakeType,
   StakingActionKindEnum,
-  ValueTransferKindEnum,
-  ValueTransferType,
+  WalletBondsType,
 } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
 import { ThemeType } from '../../app/types';
@@ -42,7 +41,6 @@ import StakingActions from './StakingActions';
 import { ContextAppLoaded } from '../../app/context';
 import Stake from '../../assets/icons/stake-white.svg';
 import Unstake from '../../assets/icons/unstake-white.svg';
-import Refresh from '../../assets/icons/refresh.svg';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
@@ -61,6 +59,8 @@ import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
 import { Layers3Icon } from 'lucide-react-native';
 import { SpinningLoaderIcon } from '../Components/Icons/SpinningLoaderIcon';
 import ZecAmount from '../Components/ZecAmount';
+import { WalletBondsStatusEnum } from '../../app/AppState/enums/WalletBondsStatusEnum';
+import Button from '../Components/Button';
 
 type DataType = {
   svg: {
@@ -72,11 +72,8 @@ type DataType = {
   tag: string;
 };
 
-type StakingMovement = ValueTransferType & {
-  stakingUiKind: StakingActionKindEnum;
-};
-
-const formatMovementDate = (unixSeconds: number) => {
+const formatMovementDate = (unixSeconds: number | undefined) => {
+  if (!unixSeconds) return '-';
   const d = new Date(unixSeconds * 1000);
   return d.toLocaleString(undefined, {
     month: 'short', // "Oct"
@@ -86,35 +83,15 @@ const formatMovementDate = (unixSeconds: number) => {
   }); // "Oct 10, 4:30 PM"
 };
 
-const formatHeaderMonth = (unixSeconds: number) => {
-  const d = new Date(unixSeconds * 1000);
-  return d.toLocaleString(undefined, {
-    month: 'long', // "October"
-    year: 'numeric', // "2025"
-  }); // "October 2025"
-};
-
-function Separator() {
-  return (
-    <View
-      style={{
-        borderBottomWidth: 1,
-        borderBottomColor: '#333333',
-        borderStyle: 'solid',
-      }}
-    />
-  );
-}
-
 type StakingProps = DrawerScreenProps<
   AppDrawerParamList,
   RouteEnum.StakingHome
 >;
 
 const Staking: React.FC<StakingProps> = ({}) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
-    valueTransfers,
     snackbars,
     removeFirstSnackbar,
     staked,
@@ -124,6 +101,8 @@ const Staking: React.FC<StakingProps> = ({}) => {
     timeToStakingDay,
     timeLeftStakingDay,
     scheduledActions,
+    walletBonds,
+    valueTransfers,
   } = context;
 
   const screenName = ScreenEnum.StakingHome;
@@ -178,40 +157,19 @@ const Staking: React.FC<StakingProps> = ({}) => {
     />
   );
 
-  const movements: StakingMovement[] = useMemo(() => {
-    if (!valueTransfers) {
+  const movements: WalletBondsType[] = useMemo(() => {
+    if (!walletBonds) {
       return [];
     }
 
-    return valueTransfers
-      .map(vt => {
-        if (vt.kind === ValueTransferKindEnum.CreateBond) {
-          return { ...vt, stakingUiKind: StakingActionKindEnum.CreateBond };
-        }
-
-        if (vt.kind === ValueTransferKindEnum.BeginUnbond) {
-          return { ...vt, stakingUiKind: StakingActionKindEnum.BeginUnbonding };
-        }
-
-        if (vt.kind === ValueTransferKindEnum.WithdrawBond) {
-          return { ...vt, stakingUiKind: StakingActionKindEnum.WithdrawBond };
-        }
-
-        if (vt.kind === ValueTransferKindEnum.RetargetDelegationBond) {
-          return { ...vt, stakingUiKind: StakingActionKindEnum.Move };
-        }
-
-        if (vt.amount <= 0) {
-          return null;
-        }
-
-        console.log(vt);
-
-        return null;
+    return walletBonds
+      .filter(b => {
+        // all bonds
+        if (b.status === WalletBondsStatusEnum.Withdrawn) return false;
+        return true;
       })
-      .filter((vt): vt is StakingMovement => vt !== null)
-      .sort((a, b) => b.time - a.time);
-  }, [valueTransfers]);
+      .sort((a, b) => b.amount - a.amount);
+  }, [walletBonds]);
 
   const stakedData: DataType[] = useMemo(() => {
     const resultJSON: StakeType[] = staked;
@@ -238,10 +196,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
   const hasMovements = movements.length > 0;
   const hasStaked = stakedData.length > 0;
   const hasScheduledActions = scheduledActions.length > 0;
-
-  const monthHeader = hasMovements
-    ? formatHeaderMonth(movements[0].time)
-    : undefined;
 
   const handleScrollToTop = useCallback(() => {
     if (scrollViewRef.current && !isScrollingToTop) {
@@ -650,137 +604,262 @@ const Staking: React.FC<StakingProps> = ({}) => {
             )}
 
             {!loading && hasScheduledActions && tab === 'scheduled' && (
-              <FlatList
-                ref={scrollViewRef}
-                onScroll={handleScroll}
-                data={scheduledActions}
-                keyExtractor={item => `scheduledActions-${item.id}`}
-                contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
-                ItemSeparatorComponent={Separator}
-                ListHeaderComponent={
-                  <View
-                    style={{
-                      borderTopLeftRadius: 25,
-                      borderTopRightRadius: 25,
-                      paddingVertical: 10,
-                      paddingHorizontal: 25,
-                      backgroundColor: '#78788029',
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: colors.placeholder,
-                        fontSize: 12,
-                      }}
-                    >
-                      {'Scheduled'}
-                    </Text>
-                  </View>
-                }
-                ListFooterComponent={
-                  <View
-                    style={{
-                      height:
-                        Platform.OS === GlobalConst.platformOSios ? 100 : 10,
-                    }}
-                  />
-                }
-                renderItem={({ item }: { item: ScheduledActionType }) => {
-                  let label: string = '';
-                  let Icon: React.ComponentType<{
-                    width: number;
-                    height: number;
-                  }> | null = null;
-
-                  switch (item.kind) {
-                    case StakingActionKindEnum.CreateBond: {
-                      label = 'Stake';
-                      Icon = Stake;
-                      break;
-                    }
-
-                    case StakingActionKindEnum.BeginUnbonding: {
-                      label = 'Unstake';
-                      Icon = Unstake;
-                      break;
-                    }
-
-                    case StakingActionKindEnum.WithdrawBond: {
-                      label = 'Withdraw';
-                      Icon = Unstake;
-                      break;
-                    }
-
-                    case StakingActionKindEnum.Move: {
-                      label = 'Redelegate';
-                      Icon = Unstake;
-                      break;
-                    }
-                  }
-
-                  return (
+              <>
+                <FadeText
+                  style={{
+                    fontSize: 12,
+                    fontStyle: 'normal',
+                    fontWeight: 400,
+                    lineHeight: 22,
+                    letterSpacing: -0.43,
+                    paddingHorizontal: 5,
+                    marginBottom: 5,
+                  }}
+                >
+                  Scheduled actions execute automatically when the next staking
+                  day begins.
+                </FadeText>
+                <FlatList
+                  ref={scrollViewRef}
+                  onScroll={handleScroll}
+                  data={scheduledActions}
+                  keyExtractor={item => `scheduledActions-${item.id}`}
+                  contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
+                  ListHeaderComponent={
                     <View
                       style={{
-                        backgroundColor: colors.secondary,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
+                        borderTopLeftRadius: 25,
+                        borderTopRightRadius: 25,
                         paddingVertical: 10,
-                        paddingHorizontal: 10,
+                        paddingHorizontal: 25,
+                        paddingTop: 15,
+                        backgroundColor: '#181818',
+                        borderTopColor: stakingDay ? '#004300' : '#594111',
+                        borderLeftColor: stakingDay ? '#004300' : '#594111',
+                        borderRightColor: stakingDay ? '#004300' : '#594111',
+                        borderTopWidth: 1,
+                        borderLeftWidth: 1,
+                        borderRightWidth: 1,
                       }}
                     >
-                      <View
-                        style={{ flexDirection: 'row', alignItems: 'center' }}
-                      >
-                        {Icon && <Icon width={20} height={20} />}
-
-                        <View>
-                          <Text
-                            style={{
-                              color: colors.text,
-                              fontWeight: '500',
-                              fontSize: 14,
-                              marginBottom: 2,
-                              marginLeft: 5,
-                            }}
-                          >
-                            {label}
-                          </Text>
-                          <Text
-                            style={{
-                              color: colors.placeholder,
-                              fontSize: 12,
-                              marginLeft: 5,
-                            }}
-                          >
-                            {item.finalizer}
-                          </Text>
-                        </View>
-                      </View>
-
-                      <ZecAmount
+                      <Text
                         style={{
-                          flexGrow: 1,
-                          alignSelf: 'auto',
-                          justifyContent: 'flex-end',
+                          color: stakingDay ? '#00B800' : '#FFAF02',
+                          fontSize: 12,
                         }}
-                        size={14}
-                        currencyName={info.currencyName}
-                        color={colors.text}
-                        amtZec={item.amount}
-                        privacy={privacy}
-                        prefix={
-                          item.kind === StakingActionKindEnum.CreateBond
-                            ? '+'
-                            : item.kind === StakingActionKindEnum.WithdrawBond
-                              ? '-'
-                              : undefined
-                        }
-                      />
+                      >
+                        {'Scheduled'}
+                      </Text>
                     </View>
-                  );
-                }}
-              />
+                  }
+                  ListFooterComponent={
+                    <>
+                      <View
+                        style={{
+                          borderBottomLeftRadius: 25,
+                          borderBottomRightRadius: 25,
+                          paddingBottom: 15,
+                          backgroundColor: '#181818',
+                          borderBottomColor: stakingDay ? '#004300' : '#594111',
+                          borderLeftColor: stakingDay ? '#004300' : '#594111',
+                          borderRightColor: stakingDay ? '#004300' : '#594111',
+                          borderBottomWidth: 1,
+                          borderLeftWidth: 1,
+                          borderRightWidth: 1,
+                        }}
+                      />
+                      <View
+                        style={{
+                          height:
+                            Platform.OS === GlobalConst.platformOSios
+                              ? 100
+                              : 10,
+                        }}
+                      />
+                    </>
+                  }
+                  renderItem={({ item }: { item: ScheduledActionType }) => {
+                    let label: string = '';
+                    let Icon: React.ComponentType<{
+                      width: number;
+                      height: number;
+                    }> | null = null;
+
+                    switch (item.kind) {
+                      case StakingActionKindEnum.CreateBond: {
+                        label = 'Stake';
+                        Icon = Stake;
+                        break;
+                      }
+
+                      case StakingActionKindEnum.BeginUnbonding: {
+                        // the txid have to be from a create_bond kind
+                        if (
+                          item.txid &&
+                          walletBonds.filter(wb => wb.txid === item.txid)
+                            .length > 0 &&
+                          walletBonds.filter(wb => wb.txid === item.txid)[0]
+                            .status === WalletBondsStatusEnum.Active
+                        ) {
+                          label = 'Unstake';
+                        } else {
+                          label = 'Unstake (transaction issue)';
+                        }
+                        Icon = Unstake;
+                        break;
+                      }
+
+                      case StakingActionKindEnum.WithdrawBond: {
+                        // the txid have to be from a unbonding kind
+                        if (
+                          item.txid &&
+                          walletBonds.filter(wb => wb.txid === item.txid)
+                            .length > 0 &&
+                          walletBonds.filter(wb => wb.txid === item.txid)[0]
+                            .status === WalletBondsStatusEnum.Unbonding
+                        ) {
+                          label = 'Withdraw';
+                        } else {
+                          label = 'Withdraw (transaction issue)';
+                        }
+                        Icon = Unstake;
+                        break;
+                      }
+
+                      case StakingActionKindEnum.Move: {
+                        // the txid have to be from a create_bond kind
+                        if (
+                          item.txid &&
+                          walletBonds.filter(wb => wb.txid === item.txid)
+                            .length > 0 &&
+                          walletBonds.filter(wb => wb.txid === item.txid)[0]
+                            .status === WalletBondsStatusEnum.Active
+                        ) {
+                          label = 'Redelegate';
+                        } else {
+                          label = 'Redelegate (transaction issue)';
+                        }
+                        Icon = Unstake;
+                        break;
+                      }
+                    }
+
+                    return (
+                      <View
+                        style={{
+                          backgroundColor: '#181818',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          paddingVertical: 10,
+                          paddingHorizontal: 10,
+                          borderLeftColor: stakingDay ? '#004300' : '#594111',
+                          borderRightColor: stakingDay ? '#004300' : '#594111',
+                          borderLeftWidth: 1,
+                          borderRightWidth: 1,
+                        }}
+                      >
+                        <TouchableOpacity
+                          style={{ width: '100%' }}
+                          onPress={() => {
+                            navigation.navigate(
+                              RouteEnum.ScheduledActionDetail,
+                              {
+                                item,
+                              },
+                            );
+                          }}
+                        >
+                          <View
+                            style={{
+                              backgroundColor: '#1F1F1F',
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              paddingVertical: 10,
+                              paddingHorizontal: 10,
+                              borderRadius: 16,
+                            }}
+                          >
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                              }}
+                            >
+                              {Icon && <Icon width={20} height={20} />}
+
+                              <View>
+                                <Text
+                                  style={{
+                                    color: colors.text,
+                                    fontWeight: '500',
+                                    fontSize: 14,
+                                    marginBottom: 2,
+                                    marginLeft: 10,
+                                  }}
+                                >
+                                  {label}
+                                </Text>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    marginLeft: 5,
+                                  }}
+                                >
+                                  <ZecAmount
+                                    style={{
+                                      flexGrow: 1,
+                                      alignSelf: 'auto',
+                                      justifyContent: 'flex-end',
+                                    }}
+                                    size={12}
+                                    currencyName={info.currencyName}
+                                    color={colors.text}
+                                    amtZec={
+                                      item.txid &&
+                                      walletBonds.filter(
+                                        wb => wb.txid === item.txid,
+                                      ).length > 0
+                                        ? walletBonds.filter(
+                                            wb => wb.txid === item.txid,
+                                          )[0].amount
+                                        : item.amount / 10 ** 8
+                                    }
+                                    privacy={privacy}
+                                  />
+                                  <Text
+                                    style={{
+                                      color: colors.placeholder,
+                                      fontSize: 12,
+                                      marginLeft: 5,
+                                    }}
+                                  >
+                                    {'with '}
+                                    {item.finalizer.length >
+                                    (dimensions.width < 500 ? 10 : 20)
+                                      ? Utils.trimToSmall(
+                                          item.finalizer,
+                                          dimensions.width < 500 ? 5 : 10,
+                                        )
+                                      : item.finalizer}
+                                  </Text>
+                                </View>
+                              </View>
+                            </View>
+                            <View
+                              style={{ flexGrow: 1, alignItems: 'flex-end' }}
+                            >
+                              <RegText style={{ fontSize: 14 }}>
+                                {'1m 12s'}
+                              </RegText>
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  }}
+                />
+              </>
             )}
 
             {!loading && hasMovements && tab === 'active' && (
@@ -790,7 +869,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
                 data={movements}
                 keyExtractor={item => `movements-${item.txid}`}
                 contentContainerStyle={{ paddingTop: 8, paddingBottom: 4 }}
-                ItemSeparatorComponent={Separator}
                 ListHeaderComponent={
                   <View
                     style={{
@@ -798,121 +876,171 @@ const Staking: React.FC<StakingProps> = ({}) => {
                       borderTopRightRadius: 25,
                       paddingVertical: 10,
                       paddingHorizontal: 25,
-                      backgroundColor: '#78788029',
+                      paddingTop: 15,
+                      backgroundColor: '#181818',
+                      borderTopColor: '#3B3B3C',
+                      borderLeftColor: '#3B3B3C',
+                      borderRightColor: '#3B3B3C',
+                      borderTopWidth: 1,
+                      borderLeftWidth: 1,
+                      borderRightWidth: 1,
                     }}
                   >
-                    {monthHeader && (
-                      <Text
-                        style={{
-                          color: colors.placeholder,
-                          fontSize: 12,
-                        }}
-                      >
-                        {monthHeader}
-                      </Text>
-                    )}
+                    <Text
+                      style={{
+                        color: colors.text,
+                        fontSize: 16,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {'Active Stake'}
+                    </Text>
                   </View>
                 }
                 ListFooterComponent={
-                  <View
-                    style={{
-                      height:
-                        Platform.OS === GlobalConst.platformOSios ? 100 : 10,
-                    }}
-                  />
+                  <>
+                    <View
+                      style={{
+                        borderBottomLeftRadius: 25,
+                        borderBottomRightRadius: 25,
+                        paddingBottom: 15,
+                        backgroundColor: '#181818',
+                        borderBottomColor: '#3B3B3C',
+                        borderLeftColor: '#3B3B3C',
+                        borderRightColor: '#3B3B3C',
+                        borderBottomWidth: 1,
+                        borderLeftWidth: 1,
+                        borderRightWidth: 1,
+                      }}
+                    />
+                    <View
+                      style={{
+                        height:
+                          Platform.OS === GlobalConst.platformOSios ? 100 : 10,
+                      }}
+                    />
+                  </>
                 }
-                renderItem={({ item }: { item: StakingMovement }) => {
-                  let label: string = '';
-                  let Icon: React.ComponentType<{
-                    width: number;
-                    height: number;
-                  }> | null = null;
-
-                  switch (item.stakingUiKind) {
-                    case StakingActionKindEnum.CreateBond: {
-                      label = 'Stake';
-                      Icon = item.confirmations === 0 ? Refresh : Stake;
-                      break;
-                    }
-
-                    case StakingActionKindEnum.BeginUnbonding: {
-                      label = 'Unstake';
-                      Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      break;
-                    }
-
-                    case StakingActionKindEnum.WithdrawBond: {
-                      label = 'Withdraw';
-                      Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      break;
-                    }
-
-                    case StakingActionKindEnum.Move: {
-                      label = 'Redelegate';
-                      Icon = item.confirmations === 0 ? Refresh : Unstake;
-                      break;
-                    }
-                  }
-
+                renderItem={({ item }: { item: WalletBondsType }) => {
                   return (
                     <View
                       style={{
-                        backgroundColor: colors.secondary,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
+                        backgroundColor: '#181818',
                         alignItems: 'center',
                         paddingVertical: 10,
                         paddingHorizontal: 10,
+                        borderLeftColor: '#3B3B3C',
+                        borderRightColor: '#3B3B3C',
+                        borderLeftWidth: 1,
+                        borderRightWidth: 1,
                       }}
                     >
                       <View
-                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                        style={{
+                          backgroundColor: '#1F1F1F',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          paddingVertical: 10,
+                          paddingHorizontal: 10,
+                          borderRadius: 16,
+                        }}
                       >
-                        {Icon && <Icon width={20} height={20} />}
+                        <View
+                          style={{ flexDirection: 'row', alignItems: 'center' }}
+                        >
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <View>
+                              <Text
+                                style={{
+                                  color: colors.text,
+                                  fontWeight: '500',
+                                  fontSize: 14,
+                                  marginBottom: 2,
+                                  marginLeft: 5,
+                                }}
+                              >
+                                {item.finalizer.length >
+                                (dimensions.width < 500 ? 10 : 20)
+                                  ? Utils.trimToSmall(
+                                      item.finalizer,
+                                      dimensions.width < 500 ? 5 : 10,
+                                    )
+                                  : item.finalizer}
+                              </Text>
+                              <Text
+                                style={{
+                                  color: colors.placeholder,
+                                  fontSize: 12,
+                                  marginLeft: 5,
+                                }}
+                              >
+                                {formatMovementDate(
+                                  valueTransfers?.filter(
+                                    vt => vt.txid === item.txid,
+                                  )[0].time,
+                                )}
+                              </Text>
+                            </View>
+                          </View>
 
-                        <View>
-                          <Text
+                          <ZecAmount
                             style={{
-                              color: colors.text,
-                              fontWeight: '500',
-                              fontSize: 14,
-                              marginBottom: 2,
-                              marginLeft: 5,
+                              flexGrow: 1,
+                              alignSelf: 'auto',
+                              justifyContent: 'flex-end',
                             }}
-                          >
-                            {label}
-                          </Text>
-                          <Text
-                            style={{
-                              color: colors.placeholder,
-                              fontSize: 12,
-                              marginLeft: 5,
-                            }}
-                          >
-                            {formatMovementDate(item.time)}
-                          </Text>
+                            size={14}
+                            currencyName={info.currencyName}
+                            color={colors.text}
+                            amtZec={item.amount}
+                            privacy={privacy}
+                          />
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginTop: 10,
+                          }}
+                        >
+                          {item.status === WalletBondsStatusEnum.Active && (
+                            <Button
+                              variant="primary"
+                              title={'Redelegate'}
+                              style={{ width: 'auto' }}
+                              onPress={() => {
+                                navigation.navigate(RouteEnum.Redelegate, {
+                                  finalizer: item.finalizer,
+                                  staked: item.amount,
+                                  closeSheet: () => {},
+                                });
+                              }}
+                            />
+                          )}
+                          {(item.status === WalletBondsStatusEnum.Active ||
+                            item.status ===
+                              WalletBondsStatusEnum.Unbonding) && (
+                            <Button
+                              variant="secondary"
+                              title={'Unstake'}
+                              style={{ width: '40%', marginLeft: 10 }}
+                              onPress={() => {
+                                navigation.navigate(RouteEnum.Unstake, {
+                                  finalizer: item.finalizer,
+                                  staked: item.amount,
+                                  closeSheet: () => {},
+                                });
+                              }}
+                            />
+                          )}
                         </View>
                       </View>
-
-                      <ZecAmount
-                        style={{
-                          flexGrow: 1,
-                          alignSelf: 'auto',
-                          justifyContent: 'flex-end',
-                        }}
-                        size={14}
-                        currencyName={info.currencyName}
-                        color={colors.text}
-                        amtZec={item.amount}
-                        privacy={privacy}
-                        prefix={
-                          item.kind === ValueTransferKindEnum.CreateBond
-                            ? '+'
-                            : item.kind === ValueTransferKindEnum.WithdrawBond
-                              ? '-'
-                              : undefined
-                        }
-                      />
                     </View>
                   );
                 }}

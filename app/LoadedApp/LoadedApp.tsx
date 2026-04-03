@@ -109,6 +109,7 @@ import Finalizers from '../../components/Finalizers/Finalizers';
 import { reverseHex32Bytes } from '../utils/hex';
 import SettingsNavigator from '../../components/Settings/SettingsNavigator';
 import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
+import ScheduledActionDetail from '../../components/ScheduledActions/ScheduledActionDetail';
 
 const LoadedAppStack = createNativeStackNavigator<LoadedAppStackParamList>();
 
@@ -133,6 +134,7 @@ type LoadedAppStackParamList = {
   [RouteEnum.Distribution]: undefined;
   [RouteEnum.Redelegate]: undefined;
   [RouteEnum.Finalizers]: undefined;
+  [RouteEnum.ScheduledActionDetail]: undefined;
 };
 
 const en = require('../translations/en.json');
@@ -2177,6 +2179,18 @@ export class LoadedAppClass extends Component<
                 {props => (
                   <Redelegate
                     {...props}
+                    redelegateTransaction={this.redelegateTransaction}
+                  />
+                )}
+              </LoadedAppStack.Screen>
+
+              <LoadedAppStack.Screen name={RouteEnum.ScheduledActionDetail}>
+                {props => (
+                  <ScheduledActionDetail
+                    {...props}
+                    beginUnstakeTransaction={this.beginUnstakeTransaction}
+                    withdrawBondTransaction={this.withdrawBondTransaction}
+                    stakeTransaction={this.stakeTransaction}
                     redelegateTransaction={this.redelegateTransaction}
                   />
                 )}

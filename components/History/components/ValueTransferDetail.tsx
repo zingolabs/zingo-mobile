@@ -267,8 +267,9 @@ const ValueTransferDetail: React.FunctionComponent<
                   RPCValueTransferStatusEnum.transmitted ||
                   valueTransfer.status ===
                     RPCValueTransferStatusEnum.calculated ||
+                  valueTransfer.status === RPCValueTransferStatusEnum.mempool ||
                   valueTransfer.status ===
-                    RPCValueTransferStatusEnum.mempool) && (
+                    RPCValueTransferStatusEnum.failed) && (
                   <FadeText
                     style={{
                       color: colors.text,

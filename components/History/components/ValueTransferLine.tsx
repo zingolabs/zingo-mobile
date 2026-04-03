@@ -209,7 +209,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                               RPCValueTransferStatusEnum.transmitted ||
                             vt.status ===
                               RPCValueTransferStatusEnum.calculated ||
-                            vt.status === RPCValueTransferStatusEnum.mempool
+                            vt.status === RPCValueTransferStatusEnum.mempool ||
+                            vt.status === RPCValueTransferStatusEnum.failed
                               ? colors.primary
                               : colors.primaryDisabled,
                           fontSize: 12,

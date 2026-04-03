@@ -68,6 +68,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     globalStaked,
     stakingDay,
     setScheduledActions,
+    scheduledActions,
   } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
@@ -144,6 +145,20 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       );
       return;
     }
+
+    if (!stakingDay) {
+      const amountScheduled = scheduledActions
+        .filter(sa => sa.kind === StakingActionKindEnum.CreateBond)
+        .reduce((acc, curr) => acc + curr.amount, 0);
+      if (amount + amountScheduled / 10 ** 8 > spendable) {
+        Alert.alert(
+          'Insufficient balance to schedule an stake action',
+          `You can scheduling stakes up to ${spendable.toFixed(5)} ${info.currencyName}.`,
+        );
+        return;
+      }
+    }
+
     // Build a minimal SendPageState to reuse existing plumbing
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
 
@@ -166,6 +181,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       finalizer: finalizer,
       finalizerTo: '',
       txid: '',
+      bondKey: '',
     };
 
     const stakingAction: StakingActionType = {

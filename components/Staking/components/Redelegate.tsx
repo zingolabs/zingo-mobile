@@ -95,6 +95,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
     privacy,
     stakingDay,
     setScheduledActions,
+    scheduledActions,
   } = context;
 
   const movements = walletBonds
@@ -201,6 +202,18 @@ const Redelegate: React.FC<RedelegateProps> = ({
       }
     }
 
+    if (!stakingDay) {
+      const isScheduled: boolean =
+        scheduledActions.filter(sa => sa.txid === bondTxid).length > 0;
+      if (isScheduled) {
+        Alert.alert(
+          'Error',
+          'This bond is already scheduled, chose another one.',
+        );
+        return;
+      }
+    }
+
     console.log('bondTxid', bondTxid);
 
     let bondKey = selectedBond.pubKey;
@@ -217,6 +230,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
       finalizer: finalizerFromText,
       finalizerTo: finalizerToText,
       txid: bondTxid,
+      bondKey: bondKey,
     };
 
     try {
@@ -236,6 +250,13 @@ const Redelegate: React.FC<RedelegateProps> = ({
         );
         setModalState('idle');
         return;
+      }
+
+      if (stakingDay && scheduledActions.filter(sa => sa.txid === bondTxid).length > 0) {
+        const list = await ScheduledActionsFileImpl.removeSA(
+          scheduledActions.filter(sa => sa.txid === bondTxid)[0].id,
+        );
+        setScheduledActions(list);
       }
 
       setModalState('success');
