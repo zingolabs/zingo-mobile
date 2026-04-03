@@ -129,12 +129,14 @@ export type StakeNavigationState = {};
 
 export type UnstakeNavigationState = {
   finalizer: string;
+  txid: string;
   staked: number;
   closeSheet: () => void;
 };
 
 export type RedelegateNavigationState = {
   finalizer: string;
+  txid: string;
   staked: number;
   closeSheet: () => void;
 };

@@ -1017,6 +1017,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                               onPress={() => {
                                 navigation.navigate(RouteEnum.Redelegate, {
                                   finalizer: item.finalizer,
+                                  txid: item.txid,
                                   staked: item.amount,
                                   closeSheet: () => {},
                                 });
@@ -1033,6 +1034,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                               onPress={() => {
                                 navigation.navigate(RouteEnum.Unstake, {
                                   finalizer: item.finalizer,
+                                  txid: item.txid,
                                   staked: item.amount,
                                   closeSheet: () => {},
                                 });

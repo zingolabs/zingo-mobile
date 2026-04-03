@@ -115,6 +115,7 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
                 clear();
                 navigation.navigate(RouteEnum.Redelegate, {
                   finalizer: item?.finalizer,
+                  txid: undefined,
                   staked: item?.value,
                   closeSheet: closeSheet,
                 });
@@ -128,6 +129,7 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
                 clear();
                 navigation.navigate(RouteEnum.Unstake, {
                   finalizer: item?.finalizer,
+                  txid: undefined,
                   staked: item?.value,
                   closeSheet: closeSheet,
                 });
