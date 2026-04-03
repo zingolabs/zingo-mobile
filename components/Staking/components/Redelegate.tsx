@@ -61,6 +61,8 @@ const Redelegate: React.FC<RedelegateProps> = ({
     !!route.params && route.params.finalizer !== undefined
       ? route.params.finalizer
       : '';
+  const txid =
+    !!route.params && route.params.txid !== undefined ? route.params.txid : '';
   const stakedFrom =
     !!route.params && route.params.staked !== undefined
       ? route.params.staked
@@ -75,6 +77,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
   const insets = useSafeAreaInsets();
 
   const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
+  const [txidFrom, setTxidFrom] = useState<string>(txid);
   const [stakedFromNumber, setStakedFromNumber] = useState<number>(stakedFrom);
   const [finalizerToText, setFinalizerToText] = useState<string>('');
   const [stakedToNumber, setStakedToNumber] = useState<number>(0);
@@ -98,20 +101,25 @@ const Redelegate: React.FC<RedelegateProps> = ({
     scheduledActions,
   } = context;
 
-  const movements = walletBonds
-    .filter(b => {
-      // only active bonds.
-      if (
-        b.status === WalletBondsStatusEnum.Withdrawn ||
-        b.status === WalletBondsStatusEnum.Unbonding
-      )
+  const movements = useMemo(() => {
+    return walletBonds
+      .filter(b => {
+        // only active bonds.
+        if (
+          b.status === WalletBondsStatusEnum.Withdrawn ||
+          b.status === WalletBondsStatusEnum.Unbonding
+        )
+          return false;
+        if (!!txidFrom && b.txid === txidFrom) return true;
+        if (txidFrom) return false;
+        if (!!finalizerFromText && b.finalizer === finalizerFromText)
+          return true;
+        // no finalizer selected, all bonds visible. Impossible case for now.
+        if (!finalizerFromText) return true;
         return false;
-      if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
-      // no finalizer selected, all bonds visible. Impossible case for now.
-      if (!finalizerFromText) return true;
-      return false;
-    })
-    .sort((a, b) => b.amount - a.amount);
+      })
+      .sort((a, b) => b.amount - a.amount);
+  }, [finalizerFromText, txidFrom, walletBonds]);
 
   const selectedBond = movements.find(tx => tx.txid === selectedTxid);
   const hasSelectedTx = !!selectedBond;
@@ -166,11 +174,11 @@ const Redelegate: React.FC<RedelegateProps> = ({
     }
   }, [finalizerToText, globalStaked]);
 
-  const shortenTxid = (txid: string) => {
-    if (txid.length <= 16) {
-      return txid;
+  const shortenTxid = (_txid: string) => {
+    if (_txid.length <= 16) {
+      return _txid;
     }
-    return `${txid.slice(0, 10)}…${txid.slice(-8)}`;
+    return `${_txid.slice(0, 10)}…${_txid.slice(-8)}`;
   };
 
   const handleRedelegatePress = async () => {
@@ -252,7 +260,10 @@ const Redelegate: React.FC<RedelegateProps> = ({
         return;
       }
 
-      if (stakingDay && scheduledActions.filter(sa => sa.txid === bondTxid).length > 0) {
+      if (
+        stakingDay &&
+        scheduledActions.filter(sa => sa.txid === bondTxid).length > 0
+      ) {
         const list = await ScheduledActionsFileImpl.removeSA(
           scheduledActions.filter(sa => sa.txid === bondTxid)[0].id,
         );
@@ -380,115 +391,115 @@ const Redelegate: React.FC<RedelegateProps> = ({
         >
           Finalizers addresses
         </Text>
-
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate(RouteEnum.Finalizers, {
-              setFinalizer: (f: string, s: number) => {
-                setFinalizerFromText(f);
-                setStakedFromNumber(s);
-              },
-              scope: 'my',
-              exclude: '',
-            })
-          }
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: 20,
+            marginBottom: 10,
+            backgroundColor: colors.secondary,
+            padding: 16,
+            marginHorizontal: 10,
+            borderWidth: 0.5,
+            borderColor: colors.text,
+          }}
         >
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               alignItems: 'center',
-              borderRadius: 20,
-              marginBottom: 10,
-              backgroundColor: colors.secondary,
-              padding: 16,
-              marginHorizontal: 10,
-              borderWidth: 0.5,
-              borderColor: colors.text,
+              flexGrow: 1,
+              flexShrink: 1,
             }}
           >
+            <FontAwesomeIcon
+              style={{ marginRight: 15 }}
+              size={20}
+              icon={faCircle}
+              color="rgba(143, 191, 250, 1)"
+            />
             <View
               style={{
-                flexDirection: 'row',
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 flexGrow: 1,
                 flexShrink: 1,
+                gap: 0,
               }}
             >
-              <FontAwesomeIcon
-                style={{ marginRight: 15 }}
-                size={20}
-                icon={faCircle}
-                color="rgba(143, 191, 250, 1)"
-              />
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'flex-start',
-                  flexGrow: 1,
-                  flexShrink: 1,
-                  gap: 0,
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <TextInput
-                    style={{
-                      flexGrow: 1,
-                      flexShrink: 1,
-                      color: colors.text,
-                      fontSize: 17,
-                      fontWeight: '400',
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TextInput
+                  style={{
+                    flexGrow: 1,
+                    flexShrink: 1,
+                    color: colors.text,
+                    fontSize: 17,
+                    fontWeight: '400',
+                  }}
+                  placeholder="Tap here for finalizer address"
+                  placeholderTextColor={colors.placeholder}
+                  value={shortenTxid(finalizerFromText)}
+                  editable={false}
+                  onChangeText={setFinalizerFromText}
+                />
+                {!!finalizerFromText && false && (
+                  <TouchableOpacity
+                    style={{ marginLeft: 5 }}
+                    onPress={() => {
+                      setFinalizerFromText('');
+                      setStakedFromNumber(0);
+                      setTxidFrom('');
                     }}
-                    placeholder="Tap here for finalizer address"
-                    placeholderTextColor={colors.placeholder}
-                    value={finalizerFromText}
-                    editable={true}
-                    onChangeText={setFinalizerFromText}
-                  />
-                  {!!finalizerFromText && (
-                    <TouchableOpacity
-                      style={{ marginLeft: 5 }}
-                      onPress={() => {
-                        setFinalizerFromText('');
-                        setStakedFromNumber(0);
+                  >
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: colors.zingo,
+                        borderRadius: 11,
+                        height: 22,
+                        width: 22,
+                        padding: 0,
                       }}
                     >
-                      <View
-                        style={{
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          backgroundColor: colors.zingo,
-                          borderRadius: 11,
-                          height: 22,
-                          width: 22,
-                          padding: 0,
-                        }}
+                      <RegText
+                        style={{ color: colors.background, marginTop: -3 }}
                       >
-                        <RegText
-                          style={{ color: colors.background, marginTop: -3 }}
-                        >
-                          x
-                        </RegText>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                </View>
-                {!!stakedFromNumber && (
-                  <FadeText
-                    style={{ marginLeft: 15, marginBottom: 5 }}
-                  >{`Staked: ${stakedFromNumber.toFixed(5)} ${info.currencyName}`}</FadeText>
+                        x
+                      </RegText>
+                    </View>
+                  </TouchableOpacity>
                 )}
               </View>
+              {!!stakedFromNumber && (
+                <FadeText
+                  style={{ marginLeft: 15, marginBottom: 5 }}
+                >{`Staked: ${stakedFromNumber.toFixed(5)} ${info.currencyName}`}</FadeText>
+              )}
             </View>
+          </View>
+          {false && (
             <ChevronDown
+              onPress={() =>
+                navigation.navigate(RouteEnum.Finalizers, {
+                  setFinalizer: (f: string, s: number) => {
+                    setFinalizerFromText(f);
+                    setStakedFromNumber(s);
+                    setTxidFrom('');
+                  },
+                  scope: 'my',
+                  exclude: '',
+                })
+              }
               width={30}
               height={30}
-              style={{ marginLeft: 5, transform: [{ rotate: '-90deg' }] }}
+              style={{ marginLeft: 5 }}
               color={colors.text}
             />
-          </View>
-        </TouchableOpacity>
+          )}
+        </View>
 
         <View>
           <View

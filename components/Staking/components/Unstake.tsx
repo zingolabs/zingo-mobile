@@ -56,6 +56,8 @@ const Unstake: React.FC<UnstakeProps> = ({
     !!route.params && route.params.finalizer !== undefined
       ? route.params.finalizer
       : '';
+  const txid =
+    !!route.params && route.params.txid !== undefined ? route.params.txid : '';
   const stakedFrom =
     !!route.params && route.params.staked !== undefined
       ? route.params.staked
@@ -70,6 +72,7 @@ const Unstake: React.FC<UnstakeProps> = ({
   const insets = useSafeAreaInsets();
 
   const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
+  const [txidFrom, setTxidFrom] = useState<string>(txid);
   const [stakedFromNumber, setStakedFromNumber] = useState<number>(stakedFrom);
 
   const [selectedTxid, setSelectedTxid] = useState<string>('');
@@ -95,6 +98,8 @@ const Unstake: React.FC<UnstakeProps> = ({
   const movements = walletBonds
     .filter(b => {
       if (b.status === WalletBondsStatusEnum.Withdrawn) return false;
+      if (!!txidFrom && b.txid === txidFrom) return true;
+      if (txidFrom) return false;
       if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
       if (!finalizerFromText) return false;
@@ -126,11 +131,11 @@ const Unstake: React.FC<UnstakeProps> = ({
     }
   }, [finalizerFromText, staked]);
 
-  const shortenTxid = (txid: string) => {
-    if (txid.length <= 16) {
-      return txid;
+  const shortenTxid = (_txid: string) => {
+    if (_txid.length <= 16) {
+      return _txid;
     }
-    return `${txid.slice(0, 10)}…${txid.slice(-8)}`;
+    return `${_txid.slice(0, 10)}…${_txid.slice(-8)}`;
   };
 
   const handleUnstakePress = async () => {
@@ -222,7 +227,10 @@ const Unstake: React.FC<UnstakeProps> = ({
         return;
       }
 
-      if (stakingDay && scheduledActions.filter(sa => sa.txid === bondTxid).length > 0) {
+      if (
+        stakingDay &&
+        scheduledActions.filter(sa => sa.txid === bondTxid).length > 0
+      ) {
         const list = await ScheduledActionsFileImpl.removeSA(
           scheduledActions.filter(sa => sa.txid === bondTxid)[0].id,
         );
@@ -416,16 +424,17 @@ const Unstake: React.FC<UnstakeProps> = ({
                   }}
                   placeholder="Tap here for finalizer address"
                   placeholderTextColor={colors.placeholder}
-                  value={finalizerFromText}
-                  editable={true}
+                  value={shortenTxid(finalizerFromText)}
+                  editable={false}
                   onChangeText={setFinalizerFromText}
                 />
-                {!!finalizerFromText && (
+                {!!finalizerFromText && false && (
                   <TouchableOpacity
                     style={{ marginLeft: 5 }}
                     onPress={() => {
                       setFinalizerFromText('');
                       setStakedFromNumber(0);
+                      setTxidFrom('');
                     }}
                   >
                     <View
@@ -455,22 +464,25 @@ const Unstake: React.FC<UnstakeProps> = ({
               )}
             </View>
           </View>
-          <ChevronDown
-            onPress={() =>
-              navigation.navigate(RouteEnum.Finalizers, {
-                setFinalizer: (f: string, s: number) => {
-                  setFinalizerFromText(f);
-                  setStakedFromNumber(s);
-                },
-                scope: 'my',
-                exclude: '',
-              })
-            }
-            width={30}
-            height={30}
-            style={{ marginLeft: 5 }}
-            color={colors.text}
-          />
+          {route.params && !route.params.finalizer && (
+            <ChevronDown
+              onPress={() =>
+                navigation.navigate(RouteEnum.Finalizers, {
+                  setFinalizer: (f: string, s: number) => {
+                    setFinalizerFromText(f);
+                    setStakedFromNumber(s);
+                    setTxidFrom('');
+                  },
+                  scope: 'my',
+                  exclude: '',
+                })
+              }
+              width={30}
+              height={30}
+              style={{ marginLeft: 5 }}
+              color={colors.text}
+            />
+          )}
         </View>
 
         {/* Content */}
