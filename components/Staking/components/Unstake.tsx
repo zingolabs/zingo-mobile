@@ -222,6 +222,13 @@ const Unstake: React.FC<UnstakeProps> = ({
         return;
       }
 
+      if (stakingDay && scheduledActions.filter(sa => sa.txid === bondTxid).length > 0) {
+        const list = await ScheduledActionsFileImpl.removeSA(
+          scheduledActions.filter(sa => sa.txid === bondTxid)[0].id,
+        );
+        setScheduledActions(list);
+      }
+
       setModalState('success');
     } catch (error: any) {
       console.warn('Unstaking tx failed:', error);

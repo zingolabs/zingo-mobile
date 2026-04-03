@@ -153,7 +153,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
       } else if (selectedKind === StakingActionKindEnum.WithdrawBond) {
         await withdrawBondTransaction(bondTxid);
       } else if (selectedKind === StakingActionKindEnum.Move) {
-        await redelegateTransaction(bondTxid, item.finalizerTo);
+        await redelegateTransaction(item.bondKey, item.finalizerTo);
       } else if (selectedKind === StakingActionKindEnum.CreateBond) {
         await stakeTransaction(sendPageState, stakingAction);
       } else {
@@ -438,7 +438,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
                       textAlign: 'center',
                     }}
                   >
-                    Sending unstaking transaction…
+                    Processing Scheduled action…
                   </Text>
                 </>
               )}
@@ -459,7 +459,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
                       textAlign: 'center',
                     }}
                   >
-                    Unstaking request transaction sent!
+                    Scheduled action request done!
                   </Text>
 
                   <View style={{ marginTop: 24, alignSelf: 'stretch' }}>

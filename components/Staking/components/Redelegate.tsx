@@ -252,6 +252,13 @@ const Redelegate: React.FC<RedelegateProps> = ({
         return;
       }
 
+      if (stakingDay && scheduledActions.filter(sa => sa.txid === bondTxid).length > 0) {
+        const list = await ScheduledActionsFileImpl.removeSA(
+          scheduledActions.filter(sa => sa.txid === bondTxid)[0].id,
+        );
+        setScheduledActions(list);
+      }
+
       setModalState('success');
     } catch (error) {
       console.warn('Redelegating tx failed:', error);
