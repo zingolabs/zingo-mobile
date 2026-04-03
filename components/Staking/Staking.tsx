@@ -613,6 +613,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                     lineHeight: 22,
                     letterSpacing: -0.43,
                     paddingHorizontal: 5,
+                    marginBottom: 5,
                   }}
                 >
                   Scheduled actions execute automatically when the next staking
@@ -692,19 +693,52 @@ const Staking: React.FC<StakingProps> = ({}) => {
                       }
 
                       case StakingActionKindEnum.BeginUnbonding: {
-                        label = 'Unstake';
+                        // the txid have to be from a create_bond kind
+                        if (
+                          item.txid &&
+                          walletBonds.filter(wb => wb.txid === item.txid)
+                            .length > 0 &&
+                          walletBonds.filter(wb => wb.txid === item.txid)[0]
+                            .status === WalletBondsStatusEnum.Active
+                        ) {
+                          label = 'Unstake';
+                        } else {
+                          label = 'Unstake (transaction issue)';
+                        }
                         Icon = Unstake;
                         break;
                       }
 
                       case StakingActionKindEnum.WithdrawBond: {
-                        label = 'Withdraw';
+                        // the txid have to be from a unbonding kind
+                        if (
+                          item.txid &&
+                          walletBonds.filter(wb => wb.txid === item.txid)
+                            .length > 0 &&
+                          walletBonds.filter(wb => wb.txid === item.txid)[0]
+                            .status === WalletBondsStatusEnum.Unbonding
+                        ) {
+                          label = 'Withdraw';
+                        } else {
+                          label = 'Withdraw (transaction issue)';
+                        }
                         Icon = Unstake;
                         break;
                       }
 
                       case StakingActionKindEnum.Move: {
-                        label = 'Redelegate';
+                        // the txid have to be from a create_bond kind
+                        if (
+                          item.txid &&
+                          walletBonds.filter(wb => wb.txid === item.txid)
+                            .length > 0 &&
+                          walletBonds.filter(wb => wb.txid === item.txid)[0]
+                            .status === WalletBondsStatusEnum.Active
+                        ) {
+                          label = 'Redelegate';
+                        } else {
+                          label = 'Redelegate (transaction issue)';
+                        }
                         Icon = Unstake;
                         break;
                       }
@@ -724,77 +758,103 @@ const Staking: React.FC<StakingProps> = ({}) => {
                           borderRightWidth: 1,
                         }}
                       >
-                        <View
-                          style={{
-                            backgroundColor: '#1F1F1F',
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            paddingVertical: 10,
-                            paddingHorizontal: 10,
-                            borderRadius: 16,
+                        <TouchableOpacity
+                          style={{ width: '100%' }}
+                          onPress={() => {
+                            navigation.navigate(
+                              RouteEnum.ScheduledActionDetail,
+                              {
+                                item,
+                              },
+                            );
                           }}
                         >
                           <View
                             style={{
+                              backgroundColor: '#1F1F1F',
                               flexDirection: 'row',
+                              justifyContent: 'space-between',
                               alignItems: 'center',
+                              paddingVertical: 10,
+                              paddingHorizontal: 10,
+                              borderRadius: 16,
                             }}
                           >
-                            {Icon && <Icon width={20} height={20} />}
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                              }}
+                            >
+                              {Icon && <Icon width={20} height={20} />}
 
-                            <View>
-                              <Text
-                                style={{
-                                  color: colors.text,
-                                  fontWeight: '500',
-                                  fontSize: 14,
-                                  marginBottom: 2,
-                                  marginLeft: 10,
-                                }}
-                              >
-                                {label}
-                              </Text>
-                              <View
-                                style={{ flexDirection: 'row', marginLeft: 5 }}
-                              >
-                                <ZecAmount
-                                  style={{
-                                    flexGrow: 1,
-                                    alignSelf: 'auto',
-                                    justifyContent: 'flex-end',
-                                  }}
-                                  size={12}
-                                  currencyName={info.currencyName}
-                                  color={colors.text}
-                                  amtZec={item.amount / 10 ** 8}
-                                  privacy={privacy}
-                                />
+                              <View>
                                 <Text
                                   style={{
-                                    color: colors.placeholder,
-                                    fontSize: 12,
+                                    color: colors.text,
+                                    fontWeight: '500',
+                                    fontSize: 14,
+                                    marginBottom: 2,
+                                    marginLeft: 10,
+                                  }}
+                                >
+                                  {label}
+                                </Text>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
                                     marginLeft: 5,
                                   }}
                                 >
-                                  {'with '}
-                                  {item.finalizer.length >
-                                  (dimensions.width < 500 ? 10 : 20)
-                                    ? Utils.trimToSmall(
-                                        item.finalizer,
-                                        dimensions.width < 500 ? 5 : 10,
-                                      )
-                                    : item.finalizer}
-                                </Text>
+                                  <ZecAmount
+                                    style={{
+                                      flexGrow: 1,
+                                      alignSelf: 'auto',
+                                      justifyContent: 'flex-end',
+                                    }}
+                                    size={12}
+                                    currencyName={info.currencyName}
+                                    color={colors.text}
+                                    amtZec={
+                                      item.txid &&
+                                      walletBonds.filter(
+                                        wb => wb.txid === item.txid,
+                                      ).length > 0
+                                        ? walletBonds.filter(
+                                            wb => wb.txid === item.txid,
+                                          )[0].amount
+                                        : item.amount / 10 ** 8
+                                    }
+                                    privacy={privacy}
+                                  />
+                                  <Text
+                                    style={{
+                                      color: colors.placeholder,
+                                      fontSize: 12,
+                                      marginLeft: 5,
+                                    }}
+                                  >
+                                    {'with '}
+                                    {item.finalizer.length >
+                                    (dimensions.width < 500 ? 10 : 20)
+                                      ? Utils.trimToSmall(
+                                          item.finalizer,
+                                          dimensions.width < 500 ? 5 : 10,
+                                        )
+                                      : item.finalizer}
+                                  </Text>
+                                </View>
                               </View>
                             </View>
+                            <View
+                              style={{ flexGrow: 1, alignItems: 'flex-end' }}
+                            >
+                              <RegText style={{ fontSize: 14 }}>
+                                {'1m 12s'}
+                              </RegText>
+                            </View>
                           </View>
-                          <View style={{ flexGrow: 1, alignItems: 'flex-end' }}>
-                            <RegText style={{ fontSize: 14 }}>
-                              {'1m 12s'}
-                            </RegText>
-                          </View>
-                        </View>
+                        </TouchableOpacity>
                       </View>
                     );
                   }}

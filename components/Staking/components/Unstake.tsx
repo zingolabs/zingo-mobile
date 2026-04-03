@@ -87,6 +87,7 @@ const Unstake: React.FC<UnstakeProps> = ({
     privacy,
     stakingDay,
     setScheduledActions,
+    scheduledActions,
   } = context;
 
   console.log('FINALIZER', finalizerFromText);
@@ -161,6 +162,18 @@ const Unstake: React.FC<UnstakeProps> = ({
       }
     }
 
+    if (!stakingDay) {
+      const isScheduled: boolean =
+        scheduledActions.filter(sa => sa.txid === bondTxid).length > 0;
+      if (isScheduled) {
+        Alert.alert(
+          'Error',
+          'This bond is already scheduled, chose another one.',
+        );
+        return;
+      }
+    }
+
     console.log('bondTxid', bondTxid);
     console.log('selectedKind', selectedKind);
 
@@ -178,6 +191,7 @@ const Unstake: React.FC<UnstakeProps> = ({
       finalizer: finalizerFromText,
       finalizerTo: '',
       txid: bondTxid,
+      bondKey: '',
     };
 
     try {
