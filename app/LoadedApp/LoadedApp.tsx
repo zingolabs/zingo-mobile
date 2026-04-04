@@ -469,6 +469,10 @@ export class LoadedAppClass extends Component<
   unsubscribeNetInfo: NetInfoSubscription;
   screenName = ScreenEnum.LoadedApp;
 
+  private lastBlockTimestamp: number | null = null;
+  private lastKnownBlock: number | null = null;
+  private blockTimes: number[] = [10]; // 10 seconds by default.
+
   constructor(props: LoadedAppClassProps) {
     super(props);
 
@@ -516,8 +520,8 @@ export class LoadedAppClass extends Component<
       setPrivacyOption: this.setPrivacyOption,
       requestFaucetFunds: this.requestFaucetFunds,
       stakingDay: false,
-      timeToStakingDay: 0,
-      timeLeftStakingDay: 0,
+      timeToStakingDay: '',
+      timeLeftStakingDay: '',
       scheduledActions: [] as ScheduledActionType[],
       setScheduledActions: this.setScheduledActions,
 
@@ -573,6 +577,23 @@ export class LoadedAppClass extends Component<
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
+  private formatSeconds = (totalSeconds: number): string => {
+    const safeSeconds = Math.max(0, Math.round(totalSeconds));
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+
+    return `${minutes}min ${seconds}sec`;
+  };
+
+  private getAverageBlockTime = (): number => {
+    if (this.blockTimes.length === 0) {
+      return 0;
+    }
+
+    const sum = this.blockTimes.reduce((acc, value) => acc + value, 0);
+    return sum / this.blockTimes.length;
+  };
+
   stakingDayCalculation = () => {
     const latest = this.state.info.latestBlock ?? 0;
 
@@ -584,10 +605,17 @@ export class LoadedAppClass extends Component<
     const remaining = isStakingDay ? 0 : cycle - mod;
     const left = isStakingDay ? activeWindow - mod : 0;
 
+    console.log('BLOCKS', remaining, left);
+
+    const avgBlockTime = this.getAverageBlockTime();
+
+    const remainingText = this.formatSeconds(remaining * avgBlockTime);
+    const leftText = this.formatSeconds(left * avgBlockTime);
+
     this.setState({
       stakingDay: isStakingDay,
-      timeToStakingDay: remaining,
-      timeLeftStakingDay: left,
+      timeToStakingDay: remainingText,
+      timeLeftStakingDay: leftText,
     });
   };
 
@@ -803,7 +831,36 @@ export class LoadedAppClass extends Component<
     _prevProps: Readonly<LoadedAppClassProps>,
     prevState: Readonly<LoadedAppClassState>,
   ): void {
-    if (prevState.info.latestBlock !== this.state.info.latestBlock) {
+    const prevBlock = prevState.info.latestBlock;
+    const currentBlock = this.state.info.latestBlock;
+
+    if (prevBlock !== currentBlock) {
+      const now = Date.now();
+
+      if (
+        this.lastBlockTimestamp !== null &&
+        this.lastKnownBlock !== null &&
+        currentBlock !== undefined &&
+        currentBlock > this.lastKnownBlock
+      ) {
+        const elapsedSeconds = (now - this.lastBlockTimestamp) / 1000;
+        const blockDiff = currentBlock - this.lastKnownBlock;
+        const secondsPerBlock = elapsedSeconds / blockDiff;
+
+        this.blockTimes.push(secondsPerBlock);
+
+        if (this.blockTimes.length > 15) {
+          this.blockTimes.shift();
+        }
+      }
+
+      console.log(this.blockTimes);
+
+      if (currentBlock !== undefined) {
+        this.lastBlockTimestamp = now;
+        this.lastKnownBlock = currentBlock;
+      }
+
       this.stakingDayCalculation();
     }
   }

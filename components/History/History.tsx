@@ -373,12 +373,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
       accessible={true}
       accessibilityLabel={translate('history.title-acc') as string}
       style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        width: '100%',
-        height: '100%',
+        flex: 1,
+        backgroundColor: colors.background,
       }}
     >
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          zIndex: 999,
+        }}
+      >
+        <SettingsButton screenName={screenName} />
+      </View>
+
+      {/* Header + quick actions */}
       <View
         style={{
           backgroundColor: colors.background,
@@ -388,18 +398,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
       >
         <WalletSummaryHeader show_staked={false} />
 
-        <View
-          style={{
-            position: 'absolute',
-            right: 10,
-            top: 10,
-          }}
-        >
-          <SettingsButton screenName={screenName} />
-        </View>
-
         <QuickActionsRow />
       </View>
+
       {loading ? (
         <ActivityIndicator
           size="large"

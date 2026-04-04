@@ -56,11 +56,10 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import FinalizerDetail from './components/FinalizerDetail';
 import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
-import { Layers3Icon } from 'lucide-react-native';
-import { SpinningLoaderIcon } from '../Components/Icons/SpinningLoaderIcon';
 import ZecAmount from '../Components/ZecAmount';
 import { WalletBondsStatusEnum } from '../../app/AppState/enums/WalletBondsStatusEnum';
 import Button from '../Components/Button';
+import StakingDayStatusBar from './components/StakingDayStatusBar';
 
 type DataType = {
   svg: {
@@ -353,68 +352,14 @@ const Staking: React.FC<StakingProps> = ({}) => {
       >
         <View
           style={{
-            position: 'absolute',
-            right: 10,
-            top: 10,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             zIndex: 999,
           }}
         >
+          <StakingDayStatusBar />
           <SettingsButton screenName={screenName} />
-        </View>
-
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingHorizontal: 10,
-          }}
-        >
-          <View
-            style={{
-              minWidth: '50%',
-              marginTop: 30,
-              paddingHorizontal: 15,
-              paddingRight: 20,
-              paddingVertical: 7,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: stakingDay
-                ? 'rgba(52, 199, 89, 0.2)'
-                : '#222223',
-              borderColor: stakingDay ? '#1E532B' : '#414141',
-              borderRadius: 25,
-              borderWidth: 1,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              {stakingDay ? (
-                <Layers3Icon width={20} height={20} color={'#34C759'} />
-              ) : (
-                <SpinningLoaderIcon size={20} color="#8E8E93" />
-              )}
-              <View>
-                {stakingDay ? (
-                  <>
-                    <RegText>Staking day</RegText>
-                    <RegText style={{ fontSize: 14 }}>
-                      Closing in {String(timeLeftStakingDay)} blocks
-                    </RegText>
-                  </>
-                ) : (
-                  <RegText style={{ fontSize: 14 }}>
-                    Opening in {String(timeToStakingDay)} blocks
-                  </RegText>
-                )}
-              </View>
-            </View>
-          </View>
         </View>
 
         {/* Header + quick actions */}
@@ -849,9 +794,40 @@ const Staking: React.FC<StakingProps> = ({}) => {
                             <View
                               style={{ flexGrow: 1, alignItems: 'flex-end' }}
                             >
-                              <RegText style={{ fontSize: 14 }}>
-                                {'1m 12s'}
-                              </RegText>
+                              {stakingDay ? (
+                                <>
+                                  <RegText
+                                    style={{
+                                      color: '#00B800',
+                                      fontSize:
+                                        timeLeftStakingDay === '0min 0sec'
+                                          ? 10
+                                          : 15,
+                                    }}
+                                  >
+                                    {'Now'}
+                                  </RegText>
+                                  <RegText style={{ fontSize: 12 }}>
+                                    Click to execute
+                                  </RegText>
+                                </>
+                              ) : (
+                                <>
+                                  <RegText
+                                    style={{
+                                      color: '#FFAF02',
+                                      fontSize:
+                                        timeToStakingDay === '0min 0sec'
+                                          ? 10
+                                          : 15,
+                                    }}
+                                  >
+                                    {timeToStakingDay === '0min 0sec'
+                                      ? 'calculating...'
+                                      : timeToStakingDay}
+                                  </RegText>
+                                </>
+                              )}
                             </View>
                           </View>
                         </TouchableOpacity>
