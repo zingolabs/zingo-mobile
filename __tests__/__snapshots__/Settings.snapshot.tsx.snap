@@ -274,13 +274,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -370,13 +374,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -477,13 +485,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -603,13 +615,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -710,13 +726,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -817,13 +837,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -924,13 +948,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -1031,13 +1059,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -1168,13 +1200,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -1264,13 +1300,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -1430,13 +1470,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -1526,13 +1570,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -1663,13 +1711,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -1759,13 +1811,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -1896,13 +1952,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -2011,13 +2071,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -2136,13 +2200,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -2428,13 +2496,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         BouncyCheckbox
         <Text
           style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "marginTop": 5,
-              "opacity": 1,
-            }
+            [
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+              {
+                "marginTop": 5,
+              },
+            ]
           }
         >
           text translated
@@ -2456,13 +2528,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         BouncyCheckbox
         <Text
           style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "marginTop": 5,
-              "opacity": 1,
-            }
+            [
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+              {
+                "marginTop": 5,
+              },
+            ]
           }
         >
           text translated
@@ -2484,13 +2560,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         BouncyCheckbox
         <Text
           style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "marginTop": 5,
-              "opacity": 1,
-            }
+            [
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+              {
+                "marginTop": 5,
+              },
+            ]
           }
         >
           text translated
@@ -2512,13 +2592,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         BouncyCheckbox
         <Text
           style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "marginTop": 5,
-              "opacity": 1,
-            }
+            [
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+              {
+                "marginTop": 5,
+              },
+            ]
           }
         >
           text translated
@@ -2540,13 +2624,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         BouncyCheckbox
         <Text
           style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "marginTop": 5,
-              "opacity": 1,
-            }
+            [
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+              {
+                "marginTop": 5,
+              },
+            ]
           }
         >
           text translated
@@ -2568,13 +2656,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         BouncyCheckbox
         <Text
           style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "marginTop": 5,
-              "opacity": 1,
-            }
+            [
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+              {
+                "marginTop": 5,
+              },
+            ]
           }
         >
           text translated
@@ -2596,13 +2688,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         BouncyCheckbox
         <Text
           style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "marginTop": 5,
-              "opacity": 1,
-            }
+            [
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+              {
+                "marginTop": 5,
+              },
+            ]
           }
         >
           text translated
@@ -2624,13 +2720,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         BouncyCheckbox
         <Text
           style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "marginTop": 5,
-              "opacity": 1,
-            }
+            [
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+              {
+                "marginTop": 5,
+              },
+            ]
           }
         >
           text translated
@@ -2737,13 +2837,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated
@@ -2844,13 +2948,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               />
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    {
+                      "marginLeft": 10,
+                    },
+                  ]
                 }
               >
                 text translated

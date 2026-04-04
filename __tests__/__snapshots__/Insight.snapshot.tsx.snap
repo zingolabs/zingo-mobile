@@ -138,7 +138,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
                           8593,
                         ],
                         "f062",
-                        "M214.6 9.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 480c0 17.7 14.3 32 32 32s32-14.3 32-32l0-370.7 105.4 105.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                        "M214.6 17.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 117.3 160 488c0 17.7 14.3 32 32 32s32-14.3 32-32l0-370.7 105.4 105.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
                       ],
                       "iconName": "arrow-up",
                       "prefix": "fas",
@@ -481,97 +481,37 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         >
           <Text
             style={
-              {
-                "color": "#c3c3c3",
-                "fontSize": 15,
-                "fontWeight": "bold",
-                "opacity": 1,
-              }
+              [
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                },
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 15,
+                  "fontWeight": "bold",
+                },
+              ]
             }
           >
             text translated
           </Text>
           <Text
             style={
-              {
-                "color": "#18bd18",
-                "fontSize": 11,
-                "fontWeight": "600",
-                "opacity": 1,
-              }
-            }
-          >
-            (
-            text translated
-            )
-          </Text>
-        </View>
-      </View>
-      <View
-        accessibilityState={
-          {
-            "busy": undefined,
-            "checked": undefined,
-            "disabled": undefined,
-            "expanded": undefined,
-            "selected": undefined,
-          }
-        }
-        accessibilityValue={
-          {
-            "max": undefined,
-            "min": undefined,
-            "now": undefined,
-            "text": undefined,
-          }
-        }
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          {
-            "opacity": 1,
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "borderBottomColor": "#18bd18",
-              "borderBottomWidth": 0,
-              "paddingBottom": 10,
-              "width": 243.33333333333334,
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "#c3c3c3",
-                "fontSize": 14,
-                "fontWeight": "normal",
-                "opacity": 1,
-              }
-            }
-          >
-            text translated
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#c3c3c3",
-                "fontSize": 11,
-                "fontWeight": "600",
-                "opacity": 1,
-              }
+              [
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                },
+                {
+                  "color": "#18bd18",
+                  "fontSize": 11,
+                },
+              ]
             }
           >
             (
@@ -627,24 +567,123 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         >
           <Text
             style={
-              {
-                "color": "#c3c3c3",
-                "fontSize": 14,
-                "fontWeight": "normal",
-                "opacity": 1,
-              }
+              [
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                },
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                },
+              ]
             }
           >
             text translated
           </Text>
           <Text
             style={
-              {
-                "color": "#c3c3c3",
-                "fontSize": 11,
-                "fontWeight": "600",
-                "opacity": 1,
-              }
+              [
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                },
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 11,
+                },
+              ]
+            }
+          >
+            (
+            text translated
+            )
+          </Text>
+        </View>
+      </View>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "borderBottomColor": "#18bd18",
+              "borderBottomWidth": 0,
+              "paddingBottom": 10,
+              "width": 243.33333333333334,
+            }
+          }
+        >
+          <Text
+            style={
+              [
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                },
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                },
+              ]
+            }
+          >
+            text translated
+          </Text>
+          <Text
+            style={
+              [
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                },
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 11,
+                },
+              ]
             }
           >
             (
