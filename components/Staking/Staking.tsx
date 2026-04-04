@@ -807,9 +807,9 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                   >
                                     {'Now'}
                                   </RegText>
-                                  <RegText style={{ fontSize: 12 }}>
+                                  <FadeText style={{ fontSize: 12 }}>
                                     Click to execute
-                                  </RegText>
+                                  </FadeText>
                                 </>
                               ) : (
                                 <>
