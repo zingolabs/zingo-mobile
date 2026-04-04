@@ -82,6 +82,9 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   stakingDay: false,
   timeToStakingDay: '',
   timeLeftStakingDay: '',
+  blocksToStakingDay: 0,
+  blocksLeftStakingDay: 0,
+  blocksTotalStakingDay: 0,
   scheduledActions: [],
   setScheduledActions: () => {},
 };

@@ -28,7 +28,8 @@ const StakingDayStatusBar: React.FunctionComponent<
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={{
-        paddingHorizontal: 15,
+        paddingLeft: 15,
+        paddingRight: expanded ? 50 : 20,
         paddingVertical: 7,
         justifyContent: 'center',
         alignItems: 'center',
