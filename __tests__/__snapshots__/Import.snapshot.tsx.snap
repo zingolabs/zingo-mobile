@@ -240,14 +240,19 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         </View>
         <Text
           style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 20,
-              "fontWeight": "600",
-              "marginBottom": 10,
-              "marginTop": 20,
-              "opacity": 1,
-            }
+            [
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+              {
+                "fontSize": 20,
+                "marginBottom": 10,
+                "marginTop": 20,
+              },
+            ]
           }
         >
           Birthday (Optional)

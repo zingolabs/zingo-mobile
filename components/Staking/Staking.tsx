@@ -813,9 +813,9 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                   >
                                     {'Now'}
                                   </RegText>
-                                  <RegText style={{ fontSize: 12 }}>
+                                  <FadeText style={{ fontSize: 12 }}>
                                     Click to execute
-                                  </RegText>
+                                  </FadeText>
                                 </>
                               ) : (
                                 <>
@@ -875,7 +875,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                         fontWeight: 600,
                       }}
                     >
-                      {'Active Stake'}
+                      {'Staking Positions'}
                     </Text>
                   </View>
                 }
@@ -1006,12 +1006,25 @@ const Staking: React.FC<StakingProps> = ({}) => {
                               }}
                             />
                           )}
-                          {(item.status === WalletBondsStatusEnum.Active ||
-                            item.status ===
-                              WalletBondsStatusEnum.Unbonding) && (
+                          {item.status === WalletBondsStatusEnum.Active && (
                             <Button
                               variant="secondary"
                               title={'Unstake'}
+                              style={{ width: '40%', marginLeft: 10 }}
+                              onPress={() => {
+                                navigation.navigate(RouteEnum.Unstake, {
+                                  finalizer: item.finalizer,
+                                  txid: item.txid,
+                                  staked: item.amount,
+                                  closeSheet: () => {},
+                                });
+                              }}
+                            />
+                          )}
+                          {item.status === WalletBondsStatusEnum.Unbonding && (
+                            <Button
+                              variant="primary"
+                              title={'Withdraw'}
                               style={{ width: '40%', marginLeft: 10 }}
                               onPress={() => {
                                 navigation.navigate(RouteEnum.Unstake, {
