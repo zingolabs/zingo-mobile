@@ -60,6 +60,7 @@ import ZecAmount from '../Components/ZecAmount';
 import { WalletBondsStatusEnum } from '../../app/AppState/enums/WalletBondsStatusEnum';
 import Button from '../Components/Button';
 import StakingDayStatusBar from './components/StakingDayStatusBar';
+import LinearGradient from 'react-native-linear-gradient';
 
 type DataType = {
   svg: {
@@ -714,9 +715,14 @@ const Staking: React.FC<StakingProps> = ({}) => {
                             );
                           }}
                         >
-                          <View
+                          <LinearGradient
+                            colors={[
+                              stakingDay ? '#002309' : '#1F1F1F',
+                              stakingDay ? '#272727' : '#1F1F1F',
+                            ]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
                             style={{
-                              backgroundColor: '#1F1F1F',
                               flexDirection: 'row',
                               justifyContent: 'space-between',
                               alignItems: 'center',
@@ -829,7 +835,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                 </>
                               )}
                             </View>
-                          </View>
+                          </LinearGradient>
                         </TouchableOpacity>
                       </View>
                     );

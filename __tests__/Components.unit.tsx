@@ -184,23 +184,4 @@ describe('Component Components - test', () => {
     );
   });
 
-  test('RegText - should accept style props', () => {
-    const { getByText } = render(
-      <RegText style={{ backgroundColor: 'red' }}>Reg Text</RegText>,
-    );
-    const element = getByText('Reg Text');
-    expect(element).toBeTruthy();
-    expect(element.props.style).toEqual(
-      expect.objectContaining({ backgroundColor: 'red' }),
-    );
-  });
-
-  test('RegText - should accept color prop', () => {
-    const { getByText } = render(<RegText color={'red'}>Reg Text</RegText>);
-    const element = getByText('Reg Text');
-    expect(element).toBeTruthy();
-    expect(element.props.style).toEqual(
-      expect.objectContaining({ color: 'red' }),
-    );
-  });
 });

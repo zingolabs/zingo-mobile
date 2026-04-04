@@ -121,6 +121,9 @@ export default interface AppContextLoaded {
   stakingDay: boolean;
   timeToStakingDay: string;
   timeLeftStakingDay: string;
+  blocksToStakingDay: number;
+  blocksLeftStakingDay: number;
+  blocksTotalStakingDay: number;
 
   // scheduled Actions
   scheduledActions: ScheduledActionType[];

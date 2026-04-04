@@ -522,6 +522,9 @@ export class LoadedAppClass extends Component<
       stakingDay: false,
       timeToStakingDay: '',
       timeLeftStakingDay: '',
+      blocksToStakingDay: 0,
+      blocksLeftStakingDay: 0,
+      blocksTotalStakingDay: 0,
       scheduledActions: [] as ScheduledActionType[],
       setScheduledActions: this.setScheduledActions,
 
@@ -616,6 +619,9 @@ export class LoadedAppClass extends Component<
       stakingDay: isStakingDay,
       timeToStakingDay: remainingText,
       timeLeftStakingDay: leftText,
+      blocksToStakingDay: remaining,
+      blocksLeftStakingDay: left,
+      blocksTotalStakingDay: activeWindow,
     });
   };
 
@@ -2066,6 +2072,9 @@ export class LoadedAppClass extends Component<
       stakingDay: this.state.stakingDay,
       timeToStakingDay: this.state.timeToStakingDay,
       timeLeftStakingDay: this.state.timeLeftStakingDay,
+      blocksToStakingDay: this.state.blocksToStakingDay,
+      blocksLeftStakingDay: this.state.blocksLeftStakingDay,
+      blocksTotalStakingDay: this.state.blocksTotalStakingDay,
       scheduledActions: this.state.scheduledActions,
       setScheduledActions: this.state.setScheduledActions,
 
