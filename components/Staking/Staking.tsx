@@ -21,7 +21,7 @@ import {
   NativeScrollEvent,
   Image,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 import {
@@ -61,6 +61,7 @@ import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
 import { Layers3Icon } from 'lucide-react-native';
 import { SpinningLoaderIcon } from '../Components/Icons/SpinningLoaderIcon';
 import ZecAmount from '../Components/ZecAmount';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type DataType = {
   svg: {
@@ -112,6 +113,7 @@ type StakingProps = DrawerScreenProps<
 >;
 
 const Staking: React.FC<StakingProps> = ({}) => {
+  const navigation = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     valueTransfers,
@@ -156,11 +158,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
     }
     return [`${snap1}%`, `${snap2}%`];
   }, [heightLayout]);
-
-  const show = useCallback((item: DataType) => {
-    bottomSheetRef.current?.snapToIndex(0);
-    setCurrentItem(item);
-  }, []);
 
   const hide = useCallback(() => {
     bottomSheetRef.current?.snapToIndex(-1);
@@ -290,7 +287,11 @@ const Staking: React.FC<StakingProps> = ({}) => {
       <TouchableOpacity
         style={{ width: '100%' }}
         key={`tag-${index}`}
-        onPress={() => show(item)}
+        onPress={() => {
+          navigation.navigate(RouteEnum.FinalizerDetails, {
+            finalizer: item.finalizer,
+          });
+        }}
       >
         <View
           style={{
@@ -397,7 +398,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
           backgroundColor: colors.background,
         }}
       >
-        <View
+        <SafeAreaView
           style={{
             position: 'absolute',
             right: 10,
@@ -406,9 +407,9 @@ const Staking: React.FC<StakingProps> = ({}) => {
           }}
         >
           <SettingsButton screenName={screenName} />
-        </View>
+        </SafeAreaView>
 
-        <View
+        <SafeAreaView
           style={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -461,7 +462,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
               </View>
             </View>
           </View>
-        </View>
+        </SafeAreaView>
 
         {/* Header + quick actions */}
         <View
@@ -580,6 +581,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
               </View>
             )}
 
+            {/* TODO: Use Router */}
             {!loading && !hasScheduledActions && tab === 'scheduled' && (
               <View style={styles.centerContent}>
                 <View

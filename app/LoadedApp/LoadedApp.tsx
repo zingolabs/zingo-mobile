@@ -109,6 +109,7 @@ import Finalizers from '../../components/Finalizers/Finalizers';
 import { reverseHex32Bytes } from '../utils/hex';
 import SettingsNavigator from '../../components/Settings/SettingsNavigator';
 import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
+import { FinalizerDetails } from '../../components/Staking/Finalizers/FinalizerDetails';
 
 const LoadedAppStack = createNativeStackNavigator<LoadedAppStackParamList>();
 
@@ -2134,6 +2135,10 @@ export class LoadedAppClass extends Component<
 
               <LoadedAppStack.Screen name={RouteEnum.ValueTransferDetail}>
                 {props => <ValueTransferDetail {...props} />}
+              </LoadedAppStack.Screen>
+
+              <LoadedAppStack.Screen name={RouteEnum.FinalizerDetails}>
+                {props => <FinalizerDetails {...props} />}
               </LoadedAppStack.Screen>
 
               <LoadedAppStack.Screen name={RouteEnum.ScannerAddress}>

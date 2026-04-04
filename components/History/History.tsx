@@ -28,7 +28,6 @@ import {
 } from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
-import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
@@ -49,6 +48,8 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 import RegText from '../Components/RegText';
 import EmptyList from '../../assets/icons/empty-cardboard-box.svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Button from '../Components/Button';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -376,7 +377,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         height: '100%',
       }}
     >
-      <View
+      <SafeAreaView
         style={{
           backgroundColor: colors.background,
           paddingTop: 10,
@@ -385,7 +386,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
       >
         <WalletSummaryHeader show_staked={false} />
 
-        <View
+        <SafeAreaView
           style={{
             position: 'absolute',
             right: 10,
@@ -393,10 +394,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
           }}
         >
           <SettingsButton screenName={screenName} />
-        </View>
+        </SafeAreaView>
 
         <QuickActionsRow />
-      </View>
+      </SafeAreaView>
       {loading ? (
         <ActivityIndicator
           size="large"
@@ -497,6 +498,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   backgroundColor: '#62626929',
                   borderBottomLeftRadius: 25,
                   borderBottomRightRadius: 25,
+                  height: '100%',
                 }}
               >
                 <View
