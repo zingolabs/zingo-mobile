@@ -393,7 +393,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
         >
           <LiquidPrimaryButton
             tintColor={'#730303'}
-            title={'Cancel'}
+            title={'Remove reminder'}
             onPress={handleCancelPress}
             style={{}}
           />
