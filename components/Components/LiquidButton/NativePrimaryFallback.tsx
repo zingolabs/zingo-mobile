@@ -52,10 +52,10 @@ const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
 
 const styles = StyleSheet.create({
   primary: {
-    minWidth: 180,
-    height: 44,
+    borderRadius: 18,
     paddingHorizontal: 20,
-    borderRadius: 12,
+    paddingVertical: 14,
+    minWidth: 160,
     alignItems: 'center',
     justifyContent: 'center',
 

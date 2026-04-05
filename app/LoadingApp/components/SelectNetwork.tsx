@@ -593,9 +593,6 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                   closeServers();
                 }, 100);
               }}
-              style={{
-                alignSelf: 'stretch',
-              }}
             />
           ) : (
             <LiquidPrimaryButton
@@ -624,9 +621,6 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                   setBorderColor('#ff383c');
                 }
                 Keyboard.dismiss();
-              }}
-              style={{
-                alignSelf: 'stretch',
               }}
             />
           )}

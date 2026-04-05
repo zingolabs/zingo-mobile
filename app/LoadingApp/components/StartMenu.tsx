@@ -230,7 +230,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               tintColor={colors.secondary}
               title={'Import wallet'}
               disabled={actionButtonsDisabled}
-              style={{ borderColor: 'transparent' }}
               onPress={() => getwalletToRestore()}
             />
 

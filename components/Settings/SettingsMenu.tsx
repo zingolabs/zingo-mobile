@@ -219,7 +219,6 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
         }}
       >
         <LiquidPrimaryButton
-          style={{ width: '90%' }}
           tintColor={colors.danger.primary}
           title={'Switch to different wallet'}
           onPress={restoreWallet}

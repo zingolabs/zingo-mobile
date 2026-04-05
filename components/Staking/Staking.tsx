@@ -993,38 +993,35 @@ const Staking: React.FC<StakingProps> = ({}) => {
                           }}
                         >
                           {item.status === WalletBondsStatusEnum.Active && (
-                            <LiquidPrimaryButton
-                              title={'Redelegate'}
-                              style={{ width: 'auto' }}
-                              onPress={() => {
-                                navigation.navigate(RouteEnum.Redelegate, {
-                                  finalizer: item.finalizer,
-                                  txid: item.txid,
-                                  staked: item.amount,
-                                  closeSheet: () => {},
-                                });
-                              }}
-                            />
-                          )}
-                          {item.status === WalletBondsStatusEnum.Active && (
-                            <LiquidPrimaryButton
-                              tintColor={colors.secondary}
-                              title={'Unstake'}
-                              style={{ width: '40%', marginLeft: 10 }}
-                              onPress={() => {
-                                navigation.navigate(RouteEnum.Unstake, {
-                                  finalizer: item.finalizer,
-                                  txid: item.txid,
-                                  staked: item.amount,
-                                  closeSheet: () => {},
-                                });
-                              }}
-                            />
+                            <>
+                              <LiquidPrimaryButton
+                                title={'Redelegate'}
+                                onPress={() => {
+                                  navigation.navigate(RouteEnum.Redelegate, {
+                                    finalizer: item.finalizer,
+                                    txid: item.txid,
+                                    staked: item.amount,
+                                    closeSheet: () => {},
+                                  });
+                                }}
+                              />
+                              <LiquidPrimaryButton
+                                tintColor={colors.secondary}
+                                title={'Unstake'}
+                                onPress={() => {
+                                  navigation.navigate(RouteEnum.Unstake, {
+                                    finalizer: item.finalizer,
+                                    txid: item.txid,
+                                    staked: item.amount,
+                                    closeSheet: () => {},
+                                  });
+                                }}
+                              />
+                            </>
                           )}
                           {item.status === WalletBondsStatusEnum.Unbonding && (
                             <LiquidPrimaryButton
                               title={'Withdraw'}
-                              style={{ width: '40%', marginLeft: 10 }}
                               onPress={() => {
                                 navigation.navigate(RouteEnum.Unstake, {
                                   finalizer: item.finalizer,

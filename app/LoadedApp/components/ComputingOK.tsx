@@ -71,7 +71,7 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({ route }) => {
 
           <View
             style={{
-              flexDirection: 'column',
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
               paddingTop: 50,

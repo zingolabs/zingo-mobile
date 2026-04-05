@@ -18,7 +18,6 @@ describe('Component Button - test', () => {
         title={'Primary button'}
         disabled={false}
         onPress={onPress}
-        style={{}}
       />,
     );
     expect(button.toJSON()).toMatchSnapshot();
@@ -31,7 +30,6 @@ describe('Component Button - test', () => {
         title={'Secondary button'}
         disabled={false}
         onPress={onPress}
-        style={{}}
       />,
     );
     expect(button.toJSON()).toMatchSnapshot();

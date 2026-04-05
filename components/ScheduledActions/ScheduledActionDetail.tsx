@@ -395,13 +395,11 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
             tintColor={'#730303'}
             title={'Remove reminder'}
             onPress={handleCancelPress}
-            style={{}}
           />
           {stakingDay && (
             <LiquidPrimaryButton
               title={'Execute now'}
               onPress={handleExecuteNowPress}
-              style={{}}
             />
           )}
         </View>
@@ -462,11 +460,17 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
                     Scheduled action request done!
                   </Text>
 
-                  <View style={{ marginTop: 24, alignSelf: 'stretch' }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginTop: 24,
+                    }}
+                  >
                     <LiquidPrimaryButton
                       title="View movements"
                       onPress={handleViewMovements}
-                      style={{ alignSelf: 'stretch' }}
                     />
                   </View>
                 </>

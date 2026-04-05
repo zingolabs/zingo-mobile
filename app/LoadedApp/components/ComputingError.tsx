@@ -100,7 +100,6 @@ const ComputingError: React.FunctionComponent<ComputingErrorProps> = ({
             <LiquidPrimaryButton
               title={'Back'}
               onPress={() => {
-                //navigation.navigate(RouteEnum.MainTabs, { screen: RouteEnum.History });
                 if (navigation.canGoBack) {
                   navigation.goBack();
                 }

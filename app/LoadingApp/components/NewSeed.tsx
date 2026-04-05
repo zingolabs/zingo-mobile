@@ -259,9 +259,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({ onClickOK }) => {
           }}
         >
           <LiquidPrimaryButton
-            style={{
-              backgroundColor: colors.primary,
-            }}
             title={!!texts && !!texts.new ? texts.new[0] : ''}
             onPress={() => onClickOKHide()}
           />

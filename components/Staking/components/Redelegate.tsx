@@ -702,7 +702,6 @@ const Redelegate: React.FC<RedelegateProps> = ({
             title={actionVerb}
             disabled={!isValidForm || modalState === 'sending'}
             onPress={handleRedelegatePress}
-            style={{ alignSelf: 'stretch' }}
           />
         </View>
 
@@ -762,11 +761,18 @@ const Redelegate: React.FC<RedelegateProps> = ({
                     Redelegate request transaction sent!
                   </Text>
 
-                  <View style={{ marginTop: 24, alignSelf: 'stretch' }}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingTop: 24,
+                      paddingBottom: 20,
+                      paddingHorizontal: 24,
+                    }}
+                  >
                     <LiquidPrimaryButton
                       title="View movements"
                       onPress={handleViewMovements}
-                      style={{ alignSelf: 'stretch' }}
                     />
                   </View>
                 </>
