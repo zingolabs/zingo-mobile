@@ -23,6 +23,7 @@ type Props = {
   style?: ViewStyle;
   textStyle?: TextStyle;
   tintColor?: ColorValue;
+  testID?: string;
 };
 
 const LiquidPrimaryButton: React.FC<Props> = ({
@@ -32,6 +33,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
   style,
   textStyle,
   tintColor,
+  testID,
 }) => {
   const { colors } = useTheme() as ThemeType;
   const [, setPressed] = useState(false);
@@ -47,6 +49,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
           disabled={disabled}
           textStyle={textStyle}
           tintColor={tintColor}
+          testID={testID}
         />
       </View>
     );
@@ -54,6 +57,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
 
   return (
     <TouchableWithoutFeedback
+      testID={testID}
       onPress={onPress}
       disabled={disabled}
       onPressIn={() => setPressed(true)}

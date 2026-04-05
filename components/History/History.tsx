@@ -28,7 +28,6 @@ import {
 } from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
-import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
@@ -50,6 +49,7 @@ import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 import RegText from '../Components/RegText';
 import EmptyList from '../../assets/icons/empty-cardboard-box.svg';
 import { RPCValueTransferStatusEnum } from '../../app/rpc/enums/RPCValueTransferStatusEnum';
+import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -455,8 +455,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
                                 : 10,
                           }}
                         >
-                          <Button
-                            variant="secondary"
+                          <LiquidPrimaryButton
+                            tintColor={colors.secondary}
                             title={translate('history.loadmore') as string}
                             onPress={loadMoreClicked}
                           />

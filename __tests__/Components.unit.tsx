@@ -183,5 +183,4 @@ describe('Component Components - test', () => {
       expect.objectContaining({ backgroundColor: 'red' }),
     );
   });
-
 });

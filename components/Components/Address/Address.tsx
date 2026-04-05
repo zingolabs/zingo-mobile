@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TextStyle } from 'react-native';
-import Button from '../Button';
+import LiquidPrimaryButton from '../LiquidButton/LiquidPrimaryButton';
 
 type AddressProps = {
   address: string;
@@ -25,9 +25,7 @@ const Address: React.FunctionComponent<AddressProps> = ({
   const shortAddress = `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
 
   return (
-    <Button
-      variant="ghost"
-      fullWidth={false}
+    <LiquidPrimaryButton
       onPress={onPress ? onPress : () => console.log('onPress')}
       title={shortAddress}
       textStyle={{

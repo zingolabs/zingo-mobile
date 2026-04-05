@@ -7,7 +7,6 @@ import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
 import { ThemeType } from '../../types';
 import { ScreenEnum, SelectServerEnum } from '../../AppState';
-import Button from '../../../components/Components/Button';
 import { ContextAppLoading } from '../../context';
 import BoldText from '../../../components/Components/BoldText';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -15,6 +14,7 @@ import Snackbars from '../../../components/Components/Snackbars';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RegText from '../../../components/Components/RegText';
 import { HeaderTitle } from '../../../components/Header';
+import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
@@ -207,8 +207,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   </BoldText>
                 </View>
               </View>
-              <Button
-                variant="primary"
+              <LiquidPrimaryButton
                 title={translate('loadingapp.opencurrentwallet') as string}
                 disabled={actionButtonsDisabled}
                 onPress={() => openCurrentWallet()}
@@ -226,18 +225,17 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               paddingHorizontal: 20,
             }}
           >
-            <Button
+            <LiquidPrimaryButton
               testID="loadingapp.restorewalletseedufvk"
-              variant="secondary"
+              tintColor={colors.secondary}
               title={'Import wallet'}
               disabled={actionButtonsDisabled}
               style={{ borderColor: 'transparent' }}
               onPress={() => getwalletToRestore()}
             />
 
-            <Button
+            <LiquidPrimaryButton
               testID="loadingapp.createnewwallet"
-              variant="primary"
               title={'Create new wallet'}
               disabled={actionButtonsDisabled}
               onPress={() => {

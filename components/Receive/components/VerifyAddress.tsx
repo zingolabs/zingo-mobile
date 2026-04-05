@@ -10,7 +10,6 @@ import {
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
-import Button from '../../Components/Button';
 import { useToast } from 'react-native-toastier';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -22,6 +21,7 @@ import RegText from '../../Components/RegText';
 import { RPCCheckAddressType } from '../../../app/rpc/types/RPCCheckAddressType';
 import { VerifyCheckIcon } from '../../Components/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '../../Components/Icons/VerifyXIcon';
+import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
 
 type VerifyAddressProps = {
   closeSheet: () => void;
@@ -217,20 +217,19 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             alignItems: 'center',
             marginVertical: 5,
             marginTop: 30,
+            gap: 10,
           }}
         >
-          <Button
-            variant="primary"
+          <LiquidPrimaryButton
             title={translate('verify') as string}
             onPress={() => {
               verifyAddress();
             }}
             disabled={!address || !!errorAddress}
           />
-          <Button
-            variant="secondary"
+          <LiquidPrimaryButton
+            tintColor={colors.secondary}
             title={translate('cancel') as string}
-            style={{ marginLeft: 10 }}
             onPress={() => {
               setAddress('');
               Keyboard.dismiss();

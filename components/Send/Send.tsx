@@ -33,7 +33,6 @@ import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import Button from '../Components/Button';
 import {
   SendPageStateClass,
   ToAddrClass,
@@ -60,6 +59,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Wallet from '../../assets/icons/wallet.svg';
 import { HeaderTitle } from '../Header';
 import { XIcon } from '../Components/Icons/XIcon';
+import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   toggleMenuDrawer: () => void;
@@ -1293,8 +1293,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}
         >
           {title === 'Send to' && (
-            <Button
-              variant="primary"
+            <LiquidPrimaryButton
               title={'Continue'}
               disabled={!addressText || validAddress !== 1}
               onPress={() => {
@@ -1305,12 +1304,10 @@ const Send: React.FunctionComponent<SendProps> = ({
           )}
 
           {title === 'Send' && (
-            <Button
+            <LiquidPrimaryButton
               testID={
                 sendButtonEnabled ? 'send.button' : 'send.button-disabled'
               }
-              accessibilityLabel={'title ' + translate('send.button')}
-              variant="primary"
               title={
                 validAmount === 1 &&
                 amountText &&

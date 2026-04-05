@@ -18,7 +18,6 @@ import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import { checkServerURI, parseServerURI, serverUris } from '../../app/uris';
-import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 
@@ -44,6 +43,7 @@ import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevel
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderTitle } from '../Header';
+import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
 
 type SettingsProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -1387,10 +1387,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             paddingBottom: 20,
           }}
         >
-          <Button
+          <LiquidPrimaryButton
             testID="settings.button.save"
             disabled={disabled || disabledButton}
-            variant="primary"
             title={translate('settings.save') as string}
             onPress={() => {
               // waiting while closing the keyboard, just in case.

@@ -12,7 +12,6 @@ import {
 import { useTheme } from '@react-navigation/native';
 import FadeText from '../../../components/Components/FadeText';
 import RegText from '../../../components/Components/RegText';
-import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
 import { GlobalConst, ScreenEnum, SelectServerEnum } from '../../AppState';
@@ -21,6 +20,7 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderTitle } from '../../../components/Header';
 import { XIcon } from '../../../components/Components/Icons/XIcon';
+import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
 
 type ImportProps = {
   actionButtonsDisabled: boolean;
@@ -476,18 +476,13 @@ const Import: React.FunctionComponent<ImportProps> = ({
             paddingHorizontal: 15,
           }}
         >
-          <Button
-            variant="primary"
+          <LiquidPrimaryButton
             title={translate('continue') as string}
             disabled={actionButtonsDisabled || buttonDisabled}
             onPress={() => {
               clear();
               okButton();
               Keyboard.dismiss();
-            }}
-            style={{
-              marginBottom: 4,
-              maxWidth: maxW,
             }}
           />
         </View>

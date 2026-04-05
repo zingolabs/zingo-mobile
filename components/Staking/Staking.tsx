@@ -58,9 +58,9 @@ import FinalizerDetail from './components/FinalizerDetail';
 import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
 import ZecAmount from '../Components/ZecAmount';
 import { WalletBondsStatusEnum } from '../../app/AppState/enums/WalletBondsStatusEnum';
-import Button from '../Components/Button';
 import StakingDayStatusBar from './components/StakingDayStatusBar';
 import LinearGradient from 'react-native-linear-gradient';
+import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
 
 type DataType = {
   svg: {
@@ -989,11 +989,11 @@ const Staking: React.FC<StakingProps> = ({}) => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             marginTop: 10,
+                            gap: 10,
                           }}
                         >
                           {item.status === WalletBondsStatusEnum.Active && (
-                            <Button
-                              variant="primary"
+                            <LiquidPrimaryButton
                               title={'Redelegate'}
                               style={{ width: 'auto' }}
                               onPress={() => {
@@ -1007,8 +1007,8 @@ const Staking: React.FC<StakingProps> = ({}) => {
                             />
                           )}
                           {item.status === WalletBondsStatusEnum.Active && (
-                            <Button
-                              variant="secondary"
+                            <LiquidPrimaryButton
+                              tintColor={colors.secondary}
                               title={'Unstake'}
                               style={{ width: '40%', marginLeft: 10 }}
                               onPress={() => {
@@ -1022,8 +1022,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                             />
                           )}
                           {item.status === WalletBondsStatusEnum.Unbonding && (
-                            <Button
-                              variant="primary"
+                            <LiquidPrimaryButton
                               title={'Withdraw'}
                               style={{ width: '40%', marginLeft: 10 }}
                               onPress={() => {

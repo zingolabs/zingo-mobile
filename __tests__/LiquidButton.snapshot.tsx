@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Button from '../components/Components/Button';
+import LiquidPrimaryButton from '../components/Components/LiquidButton/LiquidPrimaryButton';
 
 // test suite
 describe('Component Button - test', () => {
@@ -14,8 +14,7 @@ describe('Component Button - test', () => {
   const onPress = jest.fn();
   test('Button Primary - snapshot', () => {
     const button = render(
-      <Button
-        variant="primary"
+      <LiquidPrimaryButton
         title={'Primary button'}
         disabled={false}
         onPress={onPress}
@@ -27,8 +26,8 @@ describe('Component Button - test', () => {
 
   test('Button Secondary - snapshot', () => {
     const button = render(
-      <Button
-        variant="secondary"
+      <LiquidPrimaryButton
+        tintColor={'#1F1F1F'}
         title={'Secondary button'}
         disabled={false}
         onPress={onPress}

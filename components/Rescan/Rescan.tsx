@@ -3,7 +3,6 @@ import React, { useContext } from 'react';
 import { View, ScrollView } from 'react-native';
 
 import RegText from '../Components/RegText';
-import Button from '../Components/Button';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
@@ -17,6 +16,7 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderTitle } from '../Header';
+import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
 
 type RescanProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Rescan> & {
   doRescan: () => Promise<void>;
@@ -121,8 +121,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
           paddingBottom: 20,
         }}
       >
-        <Button
-          variant="primary"
+        <LiquidPrimaryButton
           title={translate('rescan.button') as string}
           onPress={doRescanAndClose}
         />

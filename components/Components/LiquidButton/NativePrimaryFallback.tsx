@@ -16,6 +16,7 @@ type NativePrimaryFallbackProps = {
   disabled?: boolean;
   textStyle?: TextStyle;
   tintColor?: ColorValue;
+  testID?: string;
 };
 
 const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
@@ -24,6 +25,7 @@ const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
   disabled,
   textStyle,
   tintColor,
+  testID,
 }) => {
   const { colors } = useTheme() as ThemeType;
 
@@ -31,6 +33,7 @@ const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
 
   return (
     <Pressable
+      testID={testID}
       onPress={onPress}
       disabled={disabled}
       accessibilityRole="button"
