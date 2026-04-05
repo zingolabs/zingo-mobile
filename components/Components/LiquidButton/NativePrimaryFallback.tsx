@@ -52,8 +52,6 @@ const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
 
 const styles = StyleSheet.create({
   primary: {
-    alignSelf: 'stretch',
-    width: '100%',
     minWidth: 180,
     height: 44,
     paddingHorizontal: 20,

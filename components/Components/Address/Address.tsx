@@ -2,6 +2,8 @@
 import React from 'react';
 import { TextStyle } from 'react-native';
 import LiquidPrimaryButton from '../LiquidButton/LiquidPrimaryButton';
+import { useTheme } from '@react-navigation/native';
+import { ThemeType } from '../../../app/types';
 
 type AddressProps = {
   address: string;
@@ -18,6 +20,7 @@ const Address: React.FunctionComponent<AddressProps> = ({
   onPress,
   style,
 }) => {
+  const { colors } = useTheme() as ThemeType;
   if (!address) {
     return null;
   }
@@ -26,6 +29,7 @@ const Address: React.FunctionComponent<AddressProps> = ({
 
   return (
     <LiquidPrimaryButton
+      tintColor={colors.secondary}
       onPress={onPress ? onPress : () => console.log('onPress')}
       title={shortAddress}
       textStyle={{
