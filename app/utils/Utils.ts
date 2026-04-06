@@ -564,3 +564,11 @@ export default class Utils {
         : color;
   };
 }
+
+export function formatSeconds(totalSeconds: number): string {
+  const safeSeconds = Math.max(0, Math.round(totalSeconds));
+  const minutes = Math.floor(safeSeconds / 60);
+  const seconds = safeSeconds % 60;
+
+  return `${minutes}min ${seconds}sec`;
+}

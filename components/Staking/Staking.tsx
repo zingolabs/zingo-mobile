@@ -60,8 +60,8 @@ import ZecAmount from '../Components/ZecAmount';
 import { WalletBondsStatusEnum } from '../../app/AppState/enums/WalletBondsStatusEnum';
 import StakingDayStatusBar from './components/StakingDayStatusBar';
 import LinearGradient from 'react-native-linear-gradient';
-import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
 import Button from '../Components/Button';
+import { formatSeconds } from '../../app/utils/Utils';
 
 type DataType = {
   svg: {
@@ -99,8 +99,8 @@ const Staking: React.FC<StakingProps> = ({}) => {
     info,
     privacy,
     stakingDay,
-    timeToStakingDay,
-    timeLeftStakingDay,
+    timeToStakingDaySeconds: timeToStakingDay,
+    timeLeftStakingDaySeconds: timeLeftStakingDay,
     scheduledActions,
     walletBonds,
     valueTransfers,
@@ -809,9 +809,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                     style={{
                                       color: '#00B800',
                                       fontSize:
-                                        timeLeftStakingDay === '0min 0sec'
-                                          ? 10
-                                          : 15,
+                                        timeLeftStakingDay === 0 ? 10 : 15,
                                     }}
                                   >
                                     {'Now'}
@@ -824,15 +822,12 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                 <RegText
                                   style={{
                                     color: '#FFAF02',
-                                    fontSize:
-                                      timeToStakingDay === '0min 0sec'
-                                        ? 10
-                                        : 15,
+                                    fontSize: timeToStakingDay === 0 ? 10 : 15,
                                   }}
                                 >
-                                  {timeToStakingDay === '0min 0sec'
+                                  {timeToStakingDay === 0
                                     ? 'calculating...'
-                                    : timeToStakingDay}
+                                    : formatSeconds(timeToStakingDay)}
                                 </RegText>
                               )}
                             </View>

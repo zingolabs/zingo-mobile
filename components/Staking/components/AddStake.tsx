@@ -76,7 +76,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     stakingDay,
     setScheduledActions,
     scheduledActions,
-    timeToStakingDay,
+    timeToStakingDaySeconds: timeToStakingDay,
   } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
