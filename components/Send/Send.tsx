@@ -1305,9 +1305,6 @@ const Send: React.FunctionComponent<SendProps> = ({
 
           {title === 'Send' && (
             <LiquidPrimaryButton
-              testID={
-                sendButtonEnabled ? 'send.button' : 'send.button-disabled'
-              }
               title={
                 validAmount === 1 &&
                 amountText &&

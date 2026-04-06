@@ -49,7 +49,7 @@ import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 import RegText from '../Components/RegText';
 import EmptyList from '../../assets/icons/empty-cardboard-box.svg';
 import { RPCValueTransferStatusEnum } from '../../app/rpc/enums/RPCValueTransferStatusEnum';
-import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
+import Button from '../Components/Button';
 
 const ViewTypes = {
   WITH_MONTH: 0,

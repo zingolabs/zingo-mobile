@@ -1388,7 +1388,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           }}
         >
           <LiquidPrimaryButton
-            testID="settings.button.save"
             disabled={disabled || disabledButton}
             title={translate('settings.save') as string}
             onPress={() => {

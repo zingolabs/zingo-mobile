@@ -12,7 +12,6 @@ import { HeaderTitle } from '../../Header';
 import Utils from '../../../app/utils';
 import ZecAmount from '../../Components/ZecAmount';
 import { TriangleAlertIcon } from 'lucide-react-native';
-import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
 import Button from '../../Components/Button';
 
 type DataType = {
