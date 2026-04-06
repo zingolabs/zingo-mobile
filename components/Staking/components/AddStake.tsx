@@ -468,9 +468,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
               !hasSelection || !finalizerText.trim() || modalState === 'sending'
             }
             onPress={async () => await handleConfirmStake()}
-            style={{
-              alignSelf: 'stretch',
-            }}
           />
         </View>
 
@@ -529,11 +526,18 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
                     Staking transaction sent!
                   </Text>
 
-                  <View style={{ marginTop: 24, alignSelf: 'stretch' }}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingTop: 24,
+                      paddingBottom: 20,
+                      paddingHorizontal: 24,
+                    }}
+                  >
                     <LiquidPrimaryButton
                       title="View movements"
                       onPress={handleViewMovements}
-                      style={{ alignSelf: 'stretch' }}
                     />
                   </View>
                 </>

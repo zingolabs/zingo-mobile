@@ -58,9 +58,10 @@ import FinalizerDetail from './components/FinalizerDetail';
 import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
 import ZecAmount from '../Components/ZecAmount';
 import { WalletBondsStatusEnum } from '../../app/AppState/enums/WalletBondsStatusEnum';
-import Button from '../Components/Button';
 import StakingDayStatusBar from './components/StakingDayStatusBar';
 import LinearGradient from 'react-native-linear-gradient';
+import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
+import Button from '../Components/Button';
 
 type DataType = {
   svg: {
@@ -989,43 +990,41 @@ const Staking: React.FC<StakingProps> = ({}) => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             marginTop: 10,
+                            gap: 10,
                           }}
                         >
                           {item.status === WalletBondsStatusEnum.Active && (
-                            <Button
-                              variant="primary"
-                              title={'Redelegate'}
-                              style={{ width: 'auto' }}
-                              onPress={() => {
-                                navigation.navigate(RouteEnum.Redelegate, {
-                                  finalizer: item.finalizer,
-                                  txid: item.txid,
-                                  staked: item.amount,
-                                  closeSheet: () => {},
-                                });
-                              }}
-                            />
-                          )}
-                          {item.status === WalletBondsStatusEnum.Active && (
-                            <Button
-                              variant="secondary"
-                              title={'Unstake'}
-                              style={{ width: '40%', marginLeft: 10 }}
-                              onPress={() => {
-                                navigation.navigate(RouteEnum.Unstake, {
-                                  finalizer: item.finalizer,
-                                  txid: item.txid,
-                                  staked: item.amount,
-                                  closeSheet: () => {},
-                                });
-                              }}
-                            />
+                            <>
+                              <Button
+                                title={'Redelegate'}
+                                variant="secondary"
+                                onPress={() => {
+                                  navigation.navigate(RouteEnum.Redelegate, {
+                                    finalizer: item.finalizer,
+                                    txid: item.txid,
+                                    staked: item.amount,
+                                    closeSheet: () => {},
+                                  });
+                                }}
+                              />
+                              <Button
+                                variant="primary"
+                                title={'Unstake'}
+                                onPress={() => {
+                                  navigation.navigate(RouteEnum.Unstake, {
+                                    finalizer: item.finalizer,
+                                    txid: item.txid,
+                                    staked: item.amount,
+                                    closeSheet: () => {},
+                                  });
+                                }}
+                              />
+                            </>
                           )}
                           {item.status === WalletBondsStatusEnum.Unbonding && (
                             <Button
-                              variant="primary"
                               title={'Withdraw'}
-                              style={{ width: '40%', marginLeft: 10 }}
+                              variant="primary"
                               onPress={() => {
                                 navigation.navigate(RouteEnum.Unstake, {
                                   finalizer: item.finalizer,

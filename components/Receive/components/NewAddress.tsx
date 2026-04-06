@@ -20,7 +20,6 @@ import {
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
-import Button from '../../Components/Button';
 import { useToast } from 'react-native-toastier';
 import { AddressUnifiedTypeEnum } from '../../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -29,6 +28,7 @@ import ContextMenu, {
   ContextMenuOnPressNativeEvent,
 } from 'react-native-context-menu-view';
 import RPCModule from '../../../app/RPCModule';
+import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
 
 type NewAddressProps = {
   addressKind: AddressKindEnum;
@@ -284,19 +284,18 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             alignItems: 'center',
             marginVertical: 5,
             marginTop: 30,
+            gap: 10,
           }}
         >
-          <Button
-            variant="primary"
+          <LiquidPrimaryButton
             title={translate('save') as string}
             onPress={() => {
               createAddress();
             }}
           />
-          <Button
-            variant="secondary"
+          <LiquidPrimaryButton
+            tintColor={colors.secondary}
             title={translate('cancel') as string}
-            style={{ marginLeft: 10 }}
             onPress={() => {
               setLabel('');
               Keyboard.dismiss();

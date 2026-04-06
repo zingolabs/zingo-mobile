@@ -234,9 +234,6 @@ const SettingsServers: React.FunctionComponent<SettingsServersProps> = ({
               ? changeServerTesnet
               : changeServerRegtest
           }
-          style={{
-            alignSelf: 'stretch',
-          }}
         />
       </View>
     </ToastProvider>

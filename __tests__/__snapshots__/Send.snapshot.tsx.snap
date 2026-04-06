@@ -415,32 +415,23 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
         }
       }
     >
-      <View
-        accessibilityLabel="Continue"
+      <div
         accessibilityRole="button"
         accessibilityState={
           {
-            "busy": false,
+            "busy": undefined,
             "checked": undefined,
             "disabled": true,
             "expanded": undefined,
             "selected": undefined,
           }
         }
-        accessibilityValue={
-          {
-            "max": undefined,
-            "min": undefined,
-            "now": undefined,
-            "text": undefined,
-          }
-        }
         accessible={true}
-        collapsable={false}
-        focusable={true}
-        onBlur={[Function]}
+        colorScheme="system"
+        effect="clear"
+        focusable={false}
+        interactive={false}
         onClick={[Function]}
-        onFocus={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -451,24 +442,23 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           [
             {
               "alignItems": "center",
-              "borderRadius": 20,
+              "borderRadius": 18,
+              "flex": 1,
               "justifyContent": "center",
-              "minHeight": 44,
-              "paddingHorizontal": 16,
+              "minWidth": 160,
+              "paddingHorizontal": 20,
+              "paddingVertical": 14,
+              "shadowColor": "#000",
+              "shadowOffset": {
+                "height": 10,
+                "width": 0,
+              },
+              "shadowOpacity": 0.35,
+              "shadowRadius": 16,
             },
             {
-              "width": "100%",
+              "opacity": 0.5,
             },
-            {
-              "backgroundColor": "#18bd18",
-              "borderColor": "#18bd18",
-              "borderWidth": 1,
-            },
-            {
-              "opacity": 0.55,
-            },
-            false,
-            undefined,
           ]
         }
       >
@@ -476,12 +466,9 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           style={
             [
               {
-                "fontSize": 16,
+                "color": "white",
+                "fontSize": 18,
                 "fontWeight": "600",
-                "textAlign": "center",
-              },
-              {
-                "color": "#c3c3c3",
               },
               undefined,
             ]
@@ -489,7 +476,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
         >
           Continue
         </Text>
-      </View>
+      </div>
     </View>
   </View>
 </View>
@@ -910,32 +897,23 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
         }
       }
     >
-      <View
-        accessibilityLabel="Continue"
+      <div
         accessibilityRole="button"
         accessibilityState={
           {
-            "busy": false,
+            "busy": undefined,
             "checked": undefined,
             "disabled": true,
             "expanded": undefined,
             "selected": undefined,
           }
         }
-        accessibilityValue={
-          {
-            "max": undefined,
-            "min": undefined,
-            "now": undefined,
-            "text": undefined,
-          }
-        }
         accessible={true}
-        collapsable={false}
-        focusable={true}
-        onBlur={[Function]}
+        colorScheme="system"
+        effect="clear"
+        focusable={false}
+        interactive={false}
         onClick={[Function]}
-        onFocus={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -946,24 +924,23 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           [
             {
               "alignItems": "center",
-              "borderRadius": 20,
+              "borderRadius": 18,
+              "flex": 1,
               "justifyContent": "center",
-              "minHeight": 44,
-              "paddingHorizontal": 16,
+              "minWidth": 160,
+              "paddingHorizontal": 20,
+              "paddingVertical": 14,
+              "shadowColor": "#000",
+              "shadowOffset": {
+                "height": 10,
+                "width": 0,
+              },
+              "shadowOpacity": 0.35,
+              "shadowRadius": 16,
             },
             {
-              "width": "100%",
+              "opacity": 0.5,
             },
-            {
-              "backgroundColor": "#18bd18",
-              "borderColor": "#18bd18",
-              "borderWidth": 1,
-            },
-            {
-              "opacity": 0.55,
-            },
-            false,
-            undefined,
           ]
         }
       >
@@ -971,12 +948,9 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           style={
             [
               {
-                "fontSize": 16,
+                "color": "white",
+                "fontSize": 18,
                 "fontWeight": "600",
-                "textAlign": "center",
-              },
-              {
-                "color": "#c3c3c3",
               },
               undefined,
             ]
@@ -984,7 +958,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
         >
           Continue
         </Text>
-      </View>
+      </div>
     </View>
   </View>
 </View>

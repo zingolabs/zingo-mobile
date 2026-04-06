@@ -7,12 +7,12 @@ import { GlobalConst, RouteEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
-import Button from '../../Components/Button';
 import { useToast } from 'react-native-toastier';
 import { HeaderTitle } from '../../Header';
 import Utils from '../../../app/utils';
 import ZecAmount from '../../Components/ZecAmount';
 import { TriangleAlertIcon } from 'lucide-react-native';
+import Button from '../../Components/Button';
 
 type DataType = {
   svg: {
@@ -106,11 +106,12 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
               marginVertical: 5,
               marginTop: 20,
               marginBottom: 20,
+              gap: 10,
             }}
           >
             <Button
-              variant="primary"
               title={'Redelegate'}
+              variant="secondary"
               onPress={() => {
                 clear();
                 navigation.navigate(RouteEnum.Redelegate, {
@@ -122,9 +123,8 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
               }}
             />
             <Button
-              variant="secondary"
+              variant="primary"
               title={'Unstake'}
-              style={{ marginLeft: 10 }}
               onPress={() => {
                 clear();
                 navigation.navigate(RouteEnum.Unstake, {

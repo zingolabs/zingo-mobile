@@ -7,7 +7,6 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
-import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
 import { SnackbarDurationEnum, ScreenEnum } from '../../AppState';
@@ -15,6 +14,7 @@ import { Header } from '../../../components/Header';
 import Utils from '../../utils';
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
 
 type TextsType = {
   new: string[];
@@ -258,11 +258,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({ onClickOK }) => {
             marginVertical: 5,
           }}
         >
-          <Button
-            variant="primary"
-            style={{
-              backgroundColor: colors.primary,
-            }}
+          <LiquidPrimaryButton
             title={!!texts && !!texts.new ? texts.new[0] : ''}
             onPress={() => onClickOKHide()}
           />

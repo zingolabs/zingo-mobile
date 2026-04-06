@@ -7,7 +7,6 @@ import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
 import { ThemeType } from '../../types';
 import { ScreenEnum, SelectServerEnum } from '../../AppState';
-import Button from '../../../components/Components/Button';
 import { ContextAppLoading } from '../../context';
 import BoldText from '../../../components/Components/BoldText';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -15,6 +14,8 @@ import Snackbars from '../../../components/Components/Snackbars';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RegText from '../../../components/Components/RegText';
 import { HeaderTitle } from '../../../components/Header';
+import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
+import Button from '../../../components/Components/Button';
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
@@ -208,7 +209,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 </View>
               </View>
               <Button
-                variant="primary"
                 title={translate('loadingapp.opencurrentwallet') as string}
                 disabled={actionButtonsDisabled}
                 onPress={() => openCurrentWallet()}
@@ -231,13 +231,10 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               variant="secondary"
               title={'Import wallet'}
               disabled={actionButtonsDisabled}
-              style={{ borderColor: 'transparent' }}
               onPress={() => getwalletToRestore()}
             />
 
-            <Button
-              testID="loadingapp.createnewwallet"
-              variant="primary"
+            <LiquidPrimaryButton
               title={'Create new wallet'}
               disabled={actionButtonsDisabled}
               onPress={() => {
@@ -258,7 +255,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   createNewWallet();
                 }
               }}
-              style={{ marginBottom: 10, marginTop: 10 }}
+              style={{ marginBottom: 10, marginTop: 10, width: '100%' }}
             />
           </View>
         </View>

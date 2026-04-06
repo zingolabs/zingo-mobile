@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
-import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { Header } from '../Header';
@@ -25,6 +24,7 @@ import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { XIcon } from '../Components/Icons/XIcon';
+import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
 
 type MemoProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Memo>;
 
@@ -220,8 +220,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ navigation, route }) => {
               marginVertical: 10,
             }}
           >
-            <Button
-              variant="primary"
+            <LiquidPrimaryButton
               title={translate('save') as string}
               onPress={doSaveAndClose}
               disabled={

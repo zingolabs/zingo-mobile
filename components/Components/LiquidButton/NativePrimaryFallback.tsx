@@ -7,6 +7,8 @@ import {
   Platform,
   TextStyle,
   ColorValue,
+  ViewStyle,
+  View,
 } from 'react-native';
 import { ThemeType } from '../../../app/types';
 
@@ -14,47 +16,54 @@ type NativePrimaryFallbackProps = {
   title: string;
   onPress: () => void;
   disabled?: boolean;
+  style?: ViewStyle;
   textStyle?: TextStyle;
   tintColor?: ColorValue;
+  testID?: string;
 };
 
 const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
   title,
   onPress,
   disabled,
+  style,
   textStyle,
   tintColor,
+  testID,
 }) => {
   const { colors } = useTheme() as ThemeType;
 
   const primary = disabled ? colors.secondary : (tintColor ?? colors.primary);
 
   return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      style={({ pressed }) => [
-        styles.primary,
-        { backgroundColor: primary },
-        pressed && !disabled && styles.primaryPressed,
-        disabled && styles.primaryDisabled,
-      ]}
-    >
-      <Text style={[styles.primaryText, textStyle]}>{title}</Text>
-    </Pressable>
+    <View style={[styles.container, style]}>
+      <Pressable
+        testID={testID}
+        onPress={onPress}
+        disabled={disabled}
+        accessibilityRole="button"
+        accessibilityState={{ disabled }}
+        style={({ pressed }) => [
+          styles.primary,
+          { backgroundColor: primary },
+          pressed && !disabled && styles.primaryPressed,
+          disabled && styles.primaryDisabled,
+        ]}
+      >
+        <Text style={[styles.primaryText, textStyle]}>{title}</Text>
+      </Pressable>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {},
   primary: {
-    alignSelf: 'stretch',
-    width: '100%',
-    minWidth: 180,
-    height: 44,
+    flex: 1,
+    borderRadius: 18,
     paddingHorizontal: 20,
-    borderRadius: 12,
+    paddingVertical: 14,
+    minWidth: 160,
     alignItems: 'center',
     justifyContent: 'center',
 

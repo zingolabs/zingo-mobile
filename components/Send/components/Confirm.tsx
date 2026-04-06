@@ -7,7 +7,6 @@ import BoldText from '../../Components/BoldText';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
 import CurrencyAmount from '../../Components/CurrencyAmount';
-import Button from '../../Components/Button';
 import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -31,6 +30,7 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderTitle } from '../../Header';
+import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
 
 type ConfirmProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Confirm>;
 
@@ -550,8 +550,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           paddingBottom: 20,
         }}
       >
-        <Button
-          variant="primary"
+        <LiquidPrimaryButton
           title={
             sendAllAmount
               ? (translate('send.confirm-button-all') as string)
