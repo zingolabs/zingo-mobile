@@ -38,6 +38,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         {
           "height": 48,
           "justifyContent": "center",
+          "marginTop": 10,
           "paddingHorizontal": 16,
         }
       }

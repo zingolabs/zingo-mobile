@@ -17,6 +17,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       {
         "height": 48,
         "justifyContent": "center",
+        "marginTop": 10,
         "paddingHorizontal": 16,
       }
     }
@@ -684,6 +685,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       {
         "height": 48,
         "justifyContent": "center",
+        "marginTop": 10,
         "paddingHorizontal": 16,
       }
     }
@@ -2094,6 +2096,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       {
         "height": 48,
         "justifyContent": "center",
+        "marginTop": 10,
         "paddingHorizontal": 16,
       }
     }
@@ -2761,6 +2764,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       {
         "height": 48,
         "justifyContent": "center",
+        "marginTop": 10,
         "paddingHorizontal": 16,
       }
     }

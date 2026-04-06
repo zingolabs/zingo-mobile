@@ -1054,7 +1054,7 @@ export class LoadedAppClass extends Component<
         this.state.valueTransfersTotal > 0 &&
         this.state.valueTransfers
           .filter((vtOld: ValueTransferType) => vtOld.confirmations === 0) // not confirmed
-          .forEach((vtOld: ValueTransferType) => {
+          .forEach(async (vtOld: ValueTransferType) => {
             const vtNew = valueTransfers.filter(
               (vt: ValueTransferType) =>
                 vt.txid === vtOld.txid &&
@@ -1183,6 +1183,20 @@ export class LoadedAppClass extends Component<
                   true,
                   this.state.translate,
                 );
+              }
+              // here I know a new transaction is confirmed
+              // lets check the scheduled actions & remove it
+              if (
+                this.state.scheduledActions.filter(
+                  sa => sa.txid === vtNew[0].txid,
+                ).length > 0
+              ) {
+                const list = await ScheduledActionsFileImpl.removeSA(
+                  this.state.scheduledActions.filter(
+                    sa => sa.txid === vtNew[0].txid,
+                  )[0].id,
+                );
+                this.setScheduledActions(list);
               }
             }
             // the ValueTransfer is gone -> Likely Reverted by the server

@@ -3,7 +3,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 type HeaderTitleProps = {
   title: string;
@@ -19,40 +18,39 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({
   const { colors } = useTheme() as ThemeType;
 
   return (
-    <SafeAreaView>
-      <View style={styles.header}>
-        <View style={styles.side}>
-          <TouchableOpacity
-            onPress={goBack}
-            style={[styles.backButton, { borderColor: colors.text }]}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <FontAwesomeIcon
-              icon={bottomSheet ? faXmark : faChevronLeft}
-              size={22}
-              color={colors.text}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View pointerEvents="none" style={styles.titleContainer}>
-          <Text
-            numberOfLines={1}
-            style={[styles.headerTitle, { color: colors.text }]}
-          >
-            {title}
-          </Text>
-        </View>
-
-        <View style={styles.side} />
+    <View style={styles.header}>
+      <View style={styles.side}>
+        <TouchableOpacity
+          onPress={goBack}
+          style={[styles.backButton, { borderColor: colors.text }]}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <FontAwesomeIcon
+            icon={bottomSheet ? faXmark : faChevronLeft}
+            size={22}
+            color={colors.text}
+          />
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+
+      <View pointerEvents="none" style={styles.titleContainer}>
+        <Text
+          numberOfLines={1}
+          style={[styles.headerTitle, { color: colors.text }]}
+        >
+          {title}
+        </Text>
+      </View>
+
+      <View style={styles.side} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   header: {
     height: 48,
+    marginTop: 10,
     paddingHorizontal: 16,
     justifyContent: 'center',
   },

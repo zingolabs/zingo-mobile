@@ -1,6 +1,7 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { useEffect } from 'react';
 import { BackHandler, LogBox, StatusBar } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
   createNavigationContainerRef,
   DefaultTheme,
@@ -73,17 +74,24 @@ const App: React.FunctionComponent = () => {
     <SafeAreaProvider>
       <StatusBar backgroundColor={zingoTheme.colors.background} />
       <NavigationContainer ref={navigationRef} theme={zingoTheme}>
-        <Stack.Navigator
-          initialRouteName={RouteEnum.LoadingApp}
-          screenOptions={{ headerShown: false, animation: 'none' }}
+        <SafeAreaView
+          style={{
+            flex: 1,
+            backgroundColor: zingoTheme.colors.background,
+          }}
         >
-          <Stack.Screen name={RouteEnum.LoadingApp}>
-            {props => <LoadingApp {...props} />}
-          </Stack.Screen>
-          <Stack.Screen name={RouteEnum.LoadedApp}>
-            {props => <LoadedApp {...props} />}
-          </Stack.Screen>
-        </Stack.Navigator>
+          <Stack.Navigator
+            initialRouteName={RouteEnum.LoadingApp}
+            screenOptions={{ headerShown: false, animation: 'none' }}
+          >
+            <Stack.Screen name={RouteEnum.LoadingApp}>
+              {props => <LoadingApp {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name={RouteEnum.LoadedApp}>
+              {props => <LoadedApp {...props} />}
+            </Stack.Screen>
+          </Stack.Navigator>
+        </SafeAreaView>
       </NavigationContainer>
     </SafeAreaProvider>
   );

@@ -9,10 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
@@ -118,7 +115,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
           />
         )}
 
-        <SafeAreaView
+        <View
           style={{
             flexGrow: 1,
             alignItems: 'center',
@@ -524,7 +521,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                 </View>
               </>
             )}
-        </SafeAreaView>
+        </View>
 
         <View
           style={{
