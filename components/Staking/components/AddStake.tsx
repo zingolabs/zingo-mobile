@@ -40,8 +40,16 @@ import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import RegText from '../../Components/RegText';
 import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
+import notifee, {
+  AndroidImportance,
+  TimestampTrigger,
+  TriggerType,
+} from '@notifee/react-native';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
+const MINUTES_TO_STAKING_DAY = 1;
+const TITLE = 'Your staking action is ready to be executed!';
+const BODY = 'TODO: Action details';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -111,6 +119,45 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     }
   }, [finalizerText, globalStaked]);
 
+  async function requestPermissions() {
+    await notifee.requestPermission();
+  }
+
+  async function scheduleReminder() {
+    await requestPermissions();
+
+    const channelId = await notifee.createChannel({
+      id: 'reminders',
+      name: 'Reminders',
+      importance: AndroidImportance.HIGH,
+    });
+
+    const fireDate = Date.now() + Number(MINUTES_TO_STAKING_DAY) * 20 * 1000;
+
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: fireDate,
+      alarmManager: true, // Android option for timestamp triggers
+    };
+
+    await notifee.createTriggerNotification(
+      {
+        title: TITLE,
+        body: BODY,
+        data: {
+          deeplink: `localreminders://reminder-opened?title=${encodeURIComponent(TITLE)}&body=${encodeURIComponent(BODY)}`,
+        },
+        android: {
+          channelId,
+          pressAction: {
+            id: 'default',
+          },
+        },
+      },
+      trigger,
+    );
+  }
+
   const handleConfirmStake = async () => {
     if (!hasSelection) {
       return;
@@ -162,11 +209,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     // Build a minimal SendPageState to reuse existing plumbing
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
 
-    // sendPageState.toaddr.to =
-    //   indexerServer.chainName === ChainNameEnum.regtestChainName
-    //     ? MINER_ADDRESS_REGTEST
-    //     : MINER_ADDRESS_TESTNET;
-    // sendPageState.toaddr.memo = defaultUnifiedAddress;
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(
       amount,
       8,
@@ -198,6 +240,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         const list = await ScheduledActionsFileImpl.addSA(
           stakingScheduledAction,
         );
+        await scheduleReminder();
         setScheduledActions(list);
       }
       setModalState('success');
