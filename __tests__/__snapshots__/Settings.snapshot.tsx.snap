@@ -3076,6 +3076,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             {
               "alignItems": "center",
               "borderRadius": 18,
+              "flex": 1,
               "justifyContent": "center",
               "minWidth": 160,
               "paddingHorizontal": 20,
@@ -3088,7 +3089,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "shadowOpacity": 0.35,
               "shadowRadius": 16,
             },
-            undefined,
             false,
           ]
         }

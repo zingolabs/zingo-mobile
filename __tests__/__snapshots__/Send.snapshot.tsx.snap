@@ -443,6 +443,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             {
               "alignItems": "center",
               "borderRadius": 18,
+              "flex": 1,
               "justifyContent": "center",
               "minWidth": 160,
               "paddingHorizontal": 20,
@@ -455,7 +456,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               "shadowOpacity": 0.35,
               "shadowRadius": 16,
             },
-            undefined,
             {
               "opacity": 0.5,
             },
@@ -925,6 +925,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             {
               "alignItems": "center",
               "borderRadius": 18,
+              "flex": 1,
               "justifyContent": "center",
               "minWidth": 160,
               "paddingHorizontal": 20,
@@ -937,7 +938,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               "shadowOpacity": 0.35,
               "shadowRadius": 16,
             },
-            undefined,
             {
               "opacity": 0.5,
             },

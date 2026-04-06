@@ -7,6 +7,8 @@ import {
   Platform,
   TextStyle,
   ColorValue,
+  ViewStyle,
+  View,
 } from 'react-native';
 import { ThemeType } from '../../../app/types';
 
@@ -14,6 +16,7 @@ type NativePrimaryFallbackProps = {
   title: string;
   onPress: () => void;
   disabled?: boolean;
+  style?: ViewStyle;
   textStyle?: TextStyle;
   tintColor?: ColorValue;
   testID?: string;
@@ -23,6 +26,7 @@ const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
   title,
   onPress,
   disabled,
+  style,
   textStyle,
   tintColor,
   testID,
@@ -32,26 +36,30 @@ const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
   const primary = disabled ? colors.secondary : (tintColor ?? colors.primary);
 
   return (
-    <Pressable
-      testID={testID}
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      style={({ pressed }) => [
-        styles.primary,
-        { backgroundColor: primary },
-        pressed && !disabled && styles.primaryPressed,
-        disabled && styles.primaryDisabled,
-      ]}
-    >
-      <Text style={[styles.primaryText, textStyle]}>{title}</Text>
-    </Pressable>
+    <View style={[styles.container, style]}>
+      <Pressable
+        testID={testID}
+        onPress={onPress}
+        disabled={disabled}
+        accessibilityRole="button"
+        accessibilityState={{ disabled }}
+        style={({ pressed }) => [
+          styles.primary,
+          { backgroundColor: primary },
+          pressed && !disabled && styles.primaryPressed,
+          disabled && styles.primaryDisabled,
+        ]}
+      >
+        <Text style={[styles.primaryText, textStyle]}>{title}</Text>
+      </Pressable>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {},
   primary: {
+    flex: 1,
     borderRadius: 18,
     paddingHorizontal: 20,
     paddingVertical: 14,

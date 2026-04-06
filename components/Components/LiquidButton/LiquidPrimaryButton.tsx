@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Text,
   StyleSheet,
@@ -36,7 +36,6 @@ const LiquidPrimaryButton: React.FC<Props> = ({
   testID,
 }) => {
   const { colors } = useTheme() as ThemeType;
-  const [, setPressed] = useState(false);
 
   const primary = disabled ? colors.secondary : (tintColor ?? colors.primary);
 
@@ -47,6 +46,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
           title={title}
           onPress={onPress}
           disabled={disabled}
+          style={style}
           textStyle={textStyle}
           tintColor={tintColor}
           testID={testID}
@@ -58,10 +58,9 @@ const LiquidPrimaryButton: React.FC<Props> = ({
   return (
     <TouchableWithoutFeedback
       testID={testID}
+      style={[styles.container, style]}
       onPress={onPress}
       disabled={disabled}
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
     >
@@ -71,7 +70,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
         effect="clear"
         colorScheme="system"
         tintColor={primary}
-        style={[styles.glass, style, disabled && styles.disabled]}
+        style={[styles.primary, disabled && styles.disabled]}
       >
         <Text style={[styles.text, textStyle]}>{title}</Text>
       </LiquidGlassView>
@@ -80,7 +79,9 @@ const LiquidPrimaryButton: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
-  glass: {
+  container: {},
+  primary: {
+    flex: 1,
     borderRadius: 18,
     paddingHorizontal: 20,
     paddingVertical: 14,
@@ -93,10 +94,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.35,
     shadowRadius: 16,
   },
-  fallback: {
-    backgroundColor: '#4f8cff',
-    alignSelf: 'stretch',
-  },
   disabled: {
     opacity: 0.5,
   },
@@ -104,10 +101,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: 'white',
-  },
-  iosButtonContainer: {
-    minWidth: 160,
-    alignSelf: 'center',
   },
 });
 
