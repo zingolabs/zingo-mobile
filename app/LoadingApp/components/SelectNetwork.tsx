@@ -128,6 +128,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             <RegText
               color={colors.text}
               style={{
+                marginTop: 42,
                 fontSize: 32,
                 fontStyle: 'normal',
                 fontWeight: 700,
