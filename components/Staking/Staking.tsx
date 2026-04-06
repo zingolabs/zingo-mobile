@@ -727,13 +727,13 @@ const Staking: React.FC<StakingProps> = ({}) => {
                               flexDirection: 'row',
                               justifyContent: 'space-between',
                               alignItems: 'center',
-                              paddingVertical: 10,
                               paddingHorizontal: 10,
                               borderRadius: 16,
                             }}
                           >
                             <View
                               style={{
+                                marginVertical: 10,
                                 flexDirection: 'row',
                                 alignItems: 'center',
                               }}
@@ -755,7 +755,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                 <View
                                   style={{
                                     flexDirection: 'row',
-                                    marginLeft: 5,
                                   }}
                                 >
                                   <ZecAmount
@@ -783,7 +782,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                     style={{
                                       color: colors.placeholder,
                                       fontSize: 12,
-                                      marginLeft: 5,
                                     }}
                                   >
                                     {'with '}
@@ -799,7 +797,11 @@ const Staking: React.FC<StakingProps> = ({}) => {
                               </View>
                             </View>
                             <View
-                              style={{ flexGrow: 1, alignItems: 'flex-end' }}
+                              style={{
+                                flexGrow: 1,
+                                alignItems: 'flex-end',
+                                paddingRight: 20,
+                              }}
                             >
                               {stakingDay ? (
                                 <>
@@ -819,21 +821,19 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                   </FadeText>
                                 </>
                               ) : (
-                                <>
-                                  <RegText
-                                    style={{
-                                      color: '#FFAF02',
-                                      fontSize:
-                                        timeToStakingDay === '0min 0sec'
-                                          ? 10
-                                          : 15,
-                                    }}
-                                  >
-                                    {timeToStakingDay === '0min 0sec'
-                                      ? 'calculating...'
-                                      : timeToStakingDay}
-                                  </RegText>
-                                </>
+                                <RegText
+                                  style={{
+                                    color: '#FFAF02',
+                                    fontSize:
+                                      timeToStakingDay === '0min 0sec'
+                                        ? 10
+                                        : 15,
+                                  }}
+                                >
+                                  {timeToStakingDay === '0min 0sec'
+                                    ? 'calculating...'
+                                    : timeToStakingDay}
+                                </RegText>
                               )}
                             </View>
                           </LinearGradient>
@@ -994,7 +994,13 @@ const Staking: React.FC<StakingProps> = ({}) => {
                           }}
                         >
                           {item.status === WalletBondsStatusEnum.Active && (
-                            <>
+                            <View
+                              style={{
+                                flexDirection: 'column',
+                                gap: 10,
+                                width: '100%',
+                              }}
+                            >
                               <Button
                                 title={'Redelegate'}
                                 variant="secondary"
@@ -1019,7 +1025,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                   });
                                 }}
                               />
-                            </>
+                            </View>
                           )}
                           {item.status === WalletBondsStatusEnum.Unbonding && (
                             <Button

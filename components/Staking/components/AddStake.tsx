@@ -506,6 +506,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           }}
         >
           <LiquidPrimaryButton
+            style={{
+              width: '100%',
+            }}
             title="Stake"
             disabled={
               !hasSelection || !finalizerText.trim() || modalState === 'sending'

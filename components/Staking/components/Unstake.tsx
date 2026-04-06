@@ -555,6 +555,9 @@ const Unstake: React.FC<UnstakeProps> = ({
           }}
         >
           <LiquidPrimaryButton
+            style={{
+              width: '100%',
+            }}
             title={actionVerb}
             disabled={!isValidForm || modalState === 'sending'}
             onPress={handleUnstakePress}

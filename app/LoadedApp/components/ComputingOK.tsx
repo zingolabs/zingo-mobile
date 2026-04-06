@@ -10,7 +10,7 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
-import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
+import Button from '../../../components/Components/Button';
 
 type ComputingOKProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -71,7 +71,7 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({ route }) => {
 
           <View
             style={{
-              flexDirection: 'row',
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               paddingTop: 50,
@@ -79,9 +79,9 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({ route }) => {
               gap: 10,
             }}
           >
-            <LiquidPrimaryButton
-              tintColor={colors.secondary}
-              title={'Details TX'}
+            <Button
+              variant="secondary"
+              title={'Details'}
               onPress={() => {
                 // have to be the first element in the VT's -> index 0.
                 // we cannot be 100% sure...
@@ -96,11 +96,19 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({ route }) => {
                 });
               }}
             />
-            <LiquidPrimaryButton
+            <Button
               title={'Back'}
               onPress={() => {
-                navigation.navigate(RouteEnum.MainTabs, {
-                  screen: RouteEnum.History,
+                navigation.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: RouteEnum.MainTabs,
+                      params: {
+                        screen: RouteEnum.History,
+                      },
+                    },
+                  ],
                 });
               }}
             />

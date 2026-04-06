@@ -14,6 +14,7 @@ import { ThemeType, AppStackParamList } from './app/types';
 import { RouteEnum } from './app/AppState';
 
 import { BackHandler, LogBox, StatusBar } from 'react-native';
+import notifee, { EventType } from '@notifee/react-native';
 
 LogBox.ignoreLogs([
   '[Reanimated] Reduced motion setting is enabled on this device.',
@@ -59,6 +60,16 @@ const Stack = createStackNavigator<AppStackParamList>();
 
 export const navigationRef = createNavigationContainerRef();
 
+const linking = {
+  prefixes: ['delegator://'],
+  config: {
+    screens: {
+      Home: '',
+      ReminderOpened: 'reminder-opened',
+    },
+  },
+};
+
 const App: React.FunctionComponent = () => {
   // avoid to close the App when the user tap on
   // the back button of the device.
@@ -73,11 +84,46 @@ const App: React.FunctionComponent = () => {
     return () => sub.remove();
   }, []);
 
+  useEffect(() => {
+    // App already running in foreground/background:
+    const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
+      if (type === EventType.PRESS) {
+        const deeplink = detail.notification?.data?.deeplink;
+        if (deeplink && navigationRef.isReady()) {
+          const url = new URL(deeplink);
+          navigationRef.navigate('ReminderOpened', {
+            title: url.searchParams.get('title') || undefined,
+            body: url.searchParams.get('body') || undefined,
+          });
+        }
+      }
+    });
+
+    // App opened from a killed state by tapping notification:
+    (async () => {
+      const initial = await notifee.getInitialNotification();
+      const deeplink = initial?.notification?.data?.deeplink;
+      if (deeplink && navigationRef.isReady()) {
+        const url = new URL(deeplink);
+        navigationRef.navigate('ReminderOpened', {
+          title: url.searchParams.get('title') || undefined,
+          body: url.searchParams.get('body') || undefined,
+        });
+      }
+    })();
+
+    return unsubscribe;
+  }, []);
+
   //console.log('render App - 1');
   return (
     <SafeAreaProvider>
       <StatusBar backgroundColor={zingoTheme.colors.background} />
-      <NavigationContainer ref={navigationRef} theme={zingoTheme}>
+      <NavigationContainer
+        ref={navigationRef}
+        theme={zingoTheme}
+        linking={linking}
+      >
         <SafeAreaView
           style={{
             flex: 1,
