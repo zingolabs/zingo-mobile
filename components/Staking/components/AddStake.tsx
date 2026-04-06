@@ -47,7 +47,6 @@ import notifee, {
 } from '@notifee/react-native';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
-const MINUTES_TO_STAKING_DAY = 1;
 const TITLE = 'Your staking action is ready to be executed!';
 const BODY = 'TODO: Action details';
 
@@ -77,6 +76,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     stakingDay,
     setScheduledActions,
     scheduledActions,
+    timeToStakingDay,
   } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
@@ -123,7 +123,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     await notifee.requestPermission();
   }
 
-  async function scheduleReminder() {
+  async function scheduleReminder({ minutes }: { minutes: number }) {
     await requestPermissions();
 
     const channelId = await notifee.createChannel({
@@ -132,7 +132,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       importance: AndroidImportance.HIGH,
     });
 
-    const fireDate = Date.now() + Number(MINUTES_TO_STAKING_DAY) * 20 * 1000;
+    const fireDate = Date.now() + Number(minutes) * 20 * 1000;
 
     const trigger: TimestampTrigger = {
       type: TriggerType.TIMESTAMP,
@@ -240,7 +240,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         const list = await ScheduledActionsFileImpl.addSA(
           stakingScheduledAction,
         );
-        await scheduleReminder();
+        // TODO: DEBERIA SER NUMEROOOOO, NO STRING!!!!
+        await scheduleReminder({ minutes: timeToStakingDay });
         setScheduledActions(list);
       }
       setModalState('success');

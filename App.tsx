@@ -90,10 +90,8 @@ const App: React.FunctionComponent = () => {
       if (type === EventType.PRESS) {
         const deeplink = detail.notification?.data?.deeplink;
         if (deeplink && navigationRef.isReady()) {
-          const url = new URL(deeplink);
-          navigationRef.navigate('ReminderOpened', {
-            title: url.searchParams.get('title') || undefined,
-            body: url.searchParams.get('body') || undefined,
+          navigationRef.navigate(RouteEnum.StakingHome, {
+            tab: 'scheduled',
           });
         }
       }
@@ -104,10 +102,8 @@ const App: React.FunctionComponent = () => {
       const initial = await notifee.getInitialNotification();
       const deeplink = initial?.notification?.data?.deeplink;
       if (deeplink && navigationRef.isReady()) {
-        const url = new URL(deeplink);
-        navigationRef.navigate('ReminderOpened', {
-          title: url.searchParams.get('title') || undefined,
-          body: url.searchParams.get('body') || undefined,
+        navigationRef.navigate(RouteEnum.StakingHome, {
+          tab: 'scheduled',
         });
       }
     })();
@@ -115,7 +111,6 @@ const App: React.FunctionComponent = () => {
     return unsubscribe;
   }, []);
 
-  //console.log('render App - 1');
   return (
     <SafeAreaProvider>
       <StatusBar backgroundColor={zingoTheme.colors.background} />

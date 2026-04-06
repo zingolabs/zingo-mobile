@@ -64,7 +64,7 @@ export type AppDrawerParamList = {
   [RouteEnum.DebugInfo]: undefined;
   [RouteEnum.Faucet]: undefined;
   [RouteEnum.About]: undefined;
-  [RouteEnum.StakingHome]: undefined;
+  [RouteEnum.StakingHome]: StakingHomeNavigationState | undefined;
   [RouteEnum.Distribution]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Info]: undefined;
@@ -126,6 +126,10 @@ export type FinalizersNavigationState = {
 };
 
 export type StakeNavigationState = {};
+
+export type StakingHomeNavigationState = {
+  tab: 'scheduled' | 'active' | 'my';
+};
 
 export type UnstakeNavigationState = {
   finalizer: string;
