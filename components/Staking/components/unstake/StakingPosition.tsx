@@ -1,9 +1,13 @@
+/* eslint-disable react-native/no-inline-styles */
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CurrencyNameEnum, WalletBondsType } from '../../../../app/AppState';
 import { WalletBondsStatusEnum } from '../../../../app/AppState/enums/WalletBondsStatusEnum';
 import { RefreshCcw } from 'lucide-react-native';
 import { useTheme } from '@react-navigation/native';
 import ZecAmount from '../../../Components/ZecAmount';
+import { ThemeType } from '../../../../app/types';
+import { useContext } from 'react';
+import { ContextAppLoaded } from '../../../../app/context';
 
 type StakingPositionProps = {
   item: WalletBondsType;
@@ -11,7 +15,9 @@ type StakingPositionProps = {
 };
 
 export function StakingPosition({ item, selected }: StakingPositionProps) {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as ThemeType;
+  const context = useContext(ContextAppLoaded);
+  const { valueTransfers } = context;
 
   let confirmations =
     valueTransfers &&
@@ -22,7 +28,7 @@ export function StakingPosition({ item, selected }: StakingPositionProps) {
   return (
     <Pressable
       onPress={() => {
-        setSelectedTxid(item.txid);
+        //setSelectedTxid(item.txid);
       }}
       style={[
         styles.txRow,

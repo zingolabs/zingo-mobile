@@ -1,32 +1,23 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Component Button - test Button Primary - snapshot 1`] = `
-<View
-  accessibilityLabel="Primary button"
+<div
   accessibilityRole="button"
   accessibilityState={
     {
-      "busy": false,
+      "busy": undefined,
       "checked": undefined,
       "disabled": false,
       "expanded": undefined,
       "selected": undefined,
     }
   }
-  accessibilityValue={
-    {
-      "max": undefined,
-      "min": undefined,
-      "now": undefined,
-      "text": undefined,
-    }
-  }
   accessible={true}
-  collapsable={false}
+  colorScheme="system"
+  effect="clear"
   focusable={true}
-  onBlur={[Function]}
+  interactive={true}
   onClick={[Function]}
-  onFocus={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -37,35 +28,32 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
     [
       {
         "alignItems": "center",
-        "borderRadius": 20,
+        "borderRadius": 30,
         "justifyContent": "center",
-        "minHeight": 44,
-        "paddingHorizontal": 16,
+        "minWidth": 160,
+        "paddingHorizontal": 20,
+        "paddingVertical": 14,
+        "shadowColor": "#000",
+        "shadowOffset": {
+          "height": 10,
+          "width": 0,
+        },
+        "shadowOpacity": 0.35,
+        "shadowRadius": 16,
       },
-      {
-        "width": "100%",
-      },
-      {
-        "backgroundColor": "#18bd18",
-        "borderColor": "#18bd18",
-        "borderWidth": 1,
-      },
+      undefined,
       false,
-      false,
-      {},
     ]
   }
+  tintColor="#18bd18"
 >
   <Text
     style={
       [
         {
-          "fontSize": 16,
+          "color": "white",
+          "fontSize": 18,
           "fontWeight": "600",
-          "textAlign": "center",
-        },
-        {
-          "color": "#c3c3c3",
         },
         undefined,
       ]
@@ -73,36 +61,27 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
   >
     Primary button
   </Text>
-</View>
+</div>
 `;
 
 exports[`Component Button - test Button Secondary - snapshot 1`] = `
-<View
-  accessibilityLabel="Secondary button"
+<div
   accessibilityRole="button"
   accessibilityState={
     {
-      "busy": false,
+      "busy": undefined,
       "checked": undefined,
       "disabled": false,
       "expanded": undefined,
       "selected": undefined,
     }
   }
-  accessibilityValue={
-    {
-      "max": undefined,
-      "min": undefined,
-      "now": undefined,
-      "text": undefined,
-    }
-  }
   accessible={true}
-  collapsable={false}
+  colorScheme="system"
+  effect="clear"
   focusable={true}
-  onBlur={[Function]}
+  interactive={true}
   onClick={[Function]}
-  onFocus={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -113,35 +92,32 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
     [
       {
         "alignItems": "center",
-        "borderRadius": 20,
+        "borderRadius": 30,
         "justifyContent": "center",
-        "minHeight": 44,
-        "paddingHorizontal": 16,
+        "minWidth": 160,
+        "paddingHorizontal": 20,
+        "paddingVertical": 14,
+        "shadowColor": "#000",
+        "shadowOffset": {
+          "height": 10,
+          "width": 0,
+        },
+        "shadowOpacity": 0.35,
+        "shadowRadius": 16,
       },
-      {
-        "width": "100%",
-      },
-      {
-        "backgroundColor": "transparent",
-        "borderColor": "#ffffff",
-        "borderWidth": 1,
-      },
+      undefined,
       false,
-      false,
-      {},
     ]
   }
+  tintColor="#1F1F1F"
 >
   <Text
     style={
       [
         {
-          "fontSize": 16,
+          "color": "white",
+          "fontSize": 18,
           "fontWeight": "600",
-          "textAlign": "center",
-        },
-        {
-          "color": "#c3c3c3",
         },
         undefined,
       ]
@@ -149,5 +125,5 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
   >
     Secondary button
   </Text>
-</View>
+</div>
 `;

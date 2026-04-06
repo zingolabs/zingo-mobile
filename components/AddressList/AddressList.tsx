@@ -26,7 +26,6 @@ import {
 } from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
-import Button from '../Components/Button';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import { Header } from '../Header';
@@ -36,6 +35,7 @@ import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
 
 type AddressListProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -265,8 +265,8 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                 marginBottom: 30,
               }}
             >
-              <Button
-                variant="secondary"
+              <LiquidPrimaryButton
+                tintColor={colors.secondary}
                 title={translate('history.loadmore') as string}
                 onPress={loadMoreClicked}
               />

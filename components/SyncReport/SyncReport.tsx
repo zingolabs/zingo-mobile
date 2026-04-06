@@ -22,10 +22,10 @@ import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRange
 import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import Button from '../Components/Button';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
 import Utils from '../../app/utils';
+import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
 
 type SyncReportProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -750,8 +750,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                 </RegText>
               )}
               {!!background.error && (
-                <Button
-                  variant="primary"
+                <LiquidPrimaryButton
                   title={translate('view-error') as string}
                   onPress={() => {
                     reportError(background.error ? background.error : '');

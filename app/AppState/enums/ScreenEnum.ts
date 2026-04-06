@@ -34,5 +34,5 @@ export enum ScreenEnum {
   Insight = 'Insight',
   ShowUfvk = 'ShowUfvk',
   Memo = 'Memo',
-  FinalizerDetails = 'FinalizerDetails',
+  FinalizerDetail = 'FinalizerDetail',
 }

@@ -17,7 +17,6 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
       {
         "height": 48,
         "justifyContent": "center",
-        "marginTop": 10,
         "paddingHorizontal": 16,
       }
     }
@@ -172,12 +171,15 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
         >
           <Text
             style={
-              {
-                "color": "#c3c3c3",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              }
+              [
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                },
+                undefined,
+              ]
             }
           >
             text translated1900100text translated
@@ -197,32 +199,23 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
       }
     }
   >
-    <View
-      accessibilityLabel="text translated"
+    <div
       accessibilityRole="button"
       accessibilityState={
         {
-          "busy": false,
+          "busy": undefined,
           "checked": undefined,
-          "disabled": false,
+          "disabled": undefined,
           "expanded": undefined,
           "selected": undefined,
         }
       }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
       accessible={true}
-      collapsable={false}
+      colorScheme="system"
+      effect="clear"
       focusable={true}
-      onBlur={[Function]}
+      interactive={true}
       onClick={[Function]}
-      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -233,35 +226,32 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
         [
           {
             "alignItems": "center",
-            "borderRadius": 20,
+            "borderRadius": 30,
             "justifyContent": "center",
-            "minHeight": 44,
-            "paddingHorizontal": 16,
+            "minWidth": 160,
+            "paddingHorizontal": 20,
+            "paddingVertical": 14,
+            "shadowColor": "#000",
+            "shadowOffset": {
+              "height": 10,
+              "width": 0,
+            },
+            "shadowOpacity": 0.35,
+            "shadowRadius": 16,
           },
-          {
-            "width": "100%",
-          },
-          {
-            "backgroundColor": "#18bd18",
-            "borderColor": "#18bd18",
-            "borderWidth": 1,
-          },
-          false,
-          false,
+          undefined,
           undefined,
         ]
       }
+      tintColor="#18bd18"
     >
       <Text
         style={
           [
             {
-              "fontSize": 16,
+              "color": "white",
+              "fontSize": 18,
               "fontWeight": "600",
-              "textAlign": "center",
-            },
-            {
-              "color": "#c3c3c3",
             },
             undefined,
           ]
@@ -269,7 +259,7 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
       >
         text translated
       </Text>
-    </View>
+    </div>
   </View>
 </View>
 `;

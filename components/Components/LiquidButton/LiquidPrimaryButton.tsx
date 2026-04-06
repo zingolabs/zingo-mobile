@@ -77,7 +77,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   glass: {
-    borderRadius: 18,
+    borderRadius: 30,
     paddingHorizontal: 20,
     paddingVertical: 14,
     minWidth: 160,

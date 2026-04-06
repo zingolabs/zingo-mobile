@@ -80,8 +80,11 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   setPrivacyOption: async () => {},
   requestFaucetFunds: async () => '',
   stakingDay: false,
-  timeToStakingDay: 0,
-  timeLeftStakingDay: 0,
+  timeToStakingDay: '',
+  timeLeftStakingDay: '',
+  blocksToStakingDay: 0,
+  blocksLeftStakingDay: 0,
+  blocksTotalStakingDay: 0,
   scheduledActions: [],
   setScheduledActions: () => {},
 };

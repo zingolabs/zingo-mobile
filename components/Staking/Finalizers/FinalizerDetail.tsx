@@ -15,35 +15,39 @@ import {
 
 import { useNavigation, useTheme } from '@react-navigation/native';
 
-import { ThemeType } from '../../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderTitle } from '../../Header';
 import { FinalizerCard } from './FinalizerCard';
 import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
-import { WalletBondsType } from '../../../app/AppState';
+import { RouteEnum, WalletBondsType } from '../../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 import { ContextAppLoaded } from '../../../app/context';
 import { FinalizerPosition } from './FinalizerPosition';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
-type FinalizerDetailsProps = {
-  finalizer: string;
-  route: any;
-};
+type FinalizerDetailProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.FinalizerDetail
+>;
 
-export function FinalizerDetails({ route }: FinalizerDetailsProps) {
+export function FinalizerDetail({ route }: FinalizerDetailProps) {
+  const finalizer =
+    !!route.params && route.params.finalizer !== undefined
+      ? route.params.finalizer
+      : '';
+
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
-  const finalizer = route.params.finalizer;
 
   const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
   const [stakedFromNumber, setStakedFromNumber] = useState<number>(1);
 
-  const [selectedTxid, setSelectedTxid] = useState<string>('');
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
 

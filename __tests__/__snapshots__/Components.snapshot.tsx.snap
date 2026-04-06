@@ -183,13 +183,17 @@ exports[`Component Components - test RegText - snapshot 1`] = `
 <Text
   onPress={[MockFunction]}
   style={
-    {
-      "backgroundColor": "white",
-      "color": "red",
-      "fontSize": 18,
-      "fontWeight": "600",
-      "opacity": 1,
-    }
+    [
+      {
+        "color": "red",
+        "fontSize": 18,
+        "fontWeight": "600",
+        "opacity": 1,
+      },
+      {
+        "backgroundColor": "white",
+      },
+    ]
   }
 >
   reg text

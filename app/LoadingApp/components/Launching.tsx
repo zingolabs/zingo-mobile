@@ -6,7 +6,7 @@ import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../types';
 import { LaunchingModeEnum, TranslateType } from '../../AppState';
-import Button from '../../../components/Components/Button';
+import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
 
 type LaunchingProps = {
   empty: boolean;
@@ -131,8 +131,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
               >
                 {props.translate('biometricsfailed-footer') as string}
               </Text>
-              <Button
-                variant="primary"
+              <LiquidPrimaryButton
                 title={props.translate('biometricsfailed-button') as string}
                 onPress={() => props.tryAgain && props.tryAgain()}
                 style={{ marginBottom: 10, marginTop: 10 }}

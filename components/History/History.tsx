@@ -48,7 +48,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
 import RegText from '../Components/RegText';
 import EmptyList from '../../assets/icons/empty-cardboard-box.svg';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { RPCValueTransferStatusEnum } from '../../app/rpc/enums/RPCValueTransferStatusEnum';
 import Button from '../Components/Button';
 
 const ViewTypes = {
@@ -212,8 +212,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
     if (!valueTransfers) {
       return [] as ValueTransferType[];
     }
-    // strictly show VT's with some amount on funds.
-    return valueTransfers;
+    // excludinf failed transactions
+    return valueTransfers.filter(
+      vt => vt.status !== RPCValueTransferStatusEnum.failed,
+    );
   }, [valueTransfers]);
 
   useEffect(() => {
@@ -371,13 +373,23 @@ const History: React.FunctionComponent<HistoryProps> = ({
       accessible={true}
       accessibilityLabel={translate('history.title-acc') as string}
       style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        width: '100%',
-        height: '100%',
+        flex: 1,
+        backgroundColor: colors.background,
       }}
     >
-      <SafeAreaView
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          zIndex: 999,
+        }}
+      >
+        <SettingsButton screenName={screenName} />
+      </View>
+
+      {/* Header + quick actions */}
+      <View
         style={{
           backgroundColor: colors.background,
           paddingTop: 10,
@@ -386,18 +398,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
       >
         <WalletSummaryHeader show_staked={false} />
 
-        <SafeAreaView
-          style={{
-            position: 'absolute',
-            right: 10,
-            top: 10,
-          }}
-        >
-          <SettingsButton screenName={screenName} />
-        </SafeAreaView>
-
         <QuickActionsRow />
-      </SafeAreaView>
+      </View>
+
       {loading ? (
         <ActivityIndicator
           size="large"

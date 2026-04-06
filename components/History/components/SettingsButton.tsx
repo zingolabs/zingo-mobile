@@ -17,26 +17,33 @@ const SettingsButton: React.FC<SettingsButtonProps> = ({ screenName }) => {
   const { colors } = useTheme() as ThemeType;
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 50,
+        paddingHorizontal: 20,
+        gap: 10,
+      }}
+    >
       {screenName === ScreenEnum.StakingHome && (
         <TouchableOpacity
-          style={{ marginRight: 5, padding: 5 }}
           testID="header.finalizers"
           onPress={() => {
             navigation.navigate(RouteEnum.Distribution);
           }}
         >
-          <ChartPieIcon height={22} width={22} color={colors.text} />
+          <ChartPieIcon height={30} width={30} color={colors.text} />
         </TouchableOpacity>
       )}
       <TouchableOpacity
-        style={{ marginRight: 5, padding: 5 }}
         testID="header.settings"
         onPress={() => {
           navigation.navigate(RouteEnum.SettingsStack);
         }}
       >
-        <SettingsIcon height={24} width={24} color={colors.text} />
+        <SettingsIcon height={30} width={30} color={colors.text} />
       </TouchableOpacity>
     </View>
   );

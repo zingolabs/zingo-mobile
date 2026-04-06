@@ -40,7 +40,9 @@ const StakingActions: React.FC<StakingActionsProps> = () => {
           onPress={() =>
             navigation.navigate(RouteEnum.Unstake, {
               finalizer: undefined,
+              txid: undefined,
               staked: undefined,
+              closeSheet: () => {},
             })
           }
           style={{

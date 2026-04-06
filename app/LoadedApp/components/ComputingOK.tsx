@@ -10,7 +10,7 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { ContextAppLoaded } from '../../context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
-import Button from '../../../components/Components/Button';
+import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
 
 type ComputingOKProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -71,17 +71,16 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({ route }) => {
 
           <View
             style={{
-              marginTop: 50,
-              gap: 10,
-              flexDirection: 'column',
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              paddingTop: 10,
+              paddingTop: 50,
               paddingBottom: 20,
+              gap: 10,
             }}
           >
-            <Button
-              variant="secondary"
+            <LiquidPrimaryButton
+              tintColor={colors.secondary}
               title={'Details TX'}
               onPress={() => {
                 // have to be the first element in the VT's -> index 0.
@@ -97,8 +96,7 @@ const ComputingOK: React.FunctionComponent<ComputingOKProps> = ({ route }) => {
                 });
               }}
             />
-            <Button
-              variant="primary"
+            <LiquidPrimaryButton
               title={'Back'}
               onPress={() => {
                 navigation.navigate(RouteEnum.MainTabs, {

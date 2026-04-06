@@ -17,7 +17,6 @@ exports[`Component Info - test Info - snapshot 1`] = `
       {
         "height": 48,
         "justifyContent": "center",
-        "marginTop": 10,
         "paddingHorizontal": 16,
       }
     }
@@ -223,12 +222,15 @@ exports[`Component Info - test Info - snapshot 1`] = `
             >
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 text translated text translated
@@ -289,12 +291,15 @@ exports[`Component Info - test Info - snapshot 1`] = `
             >
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 server_version
@@ -355,12 +360,15 @@ exports[`Component Info - test Info - snapshot 1`] = `
             >
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 http://45.76.30.90:18234
@@ -421,12 +429,15 @@ exports[`Component Info - test Info - snapshot 1`] = `
             >
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 Testnet
@@ -487,12 +498,15 @@ exports[`Component Info - test Info - snapshot 1`] = `
             >
               <Text
                 style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "opacity": 1,
-                  }
+                  [
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 2000000

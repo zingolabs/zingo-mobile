@@ -38,7 +38,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         {
           "height": 48,
           "justifyContent": "center",
-          "marginTop": 10,
           "paddingHorizontal": 16,
         }
       }
@@ -240,14 +239,19 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         </View>
         <Text
           style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 20,
-              "fontWeight": "600",
-              "marginBottom": 10,
-              "marginTop": 20,
-              "opacity": 1,
-            }
+            [
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+              {
+                "fontSize": 20,
+                "marginBottom": 10,
+                "marginTop": 20,
+              },
+            ]
           }
         >
           Birthday (Optional)
@@ -311,32 +315,23 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         }
       }
     >
-      <View
-        accessibilityLabel=""
+      <div
         accessibilityRole="button"
         accessibilityState={
           {
-            "busy": false,
+            "busy": undefined,
             "checked": undefined,
             "disabled": true,
             "expanded": undefined,
             "selected": undefined,
           }
         }
-        accessibilityValue={
-          {
-            "max": undefined,
-            "min": undefined,
-            "now": undefined,
-            "text": undefined,
-          }
-        }
         accessible={true}
-        collapsable={false}
-        focusable={true}
-        onBlur={[Function]}
+        colorScheme="system"
+        effect="clear"
+        focusable={false}
+        interactive={false}
         onClick={[Function]}
-        onFocus={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -347,26 +342,22 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           [
             {
               "alignItems": "center",
-              "borderRadius": 20,
+              "borderRadius": 30,
               "justifyContent": "center",
-              "minHeight": 44,
-              "paddingHorizontal": 16,
+              "minWidth": 160,
+              "paddingHorizontal": 20,
+              "paddingVertical": 14,
+              "shadowColor": "#000",
+              "shadowOffset": {
+                "height": 10,
+                "width": 0,
+              },
+              "shadowOpacity": 0.35,
+              "shadowRadius": 16,
             },
+            undefined,
             {
-              "width": "100%",
-            },
-            {
-              "backgroundColor": "#18bd18",
-              "borderColor": "#18bd18",
-              "borderWidth": 1,
-            },
-            {
-              "opacity": 0.55,
-            },
-            false,
-            {
-              "marginBottom": 4,
-              "maxWidth": 520,
+              "opacity": 0.5,
             },
           ]
         }
@@ -375,18 +366,15 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           style={
             [
               {
-                "fontSize": 16,
+                "color": "white",
+                "fontSize": 18,
                 "fontWeight": "600",
-                "textAlign": "center",
-              },
-              {
-                "color": "#c3c3c3",
               },
               undefined,
             ]
           }
         />
-      </View>
+      </div>
     </View>
   </View>
 </View>

@@ -11,11 +11,11 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 import { RouteEnum, ScreenEnum } from '../../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Button from '../../Components/Button';
 import FadeText from '../../Components/FadeText';
 import { createAlert } from '../../../app/createAlert';
 import { sendEmail } from '../../../app/sendEmail';
 import { HeaderTitle } from '../../Header';
+import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
 
 type DebugInfoProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -121,8 +121,7 @@ const DebugInfo: React.FunctionComponent<DebugInfoProps> = ({ navigation }) => {
         }}
       >
         {!!lastError && (
-          <Button
-            variant="primary"
+          <LiquidPrimaryButton
             title={'Report'}
             onPress={() => {
               reportError(lastError);

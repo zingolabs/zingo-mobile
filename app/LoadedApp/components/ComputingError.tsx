@@ -11,8 +11,8 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 //import { ContextAppLoaded } from '../../context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import Button from '../../../components/Components/Button';
 import FadeText from '../../../components/Components/FadeText';
+import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
 
 type ComputingErrorProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -82,26 +82,24 @@ const ComputingError: React.FunctionComponent<ComputingErrorProps> = ({
           <View
             style={{
               marginTop: 50,
-              flexDirection: 'column',
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
               paddingTop: 10,
               paddingBottom: 20,
+              gap: 10,
             }}
           >
-            <Button
-              variant="secondary"
+            <LiquidPrimaryButton
+              tintColor={colors.secondary}
               title={'Details'}
               onPress={() => {
                 setShowDetails(true);
               }}
             />
-            <Button
-              variant="primary"
-              style={{ marginLeft: 10 }}
+            <LiquidPrimaryButton
               title={'Back'}
               onPress={() => {
-                //navigation.navigate(RouteEnum.MainTabs, { screen: RouteEnum.History });
                 if (navigation.canGoBack) {
                   navigation.goBack();
                 }
