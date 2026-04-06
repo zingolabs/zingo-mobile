@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   StyleSheet,
@@ -23,7 +23,6 @@ type Props = {
   style?: ViewStyle;
   textStyle?: TextStyle;
   tintColor?: ColorValue;
-  testID?: string;
 };
 
 const LiquidPrimaryButton: React.FC<Props> = ({
@@ -33,9 +32,9 @@ const LiquidPrimaryButton: React.FC<Props> = ({
   style,
   textStyle,
   tintColor,
-  testID,
 }) => {
   const { colors } = useTheme() as ThemeType;
+  const [, setPressed] = useState(false);
 
   const primary = disabled ? colors.secondary : (tintColor ?? colors.primary);
 
@@ -46,10 +45,8 @@ const LiquidPrimaryButton: React.FC<Props> = ({
           title={title}
           onPress={onPress}
           disabled={disabled}
-          style={style}
           textStyle={textStyle}
           tintColor={tintColor}
-          testID={testID}
         />
       </View>
     );
@@ -57,10 +54,10 @@ const LiquidPrimaryButton: React.FC<Props> = ({
 
   return (
     <TouchableWithoutFeedback
-      testID={testID}
-      style={[styles.container, style]}
       onPress={onPress}
       disabled={disabled}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
     >
@@ -70,7 +67,7 @@ const LiquidPrimaryButton: React.FC<Props> = ({
         effect="clear"
         colorScheme="system"
         tintColor={primary}
-        style={[styles.primary, disabled && styles.disabled]}
+        style={[styles.glass, style, disabled && styles.disabled]}
       >
         <Text style={[styles.text, textStyle]}>{title}</Text>
       </LiquidGlassView>
@@ -79,10 +76,8 @@ const LiquidPrimaryButton: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {},
-  primary: {
-    flex: 1,
-    borderRadius: 18,
+  glass: {
+    borderRadius: 30,
     paddingHorizontal: 20,
     paddingVertical: 14,
     minWidth: 160,
@@ -94,6 +89,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.35,
     shadowRadius: 16,
   },
+  fallback: {
+    backgroundColor: '#4f8cff',
+    alignSelf: 'stretch',
+  },
   disabled: {
     opacity: 0.5,
   },
@@ -101,6 +100,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: 'white',
+  },
+  iosButtonContainer: {
+    minWidth: 160,
+    alignSelf: 'center',
   },
 });
 

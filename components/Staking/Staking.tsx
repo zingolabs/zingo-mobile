@@ -61,6 +61,7 @@ import { WalletBondsStatusEnum } from '../../app/AppState/enums/WalletBondsStatu
 import StakingDayStatusBar from './components/StakingDayStatusBar';
 import LinearGradient from 'react-native-linear-gradient';
 import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
+import Button from '../Components/Button';
 
 type DataType = {
   svg: {
@@ -994,8 +995,9 @@ const Staking: React.FC<StakingProps> = ({}) => {
                         >
                           {item.status === WalletBondsStatusEnum.Active && (
                             <>
-                              <LiquidPrimaryButton
+                              <Button
                                 title={'Redelegate'}
+                                variant="secondary"
                                 onPress={() => {
                                   navigation.navigate(RouteEnum.Redelegate, {
                                     finalizer: item.finalizer,
@@ -1005,8 +1007,8 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                   });
                                 }}
                               />
-                              <LiquidPrimaryButton
-                                tintColor={colors.secondary}
+                              <Button
+                                variant="primary"
                                 title={'Unstake'}
                                 onPress={() => {
                                   navigation.navigate(RouteEnum.Unstake, {
@@ -1020,8 +1022,9 @@ const Staking: React.FC<StakingProps> = ({}) => {
                             </>
                           )}
                           {item.status === WalletBondsStatusEnum.Unbonding && (
-                            <LiquidPrimaryButton
+                            <Button
                               title={'Withdraw'}
+                              variant="primary"
                               onPress={() => {
                                 navigation.navigate(RouteEnum.Unstake, {
                                   finalizer: item.finalizer,

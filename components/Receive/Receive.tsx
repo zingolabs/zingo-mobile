@@ -181,7 +181,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = (
   useEffect(() => {
     const advancedModeRoutes = [
       { key: 'uaddr', title: translate('receive.u-title') as string },
-      { key: 'taddr', title: translate('receive.t-title') as string },
     ];
     setRoutes(advancedModeRoutes);
   }, [translate]);
@@ -221,36 +220,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = (
                   hasTransparent={tAddr && tAddr.length > 0}
                   showMoreOptions={showMoreOptions}
                   setShowMoreOptions={setShowMoreOptions}
-                />
-              </>
-            )}
-          </>
-        );
-        break;
-      }
-      case 'taddr': {
-        let tAddress = new TransparentAddressClass(
-          0,
-          translate('receive.noaddress') as string,
-          AddressKindEnum.t,
-          RPCAddressScopeEnum.external,
-        );
-        if (tAddrIndex !== null && tAddr.length > 0) {
-          tAddress = tAddr[tAddrIndex];
-        }
-
-        component = (
-          <>
-            {!!addresses && !!defaultUnifiedAddress && (
-              <>
-                <SingleAddress
-                  address={tAddress}
-                  screenName={screenName}
-                  index={tAddrIndex ? tAddrIndex : 0}
-                  setIndex={setTAddrIndex}
-                  total={tAddr.length}
-                  show={show}
-                  changeIndex={setIndex}
                 />
               </>
             )}

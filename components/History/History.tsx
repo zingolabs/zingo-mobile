@@ -455,8 +455,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
                                 : 10,
                           }}
                         >
-                          <LiquidPrimaryButton
-                            tintColor={colors.secondary}
+                          <Button
+                            variant="secondary"
                             title={translate('history.loadmore') as string}
                             onPress={loadMoreClicked}
                           />

@@ -13,6 +13,7 @@ import Utils from '../../../app/utils';
 import ZecAmount from '../../Components/ZecAmount';
 import { TriangleAlertIcon } from 'lucide-react-native';
 import LiquidPrimaryButton from '../../Components/LiquidButton/LiquidPrimaryButton';
+import Button from '../../Components/Button';
 
 type DataType = {
   svg: {
@@ -109,8 +110,9 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
               gap: 10,
             }}
           >
-            <LiquidPrimaryButton
+            <Button
               title={'Redelegate'}
+              variant="secondary"
               onPress={() => {
                 clear();
                 navigation.navigate(RouteEnum.Redelegate, {
@@ -121,8 +123,8 @@ const FinalizerDetail: React.FunctionComponent<FinalizerDetailProps> = ({
                 });
               }}
             />
-            <LiquidPrimaryButton
-              tintColor={colors.secondary}
+            <Button
+              variant="primary"
               title={'Unstake'}
               onPress={() => {
                 clear();

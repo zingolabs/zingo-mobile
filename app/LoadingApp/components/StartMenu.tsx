@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RegText from '../../../components/Components/RegText';
 import { HeaderTitle } from '../../../components/Header';
 import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
+import Button from '../../../components/Components/Button';
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
@@ -207,7 +208,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   </BoldText>
                 </View>
               </View>
-              <LiquidPrimaryButton
+              <Button
                 title={translate('loadingapp.opencurrentwallet') as string}
                 disabled={actionButtonsDisabled}
                 onPress={() => openCurrentWallet()}
@@ -225,16 +226,15 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               paddingHorizontal: 20,
             }}
           >
-            <LiquidPrimaryButton
+            <Button
               testID="loadingapp.restorewalletseedufvk"
-              tintColor={colors.secondary}
+              variant="secondary"
               title={'Import wallet'}
               disabled={actionButtonsDisabled}
               onPress={() => getwalletToRestore()}
             />
 
             <LiquidPrimaryButton
-              testID="loadingapp.createnewwallet"
               title={'Create new wallet'}
               disabled={actionButtonsDisabled}
               onPress={() => {
@@ -255,7 +255,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   createNewWallet();
                 }
               }}
-              style={{ marginBottom: 10, marginTop: 10 }}
+              style={{ marginBottom: 10, marginTop: 10, width: '100%' }}
             />
           </View>
         </View>
