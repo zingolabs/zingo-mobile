@@ -123,7 +123,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     await notifee.requestPermission();
   }
 
-  async function scheduleReminder({ minutes }: { minutes: number }) {
+  async function scheduleReminder({ seconds }: { seconds: number }) {
     await requestPermissions();
 
     const channelId = await notifee.createChannel({
@@ -132,7 +132,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       importance: AndroidImportance.HIGH,
     });
 
-    const fireDate = Date.now() + Number(minutes) * 20 * 1000;
+    const fireDate = Date.now() + seconds * 1000;
 
     const trigger: TimestampTrigger = {
       type: TriggerType.TIMESTAMP,
@@ -145,7 +145,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         title: TITLE,
         body: BODY,
         data: {
-          deeplink: `localreminders://reminder-opened?title=${encodeURIComponent(TITLE)}&body=${encodeURIComponent(BODY)}`,
+          deeplink: `delegator://reminder-opened`,
         },
         android: {
           channelId,
@@ -199,8 +199,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         .reduce((acc, curr) => acc + curr.amount, 0);
       if (amount + amountScheduled / 10 ** 8 > spendable) {
         Alert.alert(
-          'Insufficient balance to schedule an stake action',
-          `You can scheduling stakes up to ${spendable.toFixed(5)} ${info.currencyName}.`,
+          'Insufficient balance to schedule a staking action',
+          `You can schedule stakes up to ${spendable.toFixed(5)} ${info.currencyName}.`,
         );
         return;
       }
@@ -240,8 +240,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         const list = await ScheduledActionsFileImpl.addSA(
           stakingScheduledAction,
         );
-        // TODO: DEBERIA SER NUMEROOOOO, NO STRING!!!!
-        await scheduleReminder({ minutes: timeToStakingDay });
+        await scheduleReminder({ seconds: timeToStakingDay });
         setScheduledActions(list);
       }
       setModalState('success');

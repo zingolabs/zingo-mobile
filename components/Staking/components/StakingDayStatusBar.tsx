@@ -6,6 +6,7 @@ import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import ClockActiveWithCheck from '../../../assets/icons/clock-active-with-check.svg';
 import TriangleYellow from '../../../assets/icons/triangle-yellow.svg';
+import { formatSeconds } from '../../../app/utils/Utils';
 
 type StakingDayStatusBarProps = {};
 
@@ -55,7 +56,9 @@ const StakingDayStatusBar: React.FC<StakingDayStatusBarProps> = () => {
     return value === 0;
   }, [stakingDay, timeLeftStakingDay, timeToStakingDay]);
 
-  const mainValue = stakingDay ? timeLeftStakingDay : timeToStakingDay;
+  const mainValue = stakingDay
+    ? formatSeconds(timeLeftStakingDay)
+    : formatSeconds(timeToStakingDay);
   const title = stakingDay ? 'Staking day active' : 'Staking day inactive';
 
   return (
