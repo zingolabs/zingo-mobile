@@ -520,115 +520,112 @@ const Redelegate: React.FC<RedelegateProps> = ({
           </View>
         </View>
 
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate(RouteEnum.Finalizers, {
-              setFinalizer: (f: string, s: number) => {
-                setFinalizerToText(f);
-                setStakedToNumber(s);
-              },
-              scope: 'network',
-              exclude: finalizerFromText,
-            })
-          }
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: 20,
+            marginBottom: 10,
+            backgroundColor: colors.secondary,
+            padding: 16,
+            marginHorizontal: 10,
+            borderWidth: 0.5,
+            borderColor: colors.text,
+            marginTop: -15,
+          }}
         >
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               alignItems: 'center',
-              borderRadius: 20,
-              marginBottom: 10,
-              backgroundColor: colors.secondary,
-              padding: 16,
-              marginHorizontal: 10,
-              borderWidth: 0.5,
-              borderColor: colors.text,
-              marginTop: -15,
+              flexGrow: 1,
+              flexShrink: 1,
             }}
           >
+            <FontAwesomeIcon
+              style={{ marginRight: 15 }}
+              size={20}
+              icon={faCircle}
+              color="#FC0"
+            />
             <View
               style={{
-                flexDirection: 'row',
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 flexGrow: 1,
                 flexShrink: 1,
+                gap: 0,
               }}
             >
-              <FontAwesomeIcon
-                style={{ marginRight: 15 }}
-                size={20}
-                icon={faCircle}
-                color="#FC0"
-              />
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'flex-start',
-                  flexGrow: 1,
-                  flexShrink: 1,
-                  gap: 0,
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <TextInput
-                    style={{
-                      flexGrow: 1,
-                      flexShrink: 1,
-                      color: colors.text,
-                      fontSize: 17,
-                      fontWeight: '400',
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TextInput
+                  style={{
+                    flexGrow: 1,
+                    flexShrink: 1,
+                    color: colors.text,
+                    fontSize: 17,
+                    fontWeight: '400',
+                  }}
+                  placeholder="Tap here for finalizer address"
+                  placeholderTextColor={colors.placeholder}
+                  value={finalizerToText}
+                  editable={true}
+                  onChangeText={setFinalizerToText}
+                />
+                {!!finalizerToText && (
+                  <TouchableOpacity
+                    style={{ marginLeft: 5 }}
+                    onPress={() => {
+                      setFinalizerToText('');
+                      setStakedToNumber(0);
                     }}
-                    placeholder="Tap here for finalizer address"
-                    placeholderTextColor={colors.placeholder}
-                    value={finalizerToText}
-                    editable={true}
-                    onChangeText={setFinalizerToText}
-                  />
-                  {!!finalizerToText && (
-                    <TouchableOpacity
-                      style={{ marginLeft: 5 }}
-                      onPress={() => {
-                        setFinalizerToText('');
-                        setStakedToNumber(0);
+                  >
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: colors.zingo,
+                        borderRadius: 11,
+                        height: 22,
+                        width: 22,
+                        padding: 0,
                       }}
                     >
-                      <View
-                        style={{
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          backgroundColor: colors.zingo,
-                          borderRadius: 11,
-                          height: 22,
-                          width: 22,
-                          padding: 0,
-                        }}
+                      <RegText
+                        style={{ color: colors.background, marginTop: -3 }}
                       >
-                        <RegText
-                          style={{ color: colors.background, marginTop: -3 }}
-                        >
-                          x
-                        </RegText>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                </View>
-                {!!stakedToNumber && (
-                  <FadeText
-                    style={{ marginLeft: 15, marginBottom: 5 }}
-                  >{`Voting power: ${stakedToNumber.toFixed(5)} ${info.currencyName}`}</FadeText>
+                        x
+                      </RegText>
+                    </View>
+                  </TouchableOpacity>
                 )}
               </View>
+              {!!stakedToNumber && (
+                <FadeText
+                  style={{ marginLeft: 15, marginBottom: 5 }}
+                >{`Voting power: ${stakedToNumber.toFixed(5)} ${info.currencyName}`}</FadeText>
+              )}
             </View>
-            <ChevronDown
-              width={30}
-              height={30}
-              style={{ marginLeft: 5, transform: [{ rotate: '-90deg' }] }}
-              color={colors.text}
-            />
           </View>
-        </TouchableOpacity>
+          <ChevronDown
+            onPress={() =>
+              navigation.navigate(RouteEnum.Finalizers, {
+                setFinalizer: (f: string, s: number) => {
+                  setFinalizerToText(f);
+                  setStakedToNumber(s);
+                },
+                scope: 'network',
+                exclude: finalizerFromText,
+              })
+            }
+            width={30}
+            height={30}
+            style={{ marginLeft: 5 }}
+            color={colors.text}
+          />
+        </View>
 
         {/* Content */}
         <View
