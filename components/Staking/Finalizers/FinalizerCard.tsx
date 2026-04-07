@@ -30,7 +30,10 @@ type FinalizerCardProps = {
 };
 
 function formatStake(value: number) {
-  return `${value.toLocaleString()} cTAZ`;
+  return `${value.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  })} cTAZ`;
 }
 
 export function FinalizerCard({
@@ -149,19 +152,20 @@ const styles = StyleSheet.create({
   statValueRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
   },
 
   statIcon: {
     color: '#8B8C96',
-    fontSize: 20,
-    marginRight: 4,
+    fontSize: 18,
+    marginRight: 0,
     width: 30,
     textAlign: 'center',
   },
 
   statValue: {
     color: '#8B8C96',
-    fontSize: 18,
+    fontSize: 16,
     lineHeight: 32,
     fontWeight: '400',
   },
