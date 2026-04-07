@@ -60,7 +60,6 @@ import ZecAmount from '../Components/ZecAmount';
 import { WalletBondsStatusEnum } from '../../app/AppState/enums/WalletBondsStatusEnum';
 import StakingDayStatusBar from './components/StakingDayStatusBar';
 import LinearGradient from 'react-native-linear-gradient';
-import LiquidPrimaryButton from '../Components/LiquidButton/LiquidPrimaryButton';
 import Button from '../Components/Button';
 
 type DataType = {
@@ -136,11 +135,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
     }
     return [`${snap1}%`, `${snap2}%`];
   }, [heightLayout]);
-
-  const show = useCallback((item: DataType) => {
-    bottomSheetRef.current?.snapToIndex(0);
-    setCurrentItem(item);
-  }, []);
 
   const hide = useCallback(() => {
     bottomSheetRef.current?.snapToIndex(-1);
@@ -245,7 +239,11 @@ const Staking: React.FC<StakingProps> = ({}) => {
       <TouchableOpacity
         style={{ width: '100%' }}
         key={`tag-${index}`}
-        onPress={() => show(item)}
+        onPress={() => {
+          navigation.navigate(RouteEnum.FinalizerDetails, {
+            finalizer: item.finalizer,
+          });
+        }}
       >
         <View
           style={{
@@ -481,6 +479,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
               </View>
             )}
 
+            {/* TODO: Use Router */}
             {!loading && !hasScheduledActions && tab === 'scheduled' && (
               <View style={styles.centerContent}>
                 <View
@@ -552,20 +551,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
 
             {!loading && hasScheduledActions && tab === 'scheduled' && (
               <>
-                <FadeText
-                  style={{
-                    fontSize: 12,
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    lineHeight: 22,
-                    letterSpacing: -0.43,
-                    paddingHorizontal: 5,
-                    marginBottom: 5,
-                  }}
-                >
-                  Scheduled actions execute automatically when the next staking
-                  day begins.
-                </FadeText>
                 <FlatList
                   ref={scrollViewRef}
                   onScroll={handleScroll}

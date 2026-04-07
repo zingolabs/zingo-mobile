@@ -89,6 +89,7 @@ export type AppDrawerParamList = {
   [RouteEnum.ComputingOK]: ComputingOKNavigationState | undefined;
   [RouteEnum.ComputingError]: ComputingErrorNavigationState | undefined;
   [RouteEnum.Finalizers]: FinalizersNavigationState | undefined;
+  [RouteEnum.FinalizerDetails]: FinalizerDetailNavigationState | undefined;
   [RouteEnum.Stake]: StakeNavigationState | undefined;
   [RouteEnum.Unstake]: UnstakeNavigationState | undefined;
   [RouteEnum.Redelegate]: RedelegateNavigationState | undefined;
@@ -123,6 +124,10 @@ export type FinalizersNavigationState = {
   scope: 'my' | 'network';
   exclude: string;
   goBackRoute: RouteEnum;
+};
+
+export type FinalizerDetailNavigationState = {
+  finalizer: string;
 };
 
 export type StakeNavigationState = {};

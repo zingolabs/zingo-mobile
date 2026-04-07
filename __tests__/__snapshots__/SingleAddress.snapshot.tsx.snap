@@ -50,23 +50,32 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           }
         }
       >
-        <div
+        <View
+          accessibilityLabel="UA-orchard...1234567890"
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
-              "disabled": undefined,
+              "disabled": false,
               "expanded": undefined,
               "selected": undefined,
             }
           }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
-          colorScheme="system"
-          effect="clear"
+          collapsable={false}
           focusable={true}
-          interactive={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -77,32 +86,32 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             [
               {
                 "alignItems": "center",
-                "borderRadius": 18,
-                "flex": 1,
+                "borderRadius": 20,
                 "justifyContent": "center",
-                "minWidth": 160,
-                "paddingHorizontal": 20,
-                "paddingVertical": 14,
-                "shadowColor": "#000",
-                "shadowOffset": {
-                  "height": 10,
-                  "width": 0,
-                },
-                "shadowOpacity": 0.35,
-                "shadowRadius": 16,
+                "minHeight": 44,
+                "paddingHorizontal": 16,
               },
+              false,
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              false,
+              false,
               undefined,
             ]
           }
-          tintColor="#18bd18"
         >
           <Text
             style={
               [
                 {
-                  "color": "white",
-                  "fontSize": 18,
+                  "fontSize": 16,
                   "fontWeight": "600",
+                  "textAlign": "center",
+                },
+                {
+                  "color": "#c3c3c3",
                 },
                 {
                   "color": "#ffffff",
@@ -115,7 +124,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           >
             UA-orchard...1234567890
           </Text>
-        </div>
+        </View>
         <View
           style={
             {

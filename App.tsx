@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect } from 'react';
+import { BackHandler, LogBox, StatusBar } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
   createNavigationContainerRef,
@@ -12,8 +13,6 @@ import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
 import { ThemeType, AppStackParamList } from './app/types';
 import { RouteEnum } from './app/AppState';
-
-import { BackHandler, LogBox, StatusBar } from 'react-native';
 
 LogBox.ignoreLogs([
   '[Reanimated] Reduced motion setting is enabled on this device.',
@@ -34,7 +33,7 @@ const zingoTheme: ThemeType = {
     zingo: '#b4b4b4',
     placeholder: '#8D8D8D',
     money: '#b4b4b4',
-    syncing: '#ebff5a', // yellow
+    syncing: '#ebff5a',
     notification: '',
     sideMenuBackground: '#0f0f0f',
     warning: {
@@ -56,12 +55,9 @@ const zingoTheme: ThemeType = {
 };
 
 const Stack = createStackNavigator<AppStackParamList>();
-
-export const navigationRef = createNavigationContainerRef();
+export const navigationRef = createNavigationContainerRef<AppStackParamList>();
 
 const App: React.FunctionComponent = () => {
-  // avoid to close the App when the user tap on
-  // the back button of the device.
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (navigationRef.isReady() && navigationRef.canGoBack()) {
@@ -70,10 +66,10 @@ const App: React.FunctionComponent = () => {
       }
       return true;
     });
+
     return () => sub.remove();
   }, []);
 
-  //console.log('render App - 1');
   return (
     <SafeAreaProvider>
       <StatusBar backgroundColor={zingoTheme.colors.background} />
