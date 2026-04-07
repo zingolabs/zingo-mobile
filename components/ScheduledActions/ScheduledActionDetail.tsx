@@ -174,13 +174,13 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
       setModalState('idle');
       if (JSON.stringify(error).toLowerCase().includes('window')) {
         navigation.navigate(RouteEnum.ComputingError, {
-          error: `Transaction outside of staking window :(. Try again later.`,
+          error: `Transaction outside of staking window.`,
         });
       } else if (
         JSON.stringify(error).toLowerCase().includes('staking action delay')
       ) {
         navigation.navigate(RouteEnum.ComputingError, {
-          error: `Transaction outside of staking window :(. Try again later.`,
+          error: `Cannot operate on the same staking action in the same window.`,
         });
       } else {
         navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });

@@ -612,9 +612,6 @@ export class LoadedAppClass extends Component<
 
     const avgBlockTime = this.getAverageBlockTime();
 
-    const remainingText = this.formatSeconds(remaining * avgBlockTime);
-    const leftText = this.formatSeconds(left * avgBlockTime);
-
     this.setState({
       stakingDay: isStakingDay,
       timeToStakingDaySeconds: remaining * avgBlockTime,
