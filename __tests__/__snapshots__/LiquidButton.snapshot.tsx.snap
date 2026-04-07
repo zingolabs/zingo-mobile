@@ -28,8 +28,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
     [
       {
         "alignItems": "center",
-        "borderRadius": 18,
-        "flex": 1,
+        "borderRadius": 30,
         "justifyContent": "center",
         "minWidth": 160,
         "paddingHorizontal": 20,
@@ -42,6 +41,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
         "shadowOpacity": 0.35,
         "shadowRadius": 16,
       },
+      undefined,
       false,
     ]
   }
@@ -92,8 +92,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
     [
       {
         "alignItems": "center",
-        "borderRadius": 18,
-        "flex": 1,
+        "borderRadius": 30,
         "justifyContent": "center",
         "minWidth": 160,
         "paddingHorizontal": 20,
@@ -106,6 +105,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
         "shadowOpacity": 0.35,
         "shadowRadius": 16,
       },
+      undefined,
       false,
     ]
   }

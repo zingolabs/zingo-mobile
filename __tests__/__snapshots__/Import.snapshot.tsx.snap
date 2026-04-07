@@ -343,8 +343,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           [
             {
               "alignItems": "center",
-              "borderRadius": 18,
-              "flex": 1,
+              "borderRadius": 30,
               "justifyContent": "center",
               "minWidth": 160,
               "paddingHorizontal": 20,
@@ -357,6 +356,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
               "shadowOpacity": 0.35,
               "shadowRadius": 16,
             },
+            undefined,
             {
               "opacity": 0.5,
             },
