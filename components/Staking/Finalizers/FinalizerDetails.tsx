@@ -109,7 +109,32 @@ export function FinalizerDetails({ route }: FinalizerDetailsProps) {
   const renderSeparator = () => <View style={{ height: 8 }} />;
 
   const renderStakedTxItem = ({ item }: { item: WalletBondsType }) => {
-    return <FinalizerPosition bond={item} />;
+    return (
+      <FinalizerPosition
+        bond={item}
+        onPresWithdraw={() => {}}
+        onPressRedelegate={() => {
+          navigation.navigate(RouteEnum.Redelegate, {
+            finalizer: item.finalizer,
+            txid: item.txid,
+            staked: item.amount,
+            closeSheet: () => {
+              navigation.navigate(RouteEnum.StakingHome);
+            },
+          });
+        }}
+        onPressUnstake={() => {
+          navigation.navigate(RouteEnum.Unstake, {
+            finalizer: item.finalizer,
+            txid: item.txid,
+            staked: item.amount,
+            closeSheet: () => {
+              navigation.navigate(RouteEnum.StakingHome);
+            },
+          });
+        }}
+      />
+    );
   };
 
   return (

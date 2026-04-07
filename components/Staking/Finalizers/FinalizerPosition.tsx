@@ -21,10 +21,9 @@ export default interface WalletBondsType {
 type WalletBondCardProps = {
   bond: WalletBondsType;
   dateLabel?: string;
-  onPressRedelegate?: (bond: WalletBondsType) => void;
-  onPressUnstake?: (bond: WalletBondsType) => void;
-  disableRedelegate?: boolean;
-  disableUnstake?: boolean;
+  onPressRedelegate: (bond: WalletBondsType) => void;
+  onPressUnstake: (bond: WalletBondsType) => void;
+  onPresWithdraw: (bond: WalletBondsType) => void;
 
   containerStyle?: StyleProp<ViewStyle>;
   statusTextStyle?: StyleProp<TextStyle>;
@@ -62,8 +61,7 @@ export function FinalizerPosition({
   dateLabel = '',
   onPressRedelegate,
   onPressUnstake,
-  disableRedelegate = false,
-  disableUnstake = false,
+  onPresWithdraw,
   containerStyle,
   statusTextStyle,
   dateTextStyle,
@@ -113,40 +111,62 @@ export function FinalizerPosition({
         </Text>
 
         <View style={styles.actionsRow}>
-          <Pressable
-            onPress={() => onPressRedelegate?.(bond)}
-            disabled={disableRedelegate || !isActive}
-            style={({ pressed }) => [
-              styles.actionButton,
-              styles.secondaryButton,
-              secondaryButtonStyle,
-              actionButtonStyle,
-              (disableRedelegate || !isActive) && styles.disabledButton,
-              pressed && !(disableRedelegate || !isActive) && styles.pressed,
-            ]}
-          >
-            <Text style={[styles.actionButtonText, actionButtonTextStyle]}>
-              Redelegate
-            </Text>
-          </Pressable>
+          {isActive && (
+            <>
+              <Pressable
+                onPress={() => onPressRedelegate?.(bond)}
+                disabled={!isActive}
+                style={({ pressed }) => [
+                  styles.actionButton,
+                  styles.secondaryButton,
+                  secondaryButtonStyle,
+                  actionButtonStyle,
+                  !isActive && styles.disabledButton,
+                  pressed && !!isActive && styles.pressed,
+                ]}
+              >
+                <Text style={[styles.actionButtonText, actionButtonTextStyle]}>
+                  Redelegate
+                </Text>
+              </Pressable>
 
-          <Pressable
-            onPress={() => onPressUnstake?.(bond)}
-            disabled={disableUnstake || !isActive}
-            style={({ pressed }) => [
-              styles.actionButton,
+              <Pressable
+                onPress={() => onPressUnstake?.(bond)}
+                disabled={!isActive}
+                style={({ pressed }) => [
+                  styles.actionButton,
 
-              styles.primaryButton,
-              primaryButtonStyle,
-              actionButtonStyle,
-              (disableUnstake || !isActive) && styles.disabledButton,
-              pressed && !(disableUnstake || !isActive) && styles.pressed,
-            ]}
-          >
-            <Text style={[styles.actionButtonText, actionButtonTextStyle]}>
-              Unstake
-            </Text>
-          </Pressable>
+                  styles.primaryButton,
+                  primaryButtonStyle,
+                  actionButtonStyle,
+                  !isActive && styles.disabledButton,
+                  pressed && !!isActive && styles.pressed,
+                ]}
+              >
+                <Text style={[styles.actionButtonText, actionButtonTextStyle]}>
+                  Unstake
+                </Text>
+              </Pressable>
+            </>
+          )}
+
+          {!isActive && (
+            <Pressable
+              onPress={() => onPresWithdraw?.(bond)}
+              disabled={!isActive}
+              style={({ pressed }) => [
+                styles.actionButton,
+                styles.primaryButton,
+                primaryButtonStyle,
+                actionButtonStyle,
+                pressed && !!isActive && styles.pressed,
+              ]}
+            >
+              <Text style={[styles.actionButtonText, actionButtonTextStyle]}>
+                Withdraw
+              </Text>
+            </Pressable>
+          )}
         </View>
       </View>
     </View>

@@ -551,20 +551,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
 
             {!loading && hasScheduledActions && tab === 'scheduled' && (
               <>
-                <FadeText
-                  style={{
-                    fontSize: 12,
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    lineHeight: 22,
-                    letterSpacing: -0.43,
-                    paddingHorizontal: 5,
-                    marginBottom: 5,
-                  }}
-                >
-                  Scheduled actions execute automatically when the next staking
-                  day begins.
-                </FadeText>
                 <FlatList
                   ref={scrollViewRef}
                   onScroll={handleScroll}
