@@ -982,7 +982,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                           {item.status === WalletBondsStatusEnum.Active && (
                             <View
                               style={{
-                                flexDirection: 'column',
+                                flexDirection: 'row',
                                 gap: 10,
                                 width: '100%',
                               }}
@@ -990,6 +990,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                               <Button
                                 title={'Redelegate'}
                                 variant="secondary"
+                                style={{ width: '48%' }}
                                 onPress={() => {
                                   navigation.navigate(RouteEnum.Redelegate, {
                                     finalizer: item.finalizer,
@@ -1002,6 +1003,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                               <Button
                                 variant="primary"
                                 title={'Unstake'}
+                                style={{ width: '48%' }}
                                 onPress={() => {
                                   navigation.navigate(RouteEnum.Unstake, {
                                     finalizer: item.finalizer,
@@ -1017,6 +1019,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                             <Button
                               title={'Withdraw'}
                               variant="primary"
+                              style={{ width: '48%' }}
                               onPress={() => {
                                 navigation.navigate(RouteEnum.Unstake, {
                                   finalizer: item.finalizer,
