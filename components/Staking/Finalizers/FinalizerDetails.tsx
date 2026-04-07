@@ -30,12 +30,12 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
-type FinalizerDetailProps = DrawerScreenProps<
+type FinalizerDetailsProps = DrawerScreenProps<
   AppDrawerParamList,
-  RouteEnum.FinalizerDetail
+  RouteEnum.FinalizerDetails
 >;
 
-export function FinalizerDetail({ route }: FinalizerDetailProps) {
+export function FinalizerDetails({ route }: FinalizerDetailsProps) {
   const finalizer =
     !!route.params && route.params.finalizer !== undefined
       ? route.params.finalizer
@@ -45,8 +45,8 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
   const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
 
-  const [finalizerFromText, setFinalizerFromText] = useState<string>(finalizer);
-  const [stakedFromNumber, setStakedFromNumber] = useState<number>(1);
+  const [finalizerFromText] = useState<string>(finalizer);
+  const [, setStakedFromNumber] = useState<number>(1);
 
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [kbOpen, setKbOpen] = useState(false);
@@ -54,7 +54,7 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { walletBonds, staked } = context;
+  const { walletBonds, staked, globalStaked } = context;
 
   console.log('FINALIZER', finalizer);
 
@@ -66,6 +66,18 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
       return false;
     })
     .sort((a, b) => b.amount - a.amount);
+
+  const totalStakedFinalizer = globalStaked.filter(
+    g => g.finalizer === finalizerFromText,
+  )[0].votingPower;
+
+  const totalUserStaked = walletBonds
+    .map(b => {
+      console.log('TOTAL USER STAKED:', b);
+
+      return b.amount;
+    })
+    .reduce((a, b) => a + b);
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -106,6 +118,7 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
         style={{
           flex: 1,
           backgroundColor: colors.background,
+          gap: 20,
         }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={
@@ -121,24 +134,14 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
           }}
         />
 
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: '600',
-            color: colors.text,
-            marginBottom: 8,
-            marginTop: 15,
+        <FinalizerCard
+          containerStyle={{
             marginHorizontal: 20,
           }}
-        >
-          Finalizer details
-        </Text>
-
-        <FinalizerCard
-          lifehash={''}
-          finalizerId={''}
-          userStake={0}
-          totalStake={0}
+          lifehash={finalizer}
+          finalizerId={finalizer}
+          userStake={totalUserStaked}
+          totalStake={totalStakedFinalizer}
         />
 
         {/* Content */}
@@ -146,7 +149,6 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
           style={{
             flex: 1,
             paddingHorizontal: 24,
-            paddingTop: 24,
           }}
         >
           {/* Staked TX list */}

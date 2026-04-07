@@ -240,7 +240,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
         style={{ width: '100%' }}
         key={`tag-${index}`}
         onPress={() => {
-          navigation.navigate(RouteEnum.FinalizerDetail, {
+          navigation.navigate(RouteEnum.FinalizerDetails, {
             finalizer: item.finalizer,
           });
         }}

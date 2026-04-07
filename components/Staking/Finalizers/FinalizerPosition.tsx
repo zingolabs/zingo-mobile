@@ -52,12 +52,8 @@ function getStatusColor(status: WalletBondsStatusEnum) {
   switch (status) {
     case WalletBondsStatusEnum.Active:
       return '#30D158';
-    case WalletBondsStatusEnum.Unbonding:
-      return '#F99D00';
-    case WalletBondsStatusEnum.Withdrawn:
-      return '#8E8E93';
     default:
-      return '#30D158';
+      return '#8E8E93';
   }
 }
 
@@ -91,8 +87,16 @@ export function FinalizerPosition({
               { backgroundColor: getStatusColor(bond.status) },
             ]}
           />
-          <Text style={[styles.statusText, statusTextStyle]}>
-            {bond.status}
+          <Text
+            style={[
+              styles.statusText,
+              statusTextStyle,
+              {
+                color: getStatusColor(bond.status),
+              },
+            ]}
+          >
+            {isActive ? 'Active' : 'Inactive'}
           </Text>
         </View>
 

@@ -89,7 +89,7 @@ export type AppDrawerParamList = {
   [RouteEnum.ComputingOK]: ComputingOKNavigationState | undefined;
   [RouteEnum.ComputingError]: ComputingErrorNavigationState | undefined;
   [RouteEnum.Finalizers]: FinalizersNavigationState | undefined;
-  [RouteEnum.FinalizerDetail]: FinalizerDetailNavigationState | undefined;
+  [RouteEnum.FinalizerDetails]: FinalizerDetailNavigationState | undefined;
   [RouteEnum.Stake]: StakeNavigationState | undefined;
   [RouteEnum.Unstake]: UnstakeNavigationState | undefined;
   [RouteEnum.Redelegate]: RedelegateNavigationState | undefined;

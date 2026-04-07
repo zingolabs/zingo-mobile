@@ -9,6 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { lifehashDataUrlFromStringSync } from '../../../app/utils/lifehash';
 
 type FinalizerCardProps = {
   lifehash: string;
@@ -52,7 +53,7 @@ export function FinalizerCard({
     <View style={[styles.container, containerStyle]}>
       <View style={[styles.headerRow, headerRowStyle]}>
         <Image
-          source={{ uri: lifehash }}
+          source={{ uri: lifehashDataUrlFromStringSync(lifehash) }}
           style={[styles.avatar, avatarStyle]}
           resizeMode="cover"
         />
