@@ -322,8 +322,7 @@ class BSCompanion {
                     workRequest
                 )
 
-            Log.i("SCHEDULING_TASK", "Task info ${WorkManager.getInstance(context).getWorkInfosForUniqueWork(
-                TASKID).get()}")
+            //Log.i("SCHEDULING_TASK", "Task info ${WorkManager.getInstance(context).getWorkInfosForUniqueWork(TASKID).get()}")
         }
 
         //private fun calculateInFiveMinutes(): Duration = 1.minutes

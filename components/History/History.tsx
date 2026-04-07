@@ -501,6 +501,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   backgroundColor: '#62626929',
                   borderBottomLeftRadius: 25,
                   borderBottomRightRadius: 25,
+                  height: '100%',
                 }}
               >
                 <View

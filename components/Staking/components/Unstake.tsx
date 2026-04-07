@@ -372,7 +372,7 @@ const Unstake: React.FC<UnstakeProps> = ({
             marginHorizontal: 20,
           }}
         >
-          Finalizer address
+          Finalizer details
         </Text>
 
         <View

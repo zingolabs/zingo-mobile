@@ -59,7 +59,6 @@ const NativePrimaryFallback: React.FC<NativePrimaryFallbackProps> = ({
 const styles = StyleSheet.create({
   container: {},
   primary: {
-    flex: 1,
     borderRadius: 18,
     paddingHorizontal: 20,
     paddingVertical: 14,

@@ -89,7 +89,12 @@ type StakingProps = DrawerScreenProps<
   RouteEnum.StakingHome
 >;
 
-const Staking: React.FC<StakingProps> = ({}) => {
+const Staking: React.FC<StakingProps> = ({ route }) => {
+  const tabParam =
+    !!route.params && route.params.tab !== undefined
+      ? route.params.tab
+      : 'active';
+
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
@@ -109,7 +114,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
   const screenName = ScreenEnum.StakingHome;
 
   const [loading] = useState(false);
-  const [tab, setTab] = useState<'scheduled' | 'active' | 'my'>('active');
+  const [tab, setTab] = useState<'scheduled' | 'active' | 'my'>(tabParam);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const [heightLayout, setHeightLayout] = useState<number>(10);
@@ -136,11 +141,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
     }
     return [`${snap1}%`, `${snap2}%`];
   }, [heightLayout]);
-
-  const show = useCallback((item: DataType) => {
-    bottomSheetRef.current?.snapToIndex(0);
-    setCurrentItem(item);
-  }, []);
 
   const hide = useCallback(() => {
     bottomSheetRef.current?.snapToIndex(-1);
@@ -245,7 +245,11 @@ const Staking: React.FC<StakingProps> = ({}) => {
       <TouchableOpacity
         style={{ width: '100%' }}
         key={`tag-${index}`}
-        onPress={() => show(item)}
+        onPress={() => {
+          navigation.navigate(RouteEnum.FinalizerDetails, {
+            finalizer: item.finalizer,
+          });
+        }}
       >
         <View
           style={{
@@ -481,6 +485,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
               </View>
             )}
 
+            {/* TODO: Use Router */}
             {!loading && !hasScheduledActions && tab === 'scheduled' && (
               <View style={styles.centerContent}>
                 <View
@@ -552,20 +557,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
 
             {!loading && hasScheduledActions && tab === 'scheduled' && (
               <>
-                <FadeText
-                  style={{
-                    fontSize: 12,
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    lineHeight: 22,
-                    letterSpacing: -0.43,
-                    paddingHorizontal: 5,
-                    marginBottom: 5,
-                  }}
-                >
-                  Scheduled actions execute automatically when the next staking
-                  day begins.
-                </FadeText>
                 <FlatList
                   ref={scrollViewRef}
                   onScroll={handleScroll}

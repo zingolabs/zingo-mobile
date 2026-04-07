@@ -1,19 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect } from 'react';
+import { BackHandler, LogBox, StatusBar } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
   createNavigationContainerRef,
   DefaultTheme,
+  LinkingOptions,
   NavigationContainer,
+  ParamListBase,
 } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
-import { ThemeType, AppStackParamList } from './app/types';
+import { ThemeType, AppStackParamList, AppDrawerParamList } from './app/types';
 import { RouteEnum } from './app/AppState';
-
-import { BackHandler, LogBox, StatusBar } from 'react-native';
 import notifee, { EventType } from '@notifee/react-native';
 
 LogBox.ignoreLogs([
@@ -35,7 +36,7 @@ const zingoTheme: ThemeType = {
     zingo: '#b4b4b4',
     placeholder: '#8D8D8D',
     money: '#b4b4b4',
-    syncing: '#ebff5a', // yellow
+    syncing: '#ebff5a',
     notification: '',
     sideMenuBackground: '#0f0f0f',
     warning: {
@@ -58,9 +59,9 @@ const zingoTheme: ThemeType = {
 
 const Stack = createStackNavigator<AppStackParamList>();
 
-export const navigationRef = createNavigationContainerRef();
+export const navigationRef = createNavigationContainerRef<AppDrawerParamList>();
 
-const linking = {
+const linking: LinkingOptions<ParamListBase> = {
   prefixes: ['delegator://'],
   config: {
     screens: {
@@ -71,8 +72,6 @@ const linking = {
 };
 
 const App: React.FunctionComponent = () => {
-  // avoid to close the App when the user tap on
-  // the back button of the device.
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (navigationRef.isReady() && navigationRef.canGoBack()) {
@@ -81,6 +80,7 @@ const App: React.FunctionComponent = () => {
       }
       return true;
     });
+
     return () => sub.remove();
   }, []);
 
