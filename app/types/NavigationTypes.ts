@@ -1,3 +1,4 @@
+import { NavigatorScreenParams } from '@react-navigation/native';
 import {
   AddressKindEnum,
   LaunchingModeEnum,
@@ -12,6 +13,10 @@ import {
 } from '../AppState';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 
+export type LoadedAppRouteParams =
+  | LoadedAppNavigationState
+  | (LoadedAppNavigationState & NavigatorScreenParams<AppDrawerParamList>);
+
 /**
  * Root navigation parameter list for the main stack navigator
  * This defines the structure of parameters passed between main app screens
@@ -19,7 +24,7 @@ import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 export type AppStackParamList = {
   // Stack
   [RouteEnum.LoadingApp]: LoadingAppNavigationState | undefined;
-  [RouteEnum.LoadedApp]: LoadedAppNavigationState | undefined;
+  [RouteEnum.LoadedApp]: LoadedAppRouteParams | undefined;
 };
 
 /**
@@ -38,11 +43,16 @@ export type LoadingAppNavigationState = {
  * Used for methods like navigateToLoadedApp
  */
 export type LoadedAppNavigationState = {
-  readOnly: boolean;
-  orchardPool: boolean;
-  saplingPool: boolean;
-  transparentPool: boolean;
-  firstLaunchingMessage: LaunchingModeEnum;
+  readOnly?: boolean;
+  orchardPool?: boolean;
+  saplingPool?: boolean;
+  transparentPool?: boolean;
+  firstLaunchingMessage?: LaunchingModeEnum;
+};
+
+export type MainTabParamList = {
+  [RouteEnum.History]: undefined;
+  [RouteEnum.StakingHome]: StakingHomeNavigationState | undefined;
 };
 
 /**
@@ -50,8 +60,9 @@ export type LoadedAppNavigationState = {
  * This defines the structure of parameters passed between main app screens
  */
 export type AppDrawerParamList = {
+  [RouteEnum.MainTabs]: NavigatorScreenParams<MainTabParamList> | undefined;
+
   // Drawer no params
-  [RouteEnum.History]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Messages]: undefined;
@@ -64,7 +75,6 @@ export type AppDrawerParamList = {
   [RouteEnum.DebugInfo]: undefined;
   [RouteEnum.Faucet]: undefined;
   [RouteEnum.About]: undefined;
-  [RouteEnum.StakingHome]: StakingHomeNavigationState | undefined;
   [RouteEnum.Distribution]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Info]: undefined;

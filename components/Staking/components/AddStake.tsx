@@ -42,6 +42,7 @@ import RegText from '../../Components/RegText';
 import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
 import notifee, {
   AndroidImportance,
+  AuthorizationStatus,
   TimestampTrigger,
   TriggerType,
 } from '@notifee/react-native';
@@ -120,42 +121,60 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
   }, [finalizerText, globalStaked]);
 
   async function requestPermissions() {
-    await notifee.requestPermission();
+    const settings = await notifee.getNotificationSettings();
+    console.log(settings);
+
+    if (settings.authorizationStatus >= AuthorizationStatus.AUTHORIZED) {
+      console.log('Permission settings:', settings);
+      return true;
+    } else {
+      console.log('User declined permissions');
+      const request = await notifee.requestPermission();
+      if (request.authorizationStatus >= AuthorizationStatus.AUTHORIZED) {
+        console.log('Permission request:', request);
+        return true;
+      } else {
+        console.log('User declined permissions');
+        return false;
+      }
+    }
   }
 
   async function scheduleReminder({ seconds }: { seconds: number }) {
-    await requestPermissions();
+    const allowed: boolean = await requestPermissions();
 
-    const channelId = await notifee.createChannel({
-      id: 'reminders',
-      name: 'Reminders',
-      importance: AndroidImportance.HIGH,
-    });
+    if (allowed) {
+      const channelId = await notifee.createChannel({
+        id: 'reminders',
+        name: 'Reminders',
+        importance: AndroidImportance.HIGH,
+      });
 
-    const fireDate = Date.now() + seconds * 1000;
+      const fireDate = Date.now() + seconds * 1000;
 
-    const trigger: TimestampTrigger = {
-      type: TriggerType.TIMESTAMP,
-      timestamp: fireDate,
-      alarmManager: true, // Android option for timestamp triggers
-    };
+      const trigger: TimestampTrigger = {
+        type: TriggerType.TIMESTAMP,
+        timestamp: fireDate,
+        alarmManager: true, // Android option for timestamp triggers
+      };
 
-    await notifee.createTriggerNotification(
-      {
-        title: TITLE,
-        body: BODY,
-        data: {
-          deeplink: `delegator://reminder-opened`,
-        },
-        android: {
-          channelId,
-          pressAction: {
-            id: 'default',
+      await notifee.createTriggerNotification(
+        {
+          title: TITLE,
+          body: BODY,
+          data: {
+            deeplink: `delegator://reminder-opened`,
+          },
+          android: {
+            channelId,
+            pressAction: {
+              id: 'default',
+            },
           },
         },
-      },
-      trigger,
-    );
+        trigger,
+      );
+    }
   }
 
   const handleConfirmStake = async () => {
@@ -232,6 +251,10 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       target: finalizer,
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
     };
+
+    // testing... remove it for production.
+    Alert.alert('TESTING', 'in 60 seconds you will have a notification');
+    await scheduleReminder({ seconds: 60 });
 
     try {
       if (stakingDay) {

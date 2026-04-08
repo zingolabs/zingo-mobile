@@ -2,6 +2,7 @@
 import React, {
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -33,7 +34,6 @@ import {
   StakingActionKindEnum,
   WalletBondsType,
 } from '../../app/AppState';
-import { AppDrawerParamList } from '../../app/types';
 import { ThemeType } from '../../app/types';
 import WalletSummaryHeader from '../History/components/WalletSummaryHeader';
 import SettingsButton from '../History/components/SettingsButton';
@@ -62,6 +62,7 @@ import StakingDayStatusBar from './components/StakingDayStatusBar';
 import LinearGradient from 'react-native-linear-gradient';
 import Button from '../Components/Button';
 import { formatSeconds } from '../../app/utils/Utils';
+import { MainTabParamList } from '../../app/types/NavigationTypes';
 
 type DataType = {
   svg: {
@@ -84,10 +85,7 @@ const formatMovementDate = (unixSeconds: number | undefined) => {
   }); // "Oct 10, 4:30 PM"
 };
 
-type StakingProps = DrawerScreenProps<
-  AppDrawerParamList,
-  RouteEnum.StakingHome
->;
+type StakingProps = DrawerScreenProps<MainTabParamList, RouteEnum.StakingHome>;
 
 const Staking: React.FC<StakingProps> = ({ route }) => {
   const tabParam =
@@ -129,6 +127,12 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
   };
 
   const scrollViewRef = useRef<ScrollView & FlatList<any>>(null);
+
+  useEffect(() => {
+    if (route.params && route.params.tab) {
+      setTab(route.params.tab);
+    }
+  }, [route.params, route.params?.tab]);
 
   const snapPoints = useMemo(() => {
     let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;

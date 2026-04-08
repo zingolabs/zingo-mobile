@@ -83,6 +83,7 @@ import {
   createUpdateRecoveryWalletInfo,
   removeRecoveryWalletInfo,
 } from '../recoveryWalletInfov10';
+import notifee, { EventType } from '@notifee/react-native';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ToastProvider } from 'react-native-toastier';
@@ -101,7 +102,7 @@ import ValueTransferDetail from '../../components/History/components/ValueTransf
 import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import ComputingOK from './components/ComputingOK';
 import ComputingError from './components/ComputingError';
-import { Staking, AddStakeScreen, Unstake } from '../../components/Staking';
+import { AddStakeScreen, Unstake } from '../../components/Staking';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 import Distribution from '../../components/Distribution';
 import Redelegate from '../../components/Staking/components/Redelegate';
@@ -129,7 +130,6 @@ type LoadedAppStackParamList = {
   [RouteEnum.ValueTransferDetail]: undefined;
   [RouteEnum.ScannerAddress]: undefined;
   // [RouteEnum.Seed]: undefined;
-  [RouteEnum.StakingHome]: undefined;
   [RouteEnum.Stake]: undefined;
   [RouteEnum.Unstake]: undefined;
   [RouteEnum.Distribution]: undefined;
@@ -469,11 +469,13 @@ export class LoadedAppClass extends Component<
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
+  unsubscribeNotifee: any;
   screenName = ScreenEnum.LoadedApp;
 
   private lastBlockTimestamp: number | null = null;
   private lastKnownBlock: number | null = null;
   private blockTimes: number[] = [10]; // 10 seconds by default.
+  private pendingOpenScheduledRef: boolean = false;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -580,6 +582,7 @@ export class LoadedAppClass extends Component<
     this.appstate = {} as NativeEventSubscription;
     this.linking = {} as EmitterSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
+    this.unsubscribeNotifee = null;
   }
 
   private formatSeconds = (totalSeconds: number): string => {
@@ -621,6 +624,26 @@ export class LoadedAppClass extends Component<
       blocksToStakingDay: remaining,
       blocksLeftStakingDay: left,
       blocksTotalStakingDay: activeWindow,
+    });
+  };
+
+  openScheduledTab = () => {
+    if (!this.props.navigationApp) {
+      this.pendingOpenScheduledRef = true;
+      return;
+    }
+
+    this.pendingOpenScheduledRef = false;
+
+    console.log('NOTIFEE stakinghome -> tab');
+    this.props.navigationApp.navigate(RouteEnum.LoadedApp, {
+      screen: RouteEnum.MainTabs,
+      params: {
+        screen: RouteEnum.StakingHome,
+        params: {
+          tab: 'scheduled',
+        },
+      },
     });
   };
 
@@ -830,6 +853,26 @@ export class LoadedAppClass extends Component<
         }
       },
     );
+
+    // notifee...
+    const initialNotification = await notifee.getInitialNotification();
+    if (initialNotification) {
+      const deeplink = initialNotification.notification.data?.deeplink;
+      console.log('NOTIFEE CLOSED', deeplink, this.props.navigationApp);
+      if (deeplink === 'delegator://reminder-opened') {
+        this.openScheduledTab();
+      }
+    }
+
+    this.unsubscribeNotifee = notifee.onForegroundEvent(({ type, detail }) => {
+      if (type === EventType.PRESS) {
+        const deeplink = detail.notification?.data?.deeplink;
+        console.log('NOTIFEE OPENED', deeplink, this.props.navigationApp);
+        if (deeplink === 'delegator://reminder-opened') {
+          this.openScheduledTab();
+        }
+      }
+    });
   };
 
   componentDidUpdate(
@@ -879,6 +922,9 @@ export class LoadedAppClass extends Component<
     this.unsubscribeNetInfo &&
       typeof this.unsubscribeNetInfo === 'function' &&
       this.unsubscribeNetInfo();
+    this.unsubscribeNotifee &&
+      typeof this.unsubscribeNotifee === 'function' &&
+      this.unsubscribeNotifee();
   };
 
   keepAwake = (keep: boolean): void => {
@@ -2233,10 +2279,6 @@ export class LoadedAppClass extends Component<
                     navigateToLoadingApp={this.navigateToLoadingApp}
                   />
                 )}
-              </LoadedAppStack.Screen>
-
-              <LoadedAppStack.Screen name={RouteEnum.StakingHome}>
-                {props => <Staking {...props} />}
               </LoadedAppStack.Screen>
 
               <LoadedAppStack.Screen name={RouteEnum.Stake}>

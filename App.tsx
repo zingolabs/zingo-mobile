@@ -13,9 +13,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
-import { ThemeType, AppStackParamList, AppDrawerParamList } from './app/types';
+import { ThemeType, AppStackParamList } from './app/types';
 import { RouteEnum } from './app/AppState';
-import notifee, { EventType } from '@notifee/react-native';
 
 LogBox.ignoreLogs([
   '[Reanimated] Reduced motion setting is enabled on this device.',
@@ -59,14 +58,18 @@ const zingoTheme: ThemeType = {
 
 const Stack = createStackNavigator<AppStackParamList>();
 
-export const navigationRef = createNavigationContainerRef<AppDrawerParamList>();
+const navigationRef = createNavigationContainerRef<AppStackParamList>();
 
-const linking: LinkingOptions<ParamListBase> = {
+const linking: LinkingOptions<AppStackParamList> = {
   prefixes: ['delegator://'],
   config: {
     screens: {
-      Home: '',
-      ReminderOpened: 'reminder-opened',
+      [RouteEnum.LoadingApp]: 'loading',
+      [RouteEnum.LoadedApp]: {
+        screens: {
+          [RouteEnum.StakingHome]: 'reminder-opened',
+        },
+      } as ParamListBase,
     },
   },
 };
@@ -82,33 +85,6 @@ const App: React.FunctionComponent = () => {
     });
 
     return () => sub.remove();
-  }, []);
-
-  useEffect(() => {
-    // App already running in foreground/background:
-    const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
-      if (type === EventType.PRESS) {
-        const deeplink = detail.notification?.data?.deeplink;
-        if (deeplink && navigationRef.isReady()) {
-          navigationRef.navigate(RouteEnum.StakingHome, {
-            tab: 'scheduled',
-          });
-        }
-      }
-    });
-
-    // App opened from a killed state by tapping notification:
-    (async () => {
-      const initial = await notifee.getInitialNotification();
-      const deeplink = initial?.notification?.data?.deeplink;
-      if (deeplink && navigationRef.isReady()) {
-        navigationRef.navigate(RouteEnum.StakingHome, {
-          tab: 'scheduled',
-        });
-      }
-    })();
-
-    return unsubscribe;
   }, []);
 
   return (
