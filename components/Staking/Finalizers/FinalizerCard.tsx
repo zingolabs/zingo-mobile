@@ -10,6 +10,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { lifehashDataUrlFromStringSync } from '../../../app/utils/lifehash';
+import Utils from '../../../app/utils';
 
 type FinalizerCardProps = {
   lifehash: string;
@@ -62,7 +63,7 @@ export function FinalizerCard({
         />
 
         <Text numberOfLines={1} style={[styles.title, titleStyle]}>
-          {finalizerId}
+          {Utils.trimToSmall(finalizerId, 8)}
         </Text>
       </View>
 

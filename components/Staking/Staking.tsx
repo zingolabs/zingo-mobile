@@ -950,7 +950,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                 {formatMovementDate(
                                   valueTransfers?.filter(
                                     vt => vt.txid === item.txid,
-                                  )[0].time,
+                                  )[0]?.time,
                                 )}
                               </Text>
                             </View>
