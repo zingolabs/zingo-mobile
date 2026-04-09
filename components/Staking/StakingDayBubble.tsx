@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
@@ -29,7 +30,8 @@ const CollapseMockIcon = () => (
 
 const StakingDayBubble: React.FC = () => {
   const context = useContext(ContextAppLoaded);
-  const { stakingDay, timeToStakingDay, timeLeftStakingDay } = context;
+  const { stakingDay, timeToStakingDaySeconds, timeLeftStakingDaySeconds } =
+    context;
 
   const [expanded, setExpanded] = useState(false);
   const [anchorX, setAnchorX] = useState(0);
@@ -120,11 +122,15 @@ const StakingDayBubble: React.FC = () => {
   ]);
 
   const isCalculating = useMemo(() => {
-    const value = stakingDay ? timeLeftStakingDay : timeToStakingDay;
-    return value === '0min 0sec';
-  }, [stakingDay, timeLeftStakingDay, timeToStakingDay]);
+    const value = stakingDay
+      ? timeLeftStakingDaySeconds
+      : timeToStakingDaySeconds;
+    return value === 0;
+  }, [stakingDay, timeLeftStakingDaySeconds, timeToStakingDaySeconds]);
 
-  const mainValue = stakingDay ? timeLeftStakingDay : timeToStakingDay;
+  const mainValue = stakingDay
+    ? timeLeftStakingDaySeconds
+    : timeToStakingDaySeconds;
   const title = stakingDay ? 'Staking day active' : 'Staking day inactive';
   const gradientColors = [stakingDay ? '#002309' : '#553000', '#272727'];
 

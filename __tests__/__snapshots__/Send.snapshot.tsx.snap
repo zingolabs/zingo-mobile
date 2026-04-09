@@ -148,8 +148,9 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
       <View
         style={
           {
-            "justifyContent": "center",
-            "width": 58,
+            "position": "absolute",
+            "right": 10,
+            "top": 0,
           }
         }
       />
@@ -632,8 +633,9 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
       <View
         style={
           {
-            "justifyContent": "center",
-            "width": 58,
+            "position": "absolute",
+            "right": 10,
+            "top": 0,
           }
         }
       />

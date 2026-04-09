@@ -134,8 +134,9 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
     <View
       style={
         {
-          "justifyContent": "center",
-          "width": 58,
+          "position": "absolute",
+          "right": 10,
+          "top": 0,
         }
       }
     />
@@ -802,8 +803,9 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
     <View
       style={
         {
-          "justifyContent": "center",
-          "width": 58,
+          "position": "absolute",
+          "right": 10,
+          "top": 0,
         }
       }
     />
@@ -2213,8 +2215,9 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
     <View
       style={
         {
-          "justifyContent": "center",
-          "width": 58,
+          "position": "absolute",
+          "right": 10,
+          "top": 0,
         }
       }
     />
@@ -2881,8 +2884,9 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
     <View
       style={
         {
-          "justifyContent": "center",
-          "width": 58,
+          "position": "absolute",
+          "right": 10,
+          "top": 0,
         }
       }
     />
