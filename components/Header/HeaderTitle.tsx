@@ -8,12 +8,14 @@ type HeaderTitleProps = {
   title: string;
   goBack: () => void;
   bottomSheet?: boolean;
+  ExtraComponent?: React.ReactNode;
 };
 
 const HeaderTitle: React.FC<HeaderTitleProps> = ({
   title,
   goBack,
   bottomSheet,
+  ExtraComponent,
 }) => {
   const { colors } = useTheme() as ThemeType;
 
@@ -42,7 +44,7 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({
         </Text>
       </View>
 
-      <View style={styles.side} />
+      <View style={styles.bubble}>{ExtraComponent && ExtraComponent}</View>
     </View>
   );
 };
@@ -72,6 +74,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 30,
     borderWidth: 0.2,
+  },
+  bubble: {
+    position: 'absolute',
+    top: 0,
+    right: 10,
   },
   headerTitle: {
     textAlign: 'center',

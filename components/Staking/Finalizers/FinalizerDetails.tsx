@@ -27,6 +27,7 @@ import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsSt
 import { ContextAppLoaded } from '../../../app/context';
 import { FinalizerPosition } from './FinalizerPosition';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import StakingDayBubble from '../StakingDayBubble';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -157,6 +158,7 @@ export function FinalizerDetails({ route }: FinalizerDetailsProps) {
               navigation.goBack();
             }
           }}
+          ExtraComponent={<StakingDayBubble />}
         />
 
         <FinalizerCard
