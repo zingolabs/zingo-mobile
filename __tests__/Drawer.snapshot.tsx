@@ -19,7 +19,7 @@ describe('Drawer Component', () => {
         onMenuItemSelected={onAction}
         screenName={ScreenEnum.LoadedApp}
       >
-        <Drawer.Screen name={RouteEnum.History} component={() => <></>} />
+        <Drawer.Screen name={RouteEnum.Receive} component={() => <></>} />
         <Drawer.Screen name={RouteEnum.Send} component={() => <></>} />
       </Drawer>,
     );

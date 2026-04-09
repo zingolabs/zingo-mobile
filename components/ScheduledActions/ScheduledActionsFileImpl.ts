@@ -72,4 +72,24 @@ export default class ScheduledActionsFileImpl {
       return [] as ScheduledActionType[];
     }
   }
+
+  static async updateNotifeeIdSA(
+    id: number,
+    notifeeId: string,
+  ): Promise<ScheduledActionType[]> {
+    try {
+      const list: ScheduledActionType[] = await this.listSA();
+      const newItem: ScheduledActionType = list.filter(i => i.id === id)[0];
+      newItem.notifeeId = notifeeId;
+      const newList: ScheduledActionType[] = [
+        ...list.filter(i => i.id !== id),
+        newItem,
+      ];
+      this.writeSA(newList);
+      return newList;
+    } catch (err) {
+      console.log(err);
+      return [] as ScheduledActionType[];
+    }
+  }
 }

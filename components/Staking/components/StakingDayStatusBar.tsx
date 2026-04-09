@@ -6,6 +6,7 @@ import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import ClockActiveWithCheck from '../../../assets/icons/clock-active-with-check.svg';
 import TriangleYellow from '../../../assets/icons/triangle-yellow.svg';
+import { formatSeconds } from '../../../app/utils/Utils';
 
 type StakingDayStatusBarProps = {};
 
@@ -15,7 +16,11 @@ const EXPANDED_WIDTH = 210;
 
 const StakingDayStatusBar: React.FC<StakingDayStatusBarProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { stakingDay, timeToStakingDay, timeLeftStakingDay } = context;
+  const {
+    stakingDay,
+    timeToStakingDaySeconds: timeToStakingDay,
+    timeLeftStakingDaySeconds: timeLeftStakingDay,
+  } = context;
 
   const [expanded, setExpanded] = useState(false);
 
@@ -48,10 +53,12 @@ const StakingDayStatusBar: React.FC<StakingDayStatusBarProps> = () => {
 
   const isCalculating = useMemo(() => {
     const value = stakingDay ? timeLeftStakingDay : timeToStakingDay;
-    return value === '0min 0sec';
+    return value === 0;
   }, [stakingDay, timeLeftStakingDay, timeToStakingDay]);
 
-  const mainValue = stakingDay ? timeLeftStakingDay : timeToStakingDay;
+  const mainValue = stakingDay
+    ? formatSeconds(timeLeftStakingDay)
+    : formatSeconds(timeToStakingDay);
   const title = stakingDay ? 'Staking day active' : 'Staking day inactive';
 
   return (

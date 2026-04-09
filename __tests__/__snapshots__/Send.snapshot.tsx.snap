@@ -455,7 +455,9 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               "shadowOpacity": 0.35,
               "shadowRadius": 16,
             },
-            undefined,
+            {
+              "width": "100%",
+            },
             {
               "opacity": 0.5,
             },
@@ -937,7 +939,9 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               "shadowOpacity": 0.35,
               "shadowRadius": 16,
             },
-            undefined,
+            {
+              "width": "100%",
+            },
             {
               "opacity": 0.5,
             },

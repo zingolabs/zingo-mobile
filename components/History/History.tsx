@@ -26,7 +26,7 @@ import {
   ScreenEnum,
   ValueTransferType,
 } from '../../app/AppState';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
@@ -50,6 +50,7 @@ import RegText from '../Components/RegText';
 import EmptyList from '../../assets/icons/empty-cardboard-box.svg';
 import { RPCValueTransferStatusEnum } from '../../app/rpc/enums/RPCValueTransferStatusEnum';
 import Button from '../Components/Button';
+import { MainTabParamList } from '../../app/types/NavigationTypes';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -58,7 +59,7 @@ const ViewTypes = {
   WITHOUT_MONTH_ADDRESS: 3,
 };
 
-type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> & {
+type HistoryProps = DrawerScreenProps<MainTabParamList, RouteEnum.History> & {
   // side menu
   toggleMenuDrawer: () => void;
   // privacy

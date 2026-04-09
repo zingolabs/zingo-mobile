@@ -39,6 +39,7 @@ import RegText from '../../Components/RegText';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 import ZecAmount from '../../Components/ZecAmount';
 import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
+import { scheduleReminder } from './scheduleReminder';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -91,6 +92,7 @@ const Unstake: React.FC<UnstakeProps> = ({
     stakingDay,
     setScheduledActions,
     scheduledActions,
+    timeToStakingDaySeconds: timeToStakingDay,
   } = context;
 
   console.log('FINALIZER', finalizerFromText);
@@ -184,26 +186,34 @@ const Unstake: React.FC<UnstakeProps> = ({
 
     setModalState('sending');
 
-    const stakingScheduledAction: ScheduledActionType = {
-      id: 0,
-      kind:
-        selectedKind === WalletBondsStatusEnum.Active
-          ? StakingActionKindEnum.BeginUnbonding
-          : StakingActionKindEnum.WithdrawBond,
-      amount:
-        (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount || 0) *
-        10 ** 8,
-      finalizer: finalizerFromText,
-      finalizerTo: '',
-      txid: bondTxid,
-      bondKey: '',
-    };
+    const TITLE = `Your ${selectedKind === WalletBondsStatusEnum.Active ? 'unstaking' : 'withdrawing'} action is ready to be executed!`;
+    const BODY = 'TODO: Action details';
 
     try {
       if (selectedKind === WalletBondsStatusEnum.Active) {
         if (stakingDay) {
           await beginUnstakeTransaction(bondTxid);
         } else {
+          const notifeeId = await scheduleReminder({
+            seconds: timeToStakingDay,
+            title: TITLE,
+            body: BODY,
+          });
+          const stakingScheduledAction: ScheduledActionType = {
+            id: 0,
+            kind: StakingActionKindEnum.BeginUnbonding,
+            amount:
+              (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount ||
+                0) *
+              10 ** 8,
+            finalizer: finalizerFromText,
+            finalizerTo: '',
+            txid: bondTxid,
+            bondKey: '',
+            notifeeId: notifeeId ? notifeeId : '',
+            title: TITLE,
+            body: BODY,
+          };
           const list = await ScheduledActionsFileImpl.addSA(
             stakingScheduledAction,
           );
@@ -213,6 +223,26 @@ const Unstake: React.FC<UnstakeProps> = ({
         if (stakingDay) {
           await withdrawBondTransaction(selectedBond.txid);
         } else {
+          const notifeeId = await scheduleReminder({
+            seconds: timeToStakingDay,
+            title: TITLE,
+            body: BODY,
+          });
+          const stakingScheduledAction: ScheduledActionType = {
+            id: 0,
+            kind: StakingActionKindEnum.WithdrawBond,
+            amount:
+              (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount ||
+                0) *
+              10 ** 8,
+            finalizer: finalizerFromText,
+            finalizerTo: '',
+            txid: bondTxid,
+            bondKey: '',
+            notifeeId: notifeeId ? notifeeId : '',
+            title: TITLE,
+            body: BODY,
+          };
           const list = await ScheduledActionsFileImpl.addSA(
             stakingScheduledAction,
           );
@@ -243,13 +273,13 @@ const Unstake: React.FC<UnstakeProps> = ({
       setModalState('idle');
       if (JSON.stringify(error).toLowerCase().includes('window')) {
         navigation.navigate(RouteEnum.ComputingError, {
-          error: `Transaction outside of staking window :(. Try again later.`,
+          error: `Transaction outside of staking window.`,
         });
       } else if (
         JSON.stringify(error).toLowerCase().includes('staking action delay')
       ) {
         navigation.navigate(RouteEnum.ComputingError, {
-          error: `Transaction outside of staking window :(. Try again later.`,
+          error: `Cannot operate on the same staking action in the same window.`,
         });
       } else {
         navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
@@ -555,6 +585,9 @@ const Unstake: React.FC<UnstakeProps> = ({
           }}
         >
           <LiquidPrimaryButton
+            style={{
+              width: '100%',
+            }}
             title={actionVerb}
             disabled={!isValidForm || modalState === 'sending'}
             onPress={handleUnstakePress}
