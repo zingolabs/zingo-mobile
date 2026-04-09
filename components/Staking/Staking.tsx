@@ -817,7 +817,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                                 <RegText
                                   style={{
                                     color: '#FFAF02',
-                                    fontSize: timeToStakingDay === 0 ? 10 : 15,
+                                    fontSize: timeToStakingDay === 0 ? 10 : 13,
                                   }}
                                 >
                                   {timeToStakingDay === 0
