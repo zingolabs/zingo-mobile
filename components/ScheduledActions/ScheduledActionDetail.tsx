@@ -35,6 +35,7 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import ScheduledActionsFileImpl from '../ScheduledActions/ScheduledActionsFileImpl';
 import Utils from '../../app/utils';
+import notifee from '@notifee/react-native';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -93,6 +94,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
   const handleCancelPress = async () => {
     const list = await ScheduledActionsFileImpl.removeSA(item.id);
     setScheduledActions(list);
+    await notifee.cancelNotification(item.notifeeId);
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -167,6 +169,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
 
       const list = await ScheduledActionsFileImpl.removeSA(item.id);
       setScheduledActions(list);
+      await notifee.cancelNotification(item.notifeeId);
 
       setModalState('success');
     } catch (error: any) {
@@ -174,13 +177,13 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
       setModalState('idle');
       if (JSON.stringify(error).toLowerCase().includes('window')) {
         navigation.navigate(RouteEnum.ComputingError, {
-          error: `Transaction outside of staking window :(. Try again later.`,
+          error: `Transaction outside of staking window.`,
         });
       } else if (
         JSON.stringify(error).toLowerCase().includes('staking action delay')
       ) {
         navigation.navigate(RouteEnum.ComputingError, {
-          error: `Transaction outside of staking window :(. Try again later.`,
+          error: `Cannot operate on the same staking action in the same window.`,
         });
       } else {
         navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });

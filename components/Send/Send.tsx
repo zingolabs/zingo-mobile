@@ -1294,6 +1294,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         >
           {title === 'Send to' && (
             <LiquidPrimaryButton
+              style={{
+                width: '100%',
+              }}
               title={'Continue'}
               disabled={!addressText || validAddress !== 1}
               onPress={() => {
@@ -1305,6 +1308,9 @@ const Send: React.FunctionComponent<SendProps> = ({
 
           {title === 'Send' && (
             <LiquidPrimaryButton
+              style={{
+                width: '100%',
+              }}
               title={
                 validAmount === 1 &&
                 amountText &&

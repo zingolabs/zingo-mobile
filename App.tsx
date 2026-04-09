@@ -5,7 +5,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
   createNavigationContainerRef,
   DefaultTheme,
+  LinkingOptions,
   NavigationContainer,
+  ParamListBase,
 } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -55,7 +57,22 @@ const zingoTheme: ThemeType = {
 };
 
 const Stack = createStackNavigator<AppStackParamList>();
-export const navigationRef = createNavigationContainerRef<AppStackParamList>();
+
+const navigationRef = createNavigationContainerRef<AppStackParamList>();
+
+const linking: LinkingOptions<AppStackParamList> = {
+  prefixes: ['delegator://'],
+  config: {
+    screens: {
+      [RouteEnum.LoadingApp]: 'loading',
+      [RouteEnum.LoadedApp]: {
+        screens: {
+          [RouteEnum.StakingHome]: 'reminder-opened',
+        },
+      } as ParamListBase,
+    },
+  },
+};
 
 const App: React.FunctionComponent = () => {
   useEffect(() => {
@@ -73,7 +90,11 @@ const App: React.FunctionComponent = () => {
   return (
     <SafeAreaProvider>
       <StatusBar backgroundColor={zingoTheme.colors.background} />
-      <NavigationContainer ref={navigationRef} theme={zingoTheme}>
+      <NavigationContainer
+        ref={navigationRef}
+        theme={zingoTheme}
+        linking={linking}
+      >
         <SafeAreaView
           style={{
             flex: 1,

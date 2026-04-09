@@ -83,6 +83,7 @@ import {
   createUpdateRecoveryWalletInfo,
   removeRecoveryWalletInfo,
 } from '../recoveryWalletInfov10';
+import notifee, { EventType, TriggerNotification } from '@notifee/react-native';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ToastProvider } from 'react-native-toastier';
@@ -101,7 +102,7 @@ import ValueTransferDetail from '../../components/History/components/ValueTransf
 import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import ComputingOK from './components/ComputingOK';
 import ComputingError from './components/ComputingError';
-import { Staking, AddStakeScreen, Unstake } from '../../components/Staking';
+import { AddStakeScreen, Unstake } from '../../components/Staking';
 import { StakeJsonToTypeType } from '../AppState/types/ValueTransferType';
 import Distribution from '../../components/Distribution';
 import Redelegate from '../../components/Staking/components/Redelegate';
@@ -111,6 +112,7 @@ import SettingsNavigator from '../../components/Settings/SettingsNavigator';
 import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
 import ScheduledActionDetail from '../../components/ScheduledActions/ScheduledActionDetail';
 import { FinalizerDetails } from '../../components/Staking/Finalizers/FinalizerDetails';
+import { scheduleReminder } from '../../components/Staking/components/scheduleReminder';
 
 const LoadedAppStack = createNativeStackNavigator<LoadedAppStackParamList>();
 
@@ -129,7 +131,6 @@ type LoadedAppStackParamList = {
   [RouteEnum.ValueTransferDetail]: undefined;
   [RouteEnum.ScannerAddress]: undefined;
   // [RouteEnum.Seed]: undefined;
-  [RouteEnum.StakingHome]: undefined;
   [RouteEnum.Stake]: undefined;
   [RouteEnum.Unstake]: undefined;
   [RouteEnum.Distribution]: undefined;
@@ -469,11 +470,18 @@ export class LoadedAppClass extends Component<
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
+  unsubscribeNotifee: any;
   screenName = ScreenEnum.LoadedApp;
 
   private lastBlockTimestamp: number | null = null;
   private lastKnownBlock: number | null = null;
-  private blockTimes: number[] = [10]; // 10 seconds by default.
+  // 10 seconds by default for regtest
+  // 5 minutes by default for testnet
+  private blockTimes: number[] = [
+    this.props.indexerServer.chainName === ChainNameEnum.regtestChainName
+      ? 10
+      : 5 * 60,
+  ];
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -522,8 +530,8 @@ export class LoadedAppClass extends Component<
       setPrivacyOption: this.setPrivacyOption,
       requestFaucetFunds: this.requestFaucetFunds,
       stakingDay: false,
-      timeToStakingDay: '',
-      timeLeftStakingDay: '',
+      timeToStakingDaySeconds: 0,
+      timeLeftStakingDaySeconds: 0,
       blocksToStakingDay: 0,
       blocksLeftStakingDay: 0,
       blocksTotalStakingDay: 0,
@@ -580,6 +588,7 @@ export class LoadedAppClass extends Component<
     this.appstate = {} as NativeEventSubscription;
     this.linking = {} as EmitterSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
+    this.unsubscribeNotifee = null;
   }
 
   private formatSeconds = (totalSeconds: number): string => {
@@ -599,7 +608,7 @@ export class LoadedAppClass extends Component<
     return sum / this.blockTimes.length;
   };
 
-  stakingDayCalculation = () => {
+  stakingDayCalculation = async () => {
     const latest = this.state.info.latestBlock ?? 0;
 
     const cycle = 150;
@@ -614,21 +623,67 @@ export class LoadedAppClass extends Component<
 
     const avgBlockTime = this.getAverageBlockTime();
 
-    const remainingText = this.formatSeconds(remaining * avgBlockTime);
-    const leftText = this.formatSeconds(left * avgBlockTime);
+    const newSeconds = remaining * avgBlockTime;
+
+    const triggers: TriggerNotification[] =
+      await notifee.getTriggerNotifications();
+
+    // when the Staking day begins, the App re-schedule
+    // the existent notifications for the next Staking Day.
+    // And do this in every new block.
+    if (newSeconds > 0) {
+      const list = await ScheduledActionsFileImpl.listSA();
+      list.forEach(async sa => {
+        if (
+          triggers.filter(t => t.notification.id === sa.notifeeId).length > 0
+        ) {
+          // the notification is still pending -> update it.
+          await scheduleReminder({
+            seconds: newSeconds,
+            title: sa.title,
+            body: sa.body,
+            notifeeId: sa.notifeeId,
+          });
+        } else {
+          // re-create the same notification -> new.
+          const notifeeId = await scheduleReminder({
+            seconds: newSeconds,
+            title: sa.title,
+            body: sa.body,
+          });
+          await ScheduledActionsFileImpl.updateNotifeeIdSA(
+            sa.id,
+            notifeeId ? notifeeId : '',
+          );
+        }
+      });
+    }
 
     this.setState({
       stakingDay: isStakingDay,
-      timeToStakingDay: remainingText,
-      timeLeftStakingDay: leftText,
+      timeToStakingDaySeconds: remaining * avgBlockTime,
+      timeLeftStakingDaySeconds: left * avgBlockTime,
       blocksToStakingDay: remaining,
       blocksLeftStakingDay: left,
-      blocksTotalStakingDay: activeWindow,
+      blocksTotalStakingDay: cycle - activeWindow,
+    });
+  };
+
+  openScheduledTab = () => {
+    console.log('NOTIFEE stakinghome -> tab');
+    this.props.navigationApp.navigate(RouteEnum.LoadedApp, {
+      screen: RouteEnum.MainTabs,
+      params: {
+        screen: RouteEnum.StakingHome,
+        params: {
+          tab: 'scheduled',
+        },
+      },
     });
   };
 
   componentDidMount = async () => {
-    this.stakingDayCalculation();
+    await this.stakingDayCalculation();
 
     this.setScheduledActions(await ScheduledActionsFileImpl.listSA());
 
@@ -833,12 +888,32 @@ export class LoadedAppClass extends Component<
         }
       },
     );
+
+    // notifee...
+    const initialNotification = await notifee.getInitialNotification();
+    if (initialNotification) {
+      const deeplink = initialNotification.notification.data?.deeplink;
+      console.log('NOTIFEE CLOSED', deeplink, this.props.navigationApp);
+      if (deeplink === 'delegator://reminder-opened') {
+        this.openScheduledTab();
+      }
+    }
+
+    this.unsubscribeNotifee = notifee.onForegroundEvent(({ type, detail }) => {
+      if (type === EventType.PRESS) {
+        const deeplink = detail.notification?.data?.deeplink;
+        console.log('NOTIFEE OPENED', deeplink, this.props.navigationApp);
+        if (deeplink === 'delegator://reminder-opened') {
+          this.openScheduledTab();
+        }
+      }
+    });
   };
 
-  componentDidUpdate(
+  componentDidUpdate = async (
     _prevProps: Readonly<LoadedAppClassProps>,
     prevState: Readonly<LoadedAppClassState>,
-  ): void {
+  ) => {
     const prevBlock = prevState.info.latestBlock;
     const currentBlock = this.state.info.latestBlock;
 
@@ -869,9 +944,9 @@ export class LoadedAppClass extends Component<
         this.lastKnownBlock = currentBlock;
       }
 
-      this.stakingDayCalculation();
+      await this.stakingDayCalculation();
     }
-  }
+  };
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
@@ -882,6 +957,9 @@ export class LoadedAppClass extends Component<
     this.unsubscribeNetInfo &&
       typeof this.unsubscribeNetInfo === 'function' &&
       this.unsubscribeNetInfo();
+    this.unsubscribeNotifee &&
+      typeof this.unsubscribeNotifee === 'function' &&
+      this.unsubscribeNotifee();
   };
 
   keepAwake = (keep: boolean): void => {
@@ -2086,8 +2164,8 @@ export class LoadedAppClass extends Component<
       setPrivacyOption: this.setPrivacyOption,
       requestFaucetFunds: this.requestFaucetFunds,
       stakingDay: this.state.stakingDay,
-      timeToStakingDay: this.state.timeToStakingDay,
-      timeLeftStakingDay: this.state.timeLeftStakingDay,
+      timeToStakingDaySeconds: this.state.timeToStakingDaySeconds,
+      timeLeftStakingDaySeconds: this.state.timeLeftStakingDaySeconds,
       blocksToStakingDay: this.state.blocksToStakingDay,
       blocksLeftStakingDay: this.state.blocksLeftStakingDay,
       blocksTotalStakingDay: this.state.blocksTotalStakingDay,
@@ -2236,10 +2314,6 @@ export class LoadedAppClass extends Component<
                     navigateToLoadingApp={this.navigateToLoadingApp}
                   />
                 )}
-              </LoadedAppStack.Screen>
-
-              <LoadedAppStack.Screen name={RouteEnum.StakingHome}>
-                {props => <Staking {...props} />}
               </LoadedAppStack.Screen>
 
               <LoadedAppStack.Screen name={RouteEnum.Stake}>

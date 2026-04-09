@@ -2,6 +2,7 @@
 import React, {
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -33,7 +34,6 @@ import {
   StakingActionKindEnum,
   WalletBondsType,
 } from '../../app/AppState';
-import { AppDrawerParamList } from '../../app/types';
 import { ThemeType } from '../../app/types';
 import WalletSummaryHeader from '../History/components/WalletSummaryHeader';
 import SettingsButton from '../History/components/SettingsButton';
@@ -61,6 +61,8 @@ import { WalletBondsStatusEnum } from '../../app/AppState/enums/WalletBondsStatu
 import StakingDayStatusBar from './components/StakingDayStatusBar';
 import LinearGradient from 'react-native-linear-gradient';
 import Button from '../Components/Button';
+import { formatSeconds } from '../../app/utils/Utils';
+import { MainTabParamList } from '../../app/types/NavigationTypes';
 
 type DataType = {
   svg: {
@@ -83,12 +85,14 @@ const formatMovementDate = (unixSeconds: number | undefined) => {
   }); // "Oct 10, 4:30 PM"
 };
 
-type StakingProps = DrawerScreenProps<
-  AppDrawerParamList,
-  RouteEnum.StakingHome
->;
+type StakingProps = DrawerScreenProps<MainTabParamList, RouteEnum.StakingHome>;
 
-const Staking: React.FC<StakingProps> = ({}) => {
+const Staking: React.FC<StakingProps> = ({ route }) => {
+  const tabParam =
+    !!route.params && route.params.tab !== undefined
+      ? route.params.tab
+      : 'active';
+
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
@@ -98,17 +102,19 @@ const Staking: React.FC<StakingProps> = ({}) => {
     info,
     privacy,
     stakingDay,
-    timeToStakingDay,
-    timeLeftStakingDay,
+    timeToStakingDaySeconds: timeToStakingDay,
+    timeLeftStakingDaySeconds: timeLeftStakingDay,
     scheduledActions,
     walletBonds,
     valueTransfers,
+    blocksToStakingDay,
+    blocksTotalStakingDay,
   } = context;
 
   const screenName = ScreenEnum.StakingHome;
 
   const [loading] = useState(false);
-  const [tab, setTab] = useState<'scheduled' | 'active' | 'my'>('active');
+  const [tab, setTab] = useState<'scheduled' | 'active' | 'my'>(tabParam);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const [heightLayout, setHeightLayout] = useState<number>(10);
@@ -123,6 +129,12 @@ const Staking: React.FC<StakingProps> = ({}) => {
   };
 
   const scrollViewRef = useRef<ScrollView & FlatList<any>>(null);
+
+  useEffect(() => {
+    if (route.params && route.params.tab) {
+      setTab(route.params.tab);
+    }
+  }, [route.params, route.params?.tab]);
 
   const snapPoints = useMemo(() => {
     let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
@@ -582,6 +594,55 @@ const Staking: React.FC<StakingProps> = ({}) => {
                       >
                         {'Scheduled'}
                       </Text>
+                      <View style={{ flexDirection: 'row' }}>
+                        {stakingDay ? (
+                          <View
+                            style={{
+                              height: 10,
+                              borderRadius: 100,
+                              backgroundColor: '#00B800',
+                              width: '100%',
+                              marginTop: 10,
+                            }}
+                          />
+                        ) : (
+                          <>
+                            <View
+                              style={{
+                                height: 10,
+                                borderRadius: 100,
+                                backgroundColor: '#815800',
+                                width: `${((blocksTotalStakingDay - blocksToStakingDay) * 100) / blocksTotalStakingDay}%`,
+                                marginTop: 10,
+                              }}
+                            />
+                            <View
+                              style={{
+                                height: 10,
+                                borderRadius: 100,
+                                backgroundColor: '#FFAF02',
+                                width: 20,
+                                marginTop: 10,
+                                marginLeft: -10,
+                                zIndex: 999,
+                              }}
+                            />
+                            <View
+                              style={{
+                                height: 10,
+                                borderRadius: 100,
+                                backgroundColor: '#2F2F31',
+                                width: `${(blocksToStakingDay * 100) / blocksTotalStakingDay}%`,
+                                marginTop: 10,
+                                marginLeft: -10,
+                              }}
+                            />
+                          </>
+                        )}
+                      </View>
+                      {/*
+                        <FadeText>{`to: ${blocksToStakingDay} - total: ${blocksTotalStakingDay}`}</FadeText>
+                      */}
                     </View>
                   }
                   ListFooterComponent={
@@ -712,13 +773,13 @@ const Staking: React.FC<StakingProps> = ({}) => {
                               flexDirection: 'row',
                               justifyContent: 'space-between',
                               alignItems: 'center',
-                              paddingVertical: 10,
                               paddingHorizontal: 10,
                               borderRadius: 16,
                             }}
                           >
                             <View
                               style={{
+                                marginVertical: 10,
                                 flexDirection: 'row',
                                 alignItems: 'center',
                               }}
@@ -740,7 +801,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                 <View
                                   style={{
                                     flexDirection: 'row',
-                                    marginLeft: 5,
                                   }}
                                 >
                                   <ZecAmount
@@ -768,7 +828,6 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                     style={{
                                       color: colors.placeholder,
                                       fontSize: 12,
-                                      marginLeft: 5,
                                     }}
                                   >
                                     {'with '}
@@ -784,7 +843,11 @@ const Staking: React.FC<StakingProps> = ({}) => {
                               </View>
                             </View>
                             <View
-                              style={{ flexGrow: 1, alignItems: 'flex-end' }}
+                              style={{
+                                flexGrow: 1,
+                                alignItems: 'flex-end',
+                                paddingRight: 20,
+                              }}
                             >
                               {stakingDay ? (
                                 <>
@@ -792,9 +855,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                     style={{
                                       color: '#00B800',
                                       fontSize:
-                                        timeLeftStakingDay === '0min 0sec'
-                                          ? 10
-                                          : 15,
+                                        timeLeftStakingDay === 0 ? 10 : 15,
                                     }}
                                   >
                                     {'Now'}
@@ -804,21 +865,16 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                   </FadeText>
                                 </>
                               ) : (
-                                <>
-                                  <RegText
-                                    style={{
-                                      color: '#FFAF02',
-                                      fontSize:
-                                        timeToStakingDay === '0min 0sec'
-                                          ? 10
-                                          : 15,
-                                    }}
-                                  >
-                                    {timeToStakingDay === '0min 0sec'
-                                      ? 'calculating...'
-                                      : timeToStakingDay}
-                                  </RegText>
-                                </>
+                                <RegText
+                                  style={{
+                                    color: '#FFAF02',
+                                    fontSize: timeToStakingDay === 0 ? 10 : 13,
+                                  }}
+                                >
+                                  {timeToStakingDay === 0
+                                    ? 'calculating...'
+                                    : formatSeconds(timeToStakingDay)}
+                                </RegText>
                               )}
                             </View>
                           </LinearGradient>
@@ -979,10 +1035,17 @@ const Staking: React.FC<StakingProps> = ({}) => {
                           }}
                         >
                           {item.status === WalletBondsStatusEnum.Active && (
-                            <>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                gap: 10,
+                                width: '100%',
+                              }}
+                            >
                               <Button
                                 title={'Redelegate'}
                                 variant="secondary"
+                                style={{ width: '48%' }}
                                 onPress={() => {
                                   navigation.navigate(RouteEnum.Redelegate, {
                                     finalizer: item.finalizer,
@@ -995,6 +1058,7 @@ const Staking: React.FC<StakingProps> = ({}) => {
                               <Button
                                 variant="primary"
                                 title={'Unstake'}
+                                style={{ width: '48%' }}
                                 onPress={() => {
                                   navigation.navigate(RouteEnum.Unstake, {
                                     finalizer: item.finalizer,
@@ -1004,12 +1068,13 @@ const Staking: React.FC<StakingProps> = ({}) => {
                                   });
                                 }}
                               />
-                            </>
+                            </View>
                           )}
                           {item.status === WalletBondsStatusEnum.Unbonding && (
                             <Button
                               title={'Withdraw'}
                               variant="primary"
+                              style={{ width: '48%' }}
                               onPress={() => {
                                 navigation.navigate(RouteEnum.Unstake, {
                                   finalizer: item.finalizer,

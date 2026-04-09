@@ -40,6 +40,7 @@ import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import RegText from '../../Components/RegText';
 import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
+import { scheduleReminder } from './scheduleReminder';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -69,6 +70,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     stakingDay,
     setScheduledActions,
     scheduledActions,
+    timeToStakingDaySeconds: timeToStakingDay,
   } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
@@ -152,8 +154,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
         .reduce((acc, curr) => acc + curr.amount, 0);
       if (amount + amountScheduled / 10 ** 8 > spendable) {
         Alert.alert(
-          'Insufficient balance to schedule an stake action',
-          `You can scheduling stakes up to ${spendable.toFixed(5)} ${info.currencyName}.`,
+          'Insufficient balance to schedule a staking action',
+          `You can schedule stakes up to ${spendable.toFixed(5)} ${info.currencyName}.`,
         );
         return;
       }
@@ -162,27 +164,12 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     // Build a minimal SendPageState to reuse existing plumbing
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
 
-    // sendPageState.toaddr.to =
-    //   indexerServer.chainName === ChainNameEnum.regtestChainName
-    //     ? MINER_ADDRESS_REGTEST
-    //     : MINER_ADDRESS_TESTNET;
-    // sendPageState.toaddr.memo = defaultUnifiedAddress;
     sendPageState.toaddr.amount = Utils.parseNumberFloatToStringLocale(
       amount,
       8,
     );
 
     setModalState('sending');
-
-    const stakingScheduledAction: ScheduledActionType = {
-      id: 0,
-      kind: StakingActionKindEnum.CreateBond,
-      amount: amount * 10 ** 8,
-      finalizer: finalizer,
-      finalizerTo: '',
-      txid: '',
-      bondKey: '',
-    };
 
     const stakingAction: StakingActionType = {
       kind: StakingActionKindEnum.CreateBond,
@@ -191,10 +178,34 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
     };
 
+    const TITLE = 'Your staking action is ready to be executed!';
+    const BODY = 'TODO: Action details';
+
+    // testing... remove it for production.
+    //Alert.alert('TESTING', 'in 60 seconds you will have a notification');
+    //await scheduleReminder({ seconds: 60, title: TITLE, body: BODY });
+
     try {
       if (stakingDay) {
         await stakeTransaction(sendPageState, stakingAction);
       } else {
+        const notifeeId = await scheduleReminder({
+          seconds: timeToStakingDay,
+          title: TITLE,
+          body: BODY,
+        });
+        const stakingScheduledAction: ScheduledActionType = {
+          id: 0,
+          kind: StakingActionKindEnum.CreateBond,
+          amount: amount * 10 ** 8,
+          finalizer: finalizer,
+          finalizerTo: '',
+          txid: '',
+          bondKey: '',
+          notifeeId: notifeeId ? notifeeId : '',
+          title: TITLE,
+          body: BODY,
+        };
         const list = await ScheduledActionsFileImpl.addSA(
           stakingScheduledAction,
         );
@@ -206,13 +217,13 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       setModalState('idle');
       if (JSON.stringify(error).toLowerCase().includes('window')) {
         navigation.navigate(RouteEnum.ComputingError, {
-          error: `Transaction outside of staking window :(. Try again later.`,
+          error: `Transaction outside of staking window.`,
         });
       } else if (
         JSON.stringify(error).toLowerCase().includes('staking action delay')
       ) {
         navigation.navigate(RouteEnum.ComputingError, {
-          error: `Transaction outside of staking window :(. Try again later.`,
+          error: `Cannot operate on the same staking action in the same window.`,
         });
       } else {
         navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
@@ -463,6 +474,9 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           }}
         >
           <LiquidPrimaryButton
+            style={{
+              width: '100%',
+            }}
             title="Stake"
             disabled={
               !hasSelection || !finalizerText.trim() || modalState === 'sending'
