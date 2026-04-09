@@ -53,24 +53,26 @@ export async function scheduleReminder({
       alarmManager: true, // Android option for timestamp triggers
     };
 
-    const id: string = await notifee.createTriggerNotification(
-      {
-        id: notifeeId,
-        title: title,
-        body: body,
-        data: {
-          deeplink: `delegator://reminder-opened`,
-        },
-        android: {
-          channelId,
-          pressAction: {
-            id: 'default',
-          },
+    const notification = {
+      ...(notifeeId !== undefined && { id: notifeeId }),
+      title: title,
+      body: body,
+      data: {
+        deeplink: `delegator://reminder-opened`,
+      },
+      android: {
+        channelId,
+        pressAction: {
+          id: 'default',
         },
       },
+    };
+
+    const newNotifeeId: string = await notifee.createTriggerNotification(
+      notification,
       trigger,
     );
 
-    return id;
+    return newNotifeeId;
   }
 }
