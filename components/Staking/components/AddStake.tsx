@@ -203,6 +203,8 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           txid: '',
           bondKey: '',
           notifeeId: notifeeId ? notifeeId : '',
+          title: TITLE,
+          body: BODY,
         };
         const list = await ScheduledActionsFileImpl.addSA(
           stakingScheduledAction,

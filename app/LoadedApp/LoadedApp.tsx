@@ -112,6 +112,7 @@ import SettingsNavigator from '../../components/Settings/SettingsNavigator';
 import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
 import ScheduledActionDetail from '../../components/ScheduledActions/ScheduledActionDetail';
 import { FinalizerDetails } from '../../components/Staking/Finalizers/FinalizerDetails';
+import { scheduleReminder } from '../../components/Staking/components/scheduleReminder';
 
 const LoadedAppStack = createNativeStackNavigator<LoadedAppStackParamList>();
 
@@ -474,8 +475,9 @@ export class LoadedAppClass extends Component<
 
   private lastBlockTimestamp: number | null = null;
   private lastKnownBlock: number | null = null;
-  private blockTimes: number[] = [10]; // 10 seconds by default.
-  private pendingOpenScheduledRef: boolean = false;
+  // 10 seconds by default for regtest
+  // 5 minutes by default for testnet
+  private blockTimes: number[] = [this.props.indexerServer.chainName === ChainNameEnum.regtestChainName ? 10 : 5 * 60];
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -602,7 +604,7 @@ export class LoadedAppClass extends Component<
     return sum / this.blockTimes.length;
   };
 
-  stakingDayCalculation = () => {
+  stakingDayCalculation = async () => {
     const latest = this.state.info.latestBlock ?? 0;
 
     const cycle = 150;
@@ -617,6 +619,20 @@ export class LoadedAppClass extends Component<
 
     const avgBlockTime = this.getAverageBlockTime();
 
+    const newSeconds = remaining * avgBlockTime;
+
+    if (newSeconds > 0) {
+      const list = await ScheduledActionsFileImpl.listSA();
+      list.forEach(async sa => {
+        await scheduleReminder({
+          seconds: newSeconds,
+          title: sa.title,
+          body: sa.body,
+          notifeeId: sa.notifeeId,
+        });
+      });
+    }
+
     this.setState({
       stakingDay: isStakingDay,
       timeToStakingDaySeconds: remaining * avgBlockTime,
@@ -628,13 +644,6 @@ export class LoadedAppClass extends Component<
   };
 
   openScheduledTab = () => {
-    if (!this.props.navigationApp) {
-      this.pendingOpenScheduledRef = true;
-      return;
-    }
-
-    this.pendingOpenScheduledRef = false;
-
     console.log('NOTIFEE stakinghome -> tab');
     this.props.navigationApp.navigate(RouteEnum.LoadedApp, {
       screen: RouteEnum.MainTabs,
@@ -648,7 +657,7 @@ export class LoadedAppClass extends Component<
   };
 
   componentDidMount = async () => {
-    this.stakingDayCalculation();
+    await this.stakingDayCalculation();
 
     this.setScheduledActions(await ScheduledActionsFileImpl.listSA());
 
@@ -875,10 +884,10 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  componentDidUpdate(
+  componentDidUpdate = async (
     _prevProps: Readonly<LoadedAppClassProps>,
     prevState: Readonly<LoadedAppClassState>,
-  ): void {
+  ) => {
     const prevBlock = prevState.info.latestBlock;
     const currentBlock = this.state.info.latestBlock;
 
@@ -909,7 +918,7 @@ export class LoadedAppClass extends Component<
         this.lastKnownBlock = currentBlock;
       }
 
-      this.stakingDayCalculation();
+      await this.stakingDayCalculation();
     }
   }
 

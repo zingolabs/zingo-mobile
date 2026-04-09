@@ -35,6 +35,7 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import ScheduledActionsFileImpl from '../ScheduledActions/ScheduledActionsFileImpl';
 import Utils from '../../app/utils';
+import notifee from '@notifee/react-native';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -93,6 +94,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
   const handleCancelPress = async () => {
     const list = await ScheduledActionsFileImpl.removeSA(item.id);
     setScheduledActions(list);
+    await notifee.cancelNotification(item.notifeeId);
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -167,6 +169,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
 
       const list = await ScheduledActionsFileImpl.removeSA(item.id);
       setScheduledActions(list);
+      await notifee.cancelNotification(item.notifeeId);
 
       setModalState('success');
     } catch (error: any) {

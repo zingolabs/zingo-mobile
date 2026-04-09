@@ -29,10 +29,12 @@ export async function scheduleReminder({
   seconds,
   title,
   body,
+  notifeeId,
 }: {
   seconds: number;
   title: string;
   body: string;
+  notifeeId?: string,
 }) {
   const allowed: boolean = await requestPermissions();
 
@@ -53,6 +55,7 @@ export async function scheduleReminder({
 
     const id: string = await notifee.createTriggerNotification(
       {
+        id: notifeeId,
         title: title,
         body: body,
         data: {

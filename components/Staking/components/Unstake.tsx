@@ -211,6 +211,8 @@ const Unstake: React.FC<UnstakeProps> = ({
             txid: bondTxid,
             bondKey: '',
             notifeeId: notifeeId ? notifeeId : '',
+            title: TITLE,
+            body: BODY,
           };
           const list = await ScheduledActionsFileImpl.addSA(
             stakingScheduledAction,
@@ -238,6 +240,8 @@ const Unstake: React.FC<UnstakeProps> = ({
             txid: bondTxid,
             bondKey: '',
             notifeeId: notifeeId ? notifeeId : '',
+            title: TITLE,
+            body: BODY,
           };
           const list = await ScheduledActionsFileImpl.addSA(
             stakingScheduledAction,

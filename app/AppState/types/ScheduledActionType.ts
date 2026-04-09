@@ -9,4 +9,6 @@ export default interface ScheduledActionType {
   txid: string;
   bondKey: string; // for redelegating only
   notifeeId: string;
+  title: string;
+  body: string;
 }

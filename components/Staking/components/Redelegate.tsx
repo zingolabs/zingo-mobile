@@ -256,6 +256,8 @@ const Redelegate: React.FC<RedelegateProps> = ({
             txid: bondTxid,
             bondKey: bondKey,
             notifeeId: notifeeId ? notifeeId : '',
+            title: TITLE,
+            body: BODY,
           };
           const list = await ScheduledActionsFileImpl.addSA(
             stakingScheduledAction,
