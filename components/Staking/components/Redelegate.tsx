@@ -43,6 +43,7 @@ import RegText from '../../Components/RegText';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 import ZecAmount from '../../Components/ZecAmount';
 import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
+import { scheduleReminder } from './scheduleReminder';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -99,6 +100,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
     stakingDay,
     setScheduledActions,
     scheduledActions,
+    timeToStakingDaySeconds: timeToStakingDay,
   } = context;
 
   const movements = useMemo(() => {
@@ -229,23 +231,32 @@ const Redelegate: React.FC<RedelegateProps> = ({
 
     setModalState('sending');
 
-    const stakingScheduledAction: ScheduledActionType = {
-      id: 0,
-      kind: StakingActionKindEnum.Move,
-      amount:
-        (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount || 0) *
-        10 ** 8,
-      finalizer: finalizerFromText,
-      finalizerTo: finalizerToText,
-      txid: bondTxid,
-      bondKey: bondKey,
-    };
+    const TITLE = 'Your redelegate action is ready to be executed!';
+    const BODY = 'TODO: Action details';
 
     try {
       if (selectedKind === WalletBondsStatusEnum.Active) {
         if (stakingDay) {
           await redelegateTransaction(bondKey, finalizerToText);
         } else {
+          const notifeeId = await scheduleReminder({
+            seconds: timeToStakingDay,
+            title: TITLE,
+            body: BODY,
+          });
+          const stakingScheduledAction: ScheduledActionType = {
+            id: 0,
+            kind: StakingActionKindEnum.Move,
+            amount:
+              (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount ||
+                0) *
+              10 ** 8,
+            finalizer: finalizerFromText,
+            finalizerTo: finalizerToText,
+            txid: bondTxid,
+            bondKey: bondKey,
+            notifeeId: notifeeId ? notifeeId : '',
+          };
           const list = await ScheduledActionsFileImpl.addSA(
             stakingScheduledAction,
           );

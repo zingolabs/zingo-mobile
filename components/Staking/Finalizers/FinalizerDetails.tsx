@@ -72,6 +72,7 @@ export function FinalizerDetails({ route }: FinalizerDetailsProps) {
   )[0].votingPower;
 
   const totalUserStaked = walletBonds
+    .filter(wb => wb.finalizer === finalizerFromText)
     .map(b => {
       console.log('TOTAL USER STAKED:', b);
 

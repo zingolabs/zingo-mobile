@@ -40,16 +40,9 @@ import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import RegText from '../../Components/RegText';
 import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
-import notifee, {
-  AndroidImportance,
-  AuthorizationStatus,
-  TimestampTrigger,
-  TriggerType,
-} from '@notifee/react-native';
+import { scheduleReminder } from './scheduleReminder';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
-const TITLE = 'Your staking action is ready to be executed!';
-const BODY = 'TODO: Action details';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -120,63 +113,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     }
   }, [finalizerText, globalStaked]);
 
-  async function requestPermissions() {
-    const settings = await notifee.getNotificationSettings();
-    console.log(settings);
-
-    if (settings.authorizationStatus >= AuthorizationStatus.AUTHORIZED) {
-      console.log('Permission settings:', settings);
-      return true;
-    } else {
-      console.log('User declined permissions');
-      const request = await notifee.requestPermission();
-      if (request.authorizationStatus >= AuthorizationStatus.AUTHORIZED) {
-        console.log('Permission request:', request);
-        return true;
-      } else {
-        console.log('User declined permissions');
-        return false;
-      }
-    }
-  }
-
-  async function scheduleReminder({ seconds }: { seconds: number }) {
-    const allowed: boolean = await requestPermissions();
-
-    if (allowed) {
-      const channelId = await notifee.createChannel({
-        id: 'reminders',
-        name: 'Reminders',
-        importance: AndroidImportance.HIGH,
-      });
-
-      const fireDate = Date.now() + seconds * 1000;
-
-      const trigger: TimestampTrigger = {
-        type: TriggerType.TIMESTAMP,
-        timestamp: fireDate,
-        alarmManager: true, // Android option for timestamp triggers
-      };
-
-      await notifee.createTriggerNotification(
-        {
-          title: TITLE,
-          body: BODY,
-          data: {
-            deeplink: `delegator://reminder-opened`,
-          },
-          android: {
-            channelId,
-            pressAction: {
-              id: 'default',
-            },
-          },
-        },
-        trigger,
-      );
-    }
-  }
-
   const handleConfirmStake = async () => {
     if (!hasSelection) {
       return;
@@ -235,16 +171,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
 
     setModalState('sending');
 
-    const stakingScheduledAction: ScheduledActionType = {
-      id: 0,
-      kind: StakingActionKindEnum.CreateBond,
-      amount: amount * 10 ** 8,
-      finalizer: finalizer,
-      finalizerTo: '',
-      txid: '',
-      bondKey: '',
-    };
-
     const stakingAction: StakingActionType = {
       kind: StakingActionKindEnum.CreateBond,
       val: amount * 10 ** 8,
@@ -252,18 +178,35 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
     };
 
+    const TITLE = 'Your staking action is ready to be executed!';
+    const BODY = 'TODO: Action details';
+
     // testing... remove it for production.
-    Alert.alert('TESTING', 'in 60 seconds you will have a notification');
-    await scheduleReminder({ seconds: 60 });
+    //Alert.alert('TESTING', 'in 60 seconds you will have a notification');
+    //await scheduleReminder({ seconds: 60, title: TITLE, body: BODY });
 
     try {
       if (stakingDay) {
         await stakeTransaction(sendPageState, stakingAction);
       } else {
+        const notifeeId = await scheduleReminder({
+          seconds: timeToStakingDay,
+          title: TITLE,
+          body: BODY,
+        });
+        const stakingScheduledAction: ScheduledActionType = {
+          id: 0,
+          kind: StakingActionKindEnum.CreateBond,
+          amount: amount * 10 ** 8,
+          finalizer: finalizer,
+          finalizerTo: '',
+          txid: '',
+          bondKey: '',
+          notifeeId: notifeeId ? notifeeId : '',
+        };
         const list = await ScheduledActionsFileImpl.addSA(
           stakingScheduledAction,
         );
-        await scheduleReminder({ seconds: timeToStakingDay });
         setScheduledActions(list);
       }
       setModalState('success');
