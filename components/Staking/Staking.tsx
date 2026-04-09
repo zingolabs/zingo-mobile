@@ -107,6 +107,8 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
     scheduledActions,
     walletBonds,
     valueTransfers,
+    blocksToStakingDay,
+    blocksTotalStakingDay,
   } = context;
 
   const screenName = ScreenEnum.StakingHome;
@@ -592,6 +594,55 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                       >
                         {'Scheduled'}
                       </Text>
+                      <View style={{ flexDirection: 'row' }}>
+                        {stakingDay ? (
+                          <View
+                            style={{
+                              height: 10,
+                              borderRadius: 100,
+                              backgroundColor: '#00B800',
+                              width: '100%',
+                              marginTop: 10,
+                            }}
+                          />
+                        ) : (
+                          <>
+                            <View
+                              style={{
+                                height: 10,
+                                borderRadius: 100,
+                                backgroundColor: '#815800',
+                                width: `${((blocksTotalStakingDay - blocksToStakingDay) * 100) / blocksTotalStakingDay}%`,
+                                marginTop: 10,
+                              }}
+                            />
+                            <View
+                              style={{
+                                height: 10,
+                                borderRadius: 100,
+                                backgroundColor: '#FFAF02',
+                                width: 20,
+                                marginTop: 10,
+                                marginLeft: -10,
+                                zIndex: 999,
+                              }}
+                            />
+                            <View
+                              style={{
+                                height: 10,
+                                borderRadius: 100,
+                                backgroundColor: '#2F2F31',
+                                width: `${(blocksToStakingDay * 100) / blocksTotalStakingDay}%`,
+                                marginTop: 10,
+                                marginLeft: -10,
+                              }}
+                            />
+                          </>
+                        )}
+                      </View>
+                      {/*
+                        <FadeText>{`to: ${blocksToStakingDay} - total: ${blocksTotalStakingDay}`}</FadeText>
+                      */}
                     </View>
                   }
                   ListFooterComponent={
