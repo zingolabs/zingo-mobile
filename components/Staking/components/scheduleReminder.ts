@@ -34,7 +34,7 @@ export async function scheduleReminder({
   seconds: number;
   title: string;
   body: string;
-  notifeeId?: string,
+  notifeeId?: string;
 }) {
   const allowed: boolean = await requestPermissions();
 

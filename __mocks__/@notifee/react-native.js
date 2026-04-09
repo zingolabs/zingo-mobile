@@ -9,6 +9,7 @@ const notifee = {
   cancelNotification: jest.fn(),
   cancelAllNotifications: jest.fn(),
   getInitialNotification: jest.fn(),
+  getTriggerNotifications: jest.fn(),
   onForegroundEvent: jest.fn(),
   onBackgroundEvent: jest.fn(),
   isChannelBlocked: jest.fn(),

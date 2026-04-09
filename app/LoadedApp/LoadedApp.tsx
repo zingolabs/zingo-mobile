@@ -83,7 +83,7 @@ import {
   createUpdateRecoveryWalletInfo,
   removeRecoveryWalletInfo,
 } from '../recoveryWalletInfov10';
-import notifee, { EventType } from '@notifee/react-native';
+import notifee, { EventType, TriggerNotification } from '@notifee/react-native';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ToastProvider } from 'react-native-toastier';
@@ -477,7 +477,11 @@ export class LoadedAppClass extends Component<
   private lastKnownBlock: number | null = null;
   // 10 seconds by default for regtest
   // 5 minutes by default for testnet
-  private blockTimes: number[] = [this.props.indexerServer.chainName === ChainNameEnum.regtestChainName ? 10 : 5 * 60];
+  private blockTimes: number[] = [
+    this.props.indexerServer.chainName === ChainNameEnum.regtestChainName
+      ? 10
+      : 5 * 60,
+  ];
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -621,15 +625,37 @@ export class LoadedAppClass extends Component<
 
     const newSeconds = remaining * avgBlockTime;
 
+    const triggers: TriggerNotification[] =
+      await notifee.getTriggerNotifications();
+
+    // when the Staking day begins, the App re-schedule
+    // the existent notifications for the next Staking Day.
+    // And do this in every new block.
     if (newSeconds > 0) {
       const list = await ScheduledActionsFileImpl.listSA();
       list.forEach(async sa => {
-        await scheduleReminder({
-          seconds: newSeconds,
-          title: sa.title,
-          body: sa.body,
-          notifeeId: sa.notifeeId,
-        });
+        if (
+          triggers.filter(t => t.notification.id === sa.notifeeId).length > 0
+        ) {
+          // the notification is still pending -> update it.
+          await scheduleReminder({
+            seconds: newSeconds,
+            title: sa.title,
+            body: sa.body,
+            notifeeId: sa.notifeeId,
+          });
+        } else {
+          // re-create the same notification -> new.
+          const notifeeId = await scheduleReminder({
+            seconds: newSeconds,
+            title: sa.title,
+            body: sa.body,
+          });
+          await ScheduledActionsFileImpl.updateNotifeeIdSA(
+            sa.id,
+            notifeeId ? notifeeId : '',
+          );
+        }
       });
     }
 
@@ -920,7 +946,7 @@ export class LoadedAppClass extends Component<
 
       await this.stakingDayCalculation();
     }
-  }
+  };
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
