@@ -665,7 +665,7 @@ export class LoadedAppClass extends Component<
       timeLeftStakingDaySeconds: left * avgBlockTime,
       blocksToStakingDay: remaining,
       blocksLeftStakingDay: left,
-      blocksTotalStakingDay: activeWindow,
+      blocksTotalStakingDay: cycle - activeWindow,
     });
   };
 
