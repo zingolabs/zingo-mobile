@@ -179,9 +179,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
     };
 
-    const TITLE = 'Your staking action is ready to be executed!';
-    const BODY = 'TODO: Action details';
-
     // testing... remove it for production.
     //Alert.alert('TESTING', 'in 60 seconds you will have a notification');
     //await scheduleReminder({ seconds: 60, title: TITLE, body: BODY });
@@ -190,11 +187,6 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       if (stakingDay) {
         await stakeTransaction(sendPageState, stakingAction);
       } else {
-        const notifeeId = await scheduleReminder({
-          seconds: timeToStakingDay,
-          title: TITLE,
-          body: BODY,
-        });
         const stakingScheduledAction: ScheduledActionType = {
           id: 0,
           kind: StakingActionKindEnum.CreateBond,
@@ -203,14 +195,15 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
           finalizerTo: '',
           txid: '',
           bondKey: '',
-          notifeeId: notifeeId ? notifeeId : '',
-          title: TITLE,
-          body: BODY,
         };
-        const list = await ScheduledActionsFileImpl.addSA(
+        const list = await ScheduledActionsFileImpl.addAction(
           stakingScheduledAction,
         );
         setScheduledActions(list);
+        await scheduleReminder({
+          seconds: timeToStakingDay,
+          numberActions: list.length,
+        });
       }
       setModalState('success');
     } catch (error: any) {

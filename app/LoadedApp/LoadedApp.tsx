@@ -83,7 +83,7 @@ import {
   createUpdateRecoveryWalletInfo,
   removeRecoveryWalletInfo,
 } from '../recoveryWalletInfov10';
-import notifee, { EventType, TriggerNotification } from '@notifee/react-native';
+import notifee, { EventType } from '@notifee/react-native';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ToastProvider } from 'react-native-toastier';
@@ -535,7 +535,7 @@ export class LoadedAppClass extends Component<
       blocksToStakingDay: 0,
       blocksLeftStakingDay: 0,
       blocksTotalStakingDay: 0,
-      scheduledActions: [] as ScheduledActionType[],
+      scheduledActions: {} as ScheduledActionType[],
       setScheduledActions: this.setScheduledActions,
 
       // context settings
@@ -625,38 +625,18 @@ export class LoadedAppClass extends Component<
 
     const newSeconds = remaining * avgBlockTime;
 
-    const triggers: TriggerNotification[] =
-      await notifee.getTriggerNotifications();
-
     // when the Staking day begins, the App re-schedule
-    // the existent notifications for the next Staking Day.
+    // the existent notification for the next Staking Day.
     // And do this in every new block.
     if (newSeconds > 0) {
-      const list = await ScheduledActionsFileImpl.listSA();
-      list.forEach(async sa => {
-        if (
-          triggers.filter(t => t.notification.id === sa.notifeeId).length > 0
-        ) {
-          // the notification is still pending -> update it.
-          await scheduleReminder({
-            seconds: newSeconds,
-            title: sa.title,
-            body: sa.body,
-            notifeeId: sa.notifeeId,
-          });
-        } else {
-          // re-create the same notification -> new.
-          const notifeeId = await scheduleReminder({
-            seconds: newSeconds,
-            title: sa.title,
-            body: sa.body,
-          });
-          await ScheduledActionsFileImpl.updateNotifeeIdSA(
-            sa.id,
-            notifeeId ? notifeeId : '',
-          );
-        }
-      });
+      const actions = await ScheduledActionsFileImpl.listActions();
+      const numberActions = actions.length;
+      if (numberActions > 0) {
+        await scheduleReminder({
+          seconds: newSeconds,
+          numberActions: numberActions,
+        });
+      }
     }
 
     this.setState({
@@ -685,7 +665,7 @@ export class LoadedAppClass extends Component<
   componentDidMount = async () => {
     await this.stakingDayCalculation();
 
-    this.setScheduledActions(await ScheduledActionsFileImpl.listSA());
+    this.setScheduledActions(await ScheduledActionsFileImpl.listActions());
 
     const netInfoState = await NetInfo.fetch();
     this.setState({
@@ -1269,12 +1249,15 @@ export class LoadedAppClass extends Component<
                   sa => sa.txid === vtNew[0].txid,
                 ).length > 0
               ) {
-                const list = await ScheduledActionsFileImpl.removeSA(
+                const list = await ScheduledActionsFileImpl.removeAction(
                   this.state.scheduledActions.filter(
                     sa => sa.txid === vtNew[0].txid,
                   )[0].id,
                 );
                 this.setScheduledActions(list);
+                if (list.length === 0) {
+                  await notifee.cancelAllNotifications();
+                }
               }
             }
             // the ValueTransfer is gone -> Likely Reverted by the server

@@ -93,9 +93,11 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
   }, []);
 
   const handleCancelPress = async () => {
-    const list = await ScheduledActionsFileImpl.removeSA(item.id);
+    const list = await ScheduledActionsFileImpl.removeAction(item.id);
     setScheduledActions(list);
-    await notifee.cancelNotification(item.notifeeId);
+    if (list.length === 0) {
+      await notifee.cancelAllNotifications();
+    }
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -168,9 +170,11 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
         return;
       }
 
-      const list = await ScheduledActionsFileImpl.removeSA(item.id);
+      const list = await ScheduledActionsFileImpl.removeAction(item.id);
       setScheduledActions(list);
-      await notifee.cancelNotification(item.notifeeId);
+      if (list.length === 0) {
+        await notifee.cancelAllNotifications();
+      }
 
       setModalState('success');
     } catch (error: any) {
