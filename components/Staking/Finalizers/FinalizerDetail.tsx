@@ -31,12 +31,12 @@ import StakingDayBubble from '../StakingDayBubble';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
-type FinalizerDetailsProps = DrawerScreenProps<
+type FinalizerDetailProps = DrawerScreenProps<
   AppDrawerParamList,
-  RouteEnum.FinalizerDetails
+  RouteEnum.FinalizerDetail
 >;
 
-export function FinalizerDetails({ route }: FinalizerDetailsProps) {
+export function FinalizerDetail({ route }: FinalizerDetailProps) {
   const finalizer =
     !!route.params && route.params.finalizer !== undefined
       ? route.params.finalizer

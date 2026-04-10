@@ -14,6 +14,7 @@ import ClockActiveWithCheck from '../../assets/icons/clock-active-with-check.svg
 import TriangleYellow from '../../assets/icons/triangle-yellow.svg';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from '../Components/RegText';
+import { formatSeconds } from '../../app/utils/Utils';
 
 const TAG_HEIGHT = 50;
 const COLLAPSED_SIZE = 52;
@@ -30,13 +31,16 @@ const CollapseMockIcon = () => (
 
 const StakingDayBubble: React.FC = () => {
   const context = useContext(ContextAppLoaded);
-  const { stakingDay, timeToStakingDaySeconds, timeLeftStakingDaySeconds } =
-    context;
+  const {
+    stakingDay,
+    timeToStakingDaySeconds: timeToStakingDay,
+    timeLeftStakingDaySeconds: timeLeftStakingDay,
+  } = context;
 
   const [expanded, setExpanded] = useState(false);
   const [anchorX, setAnchorX] = useState(0);
 
-  const leftAnim = useRef(new Animated.Value(0)).current;
+  const rightAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.25)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const contentOpacity = useRef(new Animated.Value(0)).current;
@@ -47,14 +51,14 @@ const StakingDayBubble: React.FC = () => {
 
   useEffect(() => {
     if (expanded) {
-      leftAnim.setValue(expandedStartLeft);
+      rightAnim.setValue(expandedStartLeft);
       scaleAnim.setValue(COLLAPSED_SIZE / EXPANDED_WIDTH);
       opacityAnim.setValue(1);
       contentOpacity.setValue(0);
       contentTranslate.setValue(-8);
 
       Animated.parallel([
-        Animated.timing(leftAnim, {
+        Animated.timing(rightAnim, {
           toValue: CENTER_LEFT,
           duration: 280,
           easing: Easing.out(Easing.cubic),
@@ -91,7 +95,7 @@ const StakingDayBubble: React.FC = () => {
           duration: 120,
           useNativeDriver: false,
         }),
-        Animated.timing(leftAnim, {
+        Animated.timing(rightAnim, {
           toValue: expandedStartLeft,
           duration: 240,
           easing: Easing.out(Easing.cubic),
@@ -114,7 +118,7 @@ const StakingDayBubble: React.FC = () => {
   }, [
     expanded,
     expandedStartLeft,
-    leftAnim,
+    rightAnim,
     scaleAnim,
     opacityAnim,
     contentOpacity,
@@ -122,15 +126,13 @@ const StakingDayBubble: React.FC = () => {
   ]);
 
   const isCalculating = useMemo(() => {
-    const value = stakingDay
-      ? timeLeftStakingDaySeconds
-      : timeToStakingDaySeconds;
+    const value = stakingDay ? timeLeftStakingDay : timeToStakingDay;
     return value === 0;
-  }, [stakingDay, timeLeftStakingDaySeconds, timeToStakingDaySeconds]);
+  }, [stakingDay, timeLeftStakingDay, timeToStakingDay]);
 
   const mainValue = stakingDay
-    ? timeLeftStakingDaySeconds
-    : timeToStakingDaySeconds;
+    ? formatSeconds(timeLeftStakingDay)
+    : formatSeconds(timeToStakingDay);
   const title = stakingDay ? 'Staking day active' : 'Staking day inactive';
   const gradientColors = [stakingDay ? '#002309' : '#553000', '#272727'];
 
@@ -168,7 +170,7 @@ const StakingDayBubble: React.FC = () => {
         style={[
           styles.expandedLayer,
           {
-            left: leftAnim,
+            right: rightAnim,
             opacity: opacityAnim,
             transform: [{ scaleX: scaleAnim }],
           },

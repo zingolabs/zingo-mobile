@@ -38,7 +38,7 @@ export enum RouteEnum {
   Redelegate = 'Redelegate',
   Finalizers = 'Finalizers',
   ScheduledActionDetail = 'ScheduledActionDetail',
-  FinalizerDetails = 'FinalizerDetails',
+  FinalizerDetail = 'FinalizerDetail',
 
   SettingsStack = 'SettingsStack',
   Notes = 'Notes',
