@@ -111,7 +111,7 @@ import { reverseHex32Bytes } from '../utils/hex';
 import SettingsNavigator from '../../components/Settings/SettingsNavigator';
 import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
 import ScheduledActionDetail from '../../components/ScheduledActions/ScheduledActionDetail';
-import { FinalizerDetails } from '../../components/Staking/Finalizers/FinalizerDetails';
+import { FinalizerDetail } from '../../components/Staking/Finalizers/FinalizerDetail';
 import { scheduleReminder } from '../../components/Staking/components/scheduleReminder';
 
 const LoadedAppStack = createNativeStackNavigator<LoadedAppStackParamList>();
@@ -137,7 +137,7 @@ type LoadedAppStackParamList = {
   [RouteEnum.Redelegate]: undefined;
   [RouteEnum.Finalizers]: undefined;
   [RouteEnum.ScheduledActionDetail]: undefined;
-  [RouteEnum.FinalizerDetails]: undefined;
+  [RouteEnum.FinalizerDetail]: undefined;
 };
 
 const en = require('../translations/en.json');
@@ -2298,8 +2298,8 @@ export class LoadedAppClass extends Component<
                 {props => <ValueTransferDetail {...props} />}
               </LoadedAppStack.Screen>
 
-              <LoadedAppStack.Screen name={RouteEnum.FinalizerDetails}>
-                {props => <FinalizerDetails {...props} />}
+              <LoadedAppStack.Screen name={RouteEnum.FinalizerDetail}>
+                {props => <FinalizerDetail {...props} />}
               </LoadedAppStack.Screen>
 
               <LoadedAppStack.Screen name={RouteEnum.ScannerAddress}>

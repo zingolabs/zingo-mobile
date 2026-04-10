@@ -36,6 +36,7 @@ import ZecAmount from '../Components/ZecAmount';
 import ScheduledActionsFileImpl from '../ScheduledActions/ScheduledActionsFileImpl';
 import Utils from '../../app/utils';
 import notifee from '@notifee/react-native';
+import StakingDayBubble from '../Staking/StakingDayBubble';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -225,6 +226,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
               navigation.goBack();
             }
           }}
+          ExtraComponent={<StakingDayBubble />}
         />
 
         <Text

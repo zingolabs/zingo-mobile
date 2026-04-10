@@ -44,6 +44,7 @@ import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsSt
 import ZecAmount from '../../Components/ZecAmount';
 import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
 import { scheduleReminder } from './scheduleReminder';
+import StakingDayBubble from '../StakingDayBubble';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -390,6 +391,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
               navigation.goBack();
             }
           }}
+          ExtraComponent={<StakingDayBubble />}
         />
 
         <Text

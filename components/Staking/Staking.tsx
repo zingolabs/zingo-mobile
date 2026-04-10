@@ -252,7 +252,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
         style={{ width: '100%' }}
         key={`tag-${index}`}
         onPress={() => {
-          navigation.navigate(RouteEnum.FinalizerDetails, {
+          navigation.navigate(RouteEnum.FinalizerDetail, {
             finalizer: item.finalizer,
           });
         }}
@@ -1006,7 +1006,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                                 {formatMovementDate(
                                   valueTransfers?.filter(
                                     vt => vt.txid === item.txid,
-                                  )[0].time,
+                                  )[0]?.time,
                                 )}
                               </Text>
                             </View>

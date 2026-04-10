@@ -46,6 +46,7 @@ import ChartPieIcon from '../../assets/icons/chart-pie.svg';
 import ZcashIcon from '../../assets/icons/zcash.svg';
 import ZecAmount from '../Components/ZecAmount';
 import { XIcon } from '../Components/Icons/XIcon';
+import StakingDayBubble from '../Staking/StakingDayBubble';
 
 type FinalizersProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -336,6 +337,7 @@ const Finalizers: React.FunctionComponent<FinalizersProps> = ({
             navigation.goBack();
           }
         }}
+        ExtraComponent={<StakingDayBubble />}
       />
 
       <View

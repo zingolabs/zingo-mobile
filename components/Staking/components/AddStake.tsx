@@ -41,6 +41,7 @@ import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import RegText from '../../Components/RegText';
 import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
 import { scheduleReminder } from './scheduleReminder';
+import StakingDayBubble from '../StakingDayBubble';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
 
@@ -257,6 +258,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
               navigation.goBack();
             }
           }}
+          ExtraComponent={<StakingDayBubble />}
         />
 
         <Text

@@ -147,8 +147,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <View
         style={
           {
-            "justifyContent": "center",
-            "width": 58,
+            "position": "absolute",
+            "right": 10,
+            "top": 0,
           }
         }
       />
