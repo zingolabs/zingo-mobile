@@ -64,7 +64,7 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
       if (b.status === WalletBondsStatusEnum.Withdrawn) return false;
       if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
-      return false;
+      if (!finalizerFromText) return false;
     })
     .sort((a, b) => b.amount - a.amount);
 
@@ -75,8 +75,6 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
   const totalUserStaked = walletBonds
     .filter(wb => wb.finalizer === finalizerFromText)
     .map(b => {
-      console.log('TOTAL USER STAKED:', b);
-
       return b.amount;
     })
     .reduce((a, b) => a + b);
