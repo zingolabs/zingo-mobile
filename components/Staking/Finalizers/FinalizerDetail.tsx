@@ -112,15 +112,18 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
     return (
       <FinalizerPosition
         bond={item}
-        onPresWithdraw={() => {}}
+        onPresWithdraw={() => {
+          navigation.navigate(RouteEnum.Unstake, {
+            finalizer: item.finalizer,
+            txid: item.txid,
+            staked: item.amount,
+          });
+        }}
         onPressRedelegate={() => {
           navigation.navigate(RouteEnum.Redelegate, {
             finalizer: item.finalizer,
             txid: item.txid,
             staked: item.amount,
-            closeSheet: () => {
-              navigation.navigate(RouteEnum.StakingHome);
-            },
           });
         }}
         onPressUnstake={() => {
@@ -128,9 +131,6 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
             finalizer: item.finalizer,
             txid: item.txid,
             staked: item.amount,
-            closeSheet: () => {
-              navigation.navigate(RouteEnum.StakingHome);
-            },
           });
         }}
       />

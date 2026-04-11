@@ -42,7 +42,6 @@ const StakingActions: React.FC<StakingActionsProps> = () => {
               finalizer: undefined,
               txid: undefined,
               staked: undefined,
-              closeSheet: () => {},
             })
           }
           style={{
