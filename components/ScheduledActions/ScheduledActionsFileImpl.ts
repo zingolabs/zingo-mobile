@@ -1,6 +1,6 @@
 import * as RNFS from 'react-native-fs';
 
-import { ScheduledActionType, GlobalConst } from '../../app/AppState';
+import { GlobalConst, ScheduledActionType } from '../../app/AppState';
 
 export default class ScheduledActionsFileImpl {
   static async getFileName() {
@@ -25,7 +25,7 @@ export default class ScheduledActionsFileImpl {
     this.writeSA(empty);
   }
 
-  static async listSA(): Promise<ScheduledActionType[]> {
+  static async listActions(): Promise<ScheduledActionType[]> {
     try {
       const fileName = await this.getFileName();
       const fileExits: boolean = await RNFS.exists(fileName);
@@ -44,49 +44,35 @@ export default class ScheduledActionsFileImpl {
     }
   }
 
-  static async addSA(
-    item: ScheduledActionType,
+  static async addAction(
+    action: ScheduledActionType,
   ): Promise<ScheduledActionType[]> {
     try {
-      const list: ScheduledActionType[] = await this.listSA();
-      const maxId = list.length > 0 ? Math.max(...list.map(a => a.id)) : 0;
-      let newItem: ScheduledActionType = item;
+      const actions: ScheduledActionType[] = await this.listActions();
+
+      const maxId =
+        actions.length > 0 ? Math.max(...actions.map(a => a.id)) : 0;
+      let newItem: ScheduledActionType = action;
       newItem.id = maxId + 1;
-      list.push(newItem);
-      this.writeSA(list);
-      return list;
+      actions.push(newItem);
+
+      this.writeSA(actions);
+      return actions;
     } catch (err) {
       console.log(err);
       return [] as ScheduledActionType[];
     }
   }
 
-  static async removeSA(id: number): Promise<ScheduledActionType[]> {
+  static async removeAction(id: number): Promise<ScheduledActionType[]> {
     try {
-      const list: ScheduledActionType[] = await this.listSA();
-      const newList: ScheduledActionType[] = list.filter(i => i.id !== id);
-      this.writeSA(newList);
-      return newList;
-    } catch (err) {
-      console.log(err);
-      return [] as ScheduledActionType[];
-    }
-  }
+      const actions: ScheduledActionType[] = await this.listActions();
+      const newActions: ScheduledActionType[] = actions.filter(
+        i => i.id !== id,
+      );
 
-  static async updateNotifeeIdSA(
-    id: number,
-    notifeeId: string,
-  ): Promise<ScheduledActionType[]> {
-    try {
-      const list: ScheduledActionType[] = await this.listSA();
-      const newItem: ScheduledActionType = list.filter(i => i.id === id)[0];
-      newItem.notifeeId = notifeeId;
-      const newList: ScheduledActionType[] = [
-        ...list.filter(i => i.id !== id),
-        newItem,
-      ];
-      this.writeSA(newList);
-      return newList;
+      this.writeSA(newActions);
+      return newActions;
     } catch (err) {
       console.log(err);
       return [] as ScheduledActionType[];

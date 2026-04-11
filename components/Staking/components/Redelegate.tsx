@@ -45,6 +45,7 @@ import ZecAmount from '../../Components/ZecAmount';
 import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
 import { scheduleReminder } from './scheduleReminder';
 import StakingDayBubble from '../StakingDayBubble';
+import notifee from '@notifee/react-native';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -232,19 +233,11 @@ const Redelegate: React.FC<RedelegateProps> = ({
 
     setModalState('sending');
 
-    const TITLE = 'Your redelegate action is ready to be executed!';
-    const BODY = 'TODO: Action details';
-
     try {
       if (selectedKind === WalletBondsStatusEnum.Active) {
         if (stakingDay) {
           await redelegateTransaction(bondKey, finalizerToText);
         } else {
-          const notifeeId = await scheduleReminder({
-            seconds: timeToStakingDay,
-            title: TITLE,
-            body: BODY,
-          });
           const stakingScheduledAction: ScheduledActionType = {
             id: 0,
             kind: StakingActionKindEnum.Move,
@@ -256,14 +249,15 @@ const Redelegate: React.FC<RedelegateProps> = ({
             finalizerTo: finalizerToText,
             txid: bondTxid,
             bondKey: bondKey,
-            notifeeId: notifeeId ? notifeeId : '',
-            title: TITLE,
-            body: BODY,
           };
-          const list = await ScheduledActionsFileImpl.addSA(
+          const list = await ScheduledActionsFileImpl.addAction(
             stakingScheduledAction,
           );
           setScheduledActions(list);
+          await scheduleReminder({
+            seconds: timeToStakingDay,
+            numberActions: list.length,
+          });
         }
       } else {
         Alert.alert(
@@ -278,10 +272,13 @@ const Redelegate: React.FC<RedelegateProps> = ({
         stakingDay &&
         scheduledActions.filter(sa => sa.txid === bondTxid).length > 0
       ) {
-        const list = await ScheduledActionsFileImpl.removeSA(
+        const list = await ScheduledActionsFileImpl.removeAction(
           scheduledActions.filter(sa => sa.txid === bondTxid)[0].id,
         );
         setScheduledActions(list);
+        if (list.length === 0) {
+          await notifee.cancelAllNotifications();
+        }
       }
 
       setModalState('success');

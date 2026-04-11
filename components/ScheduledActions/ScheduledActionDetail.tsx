@@ -37,6 +37,10 @@ import ScheduledActionsFileImpl from '../ScheduledActions/ScheduledActionsFileIm
 import Utils from '../../app/utils';
 import notifee from '@notifee/react-native';
 import StakingDayBubble from '../Staking/StakingDayBubble';
+import LinearGradient from 'react-native-linear-gradient';
+import Zap from '../../assets/icons/zap.svg';
+import Clipboard from '../../assets/icons/clipboard.svg';
+import { formatSeconds } from '../../app/utils/Utils';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -80,8 +84,14 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers, stakingDay, setScheduledActions, info, walletBonds } =
-    context;
+  const {
+    valueTransfers,
+    stakingDay,
+    setScheduledActions,
+    info,
+    walletBonds,
+    timeToStakingDaySeconds: timeToStakingDay,
+  } = context;
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -93,9 +103,11 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
   }, []);
 
   const handleCancelPress = async () => {
-    const list = await ScheduledActionsFileImpl.removeSA(item.id);
+    const list = await ScheduledActionsFileImpl.removeAction(item.id);
     setScheduledActions(list);
-    await notifee.cancelNotification(item.notifeeId);
+    if (list.length === 0) {
+      await notifee.cancelAllNotifications();
+    }
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -168,9 +180,11 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
         return;
       }
 
-      const list = await ScheduledActionsFileImpl.removeSA(item.id);
+      const list = await ScheduledActionsFileImpl.removeAction(item.id);
       setScheduledActions(list);
-      await notifee.cancelNotification(item.notifeeId);
+      if (list.length === 0) {
+        await notifee.cancelAllNotifications();
+      }
 
       setModalState('success');
     } catch (error: any) {
@@ -198,6 +212,8 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
       navigation.goBack();
     }
   };
+
+  const mainValue = formatSeconds(timeToStakingDay);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -241,14 +257,41 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
         >
           {`Review your ${
             item.kind === StakingActionKindEnum.CreateBond
-              ? 'staking action'
+              ? 'Staking action program list'
               : item.kind === StakingActionKindEnum.BeginUnbonding
-                ? 'Unstaking action'
+                ? 'Unstaking action program list'
                 : item.kind === StakingActionKindEnum.WithdrawBond
-                  ? 'Withdrawing action'
-                  : 'Redelegatation'
+                  ? 'Withdrawing action program list'
+                  : 'Redelegating action program list'
           }`}
         </Text>
+
+        <LinearGradient
+          colors={[stakingDay ? '#002309' : '#553000', '#272727']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            borderRadius: 100,
+            width: '100%',
+            marginTop: 20,
+            flexDirection: 'row',
+            gap: 10,
+            alignItems: 'center',
+            paddingHorizontal: 15,
+            paddingVertical: 8,
+          }}
+        >
+          {stakingDay ? (
+            <Zap width={18} height={18} />
+          ) : (
+            <Clipboard width={18} height={18} />
+          )}
+          <RegText style={{ color: stakingDay ? '#00A82A' : '#FFA100' }}>
+            {stakingDay
+              ? 'Executes immediately'
+              : `Staking day active in ${mainValue}`}
+          </RegText>
+        </LinearGradient>
 
         <View
           style={{
