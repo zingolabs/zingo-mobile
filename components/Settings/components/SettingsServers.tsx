@@ -221,9 +221,11 @@ const SettingsServers: React.FunctionComponent<SettingsServersProps> = ({
       </View>
       <View
         style={{
-          marginTop: 31,
+          marginTop: 'auto',
           alignItems: 'center',
           justifyContent: 'center',
+          paddingTop: 10,
+          paddingBottom: 20,
           paddingHorizontal: 20,
         }}
       >
@@ -234,6 +236,7 @@ const SettingsServers: React.FunctionComponent<SettingsServersProps> = ({
               ? changeServerTesnet
               : changeServerRegtest
           }
+          style={{ alignSelf: 'stretch' }}
         />
       </View>
     </ToastProvider>

@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
@@ -15,19 +14,14 @@ import TriangleYellow from '../../assets/icons/triangle-yellow.svg';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from '../Components/RegText';
 import { formatSeconds } from '../../app/utils/Utils';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 const TAG_HEIGHT = 50;
 const COLLAPSED_SIZE = 52;
 const EXPANDED_WIDTH = 210;
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CENTER_LEFT = (SCREEN_WIDTH - EXPANDED_WIDTH) / 2;
-
-const CollapseMockIcon = () => (
-  <View style={styles.collapseMockIcon}>
-    <View style={styles.collapseMockIconLine} />
-    <View style={[styles.collapseMockIconLine, { marginTop: 3 }]} />
-  </View>
-);
 
 const StakingDayBubble: React.FC = () => {
   const context = useContext(ContextAppLoaded);
@@ -155,7 +149,7 @@ const StakingDayBubble: React.FC = () => {
           style={styles.smallBubble}
         >
           {expanded ? (
-            <CollapseMockIcon />
+            <FontAwesomeIcon icon={faXmark} size={22} color={'#A8A8A8'} />
           ) : stakingDay ? (
             <ClockActiveWithCheck width={28} height={28} />
           ) : (

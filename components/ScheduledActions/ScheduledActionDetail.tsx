@@ -431,10 +431,11 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
         {/* Bottom CTA */}
         <View
           style={{
+            marginTop: 'auto',
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            paddingTop: 20,
+            paddingTop: 10,
             paddingBottom: 20,
             gap: 10,
           }}

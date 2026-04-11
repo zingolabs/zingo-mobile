@@ -251,16 +251,18 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({ onClickOK }) => {
         </ScrollView>
         <View
           style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
+            marginTop: 'auto',
             alignItems: 'center',
-            marginVertical: 5,
+            justifyContent: 'center',
+            paddingTop: 10,
+            paddingBottom: 20,
+            paddingHorizontal: 15,
           }}
         >
           <LiquidPrimaryButton
             title={!!texts && !!texts.new ? texts.new[0] : ''}
             onPress={() => onClickOKHide()}
+            style={{ alignSelf: 'stretch' }}
           />
         </View>
       </View>

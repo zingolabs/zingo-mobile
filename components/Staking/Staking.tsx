@@ -362,7 +362,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
             marginHorizontal: 20,
           }}
         >
-          <View
+          <TouchableOpacity
             style={{
               flexGrow: 1,
               flexDirection: 'row',
@@ -373,8 +373,10 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
               padding: 5,
               overflow: 'hidden',
             }}
+            onPress={() => setTab('scheduled')}
+            hitSlop={10}
           >
-            <TouchableOpacity onPress={() => setTab('scheduled')}>
+            <View>
               <RegText
                 style={{
                   fontWeight: tab === 'scheduled' ? 'bold' : 'normal',
@@ -384,9 +386,9 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
               >
                 {'Scheduled'}
               </RegText>
-            </TouchableOpacity>
-          </View>
-          <View
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={{
               flexGrow: 1,
               flexDirection: 'row',
@@ -397,8 +399,10 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
               padding: 5,
               overflow: 'hidden',
             }}
+            onPress={() => setTab('active')}
+            hitSlop={10}
           >
-            <TouchableOpacity onPress={() => setTab('active')}>
+            <View>
               <RegText
                 style={{
                   fontWeight: tab === 'active' ? 'bold' : 'normal',
@@ -408,9 +412,9 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
               >
                 {'Active Stake'}
               </RegText>
-            </TouchableOpacity>
-          </View>
-          <View
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={{
               flexGrow: 1,
               flexDirection: 'row',
@@ -421,8 +425,10 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
               padding: 5,
               overflow: 'hidden',
             }}
+            onPress={() => setTab('my')}
+            hitSlop={10}
           >
-            <TouchableOpacity onPress={() => setTab('my')}>
+            <View>
               <RegText
                 style={{
                   fontWeight: tab === 'my' ? 'bold' : 'normal',
@@ -432,8 +438,8 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
               >
                 {'My Finalizers'}
               </RegText>
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
         </View>
 
         <View
