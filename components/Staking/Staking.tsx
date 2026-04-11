@@ -49,12 +49,6 @@ import { faAngleUp, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 import { isLiquidGlassSupported } from '@callstack/liquid-glass';
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
-import FinalizerDetail from './components/FinalizerDetail';
 import { lifehashDataUrlFromStringSync } from '../../app/utils/lifehash';
 import ZecAmount from '../Components/ZecAmount';
 import { WalletBondsStatusEnum } from '../../app/AppState/enums/WalletBondsStatusEnum';
@@ -117,10 +111,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
   const [tab, setTab] = useState<'scheduled' | 'active' | 'my'>(tabParam);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
-  const [heightLayout, setHeightLayout] = useState<number>(10);
-  const [currentItem, setCurrentItem] = useState<DataType | null>(null);
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const dimensions = {
@@ -135,34 +126,6 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
       setTab(route.params.tab);
     }
   }, [route.params, route.params?.tab]);
-
-  const snapPoints = useMemo(() => {
-    let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
-    if (snap1 < 1) {
-      snap1 = 1;
-    }
-    let snap2: number = 80;
-    if (snap1 < 80) {
-      snap2 = snap1 + 20;
-    }
-    return [`${snap1}%`, `${snap2}%`];
-  }, [heightLayout]);
-
-  const hide = useCallback(() => {
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
-    setHeightLayout(10);
-    setCurrentItem(null);
-  }, []);
-
-  const renderBackdrop = (props: BottomSheetBackdropProps) => (
-    <BottomSheetBackdrop
-      {...props}
-      disappearsOnIndex={-1}
-      appearsOnIndex={0}
-      pressBehavior="close"
-    />
-  );
 
   const movements: WalletBondsType[] = useMemo(() => {
     if (!walletBonds) {
@@ -1051,7 +1014,6 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                                     finalizer: item.finalizer,
                                     txid: item.txid,
                                     staked: item.amount,
-                                    closeSheet: () => {},
                                   });
                                 }}
                               />
@@ -1064,7 +1026,6 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                                     finalizer: item.finalizer,
                                     txid: item.txid,
                                     staked: item.amount,
-                                    closeSheet: () => {},
                                   });
                                 }}
                               />
@@ -1080,7 +1041,6 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                                   finalizer: item.finalizer,
                                   txid: item.txid,
                                   staked: item.amount,
-                                  closeSheet: () => {},
                                 });
                               }}
                             />
@@ -1162,41 +1122,6 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
           </View>
         </View>
       </View>
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enableDynamicSizing={false}
-        enablePanDownToClose
-        keyboardBehavior={'interactive'}
-        handleStyle={{ display: 'none' }}
-        backgroundStyle={{ backgroundColor: colors.background }}
-        backdropComponent={renderBackdrop}
-      >
-        <BottomSheetView
-          style={{
-            backgroundColor: 'rgba(36, 36, 38, 1)',
-            height: '100%',
-            borderTopLeftRadius: 38,
-            borderTopRightRadius: 38,
-          }}
-        >
-          {tab === 'my' && currentItem && (
-            <>
-              <FinalizerDetail
-                item={currentItem}
-                closeSheet={hide}
-                setHeightLayout={setHeightLayout}
-              />
-              <View
-                style={{
-                  height: Platform.OS === GlobalConst.platformOSios ? 100 : 10,
-                }}
-              />
-            </>
-          )}
-        </BottomSheetView>
-      </BottomSheet>
     </ToastProvider>
   );
 };

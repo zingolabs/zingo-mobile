@@ -70,10 +70,6 @@ const Redelegate: React.FC<RedelegateProps> = ({
     !!route.params && route.params.staked !== undefined
       ? route.params.staked
       : 0;
-  const closeSheet =
-    !!route.params && route.params.closeSheet !== undefined
-      ? route.params.closeSheet
-      : () => {};
 
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
@@ -295,7 +291,6 @@ const Redelegate: React.FC<RedelegateProps> = ({
 
   const handleViewMovements = () => {
     setModalState('idle');
-    closeSheet();
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
