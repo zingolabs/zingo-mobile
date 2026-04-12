@@ -13,10 +13,8 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
-import { IndexerList } from '../utils/Utils';
 
 export default interface AppContextLoading {
-  indexerList: IndexerList;
   // context
   netInfo: NetInfoType;
   wallet: WalletType;

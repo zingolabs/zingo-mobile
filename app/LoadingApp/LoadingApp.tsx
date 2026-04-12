@@ -77,10 +77,9 @@ import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
-import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
-import { getIndexerList, IndexerList } from '../utils/Utils';
-import SelectNetworkNavigator from './components/SelectNetworkNavigator';
+import SelectNetwork from './components/SelectNetwork';
 import ConnectIndexer from './components/ConnectIndexer';
+import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -408,7 +407,6 @@ export class LoadingAppClass extends Component<
     super(props);
 
     this.state = {
-      indexerList: [] as IndexerList,
       // context
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
@@ -487,10 +485,6 @@ export class LoadingAppClass extends Component<
       },
       //actionButtonsDisabled: !netInfoState.isConnected ? true : false,
     });
-
-    const indexerList = await getIndexerList();
-
-    this.setState({ indexerList: indexerList });
 
     this.fetchZingolibVersion();
 
@@ -1074,6 +1068,8 @@ export class LoadingAppClass extends Component<
       };
     }
 
+    console.log(indexerServerUri);
+
     this.setState({ actionButtonsDisabled: true });
 
     try {
@@ -1082,17 +1078,14 @@ export class LoadingAppClass extends Component<
         this.state.translate,
       );
 
-      console.log('checkIndexerServer uri: ', uri);
-
       if (!uri || uri.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log('checkIndexerServer error: ', uri);
         return {
           result: false,
           indexerServerUriParsed: indexerServerUri,
         };
       }
 
-      const latency = await pingIndexerServer(indexerServerUri);
+      const latency = await pingIndexerServer(uri);
 
       if (latency !== null) {
         return {
@@ -1101,7 +1094,6 @@ export class LoadingAppClass extends Component<
         };
       }
 
-      console.log('checkIndexerServer error default: ', uri);
       return {
         result: false,
         indexerServerUriParsed: indexerServerUri,
@@ -1625,8 +1617,7 @@ export class LoadingAppClass extends Component<
             />
           )}
           {screen === 0.5 && (
-            <SelectNetworkNavigator
-              indexerList={this.state.indexerList}
+            <SelectNetwork
               actionButtonsDisabled={actionButtonsDisabled}
               setIndexerServer={this.setIndexerServer}
               checkIndexerServer={this.checkIndexerServer}
@@ -1641,7 +1632,8 @@ export class LoadingAppClass extends Component<
               setIndexerServer={this.setIndexerServer}
               checkIndexerServer={this.checkIndexerServer}
               closeServers={this.closeServers}
-              fromSettings={true}
+              fromSettings={fromSettings}
+              goSelectNetwork={this.goSelectNetwork}
             />
           )}
           {screen === 1 && (
