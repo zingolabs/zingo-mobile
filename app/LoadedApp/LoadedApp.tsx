@@ -2300,31 +2300,15 @@ export class LoadedAppClass extends Component<
               </LoadedAppStack.Screen>
 
               <LoadedAppStack.Screen name={RouteEnum.Stake}>
-                {props => (
-                  <AddStakeScreen
-                    {...props}
-                    stakeTransaction={this.stakeTransaction}
-                  />
-                )}
+                {props => <AddStakeScreen {...props} />}
               </LoadedAppStack.Screen>
 
               <LoadedAppStack.Screen name={RouteEnum.Unstake}>
-                {props => (
-                  <Unstake
-                    {...props}
-                    beginUnstakeTransaction={this.beginUnstakeTransaction}
-                    withdrawBondTransaction={this.withdrawBondTransaction}
-                  />
-                )}
+                {props => <Unstake {...props} />}
               </LoadedAppStack.Screen>
 
               <LoadedAppStack.Screen name={RouteEnum.Redelegate}>
-                {props => (
-                  <Redelegate
-                    {...props}
-                    redelegateTransaction={this.redelegateTransaction}
-                  />
-                )}
+                {props => <Redelegate {...props} />}
               </LoadedAppStack.Screen>
 
               <LoadedAppStack.Screen name={RouteEnum.ScheduledActionDetail}>

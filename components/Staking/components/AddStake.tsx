@@ -31,7 +31,6 @@ import {
   StakingActionKindEnum,
   ToAddrClass,
 } from '../../../app/AppState';
-import { StakingActionType } from '../../../app/AppState';
 import { ContextAppLoaded } from '../../../app/context';
 import Utils from '../../../app/utils';
 import FadeText from '../../Components/FadeText';
@@ -39,8 +38,6 @@ import ZecAmount from '../../Components/ZecAmount';
 import { HeaderTitle } from '../../Header';
 import ChevronDown from '../../../assets/icons/chevron-down.svg';
 import RegText from '../../Components/RegText';
-import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
-import { scheduleReminder } from './scheduleReminder';
 import StakingDayBubble from '../StakingDayBubble';
 
 const PRESET_AMOUNTS = [0.01, 0.1, 1, 10];
@@ -50,16 +47,9 @@ type ModalState = 'idle' | 'sending' | 'success';
 type AddStakeScreenProps = DrawerScreenProps<
   AppDrawerParamList,
   RouteEnum.Stake
-> & {
-  stakeTransaction: (
-    sendPageState: SendPageStateClass,
-    stakingAction: StakingActionType,
-  ) => Promise<string>;
-};
+>;
 
-const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
-  stakeTransaction,
-}) => {
+const AddStakeScreen: React.FC<AddStakeScreenProps> = () => {
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
@@ -69,9 +59,7 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
     privacy,
     globalStaked,
     stakingDay,
-    setScheduledActions,
     scheduledActions,
-    timeToStakingDaySeconds: timeToStakingDay,
   } = useContext(ContextAppLoaded);
 
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
@@ -170,59 +158,23 @@ const AddStakeScreen: React.FC<AddStakeScreenProps> = ({
       8,
     );
 
-    setModalState('sending');
-
-    const stakingAction: StakingActionType = {
-      kind: StakingActionKindEnum.CreateBond,
-      val: amount * 10 ** 8,
-      target: finalizer,
-      unique_public_key: 'IGNORE THIS. RUST PUTS SOMETHING HERE',
-    };
-
     // testing... remove it for production.
     //Alert.alert('TESTING', 'in 60 seconds you will have a notification');
     //await scheduleReminder({ seconds: 60, title: TITLE, body: BODY });
 
-    try {
-      if (stakingDay) {
-        await stakeTransaction(sendPageState, stakingAction);
-      } else {
-        const stakingScheduledAction: ScheduledActionType = {
-          id: 0,
-          kind: StakingActionKindEnum.CreateBond,
-          amount: amount * 10 ** 8,
-          finalizer: finalizer,
-          finalizerTo: '',
-          txid: '',
-          bondKey: '',
-        };
-        const list = await ScheduledActionsFileImpl.addAction(
-          stakingScheduledAction,
-        );
-        setScheduledActions(list);
-        await scheduleReminder({
-          seconds: timeToStakingDay,
-          numberActions: list.length,
-        });
-      }
-      setModalState('success');
-    } catch (error: any) {
-      console.warn('Stake tx failed:', error);
-      setModalState('idle');
-      if (JSON.stringify(error).toLowerCase().includes('window')) {
-        navigation.navigate(RouteEnum.ComputingError, {
-          error: `Transaction outside of staking window.`,
-        });
-      } else if (
-        JSON.stringify(error).toLowerCase().includes('staking action delay')
-      ) {
-        navigation.navigate(RouteEnum.ComputingError, {
-          error: `Cannot operate on the same staking action in the same window.`,
-        });
-      } else {
-        navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
-      }
-    }
+    // confirm screen
+    const item: ScheduledActionType = {
+      id: 0,
+      kind: StakingActionKindEnum.CreateBond,
+      amount: amount * 10 ** 8,
+      finalizer: finalizer,
+      finalizerTo: '',
+      txid: '',
+      bondKey: '',
+    };
+    navigation.navigate(RouteEnum.ScheduledActionDetail, {
+      item,
+    });
   };
 
   const handleViewMovements = () => {
