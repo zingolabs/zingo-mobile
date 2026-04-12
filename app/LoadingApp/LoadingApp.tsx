@@ -77,7 +77,6 @@ import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
-import ConnectIndexer from './components/ConnectIndexer';
 import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
 import { getIndexerList, IndexerList } from '../utils/Utils';
 import SelectNetworkNavigator from './components/SelectNetworkNavigator';
@@ -1635,16 +1634,15 @@ export class LoadingAppClass extends Component<
               goConnectIndexer={this.goConnectIndexer}
             />
           )}
-          {screen === 0.55 && (
+          {/* {screen === 0.55 && (
             <ConnectIndexer
               actionButtonsDisabled={actionButtonsDisabled}
               setIndexerServer={this.setIndexerServer}
               checkIndexerServer={this.checkIndexerServer}
               closeServers={this.closeServers}
               fromSettings={fromSettings}
-              goSelectNetwork={this.goSelectNetwork}
             />
-          )}
+          )} */}
           {screen === 1 && (
             <StartMenu
               actionButtonsDisabled={actionButtonsDisabled}

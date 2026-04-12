@@ -34,12 +34,14 @@ export type ServerListScreenProps = {
     indexerServerChainName: ChainNameEnum,
   ) => Promise<{ result: boolean; indexerServerUriParsed: string }>;
   indexerList: IndexerList;
+  closeServers: () => void;
 };
 
 export const ServerListScreen: React.FC<ServerListScreenProps> = ({
   checkIndexerServer,
   setIndexerServer,
   indexerList,
+  closeServers,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType; // TODO: FIX
   const insets = useSafeAreaInsets();
@@ -95,6 +97,7 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
 
     await setIndexerServer(selectedServer.url, ChainNameEnum.testChainName);
     Keyboard.dismiss();
+    closeServers();
   };
 
   return (

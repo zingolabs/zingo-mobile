@@ -6,8 +6,9 @@ import { ChainNameEnum } from '../../AppState';
 import { IndexerList } from '../../utils/Utils';
 import { ServerListScreen } from './ServerListScreen';
 import { SelectNetworkHomeScreen } from './SelectNetworkHomeScreen';
+import ConnectIndexer from './ConnectIndexer';
 
-type SelectNetworkProps = {
+export type SelectNetworkProps = {
   actionButtonsDisabled: boolean;
   setIndexerServer: (u: string, c: ChainNameEnum) => Promise<void>;
   checkIndexerServer: (
@@ -20,9 +21,12 @@ type SelectNetworkProps = {
   indexerList: IndexerList;
 };
 
-type SelectNetworkStackParamList = {
+export type SelectNetworkStackParamList = {
   SelectNetworkHome: undefined;
   ServerList: undefined;
+  ConnectIndexer: {
+    chainName: ChainNameEnum;
+  };
 };
 
 const Stack = createNativeStackNavigator<SelectNetworkStackParamList>();
@@ -56,6 +60,25 @@ const SelectNetworkNavigator: React.FC<SelectNetworkProps> = props => {
             indexerList={props.indexerList}
             setIndexerServer={props.setIndexerServer}
             checkIndexerServer={props.checkIndexerServer}
+            closeServers={props.closeServers}
+          />
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen
+        name="ConnectIndexer"
+        options={{
+          headerShown: false,
+        }}
+      >
+        {screenProps => (
+          <ConnectIndexer
+            {...screenProps}
+            actionButtonsDisabled={props.actionButtonsDisabled}
+            setIndexerServer={props.setIndexerServer}
+            checkIndexerServer={props.checkIndexerServer}
+            closeServers={props.closeServers}
+            fromSettings={props.fromSettings}
           />
         )}
       </Stack.Screen>
