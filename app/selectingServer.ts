@@ -15,6 +15,7 @@ export async function pingIndexerServer(
       const resp: string = await RPCModule.getLatestBlockServerInfo(uri);
 
       if (isErrorResp(resp)) {
+        console.warn('pingIndexerServer RPC error', uri, resp);
         return null;
       }
 

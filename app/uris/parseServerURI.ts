@@ -1,60 +1,36 @@
-import Url from 'url-parse';
 import { GlobalConst, TranslateType } from '../AppState';
 
 const parseServerURI = (
-  uri: string,
+  rawUri: string,
   translate: (key: string) => TranslateType,
 ): string => {
-  if (!uri || uri === '') {
+  const trimmed = rawUri?.trim();
+
+  if (!trimmed) {
     return `error: ${translate('uris.baduri')}`;
   }
 
-  const parsedUri = new Url(uri, true);
-  console.log('PARSED URI ->', parsedUri);
-  if (
-    !parsedUri ||
-    !parsedUri.hostname ||
-    !parsedUri.protocol ||
-    (parsedUri.protocol !== GlobalConst.http &&
-      parsedUri.protocol !== GlobalConst.https)
-  ) {
-    return `error: ${translate('uris.baduri')}`;
-  }
+  const normalizedInput = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
 
-  let port = parsedUri.port;
+  try {
+    const parsed = new URL(normalizedInput);
+    const protocol = parsed.protocol.replace(':', '');
 
-  if (!port) {
-    // I need to verify if the URI have a standard port like `443` or `80`
-    if (
-      parsedUri.protocol === GlobalConst.http &&
-      uri.endsWith(':' + GlobalConst.port80)
-    ) {
-      // looking for 80
-      port = GlobalConst.port80;
+    if (protocol !== 'http' && protocol !== 'https') {
+      return `error: ${translate('uris.baduri')}`;
     }
-    if (
-      parsedUri.protocol === GlobalConst.https &&
-      uri.endsWith(':' + GlobalConst.port443)
-    ) {
-      // looking for 443
-      port = GlobalConst.port443;
-    }
-    // by default              -> 9067
-    // for some `lightwalletd` ->  443
-    // for `zec.rocks`         ->  443
+
+    let port = parsed.port;
+
     if (!port) {
-      port =
-        uri.includes('na.lightwalletd') ||
-        uri.includes('sa.lightwalletd') ||
-        uri.includes('eu.lightwalletd') ||
-        uri.includes('ai.lightwalletd') ||
-        uri.includes('zec.rocks')
-          ? GlobalConst.port443
-          : GlobalConst.port9067;
+      port = protocol === 'http' ? GlobalConst.port80 : GlobalConst.port443;
     }
+
+    return `${protocol}://${parsed.hostname}:${port}`;
+  } catch {
+    return `error: ${translate('uris.baduri')}`;
   }
-
-  return `${parsedUri.protocol}//${parsedUri.hostname}:${port}`;
 };
-
 export default parseServerURI;
