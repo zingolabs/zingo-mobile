@@ -572,27 +572,3 @@ export function formatSeconds(totalSeconds: number): string {
 
   return `${minutes}min ${seconds}sec`;
 }
-
-export type IndexerList = Indexer[];
-
-export type Indexer = {
-  url: string;
-};
-
-export type IndexerListResponse = {
-  data: {
-    indexers: Indexer[];
-  };
-};
-
-export async function getIndexerList(): Promise<IndexerList> {
-  const response = await fetch('https://cl-indexer-aggregator.vercel.app/api');
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  console.log('response', response);
-  const json = (await response.json()) as IndexerListResponse;
-  console.log('json', json.data.indexers);
-  return json.data.indexers;
-}
