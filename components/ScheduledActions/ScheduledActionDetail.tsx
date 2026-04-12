@@ -488,8 +488,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
               marginTop: 20,
             }}
           >
-            This action will be queued and exectuted automatically at the start
-            of the next staking day.
+            You'll be notified when this action can be executed.
           </RegText>
         )}
 
