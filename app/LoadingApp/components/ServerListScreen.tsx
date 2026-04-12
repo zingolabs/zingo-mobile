@@ -1,4 +1,5 @@
-import React, { useContext, useMemo, useState } from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { ActivityIndicator, Keyboard, Pressable, View } from 'react-native';
 import { ChainNameEnum } from '../../AppState';
@@ -9,8 +10,7 @@ import FadeText from '../../../components/Components/FadeText';
 import { FlatList } from 'react-native-gesture-handler';
 import RegText from '../../../components/Components/RegText';
 import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
-import { ContextAppLoaded } from '../../context';
+import { faCheck, faX } from '@fortawesome/free-solid-svg-icons';
 import { Indexer, IndexerList } from '../../utils/Utils';
 
 const IOS_LIST_SEPARATOR = 'rgba(60,60,67,0.36)';
@@ -25,37 +25,35 @@ export type ServerOption = {
 };
 
 export type ServerListScreenProps = {
-  serverOptions: ServerOption[];
+  // serverOptions: ServerOption[];
   initialSelectedUri?: string;
   initialSelectedChainName?: ChainNameEnum;
-  actionButtonsDisabled: boolean;
   setIndexerServer: (u: string, c: ChainNameEnum) => Promise<void>;
   checkIndexerServer: (
     indexerServerUri: string,
     indexerServerChainName: ChainNameEnum,
   ) => Promise<{ result: boolean; indexerServerUriParsed: string }>;
-  goConnectIndexer: () => void;
   indexerList: IndexerList;
 };
 
 export const ServerListScreen: React.FC<ServerListScreenProps> = ({
-  serverOptions,
-  actionButtonsDisabled,
   checkIndexerServer,
   setIndexerServer,
-  goConnectIndexer,
   indexerList,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme() as unknown as ThemeType; // TODO: FIX
   const insets = useSafeAreaInsets();
 
   const [selectedServer, setSelectedServer] = useState<Indexer | null>(null);
   const [connected, setConnected] = useState<boolean | null>(null);
   const [borderColor, setBorderColor] = useState<string>('transparent');
-
-  console.log('selectedServer', selectedServer);
+  const [isTestingSelected, setIsTestingSelected] = useState(false);
 
   const onSelectServer = (item: Indexer) => {
+    if (isTestingSelected) {
+      return;
+    }
+
     const isSame = selectedServer?.url === item.url;
 
     if (isSame) {
@@ -74,26 +72,20 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
 
     setConnected(null);
     setBorderColor('transparent');
+    setIsTestingSelected(true);
 
-    const { result, indexerServerUriParsed } = await checkIndexerServer(
-      'https://' + selectedServer.url,
-      ChainNameEnum.testChainName,
-    );
+    try {
+      const { result } = await checkIndexerServer(
+        'http://' + selectedServer.url,
+        ChainNameEnum.testChainName,
+      );
 
-    console.log('RESULT =', result, indexerServerUriParsed);
-
-    const matchedParsedServer = serverOptions.find(
-      s => s.uri === indexerServerUriParsed,
-    ) ?? {
-      ...selectedServer,
-      uri: indexerServerUriParsed,
-    };
-
-    setSelectedServer(matchedParsedServer);
-    setConnected(result);
-    setBorderColor(result ? '#0E9634' : '#ff383c');
-
-    Keyboard.dismiss();
+      setConnected(result);
+      setBorderColor(result ? '#0E9634' : '#ff383c');
+    } finally {
+      setIsTestingSelected(false);
+      Keyboard.dismiss();
+    }
   };
 
   const onContinue = async () => {
@@ -101,9 +93,8 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
       return;
     }
 
-    await setIndexerServer(selectedServer.url, selectedServer.chainName);
+    await setIndexerServer(selectedServer.url, ChainNameEnum.testChainName);
     Keyboard.dismiss();
-    goConnectIndexer();
   };
 
   return (
@@ -146,21 +137,15 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
           }}
           data={indexerList}
           keyExtractor={item => item.url}
-          ItemSeparatorComponent={() => (
-            <View
-              style={{
-                height: 1,
-                backgroundColor: IOS_LIST_SEPARATOR,
-                marginLeft: 16,
-              }}
-            />
-          )}
+          ItemSeparatorComponent={Separator}
           renderItem={({ item }) => {
             const selected = selectedServer?.url === item.url;
+            const showRowSpinner = selected && isTestingSelected;
 
             return (
               <Pressable
                 onPress={() => onSelectServer(item)}
+                disabled={isTestingSelected}
                 style={{
                   minHeight: 64,
                   paddingHorizontal: 16,
@@ -205,6 +190,18 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
                     {item.url}
                   </RegText>
                 </View>
+
+                <View
+                  style={{
+                    minWidth: 24,
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {showRowSpinner ? (
+                    <ActivityIndicator size="small" color={colors.text} />
+                  ) : null}
+                </View>
               </Pressable>
             );
           }}
@@ -224,22 +221,19 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
           gap: 8,
         }}
       >
-        {actionButtonsDisabled && (
-          <ActivityIndicator size="small" color={colors.text} />
-        )}
-
         {connected === true && (
           <FontAwesomeIcon size={18} icon={faCheck} color={borderColor} />
         )}
+        {connected === false && (
+          <FontAwesomeIcon size={18} icon={faX} color={borderColor} />
+        )}
 
-        <RegText color={actionButtonsDisabled ? colors.text : borderColor}>
-          {actionButtonsDisabled
-            ? 'Connecting...'
-            : connected === null
-              ? ''
-              : connected
-                ? 'Connected'
-                : 'Could not connect to indexer'}
+        <RegText color={borderColor}>
+          {connected === null
+            ? ''
+            : connected
+              ? 'Connected'
+              : 'Could not connect to indexer'}
         </RegText>
       </View>
 
@@ -260,7 +254,7 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
         ) : (
           <LiquidPrimaryButton
             title={connected === null ? 'Test connection' : 'Retry'}
-            disabled={actionButtonsDisabled || !selectedServer}
+            disabled={!selectedServer || isTestingSelected}
             onPress={onTestConnection}
             style={{ alignSelf: 'stretch' }}
           />
@@ -269,3 +263,13 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
     </View>
   );
 };
+
+const Separator = () => (
+  <View
+    style={{
+      height: 1,
+      backgroundColor: IOS_LIST_SEPARATOR,
+      marginLeft: 16,
+    }}
+  />
+);
