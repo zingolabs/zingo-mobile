@@ -42,8 +42,6 @@ import Refresh from '../../../assets/icons/refresh.svg';
 import RegText from '../../Components/RegText';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 import ZecAmount from '../../Components/ZecAmount';
-import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
-import { scheduleReminder } from './scheduleReminder';
 import StakingDayBubble from '../StakingDayBubble';
 
 type ModalState = 'idle' | 'sending' | 'success';
@@ -51,14 +49,9 @@ type ModalState = 'idle' | 'sending' | 'success';
 type RedelegateProps = DrawerScreenProps<
   AppDrawerParamList,
   RouteEnum.Redelegate
-> & {
-  redelegateTransaction: (txid: string, finalizer: string) => Promise<string>;
-};
+>;
 
-const Redelegate: React.FC<RedelegateProps> = ({
-  redelegateTransaction,
-  route,
-}) => {
+const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
   const finalizer =
     !!route.params && route.params.finalizer !== undefined
       ? route.params.finalizer
@@ -69,10 +62,6 @@ const Redelegate: React.FC<RedelegateProps> = ({
     !!route.params && route.params.staked !== undefined
       ? route.params.staked
       : 0;
-  const closeSheet =
-    !!route.params && route.params.closeSheet !== undefined
-      ? route.params.closeSheet
-      : () => {};
 
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
@@ -99,9 +88,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
     info,
     privacy,
     stakingDay,
-    setScheduledActions,
     scheduledActions,
-    timeToStakingDaySeconds: timeToStakingDay,
   } = context;
 
   const movements = useMemo(() => {
@@ -230,65 +217,29 @@ const Redelegate: React.FC<RedelegateProps> = ({
     let bondKey = selectedBond.pubKey;
     console.log('selectedKind', selectedKind);
 
-    setModalState('sending');
-
-    const TITLE = 'Your redelegate action is ready to be executed!';
-    const BODY = 'TODO: Action details';
-
-    try {
-      if (selectedKind === WalletBondsStatusEnum.Active) {
-        if (stakingDay) {
-          await redelegateTransaction(bondKey, finalizerToText);
-        } else {
-          const notifeeId = await scheduleReminder({
-            seconds: timeToStakingDay,
-            title: TITLE,
-            body: BODY,
-          });
-          const stakingScheduledAction: ScheduledActionType = {
-            id: 0,
-            kind: StakingActionKindEnum.Move,
-            amount:
-              (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount ||
-                0) *
-              10 ** 8,
-            finalizer: finalizerFromText,
-            finalizerTo: finalizerToText,
-            txid: bondTxid,
-            bondKey: bondKey,
-            notifeeId: notifeeId ? notifeeId : '',
-            title: TITLE,
-            body: BODY,
-          };
-          const list = await ScheduledActionsFileImpl.addSA(
-            stakingScheduledAction,
-          );
-          setScheduledActions(list);
-        }
-      } else {
-        Alert.alert(
-          'Error',
-          `Unsupported selection kind: ${selectedKind ?? 'none'}`,
-        );
-        setModalState('idle');
-        return;
-      }
-
-      if (
-        stakingDay &&
-        scheduledActions.filter(sa => sa.txid === bondTxid).length > 0
-      ) {
-        const list = await ScheduledActionsFileImpl.removeSA(
-          scheduledActions.filter(sa => sa.txid === bondTxid)[0].id,
-        );
-        setScheduledActions(list);
-      }
-
-      setModalState('success');
-    } catch (error) {
-      console.warn('Redelegating tx failed:', error);
+    if (selectedKind === WalletBondsStatusEnum.Active) {
+      // confirm screen
+      const item: ScheduledActionType = {
+        id: 0,
+        kind: StakingActionKindEnum.Move,
+        amount:
+          (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount || 0) *
+          10 ** 8,
+        finalizer: finalizerFromText,
+        finalizerTo: finalizerToText,
+        txid: bondTxid,
+        bondKey: bondKey,
+      };
+      navigation.navigate(RouteEnum.ScheduledActionDetail, {
+        item,
+      });
+    } else {
+      Alert.alert(
+        'Error',
+        `Unsupported selection kind: ${selectedKind ?? 'none'}`,
+      );
       setModalState('idle');
-      navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
+      return;
     }
   };
 
@@ -298,7 +249,6 @@ const Redelegate: React.FC<RedelegateProps> = ({
 
   const handleViewMovements = () => {
     setModalState('idle');
-    closeSheet();
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -714,6 +664,7 @@ const Redelegate: React.FC<RedelegateProps> = ({
             title={actionVerb}
             disabled={!isValidForm || modalState === 'sending'}
             onPress={handleRedelegatePress}
+            style={{ alignSelf: 'stretch' }}
           />
         </View>
 

@@ -38,22 +38,13 @@ import Refresh from '../../../assets/icons/refresh.svg';
 import RegText from '../../Components/RegText';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 import ZecAmount from '../../Components/ZecAmount';
-import ScheduledActionsFileImpl from '../../ScheduledActions/ScheduledActionsFileImpl';
-import { scheduleReminder } from './scheduleReminder';
 import StakingDayBubble from '../StakingDayBubble';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
-type UnstakeProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Unstake> & {
-  beginUnstakeTransaction: (txid: string) => Promise<string>;
-  withdrawBondTransaction: (txid: string) => Promise<string>;
-};
+type UnstakeProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Unstake>;
 
-const Unstake: React.FC<UnstakeProps> = ({
-  beginUnstakeTransaction,
-  withdrawBondTransaction,
-  route,
-}) => {
+const Unstake: React.FC<UnstakeProps> = ({ route }) => {
   const finalizer =
     !!route.params && route.params.finalizer !== undefined
       ? route.params.finalizer
@@ -64,10 +55,6 @@ const Unstake: React.FC<UnstakeProps> = ({
     !!route.params && route.params.staked !== undefined
       ? route.params.staked
       : 0;
-  const closeSheet =
-    !!route.params && route.params.closeSheet !== undefined
-      ? route.params.closeSheet
-      : () => {};
 
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
@@ -91,9 +78,7 @@ const Unstake: React.FC<UnstakeProps> = ({
     info,
     privacy,
     stakingDay,
-    setScheduledActions,
     scheduledActions,
-    timeToStakingDaySeconds: timeToStakingDay,
   } = context;
 
   console.log('FINALIZER', finalizerFromText);
@@ -185,106 +170,43 @@ const Unstake: React.FC<UnstakeProps> = ({
     console.log('bondTxid', bondTxid);
     console.log('selectedKind', selectedKind);
 
-    setModalState('sending');
-
-    const TITLE = `Your ${selectedKind === WalletBondsStatusEnum.Active ? 'unstaking' : 'withdrawing'} action is ready to be executed!`;
-    const BODY = 'TODO: Action details';
-
-    try {
-      if (selectedKind === WalletBondsStatusEnum.Active) {
-        if (stakingDay) {
-          await beginUnstakeTransaction(bondTxid);
-        } else {
-          const notifeeId = await scheduleReminder({
-            seconds: timeToStakingDay,
-            title: TITLE,
-            body: BODY,
-          });
-          const stakingScheduledAction: ScheduledActionType = {
-            id: 0,
-            kind: StakingActionKindEnum.BeginUnbonding,
-            amount:
-              (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount ||
-                0) *
-              10 ** 8,
-            finalizer: finalizerFromText,
-            finalizerTo: '',
-            txid: bondTxid,
-            bondKey: '',
-            notifeeId: notifeeId ? notifeeId : '',
-            title: TITLE,
-            body: BODY,
-          };
-          const list = await ScheduledActionsFileImpl.addSA(
-            stakingScheduledAction,
-          );
-          setScheduledActions(list);
-        }
-      } else if (selectedKind === WalletBondsStatusEnum.Unbonding) {
-        if (stakingDay) {
-          await withdrawBondTransaction(selectedBond.txid);
-        } else {
-          const notifeeId = await scheduleReminder({
-            seconds: timeToStakingDay,
-            title: TITLE,
-            body: BODY,
-          });
-          const stakingScheduledAction: ScheduledActionType = {
-            id: 0,
-            kind: StakingActionKindEnum.WithdrawBond,
-            amount:
-              (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount ||
-                0) *
-              10 ** 8,
-            finalizer: finalizerFromText,
-            finalizerTo: '',
-            txid: bondTxid,
-            bondKey: '',
-            notifeeId: notifeeId ? notifeeId : '',
-            title: TITLE,
-            body: BODY,
-          };
-          const list = await ScheduledActionsFileImpl.addSA(
-            stakingScheduledAction,
-          );
-          setScheduledActions(list);
-        }
-      } else {
-        Alert.alert(
-          'Error',
-          `Unsupported selection kind: ${selectedKind ?? 'none'}`,
-        );
-        setModalState('idle');
-        return;
-      }
-
-      if (
-        stakingDay &&
-        scheduledActions.filter(sa => sa.txid === bondTxid).length > 0
-      ) {
-        const list = await ScheduledActionsFileImpl.removeSA(
-          scheduledActions.filter(sa => sa.txid === bondTxid)[0].id,
-        );
-        setScheduledActions(list);
-      }
-
-      setModalState('success');
-    } catch (error: any) {
-      console.warn('Unstaking tx failed:', error);
+    if (selectedKind === WalletBondsStatusEnum.Active) {
+      const item: ScheduledActionType = {
+        id: 0,
+        kind: StakingActionKindEnum.BeginUnbonding,
+        amount:
+          (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount || 0) *
+          10 ** 8,
+        finalizer: finalizerFromText,
+        finalizerTo: '',
+        txid: bondTxid,
+        bondKey: '',
+      };
+      navigation.navigate(RouteEnum.ScheduledActionDetail, {
+        item,
+      });
+    } else if (selectedKind === WalletBondsStatusEnum.Unbonding) {
+      const item: ScheduledActionType = {
+        id: 0,
+        kind: StakingActionKindEnum.WithdrawBond,
+        amount:
+          (valueTransfers?.filter(v => v.txid === bondTxid)[0].amount || 0) *
+          10 ** 8,
+        finalizer: finalizerFromText,
+        finalizerTo: '',
+        txid: bondTxid,
+        bondKey: '',
+      };
+      navigation.navigate(RouteEnum.ScheduledActionDetail, {
+        item,
+      });
+    } else {
+      Alert.alert(
+        'Error',
+        `Unsupported selection kind: ${selectedKind ?? 'none'}`,
+      );
       setModalState('idle');
-      if (JSON.stringify(error).toLowerCase().includes('window')) {
-        navigation.navigate(RouteEnum.ComputingError, {
-          error: `Transaction outside of staking window.`,
-        });
-      } else if (
-        JSON.stringify(error).toLowerCase().includes('staking action delay')
-      ) {
-        navigation.navigate(RouteEnum.ComputingError, {
-          error: `Cannot operate on the same staking action in the same window.`,
-        });
-      } else {
-        navigation.navigate(RouteEnum.ComputingError, { error: `${error}` });
-      }
+      return;
     }
   };
 
@@ -298,7 +220,6 @@ const Unstake: React.FC<UnstakeProps> = ({
 
   const handleViewMovements = () => {
     setModalState('idle');
-    closeSheet();
     if (navigation.canGoBack()) {
       navigation.goBack();
     }

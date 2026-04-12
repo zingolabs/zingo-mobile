@@ -216,12 +216,14 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
           justifyContent: 'center',
           paddingTop: 10,
           paddingBottom: 20,
+          paddingHorizontal: 20,
         }}
       >
         <LiquidPrimaryButton
           tintColor={colors.danger.primary}
           title={'Switch to different wallet'}
           onPress={restoreWallet}
+          style={{ alignSelf: 'stretch' }}
         />
       </View>
     </ToastProvider>

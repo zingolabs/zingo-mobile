@@ -115,14 +115,12 @@ export function FinalizerPosition({
             <>
               <Pressable
                 onPress={() => onPressRedelegate?.(bond)}
-                disabled={!isActive}
                 style={({ pressed }) => [
                   styles.actionButton,
                   styles.secondaryButton,
                   secondaryButtonStyle,
                   actionButtonStyle,
-                  !isActive && styles.disabledButton,
-                  pressed && !!isActive && styles.pressed,
+                  pressed && styles.pressed,
                 ]}
               >
                 <Text style={[styles.actionButtonText, actionButtonTextStyle]}>
@@ -132,15 +130,12 @@ export function FinalizerPosition({
 
               <Pressable
                 onPress={() => onPressUnstake?.(bond)}
-                disabled={!isActive}
                 style={({ pressed }) => [
                   styles.actionButton,
-
                   styles.primaryButton,
                   primaryButtonStyle,
                   actionButtonStyle,
-                  !isActive && styles.disabledButton,
-                  pressed && !!isActive && styles.pressed,
+                  pressed && styles.pressed,
                 ]}
               >
                 <Text style={[styles.actionButtonText, actionButtonTextStyle]}>
@@ -153,13 +148,12 @@ export function FinalizerPosition({
           {!isActive && (
             <Pressable
               onPress={() => onPresWithdraw?.(bond)}
-              disabled={!isActive}
               style={({ pressed }) => [
                 styles.actionButton,
                 styles.primaryButton,
                 primaryButtonStyle,
                 actionButtonStyle,
-                pressed && !!isActive && styles.pressed,
+                pressed && styles.pressed,
               ]}
             >
               <Text style={[styles.actionButtonText, actionButtonTextStyle]}>

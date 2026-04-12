@@ -507,6 +507,7 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
                   closeServers();
                 }, 100);
               }}
+              style={{ alignSelf: 'stretch' }}
             />
           ) : (
             <LiquidPrimaryButton
@@ -557,6 +558,7 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
                 }
                 Keyboard.dismiss();
               }}
+              style={{ alignSelf: 'stretch' }}
             />
           )}
         </View>

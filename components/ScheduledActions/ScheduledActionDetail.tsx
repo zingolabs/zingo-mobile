@@ -37,6 +37,11 @@ import ScheduledActionsFileImpl from '../ScheduledActions/ScheduledActionsFileIm
 import Utils from '../../app/utils';
 import notifee from '@notifee/react-native';
 import StakingDayBubble from '../Staking/StakingDayBubble';
+import LinearGradient from 'react-native-linear-gradient';
+import Zap from '../../assets/icons/zap.svg';
+import Clipboard from '../../assets/icons/clipboard.svg';
+import { formatSeconds } from '../../app/utils/Utils';
+import { scheduleReminder } from '../Staking/components/scheduleReminder';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -65,6 +70,8 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
   redelegateTransaction,
   route,
 }) => {
+  // if item.id is 0 means this screen is the
+  // confirmation screen.
   const item =
     !!route.params && route.params.item !== undefined
       ? route.params.item
@@ -75,13 +82,21 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
   const insets = useSafeAreaInsets();
 
   const [modalState, setModalState] = useState<ModalState>('idle');
+  const [confirm, _setConfirm] = useState<boolean>(item.id === 0);
   const [kbOpen, setKbOpen] = useState(false);
 
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const { valueTransfers, stakingDay, setScheduledActions, info, walletBonds } =
-    context;
+  const {
+    valueTransfers,
+    stakingDay,
+    setScheduledActions,
+    info,
+    walletBonds,
+    timeToStakingDaySeconds: timeToStakingDay,
+    scheduledActions,
+  } = context;
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -93,9 +108,11 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
   }, []);
 
   const handleCancelPress = async () => {
-    const list = await ScheduledActionsFileImpl.removeSA(item.id);
+    const list = await ScheduledActionsFileImpl.removeAction(item.id);
     setScheduledActions(list);
-    await notifee.cancelNotification(item.notifeeId);
+    if (list.length === 0) {
+      await notifee.cancelAllNotifications();
+    }
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -168,9 +185,15 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
         return;
       }
 
-      const list = await ScheduledActionsFileImpl.removeSA(item.id);
-      setScheduledActions(list);
-      await notifee.cancelNotification(item.notifeeId);
+      if (scheduledActions.filter(sa => sa.txid === bondTxid).length > 0) {
+        const list = await ScheduledActionsFileImpl.removeAction(
+          scheduledActions.filter(sa => sa.txid === bondTxid)[0].id,
+        );
+        setScheduledActions(list);
+        if (list.length === 0) {
+          await notifee.cancelAllNotifications();
+        }
+      }
 
       setModalState('success');
     } catch (error: any) {
@@ -192,12 +215,30 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
     }
   };
 
+  const handleScheduleActionPress = async () => {
+    setModalState('sending');
+
+    const list = await ScheduledActionsFileImpl.addAction(item);
+    setScheduledActions(list);
+    await scheduleReminder({
+      seconds: timeToStakingDay,
+      numberActions: list.length,
+    });
+
+    setModalState('success');
+  };
+
   const handleViewMovements = () => {
     setModalState('idle');
     if (navigation.canGoBack()) {
       navigation.goBack();
+      if (confirm) {
+        navigation.goBack();
+      }
     }
   };
+
+  const mainValue = formatSeconds(timeToStakingDay);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -213,13 +254,25 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
       >
         <HeaderTitle
           title={
-            item.kind === StakingActionKindEnum.CreateBond
+            item.kind === StakingActionKindEnum.CreateBond && !confirm
               ? 'Stake'
-              : item.kind === StakingActionKindEnum.BeginUnbonding
+              : item.kind === StakingActionKindEnum.BeginUnbonding && !confirm
                 ? 'Unstake'
-                : item.kind === StakingActionKindEnum.WithdrawBond
+                : item.kind === StakingActionKindEnum.WithdrawBond && !confirm
                   ? 'Withdraw'
-                  : 'Redelegate'
+                  : item.kind === StakingActionKindEnum.Move && !confirm
+                    ? 'Redelegate'
+                    : item.kind === StakingActionKindEnum.CreateBond && confirm
+                      ? 'Confirm stake'
+                      : item.kind === StakingActionKindEnum.BeginUnbonding &&
+                          confirm
+                        ? 'Confirm unstake'
+                        : item.kind === StakingActionKindEnum.WithdrawBond &&
+                            confirm
+                          ? 'Confirm withdraw'
+                          : item.kind === StakingActionKindEnum.Move && confirm
+                            ? 'Confirm redelegate'
+                            : ''
           }
           goBack={() => {
             if (navigation.canGoBack()) {
@@ -237,26 +290,66 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
             marginBottom: 15,
             marginTop: 5,
             alignSelf: 'center',
+            marginHorizontal: 24,
           }}
         >
-          {`Review your ${
-            item.kind === StakingActionKindEnum.CreateBond
-              ? 'staking action'
-              : item.kind === StakingActionKindEnum.BeginUnbonding
-                ? 'Unstaking action'
-                : item.kind === StakingActionKindEnum.WithdrawBond
-                  ? 'Withdrawing action'
-                  : 'Redelegatation'
+          {`${
+            item.kind === StakingActionKindEnum.CreateBond && !confirm
+              ? 'Staking action program list'
+              : item.kind === StakingActionKindEnum.BeginUnbonding && !confirm
+                ? 'Unstaking action program list'
+                : item.kind === StakingActionKindEnum.WithdrawBond && !confirm
+                  ? 'Withdrawing action program list'
+                  : item.kind === StakingActionKindEnum.Move && !confirm
+                    ? 'Redelegating action program list'
+                    : item.kind === StakingActionKindEnum.CreateBond && confirm
+                      ? 'Review your staking action'
+                      : item.kind === StakingActionKindEnum.BeginUnbonding &&
+                          confirm
+                        ? 'Review your unstaking action'
+                        : item.kind === StakingActionKindEnum.WithdrawBond &&
+                            confirm
+                          ? 'Review your Withdrawing action'
+                          : item.kind === StakingActionKindEnum.Move && confirm
+                            ? 'Review your Redelegating action'
+                            : ''
           }`}
         </Text>
+
+        <LinearGradient
+          colors={[stakingDay ? '#002309' : '#553000', '#272727']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            borderRadius: 100,
+            marginTop: 20,
+            flexDirection: 'row',
+            gap: 10,
+            alignItems: 'center',
+            paddingHorizontal: 15,
+            paddingVertical: 8,
+            marginHorizontal: 24,
+          }}
+        >
+          {stakingDay ? (
+            <Zap width={18} height={18} />
+          ) : (
+            <Clipboard width={18} height={18} />
+          )}
+          <RegText style={{ color: stakingDay ? '#00A82A' : '#FFA100' }}>
+            {stakingDay
+              ? 'Executes immediately'
+              : `Staking day active in ${mainValue}`}
+          </RegText>
+        </LinearGradient>
 
         <View
           style={{
             borderRadius: 26,
             backgroundColor: colors.secondary,
-            width: '100%',
             marginTop: 20,
             paddingVertical: 5,
+            marginHorizontal: 24,
           }}
         >
           {item.finalizer && (
@@ -385,29 +478,78 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
           )}
         </View>
 
+        {!stakingDay && confirm && (
+          <RegText
+            style={{
+              color: '#FFA100',
+              fontSize: 14,
+              fontWeight: 400,
+              paddingHorizontal: 24,
+              marginTop: 20,
+            }}
+          >
+            You'll be notified when this action can be executed.
+          </RegText>
+        )}
+
         {/* Bottom CTA */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingTop: 20,
-            paddingBottom: 20,
-            gap: 10,
-          }}
-        >
-          <LiquidPrimaryButton
-            tintColor={'#730303'}
-            title={'Remove reminder'}
-            onPress={handleCancelPress}
-          />
-          {stakingDay && (
+        {!confirm ? (
+          <View
+            style={{
+              marginTop: 'auto',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingTop: 10,
+              paddingBottom: 20,
+              paddingHorizontal: 24,
+              gap: 10,
+              width: '100%',
+            }}
+          >
             <LiquidPrimaryButton
-              title={'Execute now'}
-              onPress={handleExecuteNowPress}
+              tintColor={'#730303'}
+              title={'Remove'}
+              onPress={handleCancelPress}
+              style={{ width: stakingDay ? '50%' : '100%' }}
             />
-          )}
-        </View>
+            {stakingDay && (
+              <LiquidPrimaryButton
+                title={'Execute now'}
+                onPress={handleExecuteNowPress}
+                style={{ width: '50%' }}
+              />
+            )}
+          </View>
+        ) : (
+          <View
+            style={{
+              marginTop: 'auto',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingTop: 10,
+              paddingBottom: 20,
+              paddingHorizontal: 24,
+              gap: 10,
+              width: '100%',
+            }}
+          >
+            {stakingDay ? (
+              <LiquidPrimaryButton
+                title={'Confirm'}
+                onPress={handleExecuteNowPress}
+                style={{ width: '100%' }}
+              />
+            ) : (
+              <LiquidPrimaryButton
+                title={'Schedule action'}
+                onPress={handleScheduleActionPress}
+                style={{ width: '100%' }}
+              />
+            )}
+          </View>
+        )}
 
         {/* Modal */}
         <Modal

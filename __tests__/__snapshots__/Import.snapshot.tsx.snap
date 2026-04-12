@@ -357,7 +357,9 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
               "shadowOpacity": 0.35,
               "shadowRadius": 16,
             },
-            undefined,
+            {
+              "alignSelf": "stretch",
+            },
             {
               "opacity": 0.5,
             },

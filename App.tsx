@@ -67,7 +67,11 @@ const linking: LinkingOptions<AppStackParamList> = {
       [RouteEnum.LoadingApp]: 'loading',
       [RouteEnum.LoadedApp]: {
         screens: {
-          [RouteEnum.StakingHome]: 'reminder-opened',
+          [RouteEnum.MainTabs]: {
+            screens: {
+              [RouteEnum.StakingHome]: 'reminder-opened',
+            },
+          },
         },
       } as ParamListBase,
     },

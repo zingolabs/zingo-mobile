@@ -484,6 +484,7 @@ const Import: React.FunctionComponent<ImportProps> = ({
               okButton();
               Keyboard.dismiss();
             }}
+            style={{ alignSelf: 'stretch' }}
           />
         </View>
       </KeyboardAvoidingView>

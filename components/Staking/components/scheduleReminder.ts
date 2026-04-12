@@ -2,6 +2,7 @@ import notifee, {
   AndroidImportance,
   AuthorizationStatus,
   TimestampTrigger,
+  TriggerNotification,
   TriggerType,
 } from '@notifee/react-native';
 
@@ -27,18 +28,24 @@ async function requestPermissions() {
 
 export async function scheduleReminder({
   seconds,
-  title,
-  body,
-  notifeeId,
+  numberActions,
 }: {
   seconds: number;
-  title: string;
-  body: string;
-  notifeeId?: string;
+  numberActions: number;
 }) {
   const allowed: boolean = await requestPermissions();
 
   if (allowed) {
+    // only one notification...
+    let notifeeId: string | undefined;
+    const triggers: TriggerNotification[] =
+      await notifee.getTriggerNotifications();
+    if (triggers.length === 1) {
+      notifeeId = triggers[0].notification.id;
+    } else if (triggers.length > 1) {
+      await notifee.cancelAllNotifications();
+    }
+
     const channelId = await notifee.createChannel({
       id: 'reminders',
       name: 'Reminders',
@@ -55,8 +62,8 @@ export async function scheduleReminder({
 
     const notification = {
       ...(notifeeId !== undefined && { id: notifeeId }),
-      title: title,
-      body: body,
+      title: 'Staking day has arrived',
+      body: `You have ${numberActions} scheduled action${numberActions > 1 ? 's' : ''}.`,
       data: {
         deeplink: `delegator://reminder-opened`,
       },
@@ -68,11 +75,8 @@ export async function scheduleReminder({
       },
     };
 
-    const newNotifeeId: string = await notifee.createTriggerNotification(
-      notification,
-      trigger,
-    );
+    await notifee.createTriggerNotification(notification, trigger);
 
-    return newNotifeeId;
+    return;
   }
 }

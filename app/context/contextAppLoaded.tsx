@@ -16,6 +16,7 @@ import {
   SelectServerEnum,
   SnackbarType,
   AppContextLoaded,
+  ScheduledActionType,
 } from '../AppState';
 
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
@@ -85,7 +86,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   blocksToStakingDay: 0,
   blocksLeftStakingDay: 0,
   blocksTotalStakingDay: 0,
-  scheduledActions: [],
+  scheduledActions: {} as ScheduledActionType[],
   setScheduledActions: () => {},
 };
 
