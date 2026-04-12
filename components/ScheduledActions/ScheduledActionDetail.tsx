@@ -82,7 +82,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
   const insets = useSafeAreaInsets();
 
   const [modalState, setModalState] = useState<ModalState>('idle');
-  const [confirm, _setConfirm] = useState<boolean>(item.id === 0); 
+  const [confirm, _setConfirm] = useState<boolean>(item.id === 0);
   const [kbOpen, setKbOpen] = useState(false);
 
   const modalVisible = modalState !== 'idle';
@@ -509,7 +509,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
           >
             <LiquidPrimaryButton
               tintColor={'#730303'}
-              title={'Remove reminder'}
+              title={'Remove'}
               onPress={handleCancelPress}
               style={{ width: stakingDay ? '50%' : '100%' }}
             />

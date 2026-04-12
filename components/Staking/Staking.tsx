@@ -762,7 +762,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                                     fontWeight: '500',
                                     fontSize: 14,
                                     marginBottom: 2,
-                                    marginLeft: 10,
+                                    marginLeft: 5,
                                   }}
                                 >
                                   {label}
