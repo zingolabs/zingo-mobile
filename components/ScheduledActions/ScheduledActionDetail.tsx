@@ -82,7 +82,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
   const insets = useSafeAreaInsets();
 
   const [modalState, setModalState] = useState<ModalState>('idle');
-  const [confirm, setConfirm] = useState<boolean>(item.id === 0);
+  const [confirm, _setConfirm] = useState<boolean>(item.id === 0); 
   const [kbOpen, setKbOpen] = useState(false);
 
   const modalVisible = modalState !== 'idle';
@@ -106,10 +106,6 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
       s2.remove();
     };
   }, []);
-
-  useEffect(() => {
-    setConfirm(item.id === 0);
-  }, [item.id]);
 
   const handleCancelPress = async () => {
     const list = await ScheduledActionsFileImpl.removeAction(item.id);
