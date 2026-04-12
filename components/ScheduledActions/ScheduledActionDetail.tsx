@@ -327,8 +327,8 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
             gap: 10,
             alignItems: 'center',
             paddingHorizontal: 15,
-            paddingVertical: 8,
-            marginHorizontal: 24,
+            marginHorizontal: 10,
+            height: 40,
           }}
         >
           {stakingDay ? (
