@@ -80,6 +80,7 @@ import { AppStackParamList } from '../types';
 import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
 import { getIndexerList, IndexerList } from '../utils/Utils';
 import SelectNetworkNavigator from './components/SelectNetworkNavigator';
+import ConnectIndexer from './components/ConnectIndexer';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -1634,15 +1635,15 @@ export class LoadingAppClass extends Component<
               goConnectIndexer={this.goConnectIndexer}
             />
           )}
-          {/* {screen === 0.55 && (
+          {screen === 0.55 && (
             <ConnectIndexer
               actionButtonsDisabled={actionButtonsDisabled}
               setIndexerServer={this.setIndexerServer}
               checkIndexerServer={this.checkIndexerServer}
               closeServers={this.closeServers}
-              fromSettings={fromSettings}
+              fromSettings={true}
             />
-          )} */}
+          )}
           {screen === 1 && (
             <StartMenu
               actionButtonsDisabled={actionButtonsDisabled}
