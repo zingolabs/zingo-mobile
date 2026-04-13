@@ -42,7 +42,6 @@ import Refresh from '../../../assets/icons/refresh.svg';
 import RegText from '../../Components/RegText';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 import ZecAmount from '../../Components/ZecAmount';
-import StakingDayBubble from '../StakingDayBubble';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -80,16 +79,8 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
   const modalVisible = modalState !== 'idle';
 
   const context = useContext(ContextAppLoaded);
-  const {
-    walletBonds,
-    valueTransfers,
-    staked,
-    globalStaked,
-    info,
-    privacy,
-    stakingDay,
-    scheduledActions,
-  } = context;
+  const { walletBonds, valueTransfers, staked, globalStaked, info, privacy } =
+    context;
 
   const movements = useMemo(() => {
     return walletBonds
@@ -195,18 +186,6 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
         Alert.alert(
           'Error',
           'This bond is still processing, wait for confirmations.',
-        );
-        return;
-      }
-    }
-
-    if (!stakingDay) {
-      const isScheduled: boolean =
-        scheduledActions.filter(sa => sa.txid === bondTxid).length > 0;
-      if (isScheduled) {
-        Alert.alert(
-          'Error',
-          'This bond is already scheduled, chose another one.',
         );
         return;
       }
@@ -341,7 +320,6 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
               navigation.goBack();
             }
           }}
-          ExtraComponent={<StakingDayBubble />}
         />
 
         <Text

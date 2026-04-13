@@ -260,26 +260,28 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
                 ? 'Unstake'
                 : item.kind === StakingActionKindEnum.WithdrawBond && !confirm
                   ? 'Withdraw'
-                  : item.kind === StakingActionKindEnum.Move && !confirm
-                    ? 'Redelegate'
-                    : item.kind === StakingActionKindEnum.CreateBond && confirm
-                      ? 'Confirm stake'
-                      : item.kind === StakingActionKindEnum.BeginUnbonding &&
+                  : item.kind === StakingActionKindEnum.CreateBond && confirm
+                    ? 'Confirm stake'
+                    : item.kind === StakingActionKindEnum.BeginUnbonding &&
+                        confirm
+                      ? 'Confirm unstake'
+                      : item.kind === StakingActionKindEnum.WithdrawBond &&
                           confirm
-                        ? 'Confirm unstake'
-                        : item.kind === StakingActionKindEnum.WithdrawBond &&
-                            confirm
-                          ? 'Confirm withdraw'
-                          : item.kind === StakingActionKindEnum.Move && confirm
-                            ? 'Confirm redelegate'
-                            : ''
+                        ? 'Confirm withdraw'
+                        : item.kind === StakingActionKindEnum.Move
+                          ? 'Confirm redelegate'
+                          : ''
           }
           goBack={() => {
             if (navigation.canGoBack()) {
               navigation.goBack();
             }
           }}
-          ExtraComponent={<StakingDayBubble />}
+          ExtraComponent={
+            item.kind === StakingActionKindEnum.Move ? undefined : (
+              <StakingDayBubble />
+            )
+          }
         />
 
         <Text
@@ -300,24 +302,27 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
                 ? 'Unstaking action program list'
                 : item.kind === StakingActionKindEnum.WithdrawBond && !confirm
                   ? 'Withdrawing action program list'
-                  : item.kind === StakingActionKindEnum.Move && !confirm
-                    ? 'Redelegating action program list'
-                    : item.kind === StakingActionKindEnum.CreateBond && confirm
-                      ? 'Review your staking action'
-                      : item.kind === StakingActionKindEnum.BeginUnbonding &&
+                  : item.kind === StakingActionKindEnum.CreateBond && confirm
+                    ? 'Review your staking action'
+                    : item.kind === StakingActionKindEnum.BeginUnbonding &&
+                        confirm
+                      ? 'Review your unstaking action'
+                      : item.kind === StakingActionKindEnum.WithdrawBond &&
                           confirm
-                        ? 'Review your unstaking action'
-                        : item.kind === StakingActionKindEnum.WithdrawBond &&
-                            confirm
-                          ? 'Review your Withdrawing action'
-                          : item.kind === StakingActionKindEnum.Move && confirm
-                            ? 'Review your Redelegating action'
-                            : ''
+                        ? 'Review your Withdrawing action'
+                        : item.kind === StakingActionKindEnum.Move
+                          ? 'Review your Redelegating action'
+                          : ''
           }`}
         </Text>
 
         <LinearGradient
-          colors={[stakingDay ? '#002309' : '#553000', '#272727']}
+          colors={[
+            stakingDay || item.kind === StakingActionKindEnum.Move
+              ? '#002309'
+              : '#553000',
+            '#272727',
+          ]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={{
@@ -331,13 +336,20 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
             height: 40,
           }}
         >
-          {stakingDay ? (
+          {stakingDay || item.kind === StakingActionKindEnum.Move ? (
             <Zap width={18} height={18} />
           ) : (
             <Clipboard width={18} height={18} />
           )}
-          <RegText style={{ color: stakingDay ? '#00A82A' : '#FFA100' }}>
-            {stakingDay
+          <RegText
+            style={{
+              color:
+                stakingDay || item.kind === StakingActionKindEnum.Move
+                  ? '#00A82A'
+                  : '#FFA100',
+            }}
+          >
+            {stakingDay || item.kind === StakingActionKindEnum.Move
               ? 'Executes immediately'
               : `Staking day active in ${mainValue}`}
           </RegText>
@@ -478,7 +490,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
           )}
         </View>
 
-        {!stakingDay && confirm && (
+        {!stakingDay && confirm && item.kind !== StakingActionKindEnum.Move && (
           <RegText
             style={{
               color: '#FFA100',
@@ -511,9 +523,14 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
               tintColor={'#730303'}
               title={'Remove'}
               onPress={handleCancelPress}
-              style={{ width: stakingDay ? '50%' : '100%' }}
+              style={{
+                width:
+                  stakingDay || item.kind === StakingActionKindEnum.Move
+                    ? '50%'
+                    : '100%',
+              }}
             />
-            {stakingDay && (
+            {(stakingDay || item.kind === StakingActionKindEnum.Move) && (
               <LiquidPrimaryButton
                 title={'Execute now'}
                 onPress={handleExecuteNowPress}
@@ -535,7 +552,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
               width: '100%',
             }}
           >
-            {stakingDay ? (
+            {stakingDay || item.kind === StakingActionKindEnum.Move ? (
               <LiquidPrimaryButton
                 title={'Confirm'}
                 onPress={handleExecuteNowPress}

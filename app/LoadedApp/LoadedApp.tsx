@@ -64,6 +64,7 @@ import {
   StakingActionType,
   WalletBondsType,
   ScheduledActionType,
+  StakingActionKindEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -476,11 +477,11 @@ export class LoadedAppClass extends Component<
   private lastBlockTimestamp: number | null = null;
   private lastKnownBlock: number | null = null;
   // 10 seconds by default for regtest
-  // 5 minutes by default for testnet
+  // 30 seconds by default for testnet, who knows.
   private blockTimes: number[] = [
     this.props.indexerServer.chainName === ChainNameEnum.regtestChainName
       ? 10
-      : 5 * 60,
+      : 30,
   ];
 
   constructor(props: LoadedAppClassProps) {
@@ -625,11 +626,23 @@ export class LoadedAppClass extends Component<
 
     const newSeconds = remaining * avgBlockTime;
 
+    // delete any redelegation action if needed
+    let actions = await ScheduledActionsFileImpl.listActions();
+    if (
+      actions.filter(sa => sa.kind === StakingActionKindEnum.Move).length > 0
+    ) {
+      actions
+        .filter(sa => sa.kind === StakingActionKindEnum.Move)
+        .forEach(async sa => {
+          await ScheduledActionsFileImpl.removeAction(sa.id);
+        });
+      actions = await ScheduledActionsFileImpl.listActions();
+    }
+
     // when the Staking day begins, the App re-schedule
     // the existent notification for the next Staking Day.
     // And do this in every new block.
     if (newSeconds > 0) {
-      const actions = await ScheduledActionsFileImpl.listActions();
       const numberActions = actions.length;
       if (numberActions > 0) {
         await scheduleReminder({
@@ -912,7 +925,7 @@ export class LoadedAppClass extends Component<
 
         this.blockTimes.push(secondsPerBlock);
 
-        if (this.blockTimes.length > 15) {
+        if (this.blockTimes.length > 100) {
           this.blockTimes.shift();
         }
       }
