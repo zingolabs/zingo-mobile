@@ -80,6 +80,8 @@ import { AppStackParamList } from '../types';
 import SelectNetwork from './components/SelectNetwork';
 import ConnectIndexer from './components/ConnectIndexer';
 import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
+import { getIndexerList, IndexerList } from '../utils/Utils';
+import { ServerListScreen } from './components/ServerListScreen';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -407,6 +409,7 @@ export class LoadingAppClass extends Component<
     super(props);
 
     this.state = {
+      indexerList: [] as IndexerList,
       // context
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
@@ -485,6 +488,10 @@ export class LoadingAppClass extends Component<
       },
       //actionButtonsDisabled: !netInfoState.isConnected ? true : false,
     });
+
+    const indexerList = await getIndexerList();
+
+    this.setState({ indexerList: indexerList });
 
     this.fetchZingolibVersion();
 
@@ -1054,6 +1061,15 @@ export class LoadingAppClass extends Component<
     });
   };
 
+  /**
+   * TODO: IMPLEMENT WITHOUT RANDOM CONSTANTS
+   */
+  goAvailableServers = () => {
+    this.setState({
+      screen: 5,
+    });
+  };
+
   goSelectNetwork = () => {
     this.setState({
       screen: 0.5,
@@ -1562,6 +1578,7 @@ export class LoadingAppClass extends Component<
     //console.log('render loadingAppClass - 3', this.state.privacy);
 
     const context = {
+      indexerList: this.state.indexerList,
       // context
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
@@ -1624,6 +1641,7 @@ export class LoadingAppClass extends Component<
               closeServers={this.closeServers}
               fromSettings={fromSettings}
               goConnectIndexer={this.goConnectIndexer}
+              goAvailableServers={this.goAvailableServers}
             />
           )}
           {screen === 0.55 && (
@@ -1634,6 +1652,15 @@ export class LoadingAppClass extends Component<
               closeServers={this.closeServers}
               fromSettings={fromSettings}
               goSelectNetwork={this.goSelectNetwork}
+            />
+          )}
+          {screen === 5 && (
+            <ServerListScreen
+              goBack={fromSettings ? this.closeServers : this.goSelectNetwork}
+              indexerList={this.state.indexerList}
+              setIndexerServer={this.setIndexerServer}
+              checkIndexerServer={this.checkIndexerServer}
+              closeServers={this.closeServers}
             />
           )}
           {screen === 1 && (

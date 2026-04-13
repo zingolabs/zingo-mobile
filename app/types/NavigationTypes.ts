@@ -138,6 +138,7 @@ export type FinalizersNavigationState = {
 
 export type FinalizerDetailNavigationState = {
   finalizer: string;
+  lifehash: string;
 };
 
 export type StakeNavigationState = {};

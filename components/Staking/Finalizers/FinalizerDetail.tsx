@@ -40,13 +40,18 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
   const finalizer =
     !!route.params && route.params.finalizer !== undefined
       ? route.params.finalizer
-      : '';
+      : null;
+
+  const lifehash =
+    !!route.params && route.params.lifehash !== undefined
+      ? route.params.lifehash
+      : null;
 
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
 
-  const [finalizerFromText] = useState<string>(finalizer);
+  const [finalizerFromText] = useState<string | null>(finalizer);
   const [, setStakedFromNumber] = useState<number>(1);
 
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -68,16 +73,18 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
     })
     .sort((a, b) => b.amount - a.amount);
 
-  const totalStakedFinalizer = globalStaked.filter(
-    g => g.finalizer === finalizerFromText,
-  )[0].votingPower;
+  const totalStakedFinalizer =
+    globalStaked.filter(g => g.finalizer === finalizerFromText).length > 0
+      ? globalStaked.filter(g => g.finalizer === finalizerFromText)[0]
+          .votingPower
+      : 0;
 
   const totalUserStaked = walletBonds
     .filter(wb => wb.finalizer === finalizerFromText)
     .map(b => {
       return b.amount;
     })
-    .reduce((a, b) => a + b);
+    .reduce((a, b) => a + b, 0);
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -164,8 +171,8 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
           containerStyle={{
             marginHorizontal: 20,
           }}
-          lifehash={finalizer}
-          finalizerId={finalizer}
+          lifehash={lifehash || ''}
+          finalizerId={finalizer || ''}
           userStake={totalUserStaked}
           totalStake={totalStakedFinalizer}
         />
