@@ -56,16 +56,15 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
   const screenName = ScreenEnum.Servers;
 
   const [kbOpen, setKbOpen] = useState(false);
-  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(
+  const [indexerServerUriLocal] = useState<string>(
     indexerServerContext.uri ? indexerServerContext.uri : serverUris()[0].uri,
   );
 
-  const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] =
-    useState<ChainNameEnum>(
-      indexerServerContext.uri
-        ? indexerServerContext.chainName
-        : serverUris()[0].chainName,
-    );
+  const [, setIndexerServerChainNameLocal] = useState<ChainNameEnum>(
+    indexerServerContext.uri
+      ? indexerServerContext.chainName
+      : serverUris()[0].chainName,
+  );
 
   const insets = useSafeAreaInsets();
 
