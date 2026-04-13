@@ -317,7 +317,7 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
               }}
             >
               <TextInput
-                placeholder={'e.g. 18232'}
+                placeholder={'e.g. 18234'}
                 placeholderTextColor={colors.placeholder}
                 style={{
                   flexGrow: 1,

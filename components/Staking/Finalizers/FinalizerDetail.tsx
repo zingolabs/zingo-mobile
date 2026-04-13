@@ -4,7 +4,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Text,
-  TouchableWithoutFeedback,
   View,
   Modal,
   Keyboard,
@@ -145,155 +144,153 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <KeyboardAvoidingView
+    <KeyboardAvoidingView
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+        gap: 20,
+      }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={
+        Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
+      }
+    >
+      <HeaderTitle
+        title="Finalizer Details"
+        goBack={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
+        ExtraComponent={<StakingDayBubble />}
+      />
+
+      <FinalizerCard
+        containerStyle={{
+          marginHorizontal: 20,
+        }}
+        lifehash={lifehash || ''}
+        finalizerId={finalizer || ''}
+        userStake={totalUserStaked}
+        totalStake={totalStakedFinalizer}
+      />
+
+      {/* Content */}
+      <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
-          gap: 20,
+          paddingHorizontal: 24,
         }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={
-          Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0
-        }
       >
-        <HeaderTitle
-          title="Finalizer Details"
-          goBack={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
+        {/* Staked TX list */}
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color: colors.text,
+            marginBottom: 8,
           }}
-          ExtraComponent={<StakingDayBubble />}
-        />
+        >
+          Staking positions
+        </Text>
 
-        <FinalizerCard
-          containerStyle={{
-            marginHorizontal: 20,
-          }}
-          lifehash={lifehash || ''}
-          finalizerId={finalizer || ''}
-          userStake={totalUserStaked}
-          totalStake={totalStakedFinalizer}
-        />
-
-        {/* Content */}
         <View
           style={{
             flex: 1,
-            paddingHorizontal: 24,
+            marginBottom: 16,
           }}
         >
-          {/* Staked TX list */}
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '600',
-              color: colors.text,
-              marginBottom: 8,
-            }}
-          >
-            Staking positions
-          </Text>
+          <FlatList
+            data={movements}
+            keyExtractor={item => item.txid}
+            renderItem={renderStakedTxItem}
+            ItemSeparatorComponent={renderSeparator}
+            ListEmptyComponent={
+              <Text
+                style={{
+                  color: colors.placeholder,
+                  fontSize: 13,
+                  textAlign: 'center',
+                  marginTop: 16,
+                }}
+              >
+                You don&apos;t have any staking positions that match the
+                currently selected filters.
+              </Text>
+            }
+          />
+        </View>
+      </View>
 
+      {/* Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          if (modalState === 'success') {
+            setModalState('idle');
+          }
+        }}
+      >
+        <View style={styles.modalBackdrop}>
           <View
-            style={{
-              flex: 1,
-              marginBottom: 16,
-            }}
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: colors.background,
+                borderColor: colors.border,
+              },
+            ]}
           >
-            <FlatList
-              data={movements}
-              keyExtractor={item => item.txid}
-              renderItem={renderStakedTxItem}
-              ItemSeparatorComponent={renderSeparator}
-              ListEmptyComponent={
+            {modalState === 'sending' && (
+              <>
+                <ActivityIndicator size="large" color={colors.text} />
                 <Text
                   style={{
-                    color: colors.placeholder,
-                    fontSize: 13,
-                    textAlign: 'center',
                     marginTop: 16,
+                    color: colors.text,
+                    fontSize: 16,
+                    textAlign: 'center',
                   }}
                 >
-                  You don&apos;t have any staking positions that match the
-                  currently selected filters.
+                  Sending unstaking transaction…
                 </Text>
-              }
-            />
+              </>
+            )}
+
+            {modalState === 'success' && (
+              <>
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  size={40}
+                  color={colors.primary}
+                />
+                <Text
+                  style={{
+                    marginTop: 16,
+                    color: colors.text,
+                    fontSize: 18,
+                    fontWeight: '600',
+                    textAlign: 'center',
+                  }}
+                >
+                  Unstaking request transaction sent!
+                </Text>
+
+                <View style={{ marginTop: 24, alignSelf: 'stretch' }}>
+                  <LiquidPrimaryButton
+                    title="View movements"
+                    onPress={handleViewMovements}
+                    style={{ alignSelf: 'stretch' }}
+                  />
+                </View>
+              </>
+            )}
           </View>
         </View>
-
-        {/* Modal */}
-        <Modal
-          visible={modalVisible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => {
-            if (modalState === 'success') {
-              setModalState('idle');
-            }
-          }}
-        >
-          <View style={styles.modalBackdrop}>
-            <View
-              style={[
-                styles.modalCard,
-                {
-                  backgroundColor: colors.background,
-                  borderColor: colors.border,
-                },
-              ]}
-            >
-              {modalState === 'sending' && (
-                <>
-                  <ActivityIndicator size="large" color={colors.text} />
-                  <Text
-                    style={{
-                      marginTop: 16,
-                      color: colors.text,
-                      fontSize: 16,
-                      textAlign: 'center',
-                    }}
-                  >
-                    Sending unstaking transaction…
-                  </Text>
-                </>
-              )}
-
-              {modalState === 'success' && (
-                <>
-                  <FontAwesomeIcon
-                    icon={faCheckCircle}
-                    size={40}
-                    color={colors.primary}
-                  />
-                  <Text
-                    style={{
-                      marginTop: 16,
-                      color: colors.text,
-                      fontSize: 18,
-                      fontWeight: '600',
-                      textAlign: 'center',
-                    }}
-                  >
-                    Unstaking request transaction sent!
-                  </Text>
-
-                  <View style={{ marginTop: 24, alignSelf: 'stretch' }}>
-                    <LiquidPrimaryButton
-                      title="View movements"
-                      onPress={handleViewMovements}
-                      style={{ alignSelf: 'stretch' }}
-                    />
-                  </View>
-                </>
-              )}
-            </View>
-          </View>
-        </Modal>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+      </Modal>
+    </KeyboardAvoidingView>
   );
 }
 
