@@ -4,7 +4,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Text,
-  TouchableWithoutFeedback,
   View,
   Modal,
   Keyboard,
