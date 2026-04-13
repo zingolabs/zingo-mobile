@@ -110,24 +110,22 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
       style={{
         flex: 1,
         backgroundColor: colors.background,
-        paddingTop: 8,
       }}
     >
+      <HeaderTitle
+        title="Connect to indexer"
+        goBack={() => {
+          clear();
+
+          goBack();
+        }}
+      />
       <View
         style={{
           paddingHorizontal: 16,
-          paddingTop: 8,
           paddingBottom: 16,
         }}
       >
-        <HeaderTitle
-          title="Connect to indexer"
-          goBack={() => {
-            clear();
-
-            goBack();
-          }}
-        />
         <FadeText
           style={{
             fontSize: 15,
@@ -149,7 +147,7 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
       >
         <FlatList
           style={{
-            height: '50%',
+            height: '70%',
           }}
           data={indexerList}
           keyExtractor={item => item.url}
