@@ -22,6 +22,7 @@ import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import ComputerBlue from '../../../assets/icons/computer-blue.svg';
 import ComputerWhite from '../../../assets/icons/computer-white.svg';
 import { HeaderTitle } from '../../../components/Header';
+import { serverUris } from '../../uris';
 
 type SelectNetworkProps = {
   actionButtonsDisabled: boolean;
@@ -42,6 +43,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
   fromSettings,
   goConnectIndexer,
   goAvailableServers,
+  setIndexerServer,
 }) => {
   const context = useContext(ContextAppLoading);
   const {
@@ -54,6 +56,16 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
   const screenName = ScreenEnum.Servers;
 
   const [kbOpen, setKbOpen] = useState(false);
+  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(
+    indexerServerContext.uri ? indexerServerContext.uri : serverUris()[0].uri,
+  );
+
+  const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] =
+    useState<ChainNameEnum>(
+      indexerServerContext.uri
+        ? indexerServerContext.chainName
+        : serverUris()[0].chainName,
+    );
 
   const insets = useSafeAreaInsets();
 
@@ -231,6 +243,11 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             style={{ width: '100%' }}
             disabled={actionButtonsDisabled}
             onPress={() => {
+              setIndexerServerChainNameLocal(ChainNameEnum.testChainName);
+              setIndexerServer(
+                indexerServerUriLocal,
+                ChainNameEnum.testChainName,
+              );
               goConnectIndexer();
             }}
           >
@@ -323,6 +340,13 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 disabled={actionButtonsDisabled}
                 onPress={() => {
+                  setIndexerServerChainNameLocal(
+                    ChainNameEnum.regtestChainName,
+                  );
+                  setIndexerServer(
+                    indexerServerUriLocal,
+                    ChainNameEnum.regtestChainName,
+                  );
                   goConnectIndexer();
                 }}
               >
