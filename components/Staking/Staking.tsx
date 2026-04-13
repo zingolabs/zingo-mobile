@@ -58,7 +58,7 @@ import Button from '../Components/Button';
 import { formatSeconds } from '../../app/utils/Utils';
 import { MainTabParamList } from '../../app/types/NavigationTypes';
 
-export type Finalizer = {
+type Finalizer = {
   svg: {
     data: string;
   };
@@ -217,6 +217,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
         onPress={() => {
           navigation.navigate(RouteEnum.FinalizerDetail, {
             finalizer: item.finalizer,
+            lifehash: item.svg.data,
           });
         }}
       >

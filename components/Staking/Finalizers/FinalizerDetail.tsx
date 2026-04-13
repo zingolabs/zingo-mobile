@@ -28,7 +28,6 @@ import { ContextAppLoaded } from '../../../app/context';
 import { FinalizerPosition } from './FinalizerPosition';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import StakingDayBubble from '../StakingDayBubble';
-import { Finalizer } from '../Staking';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -43,11 +42,16 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
       ? route.params.finalizer
       : null;
 
+  const lifehash =
+    !!route.params && route.params.lifehash !== undefined
+      ? route.params.lifehash
+      : null;
+
   const navigation: any = useNavigation();
   const { colors } = useTheme() as ThemeType;
   const insets = useSafeAreaInsets();
 
-  const [finalizerFromText] = useState<Finalizer | null>(finalizer);
+  const [finalizerFromText] = useState<string | null>(finalizer);
   const [, setStakedFromNumber] = useState<number>(1);
 
   const [modalState, setModalState] = useState<ModalState>('idle');
@@ -63,23 +67,24 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
   const movements = walletBonds
     .filter(b => {
       if (b.status === WalletBondsStatusEnum.Withdrawn) return false;
-      if (!!finalizerFromText && b.finalizer === finalizerFromText.finalizer)
-        return true;
+      if (!!finalizerFromText && b.finalizer === finalizerFromText) return true;
       // no finalizer selected, all bonds visible. Impossible case for now.
       if (!finalizerFromText) return false;
     })
     .sort((a, b) => b.amount - a.amount);
 
-  const totalStakedFinalizer = globalStaked.filter(
-    g => g.finalizer === finalizerFromText?.finalizer,
-  )[0].votingPower;
+  const totalStakedFinalizer =
+    globalStaked.filter(g => g.finalizer === finalizerFromText).length > 0
+      ? globalStaked.filter(g => g.finalizer === finalizerFromText)[0]
+          .votingPower
+      : 0;
 
   const totalUserStaked = walletBonds
-    .filter(wb => wb.finalizer === finalizerFromText?.finalizer)
+    .filter(wb => wb.finalizer === finalizerFromText)
     .map(b => {
       return b.amount;
     })
-    .reduce((a, b) => a + b);
+    .reduce((a, b) => a + b, 0);
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -92,13 +97,9 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
 
   useEffect(() => {
     // looking for the voting power of the finalizer
-    if (
-      staked.filter(g => g.finalizer === finalizerFromText?.finalizer)
-        .length === 1
-    ) {
+    if (staked.filter(g => g.finalizer === finalizerFromText).length === 1) {
       setStakedFromNumber(
-        staked.filter(g => g.finalizer === finalizerFromText?.finalizer)[0]
-          .votingPower,
+        staked.filter(g => g.finalizer === finalizerFromText)[0].votingPower,
       );
     } else {
       setStakedFromNumber(0);
@@ -170,8 +171,8 @@ export function FinalizerDetail({ route }: FinalizerDetailProps) {
           containerStyle={{
             marginHorizontal: 20,
           }}
-          lifehash={finalizer?.svg.data || ''}
-          finalizerId={finalizer?.finalizer || ''}
+          lifehash={lifehash || ''}
+          finalizerId={finalizer || ''}
           userStake={totalUserStaked}
           totalStake={totalStakedFinalizer}
         />

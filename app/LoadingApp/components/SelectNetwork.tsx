@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
-  ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -11,26 +10,17 @@ import {
 import { useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
-
 import { ThemeType } from '../../types';
 import { ChainNameEnum, ScreenEnum } from '../../AppState';
 import { ContextAppLoading } from '../../context';
-import BoldText from '../../../components/Components/BoldText';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import Snackbars from '../../../components/Components/Snackbars';
 import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { serverUris } from '../../uris';
-import {
-  faCheck,
-  faChevronRight,
-  faWarning,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import ComputerBlue from '../../../assets/icons/computer-blue.svg';
 import ComputerWhite from '../../../assets/icons/computer-white.svg';
-import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
 import { HeaderTitle } from '../../../components/Header';
 
 type SelectNetworkProps = {
@@ -48,8 +38,6 @@ type SelectNetworkProps = {
 
 const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
   actionButtonsDisabled,
-  setIndexerServer,
-  checkIndexerServer,
   closeServers,
   fromSettings,
   goConnectIndexer,
@@ -57,8 +45,6 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
 }) => {
   const context = useContext(ContextAppLoading);
   const {
-    netInfo,
-    translate,
     snackbars,
     removeFirstSnackbar,
     indexerServer: indexerServerContext,
@@ -67,18 +53,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
   const { clear } = useToast();
   const screenName = ScreenEnum.Servers;
 
-  const [connected, setConnected] = useState<boolean | null>(null);
-  const [borderColor, setBorderColor] = useState<string>('transparent');
   const [kbOpen, setKbOpen] = useState(false);
-  const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(
-    indexerServerContext.uri ? indexerServerContext.uri : serverUris()[0].uri,
-  );
-  const [indexerServerChainNameLocal, setIndexerServerChainNameLocal] =
-    useState<ChainNameEnum>(
-      indexerServerContext.uri
-        ? indexerServerContext.chainName
-        : serverUris()[0].chainName,
-    );
 
   const insets = useSafeAreaInsets();
 
@@ -159,13 +134,6 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             style={{ width: '100%' }}
             disabled={actionButtonsDisabled}
             onPress={() => {
-              setIndexerServerChainNameLocal(ChainNameEnum.testChainName);
-              setIndexerServer(
-                indexerServerUriLocal,
-                ChainNameEnum.testChainName,
-              );
-              setBorderColor('transparent');
-              setConnected(null);
               goAvailableServers();
             }}
           >
@@ -263,14 +231,6 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             style={{ width: '100%' }}
             disabled={actionButtonsDisabled}
             onPress={() => {
-              //setIndexerServerUriLocal('');
-              setIndexerServerChainNameLocal(ChainNameEnum.testChainName);
-              setIndexerServer(
-                indexerServerUriLocal,
-                ChainNameEnum.testChainName,
-              );
-              setBorderColor('transparent');
-              setConnected(null);
               goConnectIndexer();
             }}
           >
@@ -363,16 +323,6 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 disabled={actionButtonsDisabled}
                 onPress={() => {
-                  //setIndexerServerUriLocal('');
-                  setIndexerServerChainNameLocal(
-                    ChainNameEnum.regtestChainName,
-                  );
-                  setIndexerServer(
-                    indexerServerUriLocal,
-                    ChainNameEnum.regtestChainName,
-                  );
-                  setBorderColor('transparent');
-                  setConnected(null);
                   goConnectIndexer();
                 }}
               >
