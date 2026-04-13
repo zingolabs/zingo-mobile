@@ -142,7 +142,7 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
       <View
         style={{
           marginHorizontal: 16,
-          borderRadius: 14,
+          borderRadius: 26,
           overflow: 'hidden',
           backgroundColor: IOS_GROUP_BG,
         }}
