@@ -23,7 +23,11 @@ import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { serverUris } from '../../uris';
-import { faCheck, faWarning } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faChevronRight,
+  faWarning,
+} from '@fortawesome/free-solid-svg-icons';
 import ComputerBlue from '../../../assets/icons/computer-blue.svg';
 import ComputerWhite from '../../../assets/icons/computer-white.svg';
 import LiquidPrimaryButton from '../../../components/Components/LiquidButton/LiquidPrimaryButton';
@@ -39,6 +43,7 @@ type SelectNetworkProps = {
   closeServers: () => void;
   fromSettings: boolean;
   goConnectIndexer: () => void;
+  goAvailableServers: () => void;
 };
 
 const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
@@ -48,6 +53,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
   closeServers,
   fromSettings,
   goConnectIndexer,
+  goAvailableServers,
 }) => {
   const context = useContext(ContextAppLoading);
   const {
@@ -130,7 +136,6 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
               style={{
                 marginTop: 42,
                 fontSize: 32,
-                fontStyle: 'normal',
                 fontWeight: 700,
               }}
             >
@@ -142,178 +147,110 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
             style={{
               marginTop: 14,
               fontSize: 14,
-              fontStyle: 'normal',
               textAlign: 'center',
               fontWeight: 500,
-              marginBottom: 39,
+              marginBottom: 24,
             }}
           >
             Choose the network this wallet will be operating on
           </FadeText>
 
           <TouchableOpacity
-            style={{
-              width: '100%',
-            }}
+            style={{ width: '100%' }}
             disabled={actionButtonsDisabled}
             onPress={() => {
-              setIndexerServerUriLocal(serverUris()[0].uri);
               setIndexerServerChainNameLocal(ChainNameEnum.testChainName);
+              setIndexerServer(
+                indexerServerUriLocal,
+                ChainNameEnum.testChainName,
+              );
               setBorderColor('transparent');
               setConnected(null);
+              goAvailableServers();
             }}
           >
             <View
               style={{
                 flexDirection: 'row',
-                justifyContent: 'flex-start',
-                borderColor:
-                  indexerServerUriLocal === serverUris()[0].uri
-                    ? colors.primary
-                    : '#494444',
+                justifyContent: 'space-between',
+                borderColor: '#494444',
                 borderWidth: 1,
                 borderRadius: 15,
-                marginBottom: 21,
+                marginBottom: 18,
                 backgroundColor: '#151414',
                 width: '100%',
                 alignItems: 'center',
+                paddingRight: 16,
               }}
             >
               <View
                 style={{
-                  justifyContent: 'center',
+                  flexDirection: 'row',
                   alignItems: 'center',
-                  backgroundColor: '#032139',
-                  borderRadius: 68,
-                  height: 46,
-                  width: 46,
-                  marginTop: 19,
-                  marginLeft: 16,
-                  marginBottom: 18,
-                  marginRight: 13,
+                  flex: 1,
                 }}
               >
-                <ComputerBlue width={24} height={24} />
-              </View>
-              <View
-                style={{
-                  justifyContent: 'center',
-                  marginTop: 10,
-                }}
-              >
-                <RegText
-                  color={colors.text}
+                <View
                   style={{
-                    fontSize: 20,
-                    fontStyle: 'normal',
-                    fontWeight: 700,
-                    lineHeight: 22,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: '#032139',
+                    borderRadius: 68,
+                    height: 46,
+                    width: 46,
+                    marginTop: 19,
+                    marginLeft: 16,
+                    marginBottom: 18,
+                    marginRight: 13,
                   }}
                 >
-                  Server A
-                </RegText>
-                <FadeText
+                  <ComputerBlue width={24} height={24} />
+                </View>
+
+                <View
                   style={{
-                    marginTop: 4,
-                    fontSize: 14,
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    lineHeight: 22,
+                    justifyContent: 'center',
+                    marginTop: 10,
+                    flex: 1,
                   }}
                 >
-                  {serverUris()[0].uri}
-                </FadeText>
+                  <RegText
+                    color={colors.text}
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 700,
+                      lineHeight: 22,
+                    }}
+                  >
+                    Available servers
+                  </RegText>
+
+                  <FadeText
+                    style={{
+                      marginTop: 4,
+                      fontSize: 14,
+                      fontWeight: 400,
+                      lineHeight: 22,
+                    }}
+                  >
+                    Choose from available indexers
+                  </FadeText>
+                </View>
               </View>
+
+              <FontAwesomeIcon
+                icon={faChevronRight}
+                size={16}
+                color="#8E8E93"
+              />
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={{
-              width: '100%',
-            }}
-            disabled={actionButtonsDisabled}
-            onPress={() => {
-              setIndexerServerUriLocal(serverUris()[1].uri);
-              setIndexerServerChainNameLocal(ChainNameEnum.testChainName);
-              setBorderColor('transparent');
-              setConnected(null);
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                borderColor:
-                  indexerServerUriLocal === serverUris()[1].uri
-                    ? colors.primary
-                    : '#494444',
-                borderWidth: 1,
-                borderRadius: 15,
-                marginBottom: 10,
-                backgroundColor: '#151414',
-                width: '100%',
-                alignItems: 'center',
-              }}
-            >
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: '#032139',
-                  borderRadius: 68,
-                  height: 46,
-                  width: 46,
-                  marginTop: 19,
-                  marginLeft: 16,
-                  marginBottom: 18,
-                  marginRight: 13,
-                }}
-              >
-                <ComputerBlue width={24} height={24} />
-              </View>
-              <View
-                style={{
-                  justifyContent: 'center',
-                  marginTop: 10,
-                }}
-              >
-                <RegText
-                  color={colors.text}
-                  style={{
-                    fontSize: 20,
-                    fontStyle: 'normal',
-                    fontWeight: 700,
-                    lineHeight: 22,
-                  }}
-                >
-                  Server B
-                </RegText>
-                <FadeText
-                  style={{
-                    marginTop: 4,
-                    fontSize: 14,
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    lineHeight: 22,
-                  }}
-                >
-                  {serverUris()[1].uri}
-                </FadeText>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          <View
-            style={{
-              justifyContent: 'center',
-              marginTop: 10,
-            }}
-          >
+          <View style={{ justifyContent: 'center', marginTop: 10 }}>
             <FadeText
               style={{
                 marginBottom: 10,
                 fontSize: 14,
-                fontStyle: 'normal',
                 fontWeight: 400,
                 lineHeight: 22,
               }}
@@ -323,9 +260,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
           </View>
 
           <TouchableOpacity
-            style={{
-              width: '100%',
-            }}
+            style={{ width: '100%' }}
             disabled={actionButtonsDisabled}
             onPress={() => {
               //setIndexerServerUriLocal('');
@@ -343,12 +278,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
-                borderColor:
-                  indexerServerUriLocal !== serverUris()[0].uri &&
-                  indexerServerUriLocal !== serverUris()[1].uri &&
-                  indexerServerChainNameLocal === ChainNameEnum.testChainName
-                    ? colors.primary
-                    : '#494444',
+                borderColor: '#494444',
                 borderWidth: 1,
                 borderRadius: 15,
                 marginBottom: 10,
@@ -373,6 +303,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
               >
                 <ComputerWhite width={24} height={24} />
               </View>
+
               <View
                 style={{
                   justifyContent: 'center',
@@ -383,23 +314,22 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                   color={colors.text}
                   style={{
                     fontSize: 20,
-                    fontStyle: 'normal',
                     fontWeight: 700,
                     lineHeight: 22,
                   }}
                 >
                   Custom
                 </RegText>
+
                 <FadeText
                   style={{
                     marginTop: 4,
                     fontSize: 14,
-                    fontStyle: 'normal',
                     fontWeight: 400,
                     lineHeight: 22,
                   }}
                 >
-                  localhost
+                  Connect to your own testnet indexer
                 </FadeText>
               </View>
             </View>
@@ -407,17 +337,11 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
 
           {!fromSettings && (
             <>
-              <View
-                style={{
-                  justifyContent: 'center',
-                  marginTop: 10,
-                }}
-              >
+              <View style={{ justifyContent: 'center', marginTop: 10 }}>
                 <FadeText
                   style={{
                     marginBottom: 10,
                     fontSize: 14,
-                    fontStyle: 'normal',
                     fontWeight: 400,
                     lineHeight: 22,
                   }}
@@ -426,209 +350,44 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
                 </FadeText>
               </View>
 
-              <View>
-                <TouchableOpacity
+              <TouchableOpacity
+                style={{
+                  justifyContent: 'center',
+                  marginTop: 10,
+                  backgroundColor: '#28282A',
+                  borderRadius: 1000,
+                  paddingVertical: 4,
+                  paddingHorizontal: 10,
+                  marginBottom: 21,
+                }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                disabled={actionButtonsDisabled}
+                onPress={() => {
+                  //setIndexerServerUriLocal('');
+                  setIndexerServerChainNameLocal(
+                    ChainNameEnum.regtestChainName,
+                  );
+                  setIndexerServer(
+                    indexerServerUriLocal,
+                    ChainNameEnum.regtestChainName,
+                  );
+                  setBorderColor('transparent');
+                  setConnected(null);
+                  goConnectIndexer();
+                }}
+              >
+                <FadeText
                   style={{
-                    justifyContent: 'center',
-                    marginTop: 10,
-                    backgroundColor: '#28282A',
-                    borderColor:
-                      indexerServerUriLocal !== serverUris()[0].uri &&
-                      indexerServerUriLocal !== serverUris()[1].uri &&
-                      indexerServerChainNameLocal ===
-                        ChainNameEnum.regtestChainName
-                        ? colors.primary
-                        : 'transparent',
-                    borderWidth: 1,
-                    borderRadius: 1000,
-                    paddingVertical: 4,
-                    paddingHorizontal: 10,
-                    marginBottom: 21,
-                  }}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  disabled={actionButtonsDisabled}
-                  onPress={() => {
-                    //setIndexerServerUriLocal('');
-                    setIndexerServerChainNameLocal(
-                      ChainNameEnum.regtestChainName,
-                    );
-                    setIndexerServer(
-                      indexerServerUriLocal,
-                      ChainNameEnum.regtestChainName,
-                    );
-                    setBorderColor('transparent');
-                    setConnected(null);
-                    goConnectIndexer();
+                    fontSize: 15,
+                    fontWeight: 400,
+                    lineHeight: 20,
+                    letterSpacing: -0.23,
                   }}
                 >
-                  <FadeText
-                    style={{
-                      fontSize: 15,
-                      fontStyle: 'normal',
-                      fontWeight: 400,
-                      lineHeight: 20,
-                      letterSpacing: -0.23,
-                    }}
-                  >
-                    Use regtest
-                  </FadeText>
-                </TouchableOpacity>
-              </View>
+                  Use regtest
+                </FadeText>
+              </TouchableOpacity>
             </>
-          )}
-
-          {(!netInfo.isConnected ||
-            netInfo.type === NetInfoStateType.cellular ||
-            netInfo.isConnectionExpensive) &&
-            false && (
-              <>
-                <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                  {translate('report.networkstatus') as string}
-                </BoldText>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'flex-end',
-                    marginHorizontal: 20,
-                  }}
-                >
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      marginBottom: 10,
-                    }}
-                  >
-                    {!netInfo.isConnected && (
-                      <BoldText style={{ fontSize: 15, color: 'red' }}>
-                        {' '}
-                        {translate('report.nointernet') as string}{' '}
-                      </BoldText>
-                    )}
-                    {netInfo.type === NetInfoStateType.cellular && (
-                      <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                        {' '}
-                        {translate('report.cellulardata') as string}{' '}
-                      </BoldText>
-                    )}
-                    {netInfo.isConnectionExpensive && (
-                      <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                        {' '}
-                        {translate('report.connectionexpensive') as string}{' '}
-                      </BoldText>
-                    )}
-                  </View>
-                </View>
-              </>
-            )}
-        </View>
-
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            alignSelf: 'flex-start',
-            margin: 0,
-            marginBottom: 4,
-            minWidth: 48,
-            minHeight: 48,
-            gap: 10,
-            marginLeft: 20,
-          }}
-        >
-          {actionButtonsDisabled && (
-            <ActivityIndicator size="small" color={colors.text} />
-          )}
-          {connected !== null && connected && (
-            <FontAwesomeIcon size={20} icon={faCheck} color={borderColor} />
-          )}
-          {connected !== null && !connected && (
-            <FontAwesomeIcon size={20} icon={faWarning} color={borderColor} />
-          )}
-          <RegText color={actionButtonsDisabled ? colors.text : borderColor}>
-            {actionButtonsDisabled
-              ? 'Connecting...'
-              : connected === null
-                ? ''
-                : connected
-                  ? 'Connected'
-                  : 'Could not connect to indexer'}
-          </RegText>
-        </View>
-
-        <View
-          style={{
-            marginTop: 'auto',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingTop: 10,
-            paddingBottom: 20,
-            paddingHorizontal: 20,
-          }}
-        >
-          {connected ? (
-            <LiquidPrimaryButton
-              title="Continue"
-              onPress={() => {
-                let newIndexerServerChainNameLocal: ChainNameEnum =
-                  indexerServerChainNameLocal;
-                if (
-                  serverUris().filter(s => s.uri === indexerServerUriLocal)
-                    .length > 0
-                ) {
-                  newIndexerServerChainNameLocal = serverUris().filter(
-                    s => s.uri === indexerServerUriLocal,
-                  )[0].chainName;
-                }
-                setIndexerServer(
-                  indexerServerUriLocal,
-                  newIndexerServerChainNameLocal,
-                );
-                Keyboard.dismiss();
-                clear();
-                // the App needs some time to store data.
-                setTimeout(() => {
-                  closeServers();
-                }, 100);
-              }}
-              style={{
-                alignSelf: 'stretch',
-              }}
-            />
-          ) : (
-            <LiquidPrimaryButton
-              title={connected === null ? 'Test Connection' : 'Retry'}
-              disabled={
-                actionButtonsDisabled ||
-                !indexerServerUriLocal ||
-                !indexerServerChainNameLocal
-              }
-              onPress={async () => {
-                setConnected(null);
-                setBorderColor('transparent');
-                const {
-                  result: _connected,
-                  indexerServerUriParsed: _indexerServerUri,
-                } = await checkIndexerServer(
-                  indexerServerUriLocal,
-                  indexerServerChainNameLocal,
-                );
-                setConnected(_connected);
-                // using local state
-                setIndexerServerUriLocal(_indexerServerUri);
-                if (_connected) {
-                  setBorderColor('#0E9634');
-                } else {
-                  setBorderColor('#ff383c');
-                }
-                Keyboard.dismiss();
-              }}
-              style={{
-                alignSelf: 'stretch',
-              }}
-            />
           )}
         </View>
       </KeyboardAvoidingView>
