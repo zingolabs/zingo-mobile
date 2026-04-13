@@ -372,7 +372,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
                   }}
                 >
                   <View style={{ flexDirection: 'row', gap: 15 }}>
-                    <RegText>
+                    <RegText style={{ fontSize: 17 }}>
                       {item.kind !== StakingActionKindEnum.Move
                         ? 'Finalizer'
                         : 'From'}
@@ -459,7 +459,7 @@ const ScheduledActionDetail: React.FC<ScheduledActionDetailProps> = ({
                   }}
                 >
                   <View style={{ flexDirection: 'row', gap: 15 }}>
-                    <RegText>{'Amount'}</RegText>
+                    <RegText style={{ fontSize: 17 }}>{'Amount'}</RegText>
                   </View>
                   <ZecAmount
                     amtZec={

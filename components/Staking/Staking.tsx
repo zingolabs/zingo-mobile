@@ -58,7 +58,7 @@ import Button from '../Components/Button';
 import { formatSeconds } from '../../app/utils/Utils';
 import { MainTabParamList } from '../../app/types/NavigationTypes';
 
-type DataType = {
+export type Finalizer = {
   svg: {
     data: string;
   };
@@ -141,7 +141,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
       .sort((a, b) => b.amount - a.amount);
   }, [walletBonds]);
 
-  const stakedData: DataType[] = useMemo(() => {
+  const stakedData: Finalizer[] = useMemo(() => {
     const resultJSON: StakeType[] = staked;
     // const randomColors = Utils.generateColorList(resultJSON.length + 10);
     const r = resultJSON
@@ -209,7 +209,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
     [isScrollingToTop],
   );
 
-  const line = (item: DataType, index: number, last: boolean) => {
+  const line = (item: Finalizer, index: number, last: boolean) => {
     return (
       <TouchableOpacity
         style={{ width: '100%' }}
@@ -477,6 +477,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                   style={{
                     color: colors.placeholder,
                     fontSize: 14,
+                    marginTop: 10,
                   }}
                 >
                   There are no scheduled actions yet.
@@ -500,9 +501,10 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                   style={{
                     color: colors.placeholder,
                     fontSize: 14,
+                    marginTop: 10,
                   }}
                 >
-                  There are no active stake yet.
+                  There are no active staking positions yet.
                 </Text>
               </View>
             )}
@@ -523,6 +525,7 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                   style={{
                     color: colors.placeholder,
                     fontSize: 14,
+                    marginTop: 10,
                   }}
                 >
                   There are no active finalizers yet.
