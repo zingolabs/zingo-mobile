@@ -124,7 +124,6 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
         title="Connect to indexer"
         goBack={() => {
           clear();
-
           goBack();
         }}
       />
