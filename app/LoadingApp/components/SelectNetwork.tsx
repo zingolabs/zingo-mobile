@@ -77,7 +77,7 @@ const SelectNetwork: React.FunctionComponent<SelectNetworkProps> = ({
     };
   }, []);
 
-  console.log('Render Select Network', indexerServerContext);
+  console.log('Render Select Network', fromSettings);
 
   return (
     <ToastProvider>

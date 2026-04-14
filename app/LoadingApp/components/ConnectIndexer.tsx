@@ -82,7 +82,14 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
 
   const custom: boolean =
     serverUris().filter(s => s.uri === indexerServerContext.uri).length === 0;
-  const { base, port } = parseUri(indexerServerContext.uri);
+  const { base, port } = parseUri(
+    `${
+      !indexerServerContext.uri.toLowerCase().startsWith(GlobalConst.http) &&
+      !indexerServerContext.uri.toLowerCase().startsWith(GlobalConst.https)
+        ? GlobalConst.http + '//' + indexerServerContext.uri
+        : indexerServerContext.uri
+    }`,
+  );
 
   const [indexerServerUriLocal, setIndexerServerUriLocal] = useState<string>(
     custom ? base : '',
@@ -116,7 +123,13 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
             : (translate('info.unknown') as string) + ' (' + chain + ')';
   };
 
-  //console.log('Render Servers', insets);
+  console.log(
+    'Render Servers',
+    indexerServerContext,
+    indexerServerUriLocal,
+    indexerServerPortLocal,
+    indexerServerChainNameLocal,
+  );
 
   return (
     <ToastProvider>
@@ -523,12 +536,6 @@ const ConnectIndexer: React.FunctionComponent<ConnectIndexerProps> = ({
                 setConnected(null);
                 setBorderColor('transparent');
                 // add http if it not have it
-                if (
-                  !indexerServerUriLocal
-                    .toLowerCase()
-                    .startsWith(GlobalConst.http)
-                ) {
-                }
                 const {
                   result: _connected,
                   indexerServerUriParsed: _indexerServerUri,

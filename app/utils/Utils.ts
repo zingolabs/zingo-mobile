@@ -596,3 +596,7 @@ export async function getIndexerList(): Promise<IndexerList> {
   console.log('json', json.data.indexers);
   return json.data.indexers;
 }
+
+export function formatAmount(value: number) {
+  return `${value.toFixed(2)} cTAZ`;
+}

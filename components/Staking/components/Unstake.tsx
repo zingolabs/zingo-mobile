@@ -335,11 +335,11 @@ const Unstake: React.FC<UnstakeProps> = ({ route }) => {
             alignItems: 'center',
             borderRadius: 20,
             marginBottom: 10,
-            backgroundColor: colors.secondary,
+            backgroundColor: '#161616',
             padding: 16,
             marginHorizontal: 10,
             borderWidth: 0.5,
-            borderColor: colors.text,
+            borderColor: '#575757',
           }}
         >
           <View
@@ -412,7 +412,7 @@ const Unstake: React.FC<UnstakeProps> = ({ route }) => {
               </View>
               {!!stakedFromNumber && (
                 <FadeText
-                  style={{ marginLeft: 15, marginBottom: 5 }}
+                  style={{ marginBottom: 5 }}
                 >{`Staked: ${stakedFromNumber.toFixed(5)} ${info.currencyName}`}</FadeText>
               )}
             </View>
