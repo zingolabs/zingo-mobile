@@ -68,16 +68,16 @@ type Finalizer = {
   tag: string;
 };
 
-const formatMovementDate = (unixSeconds: number | undefined) => {
-  if (!unixSeconds) return '-';
-  const d = new Date(unixSeconds * 1000);
-  return d.toLocaleString(undefined, {
-    month: 'short', // "Oct"
-    day: 'numeric', // "10"
-    hour: 'numeric',
-    minute: '2-digit',
-  }); // "Oct 10, 4:30 PM"
-};
+// const formatMovementDate = (unixSeconds: number | undefined) => {
+//   if (!unixSeconds) return '-';
+//   const d = new Date(unixSeconds * 1000);
+//   return d.toLocaleString(undefined, {
+//     month: 'short', // "Oct"
+//     day: 'numeric', // "10"
+//     hour: 'numeric',
+//     minute: '2-digit',
+//   }); // "Oct 10, 4:30 PM"
+// };
 
 type StakingProps = DrawerScreenProps<MainTabParamList, RouteEnum.StakingHome>;
 
@@ -100,7 +100,6 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
     timeLeftStakingDaySeconds: timeLeftStakingDay,
     scheduledActions,
     walletBonds,
-    valueTransfers,
     blocksToStakingDay,
     blocksTotalStakingDay,
   } = context;
@@ -976,11 +975,12 @@ const Staking: React.FC<StakingProps> = ({ route }) => {
                                   marginLeft: 5,
                                 }}
                               >
-                                {formatMovementDate(
+                                2026
+                                {/* {formatMovementDate(
                                   valueTransfers?.filter(
                                     vt => vt.txid === item.txid,
                                   )[0]?.time,
-                                )}
+                                )} */}
                               </Text>
                             </View>
                           </View>
