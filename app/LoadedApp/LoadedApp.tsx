@@ -1943,6 +1943,7 @@ export class LoadedAppClass extends Component<
 
     await ScheduledActionsFileImpl.resetSA();
     this.setScheduledActions([]);
+    await notifee.cancelAllNotifications();
 
     this.keepAwake(false);
     this.navigateToLoadingApp(state);
@@ -1968,6 +1969,7 @@ export class LoadedAppClass extends Component<
 
     await ScheduledActionsFileImpl.resetSA();
     this.setScheduledActions([]);
+    await notifee.cancelAllNotifications();
 
     this.keepAwake(false);
     this.navigateToLoadingApp({ startingApp: false });
@@ -2053,6 +2055,7 @@ export class LoadedAppClass extends Component<
 
       await ScheduledActionsFileImpl.resetSA();
       this.setScheduledActions([]);
+      await notifee.cancelAllNotifications();
 
       // no need to restart the tasks because is about to restart the app.
       this.navigateToLoadingApp({ startingApp: false });

@@ -82,6 +82,7 @@ import ConnectIndexer from './components/ConnectIndexer';
 import ScheduledActionsFileImpl from '../../components/ScheduledActions/ScheduledActionsFileImpl';
 import { getIndexerList, IndexerList } from '../utils/Utils';
 import { ServerListScreen } from './components/ServerListScreen';
+import notifee from '@notifee/react-native';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -1218,6 +1219,7 @@ export class LoadingAppClass extends Component<
       }
 
       await ScheduledActionsFileImpl.resetSA();
+      await notifee.cancelAllNotifications();
 
       this.navigateToLoadedApp(
         false,
@@ -1417,6 +1419,7 @@ export class LoadingAppClass extends Component<
           }
 
           await ScheduledActionsFileImpl.resetSA();
+          await notifee.cancelAllNotifications();
 
           this.navigateToLoadedApp(
             readOnly,
