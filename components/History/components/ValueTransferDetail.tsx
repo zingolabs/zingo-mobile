@@ -476,7 +476,7 @@ const ValueTransferDetail: React.FunctionComponent<
             >
               <FadeText>{translate('history.time') as string}</FadeText>
               <RegText>
-                {valueTransfer.time
+                {false
                   ? moment((valueTransfer.time || 0) * 1000).format(
                       'MMM D h:mm a',
                     )

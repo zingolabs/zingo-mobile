@@ -19,7 +19,6 @@ import {
   ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
-import moment from 'moment';
 
 import { ContextAppLoaded } from '../../../app/context';
 import { RPCValueTransferStatusEnum } from '../../../app/rpc/enums/RPCValueTransferStatusEnum';
@@ -94,7 +93,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           }}
         >
           <RegText>Activity</RegText>
-          <FadeText>{month}</FadeText>
+          <FadeText>Transactions</FadeText>
         </View>
       )}
       <TouchableOpacity
@@ -188,11 +187,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     alignItems: 'center',
                   }}
                 >
-                  <FadeText>
-                    {vt.time
-                      ? moment((vt.time || 0) * 1000).format('MMM D, h:mm a')
-                      : '--'}
-                  </FadeText>
+                  <FadeText>2026</FadeText>
                   {vt.confirmations === 0 && (
                     <View
                       style={{
