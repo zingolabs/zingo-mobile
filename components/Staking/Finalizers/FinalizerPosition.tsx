@@ -9,6 +9,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
+import { formatAmount } from '../../../app/utils/Utils';
 
 export default interface WalletBondsType {
   txid: string;
@@ -36,10 +37,6 @@ type WalletBondCardProps = {
   primaryButtonStyle?: StyleProp<ViewStyle>;
   secondaryButtonStyle?: StyleProp<ViewStyle>;
 };
-
-function formatAmount(value: number) {
-  return `${value.toFixed(2)} cTAZ`;
-}
 
 function truncateMiddle(value: string, start = 10, end = 8) {
   if (!value) return '';

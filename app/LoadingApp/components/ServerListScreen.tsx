@@ -38,6 +38,7 @@ export type ServerListScreenProps = {
   indexerList: IndexerList;
   closeServers: () => void;
   goBack: () => void;
+  previousServer?: Indexer;
 };
 
 export const ServerListScreen: React.FC<ServerListScreenProps> = ({
@@ -46,12 +47,15 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
   indexerList,
   closeServers,
   goBack,
+  previousServer,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType; // TODO: FIX
   const insets = useSafeAreaInsets();
   const { clear } = useToast();
 
-  const [selectedServer, setSelectedServer] = useState<Indexer | null>(null);
+  const [selectedServer, setSelectedServer] = useState<Indexer | null>(
+    previousServer ? previousServer : null,
+  );
   const [connected, setConnected] = useState<boolean | null>(null);
   const [borderColor, setBorderColor] = useState<string>('transparent');
   const [isTestingSelected, setIsTestingSelected] = useState(false);

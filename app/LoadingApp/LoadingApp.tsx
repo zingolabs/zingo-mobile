@@ -1661,6 +1661,7 @@ export class LoadingAppClass extends Component<
               setIndexerServer={this.setIndexerServer}
               checkIndexerServer={this.checkIndexerServer}
               closeServers={this.closeServers}
+              previousServer={}
             />
           )}
           {screen === 1 && (

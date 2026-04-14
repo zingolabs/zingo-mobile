@@ -42,6 +42,7 @@ import Refresh from '../../../assets/icons/refresh.svg';
 import RegText from '../../Components/RegText';
 import { WalletBondsStatusEnum } from '../../../app/AppState/enums/WalletBondsStatusEnum';
 import ZecAmount from '../../Components/ZecAmount';
+import { ChevronRight } from 'lucide-react-native';
 
 type ModalState = 'idle' | 'sending' | 'success';
 
@@ -322,18 +323,6 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
           }}
         />
 
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: '600',
-            color: colors.text,
-            marginBottom: 8,
-            marginTop: 15,
-            marginHorizontal: 20,
-          }}
-        >
-          Finalizers addresses
-        </Text>
         <View
           style={{
             flexDirection: 'row',
@@ -341,11 +330,11 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
             alignItems: 'center',
             borderRadius: 20,
             marginBottom: 10,
-            backgroundColor: colors.secondary,
             padding: 16,
             marginHorizontal: 10,
+            marginTop: 20,
             borderWidth: 0.5,
-            borderColor: colors.text,
+            borderColor: '#575757',
           }}
         >
           <View
@@ -418,7 +407,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
               </View>
               {!!stakedFromNumber && (
                 <FadeText
-                  style={{ marginLeft: 15, marginBottom: 5 }}
+                  style={{ marginBottom: 5 }}
                 >{`Staked: ${stakedFromNumber.toFixed(5)} ${info.currencyName}`}</FadeText>
               )}
             </View>
@@ -470,11 +459,12 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
             alignItems: 'center',
             borderRadius: 20,
             marginBottom: 10,
-            backgroundColor: colors.secondary,
+            backgroundColor: '#161616',
+
             padding: 16,
             marginHorizontal: 10,
             borderWidth: 0.5,
-            borderColor: colors.text,
+            borderColor: '#575757',
             marginTop: -15,
           }}
         >
@@ -552,7 +542,7 @@ const Redelegate: React.FC<RedelegateProps> = ({ route }) => {
               )}
             </View>
           </View>
-          <ChevronDown
+          <ChevronRight
             onPress={() =>
               navigation.navigate(RouteEnum.Finalizers, {
                 setFinalizer: (f: string, s: number) => {
