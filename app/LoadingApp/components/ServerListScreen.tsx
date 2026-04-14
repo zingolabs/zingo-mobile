@@ -38,7 +38,7 @@ export type ServerListScreenProps = {
   indexerList: IndexerList;
   closeServers: () => void;
   goBack: () => void;
-  previousServer?: Indexer;
+  previousServer?: string;
 };
 
 export const ServerListScreen: React.FC<ServerListScreenProps> = ({
@@ -53,8 +53,12 @@ export const ServerListScreen: React.FC<ServerListScreenProps> = ({
   const insets = useSafeAreaInsets();
   const { clear } = useToast();
 
+  const prevIndexer = indexerList.find(
+    indexer => indexer.url === previousServer,
+  );
+
   const [selectedServer, setSelectedServer] = useState<Indexer | null>(
-    previousServer ? previousServer : null,
+    prevIndexer ? prevIndexer : null,
   );
   const [connected, setConnected] = useState<boolean | null>(null);
   const [borderColor, setBorderColor] = useState<string>('transparent');
