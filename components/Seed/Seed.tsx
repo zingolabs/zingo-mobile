@@ -149,7 +149,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({}) => {
             }
           </FadeText>
 
-          {rows.length > 0 && (
+          {rows.length > 0 && !!seedPhrase && (
             <View
               style={{
                 marginTop: 10,
@@ -278,108 +278,122 @@ const Seed: React.FunctionComponent<SeedProps> = ({}) => {
             </View>
           )}
 
-          <TouchableOpacity
-            style={{ alignSelf: 'center' }}
-            onPress={() => {
-              if (seedPhrase) {
-                Clipboard.setString(seedPhrase);
-                if (addLastSnackbar) {
-                  addLastSnackbar({
-                    message: translate('seed.tapcopy-seed-message') as string,
-                    duration: SnackbarDurationEnum.short,
-                    screenName: [screenName],
-                  });
-                }
-                setExpandSeed(true);
-                if (privacy) {
-                  setTimeout(() => {
-                    setExpandSeed(false);
-                  }, 5 * 1000);
-                }
-              }
-            }}
-          >
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 16,
-                backgroundColor: colors.secondary,
-                borderColor: colors.border,
-                borderWidth: 1,
-                paddingVertical: 10,
-                paddingHorizontal: 20,
-                marginVertical: 10,
-              }}
-            >
-              <RegText
-                style={{
-                  color: colors.text,
-                  fontSize: 16,
-                  fontWeight: 600,
-                }}
-              >
-                Copy
-              </RegText>
-            </View>
-          </TouchableOpacity>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              borderColor: colors.border,
-              borderWidth: 1,
-              borderRadius: 25,
-              marginTop: 10,
-              marginBottom: 10,
-              backgroundColor: colors.secondary,
-              width: '100%',
-              minWidth: '50%',
-              minHeight: 48,
-              alignItems: 'center',
-              paddingHorizontal: 25,
-              paddingVertical: 15,
-            }}
-          >
-            <FadeText
-              style={{
-                flexGrow: 1,
-                flexShrink: 1,
-                fontSize: 20,
-              }}
-            >
-              Birthday
-            </FadeText>
+          {!!seedPhrase && (
             <TouchableOpacity
+              style={{ alignSelf: 'center' }}
               onPress={() => {
-                if (birthdayNumber) {
-                  Clipboard.setString(birthdayNumber);
+                if (seedPhrase) {
+                  Clipboard.setString(seedPhrase);
                   if (addLastSnackbar) {
                     addLastSnackbar({
-                      message: translate(
-                        'seed.tapcopy-birthday-message',
-                      ) as string,
+                      message: translate('seed.tapcopy-seed-message') as string,
                       duration: SnackbarDurationEnum.short,
                       screenName: [screenName],
                     });
                   }
-                  setExpandBithday(true);
+                  setExpandSeed(true);
                   if (privacy) {
                     setTimeout(() => {
-                      setExpandBithday(false);
+                      setExpandSeed(false);
                     }, 5 * 1000);
                   }
                 }
               }}
             >
-              <RegText color={colors.text} style={{ textAlign: 'center' }}>
-                {!expandBirthday
-                  ? Utils.trimToSmall(birthdayNumber, 1)
-                  : birthdayNumber}
-              </RegText>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 16,
+                  backgroundColor: colors.secondary,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  marginVertical: 10,
+                }}
+              >
+                <RegText
+                  style={{
+                    color: colors.text,
+                    fontSize: 16,
+                    fontWeight: 600,
+                  }}
+                >
+                  Copy
+                </RegText>
+              </View>
             </TouchableOpacity>
-          </View>
+          )}
+
+          {!seedPhrase && (
+            <FadeText
+              style={{ padding: 10, textAlign: 'center', fontSize: 17 }}
+            >
+              {
+                'The server is temporarily out of service. Please try again in a few seconds, or you may need to select a different server if this problem persists.'
+              }
+            </FadeText>
+          )}
+
+          {!!birthdayNumber && (
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                borderColor: colors.border,
+                borderWidth: 1,
+                borderRadius: 25,
+                marginTop: 10,
+                marginBottom: 10,
+                backgroundColor: colors.secondary,
+                width: '100%',
+                minWidth: '50%',
+                minHeight: 48,
+                alignItems: 'center',
+                paddingHorizontal: 25,
+                paddingVertical: 15,
+              }}
+            >
+              <FadeText
+                style={{
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  fontSize: 20,
+                }}
+              >
+                Birthday
+              </FadeText>
+              <TouchableOpacity
+                onPress={() => {
+                  if (birthdayNumber) {
+                    Clipboard.setString(birthdayNumber);
+                    if (addLastSnackbar) {
+                      addLastSnackbar({
+                        message: translate(
+                          'seed.tapcopy-birthday-message',
+                        ) as string,
+                        duration: SnackbarDurationEnum.short,
+                        screenName: [screenName],
+                      });
+                    }
+                    setExpandBithday(true);
+                    if (privacy) {
+                      setTimeout(() => {
+                        setExpandBithday(false);
+                      }, 5 * 1000);
+                    }
+                  }
+                }}
+              >
+                <RegText color={colors.text} style={{ textAlign: 'center' }}>
+                  {!expandBirthday
+                    ? Utils.trimToSmall(birthdayNumber, 1)
+                    : birthdayNumber}
+                </RegText>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </ScrollView>
     </ToastProvider>
