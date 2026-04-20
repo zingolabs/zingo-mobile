@@ -1,7 +1,10 @@
 import Url from 'url-parse';
 import { GlobalConst, TranslateType } from '../AppState';
 
-const parseServerURI = (uri: string, translate: (key: string) => TranslateType): string => {
+const parseServerURI = (
+  uri: string,
+  translate: (key: string) => TranslateType,
+): string => {
   if (!uri || uri === '') {
     return translate('uris.baduri') as string;
   }
@@ -11,7 +14,8 @@ const parseServerURI = (uri: string, translate: (key: string) => TranslateType):
     !parsedUri ||
     !parsedUri.hostname ||
     !parsedUri.protocol ||
-    (parsedUri.protocol !== GlobalConst.http && parsedUri.protocol !== GlobalConst.https)
+    (parsedUri.protocol !== GlobalConst.http &&
+      parsedUri.protocol !== GlobalConst.https)
   ) {
     return translate('uris.baduri') as string;
   }
@@ -20,11 +24,17 @@ const parseServerURI = (uri: string, translate: (key: string) => TranslateType):
 
   if (!port) {
     // I need to verify if the URI have a standard port like `443` or `80`
-    if (parsedUri.protocol === GlobalConst.http && uri.endsWith(':' + GlobalConst.port80)) {
+    if (
+      parsedUri.protocol === GlobalConst.http &&
+      uri.endsWith(':' + GlobalConst.port80)
+    ) {
       // looking for 80
       port = GlobalConst.port80;
     }
-    if (parsedUri.protocol === GlobalConst.https && uri.endsWith(':' + GlobalConst.port443)) {
+    if (
+      parsedUri.protocol === GlobalConst.https &&
+      uri.endsWith(':' + GlobalConst.port443)
+    ) {
       // looking for 443
       port = GlobalConst.port443;
     }

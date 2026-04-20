@@ -1,7 +1,9 @@
 import { Alert } from 'react-native';
 import { TranslateType } from '../../../app/AppState';
 
-const ShowAddressAlertAsync = (translate: (key: string) => TranslateType): Promise<void> => {
+const ShowAddressAlertAsync = (
+  translate: (key: string) => TranslateType,
+): Promise<void> => {
   return new Promise((resolve, reject) => {
     Alert.alert(
       translate('send.lose-address-title') as string,

@@ -1,4 +1,7 @@
-import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navigation/drawer';
+import {
+  createDrawerNavigator,
+  DrawerContentComponentProps,
+} from '@react-navigation/drawer';
 import React from 'react';
 import Menu from './components/Menu';
 import { MenuItemEnum, ScreenEnum } from '../../app/AppState';
@@ -30,8 +33,19 @@ const SideBar = createDrawerNavigator<AppDrawerParamList>();
  *   </Drawer>
  * }
  */
-function Drawer({ onMenuItemSelected, screenName, initialRouteName, children }: DrawerProps) {
-  const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={onMenuItemSelected} screenName={screenName} toggleMenuDrawer={() => props.navigation.toggleDrawer()} />;
+function Drawer({
+  onMenuItemSelected,
+  screenName,
+  initialRouteName,
+  children,
+}: DrawerProps) {
+  const menu = (props: DrawerContentComponentProps) => (
+    <Menu
+      onItemSelected={onMenuItemSelected}
+      screenName={screenName}
+      toggleMenuDrawer={() => props.navigation.toggleDrawer()}
+    />
+  );
 
   return (
     <SideBar.Navigator
@@ -40,7 +54,8 @@ function Drawer({ onMenuItemSelected, screenName, initialRouteName, children }: 
       screenOptions={{
         headerShown: false,
         drawerType: 'slide',
-      }}>
+      }}
+    >
       {children}
     </SideBar.Navigator>
   );

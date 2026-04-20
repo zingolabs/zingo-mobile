@@ -1,6 +1,8 @@
 import { ServerUrisType, TranslateType, ChainNameEnum } from '../AppState';
 
-const serverUris = (translate: (key: string) => TranslateType | void): ServerUrisType[] => {
+const serverUris = (
+  translate: (key: string) => TranslateType | void,
+): ServerUrisType[] => {
   return [
     // default servers (2)
     {

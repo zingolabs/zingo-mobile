@@ -22,7 +22,10 @@ export default class SettingsFileImpl {
   }
 
   // Write the server setting
-  static async writeSettings(name: SettingsNameEnum, value: string | boolean | ServerType | SecurityType) {
+  static async writeSettings(
+    name: SettingsNameEnum,
+    value: string | boolean | ServerType | SecurityType,
+  ) {
     const fileName = await this.getFileName();
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
@@ -33,7 +36,7 @@ export default class SettingsFileImpl {
       .then(() => {
         //console.log('FILE WRITTEN!')
       })
-      .catch((err) => {
+      .catch(err => {
         console.log('settings write file:', err.message);
       });
   }
@@ -45,11 +48,16 @@ export default class SettingsFileImpl {
       const fileExits: boolean = await RNFS.exists(fileName);
       if (!fileExits) {
         console.log('settings read file: The file does not exists');
-        const settings: SettingsFileClass = { firstInstall: true, version: null } as SettingsFileClass;
+        const settings: SettingsFileClass = {
+          firstInstall: true,
+          version: null,
+        } as SettingsFileClass;
         return settings;
       }
 
-      const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8)).toString());
+      const settings: SettingsFileClass = await JSON.parse(
+        (await RNFS.readFile(fileName, GlobalConst.utf8)).toString(),
+      );
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {
@@ -59,9 +67,15 @@ export default class SettingsFileImpl {
         } as ServerType;
       } else {
         if (typeof settings.server === 'string') {
-          const ss: ServerType = { uri: settings.server, chainName: ChainNameEnum.mainChainName };
+          const ss: ServerType = {
+            uri: settings.server,
+            chainName: ChainNameEnum.mainChainName,
+          };
           const standard = serverUris(() => {}).find((s: ServerUrisType) =>
-            isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, ss as ServerType),
+            isEqual(
+              { uri: s.uri, chainName: s.chainName } as ServerType,
+              ss as ServerType,
+            ),
           );
           if (standard) {
             settings.server = ss as ServerType;
@@ -124,7 +138,10 @@ export default class SettingsFileImpl {
           serverUris(() => {})
             .filter((s: ServerUrisType) => s.obsolete)
             .find((s: ServerUrisType) =>
-              isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
+              isEqual(
+                { uri: s.uri, chainName: s.chainName } as ServerType,
+                settings.server as ServerType,
+              ),
             )
         ) {
           // obsolete servers -> auto - to make easier and faster UX to the user
@@ -133,14 +150,20 @@ export default class SettingsFileImpl {
           serverUris(() => {})
             .filter((s: ServerUrisType) => s.default)
             .find((s: ServerUrisType) =>
-              isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
+              isEqual(
+                { uri: s.uri, chainName: s.chainName } as ServerType,
+                settings.server as ServerType,
+              ),
             )
         ) {
           // default servers -> auto - to make easier and faster UX to the user
           settings.selectServer = SelectServerEnum.auto;
         } else if (
           serverUris(() => {}).find((s: ServerUrisType) =>
-            isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
+            isEqual(
+              { uri: s.uri, chainName: s.chainName } as ServerType,
+              settings.server as ServerType,
+            ),
           )
         ) {
           // new servers (not default & not obsolete) -> in the list - the user changed the default server in some point
@@ -157,7 +180,10 @@ export default class SettingsFileImpl {
           serverUris(() => {})
             .filter((s: ServerUrisType) => s.obsolete)
             .find((s: ServerUrisType) =>
-              isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
+              isEqual(
+                { uri: s.uri, chainName: s.chainName } as ServerType,
+                settings.server as ServerType,
+              ),
             ) &&
           settings.selectServer !== SelectServerEnum.custom
         ) {
@@ -195,7 +221,9 @@ export default class SettingsFileImpl {
           settings.security = sec;
         }
       }
-      if (!settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)) {
+      if (
+        !settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)
+      ) {
         // doing backup of seed & birthday in the device -> false by default.
         settings.recoveryWalletInfoOnDevice = false;
       }
@@ -212,7 +240,10 @@ export default class SettingsFileImpl {
       // The File doesn't exist, so return nothing
       // Here I know 100% it is a fresh install or the user cleaned the device staorage
       console.log('settings read file:', err);
-      const settings: SettingsFileClass = { firstInstall: true, version: null } as SettingsFileClass;
+      const settings: SettingsFileClass = {
+        firstInstall: true,
+        version: null,
+      } as SettingsFileClass;
       return settings;
     }
   }

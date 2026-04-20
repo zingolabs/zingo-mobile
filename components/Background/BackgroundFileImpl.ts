@@ -18,7 +18,7 @@ export default class BackgroundFileImpl {
       .then(() => {
         //console.log('FILE WRITTEN!')
       })
-      .catch((err) => {
+      .catch(err => {
         console.log('background write file:', err.message);
       });
   }
@@ -32,7 +32,12 @@ export default class BackgroundFileImpl {
       const fileExits: boolean = await RNFS.exists(fileName);
       if (!fileExits) {
         console.log('background read file: The file does not exists');
-        return { batches: 0, message: '', date: 0, dateEnd: 0 } as BackgroundType;
+        return {
+          batches: 0,
+          message: '',
+          date: 0,
+          dateEnd: 0,
+        } as BackgroundType;
       }
 
       const rStr = (await RNFS.readFile(fileName, GlobalConst.utf8)).toString();

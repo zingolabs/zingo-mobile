@@ -1,4 +1,3 @@
-
 import React from 'react';
 //import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
 import { RouteEnum } from '../../app/AppState';
@@ -8,12 +7,17 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../app/types';
 //import { useToast } from 'react-native-toastier';
 
-type MessagesAddressProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.MessagesAddress>;
+type MessagesAddressProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.MessagesAddress
+>;
 
-const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
-  //navigation,
-  //route,
-}) => {
+const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = (
+  {
+    //navigation,
+    //route,
+  },
+) => {
   //const setScrollToBottom = route.params.setScrollToBottom;
   //const scrollToBottom = route.params.scrollToBottom;
   //const address = route.params.address;

@@ -1,4 +1,8 @@
-import { CurrencyEnum, LanguageEnum, BlockExplorerEnum } from '../../app/AppState';
+import {
+  CurrencyEnum,
+  LanguageEnum,
+  BlockExplorerEnum,
+} from '../../app/AppState';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
 
 export const mockTranslate = (p: string) => {

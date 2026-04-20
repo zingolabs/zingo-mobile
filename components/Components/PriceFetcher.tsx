@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, View, ActivityIndicator, Alert, AlertButton } from 'react-native';
+import {
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  Alert,
+  AlertButton,
+} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
@@ -19,10 +25,15 @@ type PriceFetcherProps = {
   textBefore?: string;
 };
 
-const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, screenName, textBefore }) => {
+const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
+  setZecPrice,
+  screenName,
+  textBefore,
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode, language, currency } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { translate, zecPrice, addLastSnackbar, mode, language, currency } =
+    context;
+  const { colors } = useTheme() as ThemeType;
 
   const [refreshMinutes, setRefreshMinutes] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -50,7 +61,11 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     if (min < 60) {
       return min.toString();
     } else {
-      return (min / 60).toFixed(0).toString() + ':' + (min % 60).toFixed(0).toString().padStart(2, '0');
+      return (
+        (min / 60).toFixed(0).toString() +
+        ':' +
+        (min % 60).toFixed(0).toString().padStart(2, '0')
+      );
     }
   };
 
@@ -59,7 +74,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     let price: number;
     let error: string;
     // first attempt
-    ({price, error} = await RPC.rpcGetZecPrice(withTor));
+    ({ price, error } = await RPC.rpcGetZecPrice(withTor));
     //console.log('first price fetching', price, error);
     // values:
     // 0   - initial/default value
@@ -68,22 +83,31 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     // > 0 - real value
     if (price <= 0) {
       // second attempt
-      ({price, error} = await RPC.rpcGetZecPrice(withTor));
+      ({ price, error } = await RPC.rpcGetZecPrice(withTor));
       //console.log('second price fetching', price, error);
     }
 
     if (price === -1) {
-      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: [screenName] });
+      addLastSnackbar({
+        message: `${translate('info.errorgemini')} - ${error}`,
+        screenName: [screenName],
+      });
       setLoading(false);
       return;
     }
     if (price === -2) {
-      addLastSnackbar({ message: `${translate('info.errorrpcmodule')} - ${error}`, screenName: [screenName] });
+      addLastSnackbar({
+        message: `${translate('info.errorrpcmodule')} - ${error}`,
+        screenName: [screenName],
+      });
       setLoading(false);
       return;
     }
     if (price <= 0) {
-      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: [screenName] });
+      addLastSnackbar({
+        message: `${translate('info.errorgemini')} - ${error}`,
+        screenName: [screenName],
+      });
       setZecPrice(price, 0);
     } else {
       setZecPrice(price, Date.now());
@@ -97,10 +121,23 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
 
   const onPressFetchAlert = () => {
     const buttons: AlertButton[] = [
-      ...[currency === CurrencyEnum.USDCurrency
-        ? { text: translate('send.fetch-button') as string, onPress: () => onPressFetch(false) } : {}],
-      ...[currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency
-        ? { text: translate('send.fetchwithtor-button') as string, onPress: () => onPressFetch(true) } : {}],
+      ...[
+        currency === CurrencyEnum.USDCurrency
+          ? {
+              text: translate('send.fetch-button') as string,
+              onPress: () => onPressFetch(false),
+            }
+          : {},
+      ],
+      ...[
+        currency === CurrencyEnum.USDCurrency ||
+        currency === CurrencyEnum.USDTORCurrency
+          ? {
+              text: translate('send.fetchwithtor-button') as string,
+              onPress: () => onPressFetch(true),
+            }
+          : {},
+      ],
       { text: translate('cancel') as string, style: 'cancel' },
     ];
     Alert.alert(
@@ -128,15 +165,21 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
             minHeight: 40,
             rowGap: 5,
             columnGap: 10,
-          }}>
-          {textBefore && <RegText style={{ color: colors.text }}>{textBefore}</RegText>}
+          }}
+        >
+          {textBefore && (
+            <RegText style={{ color: colors.text }}>{textBefore}</RegText>
+          )}
           <ActivityIndicator size="small" color={colors.primary} />
         </View>
       )}
       {!loading && (
         <TouchableOpacity
           disabled={loading}
-          onPress={() => (mode === ModeEnum.basic ? onPressFetch(false) : onPressFetchAlert())}>
+          onPress={() =>
+            mode === ModeEnum.basic ? onPressFetch(false) : onPressFetchAlert()
+          }
+        >
           <View
             style={{
               flexDirection: 'row',
@@ -151,9 +194,16 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
               minHeight: 40,
               rowGap: 5,
               columnGap: 10,
-            }}>
-            {textBefore && <RegText style={{ color: colors.text }}>{textBefore}</RegText>}
-            <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+            }}
+          >
+            {textBefore && (
+              <RegText style={{ color: colors.text }}>{textBefore}</RegText>
+            )}
+            <FontAwesomeIcon
+              icon={faRefresh}
+              size={20}
+              color={colors.primary}
+            />
             {refreshMinutes > 0 && (
               <FadeText>
                 {formatMinutes(refreshMinutes) + translate('history.minago')}

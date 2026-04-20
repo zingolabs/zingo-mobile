@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   View,
   ScrollView,
@@ -10,7 +17,14 @@ import {
 } from 'react-native';
 
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressKindEnum, ButtonTypeEnum, RouteEnum, ScreenEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
+import {
+  AddressKindEnum,
+  ButtonTypeEnum,
+  RouteEnum,
+  ScreenEnum,
+  TransparentAddressClass,
+  UnifiedAddressClass,
+} from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -24,56 +38,69 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type AddressListProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressList>;
+type AddressListProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.AddressList
+>;
 
 const AddressList: React.FunctionComponent<AddressListProps> = ({
   navigation,
   route,
 }) => {
-  const setIndex = !!route.params && route.params.setIndex !== undefined ? route.params.setIndex : () => {};
+  const setIndex =
+    !!route.params && route.params.setIndex !== undefined
+      ? route.params.setIndex
+      : () => {};
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    addresses,
-    snackbars,
-    removeFirstSnackbar,
-  } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { translate, addresses, snackbars, removeFirstSnackbar } = context;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.AddressList;
 
   const [numAl, setNumAl] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
-  const [addressesSliced, setAddressesSliced] = useState<(UnifiedAddressClass | TransparentAddressClass)[]>([]);
+  const [addressesSliced, setAddressesSliced] = useState<
+    (UnifiedAddressClass | TransparentAddressClass)[]
+  >([]);
 
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [addressKind, setAddressKind] = useState<AddressKindEnum>(!!route.params && route.params.addressKind !== undefined ? route.params.addressKind : AddressKindEnum.u);
+  const [addressKind, setAddressKind] = useState<AddressKindEnum>(
+    !!route.params && route.params.addressKind !== undefined
+      ? route.params.addressKind
+      : AddressKindEnum.u,
+  );
 
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
   useEffect(() => {
-    const _addressKind = !!route.params && route.params.addressKind !== undefined ? route.params.addressKind : AddressKindEnum.u;
+    const _addressKind =
+      !!route.params && route.params.addressKind !== undefined
+        ? route.params.addressKind
+        : AddressKindEnum.u;
     setAddressKind(_addressKind);
-  }, [
-    route, 
-    route.params, 
-    route.params?.addressKind
-  ]);
-  
+  }, [route, route.params, route.params?.addressKind]);
+
   const fetchAddressBookFiltered = useMemo(async () => {
     if (!addresses) {
       return [];
     }
     if (addressKind === AddressKindEnum.u) {
-      return addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === addressKind);
+      return addresses.filter(
+        (a: UnifiedAddressClass | TransparentAddressClass) =>
+          a.addressKind === addressKind,
+      );
     } else {
-      return addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === addressKind && a.scope === RPCAddressScopeEnum.external);
+      return addresses.filter(
+        (a: UnifiedAddressClass | TransparentAddressClass) =>
+          a.addressKind === addressKind &&
+          a.scope === RPCAddressScopeEnum.external,
+      );
     }
   }, [addressKind, addresses]);
 
@@ -116,22 +143,25 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     }
   }, [isScrollingToTop]);
 
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y <= 100;
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset } = event.nativeEvent;
+      const isTop = contentOffset.y <= 100;
 
-    // If we're scrolling to top and we've reached the top, stop the scrolling state
-    if (isScrollingToTop && isTop) {
-      setIsScrollingToTop(false);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = null;
+      // If we're scrolling to top and we've reached the top, stop the scrolling state
+      if (isScrollingToTop && isTop) {
+        setIsScrollingToTop(false);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = null;
+        }
       }
-    }
 
-    // Always update isAtTop for manual scrolling
-    setIsAtTop(isTop);
-  }, [isScrollingToTop]);
+      // Always update isAtTop for manual scrolling
+      setIsAtTop(isTop);
+    },
+    [isScrollingToTop],
+  );
 
   //console.log('render Address Book - 4', currentItem, action, addressBook);
 
@@ -147,11 +177,14 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
         <Header
-          title={`${translate('addresslist.title')} - ${addressKind === AddressKindEnum.u
-            ? translate('addresslist.unified')
-            : translate('addresslist.transparent')}`}
+          title={`${translate('addresslist.title')} - ${
+            addressKind === AddressKindEnum.u
+              ? translate('addresslist.unified')
+              : translate('addresslist.transparent')
+          }`}
           screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
@@ -176,7 +209,8 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             flexDirection: 'column',
             alignItems: 'stretch',
             justifyContent: 'flex-start',
-          }}>
+          }}
+        >
           {addressesSliced.length === 0 && !loading && (
             <View
               style={{
@@ -185,12 +219,19 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                 alignItems: 'center',
                 justifyContent: 'flex-start',
                 marginTop: 30,
-              }}>
-              <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
+              }}
+            >
+              <FadeText style={{ color: colors.primary }}>
+                {translate('addressbook.empty') as string}
+              </FadeText>
             </View>
           )}
           {loading ? (
-            <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
+            <ActivityIndicator
+              style={{ marginTop: 7, marginRight: 7 }}
+              size={25}
+              color={colors.primaryDisabled}
+            />
           ) : (
             <>
               {addressesSliced.map((alItem, index) => {
@@ -223,7 +264,8 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                 justifyContent: 'flex-start',
                 marginTop: 5,
                 marginBottom: 30,
-              }}>
+              }}
+            >
               <Button
                 type={ButtonTypeEnum.Secondary}
                 title={translate('addressbook.loadmore') as string}
@@ -241,8 +283,11 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                     justifyContent: 'flex-start',
                     marginTop: 5,
                     marginBottom: 30,
-                  }}>
-                  <FadeText style={{ color: colors.primary }}>{translate('addressbook.end') as string}</FadeText>
+                  }}
+                >
+                  <FadeText style={{ color: colors.primary }}>
+                    {translate('addressbook.end') as string}
+                  </FadeText>
                 </View>
               )}
             </>
@@ -264,7 +309,8 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
               borderWidth: 1,
               borderColor: colors.zingo,
               opacity: isScrollingToTop ? 0.5 : 1,
-            })}>
+            })}
+          >
             <FontAwesomeIcon
               style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
               size={20}

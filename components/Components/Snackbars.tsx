@@ -1,6 +1,10 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { View } from 'react-native';
-import { SnackbarDurationEnum, SnackbarType, ScreenEnum } from '../../app/AppState';
+import {
+  SnackbarDurationEnum,
+  SnackbarType,
+  ScreenEnum,
+} from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import { useTheme } from '@react-navigation/native';
 import { useToast } from 'react-native-toastier';
@@ -11,13 +15,19 @@ type SnackbarProps = {
   screenName: ScreenEnum;
 };
 
-const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFirstSnackbar, screenName }) => {
-  const { colors } = useTheme()  as ThemeType;
+const Snackbars: React.FunctionComponent<SnackbarProps> = ({
+  snackbars,
+  removeFirstSnackbar,
+  screenName,
+}) => {
+  const { colors } = useTheme() as ThemeType;
   const snacking = useRef<boolean>(false);
   const snackingMessage = useRef<string>(undefined);
   const [duration, setDuration] = useState<number>(4000);
   const toast = useToast();
-  const snackbarsFiltered = snackbars.filter((s: SnackbarType) => s.screenName.includes(screenName));
+  const snackbarsFiltered = snackbars.filter((s: SnackbarType) =>
+    s.screenName.includes(screenName),
+  );
 
   const handleSnackbarClose = useCallback(() => {
     if (snackbarsFiltered[0]?.message !== snackingMessage.current) {
@@ -46,8 +56,8 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
         currentSnackbar.duration === SnackbarDurationEnum.longer
           ? 8000
           : currentSnackbar.duration === SnackbarDurationEnum.short
-          ? 1000
-          : 4000,
+            ? 1000
+            : 4000,
       );
       //console.log('show snackbar', currentSnackbar);
       toast.show({
@@ -99,7 +109,12 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       }, duration + 500);
       return () => clearTimeout(timer);
     }
-  }, [duration, handleSnackbarClose, snackbarsFiltered, snackbarsFiltered.length]);
+  }, [
+    duration,
+    handleSnackbarClose,
+    snackbarsFiltered,
+    snackbarsFiltered.length,
+  ]);
 
   useEffect(() => {
     //console.log('MOUNTING - snackbar');

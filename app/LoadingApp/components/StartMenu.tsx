@@ -1,9 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Text, View, ActivityIndicator, ScrollView, Image, TouchableOpacity, TextInput, Alert, NativeSyntheticEvent, Keyboard } from 'react-native';
+import {
+  Text,
+  View,
+  ActivityIndicator,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  NativeSyntheticEvent,
+  Keyboard,
+} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context-menu-view';
+import ContextMenu, {
+  ContextMenuOnPressNativeEvent,
+} from 'react-native-context-menu-view';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEllipsisV, faWifi } from '@fortawesome/free-solid-svg-icons';
@@ -11,7 +24,13 @@ import { faEllipsisV, faWifi } from '@fortawesome/free-solid-svg-icons';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
 import { ThemeType } from '../../types';
-import { ButtonTypeEnum, ChainNameEnum, GlobalConst, ModeEnum, SelectServerEnum } from '../../AppState';
+import {
+  ButtonTypeEnum,
+  ChainNameEnum,
+  GlobalConst,
+  ModeEnum,
+  SelectServerEnum,
+} from '../../AppState';
 import Button from '../../../components/Components/Button';
 import { ContextAppLoading } from '../../context';
 import BoldText from '../../../components/Components/BoldText';
@@ -61,14 +80,15 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 }) => {
   const context = useContext(ContextAppLoading);
   const { netInfo, mode, translate, server, selectServer } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: colors.background,
-      }}>
+      }}
+    >
       <View
         style={{
           backgroundColor: colors.card,
@@ -77,7 +97,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           top: 0,
           right: 0,
           zIndex: 999,
-        }}>
+        }}
+      >
         {netInfo.isConnected && !actionButtonsDisabled && (
           <>
             {mode === ModeEnum.basic ? (
@@ -86,20 +107,44 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 dropdownMenuMode={true}
                 actions={
                   hasRecoveryWalletInfoSaved
-                    ? [{ title: translate('loadingapp.recoverkeys') as string }, {title: translate('loadingapp.advancedmode') as string }]
-                    : [{ title: translate('loadingapp.advancedmode') as string }]
+                    ? [
+                        {
+                          title: translate('loadingapp.recoverkeys') as string,
+                        },
+                        {
+                          title: translate('loadingapp.advancedmode') as string,
+                        },
+                      ]
+                    : [
+                        {
+                          title: translate('loadingapp.advancedmode') as string,
+                        },
+                      ]
                 }
-                onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
+                onPress={(
+                  e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>,
+                ) => {
                   if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
                     recoverRecoveryWalletInfo(true);
-                  } else if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 1) {
+                  } else if (
+                    hasRecoveryWalletInfoSaved &&
+                    e.nativeEvent.index === 1
+                  ) {
                     changeMode(ModeEnum.advanced);
-                  } else if (!hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
+                  } else if (
+                    !hasRecoveryWalletInfoSaved &&
+                    e.nativeEvent.index === 0
+                  ) {
                     changeMode(ModeEnum.advanced);
                   }
                 }}
               >
-                <FontAwesomeIcon style={{ width: 40, padding: 10 }} icon={faEllipsisV} color={'#ffffff'} size={40} />
+                <FontAwesomeIcon
+                  style={{ width: 40, padding: 10 }}
+                  icon={faEllipsisV}
+                  color={'#ffffff'}
+                  size={40}
+                />
               </ContextMenu>
             ) : (
               <ContextMenu
@@ -107,38 +152,67 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 dropdownMenuMode={true}
                 actions={
                   hasRecoveryWalletInfoSaved
-                    ? [{ title: translate('loadingapp.recoverkeys') as string }, { title: translate('loadingapp.custom') as string }]
+                    ? [
+                        {
+                          title: translate('loadingapp.recoverkeys') as string,
+                        },
+                        { title: translate('loadingapp.custom') as string },
+                      ]
                     : [{ title: translate('loadingapp.custom') as string }]
                 }
-                onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
+                onPress={(
+                  e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>,
+                ) => {
                   if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
                     recoverRecoveryWalletInfo(true);
-                  } else if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 1) {
+                  } else if (
+                    hasRecoveryWalletInfoSaved &&
+                    e.nativeEvent.index === 1
+                  ) {
                     customServer();
-                  } else if (!hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
+                  } else if (
+                    !hasRecoveryWalletInfoSaved &&
+                    e.nativeEvent.index === 0
+                  ) {
                     customServer();
                   }
                 }}
               >
-                <FontAwesomeIcon style={{ width: 40, padding: 10 }} icon={faEllipsisV} color={'#ffffff'} size={40} />
+                <FontAwesomeIcon
+                  style={{ width: 40, padding: 10 }}
+                  icon={faEllipsisV}
+                  color={'#ffffff'}
+                  size={40}
+                />
               </ContextMenu>
             )}
           </>
         )}
-        {!netInfo.isConnected && hasRecoveryWalletInfoSaved && !actionButtonsDisabled && (
-          <ContextMenu
-            title={translate('loadedapp.options') as string}
-            dropdownMenuMode={true}
-            actions={[{ title: translate('loadingapp.recoverkeys') as string }]}
-            onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
-              if (e.nativeEvent.index === 0) {
-                recoverRecoveryWalletInfo(true);
-              }
-            }}
-          >
-            <FontAwesomeIcon style={{ width: 40, padding: 10 }} icon={faEllipsisV} color={'#ffffff'} size={40} />
-          </ContextMenu>
-        )}
+        {!netInfo.isConnected &&
+          hasRecoveryWalletInfoSaved &&
+          !actionButtonsDisabled && (
+            <ContextMenu
+              title={translate('loadedapp.options') as string}
+              dropdownMenuMode={true}
+              actions={[
+                { title: translate('loadingapp.recoverkeys') as string },
+              ]}
+              onPress={(
+                e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>,
+              ) => {
+                if (e.nativeEvent.index === 0) {
+                  recoverRecoveryWalletInfo(true);
+                }
+              }}
+            >
+              <FontAwesomeIcon
+                style={{ width: 40, padding: 10 }}
+                icon={faEllipsisV}
+                color={'#ffffff'}
+                size={40}
+              />
+            </ContextMenu>
+          )}
       </View>
       <ScrollView
         style={{ maxHeight: '90%' }}
@@ -148,22 +222,36 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           alignItems: 'stretch',
           justifyContent: 'flex-start',
           padding: 20,
-        }}>
+        }}
+      >
         <View
           style={{
             flex: 1,
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-          }}>
-          <View style={{ marginBottom: 30, display: 'flex', alignItems: 'center' }}>
-            <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
+          }}
+        >
+          <View
+            style={{ marginBottom: 30, display: 'flex', alignItems: 'center' }}
+          >
+            <Text
+              style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}
+            >
               {translate('zingo') as string}
             </Text>
-            <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
+            <Text style={{ color: colors.zingo, fontSize: 15 }}>
+              {translate('version') as string}
+            </Text>
             <Image
               source={require('../../../assets/img/logobig-zingo.png')}
-              style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10, borderRadius: 10 }}
+              style={{
+                width: 100,
+                height: 100,
+                resizeMode: 'contain',
+                marginTop: 10,
+                borderRadius: 10,
+              }}
             />
           </View>
 
@@ -171,10 +259,14 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             <>
               <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                 {`${translate('loadingapp.actualserver') as string} [${
-                  translate(`settings.value-chainname-${server.chainName}`) as string
+                  translate(
+                    `settings.value-chainname-${server.chainName}`,
+                  ) as string
                 }]`}
               </BoldText>
-              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server.uri}</BoldText>
+              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>
+                {server.uri}
+              </BoldText>
             </>
           )}
           {selectServer === SelectServerEnum.offline && (
@@ -199,7 +291,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 marginBottom: 5,
                 justifyContent: 'center',
                 alignItems: 'center',
-              }}>
+              }}
+            >
               {true && (
                 <View
                   style={{
@@ -209,15 +302,26 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                     marginBottom: 10,
                     paddingHorizontal: 5,
                     paddingVertical: 1,
-                    borderColor: customServerOffline ? colors.primary : colors.zingo,
+                    borderColor: customServerOffline
+                      ? colors.primary
+                      : colors.zingo,
                     borderWidth: customServerOffline ? 2 : 1,
                     borderRadius: 10,
                     minWidth: 25,
                     minHeight: 25,
-                  }}>
-                  <TouchableOpacity onPress={() => onPressServerOffline(!customServerOffline)}>
-                    <View style={{ flexDirection: 'row', margin: 0, padding: 0 }}>
-                      <FontAwesomeIcon icon={faWifi} color={customServerOffline ? 'red' : colors.zingo} size={18} />
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => onPressServerOffline(!customServerOffline)}
+                  >
+                    <View
+                      style={{ flexDirection: 'row', margin: 0, padding: 0 }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faWifi}
+                        color={customServerOffline ? 'red' : colors.zingo}
+                        size={18}
+                      />
                       <FadeText style={{ marginLeft: 10, marginRight: 5 }}>
                         {translate('settings.server-offline') as string}
                       </FadeText>
@@ -243,7 +347,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                       minWidth: '50%',
                       minHeight: 48,
                       alignItems: 'center',
-                    }}>
+                    }}
+                  >
                     <TextInput
                       placeholder={GlobalConst.serverPlaceHolder}
                       placeholderTextColor={colors.placeholder}
@@ -294,7 +399,9 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             </View>
           )}
 
-          {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
+          {(!netInfo.isConnected ||
+            netInfo.type === NetInfoStateType.cellular ||
+            netInfo.isConnectionExpensive) && (
             <>
               <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                 {translate('report.networkstatus') as string}
@@ -305,8 +412,15 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   flexDirection: 'row',
                   alignItems: 'flex-end',
                   marginHorizontal: 20,
-                }}>
-                <View style={{ display: 'flex', flexDirection: 'column', marginBottom: 10 }}>
+                }}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginBottom: 10,
+                  }}
+                >
                   {!netInfo.isConnected && (
                     <BoldText style={{ fontSize: 15, color: 'red' }}>
                       {' '}
@@ -339,7 +453,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   alignItems: 'flex-end',
                   marginHorizontal: 20,
                   marginBottom: 20,
-                }}>
+                }}
+              >
                 <View
                   style={{
                     display: 'flex',
@@ -349,8 +464,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                     borderWidth: 1,
                     borderRadius: 5,
                     padding: 5,
-                  }}>
-                  <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
+                  }}
+                >
+                  <BoldText
+                    style={{ fontSize: 15, color: colors.primaryDisabled }}
+                  >
                     {translate('loadingapp.noopenwallet-message') as string}
                   </BoldText>
                 </View>
@@ -394,7 +512,14 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           )}
 
           {netInfo.isConnected && selectServer !== SelectServerEnum.offline && (
-            <View style={{ marginTop: 10, display: 'flex', alignItems: 'center', width: '100%' }}>
+            <View
+              style={{
+                marginTop: 10,
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+              }}
+            >
               <Button
                 testID="loadingapp.restorewalletseedufvk"
                 type={ButtonTypeEnum.Secondary}
@@ -413,7 +538,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 flexDirection: 'row',
                 alignItems: 'flex-end',
                 marginHorizontal: 20,
-              }}>
+              }}
+            >
               <View
                 style={{
                   display: 'flex',
@@ -423,8 +549,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   borderWidth: 1,
                   borderRadius: 5,
                   padding: 5,
-                }}>
-                <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
+                }}
+              >
+                <BoldText
+                  style={{ fontSize: 15, color: colors.primaryDisabled }}
+                >
                   {translate('loadingapp.nointernet-message') as string}
                 </BoldText>
               </View>
@@ -438,7 +567,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 flexDirection: 'row',
                 alignItems: 'flex-end',
                 marginHorizontal: 20,
-              }}>
+              }}
+            >
               <View
                 style={{
                   display: 'flex',
@@ -448,8 +578,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   borderWidth: 1,
                   borderRadius: 5,
                   padding: 5,
-                }}>
-                <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
+                }}
+              >
+                <BoldText
+                  style={{ fontSize: 15, color: colors.primaryDisabled }}
+                >
                   {translate('loadingapp.offline-message') as string}
                 </BoldText>
               </View>
@@ -457,7 +590,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           )}
 
           {actionButtonsDisabled && (
-            <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              style={{ marginVertical: 20 }}
+            />
           )}
         </View>
       </ScrollView>

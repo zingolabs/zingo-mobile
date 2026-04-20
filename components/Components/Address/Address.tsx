@@ -10,7 +10,7 @@ type AddressProps = {
   endLength?: number;
   onPress?: () => void;
   style?: TextStyle;
-}
+};
 
 const Address: React.FunctionComponent<AddressProps> = ({
   address,

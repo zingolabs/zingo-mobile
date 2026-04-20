@@ -3,7 +3,14 @@ import React, { useContext } from 'react';
 import { View, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAddressCard, faQrcode, faTrashCan, faPencil, faPaperPlane, faWallet } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAddressCard,
+  faQrcode,
+  faTrashCan,
+  faPencil,
+  faPaperPlane,
+  faWallet,
+} from '@fortawesome/free-solid-svg-icons';
 
 import FadeText from '../../Components/FadeText';
 import {
@@ -44,10 +51,19 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, totalBalance, selectServer, setSendPageState } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const {
+    translate,
+    readOnly,
+    mode,
+    totalBalance,
+    selectServer,
+    setSendPageState,
+  } = context;
+  const { colors } = useTheme() as ThemeType;
 
-  const displayAddress: string = item.address ? Utils.trimToSmall(item.address, 7) : (translate('info.unknown') as string);
+  const displayAddress: string = item.address
+    ? Utils.trimToSmall(item.address, 7)
+    : (translate('info.unknown') as string);
   const displayContact: string = item.label
     ? item.label.length > 20
       ? Utils.trimToSmall(item.label, 8)
@@ -78,7 +94,10 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   //console.log('render Ab SummaryLine - 5', index);
 
   return (
-    <View testID={`addressbooklist.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
+    <View
+      testID={`addressbooklist.${index + 1}`}
+      style={{ display: 'flex', flexDirection: 'column' }}
+    >
       <View
         style={{
           display: 'flex',
@@ -88,8 +107,15 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           borderBottomWidth: addressProtected ? 3 : 1,
           borderBottomColor: addressProtected ? colors.zingo : colors.border,
           opacity: addressProtected ? 0.5 : 1,
-        }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+          }}
+        >
           <TouchableOpacity
             onPress={() => {
               if (!addressProtected) {
@@ -97,13 +123,20 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 setAction(AddressBookActionEnum.Modify);
                 handleScrollToTop();
               }
-            }}>
+            }}
+          >
             <View style={{ flexDirection: 'row', marginBottom: 5 }}>
               <FontAwesomeIcon
                 style={{ marginHorizontal: 10 }}
                 size={24}
                 icon={item.own ? faWallet : faAddressCard}
-                color={addressProtected || item.own ? colors.zingo : item.color ? item.color : colors.primarydisabled}
+                color={
+                  addressProtected || item.own
+                    ? colors.zingo
+                    : item.color
+                      ? item.color
+                      : colors.primarydisabled
+                }
               />
               <FadeText
                 style={{
@@ -112,28 +145,53 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   color: addressProtected ? colors.zingo : colors.primary,
                   opacity: 1,
                   fontWeight: 'bold',
-                }}>
+                }}
+              >
                 {displayContact}
               </FadeText>
             </View>
             <View style={{ flexDirection: 'row' }}>
-              <FontAwesomeIcon style={{ marginHorizontal: 10 }} size={24} icon={faQrcode} color={colors.zingo} />
-              <FadeText style={{ fontSize: 18, marginHorizontal: 10, opacity: 1, fontWeight: 'bold' }}>
+              <FontAwesomeIcon
+                style={{ marginHorizontal: 10 }}
+                size={24}
+                icon={faQrcode}
+                color={colors.zingo}
+              />
+              <FadeText
+                style={{
+                  fontSize: 18,
+                  marginHorizontal: 10,
+                  opacity: 1,
+                  fontWeight: 'bold',
+                }}
+              >
                 {displayAddress}
               </FadeText>
             </View>
           </TouchableOpacity>
         </View>
         {!addressProtected && (
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+          <View
+            style={{
+              width: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
             <TouchableOpacity
               style={{ zIndex: 999, padding: 10 }}
               onPress={() => {
                 setCurrentItem(index);
                 setAction(AddressBookActionEnum.Modify);
                 handleScrollToTop();
-              }}>
-              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faPencil} color={colors.money} />
+              }}
+            >
+              <FontAwesomeIcon
+                style={{ opacity: 0.8 }}
+                size={25}
+                icon={faPencil}
+                color={colors.money}
+              />
             </TouchableOpacity>
           </View>
         )}
@@ -146,26 +204,53 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             // because the action is related with `send`.
             totalBalance.totalSpendableBalance <= 0
           ) && (
-            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                width: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
               <TouchableOpacity
                 style={{ zIndex: 999, padding: 10 }}
                 onPress={() => {
                   // enviar
-                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                  const sendPageState = new SendPageStateClass(
+                    new ToAddrClass(0),
+                  );
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
                   navigation.navigate(RouteEnum.HomeStack, {
                     screen: RouteEnum.Send,
                   });
-                }}>
-                <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
+                }}
+              >
+                <FontAwesomeIcon
+                  size={30}
+                  icon={faPaperPlane}
+                  color={colors.primary}
+                />
               </TouchableOpacity>
             </View>
           )}
         {!addressProtected && (
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableOpacity style={{ zIndex: 999, padding: 10 }} onPress={() => onPressDelete()}>
-              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faTrashCan} color={colors.money} />
+          <View
+            style={{
+              width: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <TouchableOpacity
+              style={{ zIndex: 999, padding: 10 }}
+              onPress={() => onPressDelete()}
+            >
+              <FontAwesomeIcon
+                style={{ opacity: 0.8 }}
+                size={25}
+                icon={faTrashCan}
+                color={colors.money}
+              />
             </TouchableOpacity>
           </View>
         )}

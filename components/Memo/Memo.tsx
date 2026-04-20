@@ -20,28 +20,42 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { ButtonTypeEnum, GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';
+import {
+  ButtonTypeEnum,
+  GlobalConst,
+  RouteEnum,
+  ScreenEnum,
+} from '../../app/AppState';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type MemoProps =  DrawerScreenProps<AppDrawerParamList, RouteEnum.Memo>;
+type MemoProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Memo>;
 
-const Memo: React.FunctionComponent<MemoProps> = ({
-  navigation,
-  route,
-}) => {
-  const setMessage = !!route.params && route.params.setMessage !== undefined ? route.params.setMessage : () => {};
+const Memo: React.FunctionComponent<MemoProps> = ({ navigation, route }) => {
+  const setMessage =
+    !!route.params && route.params.setMessage !== undefined
+      ? route.params.setMessage
+      : () => {};
   const context = useContext(ContextAppLoaded);
-  const { translate, defaultUnifiedAddress, snackbars, removeFirstSnackbar } = context;
+  const { translate, defaultUnifiedAddress, snackbars, removeFirstSnackbar } =
+    context;
   const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.Memo;
 
-  const [memo, setMemo] = useState<string>(!!route.params && route.params.message !== undefined ? route.params.message : '');
-  const [includeUAMessage, setIncludeUAMessage] = useState<boolean>(!!route.params && route.params.includeUAMessage !== undefined ? route.params.includeUAMessage : false);
+  const [memo, setMemo] = useState<string>(
+    !!route.params && route.params.message !== undefined
+      ? route.params.message
+      : '',
+  );
+  const [includeUAMessage, setIncludeUAMessage] = useState<boolean>(
+    !!route.params && route.params.includeUAMessage !== undefined
+      ? route.params.includeUAMessage
+      : false,
+  );
 
   const dimensions = {
     width: Dimensions.get('window').width,
@@ -49,15 +63,21 @@ const Memo: React.FunctionComponent<MemoProps> = ({
   };
 
   useEffect(() => {
-    const _message = !!route.params && route.params.message !== undefined ? route.params.message : '';
-    const _includeUAMessage = !!route.params && route.params.includeUAMessage !== undefined ? route.params.includeUAMessage : false;
+    const _message =
+      !!route.params && route.params.message !== undefined
+        ? route.params.message
+        : '';
+    const _includeUAMessage =
+      !!route.params && route.params.includeUAMessage !== undefined
+        ? route.params.includeUAMessage
+        : false;
     setMemo(_message);
     setIncludeUAMessage(_includeUAMessage);
   }, [
-    route, 
-    route.params, 
-    route.params?.includeUAMessage, 
-    route.params?.message
+    route,
+    route.params,
+    route.params?.includeUAMessage,
+    route.params?.message,
   ]);
 
   const doSaveAndClose = () => {
@@ -78,18 +98,23 @@ const Memo: React.FunctionComponent<MemoProps> = ({
       />
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
+        behavior={
+          Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'
+        }
+        keyboardVerticalOffset={
+          Platform.OS === GlobalConst.platformOSios ? 10 : 0
+        }
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
-
+        }}
+      >
         <View
           style={{
             flex: 1,
             backgroundColor: colors.background,
-          }}>
+          }}
+        >
           <Header
             title={translate('send.memo') as string}
             screenName={screenName}
@@ -116,7 +141,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({
               alignItems: 'stretch',
               justifyContent: 'flex-start',
               padding: 20,
-            }}>
+            }}
+          >
             <View
               accessible={true}
               accessibilityLabel={translate('send.memo-acc') as string}
@@ -129,7 +155,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({
                 minHeight: 48,
                 maxHeight: dimensions.height * 0.4,
                 flexDirection: 'row',
-              }}>
+              }}
+            >
               <TextInput
                 testID="send.memo-field"
                 multiline
@@ -146,15 +173,23 @@ const Memo: React.FunctionComponent<MemoProps> = ({
                 }}
                 value={memo}
                 onChangeText={(text: string) => setMemo(text)}
-                onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => setMemo(e.nativeEvent.text)}
+                onEndEditing={(
+                  e: NativeSyntheticEvent<TextInputEndEditingEventData>,
+                ) => setMemo(e.nativeEvent.text)}
                 maxLength={GlobalConst.memoMaxLength}
               />
               {memo && (
                 <TouchableOpacity
                   onPress={() => {
                     setMemo('');
-                  }}>
-                  <FontAwesomeIcon style={{ margin: 10 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{ margin: 10 }}
+                    size={25}
+                    icon={faXmark}
+                    color={colors.primaryDisabled}
+                  />
                 </TouchableOpacity>
               )}
             </View>
@@ -163,18 +198,28 @@ const Memo: React.FunctionComponent<MemoProps> = ({
                 flexDirection: 'row',
                 justifyContent: 'flex-end',
                 alignItems: 'center',
-              }}>
+              }}
+            >
               <FadeText
                 style={{
                   marginTop: 0,
                   fontWeight: 'bold',
                   color:
-                    Utils.countMemoBytes(memo, includeUAMessage, defaultUnifiedAddress) > GlobalConst.memoMaxLength
+                    Utils.countMemoBytes(
+                      memo,
+                      includeUAMessage,
+                      defaultUnifiedAddress,
+                    ) > GlobalConst.memoMaxLength
                       ? 'red'
                       : colors.text,
-                }}>{`${Utils.countMemoBytes(memo, includeUAMessage, defaultUnifiedAddress)} `}</FadeText>
-              <FadeText style={{ marginTop: 0 }}>{translate('loadedapp.of') as string}</FadeText>
-              <FadeText style={{ marginTop: 0 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
+                }}
+              >{`${Utils.countMemoBytes(memo, includeUAMessage, defaultUnifiedAddress)} `}</FadeText>
+              <FadeText style={{ marginTop: 0 }}>
+                {translate('loadedapp.of') as string}
+              </FadeText>
+              <FadeText style={{ marginTop: 0 }}>
+                {' ' + GlobalConst.memoMaxLength.toString() + ' '}
+              </FadeText>
             </View>
           </ScrollView>
           <View
@@ -184,12 +229,19 @@ const Memo: React.FunctionComponent<MemoProps> = ({
               justifyContent: 'center',
               alignItems: 'center',
               marginVertical: 10,
-            }}>
+            }}
+          >
             <Button
               type={ButtonTypeEnum.Primary}
               title={translate('save') as string}
               onPress={doSaveAndClose}
-              disabled={Utils.countMemoBytes(memo, includeUAMessage, defaultUnifiedAddress) > GlobalConst.memoMaxLength}
+              disabled={
+                Utils.countMemoBytes(
+                  memo,
+                  includeUAMessage,
+                  defaultUnifiedAddress,
+                ) > GlobalConst.memoMaxLength
+              }
             />
           </View>
         </View>

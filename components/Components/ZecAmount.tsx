@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import { Text, View, Platform, TextStyle, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  View,
+  Platform,
+  TextStyle,
+  TouchableOpacity,
+} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 
@@ -32,7 +38,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
 }) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { decimalSeparator } = getNumberFormatSettings();
 
   useEffect(() => {
@@ -79,7 +85,8 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
             alignItems: 'flex-end',
             margin: 0,
             padding: 0,
-          }}>
+          }}
+        >
           {!!currencyName && currencyName === CurrencyNameEnum.ZEC ? (
             <SvgXml
               width={size * 2 * (smallPrefix ? 0.7 : 1)}
@@ -100,7 +107,8 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 color,
                 margin: 0,
                 padding: 0,
-              }}>
+              }}
+            >
               {currencyName ? currencyName : '---'}
             </Text>
           )}
@@ -112,7 +120,8 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 color,
                 margin: 0,
                 padding: 0,
-              }}>
+              }}
+            >
               {' -' + decimalSeparator + '----'}
             </Text>
           ) : (
@@ -124,7 +133,8 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 color,
                 margin: 0,
                 padding: 0,
-              }}>
+              }}
+            >
               {' ' + splits.bigPart}
             </Text>
           )}
@@ -136,8 +146,12 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 color,
                 margin: 0,
                 padding: 0,
-                marginBottom: Platform.OS === GlobalConst.platformOSandroid ? size / 10 : size / 15,
-              }}>
+                marginBottom:
+                  Platform.OS === GlobalConst.platformOSandroid
+                    ? size / 10
+                    : size / 15,
+              }}
+            >
               {splits.smallPart}
             </Text>
           )}

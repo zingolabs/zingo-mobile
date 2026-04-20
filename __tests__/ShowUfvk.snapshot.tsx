@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { ShowUfvk } from '../components/Ufvk';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
 import { RouteEnum, UfvkActionEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -17,7 +20,9 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(a: UfvkActionEnum): DrawerScreenProps<AppDrawerParamList, RouteEnum.Ufvk> {
+function makeDrawerProps(
+  a: UfvkActionEnum,
+): DrawerScreenProps<AppDrawerParamList, RouteEnum.Ufvk> {
   return {
     navigation: mockNavigation,
     route: {

@@ -7,5 +7,4 @@ export default interface InfoType {
   latestBlock: number;
   version: string;
   currencyName: CurrencyNameEnum;
-   
 }

@@ -14,7 +14,11 @@ describe('Drawer Component', () => {
   it('renders correctly with screens', () => {
     const onAction = jest.fn();
     const { toJSON } = render(
-      <Drawer initialRouteName={RouteEnum.HomeStack} onMenuItemSelected={onAction} screenName={ScreenEnum.LoadedApp}>
+      <Drawer
+        initialRouteName={RouteEnum.HomeStack}
+        onMenuItemSelected={onAction}
+        screenName={ScreenEnum.LoadedApp}
+      >
         <Drawer.Screen name={RouteEnum.HomeStack} component={() => <></>} />
         <Drawer.Screen name={RouteEnum.Settings} component={() => <></>} />
       </Drawer>,

@@ -16,12 +16,11 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type AboutProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.About>;
 
-const About: React.FunctionComponent<AboutProps> = ({
-  navigation,
-}) => {
+const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
-  const { zingolibVersion, translate, snackbars, removeFirstSnackbar } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { zingolibVersion, translate, snackbars, removeFirstSnackbar } =
+    context;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.About;
 
@@ -43,7 +42,8 @@ const About: React.FunctionComponent<AboutProps> = ({
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
         <Header
           title={translate('zingo') + ' ' + translate('version')}
           screenName={screenName}
@@ -66,13 +66,20 @@ const About: React.FunctionComponent<AboutProps> = ({
             alignItems: 'stretch',
             justifyContent: 'flex-start',
             padding: 20,
-          }}>
+          }}
+        >
           <FadeText>{arrayTxt[0]}</FadeText>
-          <DetailLine label={translate('info.zingolib') as string} value={zingolibVersion} screenName={screenName} />
+          <DetailLine
+            label={translate('info.zingolib') as string}
+            value={zingolibVersion}
+            screenName={screenName}
+          />
           <View style={{ marginTop: 20 }}>
             {arrayTxt.map((txt: string, ind: number) => (
               <View key={txt.substring(0, 10)}>
-                {ind !== 0 && <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>}
+                {ind !== 0 && (
+                  <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>
+                )}
               </View>
             ))}
           </View>

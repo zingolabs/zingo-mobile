@@ -65,7 +65,11 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const numLinesAdd = address ? (address.length < 50 ? 2 : address.length / 30) : 0;
+    const numLinesAdd = address
+      ? address.length < 50
+        ? 2
+        : address.length / 30
+      : 0;
     let cont: string = addressBook
       .filter((ab: AddressBookFileClass) => ab.address === address)
       .map((ab: AddressBookFileClass) => ab.label)
@@ -94,14 +98,21 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       {loading ? (
         <ActivityIndicator size="small" color={colors.primary} />
       ) : (
-        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+          }}
+        >
           <View
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
               marginRight: onlyContact ? 0 : 10,
-            }}>
+            }}
+          >
             {contact && (
               <TouchableOpacity
                 onPress={() => {
@@ -111,14 +122,28 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                       setExpandContact(false);
                     }, 5 * 1000);
                   }
-                }}>
-                <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-                  {!expandContact && numLinesContact > 1 && <RegText>{Utils.trimToSmall(contact, 7)}</RegText>}
-                  {!expandContact && numLinesContact === 1 && <RegText>{contact}</RegText>}
+                }}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  {!expandContact && numLinesContact > 1 && (
+                    <RegText>{Utils.trimToSmall(contact, 7)}</RegText>
+                  )}
+                  {!expandContact && numLinesContact === 1 && (
+                    <RegText>{contact}</RegText>
+                  )}
                   {expandContact &&
-                    Utils.splitStringIntoChunks(contact, Number(numLinesContact.toFixed(0))).map(
-                      (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                    )}
+                    Utils.splitStringIntoChunks(
+                      contact,
+                      Number(numLinesContact.toFixed(0)),
+                    ).map((c: string, idx: number) => (
+                      <RegText key={idx}>{c}</RegText>
+                    ))}
                 </View>
               </TouchableOpacity>
             )}
@@ -141,21 +166,35 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                       }, 5 * 1000);
                     }
                   }
-                }}>
-                <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                }}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexWrap: 'wrap',
+                  }}
+                >
                   {!address && <RegText>{'Unknown'}</RegText>}
-                  {!expandAddress && !!address && <RegText>{Utils.trimToSmall(address, 7)}</RegText>}
+                  {!expandAddress && !!address && (
+                    <RegText>{Utils.trimToSmall(address, 7)}</RegText>
+                  )}
                   {expandAddress &&
                     !!address &&
-                    Utils.splitStringIntoChunks(address, Number(numLinesAddress.toFixed(0))).map(
-                      (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                    )}
+                    Utils.splitStringIntoChunks(
+                      address,
+                      Number(numLinesAddress.toFixed(0)),
+                    ).map((c: string, idx: number) => (
+                      <RegText key={idx}>{c}</RegText>
+                    ))}
                 </View>
               </TouchableOpacity>
             )}
           </View>
           {withIcon && !contact && oneLine && (
-            <TouchableOpacity onPress={() => launchAddressBook(address, screenName)}>
+            <TouchableOpacity
+              onPress={() => launchAddressBook(address, screenName)}
+            >
               <View
                 style={{
                   flexDirection: 'row',
@@ -163,14 +202,27 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                   alignItems: 'center',
                   paddingHorizontal: 4,
                   paddingBottom: 2,
-                }}>
-                <FontAwesomeIcon style={{ marginTop: 3 }} size={25} icon={faUserPlus} color={colors.primary} />
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ marginTop: 3 }}
+                  size={25}
+                  icon={faUserPlus}
+                  color={colors.primary}
+                />
               </View>
             </TouchableOpacity>
           )}
           {withIcon && !contact && !oneLine && (
-            <TouchableOpacity onPress={() => launchAddressBook(address, screenName)}>
-              <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faUserPlus} color={colors.primary} />
+            <TouchableOpacity
+              onPress={() => launchAddressBook(address, screenName)}
+            >
+              <FontAwesomeIcon
+                style={{ marginTop: 3 }}
+                size={30}
+                icon={faUserPlus}
+                color={colors.primary}
+              />
             </TouchableOpacity>
           )}
           {withSendIcon &&
@@ -188,14 +240,22 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 style={{ marginLeft: 10 }}
                 onPress={() => {
                   // enviar
-                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                  const sendPageState = new SendPageStateClass(
+                    new ToAddrClass(0),
+                  );
                   sendPageState.toaddr.to = address;
                   setSendPageState(sendPageState);
                   navigation.navigate(RouteEnum.HomeStack, {
                     screen: RouteEnum.Send,
                   });
-                }}>
-                <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ marginTop: 3 }}
+                  size={30}
+                  icon={faPaperPlane}
+                  color={colors.primary}
+                />
               </TouchableOpacity>
             )}
         </View>
