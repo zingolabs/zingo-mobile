@@ -19,7 +19,7 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 describe('Component ImportUfvk - test', () => {
   //snapshot test
   test('ImportUfvk - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.translate = mockTranslate;
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;

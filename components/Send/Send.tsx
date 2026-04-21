@@ -370,7 +370,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         ? totalBalance.totalSpendableBalance
         : 0;
       let zenniesForZingo = donationAddress ? false : donation;
-      //console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo, spendableBalance);
       const start = Date.now();
       const runSpendableBalanceStr =
         await RPCModule.getSpendableBalanceWithAddressInfo(
@@ -493,7 +492,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (amountPar !== null) {
-      //console.log('update field', amount);
       const amountTemp = amountPar.substring(0, 20);
       if (isNaN(Utils.parseStringLocaleToNumberFloat(amountTemp))) {
         setAmountCurrencyText('');
@@ -512,7 +510,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (amountCurrencyPar !== null) {
-      //console.log('update field', amountCurrency);
       const amountCurrencyTemp = amountCurrencyPar.substring(0, 15);
       if (isNaN(Utils.parseStringLocaleToNumberFloat(amountCurrencyTemp))) {
         setAmountText('');
@@ -759,11 +756,9 @@ const Send: React.FunctionComponent<SendProps> = ({
       setKeyboardListenersDone(true);
       Keyboard.addListener('keyboardDidShow', () => {
         setKeyboardVisible(true);
-        //console.log('OPENNNNNNNNNN', titleViewHeightPar, slideAnim.value);
       });
       Keyboard.addListener('keyboardDidHide', () => {
         setKeyboardVisible(false);
-        //console.log('CLOSEEEEEEEEE', titleViewHeightPar, slideAnim.value);
       });
     }
   };
@@ -896,7 +891,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     setTimeout(() => {
-      //console.log('sendtx error', error);
       // if the App is in background I need to store the error
       // and when the App come back to foreground shows it to the user.
       createAlert(
@@ -934,7 +928,6 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const scrollToEnd = () => {
     if (scrollViewRef.current) {
-      //console.log('scrolling to end', keyboardVisible);
       scrollViewRef.current.scrollTo({ y: contentHeight, animated: true });
     }
   };
@@ -981,7 +974,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     });
   };
 
-  //console.log(
   //  'Render, spendable',
   //  spendable,
   //  'maxAmount',
@@ -991,8 +983,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   //  keyboardVisible,
   //  contentHeight,
   //);
-
-  //console.log(slideAnim.value);
 
   const returnPage = (
     <ToastProvider>
@@ -1017,7 +1007,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           onLayout={e => {
             const { height } = e.nativeEvent.layout;
             keyboardListeners(height);
-            //console.log('LAYOUTTT', height);
           }}
         >
           <Header
@@ -2132,7 +2121,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                         try {
                           parseAddressInfoJSON = await JSON.parse(result);
                         } catch (e) {
-                          //console.log(e);
                           parseAddressInfoJSON = {} as RPCParseAddressType;
                         }
                       }
@@ -2180,7 +2168,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 // fill the fields in the screen with the donation data
                                 update = true;
                               })
-                              .catch(() => {});
+                              .catch(() => {}); // user cancelled the alert — expected
                           } else {
                             // fill the fields in the screen with the donation data
                             update = true;

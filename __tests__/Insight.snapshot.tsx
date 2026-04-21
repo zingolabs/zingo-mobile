@@ -36,7 +36,7 @@ function makeDrawerProps(): DrawerScreenProps<
 describe('Component Insight - test', () => {
   //snapshot test
   test('Insight - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.translate = mockTranslate;
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;

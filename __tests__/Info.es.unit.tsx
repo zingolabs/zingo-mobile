@@ -45,7 +45,7 @@ function makeDrawerProps(): DrawerScreenProps<
 describe('Component Info - test', () => {
   //unit test
   test('Info - price with es (,) decimal point', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.info = mockInfo;
     state.zecPrice = mockZecPrice;
     state.currency = CurrencyEnum.USDCurrency;

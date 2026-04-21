@@ -35,7 +35,7 @@ function makeDrawerProps(): DrawerScreenProps<
 describe('Component Address Book - test', () => {
   //snapshot test
   test('Address Book - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.addressBook = mockAddressBook;
     state.translate = mockTranslate;
     const onSet = jest.fn();

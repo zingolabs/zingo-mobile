@@ -37,7 +37,7 @@ function makeDrawerProps(): DrawerScreenProps<
 describe('Component Info - test', () => {
   //snapshot test
   test('Info - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.info = mockInfo;
     state.zecPrice = mockZecPrice;
     state.translate = mockTranslate;

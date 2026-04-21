@@ -14,7 +14,6 @@ import {
   SendJsonToTypeType,
   SendPageStateClass,
   ServerType,
-  ToAddrClass,
   TranslateType,
   ValueTransferType,
   BlockExplorerEnum,
@@ -281,57 +280,47 @@ export default class Utils {
     server: ServerType,
     donation: boolean,
   ): Promise<SendJsonToTypeType[]> {
-    let donationAddress: boolean = false;
-    const json: Promise<SendJsonToTypeType[][]> = Promise.all(
-      [sendPageState.toaddr].map(async (to: ToAddrClass) => {
-        const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
-        const amount = parseInt(
-          (Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(
-            0,
-          ),
-          10,
-        );
+    const to = sendPageState.toaddr;
+    const donationAddress: boolean =
+      to.to === (await Utils.getDonationAddress(server.chainName)) ||
+      to.to === (await Utils.getZenniesDonationAddress(server.chainName)) ||
+      to.to === (await Utils.getNymDonationAddress(server.chainName));
 
-        donationAddress =
-          to.to === (await Utils.getDonationAddress(server.chainName)) ||
-          to.to === (await Utils.getZenniesDonationAddress(server.chainName)) ||
-          to.to === (await Utils.getNymDonationAddress(server.chainName));
-
-        if (memo === '') {
-          return [{ address: to.to, amount } as SendJsonToTypeType];
-        } else if (
-          Buffer.byteLength(memo, GlobalConst.utf8 as BufferEncoding) <=
-          GlobalConst.memoMaxLength
-        ) {
-          return [{ address: to.to, amount, memo } as SendJsonToTypeType];
-        } else {
-          // If the memo is more than 511 bytes, then we split it into multiple transactions.
-          // Each memo will be `(xx/yy)memo part`. The prefix "(xx/yy)" is 7 bytes long, so
-          // we'll split the memo into 511-7 = 505 bytes length
-          // this make sense if we make long memos... in the future.
-          const splits = Utils.utf16Split(memo, GlobalConst.memoMaxLength - 7);
-          const tos = [];
-
-          // The first one contains all the tx value
-          tos.push({
-            address: to.to,
-            amount,
-            memo: `(1/${splits.length})${splits[0]}`,
-          } as SendJsonToTypeType);
-
-          for (let i = 1; i < splits.length; i++) {
-            tos.push({
-              address: to.to,
-              amount: 0,
-              memo: `(${i + 1}/${splits.length})${splits[i]}`,
-            } as SendJsonToTypeType);
-          }
-
-          return tos;
-        }
-      }),
+    const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
+    const amount = parseInt(
+      (Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0),
+      10,
     );
-    const jsonFlat: SendJsonToTypeType[] = (await json).flat();
+
+    let jsonFlat: SendJsonToTypeType[];
+    if (memo === '') {
+      jsonFlat = [{ address: to.to, amount } as SendJsonToTypeType];
+    } else if (
+      Buffer.byteLength(memo, GlobalConst.utf8 as BufferEncoding) <=
+      GlobalConst.memoMaxLength
+    ) {
+      jsonFlat = [{ address: to.to, amount, memo } as SendJsonToTypeType];
+    } else {
+      // If the memo is more than 511 bytes, then we split it into multiple transactions.
+      // Each memo will be `(xx/yy)memo part`. The prefix "(xx/yy)" is 7 bytes long, so
+      // we'll split the memo into 511-7 = 505 bytes length
+      // this make sense if we make long memos... in the future.
+      const splits = Utils.utf16Split(memo, GlobalConst.memoMaxLength - 7);
+      jsonFlat = [
+        {
+          address: to.to,
+          amount,
+          memo: `(1/${splits.length})${splits[0]}`,
+        } as SendJsonToTypeType,
+      ];
+      for (let i = 1; i < splits.length; i++) {
+        jsonFlat.push({
+          address: to.to,
+          amount: 0,
+          memo: `(${i + 1}/${splits.length})${splits[i]}`,
+        } as SendJsonToTypeType);
+      }
+    }
 
     const donationTransaction: SendJsonToTypeType[] = [];
 

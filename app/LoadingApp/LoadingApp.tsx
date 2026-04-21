@@ -184,10 +184,8 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       //I have to check what language and other things are in the settings
       const settings = await SettingsFileImpl.readSettings();
-      //console.log('LoadingApp', settings);
 
       // checking the version of the App in settings
-      //console.log('versions, old:', settings.version, ' new:', translate('version') as string);
       if (settings.version === null) {
         // this is a fresh install
         setFirstLaunchingMessage(LaunchingModeEnum.installing);
@@ -214,7 +212,6 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       // first I need to know if this launch is a fresh install...
       // if firstInstall is true -> 100% is the first time.
-      //console.log('first install', settings.firstInstall);
       if (settings.firstInstall) {
         // basic mode
         setMode(ModeEnum.basic);
@@ -246,7 +243,6 @@ export default function LoadingApp(props: LoadingAppProps) {
       ) {
         setLanguage(settings.language);
         i18n.locale = settings.language;
-        //console.log('apploading settings', settings.language, settings.currency);
       } else {
         const lang =
           languageTag === LanguageEnum.en ||
@@ -259,7 +255,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         setLanguage(lang);
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
-        //console.log('apploading NO settings', languageTag);
       }
       if (
         settings.currency === CurrencyEnum.noCurrency ||
@@ -387,8 +382,6 @@ export default function LoadingApp(props: LoadingAppProps) {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  //console.log('render loadingApp - 2', translate('version'));
 
   if (loading) {
     return (
@@ -547,8 +540,6 @@ export class LoadingAppClass extends Component<
 
     this.fetchZingolibVersion();
 
-    //console.log('DID MOUNT APPLOADING...');
-
     // to start the App the first time in this session
     // the user have to pass the security of the device
     if (this.state.startingApp) {
@@ -562,7 +553,6 @@ export class LoadingAppClass extends Component<
         // - true      -> the user do pass the authentication
         // - false     -> the user do NOT pass the authentication
         // - undefined -> no biometric authentication available -> Passcode.
-        //console.log('BIOMETRIC --------> ', resultBio);
         if (resultBio === false) {
           this.setState({ biometricsFailed: true });
           return;
@@ -591,7 +581,7 @@ export class LoadingAppClass extends Component<
           this.setState({ donation: true });
           SettingsFileImpl.writeSettings(SettingsNameEnum.donation, true);
         })
-        .catch(() => {});
+        .catch(() => {}); // user cancelled the alert — expected
     }
 
     // has the device the Wallet Keys stored?
@@ -628,9 +618,7 @@ export class LoadingAppClass extends Component<
 
     // Second, check if a wallet exists. Do it async so the basic screen has time to render
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-    //console.log('&&&&& background no in storage &&&&&');
     const exists = await RPCModule.walletExists();
-    //console.log('Wallet Exists result', this.state.screen, exists);
 
     if (exists && exists !== GlobalConst.false) {
       this.setState({ walletExists: true });
@@ -645,7 +633,6 @@ export class LoadingAppClass extends Component<
       // for testing
       //await delay(5000);
 
-      //console.log('Load Wallet Exists result', result);
       let error = false;
       let errorText = '';
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
@@ -653,7 +640,6 @@ export class LoadingAppClass extends Component<
           // here result can have an `error` field for watch-only which is actually OK.
           const resultJson: RPCSeedType & RPCUfvkType =
             await JSON.parse(result);
-          //console.log('Load Wallet Exists result JSON', resultJson);
           if (!resultJson.error) {
             // Load the wallet and navigate to the vts screen
             let readOnly: boolean = false;
@@ -661,7 +647,6 @@ export class LoadingAppClass extends Component<
             let saplingPool: boolean = false;
             let transparentPool: boolean = false;
             const walletKindStr: string = await RPCModule.walletKindInfo();
-            //console.log('KIND...', walletKindStr);
             try {
               const walletKindJSON: RPCWalletKindType =
                 await JSON.parse(walletKindStr);
@@ -686,8 +671,10 @@ export class LoadingAppClass extends Component<
               transparentPool = walletKindJSON.transparent;
               // if the seed & birthday are not stored in Keychain/Keystore, do it now.
               if (this.state.recoveryWalletInfoOnDevice) {
-                const wallet: WalletType = await RPC.rpcFetchWallet(readOnly);
-                await createUpdateRecoveryWalletInfo(wallet);
+                const wallet = await RPC.rpcFetchWallet(readOnly);
+                if (wallet) {
+                  await createUpdateRecoveryWalletInfo(wallet);
+                }
               } else {
                 // needs to delete the seed from the Keychain/Keystore, do it now.
                 if (this.state.hasRecoveryWalletInfoSaved) {
@@ -702,7 +689,6 @@ export class LoadingAppClass extends Component<
                 actionButtonsDisabled: false,
               });
             } catch (e) {
-              //console.log('CATCH ERROR', walletKindStr);
               this.setState({
                 readOnly,
                 orchardPool,
@@ -737,7 +723,6 @@ export class LoadingAppClass extends Component<
               newWallet,
               this.state.firstLaunchingMessage,
             );
-            //console.log('navigate to LoadedApp');
           } else {
             error = true;
             errorText = resultJson.error;
@@ -759,7 +744,6 @@ export class LoadingAppClass extends Component<
         );
       }
     } else {
-      //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
       if (this.state.mode === ModeEnum.basic) {
         // setting the prop basicFirstViewSeed to false.
         // this means when the user have funds, the seed screen will show up.
@@ -800,7 +784,6 @@ export class LoadingAppClass extends Component<
               true,
               this.state.firstLaunchingMessage,
             );
-            //console.log('navigate to LoadedApp');
           }
         }
       } else {
@@ -820,7 +803,6 @@ export class LoadingAppClass extends Component<
     this.appstate = AppState.addEventListener(
       EventListenerEnum.change,
       async nextAppState => {
-        //console.log('LOADING', 'prior', this.state.appStateStatus, 'next', nextAppState);
         // let's catch the prior value
         const priorAppState = this.state.appStateStatus;
         this.setState({ appStateStatus: nextAppState });
@@ -829,12 +811,10 @@ export class LoadingAppClass extends Component<
             priorAppState === AppStateStatusEnum.background) &&
           nextAppState === AppStateStatusEnum.active
         ) {
-          //console.log('App LOADING has come to the foreground!');
           // reading background task info
           this.fetchBackgroundSyncInfo();
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-          //console.log('&&&&& background no in storage &&&&&');
           if (
             this.state.backgroundError &&
             (this.state.backgroundError.title ||
@@ -855,7 +835,6 @@ export class LoadingAppClass extends Component<
           console.log('App LOADING is gone to the background!');
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-          //console.log('&&&&& background yes in storage &&&&&');
         }
       },
     );
@@ -881,12 +860,10 @@ export class LoadingAppClass extends Component<
           });
           if (isConnected !== state.isConnected) {
             if (!state.isConnected) {
-              //console.log('EVENT Loading: No internet connection.');
               this.setState({
                 customServerShow: false,
               });
             } else {
-              //console.log('EVENT Loading: YESSSSS internet connection.');
               // if it is offline & there is no wallet file
               // the screen is going to be empty
               // show the custom server component
@@ -974,7 +951,6 @@ export class LoadingAppClass extends Component<
       // the 15 seconds timout was fired.
       someServerIsWorking = false;
     }
-    //console.log(server);
     console.log(fasterServer);
     this.setState({
       server: fasterServer,
@@ -1105,12 +1081,12 @@ export class LoadingAppClass extends Component<
           const someServerIsWorking = await this.selectTheBestServer(true);
           if (someServerIsWorking) {
             if (start) {
-              this.setState({
-                startingApp: false,
-                serverErrorTries: 1,
-                screen,
-              });
-              this.componentDidMount();
+              this.setState(
+                { startingApp: false, serverErrorTries: 1, screen },
+                () => {
+                  this.componentDidMount();
+                },
+              );
             } else {
               createAlert(
                 this.setBackgroundError,
@@ -1509,8 +1485,6 @@ export class LoadingAppClass extends Component<
       );
     }
 
-    //console.log(seedUfvk);
-    //console.log(result);
     let error = false;
     let errorText = '';
     if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1557,7 +1531,6 @@ export class LoadingAppClass extends Component<
           try {
             const walletKindJSON: RPCWalletKindType =
               await JSON.parse(walletKindStr);
-            //console.log('KIND... JSON', walletKindJSON);
             // there are 4 kinds:
             // 1. seed
             // 2. USK
@@ -1578,8 +1551,10 @@ export class LoadingAppClass extends Component<
             transparentPool = walletKindJSON.transparent;
             // if the seed & birthday are not stored in Keychain/Keystore, do it now.
             if (this.state.recoveryWalletInfoOnDevice) {
-              const wallet: WalletType = await RPC.rpcFetchWallet(readOnly);
-              await createUpdateRecoveryWalletInfo(wallet);
+              const wallet = await RPC.rpcFetchWallet(readOnly);
+              if (wallet) {
+                await createUpdateRecoveryWalletInfo(wallet);
+              }
             } else {
               // needs to delete the seed from the Keychain/Keystore, do it now.
               if (this.state.hasRecoveryWalletInfoSaved) {
@@ -1594,7 +1569,6 @@ export class LoadingAppClass extends Component<
               actionButtonsDisabled: false,
             });
           } catch (e) {
-            //console.log('CATCH ERROR', walletKindStr);
             this.setState({
               readOnly,
               orchardPool,
@@ -1687,13 +1661,14 @@ export class LoadingAppClass extends Component<
   };
 
   changeMode = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
-    this.setState({ mode, screen: 0 });
     await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
     this.props.toggleTheme(mode);
     // if the user selects advanced mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen
     // the result will be the same -> create a new wallet.
-    this.componentDidMount();
+    this.setState({ mode, screen: 0 }, () => {
+      this.componentDidMount();
+    });
   };
 
   recoverRecoveryWalletInfo = async (security: boolean) => {
@@ -1703,6 +1678,12 @@ export class LoadingAppClass extends Component<
     // then the Alert can be too fast.
     if (wallet.seed || wallet.ufvk) {
       const txt = (wallet.seed || wallet.ufvk) + '\n\n' + wallet.birthday;
+      const preview = wallet.seed
+        ? (() => {
+            const words = wallet.seed.split(' ');
+            return `${words[0]} ... ${words[words.length - 1]}`;
+          })()
+        : `${(wallet.ufvk || '').slice(0, 5)} ... ${(wallet.ufvk || '').slice(-5)}`;
       setTimeout(
         () => {
           Alert.alert(
@@ -1710,12 +1691,13 @@ export class LoadingAppClass extends Component<
             (security
               ? ''
               : ((this.props.translate('loadingapp.recoverkeysinstall') +
-                  '\n\n') as string)) + txt,
+                  '\n\n') as string)) + preview,
             [
               {
                 text: this.props.translate('copy') as string,
                 onPress: () => {
                   Clipboard.setString(txt);
+                  setTimeout(() => Clipboard.setString(''), 60 * 1000);
                   this.addLastSnackbar({
                     message: this.props.translate('txtcopied') as string,
                     duration: SnackbarDurationEnum.short,
@@ -1770,7 +1752,6 @@ export class LoadingAppClass extends Component<
       this.setState({
         zingolibVersion: zingolibStr,
       });
-      //console.log('=========================================== > set zingolib version - ', Date.now() - start2);
     } catch (error) {
       console.log(`Critical Error info ${error}`);
       return;
@@ -1797,8 +1778,6 @@ export class LoadingAppClass extends Component<
       saplingPool,
       transparentPool,
     } = this.state;
-
-    //console.log('render loadingAppClass - 3', this.state.privacy);
 
     const context = {
       // context

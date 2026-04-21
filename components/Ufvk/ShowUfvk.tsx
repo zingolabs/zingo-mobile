@@ -13,6 +13,8 @@ import {
   Alert,
   ActivityIndicator,
   Dimensions,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
@@ -102,7 +104,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
         setFetchedWallet(info);
       } else {
         const info = await RPC.rpcFetchWallet(true);
-        setFetchedWallet(info);
+        setFetchedWallet(info ?? ({} as WalletType));
       }
       setLoadingUfvk(false);
     })();
@@ -212,7 +214,11 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   );
 
   const doCopy = () => {
-    Clipboard.setString(fetchedWallet.ufvk ? fetchedWallet.ufvk : '');
+    if (!fetchedWallet.ufvk) {
+      return;
+    }
+    Clipboard.setString(fetchedWallet.ufvk);
+    setTimeout(() => Clipboard.setString(''), 60 * 1000);
     addLastSnackbar({
       message: translate('seed.tapcopy-ufvk-message') as string,
       duration: SnackbarDurationEnum.short,
@@ -287,14 +293,29 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                 }}
               >
                 {!!fetchedWallet.ufvk && (
-                  <SingleAddress
-                    ufvk={fetchedWallet.ufvk}
-                    screenName={screenName}
-                    index={0}
-                    setIndex={() => {}}
-                    total={1}
-                    show={() => show('EA')}
-                  />
+                  <>
+                    <SingleAddress
+                      ufvk={fetchedWallet.ufvk}
+                      screenName={screenName}
+                      index={0}
+                      setIndex={() => {}}
+                      total={1}
+                      show={() => show('EA')}
+                    />
+                    <TouchableOpacity onPress={doCopy}>
+                      <Text
+                        style={{
+                          color: colors.text,
+                          textDecorationLine: 'underline',
+                          padding: 10,
+                          textAlign: 'center',
+                          minHeight: 48,
+                        }}
+                      >
+                        {translate('seed.tapcopy') as string}
+                      </Text>
+                    </TouchableOpacity>
+                  </>
                 )}
               </View>
 

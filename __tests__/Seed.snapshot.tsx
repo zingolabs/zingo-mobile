@@ -40,7 +40,7 @@ function makeDrawerProps(
 // test suite
 describe('Component Seed - test', () => {
   //snapshot test
-  const stateLoaded = defaultAppContextLoaded;
+  const stateLoaded = { ...defaultAppContextLoaded };
   stateLoaded.translate = mockTranslate;
   stateLoaded.birthday = mockWallet.birthday || 0;
   stateLoaded.info = mockInfo;

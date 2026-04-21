@@ -69,7 +69,6 @@ import {
   EventListenerEnum,
   AppContextLoaded,
   NetInfoType,
-  WalletType,
   BackgroundErrorType,
   ValueTransferType,
   ValueTransferKindEnum,
@@ -276,7 +275,6 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       //I have to check what language is in the settings
       const settings = await SettingsFileImpl.readSettings();
-      //console.log('LoadedApp', settings);
 
       // for testing
       //await delay(5000);
@@ -290,7 +288,6 @@ export default function LoadedApp(props: LoadedAppProps) {
       ) {
         setLanguage(settings.language);
         i18n.locale = settings.language;
-        //console.log('apploaded settings', settings.language, settings.currency);
       } else {
         const lang =
           languageTag === LanguageEnum.en ||
@@ -303,7 +300,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         setLanguage(lang);
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
-        //console.log('apploaded NO settings', languageTag);
       }
       if (
         settings.currency === CurrencyEnum.noCurrency ||
@@ -460,7 +456,6 @@ export default function LoadedApp(props: LoadedAppProps) {
           if (!a.hasOwnProperty('own')) {
             // verify this address as own or not
             const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-            //console.log(checkStr);
             if (
               checkStr &&
               !checkStr.toLowerCase().startsWith(GlobalConst.error)
@@ -510,7 +505,6 @@ export default function LoadedApp(props: LoadedAppProps) {
             let own: boolean;
             // verify this address as own or not
             const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-            //console.log(checkStr);
             if (
               checkStr &&
               !checkStr.toLowerCase().startsWith(GlobalConst.error)
@@ -546,12 +540,9 @@ export default function LoadedApp(props: LoadedAppProps) {
       setAddressBook(abSorted);
       await AddressBookFileImpl.writeAddressBook(abSorted);
       setLoading(false);
-      //console.log('LoadedApp functional component - finished');
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  //console.log('render LoadedApp - 2');
 
   if (loading) {
     return (
@@ -793,8 +784,6 @@ export class LoadedAppClass extends Component<
       }
     }
 
-    //console.log('DID MOUNT APPLOADED...');
-
     // Configure the RPC to start doing refreshes
     await this.rpc.clearTimers();
     await this.rpc.configure();
@@ -804,7 +793,6 @@ export class LoadedAppClass extends Component<
     this.appstate = AppState.addEventListener(
       EventListenerEnum.change,
       async nextAppState => {
-        //console.log('LOADED', 'prior', this.state.appStateStatus, 'next', nextAppState);
         // let's catch the prior value
         const priorAppState = this.state.appStateStatus;
         if (Platform.OS === GlobalConst.platformOSios) {
@@ -814,7 +802,6 @@ export class LoadedAppClass extends Component<
             (priorAppState === AppStateStatusEnum.active &&
               nextAppState === AppStateStatusEnum.inactive)
           ) {
-            //console.log('LOADED SAVED IOS do nothing', nextAppState);
             this.setState({ appStateStatus: nextAppState });
             return;
           }
@@ -826,12 +813,8 @@ export class LoadedAppClass extends Component<
             this.setState({ appStateStatus: nextAppState });
             // setting value for background task Android
             await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-            //console.log('&&&&& background yes in storage &&&&&');
             await this.rpc.clearTimers();
-            //console.log('clear timers IOS');
             this.setSyncingStatus({} as RPCSyncStatusType);
-            //console.log('clear sync status state');
-            //console.log('LOADED SAVED IOS background', nextAppState);
             // We need to save the wallet file here because
             // sometimes the App can lose the last synced chunk
             await RPCModule.doSave();
@@ -840,7 +823,6 @@ export class LoadedAppClass extends Component<
         }
         if (Platform.OS === GlobalConst.platformOSandroid) {
           if (priorAppState !== nextAppState) {
-            //console.log('LOADED SAVED Android', nextAppState);
             this.setState({ appStateStatus: nextAppState });
           }
         }
@@ -849,9 +831,7 @@ export class LoadedAppClass extends Component<
             priorAppState === AppStateStatusEnum.background) &&
           nextAppState === AppStateStatusEnum.active
         ) {
-          //console.log('App LOADED Android & IOS has come to the foreground!');
           if (Platform.OS === GlobalConst.platformOSios) {
-            //console.log('LOADED SAVED IOS foreground', nextAppState);
             this.setState({ appStateStatus: nextAppState });
           }
           // (PIN or TouchID or FaceID)
@@ -862,7 +842,6 @@ export class LoadedAppClass extends Component<
           // - true      -> the user do pass the authentication
           // - false     -> the user do NOT pass the authentication
           // - undefined -> no biometric authentication available -> Passcode -> Nothing.
-          //console.log('BIOMETRIC FOREGROUND --------> ', resultBio);
           if (resultBio === false) {
             this.navigateToLoadingApp({
               startingApp: true,
@@ -873,12 +852,10 @@ export class LoadedAppClass extends Component<
             await this.fetchBackgroundSyncInfo();
             // setting value for background task Android
             await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-            //console.log('&&&&& background no in storage &&&&&');
             // needs this because when the App go from back to fore
             // it have to re-launch all the tasks.
             await this.rpc.clearTimers();
             await this.rpc.configure();
-            //console.log('configure start timers Android & IOS');
             if (
               this.state.backgroundError &&
               (this.state.backgroundError.title ||
@@ -899,22 +876,17 @@ export class LoadedAppClass extends Component<
           console.log('App LOADED is gone to the background!');
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-          //console.log('&&&&& background yes in storage &&&&&');
           await this.rpc.clearTimers();
-          //console.log('clear timers');
           this.setSyncingStatus({} as RPCSyncStatusType);
-          //console.log('clear sync status state');
           // We need to save the wallet file here because
           // sometimes the App can lose the last synced chunk
           await RPCModule.doSave();
           if (Platform.OS === GlobalConst.platformOSios) {
-            //console.log('LOADED SAVED IOS background', nextAppState);
             this.setState({ appStateStatus: nextAppState });
           }
         } else {
           if (Platform.OS === GlobalConst.platformOSios) {
             if (priorAppState !== nextAppState) {
-              //console.log('LOADED SAVED IOS', nextAppState);
               this.setState({ appStateStatus: nextAppState });
             }
           }
@@ -954,7 +926,6 @@ export class LoadedAppClass extends Component<
           type !== state.type ||
           isConnectionExpensive !== state.details?.isConnectionExpensive
         ) {
-          //console.log('fetch net info');
           this.setState({
             netInfo: {
               isConnected: state.isConnected,
@@ -965,9 +936,7 @@ export class LoadedAppClass extends Component<
           });
           if (isConnected !== state.isConnected) {
             if (!state.isConnected) {
-              //console.log('EVENT Loaded: No internet connection.');
             } else {
-              //console.log('EVENT Loaded: YES internet connection.');
               // restart the interval process again...
               await this.rpc.clearTimers();
               await this.rpc.configure();
@@ -998,7 +967,6 @@ export class LoadedAppClass extends Component<
   };
 
   readUrl = async (url: string) => {
-    //console.log(url);
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
@@ -1007,7 +975,6 @@ export class LoadedAppClass extends Component<
         this.state.translate,
         this.state.server,
       );
-      //console.log(targets);
 
       if (target) {
         let update = false;
@@ -1021,7 +988,7 @@ export class LoadedAppClass extends Component<
               // fill the fields in the screen with the donation data
               update = true;
             })
-            .catch(() => {});
+            .catch(() => {}); // user cancelled the alert — expected
         } else if (target.address) {
           // fill the fields in the screen with the donation data
           update = true;
@@ -1058,7 +1025,6 @@ export class LoadedAppClass extends Component<
     const backgroundSyncInfoJson: BackgroundType =
       await BackgroundFileImpl.readBackground();
     if (!isEqual(this.state.backgroundSyncInfo, backgroundSyncInfoJson)) {
-      //console.log('fetch background sync info');
       this.setState({ backgroundSyncInfo: backgroundSyncInfoJson });
     }
   };
@@ -1073,7 +1039,6 @@ export class LoadedAppClass extends Component<
   setShieldingAmount = (value: number) => {
     //const start = Date.now();
     this.setState({ shieldingAmount: value });
-    //console.log('=========================================== > SH AMOUNT STORED SETSTATE - ', Date.now() - start);
   };
 
   setShowSwipeableIcons = (value: boolean) => {
@@ -1082,10 +1047,8 @@ export class LoadedAppClass extends Component<
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
-      //console.log('fetch total balance');
       //const start = Date.now();
       this.setState({ totalBalance });
-      //console.log('=========================================== > BALANCE STORED SETSTATE - ', Date.now() - start);
     }
   };
 
@@ -1093,10 +1056,8 @@ export class LoadedAppClass extends Component<
     // here is a good place to fetch the background task info
     this.fetchBackgroundSyncInfo();
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
-      //console.log('fetch syncing status report');
       //const start = Date.now();
       this.setState({ syncingStatus });
-      //console.log('=========================================== > SYNC STATUS STORED SETSTATE - ', Date.now() - start);
     }
   };
 
@@ -1164,8 +1125,6 @@ export class LoadedAppClass extends Component<
                 vt.address === vtOld.address &&
                 vt.poolType === vtOld.poolType,
             );
-            //console.log('old', vtOld);
-            //console.log('new', vtNew);
             // the ValueTransfer is confirmed when the confirmations are > 0
             if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
               let message: string = '';
@@ -1289,7 +1248,6 @@ export class LoadedAppClass extends Component<
         },
         pending === 0 ? 250 : 0,
       );
-      //console.log(
       //  '=========================================== > VALUE TRANSFERS STORED SETSTATE - ',
       //  Date.now() - start,
       //);
@@ -1301,10 +1259,8 @@ export class LoadedAppClass extends Component<
       !isEqual(this.state.messages, messages) ||
       this.state.messagesTotal !== messagesTotal
     ) {
-      //console.log('fetch messages');
       //const start = Date.now();
       this.setState({ messages, messagesTotal });
-      //console.log('=========================================== > MESSAGES STORED SETSTATE - ', Date.now() - start);
     }
   };
 
@@ -1312,10 +1268,8 @@ export class LoadedAppClass extends Component<
     addresses: (UnifiedAddressClass | TransparentAddressClass)[],
   ) => {
     if (!isEqual(this.state.addresses, addresses)) {
-      //console.log('fetch addresses');
       //const start = Date.now();
       this.setState({ addresses });
-      //console.log('=========================================== > ADDRESSES STORED SETSTATE - ', Date.now() - start);
     }
     if (addresses.length > 0) {
       // the last Unified Address created.
@@ -1334,10 +1288,8 @@ export class LoadedAppClass extends Component<
   };
 
   setSendPageState = (sendPageState: SendPageStateClass) => {
-    //console.log('fetch send page state');
     //const start = Date.now();
     this.setState({ sendPageState });
-    //console.log('=========================================== > SEND PAGE STORED SETSTATE - ', Date.now() - start);
   };
 
   clearToAddr = () => {
@@ -1351,13 +1303,11 @@ export class LoadedAppClass extends Component<
   };
 
   setZecPrice = (newZecPrice: number, newDate: number) => {
-    //console.log(this.state.zecPrice, newZecPrice);
     const zecPrice = {
       zecPrice: newZecPrice,
       date: newDate,
     } as ZecPriceType;
     if (!isEqual(this.state.zecPrice, zecPrice)) {
-      //console.log('fetch zec price');
       this.setState({ zecPrice });
     }
   };
@@ -1385,8 +1335,6 @@ export class LoadedAppClass extends Component<
       }
       //const start = Date.now();
       this.setState({ info: newInfo });
-      //console.log('=========================================== > INFO STORED SETSTATE - ', Date.now() - start);
-      //console.log('SET', newInfo);
     }
   };
 
@@ -1394,8 +1342,6 @@ export class LoadedAppClass extends Component<
     if (!this.state.zingolibVersion) {
       //const start = Date.now();
       this.setState({ zingolibVersion: newZingolibVersion });
-      //console.log('=========================================== > ZINGOLIB STORED SETSTATE - ', Date.now() - start);
-      //console.log('SET', newZingolibVersion);
     }
   };
 
@@ -1413,17 +1359,14 @@ export class LoadedAppClass extends Component<
       );
       //const start = Date.now();
       const txid = await this.rpc.sendTransaction(sendJson);
-      //console.log('&&&&&&&&&&&&&& send tx', Date.now() - start);
 
       return txid;
     } catch (err) {
-      //console.log('route sendtx error', err);
       throw err;
     }
   };
 
   doRefresh = (screen: ScreenEnum) => {
-    //console.log('================== MANUAL REFRESH ================== ', screen);
     if (screen === ScreenEnum.History || screen === ScreenEnum.ContactList) {
       // Value Transfers
       this.rpc.fetchTandZandOValueTransfers();
@@ -1444,7 +1387,6 @@ export class LoadedAppClass extends Component<
     if (!isEqual(this.state.birthday, birthday)) {
       //const start = Date.now();
       this.setState({ birthday });
-      //console.log('=========================================== > WALLET STORED SETSTATE - ', Date.now() - start);
     }
   };
 
@@ -1612,7 +1554,6 @@ export class LoadedAppClass extends Component<
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
-      //console.log('load existing wallet', result);
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
@@ -1620,7 +1561,6 @@ export class LoadedAppClass extends Component<
             await JSON.parse(result);
           if (!resultJson.error) {
             // Load the wallet and navigate to the ValueTransfers screen
-            //console.log(`wallet loaded ok ${value.uri}`);
             if (toast && selectServer !== SelectServerEnum.offline) {
               this.addLastSnackbar({
                 message: `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
@@ -1677,7 +1617,6 @@ export class LoadedAppClass extends Component<
           action: SeedActionEnum.server,
         });
       }
-      //console.log(`Error Reading Wallet ${value} - ${error}`);
       if (toast) {
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
@@ -1711,16 +1650,12 @@ export class LoadedAppClass extends Component<
     ) {
       // when the user select USD
       // the App have to create a Tor Client
-      //console.log('before CREATE ------------------- TOR CLIENT');
       const result = await RPCModule.createTorClientProcess();
-      //console.log('after CREATE ------------------- TOR CLIENT', result);
       if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
         this.setLastError(`Create tor client error: ${result}`);
       }
     } else {
-      //console.log('before REMOVE ------------------- TOR CLIENT');
       const result = await RPCModule.removeTorClientProcess();
-      //console.log('after REMOVE ------------------- TOR CLIENT', result);
       if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
         this.setLastError(`Remove tor client error: ${result}`);
       }
@@ -1802,8 +1737,10 @@ export class LoadedAppClass extends Component<
     if (!value) {
       await removeRecoveryWalletInfo();
     } else {
-      const wallet: WalletType = await RPC.rpcFetchWallet(this.state.readOnly);
-      await createUpdateRecoveryWalletInfo(wallet);
+      const wallet = await RPC.rpcFetchWallet(this.state.readOnly);
+      if (wallet) {
+        await createUpdateRecoveryWalletInfo(wallet);
+      }
     }
   };
 
@@ -1872,9 +1809,7 @@ export class LoadedAppClass extends Component<
       resultStr = (await this.rpc.changeWalletNoBackup()) as string;
     }
 
-    //console.log("jc change", resultStr);
     if (resultStr && resultStr.toLowerCase().startsWith(GlobalConst.error)) {
-      //console.log(`Error change wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -1896,9 +1831,7 @@ export class LoadedAppClass extends Component<
   onClickOKRestoreBackup = async () => {
     const resultStr = (await this.rpc.restoreBackup()) as string;
 
-    //console.log("jc restore", resultStr);
     if (resultStr && resultStr.toLowerCase().startsWith(GlobalConst.error)) {
-      //console.log(`Error restore backup wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -1934,20 +1867,17 @@ export class LoadedAppClass extends Component<
         resultStrServerPromise,
         timeoutServerPromise,
       ]);
-      //console.log(resultStrServer);
 
       if (
         resultStrServer &&
         resultStrServer.toLowerCase().startsWith(GlobalConst.error)
       ) {
-        //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
           screenName: [this.screenName],
         });
         return;
       } else {
-        //console.log(`change server ok ${value}`);
       }
 
       await SettingsFileImpl.writeSettings(
@@ -1977,12 +1907,10 @@ export class LoadedAppClass extends Component<
         resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
       }
 
-      //console.log("jc change", resultStr);
       if (
         resultStr2 &&
         resultStr2.toLowerCase().startsWith(GlobalConst.error)
       ) {
-        //console.log(`Error change wallet. ${resultStr}`);
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
@@ -2225,11 +2153,6 @@ export class LoadedAppClass extends Component<
         </View>
       );
     };
-
-    //console.log('render LoadedAppClass - 3');
-    //console.log('vt', valueTransfers);
-    //console.log('ad', addresses);
-    //console.log('ba', totalBalance);
 
     return (
       <ToastProvider>
