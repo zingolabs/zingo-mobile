@@ -1,7 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, {
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
 import { Dimensions, Keyboard, View } from 'react-native';
-import { TabView, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
+import {
+  TabView,
+  SceneRendererProps,
+  Route,
+  NavigationState,
+} from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -22,7 +35,11 @@ import {
   RouteEnum,
 } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
 import { ToastProvider } from 'react-native-toastier';
@@ -50,13 +67,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { 
-    translate, 
-    addresses, 
-    defaultUnifiedAddress, 
-    mode, 
-    snackbars, 
-    removeFirstSnackbar, 
+  const {
+    translate,
+    addresses,
+    defaultUnifiedAddress,
+    mode,
+    snackbars,
+    removeFirstSnackbar,
     addLastSnackbar,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -64,7 +81,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
-  const [sheetType, setSheetType] = useState<'NA' | 'VA' | 'NAT' | 'TW' | 'EA' | null>(null);
+  const [sheetType, setSheetType] = useState<
+    'NA' | 'VA' | 'NAT' | 'TW' | 'EA' | null
+  >(null);
 
   const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
   const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
@@ -85,10 +104,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     if (snap1 < 80) {
       snap2 = snap1 + 20;
     }
-    return [
-      `${snap1}%`,
-      `${snap2}%`,
-    ]
+    return [`${snap1}%`, `${snap2}%`];
   }, [heightLayout]);
 
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
@@ -112,18 +128,24 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   }, []);
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      if (indexBottomSheet > -1) {
-        bottomSheetRef.current?.snapToIndex(1);
-        setIndexBottomSheet(1);
-      }
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      if (indexBottomSheet > -1) {
-        bottomSheetRef.current?.snapToIndex(0);
-        setIndexBottomSheet(0);
-      }
-    });
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        if (indexBottomSheet > -1) {
+          bottomSheetRef.current?.snapToIndex(1);
+          setIndexBottomSheet(1);
+        }
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        if (indexBottomSheet > -1) {
+          bottomSheetRef.current?.snapToIndex(0);
+          setIndexBottomSheet(0);
+        }
+      },
+    );
 
     return () => {
       !!keyboardDidShowListener && keyboardDidShowListener.remove();
@@ -137,13 +159,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       // 1. UA
       // 2. T
       const uAdd =
-        addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u) ||
-        [];
+        addresses.filter(
+          (a: UnifiedAddressClass | TransparentAddressClass) =>
+            a.addressKind === AddressKindEnum.u,
+        ) || [];
       // we are filtering only the `external` addresses... for now.
       const tAdd =
         addresses.filter(
           (a: UnifiedAddressClass | TransparentAddressClass) =>
-            a.addressKind === AddressKindEnum.t && a.scope === RPCAddressScopeEnum.external,
+            a.addressKind === AddressKindEnum.t &&
+            a.scope === RPCAddressScopeEnum.external,
         ) || [];
       setUAddr(uAdd as UnifiedAddressClass[]);
       setTAddr(tAdd as TransparentAddressClass[]);
@@ -153,7 +178,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   }, [addresses]);
 
   useEffect(() => {
-    const basicModeRoutes = [{ key: 'uaddr', title: translate('receive.u-title') as string }];
+    const basicModeRoutes = [
+      { key: 'uaddr', title: translate('receive.u-title') as string },
+    ];
     const advancedModeRoutes = [
       { key: 'uaddr', title: translate('receive.u-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
@@ -250,7 +277,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           display: 'flex',
           justifyContent: 'flex-start',
           width: '100%',
-        }}>
+        }}
+      >
         <Header
           title={
             alone
@@ -267,22 +295,28 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   };
 
   const renderBackdrop = (props: BottomSheetBackdropProps) => (
-    <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" />
+    <BottomSheetBackdrop
+      {...props}
+      disappearsOnIndex={-1}
+      appearsOnIndex={0}
+      pressBehavior="close"
+    />
   );
 
   const doCopy = () => {
-    Clipboard.setString(index === 0 && uAddrIndex !== null
-      ? uAddr[uAddrIndex].address
-      : index === 1 && tAddrIndex !== null
-      ? tAddr[tAddrIndex].address
-      : '');
+    Clipboard.setString(
+      index === 0 && uAddrIndex !== null
+        ? uAddr[uAddrIndex].address
+        : index === 1 && tAddrIndex !== null
+          ? tAddr[tAddrIndex].address
+          : '',
+    );
     addLastSnackbar({
-      message: (translate('history.addresscopied') as string),
+      message: translate('history.addresscopied') as string,
       duration: SnackbarDurationEnum.short,
       screenName: [screenName],
     });
   };
-
 
   const returnPage = (
     <ToastProvider>
@@ -309,8 +343,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         keyboardBehavior={'interactive'}
         handleStyle={{ display: 'none' }}
         backgroundStyle={{ backgroundColor: colors.background }}
-        backdropComponent={renderBackdrop}>
-        <BottomSheetView style={{ backgroundColor: colors.background, height: '100%' }}>
+        backdropComponent={renderBackdrop}
+      >
+        <BottomSheetView
+          style={{ backgroundColor: colors.background, height: '100%' }}
+        >
           {sheetType === 'NA' && (
             <NewAddress
               addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
@@ -322,11 +359,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           )}
           {sheetType === 'NAT' && (
             <NewAddressTag
-              address={index === 0 && uAddrIndex !== null
-                ? uAddr[uAddrIndex].address
-                : index === 1 && tAddrIndex !== null
-                ? tAddr[tAddrIndex].address
-                : ''}
+              address={
+                index === 0 && uAddrIndex !== null
+                  ? uAddr[uAddrIndex].address
+                  : index === 1 && tAddrIndex !== null
+                    ? tAddr[tAddrIndex].address
+                    : ''
+              }
               closeSheet={hide}
               setAddressBook={setAddressBook}
               setHeightLayout={setHeightLayout}
@@ -342,30 +381,28 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           {sheetType === 'TW' && (
             <TransparentWarning
               closeSheet={hide}
-              onSuccess={
-                () => {
-                  setShowMoreOptions(false);
-                  setIndex(1);
-                }
-              }
+              onSuccess={() => {
+                setShowMoreOptions(false);
+                setIndex(1);
+              }}
               setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'EA' && (
             <ExpandedAddress
-                onCopy={doCopy}
-                closeSheet={hide}
-                title={translate('receive.title-address') as string}
-                button={translate('receive.copy-address-button') as string}
-                address={
-                  index === 0 && uAddrIndex !== null
-                    ? uAddr[uAddrIndex].address
-                    : index === 1 && tAddrIndex !== null
-                      ? tAddr[tAddrIndex].address
-                      : ''
-                }
-                setHeightLayout={setHeightLayout}
-              />
+              onCopy={doCopy}
+              closeSheet={hide}
+              title={translate('receive.title-address') as string}
+              button={translate('receive.copy-address-button') as string}
+              address={
+                index === 0 && uAddrIndex !== null
+                  ? uAddr[uAddrIndex].address
+                  : index === 1 && tAddrIndex !== null
+                    ? tAddr[tAddrIndex].address
+                    : ''
+              }
+              setHeightLayout={setHeightLayout}
+            />
           )}
         </BottomSheetView>
       </BottomSheet>

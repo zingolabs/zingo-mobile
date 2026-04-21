@@ -11,17 +11,33 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+  BottomTabBarButtonProps,
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft, faComments } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDownload,
+  faCog,
+  faRefresh,
+  faPaperPlane,
+  faClockRotateLeft,
+  faComments,
+} from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 import { LoadingAppNavigationState, AppDrawerParamList } from '../types';
-import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
-import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
+import NetInfo, {
+  NetInfoSubscription,
+  NetInfoState,
+} from '@react-native-community/netinfo/src/index';
+import {
+  activateKeepAwake,
+  deactivateKeepAwake,
+} from '@sayem314/react-native-keep-awake';
 
 import RPC from '../rpc';
 import RPCModule from '../RPCModule';
@@ -82,7 +98,10 @@ import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
-import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfov10';
+import {
+  createUpdateRecoveryWalletInfo,
+  removeRecoveryWalletInfo,
+} from '../recoveryWalletInfov10';
 
 import History from '../../components/History';
 import Send from '../../components/Send';
@@ -115,7 +134,9 @@ const Rescan = React.lazy(() => import('../../components/Rescan'));
 const Pools = React.lazy(() => import('../../components/Pools'));
 const Insight = React.lazy(() => import('../../components/Insight'));
 const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
-const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
+const ComputingTxContent = React.lazy(
+  () => import('./components/ComputingTxContent'),
+);
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -130,7 +151,10 @@ const Stack = createNativeStackNavigator<AppDrawerParamList>();
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 type LoadedAppProps = {
-  navigation: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['navigation'];
+  navigation: StackScreenProps<
+    AppStackParamList,
+    RouteEnum.LoadedApp
+  >['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
 };
@@ -143,13 +167,20 @@ const SERVER_DEFAULT_0: ServerType = {
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as ThemeType;
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.USDCurrency);
+  const [currency, setCurrency] = useState<CurrencyEnum>(
+    CurrencyEnum.USDCurrency,
+  );
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
-  const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
+  const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
+    batches: 0,
+    message: '',
+    date: 0,
+    dateEnd: 0,
+  });
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
@@ -162,12 +193,19 @@ export default function LoadedApp(props: LoadedAppProps) {
     changeWalletScreen: true,
     restoreWalletBackupScreen: true,
   });
-  const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
+  const [selectServer, setSelectServer] = useState<SelectServerEnum>(
+    SelectServerEnum.auto,
+  );
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
-  const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
-  const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(BlockExplorerEnum.Zcashexplorer);
-  const [zenniesDonationAddress, setZenniesDonationAddress] = useState<string>('');
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
+    useState<boolean>(false);
+  const [performanceLevel, setPerformanceLevel] =
+    useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
+  const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
+    BlockExplorerEnum.Zcashexplorer,
+  );
+  const [zenniesDonationAddress, setZenniesDonationAddress] =
+    useState<string>('');
   const file = useMemo(
     () => ({
       en: en,
@@ -180,31 +218,61 @@ export default function LoadedApp(props: LoadedAppProps) {
   );
   const i18n = useMemo(() => new I18n(file), [file]);
 
-  const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
-  const readOnly = !!props.route.params && props.route.params.readOnly !== undefined ? props.route.params.readOnly : false;
-  const orchardPool = !!props.route.params && props.route.params.orchardPool !== undefined ? props.route.params.orchardPool : false;
-  const saplingPool = !!props.route.params && props.route.params.saplingPool !== undefined ? props.route.params.saplingPool : false;
-  const transparentPool = !!props.route.params && props.route.params.transparentPool !== undefined ? props.route.params.transparentPool : false;
-  const newWallet = !!props.route.params && props.route.params.newWallet !== undefined ? props.route.params.newWallet : false;
-  const firstLaunchingMessage = !!props.route.params && props.route.params.firstLaunchingMessage !== undefined ? props.route.params.firstLaunchingMessage : LaunchingModeEnum.opening;
+  const translate: (key: string) => TranslateType = (key: string) =>
+    i18n.t(key);
+  const readOnly =
+    !!props.route.params && props.route.params.readOnly !== undefined
+      ? props.route.params.readOnly
+      : false;
+  const orchardPool =
+    !!props.route.params && props.route.params.orchardPool !== undefined
+      ? props.route.params.orchardPool
+      : false;
+  const saplingPool =
+    !!props.route.params && props.route.params.saplingPool !== undefined
+      ? props.route.params.saplingPool
+      : false;
+  const transparentPool =
+    !!props.route.params && props.route.params.transparentPool !== undefined
+      ? props.route.params.transparentPool
+      : false;
+  const newWallet =
+    !!props.route.params && props.route.params.newWallet !== undefined
+      ? props.route.params.newWallet
+      : false;
+  const firstLaunchingMessage =
+    !!props.route.params &&
+    props.route.params.firstLaunchingMessage !== undefined
+      ? props.route.params.firstLaunchingMessage
+      : LaunchingModeEnum.opening;
 
   useEffect(() => {
     (async () => {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
-      const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
+      const { languageTag, isRTL } =
+        RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
 
       // update layout direction
       I18nManager.forceRTL(isRTL);
 
       // If the App is mounting this component,
       // I know I have to reset the firstInstall & firstUpdateWithDonation prop in settings.
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.firstInstall, false);
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.firstUpdateWithDonation, false);
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.firstInstall,
+        false,
+      );
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.firstUpdateWithDonation,
+        false,
+      );
 
       // If the App is mounting this component, I know I have to update the version prop in settings.
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.version, translate('version') as string);
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.version,
+        translate('version') as string,
+      );
 
       //I have to check what language is in the settings
       const settings = await SettingsFileImpl.readSettings();
@@ -237,12 +305,17 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
         //console.log('apploaded NO settings', languageTag);
       }
-      if (settings.currency === CurrencyEnum.noCurrency ||
-          settings.currency === CurrencyEnum.USDCurrency ||
-          settings.currency === CurrencyEnum.USDTORCurrency) {
+      if (
+        settings.currency === CurrencyEnum.noCurrency ||
+        settings.currency === CurrencyEnum.USDCurrency ||
+        settings.currency === CurrencyEnum.USDTORCurrency
+      ) {
         setCurrency(settings.currency);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.currency,
+          currency,
+        );
       }
       if (settings.server) {
         setServer(settings.server);
@@ -257,14 +330,20 @@ export default function LoadedApp(props: LoadedAppProps) {
       if (settings.donation === true || settings.donation === false) {
         setDonation(settings.donation);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.donation, donation);
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.donation,
+          donation,
+        );
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
-      if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
+      if (
+        settings.mode === ModeEnum.basic ||
+        settings.mode === ModeEnum.advanced
+      ) {
         setMode(settings.mode);
         props.toggleTheme(settings.mode);
       } else {
@@ -274,7 +353,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       if (settings.security) {
         setSecurity(settings.security);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.security, security);
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.security,
+          security,
+        );
       }
       if (
         settings.selectServer === SelectServerEnum.auto ||
@@ -284,17 +366,29 @@ export default function LoadedApp(props: LoadedAppProps) {
       ) {
         setSelectServer(settings.selectServer);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.selectServer,
+          selectServer,
+        );
       }
       if (settings.rescanMenu === true || settings.rescanMenu === false) {
         setRescanMenu(settings.rescanMenu);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, rescanMenu);
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.rescanMenu,
+          rescanMenu,
+        );
       }
-      if (settings.recoveryWalletInfoOnDevice === true || settings.recoveryWalletInfoOnDevice === false) {
+      if (
+        settings.recoveryWalletInfoOnDevice === true ||
+        settings.recoveryWalletInfoOnDevice === false
+      ) {
         setRecoveryWalletInfoOnDevice(settings.recoveryWalletInfoOnDevice);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, recoveryWalletInfoOnDevice);
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.recoveryWalletInfoOnDevice,
+          recoveryWalletInfoOnDevice,
+        );
       }
       if (
         settings.performanceLevel === RPCPerformanceLevelEnum.High ||
@@ -304,7 +398,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       ) {
         setPerformanceLevel(settings.performanceLevel);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.performanceLevel, performanceLevel);
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.performanceLevel,
+          performanceLevel,
+        );
       }
       if (
         settings.blockExplorer === BlockExplorerEnum.Cipherscan ||
@@ -313,7 +410,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       ) {
         setBlockExplorer(settings.blockExplorer);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.blockExplorer, blockExplorer);
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.blockExplorer,
+          blockExplorer,
+        );
       }
 
       // reading background task info
@@ -321,12 +421,17 @@ export default function LoadedApp(props: LoadedAppProps) {
       setBackgroundSyncInfo(backgroundSyncInfoJson);
 
       let sort: boolean = false;
-      const zenniesAddress = await Utils.getZenniesDonationAddress(server.chainName);
+      const zenniesAddress = await Utils.getZenniesDonationAddress(
+        server.chainName,
+      );
       setZenniesDonationAddress(zenniesAddress);
 
       // adding `Zenny Tips` address always.
       let ab = await AddressBookFileImpl.readAddressBook();
-      if (ab.filter((a: AddressBookFileClass) => a.address === zenniesAddress).length === 0) {
+      if (
+        ab.filter((a: AddressBookFileClass) => a.address === zenniesAddress)
+          .length === 0
+      ) {
         ab = await AddressBookFileImpl.writeAddressBookItem(
           translate('zenny-tips-ab') as string,
           zenniesAddress,
@@ -340,7 +445,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       // if `uOrchardAddress` exists then it will be removed.
       let toUpdate: AddressBookFileClassObsolete[] = ab.filter(
         // if have orchard address or NOT have color or NOT have own flag...
-        (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color') || !a.hasOwnProperty('own'),
+        (a: AddressBookFileClassObsolete) =>
+          a.hasOwnProperty('uOrchardAddress') ||
+          !a.hasOwnProperty('color') ||
+          !a.hasOwnProperty('own'),
       );
       console.log('Address Book -> TO UPDATE', toUpdate);
       console.log('Address Book items', ab.length);
@@ -353,7 +461,10 @@ export default function LoadedApp(props: LoadedAppProps) {
             // verify this address as own or not
             const checkStr = await RPCModule.checkMyAddressInfo(a.address);
             //console.log(checkStr);
-            if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+            if (
+              checkStr &&
+              !checkStr.toLowerCase().startsWith(GlobalConst.error)
+            ) {
               const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
               own = checkJSON.is_wallet_address;
             } else {
@@ -371,7 +482,11 @@ export default function LoadedApp(props: LoadedAppProps) {
             // no value
             color = a.color !== undefined ? a.color : randomColors[i];
           }
-          if (a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('own') || !a.hasOwnProperty('color')) {
+          if (
+            a.hasOwnProperty('uOrchardAddress') ||
+            !a.hasOwnProperty('own') ||
+            !a.hasOwnProperty('color')
+          ) {
             ab = await AddressBookFileImpl.updateColorAndOwnItem(
               a.label,
               a.address,
@@ -396,7 +511,10 @@ export default function LoadedApp(props: LoadedAppProps) {
             // verify this address as own or not
             const checkStr = await RPCModule.checkMyAddressInfo(a.address);
             //console.log(checkStr);
-            if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+            if (
+              checkStr &&
+              !checkStr.toLowerCase().startsWith(GlobalConst.error)
+            ) {
               const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
               own = checkJSON.is_wallet_address;
             } else {
@@ -437,7 +555,11 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   if (loading) {
     return (
-      <Launching translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />
+      <Launching
+        translate={translate}
+        firstLaunchingMessage={LaunchingModeEnum.opening}
+        biometricsFailed={false}
+      />
     );
   } else {
     return (
@@ -486,14 +608,18 @@ const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
         alignItems: 'center',
         backgroundColor: backgroundColor,
         height: '100%',
-      }}>
+      }}
+    >
       <ActivityIndicator size="large" color={spinColor} />
     </View>
   );
 };
 
 type LoadedAppClassProps = {
-  navigationApp: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['navigation'];
+  navigationApp: StackScreenProps<
+    AppStackParamList,
+    RouteEnum.LoadedApp
+  >['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
@@ -523,14 +649,23 @@ type LoadedAppClassProps = {
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
 
-const TabPressable: React.FC<BottomTabBarButtonProps & { colors: ThemeType }> = ({ colors, ...props }) => {
-  return <PlatformPressable {...props} android_ripple={{ color: colors.primary }} />;
+const TabPressable: React.FC<
+  BottomTabBarButtonProps & { colors: ThemeType }
+> = ({ colors, ...props }) => {
+  return (
+    <PlatformPressable {...props} android_ripple={{ color: colors.primary }} />
+  );
 };
 
-const renderTabPressable = (colors: ThemeType) => (props: BottomTabBarButtonProps) =>
-  <TabPressable {...props} colors={colors} />;
+const renderTabPressable =
+  (colors: ThemeType) => (props: BottomTabBarButtonProps) => (
+    <TabPressable {...props} colors={colors} />
+  );
 
-export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClassState> {
+export class LoadedAppClass extends Component<
+  LoadedAppClassProps,
+  LoadedAppClassState
+> {
   rpc: RPC;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
@@ -602,7 +737,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       // state
       navigationHome: null,
-      appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
+      appStateStatus:
+        Platform.OS === GlobalConst.platformOSios
+          ? AppStateStatusEnum.active
+          : AppState.currentState,
       newServer: {} as ServerType,
       newSelectServer: null,
       scrollToTop: false,
@@ -638,7 +776,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       netInfo: {
         isConnected: netInfoState.isConnected,
         type: netInfoState.type,
-        isConnectionExpensive: netInfoState.details && netInfoState.details.isConnectionExpensive,
+        isConnectionExpensive:
+          netInfoState.details && netInfoState.details.isConnectionExpensive,
       },
     });
 
@@ -649,7 +788,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       if (version && version < 32) {
         Alert.alert(
           `${this.state.translate('loadedapp.migration-title')} v:${version}`,
-          this.state.translate('loadedapp.migration-body') as string
+          this.state.translate('loadedapp.migration-body') as string,
         );
       }
     }
@@ -662,106 +801,126 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     this.clearToAddr();
 
-    this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
-      //console.log('LOADED', 'prior', this.state.appStateStatus, 'next', nextAppState);
-      // let's catch the prior value
-      const priorAppState = this.state.appStateStatus;
-      if (Platform.OS === GlobalConst.platformOSios) {
-        if (
-          (priorAppState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.active) ||
-          (priorAppState === AppStateStatusEnum.active && nextAppState === AppStateStatusEnum.inactive)
-        ) {
-          //console.log('LOADED SAVED IOS do nothing', nextAppState);
-          this.setState({ appStateStatus: nextAppState });
-          return;
+    this.appstate = AppState.addEventListener(
+      EventListenerEnum.change,
+      async nextAppState => {
+        //console.log('LOADED', 'prior', this.state.appStateStatus, 'next', nextAppState);
+        // let's catch the prior value
+        const priorAppState = this.state.appStateStatus;
+        if (Platform.OS === GlobalConst.platformOSios) {
+          if (
+            (priorAppState === AppStateStatusEnum.inactive &&
+              nextAppState === AppStateStatusEnum.active) ||
+            (priorAppState === AppStateStatusEnum.active &&
+              nextAppState === AppStateStatusEnum.inactive)
+          ) {
+            //console.log('LOADED SAVED IOS do nothing', nextAppState);
+            this.setState({ appStateStatus: nextAppState });
+            return;
+          }
+          if (
+            priorAppState === AppStateStatusEnum.inactive &&
+            nextAppState === AppStateStatusEnum.background
+          ) {
+            console.log('App LOADED IOS is gone to the background!');
+            this.setState({ appStateStatus: nextAppState });
+            // setting value for background task Android
+            await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
+            //console.log('&&&&& background yes in storage &&&&&');
+            await this.rpc.clearTimers();
+            //console.log('clear timers IOS');
+            this.setSyncingStatus({} as RPCSyncStatusType);
+            //console.log('clear sync status state');
+            //console.log('LOADED SAVED IOS background', nextAppState);
+            // We need to save the wallet file here because
+            // sometimes the App can lose the last synced chunk
+            await RPCModule.doSave();
+            return;
+          }
         }
-        if (priorAppState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.background) {
-          console.log('App LOADED IOS is gone to the background!');
-          this.setState({ appStateStatus: nextAppState });
+        if (Platform.OS === GlobalConst.platformOSandroid) {
+          if (priorAppState !== nextAppState) {
+            //console.log('LOADED SAVED Android', nextAppState);
+            this.setState({ appStateStatus: nextAppState });
+          }
+        }
+        if (
+          (priorAppState === AppStateStatusEnum.inactive ||
+            priorAppState === AppStateStatusEnum.background) &&
+          nextAppState === AppStateStatusEnum.active
+        ) {
+          //console.log('App LOADED Android & IOS has come to the foreground!');
+          if (Platform.OS === GlobalConst.platformOSios) {
+            //console.log('LOADED SAVED IOS foreground', nextAppState);
+            this.setState({ appStateStatus: nextAppState });
+          }
+          // (PIN or TouchID or FaceID)
+          const resultBio = this.state.security.foregroundApp
+            ? await simpleBiometrics({ translate: this.state.translate })
+            : true;
+          // can be:
+          // - true      -> the user do pass the authentication
+          // - false     -> the user do NOT pass the authentication
+          // - undefined -> no biometric authentication available -> Passcode -> Nothing.
+          //console.log('BIOMETRIC FOREGROUND --------> ', resultBio);
+          if (resultBio === false) {
+            this.navigateToLoadingApp({
+              startingApp: true,
+              biometricsFailed: true,
+            });
+          } else {
+            // reading background task info
+            await this.fetchBackgroundSyncInfo();
+            // setting value for background task Android
+            await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+            //console.log('&&&&& background no in storage &&&&&');
+            // needs this because when the App go from back to fore
+            // it have to re-launch all the tasks.
+            await this.rpc.clearTimers();
+            await this.rpc.configure();
+            //console.log('configure start timers Android & IOS');
+            if (
+              this.state.backgroundError &&
+              (this.state.backgroundError.title ||
+                this.state.backgroundError.error)
+            ) {
+              Alert.alert(
+                this.state.backgroundError.title,
+                this.state.backgroundError.error,
+              );
+              this.setBackgroundError('', '');
+            }
+          }
+        } else if (
+          priorAppState === AppStateStatusEnum.active &&
+          (nextAppState === AppStateStatusEnum.inactive ||
+            nextAppState === AppStateStatusEnum.background)
+        ) {
+          console.log('App LOADED is gone to the background!');
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
           //console.log('&&&&& background yes in storage &&&&&');
           await this.rpc.clearTimers();
-          //console.log('clear timers IOS');
+          //console.log('clear timers');
           this.setSyncingStatus({} as RPCSyncStatusType);
           //console.log('clear sync status state');
-          //console.log('LOADED SAVED IOS background', nextAppState);
           // We need to save the wallet file here because
           // sometimes the App can lose the last synced chunk
           await RPCModule.doSave();
-          return;
-        }
-      }
-      if (Platform.OS === GlobalConst.platformOSandroid) {
-        if (priorAppState !== nextAppState) {
-          //console.log('LOADED SAVED Android', nextAppState);
-          this.setState({ appStateStatus: nextAppState });
-        }
-      }
-      if (
-        (priorAppState === AppStateStatusEnum.inactive || priorAppState === AppStateStatusEnum.background) &&
-        nextAppState === AppStateStatusEnum.active
-      ) {
-        //console.log('App LOADED Android & IOS has come to the foreground!');
-        if (Platform.OS === GlobalConst.platformOSios) {
-          //console.log('LOADED SAVED IOS foreground', nextAppState);
-          this.setState({ appStateStatus: nextAppState });
-        }
-        // (PIN or TouchID or FaceID)
-        const resultBio = this.state.security.foregroundApp
-          ? await simpleBiometrics({ translate: this.state.translate })
-          : true;
-        // can be:
-        // - true      -> the user do pass the authentication
-        // - false     -> the user do NOT pass the authentication
-        // - undefined -> no biometric authentication available -> Passcode -> Nothing.
-        //console.log('BIOMETRIC FOREGROUND --------> ', resultBio);
-        if (resultBio === false) {
-          this.navigateToLoadingApp({ startingApp: true, biometricsFailed: true });
-        } else {
-          // reading background task info
-          await this.fetchBackgroundSyncInfo();
-          // setting value for background task Android
-          await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-          //console.log('&&&&& background no in storage &&&&&');
-          // needs this because when the App go from back to fore
-          // it have to re-launch all the tasks.
-          await this.rpc.clearTimers();
-          await this.rpc.configure();
-          //console.log('configure start timers Android & IOS');
-          if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
-            Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
-            this.setBackgroundError('', '');
-          }
-        }
-      } else if (
-        priorAppState === AppStateStatusEnum.active &&
-        (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background)
-      ) {
-        console.log('App LOADED is gone to the background!');
-        // setting value for background task Android
-        await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-        //console.log('&&&&& background yes in storage &&&&&');
-        await this.rpc.clearTimers();
-        //console.log('clear timers');
-        this.setSyncingStatus({} as RPCSyncStatusType);
-        //console.log('clear sync status state');
-        // We need to save the wallet file here because
-        // sometimes the App can lose the last synced chunk
-        await RPCModule.doSave();
-        if (Platform.OS === GlobalConst.platformOSios) {
-          //console.log('LOADED SAVED IOS background', nextAppState);
-          this.setState({ appStateStatus: nextAppState });
-        }
-      } else {
-        if (Platform.OS === GlobalConst.platformOSios) {
-          if (priorAppState !== nextAppState) {
-            //console.log('LOADED SAVED IOS', nextAppState);
+          if (Platform.OS === GlobalConst.platformOSios) {
+            //console.log('LOADED SAVED IOS background', nextAppState);
             this.setState({ appStateStatus: nextAppState });
           }
+        } else {
+          if (Platform.OS === GlobalConst.platformOSios) {
+            if (priorAppState !== nextAppState) {
+              //console.log('LOADED SAVED IOS', nextAppState);
+              this.setState({ appStateStatus: nextAppState });
+            }
+          }
         }
-      }
-    });
+      },
+    );
 
     const initialUrl = await Linking.getInitialURL();
     console.log('INITIAL URI', initialUrl);
@@ -773,51 +932,61 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       });
     }
 
-    this.linking = Linking.addEventListener(EventListenerEnum.url, async ({ url }) => {
-      console.log('EVENT LISTENER URI', url);
-      if (url !== null) {
-        this.readUrl(url);
-      }
+    this.linking = Linking.addEventListener(
+      EventListenerEnum.url,
+      async ({ url }) => {
+        console.log('EVENT LISTENER URI', url);
+        if (url !== null) {
+          this.readUrl(url);
+        }
 
-      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.Send,
-      });
-    });
-
-    this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: NetInfoState) => {
-      const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
-      if (
-        isConnected !== state.isConnected ||
-        type !== state.type ||
-        isConnectionExpensive !== state.details?.isConnectionExpensive
-      ) {
-        //console.log('fetch net info');
-        this.setState({
-          netInfo: {
-            isConnected: state.isConnected,
-            type: state.type,
-            isConnectionExpensive: state.details && state.details.isConnectionExpensive,
-          },
+        this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
+          screen: RouteEnum.Send,
         });
-        if (isConnected !== state.isConnected) {
-          if (!state.isConnected) {
-            //console.log('EVENT Loaded: No internet connection.');
-          } else {
-            //console.log('EVENT Loaded: YES internet connection.');
-            // restart the interval process again...
-            await this.rpc.clearTimers();
-            await this.rpc.configure();
+      },
+    );
+
+    this.unsubscribeNetInfo = NetInfo.addEventListener(
+      async (state: NetInfoState) => {
+        const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
+        if (
+          isConnected !== state.isConnected ||
+          type !== state.type ||
+          isConnectionExpensive !== state.details?.isConnectionExpensive
+        ) {
+          //console.log('fetch net info');
+          this.setState({
+            netInfo: {
+              isConnected: state.isConnected,
+              type: state.type,
+              isConnectionExpensive:
+                state.details && state.details.isConnectionExpensive,
+            },
+          });
+          if (isConnected !== state.isConnected) {
+            if (!state.isConnected) {
+              //console.log('EVENT Loaded: No internet connection.');
+            } else {
+              //console.log('EVENT Loaded: YES internet connection.');
+              // restart the interval process again...
+              await this.rpc.clearTimers();
+              await this.rpc.configure();
+            }
           }
         }
-      }
-    });
+      },
+    );
   };
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
-    this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
+    this.appstate &&
+      typeof this.appstate.remove === 'function' &&
+      this.appstate.remove();
     this.linking && typeof this.linking === 'function' && this.linking.remove();
-    this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
+    this.unsubscribeNetInfo &&
+      typeof this.unsubscribeNetInfo === 'function' &&
+      this.unsubscribeNetInfo();
   };
 
   keepAwake = (keep: boolean): void => {
@@ -833,7 +1002,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
-      const { error, target } = await parseZcashURI(url, this.state.translate, this.state.server);
+      const { error, target } = await parseZcashURI(
+        url,
+        this.state.translate,
+        this.state.server,
+      );
       //console.log(targets);
 
       if (target) {
@@ -861,7 +1034,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             const to = new ToAddrClass(0);
 
             to.to = tgt.address || '';
-            to.amount = tgt.amount ? Utils.parseNumberFloatToStringLocale(tgt.amount, 8) : '';
+            to.amount = tgt.amount
+              ? Utils.parseNumberFloatToStringLocale(tgt.amount, 8)
+              : '';
             to.memo = tgt.memoString || '';
 
             uriToAddr = to;
@@ -880,7 +1055,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   fetchBackgroundSyncInfo = async () => {
-    const backgroundSyncInfoJson: BackgroundType = await BackgroundFileImpl.readBackground();
+    const backgroundSyncInfoJson: BackgroundType =
+      await BackgroundFileImpl.readBackground();
     if (!isEqual(this.state.backgroundSyncInfo, backgroundSyncInfoJson)) {
       //console.log('fetch background sync info');
       this.setState({ backgroundSyncInfo: backgroundSyncInfoJson });
@@ -930,8 +1106,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
-  setValueTransfersList = async (valueTransfers: ValueTransferType[], valueTransfersTotal: number) => {
-    const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
+  setValueTransfersList = async (
+    valueTransfers: ValueTransferType[],
+    valueTransfersTotal: number,
+  ) => {
+    const basicFirstViewSeed = (await SettingsFileImpl.readSettings())
+      .basicFirstViewSeed;
     // only for basic mode
     if (this.state.mode === ModeEnum.basic) {
       // only if the user doesn't see the seed the first time
@@ -943,8 +1123,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           // I need to check this out in the seed screen.
           if (!this.state.isSeedViewModalOpen) {
             this.setIsSeedViewModalOpen(true);
-            this.state.navigationHome?.navigate(RouteEnum.Seed, { 
-              action: SeedActionEnum.view 
+            this.state.navigationHome?.navigate(RouteEnum.Seed, {
+              action: SeedActionEnum.view,
             });
           }
         }
@@ -952,13 +1132,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     } else {
       // for advanced mode
       if (!basicFirstViewSeed) {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.basicFirstViewSeed,
+          true,
+        );
       }
     }
-    if (!isEqual(this.state.valueTransfers, valueTransfers) || this.state.valueTransfersTotal !== valueTransfersTotal) {
+    if (
+      !isEqual(this.state.valueTransfers, valueTransfers) ||
+      this.state.valueTransfersTotal !== valueTransfersTotal
+    ) {
       // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
-        valueTransfersTotal > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations).length : 0;
+        valueTransfersTotal > 0
+          ? valueTransfers.filter(
+              (vt: ValueTransferType) =>
+                vt.confirmations >= 0 &&
+                vt.confirmations < GlobalConst.minConfirmations,
+            ).length
+          : 0;
       // if a ValueTransfer go from 3 confirmations to > 3 -> Show a message about a ValueTransfer is confirmed
       this.state.valueTransfers &&
         this.state.valueTransfersTotal !== null &&
@@ -968,7 +1160,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           .forEach((vtOld: ValueTransferType) => {
             const vtNew = valueTransfers.filter(
               (vt: ValueTransferType) =>
-                vt.txid === vtOld.txid && vt.address === vtOld.address && vt.poolType === vtOld.poolType,
+                vt.txid === vtOld.txid &&
+                vt.address === vtOld.address &&
+                vt.poolType === vtOld.poolType,
             );
             //console.log('old', vtOld);
             //console.log('new', vtNew);
@@ -976,7 +1170,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
               let message: string = '';
               let title: string = '';
-              if (vtNew[0].kind === ValueTransferKindEnum.Received && vtNew[0].amount > 0) {
+              if (
+                vtNew[0].kind === ValueTransferKindEnum.Received &&
+                vtNew[0].amount > 0
+              ) {
                 message =
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.received') as string) +
@@ -984,10 +1181,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
                   ' ' +
                   this.state.info.currencyName;
-                title = this.state.translate('loadedapp.receive-menu') as string;
-              } else if (vtNew[0].kind === ValueTransferKindEnum.MemoToSelf && vtNew[0].fee && vtNew[0].fee > 0) {
+                title = this.state.translate(
+                  'loadedapp.receive-menu',
+                ) as string;
+              } else if (
+                vtNew[0].kind === ValueTransferKindEnum.MemoToSelf &&
+                vtNew[0].fee &&
+                vtNew[0].fee > 0
+              ) {
                 message =
-                  (this.state.translate('loadedapp.valuetransfer-confirmed') as string) +
+                  (this.state.translate(
+                    'loadedapp.valuetransfer-confirmed',
+                  ) as string) +
                   (this.state.translate('history.memotoself') as string) +
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
@@ -997,9 +1202,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       this.state.info.currencyName
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
-              } else if (vtNew[0].kind === ValueTransferKindEnum.SendToSelf && vtNew[0].fee && vtNew[0].fee > 0) {
+              } else if (
+                vtNew[0].kind === ValueTransferKindEnum.SendToSelf &&
+                vtNew[0].fee &&
+                vtNew[0].fee > 0
+              ) {
                 message =
-                  (this.state.translate('loadedapp.valuetransfer-confirmed') as string) +
+                  (this.state.translate(
+                    'loadedapp.valuetransfer-confirmed',
+                  ) as string) +
                   (this.state.translate('history.sendtoself') as string) +
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
@@ -1009,7 +1220,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       this.state.info.currencyName
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
-              } else if (vtNew[0].kind === ValueTransferKindEnum.Rejection && vtNew[0].amount > 0) {
+              } else if (
+                vtNew[0].kind === ValueTransferKindEnum.Rejection &&
+                vtNew[0].amount > 0
+              ) {
                 // not so sure about this `kind`...
                 // I guess the wallet is receiving some refund from a TEX sent.
                 message =
@@ -1019,8 +1233,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
                   ' ' +
                   this.state.info.currencyName;
-                title = this.state.translate('loadedapp.receive-menu') as string;
-              } else if (vtNew[0].kind === ValueTransferKindEnum.Shield && vtNew[0].amount > 0) {
+                title = this.state.translate(
+                  'loadedapp.receive-menu',
+                ) as string;
+              } else if (
+                vtNew[0].kind === ValueTransferKindEnum.Shield &&
+                vtNew[0].amount > 0
+              ) {
                 message =
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.shield') as string) +
@@ -1028,8 +1247,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
                   ' ' +
                   this.state.info.currencyName;
-                title = this.state.translate('loadedapp.receive-menu') as string;
-              } else if (vtNew[0].kind === ValueTransferKindEnum.Sent && vtNew[0].amount > 0) {
+                title = this.state.translate(
+                  'loadedapp.receive-menu',
+                ) as string;
+              } else if (
+                vtNew[0].kind === ValueTransferKindEnum.Sent &&
+                vtNew[0].amount > 0
+              ) {
                 message =
                   (this.state.translate('loadedapp.payment-made') as string) +
                   (this.state.translate('history.sent') as string) +
@@ -1047,7 +1271,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   title,
                   message,
                   true,
-                  this.state.translate
+                  this.state.translate,
                 );
               }
             }
@@ -1073,7 +1297,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setMessagesList = (messages: ValueTransferType[], messagesTotal: number) => {
-    if (!isEqual(this.state.messages, messages) || this.state.messagesTotal !== messagesTotal) {
+    if (
+      !isEqual(this.state.messages, messages) ||
+      this.state.messagesTotal !== messagesTotal
+    ) {
       //console.log('fetch messages');
       //const start = Date.now();
       this.setState({ messages, messagesTotal });
@@ -1081,7 +1308,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setAllAddresses = (addresses: (UnifiedAddressClass | TransparentAddressClass)[]) => {
+  setAllAddresses = (
+    addresses: (UnifiedAddressClass | TransparentAddressClass)[],
+  ) => {
     if (!isEqual(this.state.addresses, addresses)) {
       //console.log('fetch addresses');
       //const start = Date.now();
@@ -1090,8 +1319,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
     if (addresses.length > 0) {
       // the last Unified Address created.
-      const defaultUAArray = addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u);
-      const defaultUA: string = defaultUAArray[defaultUAArray.length - 1].address;
+      const defaultUAArray = addresses.filter(
+        (a: UnifiedAddressClass | TransparentAddressClass) =>
+          a.addressKind === AddressKindEnum.u,
+      );
+      const defaultUA: string =
+        defaultUAArray[defaultUAArray.length - 1].address;
       if (this.state.defaultUnifiedAddress !== defaultUA) {
         this.setState({ defaultUnifiedAddress: defaultUA });
       }
@@ -1139,7 +1372,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           newInfo.currencyName = this.state.info.currencyName;
         } else {
           newInfo.currencyName =
-            this.state.server.chainName === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ;
+            this.state.server.chainName === ChainNameEnum.mainChainName
+              ? CurrencyNameEnum.ZEC
+              : CurrencyNameEnum.TAZ;
         }
       }
       if (!newInfo.chainName) {
@@ -1164,11 +1399,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  sendTransaction = async (sendPageState: SendPageStateClass): Promise<String> => {
+  sendTransaction = async (
+    sendPageState: SendPageStateClass,
+  ): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
       const { server, donation, defaultUnifiedAddress } = this.state;
-      const sendJson = await Utils.getSendManyJSON(sendPageState, defaultUnifiedAddress, server, donation);
+      const sendJson = await Utils.getSendManyJSON(
+        sendPageState,
+        defaultUnifiedAddress,
+        server,
+        donation,
+      );
       //const start = Date.now();
       const txid = await this.rpc.sendTransaction(sendJson);
       //console.log('&&&&&&&&&&&&&& send tx', Date.now() - start);
@@ -1231,34 +1473,34 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       return;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
-        this.state.navigationHome?.navigate(RouteEnum.Ufvk, { 
-          action: UfvkActionEnum.view 
+        this.state.navigationHome?.navigate(RouteEnum.Ufvk, {
+          action: UfvkActionEnum.view,
         });
       } else {
-        this.state.navigationHome?.navigate(RouteEnum.Seed, { 
-          action: SeedActionEnum.view 
+        this.state.navigationHome?.navigate(RouteEnum.Seed, {
+          action: SeedActionEnum.view,
         });
       }
       return;
     } else if (item === MenuItemEnum.ChangeWallet) {
       if (this.state.readOnly) {
-        this.state.navigationHome?.navigate(RouteEnum.Ufvk, { 
-          action: UfvkActionEnum.change 
+        this.state.navigationHome?.navigate(RouteEnum.Ufvk, {
+          action: UfvkActionEnum.change,
         });
       } else {
-        this.state.navigationHome?.navigate(RouteEnum.Seed, { 
-          action: SeedActionEnum.change 
+        this.state.navigationHome?.navigate(RouteEnum.Seed, {
+          action: SeedActionEnum.change,
         });
       }
       return;
     } else if (item === MenuItemEnum.RestoreWalletBackup) {
       if (this.state.readOnly) {
-        this.state.navigationHome?.navigate(RouteEnum.Ufvk, { 
-          action: UfvkActionEnum.backup 
+        this.state.navigationHome?.navigate(RouteEnum.Ufvk, {
+          action: UfvkActionEnum.backup,
         });
       } else {
-        this.state.navigationHome?.navigate(RouteEnum.Seed, { 
-          action: SeedActionEnum.backup 
+        this.state.navigationHome?.navigate(RouteEnum.Seed, {
+          action: SeedActionEnum.backup,
         });
       }
       return;
@@ -1270,7 +1512,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         [
           {
             text: translate('confirm') as string,
-            onPress: async () => await this.onClickOKChangeWallet({ screen: 3, startingApp: false }),
+            onPress: async () =>
+              await this.onClickOKChangeWallet({
+                screen: 3,
+                startingApp: false,
+              }),
           },
           { text: translate('cancel') as string, style: 'cancel' },
         ],
@@ -1301,7 +1547,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       let update = false;
       if (
         this.state.sendPageState.toaddr.to &&
-        this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.server.chainName))
+        this.state.sendPageState.toaddr.to !==
+          (await Utils.getNymDonationAddress(this.state.server.chainName))
       ) {
         await ShowAddressAlertAsync(this.state.translate)
           .then(async () => {
@@ -1364,13 +1611,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         value.uri,
         value.chainName,
         this.state.performanceLevel,
-        GlobalConst.minConfirmations.toString()
+        GlobalConst.minConfirmations.toString(),
       );
       //console.log('load existing wallet', result);
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(result);
+          const resultJson: RPCSeedType & RPCUfvkType =
+            await JSON.parse(result);
           if (!resultJson.error) {
             // Load the wallet and navigate to the ValueTransfers screen
             //console.log(`wallet loaded ok ${value.uri}`);
@@ -1380,8 +1628,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 screenName: [this.screenName],
               });
             }
-            await SettingsFileImpl.writeSettings(SettingsNameEnum.server, value);
-            await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
+            await SettingsFileImpl.writeSettings(
+              SettingsNameEnum.server,
+              value,
+            );
+            await SettingsFileImpl.writeSettings(
+              SettingsNameEnum.selectServer,
+              selectServer,
+            );
             this.setState({
               server: value,
               selectServer: selectServer,
@@ -1391,7 +1645,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             await this.rpc.configure();
             // creating tor cliente if needed
             // we have two buttons to fetch -> we need tor client Just in case.
-            if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
+            if (
+              this.state.currency === CurrencyEnum.USDTORCurrency ||
+              this.state.currency === CurrencyEnum.USDCurrency
+            ) {
               const resp: string = await RPCModule.createTorClientProcess();
               if (resp && resp.toLowerCase().startsWith(GlobalConst.error)) {
                 this.setLastError(`Create tor client error: ${resp}`);
@@ -1413,12 +1670,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (error) {
       // I need to open the modal ASAP, and keep going with the toast.
       if (this.state.readOnly) {
-        this.state.navigationHome?.navigate(RouteEnum.Ufvk, { 
-          action: UfvkActionEnum.server 
+        this.state.navigationHome?.navigate(RouteEnum.Ufvk, {
+          action: UfvkActionEnum.server,
         });
       } else {
-        this.state.navigationHome?.navigate(RouteEnum.Seed, { 
-          action: SeedActionEnum.server 
+        this.state.navigationHome?.navigate(RouteEnum.Seed, {
+          action: SeedActionEnum.server,
         });
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
@@ -1449,7 +1706,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       currency: value as CurrencyEnum,
     });
 
-    if (value === CurrencyEnum.USDTORCurrency || value === CurrencyEnum.USDCurrency) {
+    if (
+      value === CurrencyEnum.USDTORCurrency ||
+      value === CurrencyEnum.USDCurrency
+    ) {
       // when the user select USD
       // the App have to create a Tor Client
       //console.log('before CREATE ------------------- TOR CLIENT');
@@ -1529,8 +1789,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
-  setRecoveryWalletInfoOnDeviceOption = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, value);
+  setRecoveryWalletInfoOnDeviceOption = async (
+    value: boolean,
+  ): Promise<void> => {
+    await SettingsFileImpl.writeSettings(
+      SettingsNameEnum.recoveryWalletInfoOnDevice,
+      value,
+    );
     this.setState({
       recoveryWalletInfoOnDevice: value as boolean,
     });
@@ -1543,8 +1808,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setPerformanceLevelOption = async (value: RPCPerformanceLevelEnum): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.performanceLevel, value);
+  setPerformanceLevelOption = async (
+    value: RPCPerformanceLevelEnum,
+  ): Promise<void> => {
+    await SettingsFileImpl.writeSettings(
+      SettingsNameEnum.performanceLevel,
+      value,
+    );
     this.setState({
       performanceLevel: value as RPCPerformanceLevelEnum,
     });
@@ -1552,10 +1822,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // change it in zingolib as well.
     const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
       this.state.performanceLevel,
-      GlobalConst.minConfirmations.toString()
+      GlobalConst.minConfirmations.toString(),
     );
-    console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
-    if (setConfigWallet && setConfigWallet.toLowerCase().startsWith(GlobalConst.error)) {
+    console.log(
+      '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET',
+      setConfigWallet,
+    );
+    if (
+      setConfigWallet &&
+      setConfigWallet.toLowerCase().startsWith(GlobalConst.error)
+    ) {
       this.setLastError(`Set performance level error: ${setConfigWallet}`);
     }
   };
@@ -1646,17 +1922,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (this.state.newServer && this.state.newSelectServer) {
       const beforeServer = this.state.server;
 
-      const resultStrServerPromise = await RPCModule.changeServerProcess(this.state.newServer.uri);
+      const resultStrServerPromise = await RPCModule.changeServerProcess(
+        this.state.newServer.uri,
+      );
       const timeoutServerPromise = new Promise((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 15 seconds'));
         }, 15 * 1000);
       });
 
-      const resultStrServer: string = await Promise.race([resultStrServerPromise, timeoutServerPromise]);
+      const resultStrServer: string = await Promise.race([
+        resultStrServerPromise,
+        timeoutServerPromise,
+      ]);
       //console.log(resultStrServer);
 
-      if (resultStrServer && resultStrServer.toLowerCase().startsWith(GlobalConst.error)) {
+      if (
+        resultStrServer &&
+        resultStrServer.toLowerCase().startsWith(GlobalConst.error)
+      ) {
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
@@ -1667,8 +1951,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         //console.log(`change server ok ${value}`);
       }
 
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, this.state.newServer);
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, this.state.newSelectServer);
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.server,
+        this.state.newServer,
+      );
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.selectServer,
+        this.state.newSelectServer,
+      );
       this.setState({
         server: this.state.newServer,
         selectServer: this.state.newSelectServer,
@@ -1689,7 +1979,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
 
       //console.log("jc change", resultStr);
-      if (resultStr2 && resultStr2.toLowerCase().startsWith(GlobalConst.error)) {
+      if (
+        resultStr2 &&
+        resultStr2.toLowerCase().startsWith(GlobalConst.error)
+      ) {
         //console.log(`Error change wallet. ${resultStr}`);
         createAlert(
           this.setBackgroundError,
@@ -1721,7 +2014,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   addLastSnackbar = (snackbar: SnackbarType) => {
     const newSnackbars = this.state.snackbars;
     // if the last one is the same don't do anything.
-    if (newSnackbars.length > 0 && newSnackbars[newSnackbars.length - 1].message === snackbar.message) {
+    if (
+      newSnackbars.length > 0 &&
+      newSnackbars[newSnackbars.length - 1].message === snackbar.message
+    ) {
       return;
     }
     newSnackbars.push(snackbar);
@@ -1733,7 +2029,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // don't store time-out errors
     // don't store silly sync errors
     if (
-      error.toLowerCase().includes('Deadline expired before operation could complete'.toLowerCase()) ||
+      error
+        .toLowerCase()
+        .includes(
+          'Deadline expired before operation could complete'.toLowerCase(),
+        ) ||
       error.toLowerCase().includes('Sync is not running'.toLowerCase()) ||
       error.toLowerCase().includes('Sync is already running'.toLowerCase())
     ) {
@@ -1743,7 +2043,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   removeFirstSnackbar = (screenName: ScreenEnum) => {
-    const newSnackbars = this.state.snackbars.filter((s: SnackbarType) => s.screenName.includes(screenName));
+    const newSnackbars = this.state.snackbars.filter((s: SnackbarType) =>
+      s.screenName.includes(screenName),
+    );
     newSnackbars.shift();
     this.setState({ snackbars: newSnackbars });
   };
@@ -1757,7 +2059,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         params: {
           currentAddress: address,
           routeStack: RouteEnum.AddressBookStack,
-        }
+        },
       });
     } else if (screenName === ScreenEnum.ValueTransferDetail) {
       this.state.navigationHome?.navigate(RouteEnum.ValueTransferDetailStack, {
@@ -1765,7 +2067,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         params: {
           currentAddress: address,
           routeStack: RouteEnum.ValueTransferDetailStack,
-        }
+        },
       });
     } else if (screenName === ScreenEnum.Confirm) {
       this.state.navigationHome?.navigate(RouteEnum.ConfirmStack, {
@@ -1773,7 +2075,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         params: {
           currentAddress: address,
           routeStack: RouteEnum.ConfirmStack,
-        }
+        },
       });
     } else if (screenName === ScreenEnum.Insight) {
       this.state.navigationHome?.navigate(RouteEnum.InsightStack, {
@@ -1781,7 +2083,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         params: {
           currentAddress: address,
           routeStack: RouteEnum.InsightStack,
-        }
+        },
       });
     }
   };
@@ -1798,7 +2100,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
-  setNavigationHome = (navigationHome: DrawerContentComponentProps['navigation']) => {
+  setNavigationHome = (
+    navigationHome: DrawerContentComponentProps['navigation'],
+  ) => {
     if (!this.state.navigationHome) {
       this.setState({
         navigationHome,
@@ -1880,7 +2184,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       blockExplorer: this.state.blockExplorer,
     };
 
-    const fnTabBarIcon = (route: { name: string; key: string }, focused: boolean) => {
+    const fnTabBarIcon = (
+      route: { name: string; key: string },
+      focused: boolean,
+    ) => {
       var iconName;
 
       if (route.name === RouteEnum.History) {
@@ -1889,11 +2196,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         if (
           mode === ModeEnum.basic &&
           !!totalBalance &&
-          (
-            (totalBalance.totalOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === 0) ||
-            (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0) ||
-            (totalBalance.totalTransparentBalance > 0 && totalBalance.confirmedTransparentBalance === 0)
-          ) &&
+          ((totalBalance.totalOrchardBalance > 0 &&
+            totalBalance.confirmedOrchardBalance === 0) ||
+            (totalBalance.totalSaplingBalance > 0 &&
+              totalBalance.confirmedSaplingBalance === 0) ||
+            (totalBalance.totalTransparentBalance > 0 &&
+              totalBalance.confirmedTransparentBalance === 0)) &&
           somePending
         ) {
           iconName = faRefresh;
@@ -1910,7 +2218,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       return (
         <View>
-          <FontAwesomeIcon size={25} icon={iconName} color={focused ? colors.background : colors.money} />
+          <FontAwesomeIcon
+            size={25}
+            icon={iconName}
+            color={focused ? colors.background : colors.money}
+          />
         </View>
       );
     };
@@ -1930,145 +2242,222 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
-            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnum.HomeStack} screenName={this.screenName}>
+            <Drawer
+              onMenuItemSelected={this.onMenuItemSelected}
+              initialRouteName={RouteEnum.HomeStack}
+              screenName={this.screenName}
+            >
               <Drawer.Screen name={RouteEnum.HomeStack}>
                 {props => {
                   useEffect(() => {
                     this.setNavigationHome(props.navigation);
                   });
                   return (
-                  <>
-                    {mode === ModeEnum.advanced ||
-                    (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
-                    (!readOnly && !!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ? (
-                      <Tab.Navigator
-                        detachInactiveScreens={true}
-                        initialRouteName={RouteEnum.History}
-                        screenOptions={({ route }: { route: { name: string; key: string } }) => ({
-                          tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-                          tabBarIconStyle: {
-                            alignSelf: 'center',
-                            marginBottom: 2,
-                          },
-                          tabBarLabel: route.name === RouteEnum.History
-                            ? (translate('loadedapp.history-menu') as string)
-                            : route.name === RouteEnum.Send
-                              ? (translate('loadedapp.send-menu') as string)
-                              : route.name === RouteEnum.Receive
-                                ? (translate('loadedapp.receive-menu') as string)
-                                : route.name === RouteEnum.Messages
-                                  ? (translate('loadedapp.messages-menu') as string)
-                                  : '',
-                          tabBarLabelPosition: 'below-icon',
-                          tabBarLabelStyle: {
-                            alignSelf: 'center',
-                            fontSize: 14,
-                          },
-                          tabBarItemStyle: {
-                            height: 60,
-                          },
-                          tabBarActiveTintColor: colors.background,
-                          tabBarActiveBackgroundColor: colors.primaryDisabled,
-                          tabBarInactiveTintColor: colors.money,
-                          tabBarInactiveBackgroundColor: colors.sideMenuBackground,
-                          tabBarStyle: {
-                            borderTopWidth: 1,
-                            height: 60,
-                          },
-                          headerShown: false,
-                          tabBarButton: renderTabPressable(colors),
-                        })}>
-                        <Tab.Screen name={RouteEnum.History}>
-                          {propsTab => (
-                            <History {...propsTab}
-                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                              setShieldingAmount={this.setShieldingAmount /* header */}
-                              setScrollToTop={this.setScrollToTop /* header & history */}
-                              scrollToTop={scrollToTop /* history */}
-                              setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                    <>
+                      {mode === ModeEnum.advanced ||
+                      (valueTransfersTotal !== null &&
+                        valueTransfersTotal > 0) ||
+                      (!readOnly &&
+                        !!totalBalance &&
+                        totalBalance.confirmedOrchardBalance +
+                          totalBalance.confirmedSaplingBalance >
+                          0) ? (
+                        <Tab.Navigator
+                          detachInactiveScreens={true}
+                          initialRouteName={RouteEnum.History}
+                          screenOptions={({
+                            route,
+                          }: {
+                            route: { name: string; key: string };
+                          }) => ({
+                            tabBarIcon: ({ focused }) =>
+                              fnTabBarIcon(route, focused),
+                            tabBarIconStyle: {
+                              alignSelf: 'center',
+                              marginBottom: 2,
+                            },
+                            tabBarLabel:
+                              route.name === RouteEnum.History
+                                ? (translate(
+                                    'loadedapp.history-menu',
+                                  ) as string)
+                                : route.name === RouteEnum.Send
+                                  ? (translate('loadedapp.send-menu') as string)
+                                  : route.name === RouteEnum.Receive
+                                    ? (translate(
+                                        'loadedapp.receive-menu',
+                                      ) as string)
+                                    : route.name === RouteEnum.Messages
+                                      ? (translate(
+                                          'loadedapp.messages-menu',
+                                        ) as string)
+                                      : '',
+                            tabBarLabelPosition: 'below-icon',
+                            tabBarLabelStyle: {
+                              alignSelf: 'center',
+                              fontSize: 14,
+                            },
+                            tabBarItemStyle: {
+                              height: 60,
+                            },
+                            tabBarActiveTintColor: colors.background,
+                            tabBarActiveBackgroundColor: colors.primaryDisabled,
+                            tabBarInactiveTintColor: colors.money,
+                            tabBarInactiveBackgroundColor:
+                              colors.sideMenuBackground,
+                            tabBarStyle: {
+                              borderTopWidth: 1,
+                              height: 60,
+                            },
+                            headerShown: false,
+                            tabBarButton: renderTabPressable(colors),
+                          })}
+                        >
+                          <Tab.Screen name={RouteEnum.History}>
+                            {propsTab => (
+                              <History
+                                {...propsTab}
+                                toggleMenuDrawer={
+                                  () =>
+                                    props.navigation.toggleDrawer() /* header */
+                                }
+                                setShieldingAmount={
+                                  this.setShieldingAmount /* header */
+                                }
+                                setScrollToTop={
+                                  this.setScrollToTop /* header & history */
+                                }
+                                scrollToTop={scrollToTop /* history */}
+                                setScrollToBottom={
+                                  this.setScrollToBottom /* header & messages */
+                                }
+                              />
+                            )}
+                          </Tab.Screen>
+                          {!readOnly &&
+                            selectServer !== SelectServerEnum.offline &&
+                            (mode === ModeEnum.advanced ||
+                              (!!totalBalance &&
+                                totalBalance.confirmedOrchardBalance +
+                                  totalBalance.confirmedSaplingBalance >
+                                  0) ||
+                              (!!totalBalance &&
+                                ((totalBalance.totalOrchardBalance > 0 &&
+                                  totalBalance.confirmedOrchardBalance === 0) ||
+                                  (totalBalance.totalSaplingBalance > 0 &&
+                                    totalBalance.confirmedSaplingBalance ===
+                                      0)) &&
+                                somePending)) && (
+                              <Tab.Screen name={RouteEnum.Send}>
+                                {propsTab => (
+                                  <Send
+                                    {...propsTab}
+                                    toggleMenuDrawer={
+                                      () =>
+                                        props.navigation.toggleDrawer() /* header */
+                                    }
+                                    setShieldingAmount={
+                                      this.setShieldingAmount /* header */
+                                    }
+                                    setScrollToTop={
+                                      this.setScrollToTop /* header & send */
+                                    }
+                                    setScrollToBottom={
+                                      this.setScrollToBottom /* header & send */
+                                    }
+                                    sendTransaction={
+                                      this.sendTransaction /* send */
+                                    }
+                                    setServerOption={
+                                      this.setServerOption /* send */
+                                    }
+                                    clearToAddr={this.clearToAddr /* send */}
+                                    setSecurityOption={
+                                      this.setSecurityOption /* send */
+                                    }
+                                  />
+                                )}
+                              </Tab.Screen>
+                            )}
+                          <Tab.Screen name={RouteEnum.Receive}>
+                            {propsTab => (
+                              <Receive
+                                {...propsTab}
+                                toggleMenuDrawer={
+                                  () =>
+                                    props.navigation.toggleDrawer() /* header */
+                                }
+                                alone={false /* receive */}
+                                setSecurityOption={this.setSecurityOption}
+                                setAddressBook={this.setAddressBook}
+                              />
+                            )}
+                          </Tab.Screen>
+                          <Tab.Screen name={RouteEnum.Messages}>
+                            {propsTab => (
+                              <MessageList
+                                {...propsTab}
+                                toggleMenuDrawer={
+                                  () =>
+                                    props.navigation.toggleDrawer() /* header */
+                                }
+                                setScrollToBottom={
+                                  this.setScrollToBottom /* header & messages */
+                                }
+                                scrollToBottom={scrollToBottom /* messages */}
+                                sendTransaction={
+                                  this.sendTransaction /* messages */
+                                }
+                                setServerOption={
+                                  this.setServerOption /* messages */
+                                }
+                              />
+                            )}
+                          </Tab.Screen>
+                        </Tab.Navigator>
+                      ) : (
+                        <>
+                          {addresses === null ? (
+                            <Loading
+                              backgroundColor={colors.background}
+                              spinColor={colors.primary}
                             />
+                          ) : (
+                            <Tab.Navigator
+                              initialRouteName={RouteEnum.Receive}
+                              screenOptions={{
+                                tabBarStyle: {
+                                  display: 'none',
+                                },
+                                headerShown: false,
+                              }}
+                            >
+                              <Tab.Screen name={RouteEnum.Receive}>
+                                {propsTab => (
+                                  <Receive
+                                    {...propsTab}
+                                    toggleMenuDrawer={
+                                      () =>
+                                        props.navigation.toggleDrawer() /* header */
+                                    }
+                                    alone={true /* receive */}
+                                    setSecurityOption={this.setSecurityOption}
+                                    setAddressBook={this.setAddressBook}
+                                  />
+                                )}
+                              </Tab.Screen>
+                            </Tab.Navigator>
                           )}
-                        </Tab.Screen>
-                        {!readOnly &&
-                          selectServer !== SelectServerEnum.offline &&
-                          (mode === ModeEnum.advanced ||
-                            (!!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ||
-                            (!!totalBalance &&
-                              (
-                                (totalBalance.totalOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === 0) ||
-                                (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0)
-                              ) &&
-                              somePending)) && (
-                            <Tab.Screen name={RouteEnum.Send}>
-                              {propsTab => (
-                                <Send {...propsTab}
-                                  toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                                  setShieldingAmount={this.setShieldingAmount /* header */}
-                                  setScrollToTop={this.setScrollToTop /* header & send */}
-                                  setScrollToBottom={this.setScrollToBottom /* header & send */}
-                                  sendTransaction={this.sendTransaction /* send */}
-                                  setServerOption={this.setServerOption /* send */}
-                                  clearToAddr={this.clearToAddr /* send */}
-                                  setSecurityOption={this.setSecurityOption /* send */}
-                                />
-                              )}
-                            </Tab.Screen>
-                          )}
-                        <Tab.Screen name={RouteEnum.Receive}>
-                          {propsTab => (
-                            <Receive {...propsTab}
-                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                              alone={false /* receive */}
-                              setSecurityOption={this.setSecurityOption}
-                              setAddressBook={this.setAddressBook}
-                            />
-                          )}
-                        </Tab.Screen>
-                        <Tab.Screen name={RouteEnum.Messages}>
-                          {propsTab => (
-                            <MessageList {...propsTab}
-                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                              setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                              scrollToBottom={scrollToBottom /* messages */}
-                              sendTransaction={this.sendTransaction /* messages */}
-                              setServerOption={this.setServerOption /* messages */}
-                            />
-                          )}
-                        </Tab.Screen>
-                      </Tab.Navigator>
-                    ) : (
-                      <>
-                        {addresses === null ? (
-                          <Loading backgroundColor={colors.background} spinColor={colors.primary} />
-                        ) : (
-                          <Tab.Navigator
-                            initialRouteName={RouteEnum.Receive}
-                            screenOptions={{
-                              tabBarStyle: {
-                                display: 'none',
-                              },
-                              headerShown: false,
-                            }}>
-                            <Tab.Screen name={RouteEnum.Receive}>
-                              {propsTab => (
-                                <Receive {...propsTab}
-                                  toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                                  alone={true /* receive */}
-                                  setSecurityOption={this.setSecurityOption}
-                                  setAddressBook={this.setAddressBook}
-                                />
-                              )}
-                            </Tab.Screen>
-                          </Tab.Navigator>
-                        )}
-                      </>
-                    )}
-                  </>
-                );}}
+                        </>
+                      )}
+                    </>
+                  );
+                }}
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.Settings}>
-                {props => 
-                  <Settings {...props}
+                {props => (
+                  <Settings
+                    {...props}
                     setServerOption={this.setServerOption}
                     setCurrencyOption={this.setCurrencyOption}
                     setLanguageOption={this.setLanguageOption}
@@ -2078,12 +2467,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     setSecurityOption={this.setSecurityOption}
                     setSelectServerOption={this.setSelectServerOption}
                     setRescanMenuOption={this.setRescanMenuOption}
-                    setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
+                    setRecoveryWalletInfoOnDeviceOption={
+                      this.setRecoveryWalletInfoOnDeviceOption
+                    }
                     setPerformanceLevelOption={this.setPerformanceLevelOption}
                     setBlockExplorerOption={this.setBlockExplorerOption}
-                    toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
+                    toggleMenuDrawer={
+                      () => props.navigation.toggleDrawer() /* header */
+                    }
                   />
-                }
+                )}
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.About} component={About} />
               <Drawer.Screen name={RouteEnum.Rescan}>
@@ -2093,46 +2486,74 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Drawer.Screen name={RouteEnum.InsightStack}>
                 {() => {
                   return (
-                    <Stack.Navigator initialRouteName={RouteEnum.Insight} screenOptions={{ headerShown: false, animation: 'none' }}>
-                      <Stack.Screen name={RouteEnum.Insight} component={Insight} />
-                      <Stack.Screen name={RouteEnum.AddressBook} >
+                    <Stack.Navigator
+                      initialRouteName={RouteEnum.Insight}
+                      screenOptions={{ headerShown: false, animation: 'none' }}
+                    >
+                      <Stack.Screen
+                        name={RouteEnum.Insight}
+                        component={Insight}
+                      />
+                      <Stack.Screen name={RouteEnum.AddressBook}>
                         {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                          <AddressBook
+                            {...props}
+                            setAddressBook={this.setAddressBook}
+                          />
                         )}
                       </Stack.Screen>
-                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                      <Stack.Screen
+                        name={RouteEnum.ScannerAddress}
+                        component={ScannerAddress}
+                      />
                     </Stack.Navigator>
                   );
                 }}
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.Ufvk}>
                 {props => {
-                  const action = !!props.route.params && props.route.params.action !== undefined ? props.route.params.action : UfvkActionEnum.view;
-                  if (action === UfvkActionEnum.view ) {
+                  const action =
+                    !!props.route.params &&
+                    props.route.params.action !== undefined
+                      ? props.route.params.action
+                      : UfvkActionEnum.view;
+                  if (action === UfvkActionEnum.view) {
                     return (
-                      <ShowUfvk {...props}
+                      <ShowUfvk
+                        {...props}
                         onClickOK={() => {}}
                         onClickCancel={() => {}}
                       />
                     );
                   } else if (action === UfvkActionEnum.change) {
                     return (
-                      <ShowUfvk {...props}
-                        onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
+                      <ShowUfvk
+                        {...props}
+                        onClickOK={async () =>
+                          await this.onClickOKChangeWallet({
+                            startingApp: false,
+                          })
+                        }
                         onClickCancel={() => {}}
                       />
                     );
                   } else if (action === UfvkActionEnum.backup) {
                     return (
-                      <ShowUfvk {...props}
-                        onClickOK={async () => await this.onClickOKRestoreBackup()}
+                      <ShowUfvk
+                        {...props}
+                        onClickOK={async () =>
+                          await this.onClickOKRestoreBackup()
+                        }
                         onClickCancel={() => {}}
                       />
                     );
                   } else if (action === UfvkActionEnum.server) {
                     return (
-                      <ShowUfvk {...props}
-                        onClickOK={async () => await this.onClickOKServerWallet()}
+                      <ShowUfvk
+                        {...props}
+                        onClickOK={async () =>
+                          await this.onClickOKServerWallet()
+                        }
                         onClickCancel={async () => {
                           // restart all the tasks again, nothing happen.
                           await this.rpc.clearTimers();
@@ -2145,10 +2566,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.Seed}>
                 {props => {
-                  const action = !!props.route.params && props.route.params.action !== undefined ? props.route.params.action : SeedActionEnum.view;
-                  if (action === SeedActionEnum.view ) {
+                  const action =
+                    !!props.route.params &&
+                    props.route.params.action !== undefined
+                      ? props.route.params.action
+                      : SeedActionEnum.view;
+                  if (action === SeedActionEnum.view) {
                     return (
-                      <Seed {...props}
+                      <Seed
+                        {...props}
                         onClickOK={() => {}}
                         onClickCancel={() => {}}
                         keepAwake={this.keepAwake}
@@ -2157,22 +2583,33 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     );
                   } else if (action === SeedActionEnum.change) {
                     return (
-                      <Seed {...props}
-                        onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
+                      <Seed
+                        {...props}
+                        onClickOK={async () =>
+                          await this.onClickOKChangeWallet({
+                            startingApp: false,
+                          })
+                        }
                         onClickCancel={() => {}}
                       />
                     );
                   } else if (action === SeedActionEnum.backup) {
                     return (
-                      <Seed {...props}
-                        onClickOK={async () => await this.onClickOKRestoreBackup()}
+                      <Seed
+                        {...props}
+                        onClickOK={async () =>
+                          await this.onClickOKRestoreBackup()
+                        }
                         onClickCancel={() => {}}
                       />
                     );
                   } else if (action === SeedActionEnum.server) {
                     return (
-                      <Seed {...props}
-                        onClickOK={async () => await this.onClickOKServerWallet()}
+                      <Seed
+                        {...props}
+                        onClickOK={async () =>
+                          await this.onClickOKServerWallet()
+                        }
                         onClickCancel={async () => {
                           // restart all the tasks again, nothing happen.
                           await this.rpc.clearTimers();
@@ -2183,18 +2620,30 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   }
                 }}
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.SyncReport} component={SyncReport} />
+              <Drawer.Screen
+                name={RouteEnum.SyncReport}
+                component={SyncReport}
+              />
               <Drawer.Screen name={RouteEnum.Pools} component={Pools} />
               <Drawer.Screen name={RouteEnum.AddressBookStack}>
                 {() => {
                   return (
-                    <Stack.Navigator initialRouteName={RouteEnum.AddressBook} screenOptions={{ headerShown: false, animation: 'none' }}>
-                      <Stack.Screen name={RouteEnum.AddressBook} >
+                    <Stack.Navigator
+                      initialRouteName={RouteEnum.AddressBook}
+                      screenOptions={{ headerShown: false, animation: 'none' }}
+                    >
+                      <Stack.Screen name={RouteEnum.AddressBook}>
                         {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                          <AddressBook
+                            {...props}
+                            setAddressBook={this.setAddressBook}
+                          />
                         )}
                       </Stack.Screen>
-                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                      <Stack.Screen
+                        name={RouteEnum.ScannerAddress}
+                        component={ScannerAddress}
+                      />
                     </Stack.Navigator>
                   );
                 }}
@@ -2202,39 +2651,78 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Drawer.Screen name={RouteEnum.ValueTransferDetailStack}>
                 {() => {
                   return (
-                    <Stack.Navigator initialRouteName={RouteEnum.ValueTransferDetail} screenOptions={{ headerShown: false, animation: 'none' }}>
-                      <Stack.Screen name={RouteEnum.ValueTransferDetail} component={ValueTransferDetail} />
-                      <Stack.Screen name={RouteEnum.AddressBook} >
+                    <Stack.Navigator
+                      initialRouteName={RouteEnum.ValueTransferDetail}
+                      screenOptions={{ headerShown: false, animation: 'none' }}
+                    >
+                      <Stack.Screen
+                        name={RouteEnum.ValueTransferDetail}
+                        component={ValueTransferDetail}
+                      />
+                      <Stack.Screen name={RouteEnum.AddressBook}>
                         {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                          <AddressBook
+                            {...props}
+                            setAddressBook={this.setAddressBook}
+                          />
                         )}
                       </Stack.Screen>
-                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                      <Stack.Screen
+                        name={RouteEnum.ScannerAddress}
+                        component={ScannerAddress}
+                      />
                     </Stack.Navigator>
                   );
                 }}
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.AddressList} component={AddressList} />
-              <Drawer.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
-              <Drawer.Screen name={RouteEnum.MessagesAddress} component={MessagesAddress} />
-              <Drawer.Screen name={RouteEnum.MessagesAll} component={MessagesAll} />
+              <Drawer.Screen
+                name={RouteEnum.AddressList}
+                component={AddressList}
+              />
+              <Drawer.Screen
+                name={RouteEnum.ScannerAddress}
+                component={ScannerAddress}
+              />
+              <Drawer.Screen
+                name={RouteEnum.MessagesAddress}
+                component={MessagesAddress}
+              />
+              <Drawer.Screen
+                name={RouteEnum.MessagesAll}
+                component={MessagesAll}
+              />
               <Drawer.Screen name={RouteEnum.Memo} component={Memo} />
               <Drawer.Screen name={RouteEnum.ConfirmStack}>
                 {() => {
                   return (
-                    <Stack.Navigator initialRouteName={RouteEnum.Confirm} screenOptions={{ headerShown: false, animation: 'none' }}>
-                      <Stack.Screen name={RouteEnum.Confirm} component={Confirm} />
-                      <Stack.Screen name={RouteEnum.AddressBook} >
+                    <Stack.Navigator
+                      initialRouteName={RouteEnum.Confirm}
+                      screenOptions={{ headerShown: false, animation: 'none' }}
+                    >
+                      <Stack.Screen
+                        name={RouteEnum.Confirm}
+                        component={Confirm}
+                      />
+                      <Stack.Screen name={RouteEnum.AddressBook}>
                         {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                          <AddressBook
+                            {...props}
+                            setAddressBook={this.setAddressBook}
+                          />
                         )}
                       </Stack.Screen>
-                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                      <Stack.Screen
+                        name={RouteEnum.ScannerAddress}
+                        component={ScannerAddress}
+                      />
                     </Stack.Navigator>
                   );
                 }}
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Computing} component={ComputingTxContent} />
+              <Drawer.Screen
+                name={RouteEnum.Computing}
+                component={ComputingTxContent}
+              />
             </Drawer>
           </GestureHandlerRootView>
         </ContextAppLoadedProvider>

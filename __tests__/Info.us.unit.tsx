@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
 import Info from '../components/Info';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
 import { CurrencyEnum, RouteEnum } from '../app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
@@ -15,7 +18,10 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Info> {
+function makeDrawerProps(): DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Info
+> {
   return {
     navigation: mockNavigation,
     route: {

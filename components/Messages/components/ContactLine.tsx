@@ -1,6 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, View, TouchableOpacity, Text, ActivityIndicator, Platform } from 'react-native';
+import {
+  Animated,
+  Dimensions,
+  View,
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+  Platform,
+} from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -50,14 +58,14 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { 
-    language, 
-    showSwipeableIcons, 
-    readOnly, 
-    selectServer, 
-    setSendPageState, 
+  const {
+    language,
+    showSwipeableIcons,
+    readOnly,
+    selectServer,
+    setSendPageState,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
 
@@ -69,11 +77,13 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const getAmountColor = (_c: ContactType) => {
-    return _c.confirmations >= 0 && _c.confirmations < GlobalConst.minConfirmations
+    return _c.confirmations >= 0 &&
+      _c.confirmations < GlobalConst.minConfirmations
       ? colors.primaryDisabled
-      : _c.kind === ValueTransferKindEnum.Received || _c.kind === ValueTransferKindEnum.Shield
-      ? colors.primary
-      : colors.text;
+      : _c.kind === ValueTransferKindEnum.Received ||
+          _c.kind === ValueTransferKindEnum.Shield
+        ? colors.primary
+        : colors.text;
   };
 
   const getIcon = () => {
@@ -146,21 +156,29 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
               alignItems: 'center',
               transform: [{ translateX: trans }],
               backgroundColor: colors.sideMenuBackground,
-            }}>
+            }}
+          >
             {messagesAddress && (
               <View
                 style={{
                   width: width,
                   justifyContent: 'flex-start',
                   alignItems: 'center',
-                }}>
+                }}
+              >
                 <TouchableOpacity
                   style={{ zIndex: 999, padding: 20, alignSelf: 'flex-start' }}
                   onPress={() => {
                     setMessagesAddressModalShow(c);
                     swipeable.reset();
-                  }}>
-                  <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{ opacity: 0.8 }}
+                    size={30}
+                    icon={faComments}
+                    color={colors.money}
+                  />
                 </TouchableOpacity>
               </View>
             )}
@@ -191,30 +209,42 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
               alignItems: 'center',
               transform: [{ translateX: trans }],
               backgroundColor: colors.sideMenuBackground,
-            }}>
-            {!!c.address && !readOnly && selectServer !== SelectServerEnum.offline && !addressProtected && (
-              <View
-                style={{
-                  width: 67,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <TouchableOpacity
-                  style={{ zIndex: 999, padding: 20 }}
-                  onPress={() => {
-                    // enviar
-                    const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-                    sendPageState.toaddr.to = c.address ? c.address : '';
-                    setSendPageState(sendPageState);
-                    navigation.navigate(RouteEnum.HomeStack, {
-                      screen: RouteEnum.Send,
-                    });
-                    swipeable.reset();
-                  }}>
-                  <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
-                </TouchableOpacity>
-              </View>
-            )}
+            }}
+          >
+            {!!c.address &&
+              !readOnly &&
+              selectServer !== SelectServerEnum.offline &&
+              !addressProtected && (
+                <View
+                  style={{
+                    width: 67,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{ zIndex: 999, padding: 20 }}
+                    onPress={() => {
+                      // enviar
+                      const sendPageState = new SendPageStateClass(
+                        new ToAddrClass(0),
+                      );
+                      sendPageState.toaddr.to = c.address ? c.address : '';
+                      setSendPageState(sendPageState);
+                      navigation.navigate(RouteEnum.HomeStack, {
+                        screen: RouteEnum.Send,
+                      });
+                      swipeable.reset();
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      size={30}
+                      icon={faPaperPlane}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
           </Animated.View>
         )}
       </>
@@ -237,7 +267,10 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   //}
 
   return (
-    <View testID={`vt-${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
+    <View
+      testID={`vt-${index + 1}`}
+      style={{ display: 'flex', flexDirection: 'column' }}
+    >
       {month !== '' && (
         <View
           style={{
@@ -248,7 +281,8 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
             borderBottomWidth: 1,
             borderColor: colors.card,
             backgroundColor: colors.background,
-          }}>
+          }}
+        >
           <FadeText>{month}</FadeText>
         </View>
       )}
@@ -257,7 +291,8 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
         onPress={() => {
           setMessagesAddressModalShow(c);
           swipeableRef?.current?.reset();
-        }}>
+        }}
+      >
         <Swipeable
           ref={swipeableRef}
           overshootLeft={false}
@@ -265,7 +300,8 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
           rightThreshold={65}
           overshootFriction={1}
           renderRightActions={handleRenderRightActions}
-          renderLeftActions={handleRenderLeftActions}>
+          renderLeftActions={handleRenderLeftActions}
+        >
           <View
             style={{
               display: 'flex',
@@ -275,7 +311,8 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
               borderBottomWidth: 1.5,
               borderBottomColor: colors.border,
               width: '100%',
-            }}>
+            }}
+          >
             <View
               style={{
                 display: 'flex',
@@ -283,7 +320,8 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                 justifyContent: 'flex-start',
                 alignItems: 'flex-start',
                 width: '100%',
-              }}>
+              }}
+            >
               <View style={{ minWidth: 50, width: '10%' }}>
                 {!getLabel(c) ? (
                   <FontAwesomeIcon
@@ -306,11 +344,15 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                       marginLeft: 5,
                       marginRight: 5,
                       marginTop: 0,
-                    }}>
+                    }}
+                  >
                     <Text
-                      style={{ fontWeight: 'bold', fontSize: 20, color: Utils.getLabelColor(c.color) }}>{`${getLabel(
-                      c,
-                    )}`}</Text>
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: 20,
+                        color: Utils.getLabelColor(c.color),
+                      }}
+                    >{`${getLabel(c)}`}</Text>
                   </View>
                 )}
               </View>
@@ -320,41 +362,78 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                  }}>
+                  }}
+                >
                   {c.label ? (
                     <RegText>{c.label}</RegText>
                   ) : (
-                    <AddressItem address={c.address} screenName={screenName} oneLine={true} />
+                    <AddressItem
+                      address={c.address}
+                      screenName={screenName}
+                      oneLine={true}
+                    />
                   )}
-                  <FadeText>{c.time ? moment((c.time || 0) * 1000).format('MMM D, h:mm a') : ''}</FadeText>
+                  <FadeText>
+                    {c.time
+                      ? moment((c.time || 0) * 1000).format('MMM D, h:mm a')
+                      : ''}
+                  </FadeText>
                 </View>
                 <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'flex-start',
-                  }}>
-                  <FadeText numberOfLines={2} ellipsizeMode={'tail'} style={{ width: '85%', maxWidth: '85%' }}>
-                    {(c.kind === ValueTransferKindEnum.MemoToSelf || c.kind === ValueTransferKindEnum.Sent
+                  }}
+                >
+                  <FadeText
+                    numberOfLines={2}
+                    ellipsizeMode={'tail'}
+                    style={{ width: '85%', maxWidth: '85%' }}
+                  >
+                    {(c.kind === ValueTransferKindEnum.MemoToSelf ||
+                    c.kind === ValueTransferKindEnum.Sent
                       ? 'You: '
                       : '') + getMemo(c)}
                   </FadeText>
-                  <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
                     {!!c.status && (
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
                         {(c.status === RPCValueTransfersStatusEnum.calculated ||
-                          c.status === RPCValueTransfersStatusEnum.transmitted) && (
+                          c.status ===
+                            RPCValueTransfersStatusEnum.transmitted) && (
                           <FontAwesomeIcon
-                            style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
+                            style={{
+                              marginLeft: 5,
+                              marginRight: 1,
+                              marginTop: 2,
+                            }}
                             size={12}
                             icon={faCircleCheckRegular}
                             color={colors.primary}
                           />
                         )}
                         {(c.status === RPCValueTransfersStatusEnum.mempool ||
-                          c.status === RPCValueTransfersStatusEnum.confirmed) && (
+                          c.status ===
+                            RPCValueTransfersStatusEnum.confirmed) && (
                           <FontAwesomeIcon
-                            style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
+                            style={{
+                              marginLeft: 5,
+                              marginRight: 1,
+                              marginTop: 2,
+                            }}
                             size={12}
                             icon={faCircleCheckSolid}
                             color={colors.primary}
@@ -362,7 +441,11 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                         )}
                         {c.status !== RPCValueTransfersStatusEnum.confirmed && (
                           <FontAwesomeIcon
-                            style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
+                            style={{
+                              marginLeft: 1,
+                              marginRight: 0,
+                              marginTop: 2,
+                            }}
                             size={12}
                             icon={faCircleCheckRegular}
                             color={colors.primary}
@@ -370,7 +453,11 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                         )}
                         {c.status === RPCValueTransfersStatusEnum.confirmed && (
                           <FontAwesomeIcon
-                            style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
+                            style={{
+                              marginLeft: 1,
+                              marginRight: 0,
+                              marginTop: 2,
+                            }}
                             size={12}
                             icon={faCircleCheckSolid}
                             color={colors.primary}
@@ -379,7 +466,11 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                         {c.status !== RPCValueTransfersStatusEnum.confirmed && (
                           <View style={{ marginLeft: 2, marginTop: 2 }}>
                             <ActivityIndicator
-                              size={Platform.OS === GlobalConst.platformOSios ? 'small' : 12}
+                              size={
+                                Platform.OS === GlobalConst.platformOSios
+                                  ? 'small'
+                                  : 12
+                              }
                               color={colors.primary}
                             />
                           </View>

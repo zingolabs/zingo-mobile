@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Dimensions,
+} from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 import { PieChart, pieDataItem } from 'react-native-gifted-charts';
@@ -18,7 +24,11 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
+import {
+  RouteEnum,
+  ScreenEnum,
+  SnackbarDurationEnum,
+} from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -34,22 +44,26 @@ type DataType = {
 } & pieDataItem;
 
 const getPercent = (percent: number) => {
-  return (percent < 1 ? '<1' : percent < 100 && percent >= 99 ? '99' : percent.toFixed(0)) + '%';
+  return (
+    (percent < 1
+      ? '<1'
+      : percent < 100 && percent >= 99
+        ? '99'
+        : percent.toFixed(0)) + '%'
+  );
 };
 
 type InsightProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Insight>;
 
-const Insight: React.FunctionComponent<InsightProps> = ({
-  navigation,
-}) => {
+const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
-  const { 
-    info, 
-    translate, 
-    privacy, 
-    addLastSnackbar, 
-    snackbars, 
-    removeFirstSnackbar, 
+  const {
+    info,
+    translate,
+    privacy,
+    addLastSnackbar,
+    snackbars,
+    removeFirstSnackbar,
     setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -92,13 +106,19 @@ const Insight: React.FunctionComponent<InsightProps> = ({
         resultJSON = {};
       }
       let amounts: { value: number; address: string; tag: string }[] = [];
-      const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
+      const resultJSONEntries: [string, number][] = Object.entries(
+        resultJSON,
+      ) as [string, number][];
       resultJSONEntries &&
         resultJSONEntries.forEach(([key, value]) => {
           if (!(tab !== 'sent' && key === 'fee')) {
             // excluding the fee for `sends` and `memobytes`.
             if (value > 0) {
-              amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
+              amounts.push({
+                value: tab === 'sent' ? value / 10 ** 8 : value,
+                address: key,
+                tag: '',
+              });
             }
           }
         });
@@ -110,10 +130,13 @@ const Insight: React.FunctionComponent<InsightProps> = ({
             value: item.value,
             address: item.address,
             tag: item.tag,
-            svg: { fill: item.address === 'fee' ? colors.zingo : randomColors[index] },
+            svg: {
+              fill: item.address === 'fee' ? colors.zingo : randomColors[index],
+            },
             color: item.address === 'fee' ? colors.zingo : randomColors[index],
             labelLineConfig: {
-              color: item.address === 'fee' ? colors.zingo : randomColors[index],
+              color:
+                item.address === 'fee' ? colors.zingo : randomColors[index],
             },
             key: `pie-${index}`,
           };
@@ -132,10 +155,15 @@ const Insight: React.FunctionComponent<InsightProps> = ({
   };
 
   const line = (item: DataType, index: number) => {
-    const totalValue = pieAmounts ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0) : 0;
+    const totalValue = pieAmounts
+      ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0)
+      : 0;
     const percent = (100 * item.value) / totalValue;
     // 30 characters per line
-    const numLines = item.address.length < 40 ? 2 : item.address.length / (dimensions.width < 500 ? 21 : 30);
+    const numLines =
+      item.address.length < 40
+        ? 2
+        : item.address.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <View style={{ width: '100%' }} key={`tag-${index}`}>
         <View
@@ -146,17 +174,26 @@ const Insight: React.FunctionComponent<InsightProps> = ({
             marginBottom: 5,
             borderBottomColor: '#333333',
             borderBottomWidth: item.address !== 'fee' ? 1 : 0,
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
+            }}
+          >
             {(!expandAddress[index] || item.address === 'fee') && (
-              <FontAwesomeIcon style={{ margin: 5 }} size={45} icon={faQrcode} color={item.svg.fill} />
+              <FontAwesomeIcon
+                style={{ margin: 5 }}
+                size={45}
+                icon={faQrcode}
+                color={item.svg.fill}
+              />
             )}
-            {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
+            {!!item.tag && (
+              <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>
+            )}
             <TouchableOpacity
               onPress={() => {
                 if (item.address !== 'fee') {
@@ -168,41 +205,57 @@ const Insight: React.FunctionComponent<InsightProps> = ({
                   });
                   selectExpandAddress(index);
                 }
-              }}>
+              }}
+            >
               <View
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   flexWrap: 'wrap',
-                }}>
+                }}
+              >
                 {item.address !== 'fee' && (
-                  <AddressItem address={item.address} screenName={screenName} oneLine={true} onlyContact={true} withIcon={true} />
+                  <AddressItem
+                    address={item.address}
+                    screenName={screenName}
+                    oneLine={true}
+                    onlyContact={true}
+                    withIcon={true}
+                  />
                 )}
                 {!expandAddress[index] && !!item.address && (
                   <RegText>
                     {item.address.length > (dimensions.width < 500 ? 10 : 20)
-                      ? Utils.trimToSmall(item.address, dimensions.width < 500 ? 5 : 10)
+                      ? Utils.trimToSmall(
+                          item.address,
+                          dimensions.width < 500 ? 5 : 10,
+                        )
                       : item.address}
                   </RegText>
                 )}
                 {expandAddress[index] &&
                   !!item.address &&
-                  Utils.splitStringIntoChunks(item.address, Number(numLines.toFixed(0))).map(
-                    (c: string, idx: number) => (
-                      <RegText color={item.svg.fill} key={idx}>
-                        {c}
-                      </RegText>
-                    ),
-                  )}
+                  Utils.splitStringIntoChunks(
+                    item.address,
+                    Number(numLines.toFixed(0)),
+                  ).map((c: string, idx: number) => (
+                    <RegText color={item.svg.fill} key={idx}>
+                      {c}
+                    </RegText>
+                  ))}
               </View>
             </TouchableOpacity>
           </View>
           <View
             style={{
-              flexDirection: expandAddress[index] && item.address !== 'fee' ? 'column-reverse' : 'row',
+              flexDirection:
+                expandAddress[index] && item.address !== 'fee'
+                  ? 'column-reverse'
+                  : 'row',
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
+            }}
+          >
             <RegText>{getPercent(percent)}</RegText>
             {tab === 'sent' ? (
               <ZecAmount
@@ -216,7 +269,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({
               <RegText style={{ marginLeft: 10 }}>
                 {'# ' +
                   item.value.toString() +
-                  (tab === 'sends' ? translate('insight.sends-unit') : translate('insight.memobytes-unit'))}
+                  (tab === 'sends'
+                    ? translate('insight.sends-unit')
+                    : translate('insight.memobytes-unit'))}
               </RegText>
             )}
           </View>
@@ -248,7 +303,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
         <Header
           title={translate('insight.title') as string}
           screenName={screenName}
@@ -275,16 +331,23 @@ const Insight: React.FunctionComponent<InsightProps> = ({
                 borderBottomColor: colors.primary,
                 borderBottomWidth: tab === 'sent' ? 2 : 0,
                 paddingBottom: 10,
-              }}>
+              }}
+            >
               <RegText
                 style={{
                   fontWeight: tab === 'sent' ? 'bold' : 'normal',
                   fontSize: tab === 'sent' ? 15 : 14,
                   color: colors.text,
-                }}>
+                }}
+              >
                 {translate('insight.sent') as string}
               </RegText>
-              <RegText style={{ fontSize: 11, color: tab === 'sent' ? colors.primary : colors.text }}>
+              <RegText
+                style={{
+                  fontSize: 11,
+                  color: tab === 'sent' ? colors.primary : colors.text,
+                }}
+              >
                 ({translate('insight.sent-text') as string})
               </RegText>
             </View>
@@ -297,16 +360,23 @@ const Insight: React.FunctionComponent<InsightProps> = ({
                 borderBottomColor: colors.primary,
                 borderBottomWidth: tab === 'sends' ? 2 : 0,
                 paddingBottom: 10,
-              }}>
+              }}
+            >
               <RegText
                 style={{
                   fontWeight: tab === 'sends' ? 'bold' : 'normal',
                   fontSize: tab === 'sends' ? 15 : 14,
                   color: colors.text,
-                }}>
+                }}
+              >
                 {translate('insight.sends') as string}
               </RegText>
-              <RegText style={{ fontSize: 11, color: tab === 'sends' ? colors.primary : colors.text }}>
+              <RegText
+                style={{
+                  fontSize: 11,
+                  color: tab === 'sends' ? colors.primary : colors.text,
+                }}
+              >
                 ({translate('insight.sends-text') as string})
               </RegText>
             </View>
@@ -319,16 +389,23 @@ const Insight: React.FunctionComponent<InsightProps> = ({
                 borderBottomColor: colors.primary,
                 borderBottomWidth: tab === 'memobytes' ? 2 : 0,
                 paddingBottom: 10,
-              }}>
+              }}
+            >
               <RegText
                 style={{
                   fontWeight: tab === 'memobytes' ? 'bold' : 'normal',
                   fontSize: tab === 'memobytes' ? 15 : 14,
                   color: colors.text,
-                }}>
+                }}
+              >
                 {translate('insight.memobytes') as string}
               </RegText>
-              <RegText style={{ fontSize: 11, color: tab === 'memobytes' ? colors.primary : colors.text }}>
+              <RegText
+                style={{
+                  fontSize: 11,
+                  color: tab === 'memobytes' ? colors.primary : colors.text,
+                }}
+              >
                 ({translate('insight.memobytes-text') as string})
               </RegText>
             </View>
@@ -339,17 +416,30 @@ const Insight: React.FunctionComponent<InsightProps> = ({
           persistentScrollbar={true}
           indicatorStyle={'white'}
           style={{ maxHeight: '90%' }}
-          contentContainerStyle={{}}>
+          contentContainerStyle={{}}
+        >
           <View style={{ display: 'flex', margin: 20 }}>
             {!loading && (!pieAmounts || !pieAmounts.length) && (
-              <View style={{ width: '100%', alignItems: 'center', marginTop: 100 }}>
+              <View
+                style={{ width: '100%', alignItems: 'center', marginTop: 100 }}
+              >
                 <RegText>{translate('insight.no-data') as string}</RegText>
               </View>
             )}
             {loading ? (
-              <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 100 }} />
+              <ActivityIndicator
+                size="large"
+                color={colors.primary}
+                style={{ marginTop: 100 }}
+              />
             ) : (
-              <View style={{ width: '100%', alignItems: 'center', paddingVertical: 10 }}>
+              <View
+                style={{
+                  width: '100%',
+                  alignItems: 'center',
+                  paddingVertical: 10,
+                }}
+              >
                 {!!pieAmounts && !!pieAmounts.length && (
                   <PieChart
                     showExternalLabels={true}
@@ -374,7 +464,14 @@ const Insight: React.FunctionComponent<InsightProps> = ({
               </View>
             )}
           </View>
-          <View style={{ display: 'flex', marginHorizontal: 5, padding: 0, alignItems: 'center' }}>
+          <View
+            style={{
+              display: 'flex',
+              marginHorizontal: 5,
+              padding: 0,
+              alignItems: 'center',
+            }}
+          >
             <View style={{ width: '100%' }}>
               {!loading && !!pieAmounts && !!pieAmounts.length && (
                 <>
@@ -383,7 +480,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({
                     .map((item, index) => {
                       return line(item, index);
                     })}
-                  <View style={{ height: 1, backgroundColor: colors.primary }} />
+                  <View
+                    style={{ height: 1, backgroundColor: colors.primary }}
+                  />
                   {pieAmounts
                     .filter(item => item.address !== 'fee')
                     .map((item, index) => {

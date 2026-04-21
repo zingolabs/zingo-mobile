@@ -45,7 +45,7 @@ type ValueTransferLineProps = {
   //setMessagesAddressModalShow: (vt: ValueTransferType) => void;
   addressProtected?: boolean;
   screenName: ScreenEnum;
-  registerSwipeable: (r: Swipeable) => void; 
+  registerSwipeable: (r: Swipeable) => void;
   closeAllSwipeables: () => void;
   closeOtherSwipeables: () => void;
 };
@@ -74,7 +74,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     selectServer,
     setSendPageState,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   //const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
 
@@ -87,21 +87,22 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   const amountColor =
     vt.status === RPCValueTransfersStatusEnum.failed
       ? colors.zingo
-      : vt.confirmations >= 0 &&
-        vt.confirmations < GlobalConst.minConfirmations
+      : vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations
         ? colors.primaryDisabled
-        : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
+        : vt.kind === ValueTransferKindEnum.Received ||
+            vt.kind === ValueTransferKindEnum.Shield
           ? colors.primary
           : colors.text;
 
   const icon =
-      vt.confirmations >= 0 &&
-        vt.confirmations < GlobalConst.minConfirmations &&
-        vt.status !== RPCValueTransfersStatusEnum.failed
-        ? faRefresh
-        : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
-          ? faArrowDown
-          : faArrowUp;
+    vt.confirmations >= 0 &&
+    vt.confirmations < GlobalConst.minConfirmations &&
+    vt.status !== RPCValueTransfersStatusEnum.failed
+      ? faRefresh
+      : vt.kind === ValueTransferKindEnum.Received ||
+          vt.kind === ValueTransferKindEnum.Shield
+        ? faArrowDown
+        : faArrowUp;
 
   const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
 
@@ -199,40 +200,64 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               alignItems: 'center',
               transform: [{ translateX: trans }],
               backgroundColor: colors.sideMenuBackground,
-            }}>
-            <View style={{ width: 65, justifyContent: 'center', alignItems: 'center' }}>
+            }}
+          >
+            <View
+              style={{
+                width: 65,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
               <TouchableOpacity
                 style={{ zIndex: 999, padding: 20 }}
                 onPress={() => {
                   setValueTransferDetailModalShow(index, vt);
                   closeAllSwipeables();
-                }}>
-                <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faFileLines} color={colors.money} />
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ opacity: 0.8 }}
+                  size={30}
+                  icon={faFileLines}
+                  color={colors.money}
+                />
               </TouchableOpacity>
             </View>
-            {!!vt.address && !readOnly && selectServer !== SelectServerEnum.offline && !addressProtected && (
-              <View
-                style={{
-                  width: 67,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <TouchableOpacity
-                  style={{ zIndex: 999, padding: 20 }}
-                  onPress={() => {
-                    // enviar
-                    const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-                    sendPageState.toaddr.to = vt.address ? vt.address : '';
-                    setSendPageState(sendPageState);
-                    navigation.navigate(RouteEnum.HomeStack, {
-                      screen: RouteEnum.Send,
-                    });
-                    closeAllSwipeables();
-                  }}>
-                  <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
-                </TouchableOpacity>
-              </View>
-            )}
+            {!!vt.address &&
+              !readOnly &&
+              selectServer !== SelectServerEnum.offline &&
+              !addressProtected && (
+                <View
+                  style={{
+                    width: 67,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{ zIndex: 999, padding: 20 }}
+                    onPress={() => {
+                      // enviar
+                      const sendPageState = new SendPageStateClass(
+                        new ToAddrClass(0),
+                      );
+                      sendPageState.toaddr.to = vt.address ? vt.address : '';
+                      setSendPageState(sendPageState);
+                      navigation.navigate(RouteEnum.HomeStack, {
+                        screen: RouteEnum.Send,
+                      });
+                      closeAllSwipeables();
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      size={30}
+                      icon={faPaperPlane}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
           </Animated.View>
         )}
       </>
@@ -274,7 +299,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-      }}>
+      }}
+    >
       {month !== '' && (
         <View
           style={{
@@ -285,7 +311,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             borderBottomWidth: 1,
             borderColor: colors.card,
             backgroundColor: colors.background,
-          }}>
+          }}
+        >
           <FadeText>{month}</FadeText>
         </View>
       )}
@@ -293,16 +320,18 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
         style={{ zIndex: 999 }}
         onPress={async () => {
           closeAllSwipeables();
-          await new Promise((r) => requestAnimationFrame(r));
+          await new Promise(r => requestAnimationFrame(r));
           setValueTransferDetailModalShow(index, vt);
-        }}>
+        }}
+      >
         <Swipeable
           ref={registerSwipeable}
           onSwipeableWillOpen={closeOtherSwipeables}
           overshootLeft={false}
           overshootRight={false}
           overshootFriction={1}
-          renderLeftActions={handleRenderLeftActions}>
+          renderLeftActions={handleRenderLeftActions}
+        >
           <View
             style={{
               display: 'flex',
@@ -314,15 +343,29 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   : 'flex-start',
               marginTop: 10,
               paddingBottom: 10,
-              borderBottomWidth: nextLineWithSameTxid ? (Platform.OS === GlobalConst.platformOSandroid ? 1 : 0.5) : 1.5,
-              borderBottomColor: nextLineWithSameTxid ? colors.primaryDisabled : colors.border,
+              borderBottomWidth: nextLineWithSameTxid
+                ? Platform.OS === GlobalConst.platformOSandroid
+                  ? 1
+                  : 0.5
+                : 1.5,
+              borderBottomColor: nextLineWithSameTxid
+                ? colors.primaryDisabled
+                : colors.border,
               borderStyle: nextLineWithSameTxid
                 ? Platform.OS === GlobalConst.platformOSandroid
                   ? 'dotted'
                   : 'solid'
                 : 'solid',
-            }}>
-            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            }}
+          >
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
               <View style={{ display: 'flex' }}>
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
@@ -338,85 +381,179 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               </View>
               <View style={{ display: 'flex' }}>
                 {!!vt.address &&
-                  (vt.confirmations < 0 || vt.confirmations >= GlobalConst.minConfirmations) && (
-                  <View>
-                    <AddressItem address={vt.address} screenName={screenName} oneLine={true} />
-                  </View>
-                )}
+                  (vt.confirmations < 0 ||
+                    vt.confirmations >= GlobalConst.minConfirmations) && (
+                    <View>
+                      <AddressItem
+                        address={vt.address}
+                        screenName={screenName}
+                        oneLine={true}
+                      />
+                    </View>
+                  )}
                 <View
                   style={{
                     display: 'flex',
-                    flexDirection: vt.kind === ValueTransferKindEnum.Sent && (vt.confirmations < 0 || vt.confirmations >= GlobalConst.minConfirmations) ? 'row' : 'column',
+                    flexDirection:
+                      vt.kind === ValueTransferKindEnum.Sent &&
+                      (vt.confirmations < 0 ||
+                        vt.confirmations >= GlobalConst.minConfirmations)
+                        ? 'row'
+                        : 'column',
                     alignItems:
-                      vt.kind === ValueTransferKindEnum.Sent && (vt.confirmations < 0 || vt.confirmations >= GlobalConst.minConfirmations) ? 'center' : 'flex-start',
-                  }}>
+                      vt.kind === ValueTransferKindEnum.Sent &&
+                      (vt.confirmations < 0 ||
+                        vt.confirmations >= GlobalConst.minConfirmations)
+                        ? 'center'
+                        : 'flex-start',
+                  }}
+                >
                   <FadeText
                     style={{
-                      opacity: vt.status === RPCValueTransfersStatusEnum.failed
-                              ? undefined
-                              : 1,
+                      opacity:
+                        vt.status === RPCValueTransfersStatusEnum.failed
+                          ? undefined
+                          : 1,
                       fontWeight: 'bold',
-                      color: vt.status === RPCValueTransfersStatusEnum.failed
-                              ? colors.zingo
-                              : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
-                                ? colors.primary
-                                : colors.text,
-                      fontSize: vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations ? 14 : 18,
-                    }}>
-                    {vt.status === RPCValueTransfersStatusEnum.failed && vt.kind === ValueTransferKindEnum.Sent
+                      color:
+                        vt.status === RPCValueTransfersStatusEnum.failed
+                          ? colors.zingo
+                          : vt.kind === ValueTransferKindEnum.Received ||
+                              vt.kind === ValueTransferKindEnum.Shield
+                            ? colors.primary
+                            : colors.text,
+                      fontSize:
+                        vt.confirmations >= 0 &&
+                        vt.confirmations < GlobalConst.minConfirmations
+                          ? 14
+                          : 18,
+                    }}
+                  >
+                    {vt.status === RPCValueTransfersStatusEnum.failed &&
+                    vt.kind === ValueTransferKindEnum.Sent
                       ? (translate('history.sent-failed') as string)
-                      : vt.status === RPCValueTransfersStatusEnum.failed && vt.kind === ValueTransferKindEnum.Shield
-                      ? (translate('history.shield-failed') as string)
-                      : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
-                      ? (translate('history.sending') as string)
-                      : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations !== 0
-                      ? (translate('history.sent') as string)
-                      : vt.kind === ValueTransferKindEnum.Received && vt.confirmations === 0
-                      ? (translate('history.receiving') as string)
-                      : vt.kind === ValueTransferKindEnum.Received && vt.confirmations !== 0
-                      ? (translate('history.received') as string)
-                      : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations === 0
-                      ? (translate('history.sendingtoself') as string)
-                      : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations !== 0
-                      ? (translate('history.memotoself') as string)
-                      : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations === 0
-                      ? (translate('history.sendingtoself') as string)
-                      : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations !== 0
-                      ? (translate('history.sendtoself') as string)
-                      : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations === 0
-                      ? (translate('history.shielding') as string)
-                      : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations !== 0
-                      ? (translate('history.shield') as string)
-                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations === 0
-                      ? (translate('history.sending') as string)
-                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations !== 0
-                      ? (translate('history.rejection') as string)
-                      : ''}
+                      : vt.status === RPCValueTransfersStatusEnum.failed &&
+                          vt.kind === ValueTransferKindEnum.Shield
+                        ? (translate('history.shield-failed') as string)
+                        : vt.kind === ValueTransferKindEnum.Sent &&
+                            vt.confirmations === 0
+                          ? (translate('history.sending') as string)
+                          : vt.kind === ValueTransferKindEnum.Sent &&
+                              vt.confirmations !== 0
+                            ? (translate('history.sent') as string)
+                            : vt.kind === ValueTransferKindEnum.Received &&
+                                vt.confirmations === 0
+                              ? (translate('history.receiving') as string)
+                              : vt.kind === ValueTransferKindEnum.Received &&
+                                  vt.confirmations !== 0
+                                ? (translate('history.received') as string)
+                                : vt.kind ===
+                                      ValueTransferKindEnum.MemoToSelf &&
+                                    vt.confirmations === 0
+                                  ? (translate(
+                                      'history.sendingtoself',
+                                    ) as string)
+                                  : vt.kind ===
+                                        ValueTransferKindEnum.MemoToSelf &&
+                                      vt.confirmations !== 0
+                                    ? (translate(
+                                        'history.memotoself',
+                                      ) as string)
+                                    : vt.kind ===
+                                          ValueTransferKindEnum.SendToSelf &&
+                                        vt.confirmations === 0
+                                      ? (translate(
+                                          'history.sendingtoself',
+                                        ) as string)
+                                      : vt.kind ===
+                                            ValueTransferKindEnum.SendToSelf &&
+                                          vt.confirmations !== 0
+                                        ? (translate(
+                                            'history.sendtoself',
+                                          ) as string)
+                                        : vt.kind ===
+                                              ValueTransferKindEnum.Shield &&
+                                            vt.confirmations === 0
+                                          ? (translate(
+                                              'history.shielding',
+                                            ) as string)
+                                          : vt.kind ===
+                                                ValueTransferKindEnum.Shield &&
+                                              vt.confirmations !== 0
+                                            ? (translate(
+                                                'history.shield',
+                                              ) as string)
+                                            : vt.kind ===
+                                                  ValueTransferKindEnum.Rejection &&
+                                                vt.confirmations === 0
+                                              ? (translate(
+                                                  'history.sending',
+                                                ) as string)
+                                              : vt.kind ===
+                                                    ValueTransferKindEnum.Rejection &&
+                                                  vt.confirmations !== 0
+                                                ? (translate(
+                                                    'history.rejection',
+                                                  ) as string)
+                                                : ''}
                   </FadeText>
-                  <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                    <FadeText>{vt.time ? moment((vt.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <FadeText>
+                      {vt.time
+                        ? moment((vt.time || 0) * 1000).format('MMM D, h:mm a')
+                        : '--'}
+                    </FadeText>
                     {haveMemo && (
                       <FontAwesomeIcon
                         style={{ marginLeft: 10 }}
                         size={15}
                         icon={faComment}
-                        color={vt.status === RPCValueTransfersStatusEnum.failed ? colors.zingo : colors.primaryDisabled}
+                        color={
+                          vt.status === RPCValueTransfersStatusEnum.failed
+                            ? colors.zingo
+                            : colors.primaryDisabled
+                        }
                       />
                     )}
                   </View>
                 </View>
               </View>
               <ZecAmount
-                style={{ flexGrow: 1, alignSelf: 'auto', justifyContent: 'flex-end', paddingRight: 5, opacity: vt.status === RPCValueTransfersStatusEnum.failed ?  0.7 : 1 }}
+                style={{
+                  flexGrow: 1,
+                  alignSelf: 'auto',
+                  justifyContent: 'flex-end',
+                  paddingRight: 5,
+                  opacity:
+                    vt.status === RPCValueTransfersStatusEnum.failed ? 0.7 : 1,
+                }}
                 size={18}
                 currencyName={info.currencyName}
-                color={vt.status === RPCValueTransfersStatusEnum.failed ? colors.zingo : amountColor}
+                color={
+                  vt.status === RPCValueTransfersStatusEnum.failed
+                    ? colors.zingo
+                    : amountColor
+                }
                 amtZec={vt.amount}
                 privacy={privacy}
               />
             </View>
             {vt.confirmations === 0 && (
-              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 3 }}>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 3,
+                }}
+              >
                 {(vt.status === RPCValueTransfersStatusEnum.transmitted ||
                   vt.status === RPCValueTransfersStatusEnum.calculated) && (
                   <FontAwesomeIcon
@@ -431,8 +568,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     color:
                       vt.status === RPCValueTransfersStatusEnum.failed
                         ? 'coral'
-                        : vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                          vt.status === RPCValueTransfersStatusEnum.calculated
+                        : vt.status ===
+                              RPCValueTransfersStatusEnum.transmitted ||
+                            vt.status === RPCValueTransfersStatusEnum.calculated
                           ? colors.primary
                           : colors.primaryDisabled,
                     fontSize: 12,
@@ -453,7 +591,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       vt.status === RPCValueTransfersStatusEnum.calculated
                         ? 0
                         : 40,
-                  }}>
+                  }}
+                >
                   {translate(`history.${vt.status}`) as string}
                 </FadeText>
               </View>

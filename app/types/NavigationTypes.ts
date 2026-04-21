@@ -1,4 +1,14 @@
-import { AddressKindEnum, LaunchingModeEnum, RouteEnum, SeedActionEnum, SelectServerEnum, SendPageStateClass, ServerType, UfvkActionEnum, ValueTransferType } from '../AppState';
+import {
+  AddressKindEnum,
+  LaunchingModeEnum,
+  RouteEnum,
+  SeedActionEnum,
+  SelectServerEnum,
+  SendPageStateClass,
+  ServerType,
+  UfvkActionEnum,
+  ValueTransferType,
+} from '../AppState';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 
 /**
@@ -63,7 +73,9 @@ export type AppDrawerParamList = {
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
   [RouteEnum.AddressList]: AddressListNavigationState | undefined;
   [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
-  [RouteEnum.ValueTransferDetail]: ValueTransferDetailNavigationState | undefined;
+  [RouteEnum.ValueTransferDetail]:
+    | ValueTransferDetailNavigationState
+    | undefined;
   [RouteEnum.MessagesAddress]: MessagesAddressNavigationState | undefined;
   [RouteEnum.MessagesAll]: MessagesAllNavigationState | undefined;
   [RouteEnum.Memo]: MemoNavigationState | undefined;

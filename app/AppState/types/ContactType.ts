@@ -16,6 +16,4 @@ export default interface ContactType {
   confirmations: number;
   status?: RPCValueTransfersStatusEnum;
   kind?: ValueTransferKindEnum;
-
-   
 }

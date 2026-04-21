@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Pools from '../components/Pools';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -16,7 +19,10 @@ import { AppDrawerParamList } from '../app/types';
 import { RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Pools> {
+function makeDrawerProps(): DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Pools
+> {
   return {
     navigation: mockNavigation,
     route: {

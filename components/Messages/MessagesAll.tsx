@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { RouteEnum } from '../../app/AppState';
 //import MessageList from './components/MessageList';
@@ -8,12 +7,17 @@ import { AppDrawerParamList } from '../../app/types';
 
 //import { useToast } from 'react-native-toastier';
 
-type MessagesAllProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.MessagesAll>;
+type MessagesAllProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.MessagesAll
+>;
 
-const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
-  //navigation,
-  //route,
-}) => {
+const MessagesAll: React.FunctionComponent<MessagesAllProps> = (
+  {
+    //navigation,
+    //route,
+  },
+) => {
   //const setScrollToBottom = route.params.setScrollToBottom;
   //const scrollToBottom = route.params.scrollToBottom;
   //const { clear } = useToast();

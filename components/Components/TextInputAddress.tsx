@@ -33,12 +33,14 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 
   useEffect(() => {
-    const parseAddress = async (addr: string): Promise<{ isValid: boolean; onlyOrchardUA: string }> => {
+    const parseAddress = async (
+      addr: string,
+    ): Promise<{ isValid: boolean; onlyOrchardUA: string }> => {
       return await Utils.isValidAddress(addr, server.chainName);
     };
 
@@ -58,10 +60,10 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     if (screenName === ScreenEnum.AddressBook) {
       navigation.navigate(routeStack, {
         screen: RouteEnum.ScannerAddress,
-        params: { 
+        params: {
           setAddress: (a: string) => setAddress(a),
           active: true,
-        }
+        },
       });
     } else if (screenName === ScreenEnum.Receive) {
       navigation.navigate(RouteEnum.ScannerAddress, {
@@ -77,10 +79,22 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     <View style={{ display: 'flex', flexDirection: 'column' }}>
       <View style={{ display: 'flex', padding: 10, marginTop: 10 }}>
         {showLabel && (
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
             <RegText>{translate('send.toaddress') as string}</RegText>
-            {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
-            {validAddress === -1 && <ErrorText>{translate('send.invalidaddress') as string}</ErrorText>}
+            {validAddress === 1 && (
+              <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+            )}
+            {validAddress === -1 && (
+              <ErrorText>
+                {translate('send.invalidaddress') as string}
+              </ErrorText>
+            )}
           </View>
         )}
         <View
@@ -89,7 +103,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
             borderRadius: 5,
             borderColor: colors.text,
             marginTop: 5,
-          }}>
+          }}
+        >
           <View style={{ flexDirection: 'row' }}>
             <View
               accessible={true}
@@ -97,7 +112,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
               style={{
                 flex: 1,
                 justifyContent: 'center',
-              }}>
+              }}
+            >
               <TextInput
                 testID="send.addressplaceholder"
                 placeholder={translate('send.addressplaceholder') as string}
@@ -120,13 +136,20 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}>
+              }}
+            >
               {address && !disabled && (
                 <TouchableOpacity
                   onPress={() => {
                     setAddress('');
-                  }}>
-                  <FontAwesomeIcon style={{ marginRight: 5 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{ marginRight: 5 }}
+                    size={25}
+                    icon={faXmark}
+                    color={colors.primaryDisabled}
+                  />
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -136,8 +159,14 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 accessibilityLabel={translate('send.scan-acc') as string}
                 onPress={() => {
                   setQrcodeModalShow();
-                }}>
-                <FontAwesomeIcon style={{ marginRight: 5 }} size={35} icon={faQrcode} color={colors.border} />
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
+                  size={35}
+                  icon={faQrcode}
+                  color={colors.border}
+                />
               </TouchableOpacity>
             </View>
           </View>

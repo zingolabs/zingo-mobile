@@ -6,9 +6,17 @@ import 'react-native';
 import React from 'react';
 
 import { render, RenderResult } from '@testing-library/react-native';
-import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
+import {
+  ContextAppLoadedProvider,
+  defaultAppContextLoaded,
+} from '../app/context';
 import AbDetail from '../components/AddressBook/components/AbDetail';
-import { AddressBookActionEnum, AddressBookFileClass, RouteEnum, ScreenEnum } from '../app/AppState';
+import {
+  AddressBookActionEnum,
+  AddressBookFileClass,
+  RouteEnum,
+  ScreenEnum,
+} from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 

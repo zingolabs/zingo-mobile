@@ -5,6 +5,4 @@ export default interface SnackbarType {
   message: string;
   screenName: ScreenEnum[];
   duration?: SnackbarDurationEnum;
-
-   
 }

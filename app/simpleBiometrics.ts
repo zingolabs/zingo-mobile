@@ -8,9 +8,12 @@ type simpleBiometricsProps = {
 };
 
 const simpleBiometrics = async (props: simpleBiometricsProps) => {
-  const rnBiometrics = new ReactNativeBiometrics({ allowDeviceCredentials: true });
+  const rnBiometrics = new ReactNativeBiometrics({
+    allowDeviceCredentials: true,
+  });
 
-  const { available, biometryType, error } = await rnBiometrics.isSensorAvailable();
+  const { available, biometryType, error } =
+    await rnBiometrics.isSensorAvailable();
 
   console.log(available, biometryType, error);
 
@@ -26,7 +29,9 @@ const simpleBiometrics = async (props: simpleBiometricsProps) => {
   try {
     const result = await rnBiometrics.simplePrompt({
       promptMessage: props.translate('biometrics-message') as string,
-      fallbackPromptMessage: props.translate('biometrics-message-ios') as string,
+      fallbackPromptMessage: props.translate(
+        'biometrics-message-ios',
+      ) as string,
     });
     if (result.success) {
       console.log('Biometric auth success');

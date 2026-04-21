@@ -49,7 +49,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addressBook } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   const [label, setLabel] = useState<string>(item.label);
   const [address, setAddress] = useState<string>(item.address);
@@ -70,10 +70,16 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     if ((!label || !address) && action === AddressBookActionEnum.Modify) {
       setError(translate('addressbook.fillboth') as string);
     }
-    if (item.label !== label && addressBook.filter((elem: AddressBookFileClass) => elem.label === label).length > 0) {
+    if (
+      item.label !== label &&
+      addressBook.filter((elem: AddressBookFileClass) => elem.label === label)
+        .length > 0
+    ) {
       if (
         item.address !== address &&
-        addressBook.filter((elem: AddressBookFileClass) => elem.address === address).length > 0
+        addressBook.filter(
+          (elem: AddressBookFileClass) => elem.address === address,
+        ).length > 0
       ) {
         setError(translate('addressbook.bothexists') as string);
       } else {
@@ -82,7 +88,9 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     } else {
       if (
         item.address !== address &&
-        addressBook.filter((elem: AddressBookFileClass) => elem.address === address).length > 0
+        addressBook.filter(
+          (elem: AddressBookFileClass) => elem.address === address,
+        ).length > 0
       ) {
         setError(translate('addressbook.addressexists') as string);
       } else {
@@ -114,8 +122,15 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       return;
     }
     // Attempt to parse as URI if it starts with zcash
-    if (addr.toLowerCase().startsWith(GlobalConst.zcash) || addr.toLowerCase().includes(':')) {
-      const {error: errorTarget, target } = await parseZcashURI(addr, translate, server);
+    if (
+      addr.toLowerCase().startsWith(GlobalConst.zcash) ||
+      addr.toLowerCase().includes(':')
+    ) {
+      const { error: errorTarget, target } = await parseZcashURI(
+        addr,
+        translate,
+        server,
+      );
       //console.log(targets);
 
       if (target) {
@@ -142,8 +157,17 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   return (
     <View
       testID={`addressbookdetail.${index + 1}`}
-      style={{ display: 'flex', flexDirection: 'column', borderColor: colors.primary, borderWidth: 1, margin: 10 }}>
-      <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{translate('addressbook.label') as string}</RegText>
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        borderColor: colors.primary,
+        borderWidth: 1,
+        margin: 10,
+      }}
+    >
+      <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
+        {translate('addressbook.label') as string}
+      </RegText>
       <View
         style={{
           display: 'flex',
@@ -151,7 +175,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           justifyContent: 'flex-start',
           paddingHorizontal: 10,
           marginTop: 10,
-        }}>
+        }}
+      >
         <View
           accessible={true}
           style={{
@@ -162,7 +187,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             minWidth: 48,
             minHeight: 48,
             maxHeight: 150,
-          }}>
+          }}
+        >
           <TextInput
             testID="addressbook.label-field"
             style={{
@@ -200,8 +226,11 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-          }}>
-          <FadeText style={{ color: colors.primary }}>{error + errorAddress}</FadeText>
+          }}
+        >
+          <FadeText style={{ color: colors.primary }}>
+            {error + errorAddress}
+          </FadeText>
         </View>
       )}
       <View
@@ -211,7 +240,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           justifyContent: 'center',
           alignItems: 'center',
           marginVertical: 5,
-        }}>
+        }}
+      >
         <Button
           type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
@@ -227,15 +257,24 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
           style={{ marginLeft: 10 }}
           onPress={() => {
-            doAction(action, label.trim(), address, item.color ? item.color : '');
+            doAction(
+              action,
+              label.trim(),
+              address,
+              item.color ? item.color : '',
+            );
             Keyboard.dismiss();
           }}
           disabled={
             action === AddressBookActionEnum.Delete
               ? false
-              : error || errorAddress || !label || (label && !label.trim()) || !address
-              ? true
-              : false
+              : error ||
+                  errorAddress ||
+                  !label ||
+                  (label && !label.trim()) ||
+                  !address
+                ? true
+                : false
           }
           twoButtons={true}
         />

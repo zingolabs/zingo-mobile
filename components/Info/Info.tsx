@@ -11,28 +11,31 @@ import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import RegText from '../Components/RegText';
-import { ChainNameEnum, CurrencyEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
+import {
+  ChainNameEnum,
+  CurrencyEnum,
+  RouteEnum,
+  ScreenEnum,
+} from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type InfoProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Info>;
 
-const Info: React.FunctionComponent<InfoProps> = ({
-  navigation,
-}) => {
+const Info: React.FunctionComponent<InfoProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
-  const { 
-    info, 
-    translate, 
-    currency, 
-    zecPrice, 
-    privacy, 
-    setZecPrice, 
-    snackbars, 
+  const {
+    info,
+    translate,
+    currency,
+    zecPrice,
+    privacy,
+    setZecPrice,
+    snackbars,
     removeFirstSnackbar,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.Info;
 
@@ -48,7 +51,8 @@ const Info: React.FunctionComponent<InfoProps> = ({
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
         <Header
           title={translate('info.title') as string}
           screenName={screenName}
@@ -70,27 +74,39 @@ const Info: React.FunctionComponent<InfoProps> = ({
             flexDirection: 'column',
             alignItems: 'stretch',
             justifyContent: 'flex-start',
-          }}>
+          }}
+        >
           <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
             <DetailLine
               label={translate('info.version') as string}
               value={translate('zingo') + ' ' + translate('version')}
               screenName={screenName}
             />
-            <DetailLine label={translate('info.serverversion') as string} value={info.version ? info.version : '-' } screenName={screenName} />
-            <DetailLine label={translate('info.zainod') as string} value={info.serverUri ? info.serverUri : '-'} screenName={screenName} />
+            <DetailLine
+              label={translate('info.serverversion') as string}
+              value={info.version ? info.version : '-'}
+              screenName={screenName}
+            />
+            <DetailLine
+              label={translate('info.zainod') as string}
+              value={info.serverUri ? info.serverUri : '-'}
+              screenName={screenName}
+            />
             <DetailLine
               label={translate('info.network') as string}
               value={
                 !info.chainName
                   ? '-'
                   : info.chainName === ChainNameEnum.mainChainName
-                  ? 'Mainnet'
-                  : info.chainName === ChainNameEnum.testChainName
-                  ? 'Testnet'
-                  : info.chainName === ChainNameEnum.regtestChainName
-                  ? 'Regtest'
-                  : (translate('info.unknown') as string) + ' (' + info.chainName + ')'
+                    ? 'Mainnet'
+                    : info.chainName === ChainNameEnum.testChainName
+                      ? 'Testnet'
+                      : info.chainName === ChainNameEnum.regtestChainName
+                        ? 'Regtest'
+                        : (translate('info.unknown') as string) +
+                          ' (' +
+                          info.chainName +
+                          ')'
               }
               screenName={screenName}
             />
@@ -99,19 +115,39 @@ const Info: React.FunctionComponent<InfoProps> = ({
               value={info.latestBlock ? info.latestBlock.toString() : '-'}
               screenName={screenName}
             />
-            {(currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
+            {(currency === CurrencyEnum.USDCurrency ||
+              currency === CurrencyEnum.USDTORCurrency) && (
               <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                <DetailLine label={(currency === CurrencyEnum.USDTORCurrency ? translate('info.zecpricetor') : translate('info.zecprice')) as string} screenName={screenName}>
+                <DetailLine
+                  label={
+                    (currency === CurrencyEnum.USDTORCurrency
+                      ? translate('info.zecpricetor')
+                      : translate('info.zecprice')) as string
+                  }
+                  screenName={screenName}
+                >
                   {zecPrice.zecPrice === -1 && (
-                    <RegText color={colors.text}>{translate('info.errorgemini') as string}</RegText>
+                    <RegText color={colors.text}>
+                      {translate('info.errorgemini') as string}
+                    </RegText>
                   )}
                   {zecPrice.zecPrice === -2 && (
-                    <RegText color={colors.text}>{translate('info.errorrpcmodule') as string}</RegText>
+                    <RegText color={colors.text}>
+                      {translate('info.errorrpcmodule') as string}
+                    </RegText>
                   )}
-                  <CurrencyAmount price={zecPrice.zecPrice} amtZec={1} currency={currency} privacy={privacy} />
+                  <CurrencyAmount
+                    price={zecPrice.zecPrice}
+                    amtZec={1}
+                    currency={currency}
+                    privacy={privacy}
+                  />
                 </DetailLine>
                 <View style={{ marginLeft: 5 }}>
-                  <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} />
+                  <PriceFetcher
+                    setZecPrice={setZecPrice}
+                    screenName={screenName}
+                  />
                 </View>
               </View>
             )}

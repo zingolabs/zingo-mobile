@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useRef, useCallback } from 'react';
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react';
 import {
   View,
   ScrollView,
@@ -17,7 +23,11 @@ import moment from 'moment';
 
 import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAngleUp,
+  faMagnifyingGlass,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 
 import {
   AddressBookFileClass,
@@ -43,7 +53,10 @@ import Snackbars from '../../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type ContactListProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ContactList> & {
+type ContactListProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.ContactList
+> & {
   toggleMenuDrawer?: () => void;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
@@ -73,19 +86,19 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   noDrawMenu,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { 
-    translate, 
-    valueTransfers, 
-    language, 
-    server, 
-    addressBook, 
-    addresses, 
-    doRefresh, 
-    zenniesDonationAddress, 
-    snackbars, 
+  const {
+    translate,
+    valueTransfers,
+    language,
+    server,
+    addressBook,
+    addresses,
+    doRefresh,
+    zenniesDonationAddress,
+    snackbars,
     removeFirstSnackbar,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.ContactList;
 
   const [contacts, setContacts] = useState<ContactType[]>([]);
@@ -105,7 +118,12 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   var lastMonth = '';
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
+    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses
+      ? addresses.filter(
+          (a: UnifiedAddressClass | TransparentAddressClass) =>
+            a.address === add,
+        )
+      : [];
     return address.length >= 1;
   };
 
@@ -175,7 +193,10 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 } else {
                   if (filter === FilterEnum.contacts && isContact.length > 0) {
                     pushAddress = true;
-                  } else if (filter === FilterEnum.noContacts && isContact.length === 0) {
+                  } else if (
+                    filter === FilterEnum.noContacts &&
+                    isContact.length === 0
+                  ) {
                     pushAddress = true;
                   }
                 }
@@ -185,7 +206,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 let found = false;
                 if (searchText) {
                   if (
-                    c.address.toLowerCase().includes(searchText.toLowerCase()) ||
+                    c.address
+                      .toLowerCase()
+                      .includes(searchText.toLowerCase()) ||
                     c.label.toLowerCase().includes(searchText.toLowerCase())
                   ) {
                     found = true;
@@ -207,7 +230,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
       addressBook
         .filter(
           (ab: AddressBookFileClass) =>
-            ab.address !== zenniesDonationAddress && Utils.isMessagesAddress({ address: ab.address } as ContactType),
+            ab.address !== zenniesDonationAddress &&
+            Utils.isMessagesAddress({ address: ab.address } as ContactType),
         )
         .forEach((ab: AddressBookFileClass) => {
           // must match the two addresses: full UA & only orchard UA.
@@ -258,7 +282,14 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
       }, 500);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addressBook, server.chainName, valueTransfers, searchMode, loading, filter]);
+  }, [
+    addressBook,
+    server.chainName,
+    valueTransfers,
+    searchMode,
+    loading,
+    filter,
+  ]);
 
   useEffect(() => {
     if (scrollToTop) {
@@ -273,22 +304,25 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     }
   };
 
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y <= 100;
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset } = event.nativeEvent;
+      const isTop = contentOffset.y <= 100;
 
-    // Always update isAtTop for manual scrolling
-    setIsAtTop(isTop);
+      // Always update isAtTop for manual scrolling
+      setIsAtTop(isTop);
 
-    // If we're scrolling to top and we've reached the top, stop the scrolling state
-    if (isScrollingToTop && isTop) {
-      setIsScrollingToTop(false);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = null;
+      // If we're scrolling to top and we've reached the top, stop the scrolling state
+      if (isScrollingToTop && isTop) {
+        setIsScrollingToTop(false);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = null;
+        }
       }
-    }
-  }, [isScrollingToTop]);
+    },
+    [isScrollingToTop],
+  );
 
   const setMessagesAddressModalShow = (c: ContactType) => {
     navigation.navigate(RouteEnum.MessagesAddress, {
@@ -322,7 +356,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
         <Header
           title={translate('messages.title-chats') as string}
           screenName={screenName}
@@ -333,7 +368,13 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           noDrawMenu={noDrawMenu}
         />
         {searchMode && (
-          <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignSelf: 'center',
+              alignItems: 'center',
+            }}
+          >
             <View
               style={{
                 display: 'flex',
@@ -341,7 +382,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 justifyContent: 'flex-start',
                 marginHorizontal: 10,
                 marginTop: 10,
-              }}>
+              }}
+            >
               <View
                 accessible={true}
                 style={{
@@ -353,9 +395,12 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   borderWidth: 2,
                   borderRadius: 15,
                   borderColor: colors.text,
-                }}>
+                }}
+              >
                 <TextInput
-                  placeholder={translate('messages.search-placeholder') as string}
+                  placeholder={
+                    translate('messages.search-placeholder') as string
+                  }
                   placeholderTextColor={colors.placeholder}
                   style={{
                     flex: 1,
@@ -366,12 +411,18 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                     backgroundColor: 'transparent',
                   }}
                   value={searchTextField}
-                  onChangeText={(text: string) => setSearchTextField(text.trim())}
-                  onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
+                  onChangeText={(text: string) =>
+                    setSearchTextField(text.trim())
+                  }
+                  onEndEditing={(
+                    e: NativeSyntheticEvent<TextInputEndEditingEventData>,
+                  ) => {
                     setSearchTextField(e.nativeEvent.text.trim());
                   }}
                   editable={true}
-                  returnKeyLabel={translate('messages.search-placeholder') as string}
+                  returnKeyLabel={
+                    translate('messages.search-placeholder') as string
+                  }
                   returnKeyType="done"
                   onSubmitEditing={() => {
                     if (searchTextField) {
@@ -381,14 +432,26 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                     }
                   }}
                 />
-                {loading && <ActivityIndicator style={{ marginRight: 7 }} size={25} color={colors.primaryDisabled} />}
+                {loading && (
+                  <ActivityIndicator
+                    style={{ marginRight: 7 }}
+                    size={25}
+                    color={colors.primaryDisabled}
+                  />
+                )}
                 {!loading && (
                   <TouchableOpacity
                     onPress={() => {
                       setSearchTextField('');
                       setSearchMode(false);
-                    }}>
-                    <FontAwesomeIcon style={{ marginRight: 7 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      style={{ marginRight: 7 }}
+                      size={25}
+                      icon={faXmark}
+                      color={colors.primaryDisabled}
+                    />
                   </TouchableOpacity>
                 )}
               </View>
@@ -403,30 +466,35 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             width: 'auto',
             marginHorizontal: 5,
             marginBottom: 2,
-          }}>
+          }}
+        >
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{
               width: 'auto',
               marginTop: 10,
-            }}>
+            }}
+          >
             <TouchableOpacity
               onPress={() => {
                 // call the screen
                 setMessagesAllModalShow();
-              }}>
+              }}
+            >
               <View
                 style={{
                   paddingHorizontal: 5,
                   marginHorizontal: 0,
-                }}>
+                }}
+              >
                 <RegText
                   style={{
                     color: colors.primary,
                     textDecorationLine: 'underline',
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('messages.link-all') as string}
                 </RegText>
               </View>
@@ -435,22 +503,32 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               onPress={() => {
                 setFilter(FilterEnum.all);
                 setLoading(true);
-              }}>
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor:
+                    filter === FilterEnum.all
+                      ? colors.primary
+                      : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
+                  borderColor:
+                    filter === FilterEnum.all ? colors.primary : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginHorizontal: 10,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
+                    color:
+                      filter === FilterEnum.all
+                        ? colors.sideMenuBackground
+                        : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('messages.filter-all') as string}
                 </FadeText>
               </View>
@@ -459,22 +537,34 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               onPress={() => {
                 setFilter(FilterEnum.contacts);
                 setLoading(true);
-              }}>
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filter === FilterEnum.contacts ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor:
+                    filter === FilterEnum.contacts
+                      ? colors.primary
+                      : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filter === FilterEnum.contacts ? colors.primary : colors.zingo,
+                  borderColor:
+                    filter === FilterEnum.contacts
+                      ? colors.primary
+                      : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginHorizontal: 0,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filter === FilterEnum.contacts ? colors.sideMenuBackground : colors.zingo,
+                    color:
+                      filter === FilterEnum.contacts
+                        ? colors.sideMenuBackground
+                        : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('messages.filter-contacts') as string}
                 </FadeText>
               </View>
@@ -483,22 +573,34 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               onPress={() => {
                 setFilter(FilterEnum.noContacts);
                 setLoading(true);
-              }}>
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filter === FilterEnum.noContacts ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor:
+                    filter === FilterEnum.noContacts
+                      ? colors.primary
+                      : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filter === FilterEnum.noContacts ? colors.primary : colors.zingo,
+                  borderColor:
+                    filter === FilterEnum.noContacts
+                      ? colors.primary
+                      : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginHorizontal: 10,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filter === FilterEnum.noContacts ? colors.sideMenuBackground : colors.zingo,
+                    color:
+                      filter === FilterEnum.noContacts
+                        ? colors.sideMenuBackground
+                        : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('messages.filter-no-contacts') as string}
                 </FadeText>
               </View>
@@ -507,8 +609,14 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               <TouchableOpacity
                 onPress={() => {
                   setSearchMode(true);
-                }}>
-                <FontAwesomeIcon style={{ margin: 0 }} size={30} icon={faMagnifyingGlass} color={colors.zingo} />
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ margin: 0 }}
+                  size={30}
+                  icon={faMagnifyingGlass}
+                  color={colors.zingo}
+                />
               </TouchableOpacity>
             )}
             {!searchMode && searchText && (
@@ -517,7 +625,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   setLoading(true);
                   setSearchText('');
                   setSearchTextField('');
-                }}>
+                }}
+              >
                 <View
                   style={{
                     backgroundColor: colors.zingo,
@@ -525,15 +634,19 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                     paddingHorizontal: 10,
                     paddingVertical: 5,
                     marginRight: 5,
-                  }}>
+                  }}
+                >
                   <FadeText
                     style={{
                       color: colors.sideMenuBackground,
                       fontWeight: 'bold',
-                    }}>
+                    }}
+                  >
                     {(translate('messages.clear-filter') as string) +
                       ' ' +
-                      (searchText.length < 4 ? searchText : searchText.slice(0, 3) + '...')}
+                      (searchText.length < 4
+                        ? searchText
+                        : searchText.slice(0, 3) + '...')}
                   </FadeText>
                 </View>
               </TouchableOpacity>
@@ -541,7 +654,11 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           </ScrollView>
         </View>
         {loading ? (
-          <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            style={{ marginVertical: 20 }}
+          />
         ) : (
           <>
             <ScrollView
@@ -563,11 +680,13 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 flexGrow: 1,
                 marginTop: 10,
                 width: '100%',
-              }}>
+              }}
+            >
               {contacts &&
                 contacts.length > 0 &&
                 contacts.map((c, index) => {
-                  let txmonth = c && c.time ? moment(c.time * 1000).format('MMM YYYY') : '';
+                  let txmonth =
+                    c && c.time ? moment(c.time * 1000).format('MMM YYYY') : '';
 
                   var month = '';
                   if (txmonth !== lastMonth) {
@@ -595,8 +714,11 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                     justifyContent: 'flex-start',
                     marginTop: 10,
                     marginBottom: 30,
-                  }}>
-                  <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
+                  }}
+                >
+                  <FadeText style={{ color: colors.primary }}>
+                    {translate('history.end') as string}
+                  </FadeText>
                 </View>
               ) : (
                 <View
@@ -606,8 +728,11 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                     justifyContent: 'flex-start',
                     marginTop: 30,
                     marginBottom: 30,
-                  }}>
-                  <FadeText style={{ color: colors.primary }}>{translate('messages.contacts-empty') as string}</FadeText>
+                  }}
+                >
+                  <FadeText style={{ color: colors.primary }}>
+                    {translate('messages.contacts-empty') as string}
+                  </FadeText>
                 </View>
               )}
             </ScrollView>
@@ -627,7 +752,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   borderWidth: 1,
                   borderColor: colors.zingo,
                   opacity: isScrollingToTop ? 0.5 : 1,
-                })}>
+                })}
+              >
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                   size={20}

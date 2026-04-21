@@ -1,6 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
-import { GlobalConst, TranslateType, SnackbarType, ScreenEnum } from './AppState';
+import {
+  GlobalConst,
+  TranslateType,
+  SnackbarType,
+  ScreenEnum,
+} from './AppState';
 
 export const createAlert = async (
   setBackgroundError: (title: string, error: string) => void,
@@ -10,7 +15,12 @@ export const createAlert = async (
   error: string,
   toast: boolean,
   translate: (key: string) => TranslateType,
-  sendEmail?: (translate: (key: string) => TranslateType, z: string, s?: string, b?: string) => void,
+  sendEmail?: (
+    translate: (key: string) => TranslateType,
+    z: string,
+    s?: string,
+    b?: string,
+  ) => void,
   zingolibVersion?: string,
 ) => {
   const background = await AsyncStorage.getItem(GlobalConst.background);
@@ -30,7 +40,13 @@ export const createAlert = async (
           [
             {
               text: translate('support') as string,
-              onPress: async () => sendEmail(translate, zingolibVersion ? zingolibVersion : '', title, error),
+              onPress: async () =>
+                sendEmail(
+                  translate,
+                  zingolibVersion ? zingolibVersion : '',
+                  title,
+                  error,
+                ),
             },
             { text: translate('cancel') as string, style: 'cancel' },
           ],

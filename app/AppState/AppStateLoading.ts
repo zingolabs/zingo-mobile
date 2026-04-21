@@ -18,6 +18,4 @@ export default interface AppStateLoading {
   donationAlert: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
   hasRecoveryWalletInfoSaved: boolean;
-
-   
 }

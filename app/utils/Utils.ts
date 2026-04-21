@@ -44,7 +44,10 @@ export default class Utils {
 
     const { decimalSeparator } = getNumberFormatSettings();
 
-    const intPart = parseInt(Utils.parseNumberFloatToStringLocale(zecValue, 8), 10);
+    const intPart = parseInt(
+      Utils.parseNumberFloatToStringLocale(zecValue, 8),
+      10,
+    );
     let bigPart = Utils.parseNumberFloatToStringLocale(zecValue, 8);
     let smallPart = '';
     let decimalPart = '';
@@ -53,7 +56,10 @@ export default class Utils {
       decimalPart = bigPart.substr(bigPart.indexOf(`${decimalSeparator}`) + 1);
       if (decimalPart.length > 4) {
         smallPart = decimalPart.substr(4);
-        decimalPart = decimalPart.substr(0, decimalPart.length - smallPart.length);
+        decimalPart = decimalPart.substr(
+          0,
+          decimalPart.length - smallPart.length,
+        );
 
         // Pad the small part with trailing 0s
         while (smallPart.length < 4) {
@@ -116,7 +122,9 @@ export default class Utils {
   }
 
   // ZENNIES FOR ZINGO
-  static async getZenniesDonationAddress(chainName: ChainNameEnum): Promise<string> {
+  static async getZenniesDonationAddress(
+    chainName: ChainNameEnum,
+  ): Promise<string> {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
@@ -135,7 +143,9 @@ export default class Utils {
   }
 
   // NYM
-  static async getNymDonationAddress(chainName: ChainNameEnum): Promise<string> {
+  static async getNymDonationAddress(
+    chainName: ChainNameEnum,
+  ): Promise<string> {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
@@ -188,10 +198,15 @@ export default class Utils {
   static parseStringLocaleToNumberFloat(stringValue: string): number {
     const { decimalSeparator } = getNumberFormatSettings();
 
-    return Number(stringValue.replace(new RegExp(`\\${decimalSeparator}`), '.'));
+    return Number(
+      stringValue.replace(new RegExp(`\\${decimalSeparator}`), '.'),
+    );
   }
 
-  static parseNumberFloatToStringLocale(numberValue: number, toFixed: number): string {
+  static parseNumberFloatToStringLocale(
+    numberValue: number,
+    toFixed: number,
+  ): string {
     const { decimalSeparator } = getNumberFormatSettings();
 
     let stringValue = numberValue.toFixed(toFixed);
@@ -199,7 +214,11 @@ export default class Utils {
     return stringValue.replace(new RegExp('\\.'), `${decimalSeparator}`);
   }
 
-  static getBlockExplorerTxIDURL(txid: string, chainName: ChainNameEnum, blockExplorer: BlockExplorerEnum): string {
+  static getBlockExplorerTxIDURL(
+    txid: string,
+    chainName: ChainNameEnum,
+    blockExplorer: BlockExplorerEnum,
+  ): string {
     if (blockExplorer === BlockExplorerEnum.Zcashexplorer) {
       if (chainName === ChainNameEnum.testChainName) {
         return `https://testnet.zcashexplorer.app/transactions/${txid}`;
@@ -266,7 +285,12 @@ export default class Utils {
     const json: Promise<SendJsonToTypeType[][]> = Promise.all(
       [sendPageState.toaddr].map(async (to: ToAddrClass) => {
         const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
-        const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
+        const amount = parseInt(
+          (Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(
+            0,
+          ),
+          10,
+        );
 
         donationAddress =
           to.to === (await Utils.getDonationAddress(server.chainName)) ||
@@ -275,7 +299,10 @@ export default class Utils {
 
         if (memo === '') {
           return [{ address: to.to, amount } as SendJsonToTypeType];
-        } else if (Buffer.byteLength(memo, GlobalConst.utf8 as BufferEncoding) <= GlobalConst.memoMaxLength) {
+        } else if (
+          Buffer.byteLength(memo, GlobalConst.utf8 as BufferEncoding) <=
+          GlobalConst.memoMaxLength
+        ) {
           return [{ address: to.to, amount, memo } as SendJsonToTypeType];
         } else {
           // If the memo is more than 511 bytes, then we split it into multiple transactions.
@@ -286,7 +313,11 @@ export default class Utils {
           const tos = [];
 
           // The first one contains all the tx value
-          tos.push({ address: to.to, amount, memo: `(1/${splits.length})${splits[0]}` } as SendJsonToTypeType);
+          tos.push({
+            address: to.to,
+            amount,
+            memo: `(1/${splits.length})${splits[0]}`,
+          } as SendJsonToTypeType);
 
           for (let i = 1; i < splits.length; i++) {
             tos.push({
@@ -307,11 +338,20 @@ export default class Utils {
     // we need to exclude 2 use cases:
     // 2. send to one of our donation UA's
     // (make no sense to do a double donation)
-    if (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress) {
+    if (
+      donation &&
+      server.chainName === ChainNameEnum.mainChainName &&
+      !donationAddress
+    ) {
       donationTransaction.push({
         address: await Utils.getZenniesDonationAddress(server.chainName),
         amount: parseInt(
-          (Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount()) * 10 ** 8).toFixed(0),
+          (
+            Utils.parseStringLocaleToNumberFloat(
+              Utils.getZenniesDonationAmount(),
+            ) *
+            10 ** 8
+          ).toFixed(0),
           10,
         ),
         memo: '', // zancas decision to not leak info with no reason.
@@ -352,24 +392,36 @@ export default class Utils {
     }
 
     isValid =
-      resultJSON.status === RPCParseAddressStatusEnum.successAddressParse && resultJSON.chain_name === serverChainName;
+      resultJSON.status === RPCParseAddressStatusEnum.successAddressParse &&
+      resultJSON.chain_name === serverChainName;
     if (isValid) {
       isFullUA =
         resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
         !!resultJSON.receivers_available &&
-        resultJSON.receivers_available.includes(RPCReceiversEnum.orchardRPCReceiver) &&
-        resultJSON.receivers_available.includes(RPCReceiversEnum.saplingRPCReceiver) &&
-        resultJSON.receivers_available.includes(RPCReceiversEnum.transparentRPCReceiver);
+        resultJSON.receivers_available.includes(
+          RPCReceiversEnum.orchardRPCReceiver,
+        ) &&
+        resultJSON.receivers_available.includes(
+          RPCReceiversEnum.saplingRPCReceiver,
+        ) &&
+        resultJSON.receivers_available.includes(
+          RPCReceiversEnum.transparentRPCReceiver,
+        );
       if (isFullUA) {
         // the only use case for this is: if the UA is full (3 receivers)
-        onlyOrchardUA = resultJSON.only_orchard_ua ? resultJSON.only_orchard_ua : '';
+        onlyOrchardUA = resultJSON.only_orchard_ua
+          ? resultJSON.only_orchard_ua
+          : '';
       }
     }
 
     return { isValid, onlyOrchardUA };
   }
 
-  static async isValidOrchardOrSaplingAddress(address: string, serverChainName: string): Promise<boolean> {
+  static async isValidOrchardOrSaplingAddress(
+    address: string,
+    serverChainName: string,
+  ): Promise<boolean> {
     //const start = Date.now();
     const result: string = await RPCModule.parseAddressInfo(address);
     //console.log('=========================================== > parse address - ', Date.now() - start);
@@ -428,7 +480,9 @@ export default class Utils {
     }
   };
 
-  static splitMemo = (memos: string[] | undefined): { memo: string; memoUA: string } => {
+  static splitMemo = (
+    memos: string[] | undefined,
+  ): { memo: string; memoUA: string } => {
     const memoTotal = memos && memos.length > 0 ? memos.join('\n') : '';
     if (memoTotal.includes(GlobalConst.replyTo)) {
       let memoArray = memoTotal.split(GlobalConst.replyTo);
@@ -439,13 +493,24 @@ export default class Utils {
     return { memo: memoTotal, memoUA: '' };
   };
 
-  static buildMemo = (memo: string | undefined, includeUAMemo: boolean, uAddress: string): string => {
+  static buildMemo = (
+    memo: string | undefined,
+    includeUAMemo: boolean,
+    uAddress: string,
+  ): string => {
     return `${memo || ''}${includeUAMemo ? GlobalConst.replyTo + uAddress : ''}`;
   };
 
-  static countMemoBytes = (memo: string | undefined, includeUAMemo: boolean, uAddress: string): number => {
+  static countMemoBytes = (
+    memo: string | undefined,
+    includeUAMemo: boolean,
+    uAddress: string,
+  ): number => {
     const memoTotal = Utils.buildMemo(memo, includeUAMemo, uAddress);
-    const len = Buffer.byteLength(memoTotal, GlobalConst.utf8 as BufferEncoding);
+    const len = Buffer.byteLength(
+      memoTotal,
+      GlobalConst.utf8 as BufferEncoding,
+    );
     return len;
   };
 

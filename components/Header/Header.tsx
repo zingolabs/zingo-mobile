@@ -127,7 +127,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     backgroundSyncInfo,
   } = context;
 
-  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
+  let translate: (key: string) => TranslateType,
+    netInfo: NetInfoType,
+    mode: ModeEnum,
+    privacy: boolean;
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -154,7 +157,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const opacityValue = useRef(new Animated.Value(1)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
-  const [percentageOutputsScanned, setPercentageOutputsScanned] = useState<number>(0);
+  const [percentageOutputsScanned, setPercentageOutputsScanned] =
+    useState<number>(0);
   const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
   const [shieldingFee, setShieldingFee] = useState<number>(0);
   const [viewSyncStatus, setViewSyncStatus] = useState<boolean>(false);
@@ -171,19 +175,24 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setSyncInProgress(true);
     } else {
       setPercentageOutputsScanned(
-        syncingStatus.percentage_total_outputs_scanned 
-          ?? syncingStatus.percentage_total_blocks_scanned
-          ?? 0,
+        syncingStatus.percentage_total_outputs_scanned ??
+          syncingStatus.percentage_total_blocks_scanned ??
+          0,
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
-        syncingStatus.scan_ranges.length > 0 &&
-        (syncingStatus.percentage_total_outputs_scanned 
-          ?? syncingStatus.percentage_total_blocks_scanned 
-          ?? 0) < 100,
+          syncingStatus.scan_ranges.length > 0 &&
+          (syncingStatus.percentage_total_outputs_scanned ??
+            syncingStatus.percentage_total_blocks_scanned ??
+            0) < 100,
       );
     }
-  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.percentage_total_blocks_scanned, syncingStatus.scan_ranges]);
+  }, [
+    syncingStatus,
+    syncingStatus.percentage_total_outputs_scanned,
+    syncingStatus.percentage_total_blocks_scanned,
+    syncingStatus.scan_ranges,
+  ]);
 
   useEffect(() => {
     // when the App is syncing this can fired a lot of times
@@ -218,7 +227,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     };
 
     if (
-      !readOnly && setShieldingAmount && selectServer !== SelectServerEnum.offline && somePending
+      !readOnly &&
+      setShieldingAmount &&
+      selectServer !== SelectServerEnum.offline &&
+      somePending
         ? 0
         : (totalBalance ? totalBalance.confirmedTransparentBalance : 0) > 0
     ) {
@@ -226,13 +238,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         let proposeFee = 0;
         let proposeAmount = 0;
         const runProposeStr = await runShieldPropose();
-        if (runProposeStr && runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+        if (
+          runProposeStr &&
+          runProposeStr.toLowerCase().startsWith(GlobalConst.error)
+        ) {
           // snack with error
           console.log('Error shield proposing', runProposeStr);
           //Alert.alert('Calculating the FEE', runProposeStr);
         } else {
           try {
-            const runProposeJson: RPCShieldProposeType = await JSON.parse(runProposeStr);
+            const runProposeJson: RPCShieldProposeType =
+              await JSON.parse(runProposeStr);
             if (runProposeJson.error) {
               // snack with error
               console.log('Error shield proposing', runProposeJson.error);
@@ -261,11 +277,20 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setShieldingFee(0);
       setShieldingAmount && setShieldingAmount(0);
     }
-  }, [readOnly, setShieldingAmount, totalBalance, totalBalance?.confirmedTransparentBalance, somePending, selectServer]);
+  }, [
+    readOnly,
+    setShieldingAmount,
+    totalBalance,
+    totalBalance?.confirmedTransparentBalance,
+    somePending,
+    selectServer,
+  ]);
 
   useEffect(() => {
     setShowShieldButton(
-      !readOnly && selectServer !== SelectServerEnum.offline && (somePending ? 0 : shieldingAmount) > 0,
+      !readOnly &&
+        selectServer !== SelectServerEnum.offline &&
+        (somePending ? 0 : shieldingAmount) > 0,
     );
   }, [readOnly, shieldingAmount, somePending, selectServer]);
 
@@ -288,7 +313,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       return;
     }
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
+      addLastSnackbar({
+        message: translate('loadedapp.connection-error') as string,
+        screenName: [screenName],
+      });
       return;
     }
 
@@ -409,7 +437,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }, [syncInProgress, noSyncingStatus]);
 
   const calculateAmountToShield = (): string => {
-    return Utils.parseNumberFloatToStringLocale(somePending ? 0 : shieldingAmount, 8);
+    return Utils.parseNumberFloatToStringLocale(
+      somePending ? 0 : shieldingAmount,
+      8,
+    );
   };
 
   const calculatePoolsToShield = (): string => {
@@ -433,7 +464,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   };
 
   const ufvkShowModal = async () => {
-    const resultBio = security.seedUfvkScreen ? await simpleBiometrics({ translate: translate }) : true;
+    const resultBio = security.seedUfvkScreen
+      ? await simpleBiometrics({ translate: translate })
+      : true;
     // can be:
     // - true      -> the user do pass the authentication
     // - false     -> the user do NOT pass the authentication
@@ -442,11 +475,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (resultBio === false) {
       // snack with Error & closing the menu.
       if (addLastSnackbar) {
-        addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
+        addLastSnackbar({
+          message: translate('biometrics-error') as string,
+          screenName: [screenName],
+        });
       }
     } else {
-      navigation.navigate(RouteEnum.Ufvk, { 
-        action: UfvkActionEnum.view 
+      navigation.navigate(RouteEnum.Ufvk, {
+        action: UfvkActionEnum.view,
       });
     }
   };
@@ -466,13 +502,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             screenName: [screenName],
           });
         setPrivacyOption && setPrivacyOption(!privacy);
-      }}>
+      }}
+    >
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-        }}>
+        }}
+      >
         <View
           style={{
             display: 'flex',
@@ -485,11 +523,16 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             padding: 0,
             minWidth: 25,
             minHeight: 25,
-          }}>
+          }}
+        >
           {privacy ? (
             <FontAwesomeIcon icon={faLock} size={25} color={colors.primary} />
           ) : (
-            <FontAwesomeIcon icon={faLockOpen} size={25} color={colors.primaryDisabled} />
+            <FontAwesomeIcon
+              icon={faLockOpen}
+              size={25}
+              color={colors.primaryDisabled}
+            />
           )}
         </View>
       </View>
@@ -510,7 +553,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             backgroundColor: colors.card,
             paddingTop: 10,
             minHeight: !noDrawMenu ? 60 : 25,
-          }}>
+          }}
+        >
           <View
             style={{
               display: 'flex',
@@ -520,7 +564,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               flexWrap: 'wrap',
               marginTop: 12,
               marginHorizontal: 5,
-            }}>
+            }}
+          >
             {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
               <View style={{ minHeight: 29, flexDirection: 'row' }}>
                 {netInfo.isConnected && !(percentageOutputsScanned === 0) ? (
@@ -538,7 +583,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           borderRadius: 10,
                           minWidth: 25,
                           minHeight: 25,
-                        }}>
+                        }}
+                      >
                         <View
                           testID="header.checkicon"
                           style={{
@@ -546,10 +592,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                             justifyContent: 'center',
                             alignItems: 'center',
                             padding: 3,
-                          }}>
-                          <FontAwesomeIcon icon={faCheck} color={colors.primary} size={19} />
+                          }}
+                        >
+                          <FontAwesomeIcon
+                            icon={faCheck}
+                            color={colors.primary}
+                            size={19}
+                          />
                           {viewSyncStatus && (
-                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{translate('synced') as string}</FadeText>
+                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                              {translate('synced') as string}
+                            </FadeText>
                           )}
                         </View>
                       </View>
@@ -567,7 +620,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           borderRadius: 10,
                           minWidth: 25,
                           minHeight: 25,
-                        }}>
+                        }}
+                      >
                         <Animated.View
                           style={{
                             opacity: opacityValue,
@@ -575,41 +629,80 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                             justifyContent: 'center',
                             alignItems: 'center',
                             padding: 3,
-                          }}>
+                          }}
+                        >
                           {mode === ModeEnum.basic ? (
-                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                              <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={19} />
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <FontAwesomeIcon
+                                icon={faPlay}
+                                color={colors.syncing}
+                                size={19}
+                              />
                               {viewSyncStatus && (
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                                <FadeText
+                                  style={{ fontSize: 10, marginLeft: 2 }}
+                                >
                                   {translate('syncing') as string}
                                 </FadeText>
                               )}
-                              {viewSyncStatus && percentageOutputsScanned > 0 && (
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
-                              )}
+                              {viewSyncStatus &&
+                                percentageOutputsScanned > 0 && (
+                                  <FadeText
+                                    style={{ fontSize: 10, marginLeft: 2 }}
+                                  >
+                                    {' - '}
+                                  </FadeText>
+                                )}
                               {percentageOutputsScanned > 0 && (
                                 <FadeText
-                                  style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
+                                  style={{ fontSize: 10, marginLeft: 2 }}
+                                >{` ${percentageOutputsScanned}%`}</FadeText>
                               )}
                             </View>
                           ) : (
-                            <TouchableOpacity testID="header.playicon" onPress={() => {
+                            <TouchableOpacity
+                              testID="header.playicon"
+                              onPress={() => {
                                 navigation.navigate(RouteEnum.SyncReport);
                               }}
                             >
-                              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={19} />
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                }}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faPlay}
+                                  color={colors.syncing}
+                                  size={19}
+                                />
                                 {viewSyncStatus && (
-                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                                  <FadeText
+                                    style={{ fontSize: 10, marginLeft: 2 }}
+                                  >
                                     {translate('syncing') as string}
                                   </FadeText>
                                 )}
-                                {viewSyncStatus && percentageOutputsScanned > 0 && (
-                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
-                                )}
+                                {viewSyncStatus &&
+                                  percentageOutputsScanned > 0 && (
+                                    <FadeText
+                                      style={{ fontSize: 10, marginLeft: 2 }}
+                                    >
+                                      {' - '}
+                                    </FadeText>
+                                  )}
                                 {percentageOutputsScanned > 0 && (
                                   <FadeText
-                                    style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
+                                    style={{ fontSize: 10, marginLeft: 2 }}
+                                  >{` ${percentageOutputsScanned}%`}</FadeText>
                                 )}
                               </View>
                             </TouchableOpacity>
@@ -633,8 +726,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           borderRadius: 10,
                           minWidth: 25,
                           minHeight: 25,
-                        }}>
-                        <TouchableOpacity onPress={() => {
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => {
                             navigation.navigate(RouteEnum.SyncReport);
                           }}
                         >
@@ -645,8 +740,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                               justifyContent: 'center',
                               alignItems: 'center',
                               padding: 3,
-                            }}>
-                            <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={19} />
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={faWifi}
+                              color={colors.primaryDisabled}
+                              size={19}
+                            />
                             {false && (
                               <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                                 {translate('connecting') as string}
@@ -670,7 +770,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                       padding: 0,
                       minWidth: 25,
                       minHeight: 25,
-                    }}>
+                    }}
+                  >
                     {mode === ModeEnum.basic ? (
                       <FontAwesomeIcon
                         icon={faCloudDownload}
@@ -678,7 +779,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         size={20}
                       />
                     ) : (
-                      <TouchableOpacity onPress={() => {
+                      <TouchableOpacity
+                        onPress={() => {
                           navigation.navigate(RouteEnum.SyncReport);
                         }}
                       >
@@ -707,7 +809,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   borderRadius: 10,
                   minWidth: 25,
                   minHeight: 25,
-                }}>
+                }}
+              >
                 <View
                   testID="header.offlineicon"
                   style={{
@@ -715,7 +818,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     justifyContent: 'center',
                     alignItems: 'center',
                     paddingHorizontal: 3,
-                  }}>
+                  }}
+                >
                   <FontAwesomeIcon icon={faWifi} color={'red'} size={18} />
                   <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                     {translate('settings.server-offline') as string}
@@ -729,25 +833,29 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               addLastSnackbar &&
               noBalance &&
               privacyComponent()}
-            {!noSyncingStatus && !!backgroundSyncInfo.error && mode === ModeEnum.advanced && (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  marginHorizontal: 5,
-                  padding: 0,
-                  minWidth: 25,
-                  minHeight: 25,
-                }}>
-                <TouchableOpacity onPress={() => {
-                    navigation.navigate(RouteEnum.SyncReport);
+            {!noSyncingStatus &&
+              !!backgroundSyncInfo.error &&
+              mode === ModeEnum.advanced && (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: 0,
+                    marginHorizontal: 5,
+                    padding: 0,
+                    minWidth: 25,
+                    minHeight: 25,
                   }}
                 >
-                  <TriangleAlert color={colors.warning.primary} size={24} />
-                </TouchableOpacity>
-              </View>
-            )}
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate(RouteEnum.SyncReport);
+                    }}
+                  >
+                    <TriangleAlert color={colors.warning.primary} size={24} />
+                  </TouchableOpacity>
+                </View>
+              )}
           </View>
 
           {!noBalance && (
@@ -757,26 +865,35 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: 0,
-              }}>
-              {mode !== ModeEnum.basic && !noPrivacy && setPrivacyOption && addLastSnackbar && privacyComponent()}
+              }}
+            >
+              {mode !== ModeEnum.basic &&
+                !noPrivacy &&
+                setPrivacyOption &&
+                addLastSnackbar &&
+                privacyComponent()}
               <ZecAmount
                 currencyName={info.currencyName}
                 color={colors.text}
                 size={36}
-                amtZec={totalBalance
-                  ? totalBalance.totalOrchardBalance +
-                    totalBalance.totalSaplingBalance +
-                    totalBalance.totalTransparentBalance
-                  : 0}
+                amtZec={
+                  totalBalance
+                    ? totalBalance.totalOrchardBalance +
+                      totalBalance.totalSaplingBalance +
+                      totalBalance.totalTransparentBalance
+                    : 0
+                }
                 privacy={privacy}
                 smallPrefix={true}
               />
               {mode !== ModeEnum.basic &&
                 totalBalance &&
-                (totalBalance.totalOrchardBalance !== totalBalance.confirmedOrchardBalance ||
+                (totalBalance.totalOrchardBalance !==
+                  totalBalance.confirmedOrchardBalance ||
                   totalBalance.totalSaplingBalance > 0 ||
                   totalBalance.totalTransparentBalance > 0) && (
-                  <TouchableOpacity onPress={() => {
+                  <TouchableOpacity
+                    onPress={() => {
                       navigation.navigate(RouteEnum.Pools);
                     }}
                   >
@@ -793,103 +910,159 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         padding: 0,
                         minWidth: 25,
                         minHeight: 25,
-                      }}>
-                      <FontAwesomeIcon icon={faInfoCircle} size={25} color={colors.primary} />
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        size={25}
+                        color={colors.primary}
+                      />
                     </View>
                   </TouchableOpacity>
                 )}
             </View>
           )}
 
-          {receivedLegend && totalBalance && totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 && (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: 0,
-              }}>
-              <RegText color={colors.primary}>{translate('seed.youreceived') as string}</RegText>
-              <ZecAmount
-                currencyName={info.currencyName}
-                color={colors.primary}
-                size={18}
-                amtZec={totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance}
-                privacy={privacy}
-              />
-              <RegText color={colors.primary}>!!!</RegText>
-            </View>
-          )}
+          {receivedLegend &&
+            totalBalance &&
+            totalBalance.totalOrchardBalance +
+              totalBalance.totalSaplingBalance >
+              0 && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                }}
+              >
+                <RegText color={colors.primary}>
+                  {translate('seed.youreceived') as string}
+                </RegText>
+                <ZecAmount
+                  currencyName={info.currencyName}
+                  color={colors.primary}
+                  size={18}
+                  amtZec={
+                    totalBalance.totalOrchardBalance +
+                    totalBalance.totalSaplingBalance
+                  }
+                  privacy={privacy}
+                />
+                <RegText color={colors.primary}>!!!</RegText>
+              </View>
+            )}
 
-          {(currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) &&
+          {(currency === CurrencyEnum.USDCurrency ||
+            currency === CurrencyEnum.USDTORCurrency) &&
             !noBalance &&
             selectServer !== SelectServerEnum.offline && (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <CurrencyAmount
                   style={{ marginTop: 0, marginBottom: 0 }}
                   price={zecPrice.zecPrice}
-                  amtZec={totalBalance
-                    ? totalBalance.totalOrchardBalance +
-                      totalBalance.totalSaplingBalance +
-                      totalBalance.totalTransparentBalance
-                    : 0}
+                  amtZec={
+                    totalBalance
+                      ? totalBalance.totalOrchardBalance +
+                        totalBalance.totalSaplingBalance +
+                        totalBalance.totalTransparentBalance
+                      : 0
+                  }
                   currency={currency}
                   privacy={privacy}
                 />
                 <View style={{ marginLeft: 5 }}>
-                  <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} />
+                  <PriceFetcher
+                    setZecPrice={setZecPrice}
+                    screenName={screenName}
+                  />
                 </View>
               </View>
             )}
 
-          {showShieldButton && !noBalance && !calculateDisableButtonToShield() && valueTransfersTotal !== null && (
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              <FadeText style={{ fontSize: 8 }}>
-                {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
-                  ` ${calculateAmountToShield()} ` +
-                  (translate('send.fee') as string) +
-                  ': ' +
-                  Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
-                  ' '}
-              </FadeText>
-              <View style={{ margin: 5, flexDirection: 'row' }}>
-                <Button
-                  testID="header.shield"
-                  type={ButtonTypeEnum.Primary}
-                  title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
-                  onPress={onPressShieldFunds}
-                  disabled={calculateDisableButtonToShield()}
-                />
+          {showShieldButton &&
+            !noBalance &&
+            !calculateDisableButtonToShield() &&
+            valueTransfersTotal !== null && (
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <FadeText style={{ fontSize: 8 }}>
+                  {(translate(
+                    `history.shield-legend-${calculatePoolsToShield()}`,
+                  ) as string) +
+                    ` ${calculateAmountToShield()} ` +
+                    (translate('send.fee') as string) +
+                    ': ' +
+                    Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
+                    ' '}
+                </FadeText>
+                <View style={{ margin: 5, flexDirection: 'row' }}>
+                  <Button
+                    testID="header.shield"
+                    type={ButtonTypeEnum.Primary}
+                    title={
+                      translate(
+                        `history.shield-${calculatePoolsToShield()}`,
+                      ) as string
+                    }
+                    onPress={onPressShieldFunds}
+                    disabled={calculateDisableButtonToShield()}
+                  />
+                </View>
               </View>
-            </View>
-          )}
+            )}
         </View>
         <View
           style={{
             padding: 11.5,
             position: 'absolute',
             left: 0,
-          }}>
-          <View style={{ alignItems: 'center', flexDirection: 'row', height: 40 }}>
+          }}
+        >
+          <View
+            style={{ alignItems: 'center', flexDirection: 'row', height: 40 }}
+          >
             {!noDrawMenu && (
               <TouchableOpacity
                 style={{ marginRight: 5 }}
                 testID="header.drawmenu"
                 accessible={true}
                 accessibilityLabel={translate('menudrawer-acc') as string}
-                onPress={toggleMenuDrawer}>
-                <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
+                onPress={toggleMenuDrawer}
+              >
+                <FontAwesomeIcon
+                  icon={faBars}
+                  size={40}
+                  color={colors.border}
+                />
               </TouchableOpacity>
             )}
             {readOnly && !noUfvkIcon && (
               <>
-                {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal <= 0) &&
-                !(mode === ModeEnum.basic && totalBalance && totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance <= 0) ? (
+                {!(
+                  mode === ModeEnum.basic &&
+                  valueTransfersTotal !== null &&
+                  valueTransfersTotal <= 0
+                ) &&
+                !(
+                  mode === ModeEnum.basic &&
+                  totalBalance &&
+                  totalBalance.totalOrchardBalance +
+                    totalBalance.totalSaplingBalance <=
+                    0
+                ) ? (
                   <TouchableOpacity onPress={() => ufvkShowModal()}>
-                    <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
+                    <FontAwesomeIcon
+                      icon={faSnowflake}
+                      size={24}
+                      color={colors.zingo}
+                    />
                   </TouchableOpacity>
                 ) : (
-                  <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
+                  <FontAwesomeIcon
+                    icon={faSnowflake}
+                    size={24}
+                    color={colors.zingo}
+                  />
                 )}
               </>
             )}
@@ -901,14 +1074,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             padding: 13,
             position: 'absolute',
             right: 0,
-          }}>
+          }}
+        >
           {!noDrawMenu && screenName !== ScreenEnum.Settings ? (
             <>
               <TouchableOpacity
                 style={{ marginRight: 5 }}
                 testID="header.drawmenu"
                 onPress={async () => {
-                  const resultBio = security.settingsScreen ? await simpleBiometrics({ translate: translate }) : true;
+                  const resultBio = security.settingsScreen
+                    ? await simpleBiometrics({ translate: translate })
+                    : true;
                   // can be:
                   // - true      -> the user do pass the authentication
                   // - false     -> the user do NOT pass the authentication
@@ -917,19 +1093,32 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   if (resultBio === false) {
                     // snack with Error & closing the menu.
                     if (addLastSnackbar) {
-                      addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
+                      addLastSnackbar({
+                        message: translate('biometrics-error') as string,
+                        screenName: [screenName],
+                      });
                     }
                   } else {
                     navigation.navigate(RouteEnum.Settings);
                   }
-                }}>
-                <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faGear}
+                  size={35}
+                  color={colors.border}
+                />
               </TouchableOpacity>
             </>
           ) : (
             <Image
               source={require('../../assets/img/logobig-zingo.png')}
-              style={{ width: 38, height: 38, resizeMode: 'contain', borderRadius: 10 }}
+              style={{
+                width: 38,
+                height: 38,
+                resizeMode: 'contain',
+                borderRadius: 10,
+              }}
             />
           )}
         </View>
@@ -944,7 +1133,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             flexWrap: 'wrap',
             width: '100%',
             marginVertical: 5,
-          }}>
+          }}
+        >
           {closeScreen ? (
             <>
               <TouchableOpacity onPress={() => closeScreen()}>
@@ -955,7 +1145,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   color={colors.primary}
                 />
               </TouchableOpacity>
-              <RegText testID={testID} color={colors.money} style={{ paddingHorizontal: 5 }}>
+              <RegText
+                testID={testID}
+                color={colors.money}
+                style={{ paddingHorizontal: 5 }}
+              >
                 {title}
               </RegText>
               <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
@@ -963,7 +1157,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           ) : (
             <>
               <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-              <RegText testID={testID} color={colors.money} style={{ paddingHorizontal: 5, textAlign: 'center' }}>
+              <RegText
+                testID={testID}
+                color={colors.money}
+                style={{ paddingHorizontal: 5, textAlign: 'center' }}
+              >
                 {title}
               </RegText>
               <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
@@ -971,7 +1169,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           )}
         </View>
 
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
+        <View
+          style={{ width: '100%', height: 1, backgroundColor: colors.primary }}
+        />
       </View>
     </>
   );

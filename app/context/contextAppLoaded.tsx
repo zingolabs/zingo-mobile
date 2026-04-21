@@ -94,6 +94,13 @@ type ContextProviderProps = {
   value: AppContextLoaded;
 };
 
-export const ContextAppLoadedProvider = ({ children, value }: ContextProviderProps) => {
-  return <ContextAppLoaded.Provider value={value}>{children}</ContextAppLoaded.Provider>;
+export const ContextAppLoadedProvider = ({
+  children,
+  value,
+}: ContextProviderProps) => {
+  return (
+    <ContextAppLoaded.Provider value={value}>
+      {children}
+    </ContextAppLoaded.Provider>
+  );
 };

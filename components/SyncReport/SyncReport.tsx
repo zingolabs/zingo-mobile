@@ -28,28 +28,31 @@ import { sendEmail } from '../../app/sendEmail';
 import Utils from '../../app/utils';
 //import { ModeEnum } from '../../app/AppState';
 
-type SyncReportProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.SyncReport>;
+type SyncReportProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.SyncReport
+>;
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { 
-    syncingStatus, 
-    wallet, 
-    translate, 
-    backgroundSyncInfo, 
-    language, 
-    netInfo, 
-    snackbars, 
-    removeFirstSnackbar, 
+  const {
+    syncingStatus,
+    wallet,
+    translate,
+    backgroundSyncInfo,
+    language,
+    netInfo,
+    snackbars,
+    removeFirstSnackbar,
     info,
     zingolibVersion,
     setBackgroundError,
     addLastSnackbar,
     setBackgroundSyncErrorInfo,
   } = context; //mode
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.SyncReport;
 
@@ -62,7 +65,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const [server2Percent, setServer2Percent] = useState<number>(0);
   const [server3Percent, setServer3Percent] = useState<number>(0);
 
-  const [percentageOutputsScanned, setPercentageOutputsScanned] = useState<number>(0);
+  const [percentageOutputsScanned, setPercentageOutputsScanned] =
+    useState<number>(0);
   const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
 
   useEffect(() => {
@@ -73,8 +77,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     if (info.latestBlock) {
       (async () => {
         const a = [
-          0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000, 5500000, 6000000,
-          6500000, 7000000, 7500000, 8000000, 8500000, 9000000, 9500000, 10000000,
+          0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000,
+          4000000, 4500000, 5000000, 5500000, 6000000, 6500000, 7000000,
+          7500000, 8000000, 8500000, 9000000, 9500000, 10000000,
         ];
         const l = [
           '0',
@@ -123,19 +128,24 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       setSyncInProgress(true);
     } else {
       setPercentageOutputsScanned(
-        syncingStatus.percentage_total_outputs_scanned 
-          ?? syncingStatus.percentage_total_blocks_scanned
-          ?? 0,
+        syncingStatus.percentage_total_outputs_scanned ??
+          syncingStatus.percentage_total_blocks_scanned ??
+          0,
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
-        syncingStatus.scan_ranges.length > 0 &&
-        (syncingStatus.percentage_total_outputs_scanned 
-          ?? syncingStatus.percentage_total_blocks_scanned 
-          ?? 0) < 100,
+          syncingStatus.scan_ranges.length > 0 &&
+          (syncingStatus.percentage_total_outputs_scanned ??
+            syncingStatus.percentage_total_blocks_scanned ??
+            0) < 100,
       );
     }
-  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.percentage_total_blocks_scanned, syncingStatus.scan_ranges]);
+  }, [
+    syncingStatus,
+    syncingStatus.percentage_total_outputs_scanned,
+    syncingStatus.percentage_total_blocks_scanned,
+    syncingStatus.scan_ranges,
+  ]);
 
   useEffect(() => {
     /*
@@ -148,7 +158,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
     const serv1: number = wallet.birthday || 0;
     const serv2: number =
-      info.latestBlock && wallet.birthday ? info.latestBlock - wallet.birthday : 0;
+      info.latestBlock && wallet.birthday
+        ? info.latestBlock - wallet.birthday
+        : 0;
     const serv3: number = maxBlocks ? maxBlocks - serv1 - serv2 : 0;
     const serv1Percent: number = (serv1 * 100) / maxBlocks;
     const serv2Percent: number = (serv2 * 100) / maxBlocks;
@@ -161,18 +173,16 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
     const servServer: number = info.latestBlock || 0;
     const servWallet: number =
-      info.latestBlock && wallet.birthday ? info.latestBlock - wallet.birthday : 0;
+      info.latestBlock && wallet.birthday
+        ? info.latestBlock - wallet.birthday
+        : 0;
 
     setServerServer(servServer);
     setServerWallet(servWallet);
     setServer1Percent(serv1Percent);
     setServer2Percent(serv2Percent);
     setServer3Percent(serv3Percent);
-  }, [
-    maxBlocks,
-    info.latestBlock,
-    wallet.birthday,
-  ]);
+  }, [maxBlocks, info.latestBlock, wallet.birthday]);
 
   const reportError = (error: string) => {
     createAlert(
@@ -203,7 +213,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
         <Header
           title={translate('report.title') as string}
           screenName={screenName}
@@ -226,23 +237,41 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             flexDirection: 'column',
             alignItems: 'stretch',
             justifyContent: 'flex-start',
-          }}>
-          {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
+          }}
+        >
+          {(!netInfo.isConnected ||
+            netInfo.type === NetInfoStateType.cellular ||
+            netInfo.isConnectionExpensive) && (
             <View
               style={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'flex-end',
                 marginHorizontal: 20,
-              }}>
-              <DetailLine label={translate('report.networkstatus') as string} screenName={screenName}>
+              }}
+            >
+              <DetailLine
+                label={translate('report.networkstatus') as string}
+                screenName={screenName}
+              >
                 <View style={{ display: 'flex', flexDirection: 'column' }}>
-                  {!netInfo.isConnected && <RegText color="red"> {translate('report.nointernet') as string} </RegText>}
+                  {!netInfo.isConnected && (
+                    <RegText color="red">
+                      {' '}
+                      {translate('report.nointernet') as string}{' '}
+                    </RegText>
+                  )}
                   {netInfo.type === NetInfoStateType.cellular && (
-                    <RegText color="yellow"> {translate('report.cellulardata') as string} </RegText>
+                    <RegText color="yellow">
+                      {' '}
+                      {translate('report.cellulardata') as string}{' '}
+                    </RegText>
                   )}
                   {netInfo.isConnectionExpensive && (
-                    <RegText color="yellow"> {translate('report.connectionexpensive') as string} </RegText>
+                    <RegText color="yellow">
+                      {' '}
+                      {translate('report.connectionexpensive') as string}{' '}
+                    </RegText>
                   )}
                 </View>
               </DetailLine>
@@ -256,18 +285,33 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           )}
           {!!maxBlocks && netInfo.isConnected ? (
             <>
-              <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
+              <View
+                style={{
+                  display: 'flex',
+                  marginHorizontal: 20,
+                  marginBottom: 30,
+                }}
+              >
                 <DetailLine
                   label={translate('report.syncstatus') as string}
                   value={
-                      syncInProgress
-                        ? ((translate('report.running') as string) + ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned + '%' : ''}`)
-                        : (translate('report.finished') as string)
+                    syncInProgress
+                      ? (translate('report.running') as string) +
+                        ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned + '%' : ''}`
+                      : (translate('report.finished') as string)
                   }
                   screenName={screenName}
                 />
 
-                <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
+                <View
+                  style={{
+                    height: 2,
+                    width: '100%',
+                    backgroundColor: 'white',
+                    marginTop: 15,
+                    marginBottom: 10,
+                  }}
+                />
 
                 {!!maxBlocks && serverServer > 0 && serverWallet > 0 && (
                   <>
@@ -278,14 +322,21 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                         width: '100%',
                         justifyContent: 'space-between',
                         marginTop: 10,
-                      }}>
+                      }}
+                    >
                       {labels.map((label: string) => (
                         <Text key={label} style={{ color: colors.primary }}>
                           {label}
                         </Text>
                       ))}
                     </View>
-                    <View style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        width: '100%',
+                      }}
+                    >
                       {points.map((point: number) => (
                         <View
                           key={point}
@@ -309,7 +360,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                         borderBottomColor: colors.primary,
                         borderBottomWidth: 2,
                         marginBottom: 0,
-                      }}>
+                      }}
+                    >
                       {server1Percent >= 0 && (
                         <View
                           style={{
@@ -357,8 +409,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                           justifyContent: 'flex-start',
                           alignItems: 'center',
                           marginTop: 5,
-                        }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.server-title') as string}</Text>
+                        }}
+                      >
+                        <Text style={{ color: colors.primary }}>
+                          {translate('report.server-title') as string}
+                        </Text>
                         <View
                           style={{
                             display: 'flex',
@@ -371,7 +426,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                           }}
                         />
                         <Text style={{ color: colors.text }}>
-                          {serverServer + (translate('report.blocks') as string)}
+                          {serverServer +
+                            (translate('report.blocks') as string)}
                         </Text>
                       </View>
                     )}
@@ -384,8 +440,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                           justifyContent: 'flex-start',
                           alignItems: 'center',
                           marginTop: 5,
-                        }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.wallet') as string}</Text>
+                        }}
+                      >
+                        <Text style={{ color: colors.primary }}>
+                          {translate('report.wallet') as string}
+                        </Text>
                         <View
                           style={{
                             display: 'flex',
@@ -397,14 +456,24 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                             margin: 5,
                           }}
                         />
-                        <Text testID="syncreport.wallettotalblocks" style={{ color: colors.text }}>
-                          {serverWallet + (translate('report.blocks') as string)}
+                        <Text
+                          testID="syncreport.wallettotalblocks"
+                          style={{ color: colors.text }}
+                        >
+                          {serverWallet +
+                            (translate('report.blocks') as string)}
                         </Text>
                       </View>
                     )}
 
                     <View
-                      style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
+                      style={{
+                        height: 2,
+                        width: '100%',
+                        backgroundColor: 'white',
+                        marginTop: 15,
+                        marginBottom: 10,
+                      }}
                     />
                   </>
                 )}
@@ -422,16 +491,25 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                           width: '100%',
                           justifyContent: 'space-between',
                           marginTop: 5,
-                        }}>
+                        }}
+                      >
                         <>
                           <Text style={{ color: colors.text }}>
                             {wallet.birthday}
                           </Text>
-                          <Text style={{ color: colors.text }}>{info.latestBlock}</Text>
+                          <Text style={{ color: colors.text }}>
+                            {info.latestBlock}
+                          </Text>
                         </>
                       </View>
                       <View
-                        style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: '100%',
+                          justifyContent: 'space-between',
+                        }}
+                      >
                         <>
                           <View
                             style={{
@@ -458,38 +536,54 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                           borderBottomColor: 'green',
                           borderBottomWidth: 0,
                           marginBottom: 0,
-                        }}>
-                        {!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.map((range: RPCSyncScanRangeStatusType) => {
-                          const percent: number = ((range.end_block - range.start_block) * 100) / (info.latestBlock - wallet.birthday);
-                          return <View
-                            key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
-                            style={{
-                              height: 15,
-                              width: `${percent}%`,
-                              backgroundColor:
-                                range.priority === RPCSyncScanRangePriorityStatusEnum.Scanning
-                                  ? 'orange' /* Scanning */
-                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned
-                                  ? 'green'  /* Scanned  */
-                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping
-                                  ? 'green'  /* Scanned  */
-                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.Historic
-                                  ? 'gray'   /* Low priority */
-                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.OpenAdjacent
-                                  ? 'blue'   /* High priority */
-                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.FoundNote
-                                  ? 'blue'   /* High priority */
-                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.ChainTip
-                                  ? 'blue'   /* High priority */
-                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.Verify
-                                  ? 'blue'   /* High priority */
-                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.RefetchingNullifiers
-                                  ? 'darkorange'   /* Refetching spends */
-                                  : 'red',   /* error somehow */
-                            }}
-                          />;
-                        }
-                        )}
+                        }}
+                      >
+                        {!!syncingStatus.scan_ranges &&
+                          syncingStatus.scan_ranges.map(
+                            (range: RPCSyncScanRangeStatusType) => {
+                              const percent: number =
+                                ((range.end_block - range.start_block) * 100) /
+                                (info.latestBlock - wallet.birthday);
+                              return (
+                                <View
+                                  key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
+                                  style={{
+                                    height: 15,
+                                    width: `${percent}%`,
+                                    backgroundColor:
+                                      range.priority ===
+                                      RPCSyncScanRangePriorityStatusEnum.Scanning
+                                        ? 'orange' /* Scanning */
+                                        : range.priority ===
+                                            RPCSyncScanRangePriorityStatusEnum.Scanned
+                                          ? 'green' /* Scanned  */
+                                          : range.priority ===
+                                              RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping
+                                            ? 'green' /* Scanned  */
+                                            : range.priority ===
+                                                RPCSyncScanRangePriorityStatusEnum.Historic
+                                              ? 'gray' /* Low priority */
+                                              : range.priority ===
+                                                  RPCSyncScanRangePriorityStatusEnum.OpenAdjacent
+                                                ? 'blue' /* High priority */
+                                                : range.priority ===
+                                                    RPCSyncScanRangePriorityStatusEnum.FoundNote
+                                                  ? 'blue' /* High priority */
+                                                  : range.priority ===
+                                                      RPCSyncScanRangePriorityStatusEnum.ChainTip
+                                                    ? 'blue' /* High priority */
+                                                    : range.priority ===
+                                                        RPCSyncScanRangePriorityStatusEnum.Verify
+                                                      ? 'blue' /* High priority */
+                                                      : range.priority ===
+                                                          RPCSyncScanRangePriorityStatusEnum.RefetchingNullifiers
+                                                        ? 'darkorange' /* Refetching spends */
+                                                        : 'red' /* error somehow */,
+                                  }}
+                                />
+                              );
+                            },
+                          )}
                       </View>
                     </DetailLine>
                     <DetailLine
@@ -504,13 +598,15 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                           alignItems: 'flex-start',
                           marginTop: 5,
                           marginLeft: 10,
-                        }}>
+                        }}
+                      >
                         <View
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
                             flexWrap: 'nowrap',
-                            }}>
+                          }}
+                        >
                           <View
                             style={{
                               display: 'flex',
@@ -531,7 +627,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                             display: 'flex',
                             flexDirection: 'row',
                             flexWrap: 'nowrap',
-                            }}>
+                          }}
+                        >
                           <View
                             style={{
                               display: 'flex',
@@ -552,7 +649,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                             display: 'flex',
                             flexDirection: 'row',
                             flexWrap: 'nowrap',
-                            }}>
+                          }}
+                        >
                           <View
                             style={{
                               display: 'flex',
@@ -573,7 +671,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                             display: 'flex',
                             flexDirection: 'row',
                             flexWrap: 'nowrap',
-                            }}>
+                          }}
+                        >
                           <View
                             style={{
                               display: 'flex',
@@ -594,7 +693,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                             display: 'flex',
                             flexDirection: 'row',
                             flexWrap: 'nowrap',
-                            }}>
+                          }}
+                        >
                           <View
                             style={{
                               display: 'flex',
@@ -617,50 +717,84 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               </View>
             </>
           ) : (
-            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 20,
+              }}
+            >
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
-          {(Number(backgroundSyncInfo.date) > 0 || Number(backgroundSyncInfo.dateEnd) > 0 || !!backgroundSyncInfo.message || !!backgroundSyncInfo.error) && (
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  marginHorizontal: 20,
-                  width: '100%',
-                  marginBottom: 20,
-                }}>
-                <DetailLine
-                  label={translate('report.lastbackgroundsync') as string}
-                  value={
-                    //background.batches.toString() +
-                    //translate('report.batches-date') +
-                    moment(Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
-                    (Number(backgroundSyncInfo.dateEnd) > 0 && Number(backgroundSyncInfo.date) !== Number(backgroundSyncInfo.dateEnd)
-                      ? (
-                        moment(Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000).format('YYYY MMM D') ===
-                        moment(Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D')
-                          ? ' - ' + moment(Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) * 1000).format('h:mm:ss a')
-                          : ' - ' + moment(Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
-                        )
-                      : '')
-                  }
-                  screenName={screenName}
+          {(Number(backgroundSyncInfo.date) > 0 ||
+            Number(backgroundSyncInfo.dateEnd) > 0 ||
+            !!backgroundSyncInfo.message ||
+            !!backgroundSyncInfo.error) && (
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                marginHorizontal: 20,
+                width: '100%',
+                marginBottom: 20,
+              }}
+            >
+              <DetailLine
+                label={translate('report.lastbackgroundsync') as string}
+                value={
+                  //background.batches.toString() +
+                  //translate('report.batches-date') +
+                  moment(
+                    Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000,
+                  ).format('YYYY MMM D h:mm:ss a') +
+                  (Number(backgroundSyncInfo.dateEnd) > 0 &&
+                  Number(backgroundSyncInfo.date) !==
+                    Number(backgroundSyncInfo.dateEnd)
+                    ? moment(
+                        Number(Number(backgroundSyncInfo.date).toFixed(0)) *
+                          1000,
+                      ).format('YYYY MMM D') ===
+                      moment(
+                        Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) *
+                          1000,
+                      ).format('YYYY MMM D')
+                      ? ' - ' +
+                        moment(
+                          Number(
+                            Number(backgroundSyncInfo.dateEnd).toFixed(0),
+                          ) * 1000,
+                        ).format('h:mm:ss a')
+                      : ' - ' +
+                        moment(
+                          Number(
+                            Number(backgroundSyncInfo.dateEnd).toFixed(0),
+                          ) * 1000,
+                        ).format('YYYY MMM D h:mm:ss a')
+                    : '')
+                }
+                screenName={screenName}
+              />
+              {!!backgroundSyncInfo.message && (
+                <RegText style={{ marginBottom: 20 }} color={colors.text}>
+                  {backgroundSyncInfo.message}
+                </RegText>
+              )}
+              {!!backgroundSyncInfo.error && (
+                <Button
+                  type={ButtonTypeEnum.Primary}
+                  title={translate('view-error') as string}
+                  onPress={() => {
+                    reportError(
+                      backgroundSyncInfo.error ? backgroundSyncInfo.error : '',
+                    );
+                  }}
+                  twoButtons={true}
                 />
-                {!!backgroundSyncInfo.message && <RegText style={{ marginBottom: 20}} color={colors.text}>{backgroundSyncInfo.message}</RegText>}
-                {!!backgroundSyncInfo.error && (
-                  <Button
-                    type={ButtonTypeEnum.Primary}
-                    title={translate('view-error') as string}
-                    onPress={() => {
-                      reportError(backgroundSyncInfo.error ? backgroundSyncInfo.error : '');
-                    }}
-                    twoButtons={true}
-                  />
-                )}
-              </View>
-            )}
+              )}
+            </View>
+          )}
         </ScrollView>
       </View>
     </ToastProvider>

@@ -1,4 +1,8 @@
-import { PoolEnum, ValueTransferType, ValueTransferKindEnum } from '../../app/AppState';
+import {
+  PoolEnum,
+  ValueTransferType,
+  ValueTransferKindEnum,
+} from '../../app/AppState';
 import { RPCValueTransfersStatusEnum } from '../../app/rpc/enums/RPCValueTransfersStatusEnum';
 
 export const mockValueTransfers: ValueTransferType[] = [

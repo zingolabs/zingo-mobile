@@ -1,6 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Linking, Text, Alert } from 'react-native';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+  Text,
+  Alert,
+} from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
@@ -34,7 +41,11 @@ import CurrencyAmount from '../../Components/CurrencyAmount';
 import AddressItem from '../../Components/AddressItem';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
-import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import {
+  faTriangleExclamation,
+  faChevronDown,
+  faChevronUp,
+} from '@fortawesome/free-solid-svg-icons';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -45,11 +56,14 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
-type ValueTransferDetailProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail>;
+type ValueTransferDetailProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.ValueTransferDetail
+>;
 
-const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = ({
-  route,
-}) => {
+const ValueTransferDetail: React.FunctionComponent<
+  ValueTransferDetailProps
+> = ({ route }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
@@ -71,14 +85,30 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     setPrivacyOption,
     blockExplorer,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.ValueTransferDetail;
 
-  const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(!!route.params && route.params.vt !== undefined ? route.params.vt : {} as ValueTransferType);
-  const [valueTransferIndex, setValueTransferIndex] = useState<number>(!!route.params && route.params.index !== undefined ? route.params.index : 0);
-  const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>(!!route.params && route.params.valueTransfersSliced !== undefined ? route.params.valueTransfersSliced : [] as ValueTransferType[]);
-  const [totalLength, setTotalLength] = useState<number>(!!route.params && route.params.totalLength !== undefined ? route.params.totalLength : 0);
+  const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(
+    !!route.params && route.params.vt !== undefined
+      ? route.params.vt
+      : ({} as ValueTransferType),
+  );
+  const [valueTransferIndex, setValueTransferIndex] = useState<number>(
+    !!route.params && route.params.index !== undefined ? route.params.index : 0,
+  );
+  const [valueTransfersSliced, setValueTransfersSliced] = useState<
+    ValueTransferType[]
+  >(
+    !!route.params && route.params.valueTransfersSliced !== undefined
+      ? route.params.valueTransfersSliced
+      : ([] as ValueTransferType[]),
+  );
+  const [totalLength, setTotalLength] = useState<number>(
+    !!route.params && route.params.totalLength !== undefined
+      ? route.params.totalLength
+      : 0,
+  );
   const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
@@ -92,39 +122,64 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   }, [language]);
 
   useEffect(() => {
-    const _index = !!route.params && route.params.index !== undefined ? route.params.index : 0;
-    const _vt = !!route.params && route.params.vt !== undefined ? route.params.vt : {} as ValueTransferType;
-    const _valueTransfersSliced = !!route.params && route.params.valueTransfersSliced !== undefined ? route.params.valueTransfersSliced : [] as ValueTransferType[];
-    const _totalLength = !!route.params && route.params.totalLength !== undefined ? route.params.totalLength : 0;
+    const _index =
+      !!route.params && route.params.index !== undefined
+        ? route.params.index
+        : 0;
+    const _vt =
+      !!route.params && route.params.vt !== undefined
+        ? route.params.vt
+        : ({} as ValueTransferType);
+    const _valueTransfersSliced =
+      !!route.params && route.params.valueTransfersSliced !== undefined
+        ? route.params.valueTransfersSliced
+        : ([] as ValueTransferType[]);
+    const _totalLength =
+      !!route.params && route.params.totalLength !== undefined
+        ? route.params.totalLength
+        : 0;
     setValueTransferIndex(_index);
     setValueTransfer(_vt);
     setValueTransfersSliced(_valueTransfersSliced);
     setTotalLength(_totalLength);
   }, [
-    route, 
-    route.params, 
+    route,
+    route.params,
     route.params?.index,
     route.params?.vt,
     route.params?.valueTransfersSliced,
     route.params?.totalLength,
   ]);
-  
+
   useEffect(() => {
     const spendCo =
-    valueTransfer.status === RPCValueTransfersStatusEnum.failed
-      ? colors.zingo
-      : valueTransfer.confirmations >= 0 &&
-        valueTransfer.confirmations < GlobalConst.minConfirmations
-        ? colors.primaryDisabled
-        : valueTransfer.kind === ValueTransferKindEnum.Received || valueTransfer.kind === ValueTransferKindEnum.Shield
-          ? colors.primary
-          : colors.text;
+      valueTransfer.status === RPCValueTransfersStatusEnum.failed
+        ? colors.zingo
+        : valueTransfer.confirmations >= 0 &&
+            valueTransfer.confirmations < GlobalConst.minConfirmations
+          ? colors.primaryDisabled
+          : valueTransfer.kind === ValueTransferKindEnum.Received ||
+              valueTransfer.kind === ValueTransferKindEnum.Shield
+            ? colors.primary
+            : colors.text;
     setSpendColor(spendCo);
-  }, [colors.primary, colors.primaryDisabled, colors.text, colors.zingo, valueTransfer.confirmations, valueTransfer.kind, valueTransfer.status]);
+  }, [
+    colors.primary,
+    colors.primaryDisabled,
+    colors.text,
+    colors.zingo,
+    valueTransfer.confirmations,
+    valueTransfer.kind,
+    valueTransfer.status,
+  ]);
 
   useEffect(() => {
     (async () => {
-      setAddressProtected(await isAddressProtected(valueTransfer.address ? valueTransfer.address : ''));
+      setAddressProtected(
+        await isAddressProtected(
+          valueTransfer.address ? valueTransfer.address : '',
+        ),
+      );
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [valueTransfer.address]);
@@ -134,7 +189,11 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       return;
     }
 
-    const url = Utils.getBlockExplorerTxIDURL(txid, server.chainName, blockExplorer);
+    const url = Utils.getBlockExplorerTxIDURL(
+      txid,
+      server.chainName,
+      blockExplorer,
+    );
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
@@ -169,19 +228,28 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   };
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
+    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses
+      ? addresses.filter(
+          (a: UnifiedAddressClass | TransparentAddressClass) =>
+            a.address === add,
+        )
+      : [];
     return address.length >= 1;
   };
 
-  const isAddressProtected: (add: string) => Promise<boolean> = async (add: string) => {
+  const isAddressProtected: (add: string) => Promise<boolean> = async (
+    add: string,
+  ) => {
     return zenniesDonationAddress === add;
   };
 
   const moveValueTransferDetail = (indexParm: number, typeParm: number) => {
     // -1 -> Previous ValueTransfer
     //  1 -> Next ValueTransfer
-    if ((indexParm > 0 && typeParm === -1) ||
-        (indexParm < valueTransfersSliced.length - 1 && typeParm === 1)) {
+    if (
+      (indexParm > 0 && typeParm === -1) ||
+      (indexParm < valueTransfersSliced.length - 1 && typeParm === 1)
+    ) {
       const newIndex = indexParm + typeParm;
       setValueTransfer(valueTransfersSliced[newIndex]);
       setValueTransferIndex(newIndex);
@@ -193,14 +261,19 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       return;
     }
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
+      addLastSnackbar({
+        message: translate('loadedapp.connection-error') as string,
+        screenName: [screenName],
+      });
       return;
     }
 
     // not use await here.
     navigation.navigate(RouteEnum.Computing);
 
-    let actionStr: string = await RPCModule.removeTransactionProcess(valueTransfer.txid);
+    let actionStr: string = await RPCModule.removeTransactionProcess(
+      valueTransfer.txid,
+    );
 
     console.log('REMOVE', actionStr);
 
@@ -238,7 +311,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       translate(`history.${action}-title`) as string,
       translate(`history.${action}-alert`) as string,
       [
-        { text: translate('confirm') as string, onPress: () => runAction(action) },
+        {
+          text: translate('confirm') as string,
+          onPress: () => runAction(action),
+        },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
       { cancelable: false },
@@ -264,7 +340,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
         <Header
           title={translate('history.details') as string}
           screenName={screenName}
@@ -289,14 +366,20 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               alignItems: 'center',
               marginRight: 30,
               marginTop: 5,
-            }}>
+            }}
+          >
             <TouchableOpacity
               onPress={() => moveValueTransferDetail(valueTransferIndex, -1)}
               style={{ marginRight: 25 }}
-              disabled={valueTransferIndex === 0}>
+              disabled={valueTransferIndex === 0}
+            >
               <FontAwesomeIcon
                 icon={faChevronUp}
-                color={valueTransferIndex === 0 ? colors.primaryDisabled : colors.primary}
+                color={
+                  valueTransferIndex === 0
+                    ? colors.primaryDisabled
+                    : colors.primary
+                }
                 size={30}
               />
             </TouchableOpacity>
@@ -304,10 +387,15 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             <TouchableOpacity
               onPress={() => moveValueTransferDetail(valueTransferIndex, 1)}
               style={{ marginLeft: 25 }}
-              disabled={valueTransferIndex === valueTransfersSliced.length - 1}>
+              disabled={valueTransferIndex === valueTransfersSliced.length - 1}
+            >
               <FontAwesomeIcon
                 icon={faChevronDown}
-                color={valueTransferIndex === valueTransfersSliced.length - 1 ? colors.primaryDisabled : colors.primary}
+                color={
+                  valueTransferIndex === valueTransfersSliced.length - 1
+                    ? colors.primaryDisabled
+                    : colors.primary
+                }
                 size={30}
               />
             </TouchableOpacity>
@@ -321,7 +409,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             flexDirection: 'column',
             alignItems: 'stretch',
             justifyContent: 'flex-start',
-          }}>
+          }}
+        >
           <View
             style={{
               display: 'flex',
@@ -331,41 +420,83 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               padding: 10,
               borderWidth: 1,
               borderRadius: 10,
-              borderColor: valueTransfer.status === RPCValueTransfersStatusEnum.failed ? 'coral' : colors.border,
-            }}>
-            <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-              {valueTransfer.status === RPCValueTransfersStatusEnum.failed && valueTransfer.kind === ValueTransferKindEnum.Sent
+              borderColor:
+                valueTransfer.status === RPCValueTransfersStatusEnum.failed
+                  ? 'coral'
+                  : colors.border,
+            }}
+          >
+            <BoldText
+              style={{
+                textAlign: 'center',
+                textTransform: 'capitalize',
+                color: spendColor,
+              }}
+            >
+              {valueTransfer.status === RPCValueTransfersStatusEnum.failed &&
+              valueTransfer.kind === ValueTransferKindEnum.Sent
                 ? (translate('history.sent-failed') as string)
-                : valueTransfer.status === RPCValueTransfersStatusEnum.failed && valueTransfer.kind === ValueTransferKindEnum.Shield
-                ? (translate('history.shield-failed') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations === 0
-                ? (translate('history.sending') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations !== 0
-                ? (translate('history.sent') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Received && valueTransfer.confirmations === 0
-                ? (translate('history.receiving') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Received && valueTransfer.confirmations !== 0
-                ? (translate('history.received') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.MemoToSelf && valueTransfer.confirmations === 0
-                ? (translate('history.sendingtoself') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.MemoToSelf && valueTransfer.confirmations !== 0
-                ? (translate('history.memotoself') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.SendToSelf && valueTransfer.confirmations === 0
-                ? (translate('history.sendingtoself') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.SendToSelf && valueTransfer.confirmations !== 0
-                ? (translate('history.sendtoself') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Shield && valueTransfer.confirmations === 0
-                ? (translate('history.shielding') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Shield && valueTransfer.confirmations !== 0
-                ? (translate('history.shield') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Rejection && valueTransfer.confirmations === 0
-                ? (translate('history.sending') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Rejection && valueTransfer.confirmations !== 0
-                ? (translate('history.rejection') as string)
-                : ''}
+                : valueTransfer.status === RPCValueTransfersStatusEnum.failed &&
+                    valueTransfer.kind === ValueTransferKindEnum.Shield
+                  ? (translate('history.shield-failed') as string)
+                  : valueTransfer.kind === ValueTransferKindEnum.Sent &&
+                      valueTransfer.confirmations === 0
+                    ? (translate('history.sending') as string)
+                    : valueTransfer.kind === ValueTransferKindEnum.Sent &&
+                        valueTransfer.confirmations !== 0
+                      ? (translate('history.sent') as string)
+                      : valueTransfer.kind === ValueTransferKindEnum.Received &&
+                          valueTransfer.confirmations === 0
+                        ? (translate('history.receiving') as string)
+                        : valueTransfer.kind ===
+                              ValueTransferKindEnum.Received &&
+                            valueTransfer.confirmations !== 0
+                          ? (translate('history.received') as string)
+                          : valueTransfer.kind ===
+                                ValueTransferKindEnum.MemoToSelf &&
+                              valueTransfer.confirmations === 0
+                            ? (translate('history.sendingtoself') as string)
+                            : valueTransfer.kind ===
+                                  ValueTransferKindEnum.MemoToSelf &&
+                                valueTransfer.confirmations !== 0
+                              ? (translate('history.memotoself') as string)
+                              : valueTransfer.kind ===
+                                    ValueTransferKindEnum.SendToSelf &&
+                                  valueTransfer.confirmations === 0
+                                ? (translate('history.sendingtoself') as string)
+                                : valueTransfer.kind ===
+                                      ValueTransferKindEnum.SendToSelf &&
+                                    valueTransfer.confirmations !== 0
+                                  ? (translate('history.sendtoself') as string)
+                                  : valueTransfer.kind ===
+                                        ValueTransferKindEnum.Shield &&
+                                      valueTransfer.confirmations === 0
+                                    ? (translate('history.shielding') as string)
+                                    : valueTransfer.kind ===
+                                          ValueTransferKindEnum.Shield &&
+                                        valueTransfer.confirmations !== 0
+                                      ? (translate('history.shield') as string)
+                                      : valueTransfer.kind ===
+                                            ValueTransferKindEnum.Rejection &&
+                                          valueTransfer.confirmations === 0
+                                        ? (translate(
+                                            'history.sending',
+                                          ) as string)
+                                        : valueTransfer.kind ===
+                                              ValueTransferKindEnum.Rejection &&
+                                            valueTransfer.confirmations !== 0
+                                          ? (translate(
+                                              'history.rejection',
+                                            ) as string)
+                                          : ''}
             </BoldText>
             <ZecAmount
-              style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}
+              style={{
+                opacity:
+                  valueTransfer.status === RPCValueTransfersStatusEnum.failed
+                    ? 0.5
+                    : 1,
+              }}
               currencyName={info.currencyName}
               size={36}
               amtZec={valueTransfer.amount}
@@ -373,13 +504,19 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               smallPrefix={true}
             />
             {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
-              <CurrencyAmount price={valueTransfer.zecPrice} amtZec={valueTransfer.amount} currency={currency} privacy={privacy} />
+              <CurrencyAmount
+                price={valueTransfer.zecPrice}
+                amtZec={valueTransfer.amount}
+                currency={currency}
+                privacy={privacy}
+              />
             )}
           </View>
 
-          {valueTransfer.confirmations === 0 && ( /* not min confirmations applied */
+          {valueTransfer.confirmations ===
+            0 /* not min confirmations applied */ && (
             <>
-              {(valueTransfer.status === RPCValueTransfersStatusEnum.failed) && (
+              {valueTransfer.status === RPCValueTransfersStatusEnum.failed && (
                 <>
                   <View
                     style={{
@@ -388,7 +525,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       justifyContent: 'center',
                       alignItems: 'center',
                       marginBottom: 10,
-                    }}>
+                    }}
+                  >
                     <Button
                       type={ButtonTypeEnum.Primary}
                       title={translate('history.remove') as string}
@@ -404,79 +542,152 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
 
           {valueTransfer.confirmations >= 0 &&
             valueTransfer.confirmations < GlobalConst.minConfirmations && (
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              {(valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                valueTransfer.status === RPCValueTransfersStatusEnum.calculated) && (
-                <FontAwesomeIcon
-                  style={{ marginRight: 5 }}
-                  icon={faTriangleExclamation}
-                  color={colors.syncing}
-                  size={15}
-                />
-              )}
-              {(valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
-                valueTransfer.status === RPCValueTransfersStatusEnum.mempool ||
-                valueTransfer.status === RPCValueTransfersStatusEnum.failed) && (
-                <FadeText
-                  style={{
-                    color:
-                      valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                        ? 'coral'
-                        : valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                          valueTransfer.status === RPCValueTransfersStatusEnum.calculated
-                          ? colors.primary
-                          : colors.primaryDisabled,
-                    fontSize: 12,
-                    opacity: 1,
-                    fontWeight: '700',
-                    textAlign:
-                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                      valueTransfer.status === RPCValueTransfersStatusEnum.calculated
-                        ? 'center'
-                        : 'left',
-                    textDecorationLine:
-                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                      valueTransfer.status === RPCValueTransfersStatusEnum.calculated
-                        ? 'underline'
-                        : 'none',
-                  }}>
-                  {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
-                </FadeText>
-              )}
-              {valueTransfer.status === RPCValueTransfersStatusEnum.confirmed &&
-                valueTransfer.confirmations >= 0 &&
-                valueTransfer.confirmations < GlobalConst.minConfirmations && (
-                <FadeText
-                  style={{
-                    color: colors.primaryDisabled,
-                    fontSize: 12,
-                    opacity: 1,
-                    fontWeight: '700',
-                    textAlign: 'left',
-                    textDecorationLine: 'none',
-                  }}>
-                  {(translate(`history.${valueTransfer.status}`) as string) + ' - ' +
-                    (translate('history.waiting') as string) + ' (' +
-                    GlobalConst.minConfirmations.toString() + ')'}
-                </FadeText>
-              )}
-            </View>
-          )}
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {(valueTransfer.status ===
+                  RPCValueTransfersStatusEnum.transmitted ||
+                  valueTransfer.status ===
+                    RPCValueTransfersStatusEnum.calculated) && (
+                  <FontAwesomeIcon
+                    style={{ marginRight: 5 }}
+                    icon={faTriangleExclamation}
+                    color={colors.syncing}
+                    size={15}
+                  />
+                )}
+                {(valueTransfer.status ===
+                  RPCValueTransfersStatusEnum.transmitted ||
+                  valueTransfer.status ===
+                    RPCValueTransfersStatusEnum.calculated ||
+                  valueTransfer.status ===
+                    RPCValueTransfersStatusEnum.mempool ||
+                  valueTransfer.status ===
+                    RPCValueTransfersStatusEnum.failed) && (
+                  <FadeText
+                    style={{
+                      color:
+                        valueTransfer.status ===
+                        RPCValueTransfersStatusEnum.failed
+                          ? 'coral'
+                          : valueTransfer.status ===
+                                RPCValueTransfersStatusEnum.transmitted ||
+                              valueTransfer.status ===
+                                RPCValueTransfersStatusEnum.calculated
+                            ? colors.primary
+                            : colors.primaryDisabled,
+                      fontSize: 12,
+                      opacity: 1,
+                      fontWeight: '700',
+                      textAlign:
+                        valueTransfer.status ===
+                          RPCValueTransfersStatusEnum.transmitted ||
+                        valueTransfer.status ===
+                          RPCValueTransfersStatusEnum.calculated
+                          ? 'center'
+                          : 'left',
+                      textDecorationLine:
+                        valueTransfer.status ===
+                          RPCValueTransfersStatusEnum.transmitted ||
+                        valueTransfer.status ===
+                          RPCValueTransfersStatusEnum.calculated
+                          ? 'underline'
+                          : 'none',
+                    }}
+                  >
+                    {(translate(`history.${valueTransfer.status}`) as string) +
+                      ' - ' +
+                      (translate('history.not-confirmed') as string)}
+                  </FadeText>
+                )}
+                {valueTransfer.status ===
+                  RPCValueTransfersStatusEnum.confirmed &&
+                  valueTransfer.confirmations >= 0 &&
+                  valueTransfer.confirmations <
+                    GlobalConst.minConfirmations && (
+                    <FadeText
+                      style={{
+                        color: colors.primaryDisabled,
+                        fontSize: 12,
+                        opacity: 1,
+                        fontWeight: '700',
+                        textAlign: 'left',
+                        textDecorationLine: 'none',
+                      }}
+                    >
+                      {(translate(
+                        `history.${valueTransfer.status}`,
+                      ) as string) +
+                        ' - ' +
+                        (translate('history.waiting') as string) +
+                        ' (' +
+                        GlobalConst.minConfirmations.toString() +
+                        ')'}
+                    </FadeText>
+                  )}
+              </View>
+            )}
 
           <View style={{ margin: 10 }}>
-            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: 10,
+              }}
+            >
               <View style={{ display: 'flex' }}>
                 <FadeText>{translate('history.time') as string}</FadeText>
-                <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{valueTransfer.time ? moment((valueTransfer.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
+                <RegText
+                  style={{
+                    opacity:
+                      valueTransfer.status ===
+                      RPCValueTransfersStatusEnum.failed
+                        ? 0.5
+                        : 1,
+                  }}
+                >
+                  {valueTransfer.time
+                    ? moment((valueTransfer.time || 0) * 1000).format(
+                        'YYYY MMM D h:mm a',
+                      )
+                    : '--'}
+                </RegText>
               </View>
               <View style={{ display: 'flex', alignItems: 'flex-end' }}>
-                <FadeText>{translate('history.confirmations') as string}</FadeText>
-                <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{valueTransfer.confirmations >= 0 ? valueTransfer.confirmations.toString() : '-'}</RegText>
+                <FadeText>
+                  {translate('history.confirmations') as string}
+                </FadeText>
+                <RegText
+                  style={{
+                    opacity:
+                      valueTransfer.status ===
+                      RPCValueTransfersStatusEnum.failed
+                        ? 0.5
+                        : 1,
+                  }}
+                >
+                  {valueTransfer.confirmations >= 0
+                    ? valueTransfer.confirmations.toString()
+                    : '-'}
+                </RegText>
               </View>
             </View>
 
-            <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                marginTop: 10,
+              }}
+            >
               <FadeText>{translate('history.txid') as string}</FadeText>
               <TouchableOpacity
                 onPress={() => {
@@ -489,19 +700,64 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                     });
                     setExpandTxid(true);
                   }
-                }}>
-                {!valueTransfer.txid && <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{'Unknown'}</RegText>}
-                {!expandTxid && !!valueTransfer.txid && <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{Utils.trimToSmall(valueTransfer.txid, 10)}</RegText>}
+                }}
+              >
+                {!valueTransfer.txid && (
+                  <RegText
+                    style={{
+                      opacity:
+                        valueTransfer.status ===
+                        RPCValueTransfersStatusEnum.failed
+                          ? 0.5
+                          : 1,
+                    }}
+                  >
+                    {'Unknown'}
+                  </RegText>
+                )}
+                {!expandTxid && !!valueTransfer.txid && (
+                  <RegText
+                    style={{
+                      opacity:
+                        valueTransfer.status ===
+                        RPCValueTransfersStatusEnum.failed
+                          ? 0.5
+                          : 1,
+                    }}
+                  >
+                    {Utils.trimToSmall(valueTransfer.txid, 10)}
+                  </RegText>
+                )}
                 {expandTxid && !!valueTransfer.txid && (
                   <>
-                    <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{valueTransfer.txid}</RegText>
-                    {server.chainName !== ChainNameEnum.regtestChainName && valueTransfer.status !== RPCValueTransfersStatusEnum.failed && (
-                      <TouchableOpacity onPress={() => handleTxIDClick(valueTransfer.txid)}>
-                        <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
-                          {translate('history.viewexplorer') as string}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
+                    <RegText
+                      style={{
+                        opacity:
+                          valueTransfer.status ===
+                          RPCValueTransfersStatusEnum.failed
+                            ? 0.5
+                            : 1,
+                      }}
+                    >
+                      {valueTransfer.txid}
+                    </RegText>
+                    {server.chainName !== ChainNameEnum.regtestChainName &&
+                      valueTransfer.status !==
+                        RPCValueTransfersStatusEnum.failed && (
+                        <TouchableOpacity
+                          onPress={() => handleTxIDClick(valueTransfer.txid)}
+                        >
+                          <Text
+                            style={{
+                              color: colors.text,
+                              textDecorationLine: 'underline',
+                              margin: 15,
+                            }}
+                          >
+                            {translate('history.viewexplorer') as string}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
                   </>
                 )}
               </TouchableOpacity>
@@ -510,14 +766,39 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             {!!valueTransfer.fee && valueTransfer.fee > 0 && (
               <View style={{ display: 'flex', marginTop: 10 }}>
                 <FadeText>{translate('history.txfee') as string}</FadeText>
-                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <ZecAmount style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }} amtZec={valueTransfer.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <ZecAmount
+                    style={{
+                      opacity:
+                        valueTransfer.status ===
+                        RPCValueTransfersStatusEnum.failed
+                          ? 0.5
+                          : 1,
+                    }}
+                    amtZec={valueTransfer.fee}
+                    size={18}
+                    currencyName={info.currencyName}
+                    privacy={privacy}
+                  />
                 </View>
               </View>
             )}
 
             {!!valueTransfer.address && (
-              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  marginTop: 10,
+                }}
+              >
                 <FadeText>{translate('history.address') as string}</FadeText>
                 <AddressItem
                   address={valueTransfer.address}
@@ -530,18 +811,58 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             )}
 
             {!!valueTransfer.poolType && (
-              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  marginTop: 10,
+                }}
+              >
                 <FadeText>{translate('history.pool') as string}</FadeText>
-                <RegText style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }}>{valueTransfer.poolType}</RegText>
+                <RegText
+                  style={{
+                    opacity:
+                      valueTransfer.status ===
+                      RPCValueTransfersStatusEnum.failed
+                        ? 0.5
+                        : 1,
+                  }}
+                >
+                  {valueTransfer.poolType}
+                </RegText>
               </View>
             )}
 
             <View style={{ marginTop: 10 }}>
               <FadeText>{translate('history.amount') as string}</FadeText>
-              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount style={{ opacity: valueTransfer.status === RPCValueTransfersStatusEnum.failed ?  0.5 : 1 }} amtZec={valueTransfer.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <ZecAmount
+                  style={{
+                    opacity:
+                      valueTransfer.status ===
+                      RPCValueTransfersStatusEnum.failed
+                        ? 0.5
+                        : 1,
+                  }}
+                  amtZec={valueTransfer.amount}
+                  size={18}
+                  currencyName={info.currencyName}
+                  privacy={privacy}
+                />
                 {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
-                  <CurrencyAmount price={valueTransfer.zecPrice} amtZec={valueTransfer.amount} currency={currency} privacy={privacy} />
+                  <CurrencyAmount
+                    price={valueTransfer.zecPrice}
+                    amtZec={valueTransfer.amount}
+                    currency={currency}
+                    privacy={privacy}
+                  />
                 )}
               </View>
             </View>
@@ -558,7 +879,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         duration: SnackbarDurationEnum.short,
                         screenName: [screenName],
                       });
-                    }}>
+                    }}
+                  >
                     <RegText selectable={true}>{memo}</RegText>
                   </TouchableOpacity>
                 )}
@@ -578,18 +900,33 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         duration: SnackbarDurationEnum.short,
                         screenName: [screenName],
                       });
-                    }}>
+                    }}
+                  >
                     <RegText>{GlobalConst.replyTo}</RegText>
                     {!thisWalletAddress(memoUA) && (
-                      <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
+                      <FontAwesomeIcon
+                        icon={faTriangleExclamation}
+                        color={'red'}
+                        size={18}
+                      />
                     )}
-                    <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
+                    <RegText
+                      style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}
+                    >
+                      {memoUA}
+                    </RegText>
                     {contactFound(memoUA) && (
                       <View style={{ flexDirection: 'row' }}>
                         {!thisWalletAddress(memoUA) && (
-                          <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
+                          <RegText style={{ opacity: 0.6 }}>
+                            {translate('addressbook.likely') as string}
+                          </RegText>
                         )}
-                        <AddressItem address={memoUA} screenName={screenName} onlyContact={true} />
+                        <AddressItem
+                          address={memoUA}
+                          screenName={screenName}
+                          onlyContact={true}
+                        />
                       </View>
                     )}
                     {!contactFound(memoUA) && thisWalletAddress(memoUA) && (

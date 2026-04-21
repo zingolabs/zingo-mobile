@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
 import Info from '../components/Info';
-import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
+import {
+  ContextAppLoadedProvider,
+  defaultAppContextLoaded,
+} from '../app/context';
 import { CurrencyEnum, RouteEnum } from '../app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
@@ -25,7 +28,10 @@ jest.mock('react-native-localize', () => ({
   },
 }));
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Info> {
+function makeDrawerProps(): DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Info
+> {
   return {
     navigation: mockNavigation,
     route: {

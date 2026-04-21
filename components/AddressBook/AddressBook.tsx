@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   View,
   ScrollView,
@@ -11,7 +18,15 @@ import {
 } from 'react-native';
 
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, FilterEnum, GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';
+import {
+  AddressBookActionEnum,
+  AddressBookFileClass,
+  ButtonTypeEnum,
+  FilterEnum,
+  GlobalConst,
+  RouteEnum,
+  ScreenEnum,
+} from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -29,7 +44,10 @@ import RPCModule from '../../app/RPCModule';
 import { RPCCheckAddressType } from '../../app/rpc/types/RPCCheckAddressType';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type AddressBookProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressBook> & {
+type AddressBookProps = DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.AddressBook
+> & {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 
@@ -46,15 +64,19 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     snackbars,
     removeFirstSnackbar,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.AddressBook;
 
   const [numAb, setNumAb] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   //const [addressBookFiltered, setAddressBookFiltered] = useState<AddressBookFileClass[]>([]);
-  const [addressBookSliced, setAddressBookSliced] = useState<AddressBookFileClass[]>([]);
-  const [addressBookProtected, setAddressBookProtected] = useState<AddressBookFileClass[]>([]);
+  const [addressBookSliced, setAddressBookSliced] = useState<
+    AddressBookFileClass[]
+  >([]);
+  const [addressBookProtected, setAddressBookProtected] = useState<
+    AddressBookFileClass[]
+  >([]);
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
   const [action, setAction] = useState<AddressBookActionEnum | null>(null);
@@ -63,42 +85,57 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
-  const [currentAddress, setCurrentAddress] = useState<string>(!!route.params && route.params.currentAddress !== undefined ? route.params.currentAddress : '');
-  const [routeStack, setRouteStack] = useState<RouteEnum>(!!route.params && route.params.routeStack !== undefined ? route.params.routeStack : RouteEnum.AddressBookStack);
+  const [currentAddress, setCurrentAddress] = useState<string>(
+    !!route.params && route.params.currentAddress !== undefined
+      ? route.params.currentAddress
+      : '',
+  );
+  const [routeStack, setRouteStack] = useState<RouteEnum>(
+    !!route.params && route.params.routeStack !== undefined
+      ? route.params.routeStack
+      : RouteEnum.AddressBookStack,
+  );
 
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
   const fetchAddressBookFiltered = useMemo(async () => {
-      const filterApply = (ab: AddressBookFileClass) => {
-        if (filter === FilterEnum.all) {
-          return true;
-        } else if (filter === FilterEnum.contacts) {
-          return !ab.own;
-        } else if (filter === FilterEnum.wallet) {
-          return ab.own;
-        }
-      };
+    const filterApply = (ab: AddressBookFileClass) => {
+      if (filter === FilterEnum.all) {
+        return true;
+      } else if (filter === FilterEnum.contacts) {
+        return !ab.own;
+      } else if (filter === FilterEnum.wallet) {
+        return ab.own;
+      }
+    };
     // excluding this address from the list
-    return addressBook.filter((ab: AddressBookFileClass) => ab.address !== zenniesDonationAddress && filterApply(ab));
+    return addressBook.filter(
+      (ab: AddressBookFileClass) =>
+        ab.address !== zenniesDonationAddress && filterApply(ab),
+    );
   }, [addressBook, filter, zenniesDonationAddress]);
 
   const fetchAddressBookProtected = useMemo(async () => {
     // only protected address to use internally ZingoLabs.
-    return addressBook.filter((ab: AddressBookFileClass) => ab.address === zenniesDonationAddress);
+    return addressBook.filter(
+      (ab: AddressBookFileClass) => ab.address === zenniesDonationAddress,
+    );
   }, [addressBook, zenniesDonationAddress]);
 
   useEffect(() => {
-    const _currentAddress = !!route.params && route.params.currentAddress !== undefined ? route.params.currentAddress : '';
-    const _routeStack = !!route.params && route.params.routeStack !== undefined ? route.params.routeStack : RouteEnum.AddressBookStack;
+    const _currentAddress =
+      !!route.params && route.params.currentAddress !== undefined
+        ? route.params.currentAddress
+        : '';
+    const _routeStack =
+      !!route.params && route.params.routeStack !== undefined
+        ? route.params.routeStack
+        : RouteEnum.AddressBookStack;
     setCurrentAddress(_currentAddress);
     setRouteStack(_routeStack);
-  }, [
-    route, 
-    route.params,
-    route.params?.currentAddress,
-  ]);
+  }, [route, route.params, route.params?.currentAddress]);
 
   useEffect(() => {
     (async () => {
@@ -110,7 +147,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       setAddressBookProtected(abp);
       // find the current address
       if (currentAddress) {
-        const index: number = abf.findIndex((i: AddressBookFileClass) => i.address === currentAddress);
+        const index: number = abf.findIndex(
+          (i: AddressBookFileClass) => i.address === currentAddress,
+        );
         if (index === -1) {
           setAction(AddressBookActionEnum.Add);
         } else {
@@ -120,7 +159,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       }
       setLoading(false);
     })();
-  }, [currentAddress, fetchAddressBookProtected, fetchAddressBookFiltered, numAb, addressBook]);
+  }, [
+    currentAddress,
+    fetchAddressBookProtected,
+    fetchAddressBookFiltered,
+    numAb,
+    addressBook,
+  ]);
 
   const loadMoreClicked = useCallback(() => {
     setNumAb(numAb + 50);
@@ -210,22 +255,25 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     }
   }, [isScrollingToTop]);
 
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y <= 100;
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset } = event.nativeEvent;
+      const isTop = contentOffset.y <= 100;
 
-    // If we're scrolling to top and we've reached the top, stop the scrolling state
-    if (isScrollingToTop && isTop) {
-      setIsScrollingToTop(false);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = null;
+      // If we're scrolling to top and we've reached the top, stop the scrolling state
+      if (isScrollingToTop && isTop) {
+        setIsScrollingToTop(false);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = null;
+        }
       }
-    }
 
-    // Always update isAtTop for manual scrolling
-    setIsAtTop(isTop);
-  }, [isScrollingToTop]);
+      // Always update isAtTop for manual scrolling
+      setIsAtTop(isTop);
+    },
+    [isScrollingToTop],
+  );
 
   //console.log('render Address Book - 4', currentItem, action, addressBook);
 
@@ -241,7 +289,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         style={{
           flex: 1,
           backgroundColor: colors.background,
-        }}>
+        }}
+      >
         <Header
           title={translate('addressbook.title') as string}
           screenName={screenName}
@@ -268,7 +317,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             width: '100%',
             marginHorizontal: 5,
             marginBottom: 2,
-          }}>
+          }}
+        >
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -277,28 +327,39 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               marginTop: 10,
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
+            }}
+          >
             <TouchableOpacity
               onPress={() => {
                 cancel();
                 setFilter(FilterEnum.all);
                 setLoading(true);
-              }}>
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor:
+                    filter === FilterEnum.all
+                      ? colors.primary
+                      : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
+                  borderColor:
+                    filter === FilterEnum.all ? colors.primary : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginRight: 10,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
+                    color:
+                      filter === FilterEnum.all
+                        ? colors.sideMenuBackground
+                        : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('messages.filter-all') as string}
                 </FadeText>
               </View>
@@ -308,22 +369,34 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 cancel();
                 setFilter(FilterEnum.contacts);
                 setLoading(true);
-              }}>
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filter === FilterEnum.contacts ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor:
+                    filter === FilterEnum.contacts
+                      ? colors.primary
+                      : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filter === FilterEnum.contacts ? colors.primary : colors.zingo,
+                  borderColor:
+                    filter === FilterEnum.contacts
+                      ? colors.primary
+                      : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginRight: 10,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filter === FilterEnum.contacts ? colors.sideMenuBackground : colors.zingo,
+                    color:
+                      filter === FilterEnum.contacts
+                        ? colors.sideMenuBackground
+                        : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('messages.filter-contacts') as string}
                 </FadeText>
               </View>
@@ -333,22 +406,34 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 cancel();
                 setFilter(FilterEnum.wallet);
                 setLoading(true);
-              }}>
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filter === FilterEnum.wallet ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor:
+                    filter === FilterEnum.wallet
+                      ? colors.primary
+                      : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filter === FilterEnum.wallet ? colors.primary : colors.zingo,
+                  borderColor:
+                    filter === FilterEnum.wallet
+                      ? colors.primary
+                      : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginRight: 0,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filter === FilterEnum.wallet ? colors.sideMenuBackground : colors.zingo,
+                    color:
+                      filter === FilterEnum.wallet
+                        ? colors.sideMenuBackground
+                        : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('addressbook.filter-wallet') as string}
                 </FadeText>
               </View>
@@ -366,7 +451,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             flexDirection: 'column',
             alignItems: 'stretch',
             justifyContent: 'flex-start',
-          }}>
+          }}
+        >
           {currentItem === -1 && action !== null && (
             <AbDetail
               index={-1}
@@ -392,20 +478,30 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               routeStack={routeStack}
             />
           )}
-          {!currentAddress && addressBookSliced.length === 0 && currentItem !== -1 && !loading && (
-            <View
-              style={{
-                height: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                marginTop: 30,
-              }}>
-              <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
-            </View>
-          )}
+          {!currentAddress &&
+            addressBookSliced.length === 0 &&
+            currentItem !== -1 &&
+            !loading && (
+              <View
+                style={{
+                  height: 150,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: 30,
+                }}
+              >
+                <FadeText style={{ color: colors.primary }}>
+                  {translate('addressbook.empty') as string}
+                </FadeText>
+              </View>
+            )}
           {loading ? (
-            <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
+            <ActivityIndicator
+              style={{ marginTop: 7, marginRight: 7 }}
+              size={25}
+              color={colors.primaryDisabled}
+            />
           ) : (
             <>
               {!currentAddress &&
@@ -472,7 +568,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 justifyContent: 'flex-start',
                 marginTop: 5,
                 marginBottom: 30,
-              }}>
+              }}
+            >
               <Button
                 type={ButtonTypeEnum.Secondary}
                 title={translate('addressbook.loadmore') as string}
@@ -481,19 +578,25 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             </View>
           ) : (
             <>
-              {!currentAddress && !!addressBookSliced && !!addressBookSliced.length && !loading && (
-                <View
-                  style={{
-                    height: 150,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    marginTop: 5,
-                    marginBottom: 30,
-                  }}>
-                  <FadeText style={{ color: colors.primary }}>{translate('addressbook.end') as string}</FadeText>
-                </View>
-              )}
+              {!currentAddress &&
+                !!addressBookSliced &&
+                !!addressBookSliced.length &&
+                !loading && (
+                  <View
+                    style={{
+                      height: 150,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      marginTop: 5,
+                      marginBottom: 30,
+                    }}
+                  >
+                    <FadeText style={{ color: colors.primary }}>
+                      {translate('addressbook.end') as string}
+                    </FadeText>
+                  </View>
+                )}
             </>
           )}
         </ScrollView>
@@ -513,7 +616,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               borderWidth: 1,
               borderColor: colors.zingo,
               opacity: isScrollingToTop ? 0.5 : 1,
-            })}>
+            })}
+          >
             <FontAwesomeIcon
               style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
               size={20}
@@ -530,7 +634,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               justifyContent: 'center',
               alignItems: 'center',
               marginVertical: 5,
-            }}>
+            }}
+          >
             <Button
               testID="addressbook.button.new"
               type={ButtonTypeEnum.Primary}

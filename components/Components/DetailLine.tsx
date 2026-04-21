@@ -18,8 +18,14 @@ type DetailLineProps = {
   screenName: ScreenEnum;
 };
 
-const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID, screenName }) => {
-  const { colors } = useTheme()  as ThemeType;
+const DetailLine: React.FunctionComponent<DetailLineProps> = ({
+  label,
+  value,
+  children,
+  testID,
+  screenName,
+}) => {
+  const { colors } = useTheme() as ThemeType;
   const context = useContext(ContextAppLoaded);
   const { addLastSnackbar, translate } = context;
 
@@ -35,7 +41,8 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, ch
               duration: SnackbarDurationEnum.short,
               screenName: [screenName],
             });
-          }}>
+          }}
+        >
           <RegText testID={testID} color={colors.text}>
             {value}
           </RegText>

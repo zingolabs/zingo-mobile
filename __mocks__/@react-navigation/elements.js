@@ -1,1 +1,3 @@
-export const PlatformPressable = jest.fn().mockImplementation(({ children }) => children);
+export const PlatformPressable = jest
+  .fn()
+  .mockImplementation(({ children }) => children);

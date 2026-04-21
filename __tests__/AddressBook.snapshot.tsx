@@ -6,7 +6,10 @@ import 'react-native';
 import React from 'react';
 
 import { render, RenderResult } from '@testing-library/react-native';
-import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
+import {
+  ContextAppLoadedProvider,
+  defaultAppContextLoaded,
+} from '../app/context';
 import { AddressBook } from '../components/AddressBook';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
@@ -15,7 +18,10 @@ import { AppDrawerParamList } from '../app/types';
 import { RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressBook> {
+function makeDrawerProps(): DrawerScreenProps<
+  AppDrawerParamList,
+  RouteEnum.AddressBook
+> {
   return {
     navigation: mockNavigation,
     route: {

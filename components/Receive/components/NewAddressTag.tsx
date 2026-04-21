@@ -3,10 +3,7 @@ import React, { useContext, useState } from 'react';
 import { View, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import {
-  AddressBookFileClass,
-  ButtonTypeEnum,
-} from '../../../app/AppState';
+import { AddressBookFileClass, ButtonTypeEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
@@ -23,9 +20,9 @@ type NewAddressTagProps = {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   setHeightLayout: (h: number) => void;
 };
-const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({ 
-  address, 
-  closeSheet, 
+const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
+  address,
+  closeSheet,
   setAddressBook,
   setHeightLayout,
 }) => {
@@ -43,7 +40,12 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
       }
       //console.log(label, address);
       const randomColors = Utils.generateColorList(1);
-      const ab = await AddressBookFileImpl.writeAddressBookItem(label, address, randomColors[0], true);
+      const ab = await AddressBookFileImpl.writeAddressBookItem(
+        label,
+        address,
+        randomColors[0],
+        true,
+      );
       //console.log(ab);
       setAddressBook(ab);
     } catch (error) {
@@ -59,15 +61,16 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   };
 
   return (
-    <View 
+    <View
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
         //console.log('LAYOUTTT', height);
         setHeightLayout(height + 70);
       }}
-      style={{ 
-        backgroundColor: colors.background 
-      }}>
+      style={{
+        backgroundColor: colors.background,
+      }}
+    >
       <TouchableOpacity
         onPress={() => {
           setLabel('');
@@ -76,7 +79,8 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
           setTimeout(() => {
             closeSheet();
           }, 100);
-        }}>
+        }}
+      >
         <FontAwesomeIcon
           size={30}
           icon={faXmark}
@@ -84,12 +88,15 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
           style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
         />
       </TouchableOpacity>
-      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
+      <RegText
+        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
+      >
         {translate('receive.add-tag') as string}
       </RegText>
-      <View
-        style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
-        <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{'Tag'}</RegText>
+      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
+        <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
+          {'Tag'}
+        </RegText>
         <View
           style={{
             display: 'flex',
@@ -97,7 +104,8 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             justifyContent: 'flex-start',
             paddingHorizontal: 10,
             marginTop: 10,
-          }}>
+          }}
+        >
           <View
             accessible={true}
             style={{
@@ -108,7 +116,8 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
               minWidth: 48,
               minHeight: 48,
               maxHeight: 150,
-            }}>
+            }}
+          >
             <TextInput
               style={{
                 color: colors.text,
@@ -136,7 +145,8 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             alignItems: 'center',
             marginVertical: 5,
             marginTop: 30,
-          }}>
+          }}
+        >
           <Button
             type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}

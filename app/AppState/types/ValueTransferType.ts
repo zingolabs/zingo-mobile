@@ -15,5 +15,4 @@ export default interface ValueTransferType {
   memos?: string[];
   poolType?: PoolEnum;
   status: RPCValueTransfersStatusEnum;
-   
 }
