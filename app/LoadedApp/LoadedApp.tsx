@@ -758,7 +758,7 @@ export class LoadedAppClass extends Component<
       props.translate,
       this.keepAwake,
       this.setZingolibVersion,
-      this.setWallet,
+      this.setBirthday,
       this.setLastError,
       props.readOnly,
       props.server,
@@ -1440,9 +1440,7 @@ export class LoadedAppClass extends Component<
     await this.rpc.refreshSync(true);
   };
 
-  setWallet = async (wallet: WalletType) => {
-    //console.log(wallet, this.state.readOnly);
-    const birthday = wallet.birthday || 0;
+  setBirthday = async (birthday: number) => {
     if (!isEqual(this.state.birthday, birthday)) {
       //const start = Date.now();
       this.setState({ birthday });
