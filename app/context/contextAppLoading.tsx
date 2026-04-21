@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 
 import {
   AppContextLoading,
-  WalletType,
   ZecPriceType,
   BackgroundType,
   NetInfoType,
@@ -20,7 +19,6 @@ import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
-  wallet: {} as WalletType,
   server: {} as ServerType,
   currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,

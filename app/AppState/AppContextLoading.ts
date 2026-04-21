@@ -1,4 +1,3 @@
-import WalletType from './types/WalletType';
 import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
@@ -19,7 +18,6 @@ import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 export default interface AppContextLoading {
   // context
   netInfo: NetInfoType;
-  wallet: WalletType;
   zecPrice: ZecPriceType;
   translate: (key: string) => TranslateType;
   backgroundSyncInfo: BackgroundType;

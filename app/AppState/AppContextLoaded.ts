@@ -4,7 +4,6 @@ import SendPageStateClass from './classes/SendPageStateClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 
 import InfoType from './types/InfoType';
-import WalletType from './types/WalletType';
 import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
@@ -53,8 +52,8 @@ export default interface AppContextLoaded {
   // syncing Info about the status of the process
   syncingStatus: RPCSyncStatusType;
 
-  // wallet recovery info
-  wallet: WalletType;
+  // wallet birthday block height
+  birthday: number;
 
   // active UA in the wallet
   defaultUnifiedAddress: string;

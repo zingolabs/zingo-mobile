@@ -42,6 +42,9 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import ExpandedAddress from '../Receive/components/ExpandedAddress';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
+import WalletType from '../../app/AppState/types/WalletType';
+import RPC from '../../app/rpc/RPC';
 
 type TextsType = {
   new: string[];
@@ -65,13 +68,13 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     translate,
-    wallet,
     server,
     mode,
     addLastSnackbar,
     snackbars,
     removeFirstSnackbar,
     setPrivacyOption,
+    recoveryWalletInfoOnDevice,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
@@ -86,6 +89,24 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       : UfvkActionEnum.view,
   );
   const [heightLayout, setHeightLayout] = useState<number>(10);
+  const [fetchedWallet, setFetchedWallet] = useState<WalletType>(
+    {} as WalletType,
+  );
+  const [loadingUfvk, setLoadingUfvk] = useState<boolean>(true);
+
+  useEffect(() => {
+    (async () => {
+      setLoadingUfvk(true);
+      if (recoveryWalletInfoOnDevice) {
+        const info = await getRecoveryWalletInfo();
+        setFetchedWallet(info);
+      } else {
+        const info = await RPC.rpcFetchWallet(true);
+        setFetchedWallet(info);
+      }
+      setLoadingUfvk(false);
+    })();
+  }, [recoveryWalletInfoOnDevice]);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -191,7 +212,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   );
 
   const doCopy = () => {
-    Clipboard.setString(wallet.ufvk ? wallet.ufvk : '');
+    Clipboard.setString(fetchedWallet.ufvk ? fetchedWallet.ufvk : '');
     addLastSnackbar({
       message: translate('seed.tapcopy-ufvk-message') as string,
       duration: SnackbarDurationEnum.short,
@@ -226,92 +247,101 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           addLastSnackbar={addLastSnackbar}
           closeScreen={onClickCancelHide}
         />
-        <ScrollView
-          style={{ height: '80%', maxHeight: '80%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-          }}
-        >
-          <RegText
-            style={{
-              marginTop: 0,
-              padding: 20,
-              textAlign: 'center',
-              fontWeight: '900',
-            }}
-          >
-            {action === UfvkActionEnum.backup ||
-            action === UfvkActionEnum.change ||
-            action === UfvkActionEnum.server
-              ? (translate(`ufvk.text-readonly-${action}`) as string)
-              : (translate('ufvk.text-readonly') as string)}
-          </RegText>
-
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              marginTop: 0,
-              alignItems: 'center',
-            }}
-          >
-            {!!wallet.ufvk && (
-              <SingleAddress
-                ufvk={wallet.ufvk}
-                screenName={screenName}
-                index={0}
-                setIndex={() => {}}
-                total={1}
-                show={() => show('EA')}
-              />
-            )}
-            {!wallet.ufvk && (
-              <ActivityIndicator size="large" color={colors.primary} />
-            )}
-          </View>
-
-          <View style={{ marginBottom: 30 }} />
-        </ScrollView>
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-          }}
-        >
-          <Button
-            type={
-              mode === ModeEnum.basic
-                ? ButtonTypeEnum.Secondary
-                : ButtonTypeEnum.Primary
-            }
-            style={{
-              backgroundColor:
-                mode === ModeEnum.basic ? colors.background : colors.primary,
-            }}
-            title={
-              mode === ModeEnum.basic
-                ? (translate('cancel') as string)
-                : !!texts && !!texts[action]
-                  ? texts[action][times]
-                  : ''
-            }
-            onPress={() => {
-              if (!wallet.ufvk) {
-                return;
-              }
-              if (times === 0) {
-                onClickOKHide();
-              } else if (times === 1) {
-                onPressOK();
-              }
-            }}
+        {loadingUfvk ? (
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            style={{ marginVertical: 20 }}
           />
-        </View>
+        ) : (
+          <>
+            <ScrollView
+              style={{ height: '80%', maxHeight: '80%' }}
+              contentContainerStyle={{
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                justifyContent: 'flex-start',
+              }}
+            >
+              <RegText
+                style={{
+                  marginTop: 0,
+                  padding: 20,
+                  textAlign: 'center',
+                  fontWeight: '900',
+                }}
+              >
+                {action === UfvkActionEnum.backup ||
+                action === UfvkActionEnum.change ||
+                action === UfvkActionEnum.server
+                  ? (translate(`ufvk.text-readonly-${action}`) as string)
+                  : (translate('ufvk.text-readonly') as string)}
+              </RegText>
+
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  marginTop: 0,
+                  alignItems: 'center',
+                }}
+              >
+                {!!fetchedWallet.ufvk && (
+                  <SingleAddress
+                    ufvk={fetchedWallet.ufvk}
+                    screenName={screenName}
+                    index={0}
+                    setIndex={() => {}}
+                    total={1}
+                    show={() => show('EA')}
+                  />
+                )}
+              </View>
+
+              <View style={{ marginBottom: 30 }} />
+            </ScrollView>
+            <View
+              style={{
+                flexGrow: 1,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 5,
+              }}
+            >
+              <Button
+                type={
+                  mode === ModeEnum.basic
+                    ? ButtonTypeEnum.Secondary
+                    : ButtonTypeEnum.Primary
+                }
+                style={{
+                  backgroundColor:
+                    mode === ModeEnum.basic
+                      ? colors.background
+                      : colors.primary,
+                }}
+                title={
+                  mode === ModeEnum.basic
+                    ? (translate('cancel') as string)
+                    : !!texts && !!texts[action]
+                      ? texts[action][times]
+                      : ''
+                }
+                onPress={() => {
+                  if (!fetchedWallet.ufvk) {
+                    return;
+                  }
+                  if (times === 0) {
+                    onClickOKHide();
+                  } else if (times === 1) {
+                    onPressOK();
+                  }
+                }}
+              />
+            </View>
+          </>
+        )}
       </View>
       <BottomSheet
         ref={bottomSheetRef}
@@ -332,7 +362,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
               closeSheet={hide}
               title={translate('receive.title-address') as string}
               button={translate('receive.copy-address-button') as string}
-              address={wallet.ufvk ? wallet.ufvk : ''}
+              address={fetchedWallet.ufvk ? fetchedWallet.ufvk : ''}
               setHeightLayout={setHeightLayout}
             />
           )}

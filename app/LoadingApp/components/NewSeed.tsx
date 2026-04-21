@@ -10,6 +10,7 @@ import FadeText from '../../../components/Components/FadeText';
 import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
+import WalletType from '../../AppState/types/WalletType';
 import {
   ModeEnum,
   SnackbarDurationEnum,
@@ -31,12 +32,15 @@ type TextsType = {
 };
 
 type NewSeedProps = {
+  wallet: WalletType;
   onClickOK: () => void;
 };
-const NewSeed: React.FunctionComponent<NewSeedProps> = ({ onClickOK }) => {
+const NewSeed: React.FunctionComponent<NewSeedProps> = ({
+  wallet,
+  onClickOK,
+}) => {
   const context = useContext(ContextAppLoading);
   const {
-    wallet,
     translate,
     netInfo,
     privacy,

@@ -48,7 +48,7 @@ export default class RPC {
   translate: (key: string) => TranslateType;
   keepAwake: (keep: boolean) => void;
   fnSetZingolib: (zingolib: string) => void;
-  fnSetWallet: (wallet: WalletType) => void;
+  fnSetBirthday: (birthday: number) => void;
   fnSetLastError: (error: string) => void;
 
   updateTimerID?: NodeJS.Timeout;
@@ -95,7 +95,7 @@ export default class RPC {
     translate: (key: string) => TranslateType,
     keepAwake: (keep: boolean) => void,
     fnSetZingolib: (zingolib: string) => void,
-    fnSetWallet: (wallet: WalletType) => void,
+    fnSetBirthday: (birthday: number) => void,
     fnSetLastError: (error: string) => void,
     readOnly: boolean,
     server: ServerType,
@@ -110,7 +110,7 @@ export default class RPC {
     this.translate = translate;
     this.keepAwake = keepAwake;
     this.fnSetZingolib = fnSetZingolib;
-    this.fnSetWallet = fnSetWallet;
+    this.fnSetBirthday = fnSetBirthday;
     this.fnSetLastError = fnSetLastError;
 
     this.lastWalletBlockHeight = 0;
@@ -1252,7 +1252,7 @@ export default class RPC {
 
       if (wallet) {
         this.walletBirthday = wallet.birthday;
-        this.fnSetWallet(wallet);
+        this.fnSetBirthday(wallet.birthday || 0);
       }
       this.fetchWalletBirthdaySeedUfvkLock = false;
     } catch (error) {

@@ -30,7 +30,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
-    wallet,
+    birthday,
     translate,
     netInfo,
     addLastSnackbar,
@@ -107,7 +107,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
           <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
             <RegText>
               {(translate('rescan.text-1') as string) +
-                wallet.birthday +
+                birthday +
                 translate('rescan.text-2')}
             </RegText>
           </View>
