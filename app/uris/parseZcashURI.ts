@@ -112,8 +112,9 @@ const parseZcashURI = async (
         } else {
           // Parse as base64
           try {
-            target.memoString = Base64.decode(value);
-            target.memoBase64 = value;
+            const decoded = Base64.decode(value);
+            target.memoString = decoded.slice(0, GlobalConst.memoMaxLength);
+            target.memoBase64 = Base64.encode(target.memoString);
           } catch (e) {
             errors.push(`${translate('uris.base64')} "${value}"`);
           }

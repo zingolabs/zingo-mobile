@@ -39,7 +39,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     syncingStatus,
-    wallet,
+    birthday,
     translate,
     backgroundSyncInfo,
     language,
@@ -156,11 +156,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     - server3 : empty part of the server bar
     */
 
-    const serv1: number = wallet.birthday || 0;
+    const serv1: number = birthday || 0;
     const serv2: number =
-      info.latestBlock && wallet.birthday
-        ? info.latestBlock - wallet.birthday
-        : 0;
+      info.latestBlock && birthday ? info.latestBlock - birthday : 0;
     const serv3: number = maxBlocks ? maxBlocks - serv1 - serv2 : 0;
     const serv1Percent: number = (serv1 * 100) / maxBlocks;
     const serv2Percent: number = (serv2 * 100) / maxBlocks;
@@ -173,16 +171,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
     const servServer: number = info.latestBlock || 0;
     const servWallet: number =
-      info.latestBlock && wallet.birthday
-        ? info.latestBlock - wallet.birthday
-        : 0;
+      info.latestBlock && birthday ? info.latestBlock - birthday : 0;
 
     setServerServer(servServer);
     setServerWallet(servWallet);
     setServer1Percent(serv1Percent);
     setServer2Percent(serv2Percent);
     setServer3Percent(serv3Percent);
-  }, [maxBlocks, info.latestBlock, wallet.birthday]);
+  }, [maxBlocks, info.latestBlock, birthday]);
 
   const reportError = (error: string) => {
     createAlert(
@@ -494,9 +490,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                         }}
                       >
                         <>
-                          <Text style={{ color: colors.text }}>
-                            {wallet.birthday}
-                          </Text>
+                          <Text style={{ color: colors.text }}>{birthday}</Text>
                           <Text style={{ color: colors.text }}>
                             {info.latestBlock}
                           </Text>
@@ -543,7 +537,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                             (range: RPCSyncScanRangeStatusType) => {
                               const percent: number =
                                 ((range.end_block - range.start_block) * 100) /
-                                (info.latestBlock - wallet.birthday);
+                                (info.latestBlock - birthday);
                               return (
                                 <View
                                   key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}

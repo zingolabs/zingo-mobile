@@ -1286,6 +1286,7 @@ export class LoadingAppClass extends Component<
     newWallet: boolean,
     firstLaunchingMessage: LaunchingModeEnum,
   ) => {
+    this.setState(s => ({ wallet: { ...s.wallet, seed: '', ufvk: '' } }));
     this.props.navigationApp.reset({
       index: 0,
       routes: [
@@ -1802,7 +1803,6 @@ export class LoadingAppClass extends Component<
     const context = {
       // context
       netInfo: this.state.netInfo,
-      wallet: this.state.wallet,
       zecPrice: this.state.zecPrice,
       backgroundSyncInfo: this.state.backgroundSyncInfo,
       translate: this.state.translate,
@@ -1894,6 +1894,7 @@ export class LoadingAppClass extends Component<
               }
             >
               <NewSeed
+                wallet={this.state.wallet}
                 onClickOK={() =>
                   this.navigateToLoadedApp(
                     readOnly,

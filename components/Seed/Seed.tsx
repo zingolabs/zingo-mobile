@@ -1,6 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, Alert } from 'react-native';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 
 import { useNavigation, useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -26,6 +33,9 @@ import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
+import WalletType from '../../app/AppState/types/WalletType';
+import RPC from '../../app/rpc/RPC';
 
 type TextsType = {
   new: string[];
@@ -52,7 +62,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
-    wallet,
+    birthday: birthdayFromContext,
     translate,
     server,
     netInfo,
@@ -62,6 +72,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     snackbars,
     removeFirstSnackbar,
     setPrivacyOption,
+    recoveryWalletInfoOnDevice,
   } = context;
   const { colors } = useTheme() as ThemeType;
   // when this screen is open from LoadingApp (new wallet)
@@ -79,9 +90,27 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       ? route.params.action
       : SeedActionEnum.view,
   );
+  const [fetchedWallet, setFetchedWallet] = useState<WalletType>(
+    {} as WalletType,
+  );
+  const [loadingSeed, setLoadingSeed] = useState<boolean>(true);
 
-  const seedPhrase = wallet.seed || '';
-  const birthdayNumber = (wallet.birthday && wallet.birthday.toString()) || '';
+  useEffect(() => {
+    (async () => {
+      setLoadingSeed(true);
+      const seedInfo = recoveryWalletInfoOnDevice
+        ? await getRecoveryWalletInfo()
+        : await RPC.rpcFetchWallet(false);
+      const ufvkInfo = await RPC.rpcFetchWallet(true);
+      setFetchedWallet({ ...seedInfo, ufvk: ufvkInfo.ufvk });
+      setLoadingSeed(false);
+    })();
+  }, [recoveryWalletInfoOnDevice]);
+
+  const seedPhrase = fetchedWallet.seed || '';
+  const ufvk = fetchedWallet.ufvk || '';
+  const birthdayNumber =
+    (birthdayFromContext && birthdayFromContext.toString()) || '';
 
   useEffect(() => {
     const _action =
@@ -250,181 +279,226 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           }
           closeScreen={onClickCancelHide}
         />
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          style={{ height: '80%', maxHeight: '80%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-          }}
-        >
-          <RegText
-            style={{
-              marginTop: 0,
-              padding: 20,
-              textAlign: 'center',
-              fontWeight: '900',
-            }}
-          >
-            {action === SeedActionEnum.backup ||
-            action === SeedActionEnum.change ||
-            action === SeedActionEnum.server
-              ? (translate(`seed.text-readonly-${action}`) as string)
-              : (translate('seed.text-readonly') as string)}
-          </RegText>
-          <View
-            style={{
-              margin: 10,
-              padding: 10,
-              borderWidth: 1,
-              borderRadius: 10,
-              borderColor: colors.text,
-              maxHeight: '45%',
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                if (seedPhrase) {
-                  Clipboard.setString(seedPhrase);
-                  if (addLastSnackbar) {
-                    addLastSnackbar({
-                      message: translate('seed.tapcopy-seed-message') as string,
-                      duration: SnackbarDurationEnum.short,
-                      screenName: [screenName],
-                    });
-                  }
-                  setExpandSeed(true);
-                  if (privacy) {
-                    setTimeout(() => {
-                      setExpandSeed(false);
-                    }, 5 * 1000);
-                  }
-                }
+        {loadingSeed ? (
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            style={{ marginVertical: 20 }}
+          />
+        ) : (
+          <>
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              style={{ height: '80%', maxHeight: '80%' }}
+              contentContainerStyle={{
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                justifyContent: 'flex-start',
               }}
             >
               <RegText
-                color={colors.text}
                 style={{
+                  marginTop: 0,
+                  padding: 20,
                   textAlign: 'center',
+                  fontWeight: '900',
                 }}
               >
-                {!expandSeed ? Utils.trimToSmall(seedPhrase, 5) : seedPhrase}
+                {action === SeedActionEnum.backup ||
+                action === SeedActionEnum.change ||
+                action === SeedActionEnum.server
+                  ? (translate(`seed.text-readonly-${action}`) as string)
+                  : (translate('seed.text-readonly') as string)}
               </RegText>
-            </TouchableOpacity>
-            <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-            >
-              <View />
-              <TouchableOpacity
-                onPress={() => {
-                  if (seedPhrase) {
-                    Clipboard.setString(seedPhrase);
-                    if (addLastSnackbar) {
-                      addLastSnackbar({
-                        message: translate(
-                          'seed.tapcopy-seed-message',
-                        ) as string,
-                        duration: SnackbarDurationEnum.short,
-                        screenName: [screenName],
-                      });
-                    }
-                  }
+              <View
+                style={{
+                  margin: 10,
+                  padding: 10,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  borderColor: colors.text,
+                  maxHeight: '45%',
                 }}
               >
-                <Text
-                  style={{
-                    color: colors.text,
-                    textDecorationLine: 'underline',
-                    padding: 10,
-                    marginTop: 0,
-                    textAlign: 'center',
-                    minHeight: 48,
+                <TouchableOpacity
+                  onPress={() => {
+                    if (seedPhrase) {
+                      Clipboard.setString(seedPhrase);
+                      if (addLastSnackbar) {
+                        addLastSnackbar({
+                          message: translate(
+                            'seed.tapcopy-seed-message',
+                          ) as string,
+                          duration: SnackbarDurationEnum.short,
+                          screenName: [screenName],
+                        });
+                      }
+                      setExpandSeed(true);
+                      if (privacy) {
+                        setTimeout(() => {
+                          setExpandSeed(false);
+                        }, 5 * 1000);
+                      }
+                    }
                   }}
                 >
-                  {translate('seed.tapcopy') as string}
-                </Text>
-              </TouchableOpacity>
-              <View />
-            </View>
-          </View>
+                  <RegText
+                    color={colors.text}
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
+                    {!expandSeed
+                      ? Utils.trimToSmall(seedPhrase, 5)
+                      : seedPhrase}
+                  </RegText>
+                </TouchableOpacity>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <View />
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (seedPhrase) {
+                        Clipboard.setString(seedPhrase);
+                        if (addLastSnackbar) {
+                          addLastSnackbar({
+                            message: translate(
+                              'seed.tapcopy-seed-message',
+                            ) as string,
+                            duration: SnackbarDurationEnum.short,
+                            screenName: [screenName],
+                          });
+                        }
+                      }
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: colors.text,
+                        textDecorationLine: 'underline',
+                        padding: 10,
+                        marginTop: 0,
+                        textAlign: 'center',
+                        minHeight: 48,
+                      }}
+                    >
+                      {translate('seed.tapcopy') as string}
+                    </Text>
+                  </TouchableOpacity>
+                  <View />
+                </View>
+              </View>
 
-          <View style={{ marginTop: 10, alignItems: 'center' }}>
-            <FadeText style={{ textAlign: 'center' }}>
-              {translate('seed.birthday-readonly') as string}
-            </FadeText>
-            <TouchableOpacity
-              onPress={() => {
-                if (birthdayNumber) {
-                  Clipboard.setString(birthdayNumber);
-                  if (addLastSnackbar) {
-                    addLastSnackbar({
-                      message: translate(
-                        'seed.tapcopy-birthday-message',
-                      ) as string,
-                      duration: SnackbarDurationEnum.short,
-                      screenName: [screenName],
-                    });
-                  }
-                  setExpandBithday(true);
-                  if (privacy) {
-                    setTimeout(() => {
-                      setExpandBithday(false);
-                    }, 5 * 1000);
-                  }
-                }
+              <View style={{ marginTop: 10, alignItems: 'center' }}>
+                <FadeText style={{ textAlign: 'center' }}>
+                  {translate('seed.birthday-readonly') as string}
+                </FadeText>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (birthdayNumber) {
+                      Clipboard.setString(birthdayNumber);
+                      if (addLastSnackbar) {
+                        addLastSnackbar({
+                          message: translate(
+                            'seed.tapcopy-birthday-message',
+                          ) as string,
+                          duration: SnackbarDurationEnum.short,
+                          screenName: [screenName],
+                        });
+                      }
+                      setExpandBithday(true);
+                      if (privacy) {
+                        setTimeout(() => {
+                          setExpandBithday(false);
+                        }, 5 * 1000);
+                      }
+                    }
+                  }}
+                >
+                  <RegText color={colors.text} style={{ textAlign: 'center' }}>
+                    {!expandBirthday
+                      ? Utils.trimToSmall(birthdayNumber, 1)
+                      : birthdayNumber}
+                  </RegText>
+                </TouchableOpacity>
+              </View>
+              {!!ufvk && (
+                <View style={{ marginTop: 10, alignItems: 'center' }}>
+                  <FadeText style={{ textAlign: 'center' }}>
+                    {translate('ufvk.viewkey') as string}
+                  </FadeText>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Clipboard.setString(ufvk);
+                      if (addLastSnackbar) {
+                        addLastSnackbar({
+                          message: translate('ufvk.tapcopy-message') as string,
+                          duration: SnackbarDurationEnum.short,
+                          screenName: [screenName],
+                        });
+                      }
+                    }}
+                  >
+                    <RegText
+                      color={colors.text}
+                      style={{ textAlign: 'center' }}
+                    >
+                      {Utils.trimToSmall(ufvk, 8)}
+                    </RegText>
+                  </TouchableOpacity>
+                </View>
+              )}
+              <View style={{ marginBottom: 30 }} />
+            </ScrollView>
+            <View
+              style={{
+                flexGrow: 1,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 5,
               }}
             >
-              <RegText color={colors.text} style={{ textAlign: 'center' }}>
-                {!expandBirthday
-                  ? Utils.trimToSmall(birthdayNumber, 1)
-                  : birthdayNumber}
-              </RegText>
-            </TouchableOpacity>
-          </View>
-          <View style={{ marginBottom: 30 }} />
-        </ScrollView>
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-          }}
-        >
-          <Button
-            testID="seed.button.ok"
-            type={
-              mode === ModeEnum.basic
-                ? ButtonTypeEnum.Secondary
-                : ButtonTypeEnum.Primary
-            }
-            style={{
-              backgroundColor:
-                mode === ModeEnum.basic ? colors.background : colors.primary,
-            }}
-            title={
-              mode === ModeEnum.basic
-                ? !basicFirstViewSeed
-                  ? (translate('seed.showtransactions') as string)
-                  : (translate('cancel') as string)
-                : !!texts && !!texts[action]
-                  ? texts[action][times]
-                  : ''
-            }
-            onPress={async () => {
-              if (!seedPhrase) {
-                return;
-              }
-              if (times === 0) {
-                onClickOKHide(seedPhrase, Number(birthdayNumber));
-              } else if (times === 1) {
-                onPressOK();
-              }
-            }}
-          />
-        </View>
+              <Button
+                testID="seed.button.ok"
+                type={
+                  mode === ModeEnum.basic
+                    ? ButtonTypeEnum.Secondary
+                    : ButtonTypeEnum.Primary
+                }
+                style={{
+                  backgroundColor:
+                    mode === ModeEnum.basic
+                      ? colors.background
+                      : colors.primary,
+                }}
+                title={
+                  mode === ModeEnum.basic
+                    ? !basicFirstViewSeed
+                      ? (translate('seed.showtransactions') as string)
+                      : (translate('cancel') as string)
+                    : !!texts && !!texts[action]
+                      ? texts[action][times]
+                      : ''
+                }
+                onPress={async () => {
+                  if (!seedPhrase) {
+                    return;
+                  }
+                  if (times === 0) {
+                    onClickOKHide(seedPhrase, Number(birthdayNumber));
+                  } else if (times === 1) {
+                    onPressOK();
+                  }
+                }}
+              />
+            </View>
+          </>
+        )}
       </View>
     </ToastProvider>
   );

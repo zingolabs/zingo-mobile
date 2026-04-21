@@ -688,7 +688,7 @@ export class LoadedAppClass extends Component<
       setSendPageState: this.setSendPageState,
       info: {} as InfoType,
       syncingStatus: {} as RPCSyncStatusType,
-      wallet: {} as WalletType,
+      birthday: 0,
       defaultUnifiedAddress: '',
       zecPrice: {
         zecPrice: 0,
@@ -923,7 +923,7 @@ export class LoadedAppClass extends Component<
     );
 
     const initialUrl = await Linking.getInitialURL();
-    console.log('INITIAL URI', initialUrl);
+    console.log('Received initial deep link URI');
     if (initialUrl !== null) {
       this.readUrl(initialUrl);
 
@@ -935,7 +935,7 @@ export class LoadedAppClass extends Component<
     this.linking = Linking.addEventListener(
       EventListenerEnum.url,
       async ({ url }) => {
-        console.log('EVENT LISTENER URI', url);
+        console.log('Received deep link URI event');
         if (url !== null) {
           this.readUrl(url);
         }
@@ -1442,9 +1442,10 @@ export class LoadedAppClass extends Component<
 
   setWallet = async (wallet: WalletType) => {
     //console.log(wallet, this.state.readOnly);
-    if (!isEqual(this.state.wallet, wallet)) {
+    const birthday = wallet.birthday || 0;
+    if (!isEqual(this.state.birthday, birthday)) {
       //const start = Date.now();
-      this.setState({ wallet });
+      this.setState({ birthday });
       //console.log('=========================================== > WALLET STORED SETSTATE - ', Date.now() - start);
     }
   };
@@ -2129,7 +2130,7 @@ export class LoadedAppClass extends Component<
     const context = {
       //context
       netInfo: this.state.netInfo,
-      wallet: this.state.wallet,
+      birthday: this.state.birthday,
       totalBalance: this.state.totalBalance,
       addresses: this.state.addresses,
       valueTransfers: this.state.valueTransfers,
