@@ -38,7 +38,7 @@ function makeDrawerProps(): DrawerScreenProps<
 describe('Component Memo - test', () => {
   //snapshot test
   test('Memo - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.translate = mockTranslate;
     const props = makeDrawerProps();
     const memo = render(

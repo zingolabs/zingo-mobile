@@ -37,7 +37,7 @@ function makeDrawerProps(): DrawerScreenProps<
 // test suite
 describe('Component History - test', () => {
   //snapshot test
-  const state = defaultAppContextLoaded;
+  const state = { ...defaultAppContextLoaded };
   state.valueTransfers = mockValueTransfers;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;

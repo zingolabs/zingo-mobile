@@ -23,7 +23,7 @@ import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 // test suite
 describe('Component Address Book Details - test', () => {
   //snapshot test
-  const state = defaultAppContextLoaded;
+  const state = { ...defaultAppContextLoaded };
   state.addressBook = mockAddressBook;
   state.translate = mockTranslate;
   const onCancel = jest.fn();

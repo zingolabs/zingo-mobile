@@ -38,7 +38,7 @@ function makeDrawerProps(): DrawerScreenProps<
 // test suite
 describe('Component SyncReport - test', () => {
   //snapshot test
-  const state = defaultAppContextLoaded;
+  const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;

@@ -321,13 +321,6 @@ const ValueTransferDetail: React.FunctionComponent<
     );
   };
 
-  //console.log('render History Detail', valueTransferIndex, valueTransfer);
-
-  //if (valueTransfer.status === RPCValueTransfersStatusEnum.calculated || valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) {
-  //  console.log('server', info.latestBlock, 'VT', valueTransfer.blockheight, 'expire', GlobalConst.expireBlocks);
-  //  console.log(info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks);
-  //}
-
   return (
     <ToastProvider>
       <Snackbars

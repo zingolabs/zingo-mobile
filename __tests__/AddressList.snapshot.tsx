@@ -37,7 +37,7 @@ function makeDrawerProps(
 describe('Component Unified Address List - test', () => {
   //snapshot test
   test('Address Unified List - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     const props = makeDrawerProps(AddressKindEnum.u);
@@ -50,7 +50,7 @@ describe('Component Unified Address List - test', () => {
   });
 
   test('Address Transparent List - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     const props = makeDrawerProps(AddressKindEnum.t);

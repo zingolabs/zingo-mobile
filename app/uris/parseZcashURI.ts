@@ -113,6 +113,11 @@ const parseZcashURI = async (
           // Parse as base64
           try {
             const decoded = Base64.decode(value);
+            if (decoded.length > GlobalConst.memoMaxLength) {
+              console.log(
+                `URI memo truncated from ${decoded.length} to ${GlobalConst.memoMaxLength} bytes`,
+              );
+            }
             target.memoString = decoded.slice(0, GlobalConst.memoMaxLength);
             target.memoBase64 = Base64.encode(target.memoString);
           } catch (e) {
@@ -126,7 +131,7 @@ const parseZcashURI = async (
           break;
         }
         const a = parseFloat(value);
-        if (isNaN(a)) {
+        if (isNaN(a) || a < 0 || a > 21_000_000) {
           errors.push(`${translate('uris.amount')} "${value}"`);
           break;
         }

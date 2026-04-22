@@ -100,9 +100,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       setLoadingSeed(true);
       const seedInfo = recoveryWalletInfoOnDevice
         ? await getRecoveryWalletInfo()
-        : await RPC.rpcFetchWallet(false);
+        : ((await RPC.rpcFetchWallet(false)) ?? ({} as WalletType));
       const ufvkInfo = await RPC.rpcFetchWallet(true);
-      setFetchedWallet({ ...seedInfo, ufvk: ufvkInfo.ufvk });
+      setFetchedWallet({ ...seedInfo, ufvk: ufvkInfo?.ufvk });
       setLoadingSeed(false);
     })();
   }, [recoveryWalletInfoOnDevice]);
@@ -241,10 +241,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     }
   };
 
-  //console.log('=================================');
-  //console.log(wallet.seed, wallet.birthday);
-  //console.log('render seed', privacy);
-
   return (
     <ToastProvider>
       <Snackbars
@@ -324,6 +320,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   onPress={() => {
                     if (seedPhrase) {
                       Clipboard.setString(seedPhrase);
+                      setTimeout(() => Clipboard.setString(''), 60 * 1000);
                       if (addLastSnackbar) {
                         addLastSnackbar({
                           message: translate(
@@ -364,6 +361,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     onPress={() => {
                       if (seedPhrase) {
                         Clipboard.setString(seedPhrase);
+                        setTimeout(() => Clipboard.setString(''), 60 * 1000);
                         if (addLastSnackbar) {
                           addLastSnackbar({
                             message: translate(

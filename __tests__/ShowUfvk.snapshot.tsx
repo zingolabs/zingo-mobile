@@ -37,7 +37,7 @@ function makeDrawerProps(
 // test suite
 describe('Component ShowUfvk - test', () => {
   //snapshot test
-  const state = defaultAppContextLoaded;
+  const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;

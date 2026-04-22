@@ -37,7 +37,7 @@ function makeDrawerProps(): DrawerScreenProps<
 describe('Component Receive - test', () => {
   //snapshot test
   test('Receive - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     state.info = mockInfo;

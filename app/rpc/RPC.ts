@@ -165,7 +165,6 @@ export default class RPC {
           Date.now() - start,
         );
       }
-      //console.log(resultStr);
 
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -204,7 +203,6 @@ export default class RPC {
   static async rpcShieldFunds(): Promise<string> {
     try {
       const shieldStr: string = await RPCModule.confirmProcess();
-      //console.log(shieldStr);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error shield ${shieldStr}`);
@@ -222,7 +220,7 @@ export default class RPC {
     }
   }
 
-  static async rpcFetchWallet(readOnly: boolean): Promise<WalletType> {
+  static async rpcFetchWallet(readOnly: boolean): Promise<WalletType | null> {
     if (readOnly) {
       // only viewing key & birthday
       try {
@@ -237,11 +235,11 @@ export default class RPC {
         if (ufvkStr) {
           if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error ufvk ${ufvkStr}`);
-            return {} as WalletType;
+            return null;
           }
         } else {
           console.log('Internal Error ufvk');
-          return {} as WalletType;
+          return null;
         }
         const RPCufvk: WalletType = await JSON.parse(ufvkStr);
 
@@ -256,7 +254,7 @@ export default class RPC {
         return wallet;
       } catch (error) {
         console.log(`Critical Error ufvk ${error}`);
-        return {} as WalletType;
+        return null;
       }
     } else {
       // only seed & birthday
@@ -272,11 +270,11 @@ export default class RPC {
         if (seedStr) {
           if (seedStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error seed ${seedStr}`);
-            return {} as WalletType;
+            return null;
           }
         } else {
           console.log('Internal Error seed');
-          return {} as WalletType;
+          return null;
         }
         const RPCseed: RPCSeedType = await JSON.parse(seedStr);
 
@@ -291,13 +289,12 @@ export default class RPC {
         return wallet;
       } catch (error) {
         console.log(`Critical Error seed ${error}`);
-        return {} as WalletType;
+        return null;
       }
     }
   }
 
   async runTaskPromises(): Promise<void> {
-    //console.log('+++++++++++++++++ interval update 5 secs ALL', this.timers);
     this.sanitizeTimers();
 
     // this run only once.
@@ -343,7 +340,6 @@ export default class RPC {
       taskPromises.push(
         new Promise<void>(async resolve => {
           await this.fetchSyncPoll();
-          //console.log('INTERVAL poll sync');
           resolve();
         }),
       );
@@ -367,7 +363,6 @@ export default class RPC {
         taskPromises.push(
           new Promise<void>(async resolve => {
             await this.fetchSyncPoll();
-            //console.log('INTERVAL poll sync');
             resolve();
           }),
         );
@@ -376,7 +371,6 @@ export default class RPC {
         taskPromises.push(
           new Promise<void>(async resolve => {
             await this.fetchSyncPoll();
-            //console.log('INTERVAL poll sync');
             resolve();
           }),
         );
@@ -384,7 +378,6 @@ export default class RPC {
           new Promise<void>(async resolve => {
             //const s = Date.now();
             await this.fetchWalletHeight();
-            //console.log('wallet height - ', Date.now() - s);
             resolve();
           }),
         );
@@ -392,7 +385,6 @@ export default class RPC {
           new Promise<void>(async resolve => {
             //const s = Date.now();
             await this.fetchWalletBirthdaySeedUfvk();
-            //console.log('wallet birthday - ', Date.now() - s);
             resolve();
           }),
         );
@@ -400,7 +392,6 @@ export default class RPC {
           new Promise<void>(async resolve => {
             //const s = Date.now();
             await this.fetchInfoAndServerHeight();
-            //console.log('info & server height - ', Date.now() - s);
             resolve();
           }),
         );
@@ -408,7 +399,6 @@ export default class RPC {
           new Promise<void>(async resolve => {
             //const s = Date.now();
             await this.fetchAddresses();
-            //console.log('addresses - ', Date.now() - s);
             resolve();
           }),
         );
@@ -416,7 +406,6 @@ export default class RPC {
           new Promise<void>(async resolve => {
             //const s = Date.now();
             await this.fetchTotalBalance();
-            //console.log('balance - ', Date.now() - s);
             resolve();
           }),
         );
@@ -438,7 +427,6 @@ export default class RPC {
           new Promise<void>(async resolve => {
             //const s = Date.now();
             await this.fetchTandZandOValueTransfers();
-            //console.log('value transfers - ', Date.now() - s);
             resolve();
           }),
         );
@@ -446,14 +434,13 @@ export default class RPC {
           new Promise<void>(async resolve => {
             //const s = Date.now();
             await this.fetchTandZandOMessages();
-            //console.log('messages - ', Date.now() - s);
             resolve();
           }),
         );
       }
     }
 
-    Promise.allSettled(taskPromises);
+    await Promise.allSettled(taskPromises);
   }
 
   // this is only for the first time when the App is booting, but
@@ -479,7 +466,6 @@ export default class RPC {
     // every 5 seconds the App update part of the data
     if (!this.updateTimerID) {
       this.updateTimerID = setInterval(() => this.runTaskPromises(), 5 * 1000); // 5 secs
-      //console.log('create update timer', this.updateVTTimerID);
       this.timers.push(this.updateTimerID);
     }
 
@@ -509,14 +495,12 @@ export default class RPC {
     if (this.updateTimerID) {
       clearInterval(this.updateTimerID);
       this.updateTimerID = undefined;
-      //console.log('kill update timer', this.updateVTTimerID);
     }
 
     // and now the array of timers...
     while (this.timers.length > 0) {
       const inter = this.timers.pop();
       clearInterval(inter);
-      //console.log('kill item array timers', inter);
     }
   }
 
@@ -529,7 +513,6 @@ export default class RPC {
       } else {
         clearInterval(this.timers[i]);
         deleted.push(i);
-        //console.log('sanitize - kill item array timers', this.timers[i]);
       }
     }
     // remove the cleared timers.
@@ -541,7 +524,6 @@ export default class RPC {
   async refreshSync(fullRescan?: boolean) {
     try {
       if (this.refreshSyncLock && !fullRescan) {
-        //console.log('REFRESH ----> in execution already');
         return;
       }
       this.refreshSyncLock = true;
@@ -576,7 +558,6 @@ export default class RPC {
             Date.now() - start,
           );
         }
-        //console.log('rescan RUN', rescanStr);
         if (
           rescanStr &&
           rescanStr.toLowerCase().startsWith(GlobalConst.error)
@@ -610,7 +591,6 @@ export default class RPC {
   async fetchSyncStatus(): Promise<void> {
     try {
       if (this.fetchSyncStatusLock) {
-        //console.log('sync status locked');
         return;
       }
       this.fetchSyncStatusLock = true;
@@ -643,15 +623,12 @@ export default class RPC {
         return;
       }
 
-      //console.log('SYNC STATUS', ss);
       console.log(
         'SYNC STATUS',
         ss.scan_ranges?.length,
         ss.percentage_total_outputs_scanned,
         ss.percentage_total_blocks_scanned,
       );
-
-      //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
       // avoiding 0.00, minimum 0.01, maximun 100
       // fixing when is:
@@ -919,7 +896,6 @@ export default class RPC {
           Date.now() - start,
         );
       }
-      //console.log(spendableStr);
       let spendableJSON: RPCSpendablebalanceType =
         {} as RPCSpendablebalanceType;
       if (spendableStr) {
@@ -971,7 +947,6 @@ export default class RPC {
         totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
         //totalSpendableBalance: ((balanceJSON.confirmed_orchard_balance + balanceJSON.confirmed_sapling_balance) || 0) / 10 ** 8,
       };
-      //console.log(balance);
       this.fnSetTotalBalance(balance);
       this.fetchTotalBalanceLock = false;
     } catch (error) {
@@ -1072,8 +1047,6 @@ export default class RPC {
           );
           allAddresses.push(t);
         });
-
-      //console.log(allAddresses);
 
       this.fnSetAllAddresses(allAddresses);
       this.fetchAddressesLock = false;
@@ -1270,7 +1243,6 @@ export default class RPC {
   async fetchTandZandOValueTransfers() {
     try {
       if (this.fetchTandZandOValueTransfersLock) {
-        //console.log('VT LOCKKKKKKKKKKKKKKKKKKKKKKK');
         return;
       }
       this.fetchTandZandOValueTransfersLock = true;
@@ -1296,8 +1268,6 @@ export default class RPC {
         console.log('Internal Error server height');
       }
 
-      //console.log('SERVER HEIGHT', this.lastServerBlockHeight);
-
       const start2 = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
       if (Date.now() - start2 > 4000) {
@@ -1306,7 +1276,6 @@ export default class RPC {
           Date.now() - start2,
         );
       }
-      //console.log(valueTransfersStr);
       if (valueTransfersStr) {
         if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error value transfers ${valueTransfersStr}`);
@@ -1321,8 +1290,6 @@ export default class RPC {
       }
       const valueTransfersJSON: RPCValueTransfersType =
         await JSON.parse(valueTransfersStr);
-
-      //console.log(valueTransfersJSON);
 
       let vtList: ValueTransferType[] = [];
 
@@ -1404,12 +1371,9 @@ export default class RPC {
             //  console.log(vt);
             //}
 
-            //console.log(currentValueTransferList);
             vtList.push(currentValueTransferList);
           },
         );
-
-      //console.log(vtlist);
 
       this.fnSetValueTransfersList(vtList, vtList.length);
       this.fetchTandZandOValueTransfersLock = false;
@@ -1428,7 +1392,6 @@ export default class RPC {
   async fetchTandZandOMessages() {
     try {
       if (this.fetchTandZandOMessagesLock) {
-        //console.log('MESSAGES LOCKKKKKKKKKKKKKKKKKKKKKKK');
         return;
       }
       this.fetchTandZandOMessagesLock = true;
@@ -1440,7 +1403,6 @@ export default class RPC {
           Date.now() - start,
         );
       }
-      //console.log(messagesStr);
       if (messagesStr) {
         if (messagesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error value transfers messages ${messagesStr}`);
@@ -1454,8 +1416,6 @@ export default class RPC {
         return;
       }
       const messagesJSON: RPCValueTransfersType = await JSON.parse(messagesStr);
-
-      //console.log(valueTransfersJSON);
 
       let mList: ValueTransferType[] = [];
 
@@ -1530,11 +1490,8 @@ export default class RPC {
           //  console.log(m);
           //}
 
-          //console.log(currentValueTransferList);
           mList.push(currentMessageList);
         });
-
-      //console.log(mlist);
 
       this.fnSetMessagesList(mList, mList.length);
       this.fetchTandZandOMessagesLock = false;
@@ -1618,12 +1575,10 @@ export default class RPC {
       this.setInSend(false);
 
       if (sendTxids) {
-        //console.log('00000000 RESOLVE send');
         resolve(sendTxids);
         return;
       }
       if (sendError) {
-        //console.log('00000000 REJECT send');
         reject(sendError);
         return;
       }
@@ -1635,7 +1590,6 @@ export default class RPC {
   async changeWallet() {
     const exists = await RPCModule.walletExists();
 
-    //console.log('jc change wallet', exists);
     if (exists && exists !== GlobalConst.false) {
       await this.pauseSyncProcess();
       await RPCModule.doSaveBackup();
@@ -1653,7 +1607,6 @@ export default class RPC {
   async changeWalletNoBackup() {
     const exists = await RPCModule.walletExists();
 
-    //console.log('jc change wallet', exists);
     if (exists && exists !== GlobalConst.false) {
       await this.pauseSyncProcess();
       const result = await RPCModule.deleteExistingWallet();
@@ -1670,11 +1623,9 @@ export default class RPC {
   async restoreBackup() {
     const existsBackup = await RPCModule.walletBackupExists();
 
-    //console.log('jc restore backup', existsBackup);
     if (existsBackup && existsBackup !== GlobalConst.false) {
       const existsWallet = await RPCModule.walletExists();
 
-      //console.log('jc restore wallet', existsWallet);
       if (existsWallet && existsWallet !== GlobalConst.false) {
         await this.pauseSyncProcess();
         await RPCModule.restoreExistingWalletBackup();

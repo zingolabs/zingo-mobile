@@ -96,3 +96,6 @@ buck-out/
 # Keystore
 /android/app/Zingo.jks
 /android/local.zingo.jks.properties
+
+# Claude Code
+.claude/

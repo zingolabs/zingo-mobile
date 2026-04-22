@@ -481,15 +481,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setHeightLayout(10);
   }, []);
 
-  console.log(
-    'render History - 4',
-    filterKind,
-    filterFailed,
-    filterMemos,
-    filterWithFunds,
-  );
-  //console.log(valueTransfersSliced[0]);
-
   return (
     <ToastProvider>
       <Snackbars
