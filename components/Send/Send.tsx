@@ -714,8 +714,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     const items = addressBook
       .filter(
-        (item: AddressBookFileClass) =>
-          item.address !== zenniesDonationAddress,
+        (item: AddressBookFileClass) => item.address !== zenniesDonationAddress,
       )
       .map((item: AddressBookFileClass) => ({
         label: item.label,

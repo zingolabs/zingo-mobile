@@ -1160,7 +1160,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       keyboardType="numeric"
                       maxLength={20}
                       onChangeText={[Function]}
-                      onEndEditing={[Function]}
                       placeholder="#.########"
                       placeholderTextColor="#888888"
                       style={
@@ -1531,7 +1530,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       keyboardType="numeric"
                       maxLength={15}
                       onChangeText={[Function]}
-                      onEndEditing={[Function]}
                       placeholder="#.##"
                       placeholderTextColor="#888888"
                       style={
@@ -2755,7 +2753,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       keyboardType="numeric"
                       maxLength={20}
                       onChangeText={[Function]}
-                      onEndEditing={[Function]}
                       placeholder="#.########"
                       placeholderTextColor="#888888"
                       style={
