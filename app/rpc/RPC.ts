@@ -461,12 +461,11 @@ export default class RPC {
   }
 
   async refreshSync(fullRescan?: boolean) {
+    if (this.refreshSyncLock && !fullRescan) {
+      return;
+    }
+    this.refreshSyncLock = true;
     try {
-      if (this.refreshSyncLock && !fullRescan) {
-        return;
-      }
-      this.refreshSyncLock = true;
-
       // the App can called `sync run` no matter what
       // this is handy to have the wallet fully synced
       // anytime.
@@ -522,17 +521,17 @@ export default class RPC {
       }
     } catch (error) {
       console.log(`Critical Error sync/rescan run ${error}`);
+    } finally {
+      this.refreshSyncLock = false;
     }
-
-    this.refreshSyncLock = false;
   }
 
   async fetchSyncStatus(): Promise<void> {
+    if (this.fetchSyncStatusLock) {
+      return;
+    }
+    this.fetchSyncStatusLock = true;
     try {
-      if (this.fetchSyncStatusLock) {
-        return;
-      }
-      this.fetchSyncStatusLock = true;
       const start = Date.now();
       const returnStatus: string = await RPCModule.statusSyncInfo();
       if (Date.now() - start > 4000) {
@@ -547,7 +546,6 @@ export default class RPC {
       ) {
         console.log('SYNC STATUS ERROR', returnStatus);
         this.fnSetLastError(`Error sync status: ${returnStatus}`);
-        this.fetchSyncStatusLock = false;
         return;
       }
       let ss = {} as RPCSyncStatusType;
@@ -558,7 +556,6 @@ export default class RPC {
         this.fnSetLastError(
           `Error sync status parse: ${error} value: ${returnStatus}`,
         );
-        this.fetchSyncStatusLock = false;
         return;
       }
 
@@ -611,18 +608,18 @@ export default class RPC {
       this.fnSetSyncingStatus(ss as RPCSyncStatusType);
     } catch (error) {
       console.log(`Critical Error sync status ${error}`);
+    } finally {
+      this.fetchSyncStatusLock = false;
     }
-
-    this.fetchSyncStatusLock = false;
   }
 
   async fetchSyncPoll(): Promise<void> {
+    if (this.fetchSyncPollLock) {
+      console.log('***************** SYNC POLL - locked');
+      return;
+    }
+    this.fetchSyncPollLock = true;
     try {
-      if (this.fetchSyncPollLock) {
-        console.log('***************** SYNC POLL - locked');
-        return;
-      }
-      this.fetchSyncPollLock = true;
       const start = Date.now();
       const returnPoll: string = await RPCModule.pollSyncInfo();
       if (Date.now() - start > 4000) {
@@ -637,7 +634,6 @@ export default class RPC {
       ) {
         console.log('SYNC POLL ERROR', returnPoll);
         this.fnSetLastError(`Error sync poll: ${returnPoll}`);
-        this.fetchSyncPollLock = false;
         return;
       }
 
@@ -648,7 +644,6 @@ export default class RPC {
         setTimeout(async () => {
           await this.refreshSync();
         }, 0);
-        this.fetchSyncPollLock = false;
         return;
       }
 
@@ -664,7 +659,6 @@ export default class RPC {
         setTimeout(async () => {
           await this.refreshSync();
         }, 0);
-        this.fetchSyncPollLock = false;
         return;
       }
 
@@ -676,7 +670,6 @@ export default class RPC {
         this.fnSetLastError(
           `Error sync poll parse: ${error} value: ${returnPoll}`,
         );
-        this.fetchSyncPollLock = false;
         return;
       }
 
@@ -713,17 +706,17 @@ export default class RPC {
       }, 0);
     } catch (error) {
       console.log(`Critical Error sync poll ${error}`);
+    } finally {
+      this.fetchSyncPollLock = false;
     }
-
-    this.fetchSyncPollLock = false;
   }
 
   async fetchInfoAndServerHeight(): Promise<void> {
+    if (this.fetchInfoAndServerHeightLock) {
+      return;
+    }
+    this.fetchInfoAndServerHeightLock = true;
     try {
-      if (this.fetchInfoAndServerHeightLock) {
-        return;
-      }
-      this.fetchInfoAndServerHeightLock = true;
       let infoError: boolean = false;
       const start = Date.now();
       const infoStr: string = await RPCModule.infoServerInfo();
@@ -751,7 +744,6 @@ export default class RPC {
           version: '',
         } as InfoType);
         this.lastServerBlockHeight = 0;
-        this.fetchInfoAndServerHeightLock = false;
         return;
       }
 
@@ -772,24 +764,23 @@ export default class RPC {
 
       this.fnSetInfo(info);
       this.lastServerBlockHeight = info.latestBlock;
-      this.fetchInfoAndServerHeightLock = false;
     } catch (error) {
       console.log(`Critical Error info & server block height ${error}`);
       this.fnSetLastError(`Error info: ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.clearTimers();
       await this.configure();
+    } finally {
       this.fetchInfoAndServerHeightLock = false;
-      return;
     }
   }
 
   async fetchZingolibVersion(): Promise<void> {
+    if (this.fetchZingolibVersionLock) {
+      return;
+    }
+    this.fetchZingolibVersionLock = true;
     try {
-      if (this.fetchZingolibVersionLock) {
-        return;
-      }
-      this.fetchZingolibVersionLock = true;
       const start = Date.now();
       let zingolibStr: string = await RPCModule.getVersionInfo();
       if (Date.now() - start > 4000) {
@@ -810,22 +801,21 @@ export default class RPC {
       }
 
       this.fnSetZingolib(zingolibStr);
-      this.fetchZingolibVersionLock = false;
     } catch (error) {
       console.log(`Critical Error zingolib version ${error}`);
       this.fnSetLastError(`Error zingolib version: ${error}`);
+    } finally {
       this.fetchZingolibVersionLock = false;
-      return;
     }
   }
 
   // This method will get the total balances
   async fetchTotalBalance() {
+    if (this.fetchTotalBalanceLock) {
+      return;
+    }
+    this.fetchTotalBalanceLock = true;
     try {
-      if (this.fetchTotalBalanceLock) {
-        return;
-      }
-      this.fetchTotalBalanceLock = true;
       const start = Date.now();
       const spendableStr: string =
         await RPCModule.getSpendableBalanceTotalInfo();
@@ -860,12 +850,10 @@ export default class RPC {
         if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error balance ${balanceStr}`);
           this.fnSetLastError(`Error balance: ${balanceStr}`);
-          this.fetchTotalBalanceLock = false;
           return;
         }
       } else {
         console.log('Internal Error balance');
-        this.fetchTotalBalanceLock = false;
         return;
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
@@ -887,26 +875,24 @@ export default class RPC {
         //totalSpendableBalance: ((balanceJSON.confirmed_orchard_balance + balanceJSON.confirmed_sapling_balance) || 0) / 10 ** 8,
       };
       this.fnSetTotalBalance(balance);
-      this.fetchTotalBalanceLock = false;
     } catch (error) {
       console.log(`Critical Error balances ${error}`);
       this.fnSetLastError(`Error balance: ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.clearTimers();
       await this.configure();
+    } finally {
       this.fetchTotalBalanceLock = false;
-      return;
     }
   }
 
   // This method will get the total balances
   async fetchAddresses() {
+    if (this.fetchAddressesLock) {
+      return;
+    }
+    this.fetchAddressesLock = true;
     try {
-      if (this.fetchAddressesLock) {
-        return;
-      }
-      this.fetchAddressesLock = true;
-
       // UNIFIED
       const start = Date.now();
       const unifiedAddressesStr: string =
@@ -923,12 +909,10 @@ export default class RPC {
           this.fnSetLastError(
             `Error unified addresses: ${unifiedAddressesStr}`,
           );
-          this.fetchAddressesLock = false;
           return;
         }
       } else {
         console.log('Internal Error addresses');
-        this.fetchAddressesLock = false;
         return;
       }
       const unifiedAddressesJSON: RPCUnifiedAddressType[] =
@@ -950,12 +934,10 @@ export default class RPC {
           this.fnSetLastError(
             `Error transparent addresses: ${transparentAddressStr}`,
           );
-          this.fetchAddressesLock = false;
           return;
         }
       } else {
         console.log('Internal Error addresses');
-        this.fetchAddressesLock = false;
         return;
       }
       const transparentAddressesJSON: RPCTransparentAddressType[] =
@@ -988,24 +970,23 @@ export default class RPC {
         });
 
       this.fnSetAllAddresses(allAddresses);
-      this.fetchAddressesLock = false;
     } catch (error) {
       console.log(`Critical Error addresses ${error}`);
       this.fnSetLastError(`Error addresses: ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.clearTimers();
       await this.configure();
+    } finally {
       this.fetchAddressesLock = false;
-      return;
     }
   }
 
   async fetchWalletHeight(): Promise<void> {
+    if (this.fetchWalletHeightLock) {
+      return;
+    }
+    this.fetchWalletHeightLock = true;
     try {
-      if (this.fetchWalletHeightLock) {
-        return;
-      }
-      this.fetchWalletHeightLock = true;
       const start = Date.now();
       const heightStr: string = await RPCModule.getLatestBlockWalletInfo();
       if (Date.now() - start > 4000) {
@@ -1018,35 +999,32 @@ export default class RPC {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet height ${heightStr}`);
           this.fnSetLastError(`Error wallet height: ${heightStr}`);
-          this.fetchWalletHeightLock = false;
           return;
         }
       } else {
         console.log('Internal Error wallet height');
-        this.fetchWalletHeightLock = false;
         return;
       }
       const heightJSON: RPCWalletHeight = await JSON.parse(heightStr);
 
       this.lastWalletBlockHeight = heightJSON.height;
-      this.fetchWalletHeightLock = false;
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
       this.fnSetLastError(`Error wallet height: ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.clearTimers();
       await this.configure();
+    } finally {
       this.fetchWalletHeightLock = false;
-      return;
     }
   }
 
   async getWalletSaveRequired(): Promise<boolean> {
+    if (this.getWalletSaveRequiredLock) {
+      return false;
+    }
+    this.getWalletSaveRequiredLock = true;
     try {
-      if (this.getWalletSaveRequiredLock) {
-        return false;
-      }
-      this.getWalletSaveRequiredLock = true;
       const start = Date.now();
       const walletSaveRequiredStr: string =
         await RPCModule.getWalletSaveRequiredInfo();
@@ -1062,24 +1040,22 @@ export default class RPC {
           this.fnSetLastError(
             `Error wallet save required: ${walletSaveRequiredStr}`,
           );
-          this.getWalletSaveRequiredLock = false;
           return false;
         }
       } else {
         console.log('Internal Error wallet save required');
-        this.getWalletSaveRequiredLock = false;
         return false;
       }
       const walletSaveRequiredJSON: RPCWalletSaveRequiredType =
         await JSON.parse(walletSaveRequiredStr);
 
-      this.getWalletSaveRequiredLock = false;
       return walletSaveRequiredJSON.save_required;
     } catch (error) {
       console.log(`Critical Error wallet save required ${error}`);
       this.fnSetLastError(`Error wallet save required: ${error}`);
-      this.getWalletSaveRequiredLock = false;
       return false;
+    } finally {
+      this.getWalletSaveRequiredLock = false;
     }
   }
 
@@ -1155,36 +1131,35 @@ export default class RPC {
   }
 
   async fetchWalletBirthdaySeedUfvk(): Promise<void> {
+    if (this.fetchWalletBirthdaySeedUfvkLock) {
+      return;
+    }
+    this.fetchWalletBirthdaySeedUfvkLock = true;
     try {
-      if (this.fetchWalletBirthdaySeedUfvkLock) {
-        return;
-      }
-      this.fetchWalletBirthdaySeedUfvkLock = true;
       const wallet = await RPC.rpcFetchWallet(this.readOnly);
 
       if (wallet) {
         this.walletBirthday = wallet.birthday;
         this.fnSetBirthday(wallet.birthday || 0);
       }
-      this.fetchWalletBirthdaySeedUfvkLock = false;
     } catch (error) {
       console.log(`Critical Error wallet birthday ${error}`);
       this.fnSetLastError(`Error wallet birthday: ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.clearTimers();
       await this.configure();
+    } finally {
       this.fetchWalletBirthdaySeedUfvkLock = false;
-      return;
     }
   }
 
   // Fetch all T and Z and O ValueTransfers
   async fetchTandZandOValueTransfers() {
+    if (this.fetchTandZandOValueTransfersLock) {
+      return;
+    }
+    this.fetchTandZandOValueTransfersLock = true;
     try {
-      if (this.fetchTandZandOValueTransfersLock) {
-        return;
-      }
-      this.fetchTandZandOValueTransfersLock = true;
       // first to get the last server block.
       const start = Date.now();
       const heightStr: string = await RPCModule.getLatestBlockServerInfo(
@@ -1219,12 +1194,10 @@ export default class RPC {
         if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error value transfers ${valueTransfersStr}`);
           this.fnSetLastError(`Error value transfers: ${valueTransfersStr}`);
-          this.fetchTandZandOValueTransfersLock = false;
           return;
         }
       } else {
         console.log('Internal Error value transfers');
-        this.fetchTandZandOValueTransfersLock = false;
         return;
       }
       const valueTransfersJSON: RPCValueTransfersType =
@@ -1315,25 +1288,24 @@ export default class RPC {
         );
 
       this.fnSetValueTransfersList(vtList, vtList.length);
-      this.fetchTandZandOValueTransfersLock = false;
     } catch (error) {
       console.log(`Critical Error value transfers ${error}`);
       this.fnSetLastError(`Error value transfers: ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.clearTimers();
       await this.configure();
+    } finally {
       this.fetchTandZandOValueTransfersLock = false;
-      return;
     }
   }
 
   // Fetch all T and Z and O ValueTransfers as a Messages
   async fetchTandZandOMessages() {
+    if (this.fetchTandZandOMessagesLock) {
+      return;
+    }
+    this.fetchTandZandOMessagesLock = true;
     try {
-      if (this.fetchTandZandOMessagesLock) {
-        return;
-      }
-      this.fetchTandZandOMessagesLock = true;
       const start = Date.now();
       const messagesStr: string = await RPCModule.getMessagesInfo('');
       if (Date.now() - start > 4000) {
@@ -1346,12 +1318,10 @@ export default class RPC {
         if (messagesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error value transfers messages ${messagesStr}`);
           this.fnSetLastError(`Error value transfers messages: ${messagesStr}`);
-          this.fetchTandZandOMessagesLock = false;
           return;
         }
       } else {
         console.log('Internal Error value transfers messages');
-        this.fetchTandZandOMessagesLock = false;
         return;
       }
       const messagesJSON: RPCValueTransfersType = await JSON.parse(messagesStr);
@@ -1433,15 +1403,14 @@ export default class RPC {
         });
 
       this.fnSetMessagesList(mList, mList.length);
-      this.fetchTandZandOMessagesLock = false;
     } catch (error) {
       console.log(`Critical Error value transfers messages ${error}`);
       this.fnSetLastError(`Error value transfers messages: ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.clearTimers();
       await this.configure();
+    } finally {
       this.fetchTandZandOMessagesLock = false;
-      return;
     }
   }
 
