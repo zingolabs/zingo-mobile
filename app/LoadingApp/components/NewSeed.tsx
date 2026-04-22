@@ -62,6 +62,12 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   const birthdayNumber = (wallet.birthday && wallet.birthday.toString()) || '';
 
   useEffect(() => {
+    return () => {
+      Clipboard.setString('');
+    };
+  }, []);
+
+  useEffect(() => {
     if (privacy) {
       setExpandSeed(false);
       setExpandBithday(false);

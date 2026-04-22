@@ -1427,7 +1427,6 @@ export default class RPC {
       let sendError: string = '';
       let sendTxids: string = '';
       try {
-        console.log('send JSON', sendJson);
         // creating the propose
         const proposeStr: string = await RPCModule.sendProcess(
           JSON.stringify(sendJson),
