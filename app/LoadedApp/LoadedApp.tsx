@@ -949,13 +949,23 @@ export class LoadedAppClass extends Component<
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
-    this.appstate &&
-      typeof this.appstate.remove === 'function' &&
-      this.appstate.remove();
-    this.linking && typeof this.linking === 'function' && this.linking.remove();
-    this.unsubscribeNetInfo &&
-      typeof this.unsubscribeNetInfo === 'function' &&
-      this.unsubscribeNetInfo();
+    const safeRemove = (listener: unknown, name: string) => {
+      try {
+        if (
+          listener &&
+          typeof (listener as { remove: () => void }).remove === 'function'
+        ) {
+          (listener as { remove: () => void }).remove();
+        } else if (typeof listener === 'function') {
+          (listener as () => void)();
+        }
+      } catch (e) {
+        console.log(`Error removing listener ${name}`, e);
+      }
+    };
+    safeRemove(this.appstate, 'appstate');
+    safeRemove(this.linking, 'linking');
+    safeRemove(this.unsubscribeNetInfo, 'netInfo');
   };
 
   keepAwake = (keep: boolean): void => {
@@ -988,7 +998,12 @@ export class LoadedAppClass extends Component<
               // fill the fields in the screen with the donation data
               update = true;
             })
-            .catch(() => {}); // user cancelled the alert — expected
+            .catch((e: unknown) => {
+              // user cancelled the alert — expected, log unexpected errors
+              if (e && (e as Error).message !== 'cancelled') {
+                console.log('ShowAddressAlert unexpected error', e);
+              }
+            });
         } else if (target.address) {
           // fill the fields in the screen with the donation data
           update = true;
@@ -1030,8 +1045,7 @@ export class LoadedAppClass extends Component<
   };
 
   setBackgroundSyncErrorInfo = async (error: string) => {
-    const newBackgroundSyncInfo = this.state.backgroundSyncInfo;
-    newBackgroundSyncInfo.error = error;
+    const newBackgroundSyncInfo = { ...this.state.backgroundSyncInfo, error };
     this.setState({ backgroundSyncInfo: newBackgroundSyncInfo });
     await BackgroundFileImpl.writeBackground(newBackgroundSyncInfo);
   };

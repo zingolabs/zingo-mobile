@@ -336,13 +336,7 @@ export default class RPC {
     // if the wallet needs to save, means the App needs to fetch all the new data
     if (!(await this.getWalletSaveRequired())) {
       console.log('***************** NOT SAVE REQUIRED: No fetching data');
-      // do need this because of the sync process
-      taskPromises.push(
-        new Promise<void>(async resolve => {
-          await this.fetchSyncPoll();
-          resolve();
-        }),
-      );
+      taskPromises.push(this.fetchSyncPoll());
     } else {
       if (
         this.getWalletSaveRequiredLock ||
@@ -359,59 +353,17 @@ export default class RPC {
         this.refreshSyncLock
       ) {
         console.log('***************** LONG TASKS: No fetching data');
-        // do need this because of the sync process
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            await this.fetchSyncPoll();
-            resolve();
-          }),
-        );
+        taskPromises.push(this.fetchSyncPoll());
       } else {
-        // do need this because of the sync process
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            await this.fetchSyncPoll();
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchWalletHeight();
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchWalletBirthdaySeedUfvk();
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchInfoAndServerHeight();
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchAddresses();
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchTotalBalance();
-            resolve();
-          }),
-        );
+        taskPromises.push(this.fetchSyncPoll());
+        taskPromises.push(this.fetchWalletHeight());
+        taskPromises.push(this.fetchWalletBirthdaySeedUfvk());
+        taskPromises.push(this.fetchInfoAndServerHeight());
+        taskPromises.push(this.fetchAddresses());
+        taskPromises.push(this.fetchTotalBalance());
         // save the wallet as required.
         taskPromises.push(
-          new Promise<void>(async resolve => {
+          (async () => {
             const start = Date.now();
             await RPCModule.doSave();
             if (Date.now() - start > 4000) {
@@ -420,23 +372,10 @@ export default class RPC {
                 Date.now() - start,
               );
             }
-            resolve();
-          }),
+          })(),
         );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchTandZandOValueTransfers();
-            resolve();
-          }),
-        );
-        taskPromises.push(
-          new Promise<void>(async resolve => {
-            //const s = Date.now();
-            await this.fetchTandZandOMessages();
-            resolve();
-          }),
-        );
+        taskPromises.push(this.fetchTandZandOValueTransfers());
+        taskPromises.push(this.fetchTandZandOMessages());
       }
     }
 
