@@ -275,8 +275,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         server,
         donation,
       );
-      console.log('SEND', sendJson);
-
       // fee
       let proposeFee = 0;
       const runProposeStr = await runSendPropose(JSON.stringify(sendJson));
@@ -2220,4 +2218,4 @@ const Send: React.FunctionComponent<SendProps> = ({
   return returnPage;
 };
 
-export default Send;
+export default React.memo(Send);

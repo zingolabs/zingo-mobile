@@ -118,6 +118,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     (birthdayFromContext && birthdayFromContext.toString()) || '';
 
   useEffect(() => {
+    return () => {
+      Clipboard.setString('');
+    };
+  }, []);
+
+  useEffect(() => {
     const _action =
       !!route.params && route.params.action !== undefined
         ? route.params.action
@@ -507,4 +513,4 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   );
 };
 
-export default Seed;
+export default React.memo(Seed);
