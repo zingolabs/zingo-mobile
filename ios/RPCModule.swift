@@ -54,7 +54,12 @@ class RPCModule: NSObject {
   }
 
   func writeFile(_ fileName: String, fileBase64EncodedString: String) throws {
-    try fileBase64EncodedString.write(toFile: getFileName(fileName), atomically: true, encoding: .utf8)
+    let filePath = try getFileName(fileName)
+    try fileBase64EncodedString.write(toFile: filePath, atomically: true, encoding: .utf8)
+    var fileURL = URL(fileURLWithPath: filePath)
+    var resourceValues = URLResourceValues()
+    resourceValues.isExcludedFromBackup = true
+    try? fileURL.setResourceValues(resourceValues)
   }
 
   func deleteFile(_ fileName: String) throws {
@@ -202,7 +207,7 @@ class RPCModule: NSObject {
           if correct == "true" {
             try self.saveWalletFile(walletEncodedString)
           } else {
-            let err = "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect: \(walletEncodedString)"
+            let err = "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect. Size: \(walletEncodedString.count)"
             NSLog(err)
             throw FileError.saveFileError(err)
           }
