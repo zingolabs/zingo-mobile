@@ -98,12 +98,17 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   useEffect(() => {
     (async () => {
       setLoadingSeed(true);
-      const seedInfo = recoveryWalletInfoOnDevice
-        ? await getRecoveryWalletInfo()
-        : ((await RPC.rpcFetchWallet(false)) ?? ({} as WalletType));
-      const ufvkInfo = await RPC.rpcFetchWallet(true);
-      setFetchedWallet({ ...seedInfo, ufvk: ufvkInfo?.ufvk });
-      setLoadingSeed(false);
+      try {
+        const seedInfo = recoveryWalletInfoOnDevice
+          ? await getRecoveryWalletInfo()
+          : ((await RPC.rpcFetchWallet(false)) ?? ({} as WalletType));
+        const ufvkInfo = await RPC.rpcFetchWallet(true);
+        setFetchedWallet({ ...seedInfo, ufvk: ufvkInfo?.ufvk });
+      } catch (e) {
+        console.log('Error fetching wallet info for seed screen', e);
+      } finally {
+        setLoadingSeed(false);
+      }
     })();
   }, [recoveryWalletInfoOnDevice]);
 

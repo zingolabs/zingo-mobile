@@ -163,6 +163,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
               onPress={() => {
                 if (seedPhrase) {
                   Clipboard.setString(seedPhrase);
+                  setTimeout(() => Clipboard.setString(''), 60 * 1000);
                   if (addLastSnackbar) {
                     addLastSnackbar({
                       message: translate('seed.tapcopy-seed-message') as string,
