@@ -33,7 +33,7 @@ struct SyncStatus: Decodable {
     let percentage_total_outputs_scanned: Double?
 }
 
-@UIApplicationMain
+@main
 class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
   var reactNativeDelegate: ReactNativeDelegate?
@@ -58,14 +58,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
  
     reactNativeDelegate = delegate
     reactNativeFactory = factory
- 
-    window = UIWindow(frame: UIScreen.main.bounds)
- 
-    factory.startReactNative(
-      withModuleName: "Zingo",
-      in: window,
-      launchOptions: launchOptions
-    )
 
     if #available(iOS 13.0, *) {
       NSLog("BGTask registerTasks")
@@ -76,8 +68,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func application(
-    _ application: UIApplication, 
-    open url: URL, 
+    _ application: UIApplication,
+    configurationForConnecting connectingSceneSession: UISceneSession,
+    options: UIScene.ConnectionOptions
+  ) -> UISceneConfiguration {
+    UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+  }
+
+  func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {}
+
+  func application(
+    _ application: UIApplication,
+    open url: URL,
     options: [UIApplication.OpenURLOptionsKey : Any] = [:]
   ) -> Bool {
     return RCTLinkingManager.application(application, open: url, options: options)
@@ -95,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
   }
 
-  func applicationWillEnterForeground(_ application: UIApplication) {
+  func handleForeground() {
     if #available(iOS 13.0, *) {
       NSLog("BGTask foreground")
       self.cancelExecutingTask()
@@ -107,7 +109,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   }
 
-  func applicationDidEnterBackground(_ application: UIApplication) {
+  func handleBackground() {
     if #available(iOS 13.0, *) {
       NSLog("BGTask background")
 

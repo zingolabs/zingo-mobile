@@ -75,7 +75,6 @@ import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalance
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { isEqual } from 'lodash';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
@@ -183,6 +182,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     useState<boolean>(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
+  const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
 
   const runSendPropose = async (proposeJSON: string): Promise<string> => {
@@ -245,6 +245,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       memoPar: string,
       includeUAMemoPar: boolean,
     ): Promise<void> => {
+      const generation = feeCalculationGenRef.current;
+
       // if no address -> make no sense to run the propose
       if (!addressPar || validAddress !== 1) {
         defaultValueFee();
@@ -278,6 +280,12 @@ const Send: React.FunctionComponent<SendProps> = ({
       // fee
       let proposeFee = 0;
       const runProposeStr = await runSendPropose(JSON.stringify(sendJson));
+
+      // discard result if a newer calculation (or a clear) has superseded this one
+      if (feeCalculationGenRef.current !== generation) {
+        return;
+      }
+
       //Alert.alert('Calculating the FEE ' + command, runProposeStr);
       if (
         runProposeStr &&
@@ -704,21 +712,16 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
-    (async () => {
-      const items = addressBook
-        .filter(
-          (item: AddressBookFileClass) =>
-            item.address !== zenniesDonationAddress,
-        )
-        .map((item: AddressBookFileClass) => ({
-          label: item.label,
-          value: item.address,
-        }));
-      if (!isEqual(items, itemsPicker)) {
-        setItemsPicker(items);
-      }
-    })();
-  }, [addressBook, itemsPicker, zenniesDonationAddress]);
+    const items = addressBook
+      .filter(
+        (item: AddressBookFileClass) => item.address !== zenniesDonationAddress,
+      )
+      .map((item: AddressBookFileClass) => ({
+        label: item.label,
+        value: item.address,
+      }));
+    setItemsPicker(items);
+  }, [addressBook, zenniesDonationAddress]);
 
   useEffect(() => {
     if (addressText) {
@@ -762,6 +765,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const clearState = () => {
+    feeCalculationGenRef.current += 1;
     setAddressText('');
     setAmountText('');
     setAmountCurrencyText('');
@@ -1136,6 +1140,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <>
                         {!updatingToField ? (
                           <RNPickerSelect
+                            key={itemsPicker.length}
                             style={{
                               modalViewBottom: {
                                 minHeight: 300,
@@ -1437,23 +1442,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             null,
                           )
                         }
-                        onEndEditing={(
-                          e: NativeSyntheticEvent<TextInputEndEditingEventData>,
-                        ) => {
-                          updateToField(
-                            null,
-                            e.nativeEvent.text.substring(0, 20),
-                            null,
-                            null,
-                            null,
-                          );
-                          calculateFeeWithPropose(
-                            e.nativeEvent.text.substring(0, 20),
-                            addressText,
-                            memoText,
-                            includeUAMemoBoolean,
-                          );
-                        }}
                         editable={true}
                         maxLength={20}
                       />
@@ -1763,24 +1751,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 null,
                               )
                             }
-                            onEndEditing={(
-                              e: NativeSyntheticEvent<TextInputEndEditingEventData>,
-                            ) => {
-                              updateToField(
-                                null,
-                                null,
-                                e.nativeEvent.text.substring(0, 15),
-                                null,
-                                null,
-                              );
-                              // re-calculate the fee with the zec amount in the other field
-                              calculateFeeWithPropose(
-                                amountText,
-                                addressText,
-                                memoText,
-                                includeUAMemoBoolean,
-                              );
-                            }}
                             editable={true}
                             maxLength={15}
                           />
