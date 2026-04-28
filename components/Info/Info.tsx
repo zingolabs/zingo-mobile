@@ -30,7 +30,6 @@ const Info: React.FunctionComponent<InfoProps> = ({ navigation }) => {
     translate,
     currency,
     zecPrice,
-    privacy,
     setZecPrice,
     snackbars,
     removeFirstSnackbar,
@@ -140,7 +139,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ navigation }) => {
                     price={zecPrice.zecPrice}
                     amtZec={1}
                     currency={currency}
-                    privacy={privacy}
+                    privacy={false}
                   />
                 </DetailLine>
                 <View style={{ marginLeft: 5 }}>
