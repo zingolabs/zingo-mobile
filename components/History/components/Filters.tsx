@@ -8,7 +8,6 @@ import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import { useToast } from 'react-native-toastier';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import FadeText from '../../Components/FadeText';
@@ -40,7 +39,6 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
 
   const [filterWithFundsLocal, setFilterWithFundsLocal] =
     useState<boolean>(filterWithFunds);
@@ -75,7 +73,6 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
       <TouchableOpacity
         onPress={() => {
           clearLocal();
-          clear();
           setTimeout(() => {
             closeSheet();
           }, 100);
@@ -341,7 +338,6 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               setFilterFailed(false);
               setFilterMemos(false);
               clearLocal();
-              clear();
               closeSheet();
             }}
             twoButtons={true}
@@ -356,7 +352,6 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               setFilterFailed(filterFailedLocal);
               setFilterMemos(filterMemosLocal);
               clearLocal();
-              clear();
               closeSheet();
             }}
             twoButtons={true}

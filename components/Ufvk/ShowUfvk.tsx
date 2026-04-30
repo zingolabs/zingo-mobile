@@ -35,8 +35,6 @@ import {
   SnackbarDurationEnum,
   UfvkActionEnum,
 } from '../../app/AppState';
-import Snackbars from '../Components/Snackbars';
-import { ToastProvider, useToast } from 'react-native-toastier';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -73,13 +71,10 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     server,
     mode,
     addLastSnackbar,
-    snackbars,
-    removeFirstSnackbar,
     setPrivacyOption,
     recoveryWalletInfoOnDevice,
   } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
   const screenName = ScreenEnum.ShowUfvk;
 
   const [times, setTimes] = useState<number>(0);
@@ -110,6 +105,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     })();
   }, [recoveryWalletInfoOnDevice]);
 
+  const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const snapPoints = useMemo(() => {
@@ -159,6 +155,15 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     );
   }, [action, translate]);
 
+  useEffect(() => {
+    return () => {
+      if (clipboardTimer.current) {
+        clearTimeout(clipboardTimer.current);
+      }
+      Clipboard.setString('');
+    };
+  }, []);
+
   const onPressOK = () => {
     Alert.alert(
       !!texts && !!texts[action] ? texts[action][3] : '',
@@ -190,7 +195,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
 
   const onClickCancelHide = () => {
     onClickCancel();
-    clear();
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -198,7 +202,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
 
   const onClickOKHide = () => {
     onClickOK();
-    clear();
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -217,23 +220,26 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     if (!fetchedWallet.ufvk) {
       return;
     }
+    if (clipboardTimer.current) {
+      clearTimeout(clipboardTimer.current);
+    }
     Clipboard.setString(fetchedWallet.ufvk);
-    setTimeout(() => Clipboard.setString(''), 60 * 1000);
-    addLastSnackbar({
-      message: translate('seed.tapcopy-ufvk-message') as string,
-      duration: SnackbarDurationEnum.short,
-      screenName: [screenName],
-    });
+    addLastSnackbar(
+      translate('seed.tapcopy-ufvk-message') as string,
+      SnackbarDurationEnum.longer,
+    );
+    clipboardTimer.current = setTimeout(() => {
+      Clipboard.setString('');
+      clipboardTimer.current = null;
+      addLastSnackbar(
+        translate('seed.clipboard-cleared') as string,
+        SnackbarDurationEnum.long,
+      );
+    }, 60 * 1000);
   };
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
-
+    <View>
       <View
         style={{
           flex: 1,
@@ -296,7 +302,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                   <>
                     <SingleAddress
                       ufvk={fetchedWallet.ufvk}
-                      screenName={screenName}
                       index={0}
                       setIndex={() => {}}
                       total={1}
@@ -389,7 +394,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           )}
         </BottomSheetView>
       </BottomSheet>
-    </ToastProvider>
+    </View>
   );
 };
 

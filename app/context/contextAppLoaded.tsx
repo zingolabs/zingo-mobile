@@ -14,7 +14,6 @@ import {
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
-  SnackbarType,
   AppContextLoaded,
   BlockExplorerEnum,
 } from '../AppState';
@@ -63,9 +62,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   saplingPool: true,
   transparentPool: true,
   mode: ModeEnum.advanced,
-  snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
-  removeFirstSnackbar: () => {},
   restartApp: () => {},
   somePending: false,
   addressBook: [] as AddressBookFileClass[],

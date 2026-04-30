@@ -4,14 +4,13 @@ import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
-import SnackbarType from './types/SnackbarType';
 import SecurityType from './types/SecurityType';
 
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
-import { ScreenEnum } from './enums/ScreenEnum';
+import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
@@ -27,9 +26,7 @@ export default interface AppContextLoading {
   orchardPool: boolean;
   saplingPool: boolean;
   transparentPool: boolean;
-  snackbars: SnackbarType[];
-  addLastSnackbar: (snackbar: SnackbarType) => void;
-  removeFirstSnackbar: (s: ScreenEnum) => void;
+  addLastSnackbar: (message: string, duration?: SnackbarDurationEnum) => void;
   zingolibVersion: string;
   setPrivacyOption: (value: boolean) => Promise<void>;
 

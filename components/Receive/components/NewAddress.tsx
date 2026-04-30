@@ -23,7 +23,6 @@ import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import { useToast } from 'react-native-toastier';
 import { AddressUnifiedTypeEnum } from '../../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -47,13 +46,11 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   addressKind,
   closeSheet,
   setAddressBook,
-  screenName,
   setHeightLayout,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
 
   const [label, setLabel] = useState<string>('');
   const [type, setType] = useState<AddressUnifiedTypeEnum>(
@@ -85,11 +82,10 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
         if (newAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error new address ${newAddressStr}`);
 
-          addLastSnackbar({
-            message: translate('receive.transparent.new-error') as string,
-            duration: SnackbarDurationEnum.short,
-            screenName: [screenName],
-          });
+          addLastSnackbar(
+            translate('receive.transparent.new-error') as string,
+            SnackbarDurationEnum.short,
+          );
 
           // return newAddressStr;
         }
@@ -128,7 +124,6 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
 
     setLabel('');
     Keyboard.dismiss();
-    clear();
     setTimeout(() => {
       closeSheet();
     }, 100);
@@ -149,7 +144,6 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
         onPress={() => {
           setLabel('');
           Keyboard.dismiss();
-          clear();
           setTimeout(() => {
             closeSheet();
           }, 100);
@@ -323,7 +317,6 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             onPress={() => {
               setLabel('');
               Keyboard.dismiss();
-              clear();
               setTimeout(() => {
                 closeSheet();
               }, 100);

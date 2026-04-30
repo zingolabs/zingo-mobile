@@ -37,7 +37,6 @@ import {
   SnackbarDurationEnum,
   SettingsNameEnum,
   RouteEnum,
-  SnackbarType,
   AppStateStatusEnum,
   GlobalConst,
   EventListenerEnum,
@@ -57,7 +56,8 @@ import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
-import Snackbars from '../../components/Components/Snackbars';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import Launching from './components/Launching';
 import simpleBiometrics from '../simpleBiometrics';
@@ -75,7 +75,6 @@ import ImportUfvk from './components/ImportUfvk';
 import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
-import { ToastProvider } from 'react-native-toastier';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
@@ -454,6 +453,7 @@ export class LoadingAppClass extends Component<
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
+  clipboardTimer: ReturnType<typeof setTimeout> | null = null;
   screenName = ScreenEnum.LoadingApp;
 
   constructor(props: LoadingAppClassProps) {
@@ -472,9 +472,7 @@ export class LoadingAppClass extends Component<
       orchardPool: true,
       saplingPool: true,
       transparentPool: true,
-      snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
-      removeFirstSnackbar: this.removeFirstSnackbar,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
 
@@ -594,13 +592,10 @@ export class LoadingAppClass extends Component<
     if (this.state.selectServer === SelectServerEnum.auto) {
       if (netInfoState.isConnected) {
         setTimeout(() => {
-          this.addLastSnackbar({
-            message: this.state.translate(
-              'loadedapp.selectingserver',
-            ) as string,
-            duration: SnackbarDurationEnum.longer,
-            screenName: [this.screenName],
-          });
+          this.addLastSnackbar(
+            this.state.translate('loadedapp.selectingserver') as string,
+            SnackbarDurationEnum.longer,
+          );
         }, 10);
         // not a different one, can be the same.
         const someServerIsWorking = await this.selectTheBestServer(false);
@@ -695,10 +690,7 @@ export class LoadingAppClass extends Component<
                 transparentPool,
                 actionButtonsDisabled: false,
               });
-              this.addLastSnackbar({
-                message: walletKindStr,
-                screenName: [this.screenName],
-              });
+              this.addLastSnackbar(walletKindStr);
             }
             // creating tor cliente if needed
             if (
@@ -963,22 +955,17 @@ export class LoadingAppClass extends Component<
     // message with the result only for advanced users
     if (this.state.mode === ModeEnum.advanced && someServerIsWorking) {
       if (isEqual(actualServer, fasterServer)) {
-        this.addLastSnackbar({
-          message: this.state.translate(
-            'loadedapp.selectingserversame',
-          ) as string,
-          duration: SnackbarDurationEnum.long,
-          screenName: [this.screenName],
-        });
+        this.addLastSnackbar(
+          this.state.translate('loadedapp.selectingserversame') as string,
+          SnackbarDurationEnum.long,
+        );
       } else {
-        this.addLastSnackbar({
-          message:
-            (this.state.translate('loadedapp.selectingserverbest') as string) +
+        this.addLastSnackbar(
+          (this.state.translate('loadedapp.selectingserverbest') as string) +
             ' ' +
             fasterServer.uri,
-          duration: SnackbarDurationEnum.long,
-          screenName: [this.screenName],
-        });
+          SnackbarDurationEnum.long,
+        );
       }
     }
     return someServerIsWorking;
@@ -1016,11 +1003,10 @@ export class LoadingAppClass extends Component<
       this.state.netInfo.isConnected &&
       this.state.selectServer !== SelectServerEnum.offline
     ) {
-      this.addLastSnackbar({
-        message: this.state.translate('restarting') as string,
-        duration: SnackbarDurationEnum.long,
-        screenName: [this.screenName],
-      });
+      this.addLastSnackbar(
+        this.state.translate('restarting') as string,
+        SnackbarDurationEnum.long,
+      );
     }
     // if no internet connection -> show the error.
     // if Offline mode -> show the error.
@@ -1031,7 +1017,6 @@ export class LoadingAppClass extends Component<
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        [this.screenName],
         title,
         result,
         false,
@@ -1051,7 +1036,6 @@ export class LoadingAppClass extends Component<
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
-          [this.screenName],
           title,
           result,
           false,
@@ -1069,13 +1053,10 @@ export class LoadingAppClass extends Component<
         if (this.state.serverErrorTries === 0) {
           // first try
           this.setState({ screen, actionButtonsDisabled: true });
-          this.addLastSnackbar({
-            message: this.state.translate(
-              'loadingapp.serverfirsttry',
-            ) as string,
-            duration: SnackbarDurationEnum.longer,
-            screenName: [this.screenName],
-          });
+          this.addLastSnackbar(
+            this.state.translate('loadingapp.serverfirsttry') as string,
+            SnackbarDurationEnum.longer,
+          );
           // a different server.
           const someServerIsWorking = await this.selectTheBestServer(true);
           if (someServerIsWorking) {
@@ -1090,7 +1071,6 @@ export class LoadingAppClass extends Component<
               createAlert(
                 this.setBackgroundError,
                 this.addLastSnackbar,
-                [this.screenName],
                 title,
                 result,
                 false,
@@ -1108,7 +1088,6 @@ export class LoadingAppClass extends Component<
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
-              [this.screenName],
               title,
               this.state.translate('loadingapp.noservers') as string,
               false,
@@ -1124,18 +1103,14 @@ export class LoadingAppClass extends Component<
           }
         } else {
           // second try
-          this.addLastSnackbar({
-            message: this.state.translate(
-              'loadingapp.serversecondtry',
-            ) as string,
-            duration: SnackbarDurationEnum.longer,
-            screenName: [this.screenName],
-          });
+          this.addLastSnackbar(
+            this.state.translate('loadingapp.serversecondtry') as string,
+            SnackbarDurationEnum.longer,
+          );
           setTimeout(() => {
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
-              [this.screenName],
               title,
               result,
               false,
@@ -1201,18 +1176,14 @@ export class LoadingAppClass extends Component<
       );
       const chainName = this.state.customServerChainName;
       if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
-        this.addLastSnackbar({
-          message: this.state.translate('settings.isuri') as string,
-          screenName: [this.screenName],
-        });
+        this.addLastSnackbar(this.state.translate('settings.isuri') as string);
         this.setState({ actionButtonsDisabled: false });
         return;
       }
 
-      this.addLastSnackbar({
-        message: this.state.translate('loadedapp.tryingnewserver') as string,
-        screenName: [this.screenName],
-      });
+      this.addLastSnackbar(
+        this.state.translate('loadedapp.tryingnewserver') as string,
+      );
 
       const cs = {
         uri: uri,
@@ -1241,13 +1212,10 @@ export class LoadingAppClass extends Component<
           customServerOffline: false,
         });
       } else {
-        this.addLastSnackbar({
-          message:
-            (this.state.translate(
-              'loadedapp.changeservernew-error',
-            ) as string) + uri,
-          screenName: [this.screenName],
-        });
+        this.addLastSnackbar(
+          (this.state.translate('loadedapp.changeservernew-error') as string) +
+            uri,
+        );
       }
     }
     this.setState({ actionButtonsDisabled: false });
@@ -1285,10 +1253,9 @@ export class LoadingAppClass extends Component<
       !this.state.netInfo.isConnected ||
       this.state.selectServer === SelectServerEnum.offline
     ) {
-      this.addLastSnackbar({
-        message: this.state.translate('loadedapp.connection-error') as string,
-        screenName: [this.screenName],
-      });
+      this.addLastSnackbar(
+        this.state.translate('loadedapp.connection-error') as string,
+      );
       return;
     }
     this.setState({ actionButtonsDisabled: true });
@@ -1308,7 +1275,6 @@ export class LoadingAppClass extends Component<
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
-            [this.screenName],
             this.state.translate('loadingapp.creatingwallet-label') as string,
             seedJSON.error,
             false,
@@ -1323,7 +1289,6 @@ export class LoadingAppClass extends Component<
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
-          [this.screenName],
           this.state.translate('loadingapp.creatingwallet-label') as string,
           e instanceof Error ? e.message : String(e),
           false,
@@ -1379,7 +1344,6 @@ export class LoadingAppClass extends Component<
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        [this.screenName],
         this.state.translate('loadingapp.emptyseedufvk-label') as string,
         this.state.translate('loadingapp.emptyseedufvk-error') as string,
         false,
@@ -1417,7 +1381,6 @@ export class LoadingAppClass extends Component<
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
-          [this.screenName],
           this.state.translate('loadingapp.invalidseedufvk-label') as string,
           this.state.translate('loadingapp.invalidseedufvk-error') as string,
           false,
@@ -1443,7 +1406,6 @@ export class LoadingAppClass extends Component<
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        [this.screenName],
         this.state.translate('loadingapp.invalidbirthday-label') as string,
         this.state.translate('loadingapp.invalidbirthday-error') as string,
         false,
@@ -1491,30 +1453,6 @@ export class LoadingAppClass extends Component<
         // here result can have an `error` field for watch-only which is actually OK.
         const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(result);
         if (!resultJson.error) {
-          // storing the seed/ufvk & birthday in KeyChain/KeyStore
-          if (this.state.recoveryWalletInfoOnDevice) {
-            if (type === RestoreFromTypeEnum.seedRestoreFrom) {
-              // here I have to store the seed/birthday in the device
-              // because the user is restoring from seed (same or different)
-              const walletSeed: WalletType = {
-                seed: seedUfvk.toLowerCase(),
-                birthday: Number(walletBirthday),
-              };
-              await createUpdateRecoveryWalletInfo(walletSeed);
-            } else {
-              // here I have to store the ufvk in the device
-              // because the user is restoring from ufvk (same or different)
-              const walletUfvk: WalletType = {
-                ufvk: seedUfvk.toLowerCase(),
-                birthday: Number(walletBirthday),
-              };
-              await createUpdateRecoveryWalletInfo(walletUfvk);
-            }
-          } else {
-            if (this.state.hasRecoveryWalletInfoSaved) {
-              await removeRecoveryWalletInfo();
-            }
-          }
           // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
           await SettingsFileImpl.writeSettings(
             SettingsNameEnum.basicFirstViewSeed,
@@ -1575,10 +1513,7 @@ export class LoadingAppClass extends Component<
               transparentPool,
               actionButtonsDisabled: false,
             });
-            this.addLastSnackbar({
-              message: walletKindStr,
-              screenName: [this.screenName],
-            });
+            this.addLastSnackbar(walletKindStr);
           }
           // creating tor cliente if needed
           if (
@@ -1640,23 +1575,19 @@ export class LoadingAppClass extends Component<
     this.setState({ customServerOffline: value });
   };
 
-  addLastSnackbar = (snackbar: SnackbarType) => {
-    const newSnackbars = this.state.snackbars;
-    // if the last one is the same don't do anything.
-    if (
-      newSnackbars.length > 0 &&
-      newSnackbars[newSnackbars.length - 1].message === snackbar.message
-    ) {
-      return;
-    }
-    newSnackbars.push(snackbar);
-    this.setState({ snackbars: newSnackbars });
-  };
-
-  removeFirstSnackbar = () => {
-    const newSnackbars = this.state.snackbars;
-    newSnackbars.shift();
-    this.setState({ snackbars: newSnackbars });
+  addLastSnackbar = (message: string, duration?: SnackbarDurationEnum) => {
+    Toast.show({
+      type: 'appInfo',
+      text1: message,
+      visibilityTime:
+        duration === SnackbarDurationEnum.longer
+          ? 9000
+          : duration === SnackbarDurationEnum.short
+            ? 2000
+            : 5000,
+      position: 'bottom',
+      bottomOffset: 80,
+    });
   };
 
   changeMode = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
@@ -1695,13 +1626,26 @@ export class LoadingAppClass extends Component<
               {
                 text: this.props.translate('copy') as string,
                 onPress: () => {
+                  if (this.clipboardTimer) {
+                    clearTimeout(this.clipboardTimer);
+                  }
                   Clipboard.setString(txt);
-                  setTimeout(() => Clipboard.setString(''), 60 * 1000);
-                  this.addLastSnackbar({
-                    message: this.props.translate('txtcopied') as string,
-                    duration: SnackbarDurationEnum.short,
-                    screenName: [this.screenName],
-                  });
+                  this.addLastSnackbar(
+                    this.props.translate(
+                      wallet.seed
+                        ? 'seed.tapcopy-seed-message'
+                        : 'seed.tapcopy-ufvk-message',
+                    ) as string,
+                    SnackbarDurationEnum.longer,
+                  );
+                  this.clipboardTimer = setTimeout(() => {
+                    Clipboard.setString('');
+                    this.clipboardTimer = null;
+                    this.addLastSnackbar(
+                      this.props.translate('seed.clipboard-cleared') as string,
+                      SnackbarDurationEnum.long,
+                    );
+                  }, 60 * 1000);
                 },
               },
               {
@@ -1767,7 +1711,6 @@ export class LoadingAppClass extends Component<
       customServerUri,
       customServerChainName,
       customServerOffline,
-      snackbars,
       firstLaunchingMessage,
       biometricsFailed,
       translate,
@@ -1790,9 +1733,7 @@ export class LoadingAppClass extends Component<
       orchardPool: this.state.orchardPool,
       saplingPool: this.state.saplingPool,
       transparentPool: this.state.transparentPool,
-      snackbars: this.state.snackbars,
-      addLastSnackbar: this.state.addLastSnackbar,
-      removeFirstSnackbar: this.removeFirstSnackbar,
+      addLastSnackbar: this.addLastSnackbar,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
 
@@ -1813,13 +1754,7 @@ export class LoadingAppClass extends Component<
     };
 
     return (
-      <ToastProvider>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={this.removeFirstSnackbar}
-          screenName={this.screenName}
-        />
-
+      <>
         <ContextAppLoadingProvider value={context}>
           {screen === 0 && (
             <Launching
@@ -1900,7 +1835,8 @@ export class LoadingAppClass extends Component<
             </Modal>
           )}
         </ContextAppLoadingProvider>
-      </ToastProvider>
+        <Toast config={toastConfig} />
+      </>
     );
   }
 }

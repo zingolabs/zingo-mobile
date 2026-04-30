@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -30,8 +30,6 @@ import {
 import Header from '../Header';
 import Utils from '../../app/utils';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
-import Snackbars from '../Components/Snackbars';
-import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import WalletType from '../../app/AppState/types/WalletType';
@@ -69,16 +67,15 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     privacy,
     mode,
     addLastSnackbar,
-    snackbars,
-    removeFirstSnackbar,
     setPrivacyOption,
     recoveryWalletInfoOnDevice,
   } = context;
   const { colors } = useTheme() as ThemeType;
   // when this screen is open from LoadingApp (new wallet)
   // is using the standard modal from react-native
-  const { clear } = useToast();
   const screenName = ScreenEnum.Seed;
+
+  const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -119,9 +116,42 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   useEffect(() => {
     return () => {
+      if (clipboardTimer.current) {
+        clearTimeout(clipboardTimer.current);
+      }
       Clipboard.setString('');
     };
   }, []);
+
+  const copySeedToClipboard = (expandOnCopy?: boolean) => {
+    if (!seedPhrase) return;
+    if (clipboardTimer.current) {
+      clearTimeout(clipboardTimer.current);
+    }
+    Clipboard.setString(seedPhrase);
+    if (addLastSnackbar) {
+      addLastSnackbar(
+        translate('seed.tapcopy-seed-message') as string,
+        SnackbarDurationEnum.longer,
+      );
+    }
+    if (expandOnCopy) {
+      setExpandSeed(true);
+      if (privacy) {
+        setTimeout(() => setExpandSeed(false), 5 * 1000);
+      }
+    }
+    clipboardTimer.current = setTimeout(() => {
+      Clipboard.setString('');
+      clipboardTimer.current = null;
+      if (addLastSnackbar) {
+        addLastSnackbar(
+          translate('seed.clipboard-cleared') as string,
+          SnackbarDurationEnum.long,
+        );
+      }
+    }, 60 * 1000);
+  };
 
   useEffect(() => {
     const _action =
@@ -216,7 +246,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   const onClickCancelHide = () => {
     onClickCancel();
-    clear();
     hiding();
   };
 
@@ -225,7 +254,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     birthdayNumberParm: number,
   ) => {
     onClickOK(seedPhraseParm, birthdayNumberParm);
-    clear();
     hiding();
   };
 
@@ -253,263 +281,206 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   };
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <Header
+        title={
+          translate('seed.title') + ' (' + translate(`seed.${action}`) + ')'
+        }
         screenName={screenName}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noUfvkIcon={true}
+        setPrivacyOption={setPrivacyOption}
+        addLastSnackbar={addLastSnackbar}
+        translate={translate}
+        netInfo={netInfo}
+        mode={mode}
+        privacy={privacy}
+        receivedLegend={
+          action === SeedActionEnum.view ? !basicFirstViewSeed : false
+        }
+        closeScreen={onClickCancelHide}
       />
-
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}
-      >
-        <Header
-          title={
-            translate('seed.title') + ' (' + translate(`seed.${action}`) + ')'
-          }
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noUfvkIcon={true}
-          setPrivacyOption={setPrivacyOption}
-          addLastSnackbar={addLastSnackbar}
-          translate={translate}
-          netInfo={netInfo}
-          mode={mode}
-          privacy={privacy}
-          receivedLegend={
-            action === SeedActionEnum.view ? !basicFirstViewSeed : false
-          }
-          closeScreen={onClickCancelHide}
+      {loadingSeed ? (
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+          style={{ marginVertical: 20 }}
         />
-        {loadingSeed ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.primary}
-            style={{ marginVertical: 20 }}
-          />
-        ) : (
-          <>
-            <ScrollView
-              keyboardShouldPersistTaps="handled"
-              style={{ height: '80%', maxHeight: '80%' }}
-              contentContainerStyle={{
-                flexDirection: 'column',
-                alignItems: 'stretch',
-                justifyContent: 'flex-start',
+      ) : (
+        <>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            style={{ height: '80%', maxHeight: '80%' }}
+            contentContainerStyle={{
+              flexDirection: 'column',
+              alignItems: 'stretch',
+              justifyContent: 'flex-start',
+            }}
+          >
+            <RegText
+              style={{
+                marginTop: 0,
+                padding: 20,
+                textAlign: 'center',
+                fontWeight: '900',
               }}
             >
-              <RegText
-                style={{
-                  marginTop: 0,
-                  padding: 20,
-                  textAlign: 'center',
-                  fontWeight: '900',
-                }}
-              >
-                {action === SeedActionEnum.backup ||
-                action === SeedActionEnum.change ||
-                action === SeedActionEnum.server
-                  ? (translate(`seed.text-readonly-${action}`) as string)
-                  : (translate('seed.text-readonly') as string)}
-              </RegText>
+              {action === SeedActionEnum.backup ||
+              action === SeedActionEnum.change ||
+              action === SeedActionEnum.server
+                ? (translate(`seed.text-readonly-${action}`) as string)
+                : (translate('seed.text-readonly') as string)}
+            </RegText>
+            <View
+              style={{
+                margin: 10,
+                padding: 10,
+                borderWidth: 1,
+                borderRadius: 10,
+                borderColor: colors.text,
+                maxHeight: '45%',
+              }}
+            >
+              <TouchableOpacity onPress={() => copySeedToClipboard(true)}>
+                <RegText
+                  color={colors.text}
+                  style={{
+                    textAlign: 'center',
+                  }}
+                >
+                  {!expandSeed ? Utils.trimToSmall(seedPhrase, 5) : seedPhrase}
+                </RegText>
+              </TouchableOpacity>
               <View
                 style={{
-                  margin: 10,
-                  padding: 10,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  borderColor: colors.text,
-                  maxHeight: '45%',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
                 }}
               >
-                <TouchableOpacity
-                  onPress={() => {
-                    if (seedPhrase) {
-                      Clipboard.setString(seedPhrase);
-                      setTimeout(() => Clipboard.setString(''), 60 * 1000);
-                      if (addLastSnackbar) {
-                        addLastSnackbar({
-                          message: translate(
-                            'seed.tapcopy-seed-message',
-                          ) as string,
-                          duration: SnackbarDurationEnum.short,
-                          screenName: [screenName],
-                        });
-                      }
-                      setExpandSeed(true);
-                      if (privacy) {
-                        setTimeout(() => {
-                          setExpandSeed(false);
-                        }, 5 * 1000);
-                      }
-                    }
-                  }}
-                >
-                  <RegText
-                    color={colors.text}
+                <View />
+                <TouchableOpacity onPress={() => copySeedToClipboard(false)}>
+                  <Text
                     style={{
+                      color: colors.text,
+                      textDecorationLine: 'underline',
+                      padding: 10,
+                      marginTop: 0,
                       textAlign: 'center',
+                      minHeight: 48,
                     }}
                   >
-                    {!expandSeed
-                      ? Utils.trimToSmall(seedPhrase, 5)
-                      : seedPhrase}
-                  </RegText>
+                    {translate('seed.tapcopy') as string}
+                  </Text>
                 </TouchableOpacity>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <View />
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (seedPhrase) {
-                        Clipboard.setString(seedPhrase);
-                        setTimeout(() => Clipboard.setString(''), 60 * 1000);
-                        if (addLastSnackbar) {
-                          addLastSnackbar({
-                            message: translate(
-                              'seed.tapcopy-seed-message',
-                            ) as string,
-                            duration: SnackbarDurationEnum.short,
-                            screenName: [screenName],
-                          });
-                        }
-                      }
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: colors.text,
-                        textDecorationLine: 'underline',
-                        padding: 10,
-                        marginTop: 0,
-                        textAlign: 'center',
-                        minHeight: 48,
-                      }}
-                    >
-                      {translate('seed.tapcopy') as string}
-                    </Text>
-                  </TouchableOpacity>
-                  <View />
-                </View>
+                <View />
               </View>
+            </View>
 
+            <View style={{ marginTop: 10, alignItems: 'center' }}>
+              <FadeText style={{ textAlign: 'center' }}>
+                {translate('seed.birthday-readonly') as string}
+              </FadeText>
+              <TouchableOpacity
+                onPress={() => {
+                  if (birthdayNumber) {
+                    Clipboard.setString(birthdayNumber);
+                    if (addLastSnackbar) {
+                      addLastSnackbar(
+                        translate('seed.tapcopy-birthday-message') as string,
+                        SnackbarDurationEnum.short,
+                      );
+                    }
+                    setExpandBithday(true);
+                    if (privacy) {
+                      setTimeout(() => {
+                        setExpandBithday(false);
+                      }, 5 * 1000);
+                    }
+                  }
+                }}
+              >
+                <RegText color={colors.text} style={{ textAlign: 'center' }}>
+                  {!expandBirthday
+                    ? Utils.trimToSmall(birthdayNumber, 1)
+                    : birthdayNumber}
+                </RegText>
+              </TouchableOpacity>
+            </View>
+            {!!ufvk && (
               <View style={{ marginTop: 10, alignItems: 'center' }}>
                 <FadeText style={{ textAlign: 'center' }}>
-                  {translate('seed.birthday-readonly') as string}
+                  {translate('ufvk.viewkey') as string}
                 </FadeText>
                 <TouchableOpacity
                   onPress={() => {
-                    if (birthdayNumber) {
-                      Clipboard.setString(birthdayNumber);
-                      if (addLastSnackbar) {
-                        addLastSnackbar({
-                          message: translate(
-                            'seed.tapcopy-birthday-message',
-                          ) as string,
-                          duration: SnackbarDurationEnum.short,
-                          screenName: [screenName],
-                        });
-                      }
-                      setExpandBithday(true);
-                      if (privacy) {
-                        setTimeout(() => {
-                          setExpandBithday(false);
-                        }, 5 * 1000);
-                      }
+                    Clipboard.setString(ufvk);
+                    if (addLastSnackbar) {
+                      addLastSnackbar(
+                        translate('ufvk.tapcopy-message') as string,
+                        SnackbarDurationEnum.short,
+                      );
                     }
                   }}
                 >
                   <RegText color={colors.text} style={{ textAlign: 'center' }}>
-                    {!expandBirthday
-                      ? Utils.trimToSmall(birthdayNumber, 1)
-                      : birthdayNumber}
+                    {Utils.trimToSmall(ufvk, 8)}
                   </RegText>
                 </TouchableOpacity>
               </View>
-              {!!ufvk && (
-                <View style={{ marginTop: 10, alignItems: 'center' }}>
-                  <FadeText style={{ textAlign: 'center' }}>
-                    {translate('ufvk.viewkey') as string}
-                  </FadeText>
-                  <TouchableOpacity
-                    onPress={() => {
-                      Clipboard.setString(ufvk);
-                      if (addLastSnackbar) {
-                        addLastSnackbar({
-                          message: translate('ufvk.tapcopy-message') as string,
-                          duration: SnackbarDurationEnum.short,
-                          screenName: [screenName],
-                        });
-                      }
-                    }}
-                  >
-                    <RegText
-                      color={colors.text}
-                      style={{ textAlign: 'center' }}
-                    >
-                      {Utils.trimToSmall(ufvk, 8)}
-                    </RegText>
-                  </TouchableOpacity>
-                </View>
-              )}
-              <View style={{ marginBottom: 30 }} />
-            </ScrollView>
-            <View
+            )}
+            <View style={{ marginBottom: 30 }} />
+          </ScrollView>
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginVertical: 5,
+            }}
+          >
+            <Button
+              testID="seed.button.ok"
+              type={
+                mode === ModeEnum.basic
+                  ? ButtonTypeEnum.Secondary
+                  : ButtonTypeEnum.Primary
+              }
               style={{
-                flexGrow: 1,
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginVertical: 5,
+                backgroundColor:
+                  mode === ModeEnum.basic ? colors.background : colors.primary,
               }}
-            >
-              <Button
-                testID="seed.button.ok"
-                type={
-                  mode === ModeEnum.basic
-                    ? ButtonTypeEnum.Secondary
-                    : ButtonTypeEnum.Primary
+              title={
+                mode === ModeEnum.basic
+                  ? !basicFirstViewSeed
+                    ? (translate('seed.showtransactions') as string)
+                    : (translate('cancel') as string)
+                  : !!texts && !!texts[action]
+                    ? texts[action][times]
+                    : ''
+              }
+              onPress={async () => {
+                if (!seedPhrase) {
+                  return;
                 }
-                style={{
-                  backgroundColor:
-                    mode === ModeEnum.basic
-                      ? colors.background
-                      : colors.primary,
-                }}
-                title={
-                  mode === ModeEnum.basic
-                    ? !basicFirstViewSeed
-                      ? (translate('seed.showtransactions') as string)
-                      : (translate('cancel') as string)
-                    : !!texts && !!texts[action]
-                      ? texts[action][times]
-                      : ''
+                if (times === 0) {
+                  onClickOKHide(seedPhrase, Number(birthdayNumber));
+                } else if (times === 1) {
+                  onPressOK();
                 }
-                onPress={async () => {
-                  if (!seedPhrase) {
-                    return;
-                  }
-                  if (times === 0) {
-                    onClickOKHide(seedPhrase, Number(birthdayNumber));
-                  } else if (times === 1) {
-                    onPressOK();
-                  }
-                }}
-              />
-            </View>
-          </>
-        )}
-      </View>
-    </ToastProvider>
+              }}
+            />
+          </View>
+        </>
+      )}
+    </View>
   );
 };
 

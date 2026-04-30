@@ -16,18 +16,16 @@ import moment from 'moment';
 import RPC from '../../app/rpc';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
-import { CurrencyEnum, ModeEnum, ScreenEnum } from '../../app/AppState';
+import { CurrencyEnum, ModeEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
 
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
-  screenName: ScreenEnum;
   textBefore?: string;
 };
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   setZecPrice,
-  screenName,
   textBefore,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -88,26 +86,17 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     }
 
     if (price === -1) {
-      addLastSnackbar({
-        message: `${translate('info.errorgemini')} - ${error}`,
-        screenName: [screenName],
-      });
+      addLastSnackbar(`${translate('info.errorgemini')} - ${error}`);
       setLoading(false);
       return;
     }
     if (price === -2) {
-      addLastSnackbar({
-        message: `${translate('info.errorrpcmodule')} - ${error}`,
-        screenName: [screenName],
-      });
+      addLastSnackbar(`${translate('info.errorrpcmodule')} - ${error}`);
       setLoading(false);
       return;
     }
     if (price <= 0) {
-      addLastSnackbar({
-        message: `${translate('info.errorgemini')} - ${error}`,
-        screenName: [screenName],
-      });
+      addLastSnackbar(`${translate('info.errorgemini')} - ${error}`);
       setZecPrice(price, 0);
     } else {
       setZecPrice(price, Date.now());

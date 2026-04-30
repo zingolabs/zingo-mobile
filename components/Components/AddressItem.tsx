@@ -152,13 +152,12 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 onPress={() => {
                   if (address && !oneLine && !addressProtected) {
                     Clipboard.setString(address);
-                    addLastSnackbar({
-                      message: ufvk
+                    addLastSnackbar(
+                      ufvk
                         ? (translate('seed.tapcopy-ufvk-message') as string)
                         : (translate('history.addresscopied') as string),
-                      duration: SnackbarDurationEnum.short,
-                      screenName: [screenName],
-                    });
+                      SnackbarDurationEnum.short,
+                    );
                     setExpandAddress(true);
                     if (privacy) {
                       setTimeout(() => {

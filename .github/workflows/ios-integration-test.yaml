@@ -57,8 +57,12 @@ jobs:
         run: yarn
 
       - name: Pod Install
-        working-directory: ios
-        run: pod install
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 15
+          command: cd ios && pod install
 
       - name: Info
         run: |

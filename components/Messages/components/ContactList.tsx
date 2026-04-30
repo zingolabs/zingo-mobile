@@ -49,8 +49,6 @@ import Header from '../../Header';
 import Utils from '../../../app/utils';
 import ContactLine from './ContactLine';
 import RegText from '../../Components/RegText';
-import Snackbars from '../../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type ContactListProps = DrawerScreenProps<
@@ -95,8 +93,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     addresses,
     doRefresh,
     zenniesDonationAddress,
-    snackbars,
-    removeFirstSnackbar,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.ContactList;
@@ -345,427 +341,415 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   //console.log('search text:', searchText, 'field:', searchTextField);
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <Header
+        title={translate('messages.title-chats') as string}
         screenName={screenName}
+        toggleMenuDrawer={toggleMenuDrawer}
+        noPrivacy={true}
+        noBalance={true}
+        closeScreen={closeModal}
+        noDrawMenu={noDrawMenu}
       />
-
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}
-      >
-        <Header
-          title={translate('messages.title-chats') as string}
-          screenName={screenName}
-          toggleMenuDrawer={toggleMenuDrawer}
-          noPrivacy={true}
-          noBalance={true}
-          closeScreen={closeModal}
-          noDrawMenu={noDrawMenu}
-        />
-        {searchMode && (
+      {searchMode && (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignSelf: 'center',
+            alignItems: 'center',
+          }}
+        >
           <View
             style={{
+              display: 'flex',
               flexDirection: 'row',
-              alignSelf: 'center',
-              alignItems: 'center',
+              justifyContent: 'flex-start',
+              marginHorizontal: 10,
+              marginTop: 10,
+            }}
+          >
+            <View
+              accessible={true}
+              style={{
+                flexGrow: 1,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '90%',
+                borderWidth: 2,
+                borderRadius: 15,
+                borderColor: colors.text,
+              }}
+            >
+              <TextInput
+                placeholder={translate('messages.search-placeholder') as string}
+                placeholderTextColor={colors.placeholder}
+                style={{
+                  flex: 1,
+                  color: colors.text,
+                  fontWeight: '600',
+                  fontSize: 14,
+                  marginLeft: 5,
+                  backgroundColor: 'transparent',
+                }}
+                value={searchTextField}
+                onChangeText={(text: string) => setSearchTextField(text.trim())}
+                onEndEditing={(
+                  e: NativeSyntheticEvent<TextInputEndEditingEventData>,
+                ) => {
+                  setSearchTextField(e.nativeEvent.text.trim());
+                }}
+                editable={true}
+                returnKeyLabel={
+                  translate('messages.search-placeholder') as string
+                }
+                returnKeyType="done"
+                onSubmitEditing={() => {
+                  if (searchTextField) {
+                    setSearchText(searchTextField);
+                    setSearchMode(false);
+                    setLoading(true);
+                  }
+                }}
+              />
+              {loading && (
+                <ActivityIndicator
+                  style={{ marginRight: 7 }}
+                  size={25}
+                  color={colors.primaryDisabled}
+                />
+              )}
+              {!loading && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSearchTextField('');
+                    setSearchMode(false);
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{ marginRight: 7 }}
+                    size={25}
+                    icon={faXmark}
+                    color={colors.primaryDisabled}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+      )}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 'auto',
+          marginHorizontal: 5,
+          marginBottom: 2,
+        }}
+      >
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            width: 'auto',
+            marginTop: 10,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              // call the screen
+              setMessagesAllModalShow();
             }}
           >
             <View
               style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                marginHorizontal: 10,
-                marginTop: 10,
+                paddingHorizontal: 5,
+                marginHorizontal: 0,
               }}
             >
-              <View
-                accessible={true}
+              <RegText
                 style={{
-                  flexGrow: 1,
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '90%',
-                  borderWidth: 2,
-                  borderRadius: 15,
-                  borderColor: colors.text,
+                  color: colors.primary,
+                  textDecorationLine: 'underline',
+                  fontWeight: 'bold',
                 }}
               >
-                <TextInput
-                  placeholder={
-                    translate('messages.search-placeholder') as string
-                  }
-                  placeholderTextColor={colors.placeholder}
-                  style={{
-                    flex: 1,
-                    color: colors.text,
-                    fontWeight: '600',
-                    fontSize: 14,
-                    marginLeft: 5,
-                    backgroundColor: 'transparent',
-                  }}
-                  value={searchTextField}
-                  onChangeText={(text: string) =>
-                    setSearchTextField(text.trim())
-                  }
-                  onEndEditing={(
-                    e: NativeSyntheticEvent<TextInputEndEditingEventData>,
-                  ) => {
-                    setSearchTextField(e.nativeEvent.text.trim());
-                  }}
-                  editable={true}
-                  returnKeyLabel={
-                    translate('messages.search-placeholder') as string
-                  }
-                  returnKeyType="done"
-                  onSubmitEditing={() => {
-                    if (searchTextField) {
-                      setSearchText(searchTextField);
-                      setSearchMode(false);
-                      setLoading(true);
-                    }
-                  }}
-                />
-                {loading && (
-                  <ActivityIndicator
-                    style={{ marginRight: 7 }}
-                    size={25}
-                    color={colors.primaryDisabled}
-                  />
-                )}
-                {!loading && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setSearchTextField('');
-                      setSearchMode(false);
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      style={{ marginRight: 7 }}
-                      size={25}
-                      icon={faXmark}
-                      color={colors.primaryDisabled}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
+                {translate('messages.link-all') as string}
+              </RegText>
             </View>
-          </View>
-        )}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 'auto',
-            marginHorizontal: 5,
-            marginBottom: 2,
-          }}
-        >
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              width: 'auto',
-              marginTop: 10,
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setFilter(FilterEnum.all);
+              setLoading(true);
             }}
           >
-            <TouchableOpacity
-              onPress={() => {
-                // call the screen
-                setMessagesAllModalShow();
+            <View
+              style={{
+                backgroundColor:
+                  filter === FilterEnum.all
+                    ? colors.primary
+                    : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor:
+                  filter === FilterEnum.all ? colors.primary : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginHorizontal: 10,
               }}
             >
-              <View
+              <FadeText
                 style={{
-                  paddingHorizontal: 5,
-                  marginHorizontal: 0,
-                }}
-              >
-                <RegText
-                  style={{
-                    color: colors.primary,
-                    textDecorationLine: 'underline',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {translate('messages.link-all') as string}
-                </RegText>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setFilter(FilterEnum.all);
-                setLoading(true);
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor:
+                  color:
                     filter === FilterEnum.all
-                      ? colors.primary
-                      : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor:
-                    filter === FilterEnum.all ? colors.primary : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  marginHorizontal: 10,
+                      ? colors.sideMenuBackground
+                      : colors.zingo,
+                  fontWeight: 'bold',
                 }}
               >
-                <FadeText
-                  style={{
-                    color:
-                      filter === FilterEnum.all
-                        ? colors.sideMenuBackground
-                        : colors.zingo,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {translate('messages.filter-all') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
+                {translate('messages.filter-all') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setFilter(FilterEnum.contacts);
+              setLoading(true);
+            }}
+          >
+            <View
+              style={{
+                backgroundColor:
+                  filter === FilterEnum.contacts
+                    ? colors.primary
+                    : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor:
+                  filter === FilterEnum.contacts
+                    ? colors.primary
+                    : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginHorizontal: 0,
+              }}
+            >
+              <FadeText
+                style={{
+                  color:
+                    filter === FilterEnum.contacts
+                      ? colors.sideMenuBackground
+                      : colors.zingo,
+                  fontWeight: 'bold',
+                }}
+              >
+                {translate('messages.filter-contacts') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setFilter(FilterEnum.noContacts);
+              setLoading(true);
+            }}
+          >
+            <View
+              style={{
+                backgroundColor:
+                  filter === FilterEnum.noContacts
+                    ? colors.primary
+                    : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor:
+                  filter === FilterEnum.noContacts
+                    ? colors.primary
+                    : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginHorizontal: 10,
+              }}
+            >
+              <FadeText
+                style={{
+                  color:
+                    filter === FilterEnum.noContacts
+                      ? colors.sideMenuBackground
+                      : colors.zingo,
+                  fontWeight: 'bold',
+                }}
+              >
+                {translate('messages.filter-no-contacts') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          {!searchMode && !searchText && (
             <TouchableOpacity
               onPress={() => {
-                setFilter(FilterEnum.contacts);
+                setSearchMode(true);
+              }}
+            >
+              <FontAwesomeIcon
+                style={{ margin: 0 }}
+                size={30}
+                icon={faMagnifyingGlass}
+                color={colors.zingo}
+              />
+            </TouchableOpacity>
+          )}
+          {!searchMode && searchText && (
+            <TouchableOpacity
+              onPress={() => {
                 setLoading(true);
+                setSearchText('');
+                setSearchTextField('');
               }}
             >
               <View
                 style={{
-                  backgroundColor:
-                    filter === FilterEnum.contacts
-                      ? colors.primary
-                      : colors.sideMenuBackground,
+                  backgroundColor: colors.zingo,
                   borderRadius: 15,
-                  borderColor:
-                    filter === FilterEnum.contacts
-                      ? colors.primary
-                      : colors.zingo,
-                  borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
-                  marginHorizontal: 0,
+                  marginRight: 5,
                 }}
               >
                 <FadeText
                   style={{
-                    color:
-                      filter === FilterEnum.contacts
-                        ? colors.sideMenuBackground
-                        : colors.zingo,
+                    color: colors.sideMenuBackground,
                     fontWeight: 'bold',
                   }}
                 >
-                  {translate('messages.filter-contacts') as string}
+                  {(translate('messages.clear-filter') as string) +
+                    ' ' +
+                    (searchText.length < 4
+                      ? searchText
+                      : searchText.slice(0, 3) + '...')}
                 </FadeText>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setFilter(FilterEnum.noContacts);
-                setLoading(true);
-              }}
-            >
+          )}
+        </ScrollView>
+      </View>
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+          style={{ marginVertical: 20 }}
+        />
+      ) : (
+        <>
+          <ScrollView
+            ref={scrollViewRef}
+            onScroll={handleScroll}
+            scrollEventThrottle={100}
+            accessible={true}
+            accessibilityLabel={translate('history.list-acc') as string}
+            keyboardShouldPersistTaps="handled"
+            refreshControl={
+              <RefreshControl
+                refreshing={false}
+                onRefresh={() => doRefresh(screenName)}
+                tintColor={colors.text}
+                title={translate('history.refreshing') as string}
+              />
+            }
+            style={{
+              flexGrow: 1,
+              marginTop: 10,
+              width: '100%',
+            }}
+          >
+            {contacts &&
+              contacts.length > 0 &&
+              contacts.map((c, index) => {
+                let txmonth =
+                  c && c.time ? moment(c.time * 1000).format('MMM YYYY') : '';
+
+                var month = '';
+                if (txmonth !== lastMonth) {
+                  month = txmonth;
+                  lastMonth = txmonth;
+                }
+
+                return (
+                  <ContactLine
+                    key={`${index}-${c.address}-${c.kind}`}
+                    index={index}
+                    c={c}
+                    month={month}
+                    setMessagesAddressModalShow={setMessagesAddressModalShow}
+                    addressProtected={c.address === zenniesDonationAddress}
+                    screenName={screenName}
+                  />
+                );
+              })}
+            {!!contacts && !!contacts.length ? (
               <View
                 style={{
-                  backgroundColor:
-                    filter === FilterEnum.noContacts
-                      ? colors.primary
-                      : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor:
-                    filter === FilterEnum.noContacts
-                      ? colors.primary
-                      : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  marginHorizontal: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: 10,
+                  marginBottom: 30,
                 }}
               >
-                <FadeText
-                  style={{
-                    color:
-                      filter === FilterEnum.noContacts
-                        ? colors.sideMenuBackground
-                        : colors.zingo,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {translate('messages.filter-no-contacts') as string}
+                <FadeText style={{ color: colors.primary }}>
+                  {translate('history.end') as string}
                 </FadeText>
               </View>
-            </TouchableOpacity>
-            {!searchMode && !searchText && (
-              <TouchableOpacity
-                onPress={() => {
-                  setSearchMode(true);
+            ) : (
+              <View
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: 30,
+                  marginBottom: 30,
                 }}
               >
-                <FontAwesomeIcon
-                  style={{ margin: 0 }}
-                  size={30}
-                  icon={faMagnifyingGlass}
-                  color={colors.zingo}
-                />
-              </TouchableOpacity>
-            )}
-            {!searchMode && searchText && (
-              <TouchableOpacity
-                onPress={() => {
-                  setLoading(true);
-                  setSearchText('');
-                  setSearchTextField('');
-                }}
-              >
-                <View
-                  style={{
-                    backgroundColor: colors.zingo,
-                    borderRadius: 15,
-                    paddingHorizontal: 10,
-                    paddingVertical: 5,
-                    marginRight: 5,
-                  }}
-                >
-                  <FadeText
-                    style={{
-                      color: colors.sideMenuBackground,
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    {(translate('messages.clear-filter') as string) +
-                      ' ' +
-                      (searchText.length < 4
-                        ? searchText
-                        : searchText.slice(0, 3) + '...')}
-                  </FadeText>
-                </View>
-              </TouchableOpacity>
+                <FadeText style={{ color: colors.primary }}>
+                  {translate('messages.contacts-empty') as string}
+                </FadeText>
+              </View>
             )}
           </ScrollView>
-        </View>
-        {loading ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.primary}
-            style={{ marginVertical: 20 }}
-          />
-        ) : (
-          <>
-            <ScrollView
-              ref={scrollViewRef}
-              onScroll={handleScroll}
-              scrollEventThrottle={100}
-              accessible={true}
-              accessibilityLabel={translate('history.list-acc') as string}
-              keyboardShouldPersistTaps="handled"
-              refreshControl={
-                <RefreshControl
-                  refreshing={false}
-                  onRefresh={() => doRefresh(screenName)}
-                  tintColor={colors.text}
-                  title={translate('history.refreshing') as string}
-                />
-              }
-              style={{
-                flexGrow: 1,
-                marginTop: 10,
-                width: '100%',
-              }}
+          {!isAtTop && (
+            <Pressable
+              onPress={handleScrollToTop}
+              disabled={isScrollingToTop}
+              style={({ pressed }) => ({
+                position: 'absolute',
+                bottom: 30,
+                right: 10,
+                paddingHorizontal: 5,
+                paddingVertical: 10,
+                backgroundColor: colors.sideMenuBackground,
+                borderRadius: 50,
+                transform: [{ scale: pressed ? 0.9 : 1 }],
+                borderWidth: 1,
+                borderColor: colors.zingo,
+                opacity: isScrollingToTop ? 0.5 : 1,
+              })}
             >
-              {contacts &&
-                contacts.length > 0 &&
-                contacts.map((c, index) => {
-                  let txmonth =
-                    c && c.time ? moment(c.time * 1000).format('MMM YYYY') : '';
-
-                  var month = '';
-                  if (txmonth !== lastMonth) {
-                    month = txmonth;
-                    lastMonth = txmonth;
-                  }
-
-                  return (
-                    <ContactLine
-                      key={`${index}-${c.address}-${c.kind}`}
-                      index={index}
-                      c={c}
-                      month={month}
-                      setMessagesAddressModalShow={setMessagesAddressModalShow}
-                      addressProtected={c.address === zenniesDonationAddress}
-                      screenName={screenName}
-                    />
-                  );
-                })}
-              {!!contacts && !!contacts.length ? (
-                <View
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    marginTop: 10,
-                    marginBottom: 30,
-                  }}
-                >
-                  <FadeText style={{ color: colors.primary }}>
-                    {translate('history.end') as string}
-                  </FadeText>
-                </View>
-              ) : (
-                <View
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    marginTop: 30,
-                    marginBottom: 30,
-                  }}
-                >
-                  <FadeText style={{ color: colors.primary }}>
-                    {translate('messages.contacts-empty') as string}
-                  </FadeText>
-                </View>
-              )}
-            </ScrollView>
-            {!isAtTop && (
-              <Pressable
-                onPress={handleScrollToTop}
-                disabled={isScrollingToTop}
-                style={({ pressed }) => ({
-                  position: 'absolute',
-                  bottom: 30,
-                  right: 10,
-                  paddingHorizontal: 5,
-                  paddingVertical: 10,
-                  backgroundColor: colors.sideMenuBackground,
-                  borderRadius: 50,
-                  transform: [{ scale: pressed ? 0.9 : 1 }],
-                  borderWidth: 1,
-                  borderColor: colors.zingo,
-                  opacity: isScrollingToTop ? 0.5 : 1,
-                })}
-              >
-                <FontAwesomeIcon
-                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={20}
-                  icon={faAngleUp}
-                  color={colors.zingo}
-                />
-              </Pressable>
-            )}
-          </>
-        )}
-      </View>
-    </ToastProvider>
+              <FontAwesomeIcon
+                style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                size={20}
+                icon={faAngleUp}
+                color={colors.zingo}
+              />
+            </Pressable>
+          )}
+        </>
+      )}
+    </View>
   );
 };
 

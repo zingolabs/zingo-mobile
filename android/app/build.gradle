@@ -335,4 +335,7 @@ dependencies {
 
     // back navigation implementation
     implementation 'androidx.activity:activity:1.10.1'
+
+    // encrypted file storage
+    implementation 'androidx.security:security-crypto:1.0.0'
 }

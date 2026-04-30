@@ -63,7 +63,6 @@ import {
   UfvkActionEnum,
   SettingsNameEnum,
   RouteEnum,
-  SnackbarType,
   AppStateStatusEnum,
   GlobalConst,
   EventListenerEnum,
@@ -79,6 +78,7 @@ import {
   ScreenEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
+  SnackbarDurationEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -89,7 +89,8 @@ import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { sendEmail } from '../sendEmail';
-import Snackbars from '../../components/Components/Snackbars';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import { AddressBook } from '../../components/AddressBook';
@@ -109,7 +110,6 @@ import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
 import MessageList from '../../components/Messages/components/MessageList';
-import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
@@ -695,9 +695,7 @@ export class LoadedAppClass extends Component<
       orchardPool: props.orchardPool,
       saplingPool: props.saplingPool,
       transparentPool: props.transparentPool,
-      snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
-      removeFirstSnackbar: this.removeFirstSnackbar,
       restartApp: this.navigateToLoadingApp,
       somePending: false,
       addressBook: props.addressBook,
@@ -1030,7 +1028,7 @@ export class LoadedAppClass extends Component<
       }
       if (error) {
         // Show the error message as a toast
-        this.addLastSnackbar({ message: error, screenName: [this.screenName] });
+        this.addLastSnackbar(error);
       }
     }
   };
@@ -1239,7 +1237,6 @@ export class LoadedAppClass extends Component<
                 createAlert(
                   this.setBackgroundError,
                   this.addLastSnackbar,
-                  [this.screenName],
                   title,
                   message,
                   true,
@@ -1575,10 +1572,9 @@ export class LoadedAppClass extends Component<
           if (!resultJson.error) {
             // Load the wallet and navigate to the ValueTransfers screen
             if (toast && selectServer !== SelectServerEnum.offline) {
-              this.addLastSnackbar({
-                message: `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
-                screenName: [this.screenName],
-              });
+              this.addLastSnackbar(
+                `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
+              );
             }
             await SettingsFileImpl.writeSettings(
               SettingsNameEnum.server,
@@ -1631,10 +1627,9 @@ export class LoadedAppClass extends Component<
         });
       }
       if (toast) {
-        this.addLastSnackbar({
-          message: `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
-          screenName: [this.screenName],
-        });
+        this.addLastSnackbar(
+          `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+        );
       }
 
       // we need to restore the old server because the new one doesn't have the seed of the current wallet.
@@ -1826,7 +1821,6 @@ export class LoadedAppClass extends Component<
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        [this.screenName],
         this.state.translate('loadedapp.changingwallet-label') as string,
         resultStr,
         false,
@@ -1848,7 +1842,6 @@ export class LoadedAppClass extends Component<
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        [this.screenName],
         this.state.translate('loadedapp.restoringwallet-label') as string,
         resultStr,
         false,
@@ -1885,10 +1878,9 @@ export class LoadedAppClass extends Component<
         resultStrServer &&
         resultStrServer.toLowerCase().startsWith(GlobalConst.error)
       ) {
-        this.addLastSnackbar({
-          message: `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
-          screenName: [this.screenName],
-        });
+        this.addLastSnackbar(
+          `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
+        );
         return;
       } else {
       }
@@ -1927,7 +1919,6 @@ export class LoadedAppClass extends Component<
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
-          [this.screenName],
           this.state.translate('loadedapp.changingwallet-label') as string,
           resultStr2,
           false,
@@ -1951,17 +1942,19 @@ export class LoadedAppClass extends Component<
     this.setState({ addressBook });
   };
 
-  addLastSnackbar = (snackbar: SnackbarType) => {
-    const newSnackbars = this.state.snackbars;
-    // if the last one is the same don't do anything.
-    if (
-      newSnackbars.length > 0 &&
-      newSnackbars[newSnackbars.length - 1].message === snackbar.message
-    ) {
-      return;
-    }
-    newSnackbars.push(snackbar);
-    this.setState({ snackbars: newSnackbars });
+  addLastSnackbar = (message: string, duration?: SnackbarDurationEnum) => {
+    Toast.show({
+      type: 'appInfo',
+      text1: message,
+      visibilityTime:
+        duration === SnackbarDurationEnum.longer
+          ? 9000
+          : duration === SnackbarDurationEnum.short
+            ? 2000
+            : 5000,
+      position: 'bottom',
+      bottomOffset: 80,
+    });
   };
 
   setLastError = (error: string) => {
@@ -1980,14 +1973,6 @@ export class LoadedAppClass extends Component<
       return;
     }
     this.setState({ lastError: error });
-  };
-
-  removeFirstSnackbar = (screenName: ScreenEnum) => {
-    const newSnackbars = this.state.snackbars.filter((s: SnackbarType) =>
-      s.screenName.includes(screenName),
-    );
-    newSnackbars.shift();
-    this.setState({ snackbars: newSnackbars });
   };
 
   // close modal make sense because this is called
@@ -2052,7 +2037,6 @@ export class LoadedAppClass extends Component<
 
   render() {
     const {
-      snackbars,
       mode,
       valueTransfersTotal,
       readOnly,
@@ -2093,9 +2077,7 @@ export class LoadedAppClass extends Component<
       orchardPool: this.state.orchardPool,
       saplingPool: this.state.saplingPool,
       transparentPool: this.state.transparentPool,
-      snackbars: this.state.snackbars,
-      addLastSnackbar: this.state.addLastSnackbar,
-      removeFirstSnackbar: this.state.removeFirstSnackbar,
+      addLastSnackbar: this.addLastSnackbar,
       addressBook: this.state.addressBook,
       launchAddressBook: this.state.launchAddressBook,
       shieldingAmount: this.state.shieldingAmount,
@@ -2168,13 +2150,7 @@ export class LoadedAppClass extends Component<
     };
 
     return (
-      <ToastProvider>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={this.removeFirstSnackbar}
-          screenName={this.screenName}
-        />
-
+      <>
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
             <Drawer
@@ -2661,7 +2637,8 @@ export class LoadedAppClass extends Component<
             </Drawer>
           </GestureHandlerRootView>
         </ContextAppLoadedProvider>
-      </ToastProvider>
+        <Toast config={toastConfig} />
+      </>
     );
   }
 }

@@ -1,37 +1,25 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Component Receive - test Receive - snapshot 1`] = `
-<View
-  style={
-    [
-      {
-        "flex": 1,
-      },
-      undefined,
-    ]
-  }
->
-  <View />
-  <
-    navigationState={
-      {
-        "index": 0,
-        "routes": [
-          {
-            "key": "uaddr",
-            "title": "text translated",
-          },
-          {
-            "key": "taddr",
-            "title": "text translated",
-          },
-        ],
-      }
+<
+  navigationState={
+    {
+      "index": 0,
+      "routes": [
+        {
+          "key": "uaddr",
+          "title": "text translated",
+        },
+        {
+          "key": "taddr",
+          "title": "text translated",
+        },
+      ],
     }
-    onIndexChange={[Function]}
-    renderScene={[Function]}
-    renderTabBar={[Function]}
-    swipeEnabled={false}
-  />
-</View>
+  }
+  onIndexChange={[Function]}
+  renderScene={[Function]}
+  renderTabBar={[Function]}
+  swipeEnabled={false}
+/>
 `;

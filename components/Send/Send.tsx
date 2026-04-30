@@ -72,8 +72,6 @@ import selectingServer from '../../app/selectingServer';
 //import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
-import { ToastProvider } from 'react-native-toastier';
-import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
@@ -133,8 +131,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     //security,
     currency,
     zingolibVersion,
-    snackbars,
-    removeFirstSnackbar,
     setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -490,7 +486,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
         if (error) {
           // Show the error message as a toast
-          addLastSnackbar({ message: error, screenName: [screenName] });
+          addLastSnackbar(error);
         }
       } else {
         setAddressText(addressPar.replace(/[ \t\n\r]+/g, '')); // Remove spaces
@@ -790,10 +786,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({
-        message: translate('loadedapp.connection-error') as string,
-        screenName: [screenName],
-      });
+      addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }
 
@@ -814,7 +807,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       createAlert(
         setBackgroundError,
         addLastSnackbar,
-        [screenName, ScreenEnum.History],
         translate('send.confirm-title') as string,
         `${translate('send.Broadcast')} ${txid}`,
         true,
@@ -872,7 +864,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           createAlert(
             setBackgroundError,
             addLastSnackbar,
-            [screenName, ScreenEnum.History],
             translate('send.confirm-title') as string,
             `${translate('send.Broadcast')} ${txid}`,
             true,
@@ -898,7 +889,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       createAlert(
         setBackgroundError,
         addLastSnackbar,
-        [screenName],
         translate('send.sending-error') as string,
         `${customError ? customError : error}`,
         false,
@@ -987,13 +977,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   //);
 
   const returnPage = (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
-
+    <View>
       <View
         accessible={true}
         accessibilityLabel={translate('send.title-acc') as string}
@@ -1684,7 +1668,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     >
                       <PriceFetcher
                         setZecPrice={setZecPrice}
-                        screenName={screenName}
                         textBefore={translate('send.nofetchprice') as string}
                       />
                     </View>
@@ -1789,10 +1772,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           }}
                         >
                           <View style={{ width: '5%' }} />
-                          <PriceFetcher
-                            setZecPrice={setZecPrice}
-                            screenName={screenName}
-                          />
+                          <PriceFetcher setZecPrice={setZecPrice} />
                         </View>
                       </View>
                     </View>
@@ -2034,10 +2014,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           Utils.getZenniesDonationAmount(),
                         )
                     ) {
-                      addLastSnackbar({
-                        message: `${translate('send.donation-minimum-message') as string}`,
-                        screenName: [screenName],
-                      });
+                      addLastSnackbar(
+                        `${translate('send.donation-minimum-message') as string}`,
+                      );
                       updateToField(
                         null,
                         Utils.getZenniesDonationAmount(),
@@ -2051,12 +2030,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                       !netInfo.isConnected ||
                       selectServer === SelectServerEnum.offline
                     ) {
-                      addLastSnackbar({
-                        message: translate(
-                          'loadedapp.connection-error',
-                        ) as string,
-                        screenName: [screenName],
-                      });
+                      addLastSnackbar(
+                        translate('loadedapp.connection-error') as string,
+                      );
                       return;
                     }
                     if (
@@ -2068,10 +2044,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           maxAmount.toFixed(8),
                         )
                     ) {
-                      addLastSnackbar({
-                        message: `${translate('send.sendall-message') as string}`,
-                        screenName: [screenName],
-                      });
+                      addLastSnackbar(
+                        `${translate('send.sendall-message') as string}`,
+                      );
                     }
                     // if the address is transparent - clean the memo field Just in Case.
                     if (!memoEnabled) {
@@ -2182,7 +2157,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           </View>
         </ScrollView>
       </View>
-    </ToastProvider>
+    </View>
   );
 
   return returnPage;

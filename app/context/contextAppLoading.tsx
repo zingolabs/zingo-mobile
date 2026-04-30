@@ -11,7 +11,6 @@ import {
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
-  SnackbarType,
   BlockExplorerEnum,
 } from '../AppState';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
@@ -42,9 +41,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   saplingPool: true,
   transparentPool: true,
   mode: ModeEnum.advanced,
-  snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
-  removeFirstSnackbar: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,

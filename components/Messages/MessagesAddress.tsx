@@ -5,7 +5,6 @@ import { RouteEnum } from '../../app/AppState';
 
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../app/types';
-//import { useToast } from 'react-native-toastier';
 
 type MessagesAddressProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -23,7 +22,6 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = (
   //const address = route.params.address;
   //const sendTransaction = route.params.sendTransaction;
   //const setServerOption = route.params.setServerOption;
-  //const { clear } = useToast();
 
   return null;
 

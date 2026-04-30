@@ -503,7 +503,8 @@
     "text-readonly-server": "Before changing another server, carefully write down this seed phrase. It is the only way you can restore/access your current wallet.",
     "text-no-readonly": "Enter your seed phrase (24 words)",
     "tapcopy": "Tap to copy",
-    "tapcopy-seed-message": "Seed copied to Clipboard",
+    "tapcopy-seed-message": "Seed copied to Clipboard (clears in 60s)",
+    "clipboard-cleared": "Clipboard cleared for security",
     "tapcopy-birthday-message": "Birthday copied to Clipboard",
     "birthday-readonly": "Wallet Birthday",
     "birthday-no-readonly": "Block height of first transaction. (It's OK, if you don't know)\nValue range between ",
@@ -517,7 +518,7 @@
     "tapreveal": "Tap to reveal",
     "showtransactions": "Show Transactions",
     "youreceived": "You received",
-    "tapcopy-ufvk-message": "Viewing Key copied to Clipboard"
+    "tapcopy-ufvk-message": "Viewing Key copied to Clipboard (clears in 60s)"
   },
   "send": {
     "Broadcast": "Broadcasted and awaiting confirmation Tx:",

@@ -15,7 +15,6 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundType from './types/BackgroundType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
-import SnackbarType from './types/SnackbarType';
 import ZecPriceType from './types/ZecPriceType';
 import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
@@ -86,7 +85,6 @@ export {
   TranslateType,
   NetInfoType,
   ServerType,
-  SnackbarType,
   SecurityType,
   ServerUrisType,
   ValueTransferType,

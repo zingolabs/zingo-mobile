@@ -60,6 +60,10 @@ class RPCModule: NSObject {
     var resourceValues = URLResourceValues()
     resourceValues.isExcludedFromBackup = true
     try? fileURL.setResourceValues(resourceValues)
+    try? FileManager.default.setAttributes(
+      [.protectionKey: FileProtectionType.complete],
+      ofItemAtPath: filePath
+    )
   }
 
   func deleteFile(_ fileName: String) throws {

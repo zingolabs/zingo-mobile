@@ -1,17 +1,7 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Component Send - test Send currency USD, privacy high & mode advanced - snapshot 1`] = `
-<View
-  style={
-    [
-      {
-        "flex": 1,
-      },
-      undefined,
-    ]
-  }
->
-  <View />
+<View>
   <View
     accessibilityLabel="text translated"
     accessible={true}
@@ -1926,17 +1916,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
 `;
 
 exports[`Component Send - test Send no currency, privacy normal & mode basic - snapshot 1`] = `
-<View
-  style={
-    [
-      {
-        "flex": 1,
-      },
-      undefined,
-    ]
-  }
->
-  <View />
+<View>
   <View
     accessibilityLabel="text translated"
     accessible={true}

@@ -38,8 +38,6 @@ import AddressBookFileImpl from './AddressBookFileImpl';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
-import Snackbars from '../Components/Snackbars';
-import { ToastProvider, useToast } from 'react-native-toastier';
 import RPCModule from '../../app/RPCModule';
 import { RPCCheckAddressType } from '../../app/rpc/types/RPCCheckAddressType';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -57,15 +55,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    addressBook,
-    zenniesDonationAddress,
-    snackbars,
-    removeFirstSnackbar,
-  } = context;
+  const { translate, addressBook, zenniesDonationAddress } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
   const screenName = ScreenEnum.AddressBook;
 
   const [numAb, setNumAb] = useState<number>(50);
@@ -180,7 +171,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     setCurrentItem(null);
     setAction(null);
     if (currentAddress) {
-      clear();
       setCurrentAddress('');
       if (navigation.canGoBack()) {
         navigation.goBack();
@@ -278,272 +268,227 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   //console.log('render Address Book - 4', currentItem, action, addressBook);
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <Header
+        title={translate('addressbook.title') as string}
         screenName={screenName}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+        closeScreen={() => {
+          setCurrentItem(null);
+          setAction(null);
+          setCurrentAddress('');
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
       />
-
       <View
         style={{
-          flex: 1,
-          backgroundColor: colors.background,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          marginHorizontal: 5,
+          marginBottom: 2,
         }}
       >
-        <Header
-          title={translate('addressbook.title') as string}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-          closeScreen={() => {
-            setCurrentItem(null);
-            setAction(null);
-            setCurrentAddress('');
-            clear();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
-        />
-        <View
-          style={{
-            flexDirection: 'row',
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            width: '100%',
+            marginTop: 10,
             alignItems: 'center',
             justifyContent: 'center',
-            width: '100%',
-            marginHorizontal: 5,
-            marginBottom: 2,
           }}
         >
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              width: '100%',
-              marginTop: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
+          <TouchableOpacity
+            onPress={() => {
+              cancel();
+              setFilter(FilterEnum.all);
+              setLoading(true);
             }}
           >
-            <TouchableOpacity
-              onPress={() => {
-                cancel();
-                setFilter(FilterEnum.all);
-                setLoading(true);
+            <View
+              style={{
+                backgroundColor:
+                  filter === FilterEnum.all
+                    ? colors.primary
+                    : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor:
+                  filter === FilterEnum.all ? colors.primary : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginRight: 10,
               }}
             >
-              <View
+              <FadeText
                 style={{
-                  backgroundColor:
+                  color:
                     filter === FilterEnum.all
-                      ? colors.primary
-                      : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor:
-                    filter === FilterEnum.all ? colors.primary : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  marginRight: 10,
+                      ? colors.sideMenuBackground
+                      : colors.zingo,
+                  fontWeight: 'bold',
                 }}
               >
-                <FadeText
-                  style={{
-                    color:
-                      filter === FilterEnum.all
-                        ? colors.sideMenuBackground
-                        : colors.zingo,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {translate('messages.filter-all') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                cancel();
-                setFilter(FilterEnum.contacts);
-                setLoading(true);
+                {translate('messages.filter-all') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              cancel();
+              setFilter(FilterEnum.contacts);
+              setLoading(true);
+            }}
+          >
+            <View
+              style={{
+                backgroundColor:
+                  filter === FilterEnum.contacts
+                    ? colors.primary
+                    : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor:
+                  filter === FilterEnum.contacts
+                    ? colors.primary
+                    : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginRight: 10,
               }}
             >
-              <View
+              <FadeText
                 style={{
-                  backgroundColor:
+                  color:
                     filter === FilterEnum.contacts
-                      ? colors.primary
-                      : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor:
-                    filter === FilterEnum.contacts
-                      ? colors.primary
+                      ? colors.sideMenuBackground
                       : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  marginRight: 10,
+                  fontWeight: 'bold',
                 }}
               >
-                <FadeText
-                  style={{
-                    color:
-                      filter === FilterEnum.contacts
-                        ? colors.sideMenuBackground
-                        : colors.zingo,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {translate('messages.filter-contacts') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                cancel();
-                setFilter(FilterEnum.wallet);
-                setLoading(true);
+                {translate('messages.filter-contacts') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              cancel();
+              setFilter(FilterEnum.wallet);
+              setLoading(true);
+            }}
+          >
+            <View
+              style={{
+                backgroundColor:
+                  filter === FilterEnum.wallet
+                    ? colors.primary
+                    : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor:
+                  filter === FilterEnum.wallet ? colors.primary : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginRight: 0,
               }}
             >
-              <View
+              <FadeText
                 style={{
-                  backgroundColor:
+                  color:
                     filter === FilterEnum.wallet
-                      ? colors.primary
-                      : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor:
-                    filter === FilterEnum.wallet
-                      ? colors.primary
+                      ? colors.sideMenuBackground
                       : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  marginRight: 0,
+                  fontWeight: 'bold',
                 }}
               >
-                <FadeText
-                  style={{
-                    color:
-                      filter === FilterEnum.wallet
-                        ? colors.sideMenuBackground
-                        : colors.zingo,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {translate('addressbook.filter-wallet') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
-        <ScrollView
-          ref={scrollViewRef}
-          onScroll={handleScroll}
-          scrollEventThrottle={100}
-          testID="addressbook.scroll-view"
-          keyboardShouldPersistTaps="handled"
-          style={{ height: '80%', maxHeight: '80%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-          }}
-        >
-          {currentItem === -1 && action !== null && (
-            <AbDetail
-              index={-1}
-              key={'detail-new'}
-              item={{} as AddressBookFileClass}
-              cancel={cancel}
-              action={action}
-              doAction={doAction}
-              currentAddress={currentAddress}
-              screenName={screenName}
-              routeStack={routeStack}
-            />
+                {translate('addressbook.filter-wallet') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+      <ScrollView
+        ref={scrollViewRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={100}
+        testID="addressbook.scroll-view"
+        keyboardShouldPersistTaps="handled"
+        style={{ height: '80%', maxHeight: '80%' }}
+        contentContainerStyle={{
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          justifyContent: 'flex-start',
+        }}
+      >
+        {currentItem === -1 && action !== null && (
+          <AbDetail
+            index={-1}
+            key={'detail-new'}
+            item={{} as AddressBookFileClass}
+            cancel={cancel}
+            action={action}
+            doAction={doAction}
+            currentAddress={currentAddress}
+            screenName={screenName}
+            routeStack={routeStack}
+          />
+        )}
+        {currentItem !== null && currentItem > -1 && action !== null && (
+          <AbDetail
+            index={currentItem}
+            key={`detail-${currentItem}-${addressBookSliced[currentItem].label}`}
+            item={addressBookSliced[currentItem]}
+            cancel={cancel}
+            action={action}
+            doAction={doAction}
+            screenName={screenName}
+            routeStack={routeStack}
+          />
+        )}
+        {!currentAddress &&
+          addressBookSliced.length === 0 &&
+          currentItem !== -1 &&
+          !loading && (
+            <View
+              style={{
+                height: 150,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                marginTop: 30,
+              }}
+            >
+              <FadeText style={{ color: colors.primary }}>
+                {translate('addressbook.empty') as string}
+              </FadeText>
+            </View>
           )}
-          {currentItem !== null && currentItem > -1 && action !== null && (
-            <AbDetail
-              index={currentItem}
-              key={`detail-${currentItem}-${addressBookSliced[currentItem].label}`}
-              item={addressBookSliced[currentItem]}
-              cancel={cancel}
-              action={action}
-              doAction={doAction}
-              screenName={screenName}
-              routeStack={routeStack}
-            />
-          )}
-          {!currentAddress &&
-            addressBookSliced.length === 0 &&
-            currentItem !== -1 &&
-            !loading && (
-              <View
-                style={{
-                  height: 150,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  marginTop: 30,
-                }}
-              >
-                <FadeText style={{ color: colors.primary }}>
-                  {translate('addressbook.empty') as string}
-                </FadeText>
-              </View>
-            )}
-          {loading ? (
-            <ActivityIndicator
-              style={{ marginTop: 7, marginRight: 7 }}
-              size={25}
-              color={colors.primaryDisabled}
-            />
-          ) : (
-            <>
-              {!currentAddress &&
-                addressBookSliced.map((aBItem, index) => {
-                  return (
-                    <View key={`container-${index}-${aBItem.label}`}>
-                      {currentItem === index && (
-                        <AbSummaryLine
-                          index={index}
-                          key={`line-${index}-${aBItem.label}`}
-                          item={aBItem}
-                          setCurrentItem={setCurrentItem}
-                          setAction={setAction}
-                          handleScrollToTop={handleScrollToTop}
-                          doAction={doAction}
-                        />
-                      )}
-                    </View>
-                  );
-                })}
-              {!currentAddress &&
-                addressBookSliced.map((aBItem, index) => {
-                  return (
-                    <View key={`container-${index}-${aBItem.label}`}>
-                      {currentItem !== index && (
-                        <AbSummaryLine
-                          index={index}
-                          key={`line-${index}-${aBItem.label}`}
-                          item={aBItem}
-                          setCurrentItem={setCurrentItem}
-                          setAction={setAction}
-                          handleScrollToTop={handleScrollToTop}
-                          doAction={doAction}
-                        />
-                      )}
-                    </View>
-                  );
-                })}
-              {!currentAddress &&
-                addressBookProtected.map((aBItem, index) => {
-                  return (
-                    <View key={`container-${index}-${aBItem.label}`}>
+        {loading ? (
+          <ActivityIndicator
+            style={{ marginTop: 7, marginRight: 7 }}
+            size={25}
+            color={colors.primaryDisabled}
+          />
+        ) : (
+          <>
+            {!currentAddress &&
+              addressBookSliced.map((aBItem, index) => {
+                return (
+                  <View key={`container-${index}-${aBItem.label}`}>
+                    {currentItem === index && (
                       <AbSummaryLine
                         index={index}
                         key={`line-${index}-${aBItem.label}`}
@@ -552,100 +497,134 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                         setAction={setAction}
                         handleScrollToTop={handleScrollToTop}
                         doAction={doAction}
-                        addressProtected={true}
                       />
-                    </View>
-                  );
-                })}
-            </>
-          )}
-          {loadMoreButton && !currentAddress ? (
-            <View
-              style={{
-                height: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                marginTop: 5,
-                marginBottom: 30,
-              }}
-            >
-              <Button
-                type={ButtonTypeEnum.Secondary}
-                title={translate('addressbook.loadmore') as string}
-                onPress={loadMoreClicked}
-              />
-            </View>
-          ) : (
-            <>
-              {!currentAddress &&
-                !!addressBookSliced &&
-                !!addressBookSliced.length &&
-                !loading && (
-                  <View
-                    style={{
-                      height: 150,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      marginTop: 5,
-                      marginBottom: 30,
-                    }}
-                  >
-                    <FadeText style={{ color: colors.primary }}>
-                      {translate('addressbook.end') as string}
-                    </FadeText>
+                    )}
                   </View>
-                )}
-            </>
-          )}
-        </ScrollView>
-        {!isAtTop && (
-          <Pressable
-            onPress={handleScrollToTop}
-            disabled={isScrollingToTop}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              bottom: 105,
-              right: 10,
-              paddingHorizontal: 5,
-              paddingVertical: 10,
-              backgroundColor: colors.sideMenuBackground,
-              borderRadius: 50,
-              transform: [{ scale: pressed ? 0.9 : 1 }],
-              borderWidth: 1,
-              borderColor: colors.zingo,
-              opacity: isScrollingToTop ? 0.5 : 1,
-            })}
-          >
-            <FontAwesomeIcon
-              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-              size={20}
-              icon={faAngleUp}
-              color={colors.zingo}
-            />
-          </Pressable>
+                );
+              })}
+            {!currentAddress &&
+              addressBookSliced.map((aBItem, index) => {
+                return (
+                  <View key={`container-${index}-${aBItem.label}`}>
+                    {currentItem !== index && (
+                      <AbSummaryLine
+                        index={index}
+                        key={`line-${index}-${aBItem.label}`}
+                        item={aBItem}
+                        setCurrentItem={setCurrentItem}
+                        setAction={setAction}
+                        handleScrollToTop={handleScrollToTop}
+                        doAction={doAction}
+                      />
+                    )}
+                  </View>
+                );
+              })}
+            {!currentAddress &&
+              addressBookProtected.map((aBItem, index) => {
+                return (
+                  <View key={`container-${index}-${aBItem.label}`}>
+                    <AbSummaryLine
+                      index={index}
+                      key={`line-${index}-${aBItem.label}`}
+                      item={aBItem}
+                      setCurrentItem={setCurrentItem}
+                      setAction={setAction}
+                      handleScrollToTop={handleScrollToTop}
+                      doAction={doAction}
+                      addressProtected={true}
+                    />
+                  </View>
+                );
+              })}
+          </>
         )}
-        {currentItem === null && !loading && (
+        {loadMoreButton && !currentAddress ? (
           <View
             style={{
-              flexGrow: 1,
-              flexDirection: 'row',
-              justifyContent: 'center',
+              height: 150,
+              display: 'flex',
               alignItems: 'center',
-              marginVertical: 5,
+              justifyContent: 'flex-start',
+              marginTop: 5,
+              marginBottom: 30,
             }}
           >
             <Button
-              testID="addressbook.button.new"
-              type={ButtonTypeEnum.Primary}
-              title={translate('addressbook.new') as string}
-              onPress={() => newAddressBookItem()}
+              type={ButtonTypeEnum.Secondary}
+              title={translate('addressbook.loadmore') as string}
+              onPress={loadMoreClicked}
             />
           </View>
+        ) : (
+          <>
+            {!currentAddress &&
+              !!addressBookSliced &&
+              !!addressBookSliced.length &&
+              !loading && (
+                <View
+                  style={{
+                    height: 150,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    marginTop: 5,
+                    marginBottom: 30,
+                  }}
+                >
+                  <FadeText style={{ color: colors.primary }}>
+                    {translate('addressbook.end') as string}
+                  </FadeText>
+                </View>
+              )}
+          </>
         )}
-      </View>
-    </ToastProvider>
+      </ScrollView>
+      {!isAtTop && (
+        <Pressable
+          onPress={handleScrollToTop}
+          disabled={isScrollingToTop}
+          style={({ pressed }) => ({
+            position: 'absolute',
+            bottom: 105,
+            right: 10,
+            paddingHorizontal: 5,
+            paddingVertical: 10,
+            backgroundColor: colors.sideMenuBackground,
+            borderRadius: 50,
+            transform: [{ scale: pressed ? 0.9 : 1 }],
+            borderWidth: 1,
+            borderColor: colors.zingo,
+            opacity: isScrollingToTop ? 0.5 : 1,
+          })}
+        >
+          <FontAwesomeIcon
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+            size={20}
+            icon={faAngleUp}
+            color={colors.zingo}
+          />
+        </Pressable>
+      )}
+      {currentItem === null && !loading && (
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}
+        >
+          <Button
+            testID="addressbook.button.new"
+            type={ButtonTypeEnum.Primary}
+            title={translate('addressbook.new') as string}
+            onPress={() => newAddressBookItem()}
+          />
+        </View>
+      )}
+    </View>
   );
 };
 

@@ -42,8 +42,6 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
-import { ToastProvider } from 'react-native-toastier';
-import Snackbars from '../Components/Snackbars';
 import NewAddressTag from './components/NewAddressTag';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from './components/ExpandedAddress';
@@ -67,15 +65,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    addresses,
-    defaultUnifiedAddress,
-    mode,
-    snackbars,
-    removeFirstSnackbar,
-    addLastSnackbar,
-  } = context;
+  const { translate, addresses, defaultUnifiedAddress, mode, addLastSnackbar } =
+    context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Receive;
 
@@ -214,7 +205,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               <>
                 <SingleAddress
                   address={uAddress}
-                  screenName={screenName}
                   index={uAddrIndex ? uAddrIndex : 0}
                   setIndex={setUAddrIndex}
                   total={uAddr.length}
@@ -247,7 +237,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               <>
                 <SingleAddress
                   address={tAddress}
-                  screenName={screenName}
                   index={tAddrIndex ? tAddrIndex : 0}
                   setIndex={setTAddrIndex}
                   total={tAddr.length}
@@ -311,21 +300,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           ? tAddr[tAddrIndex].address
           : '',
     );
-    addLastSnackbar({
-      message: translate('history.addresscopied') as string,
-      duration: SnackbarDurationEnum.short,
-      screenName: [screenName],
-    });
+    addLastSnackbar(
+      translate('history.addresscopied') as string,
+      SnackbarDurationEnum.short,
+    );
   };
 
   const returnPage = (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
-
+    <>
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
@@ -406,7 +388,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           )}
         </BottomSheetView>
       </BottomSheet>
-    </ToastProvider>
+    </>
   );
 
   //console.log('render Receive - 4', uAddr, uAddrIndex, tAddr, tAddrIndex, defaultUnifiedAddress);

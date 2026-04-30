@@ -24,7 +24,6 @@ type MenuProps = {
 
 const Menu: React.FunctionComponent<MenuProps> = ({
   onItemSelected,
-  screenName,
   toggleMenuDrawer,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -69,10 +68,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
       //console.log('BIOMETRIC --------> ', resultBio);
       if (resultBio === false) {
         // snack with Error & closing the menu.
-        addLastSnackbar({
-          message: translate('biometrics-error') as string,
-          screenName: [screenName],
-        });
+        addLastSnackbar(translate('biometrics-error') as string);
       } else {
         // the App/Drawer needs a bit of time to close
         // properly

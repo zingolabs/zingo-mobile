@@ -16,8 +16,6 @@ import {
   SelectServerEnum,
   SnackbarDurationEnum,
 } from '../../app/AppState';
-import Snackbars from '../Components/Snackbars';
-import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type RescanProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Rescan> & {
@@ -29,106 +27,84 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   doRescan,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    birthday,
-    translate,
-    netInfo,
-    addLastSnackbar,
-    selectServer,
-    snackbars,
-    removeFirstSnackbar,
-  } = context;
+  const { birthday, translate, netInfo, addLastSnackbar, selectServer } =
+    context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
   const screenName = ScreenEnum.Rescan;
 
   const doRescanAndClose = async () => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({
-        message: translate('loadedapp.connection-error') as string,
-        screenName: [screenName],
-      });
+      addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }
     // was removed the `await` here because launching the rescan can
     // take a lot of time and it's better the App responsive.
     doRescan();
-    clear();
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
     setTimeout(() => {
       // because this message is between screens.
-      addLastSnackbar({
-        message: translate('loadedapp.syncing') as string,
-        duration: SnackbarDurationEnum.longer,
-        screenName: [screenName, ScreenEnum.LoadedApp],
-      });
+      addLastSnackbar(
+        translate('loadedapp.syncing') as string,
+        SnackbarDurationEnum.longer,
+      );
     }, 3 * 1000);
   };
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <Header
+        title={translate('rescan.title') as string}
         screenName={screenName}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+        closeScreen={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
       />
-
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
+      <ScrollView
+        style={{ height: '80%', maxHeight: '80%' }}
+        contentContainerStyle={{
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          justifyContent: 'flex-start',
         }}
       >
-        <Header
-          title={translate('rescan.title') as string}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-          closeScreen={() => {
-            clear();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
-        />
-        <ScrollView
-          style={{ height: '80%', maxHeight: '80%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-          }}
-        >
-          <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-            <RegText>
-              {(translate('rescan.text-1') as string) +
-                birthday +
-                translate('rescan.text-2')}
-            </RegText>
-          </View>
-        </ScrollView>
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-          }}
-        >
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('rescan.button') as string}
-            onPress={doRescanAndClose}
-          />
+        <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
+          <RegText>
+            {(translate('rescan.text-1') as string) +
+              birthday +
+              translate('rescan.text-2')}
+          </RegText>
         </View>
+      </ScrollView>
+      <View
+        style={{
+          flexGrow: 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}
+      >
+        <Button
+          type={ButtonTypeEnum.Primary}
+          title={translate('rescan.button') as string}
+          onPress={doRescanAndClose}
+        />
       </View>
-    </ToastProvider>
+    </View>
   );
 };
 
