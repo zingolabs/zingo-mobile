@@ -53,6 +53,7 @@ jest.mock('react-native', () => {
     getZenniesDonationAddress: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
+  RN.RefreshControl = jest.fn(() => null);
 
   return RN;
 });
