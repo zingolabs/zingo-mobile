@@ -17,7 +17,6 @@ import {
   ButtonTypeEnum,
   ModeEnum,
   RouteEnum,
-  ScreenEnum,
   SnackbarDurationEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
@@ -45,7 +44,6 @@ import Address from './Address/Address';
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
   ufvk?: string;
-  screenName: ScreenEnum;
   index: number;
   setIndex: (i: number) => void;
   total: number;
@@ -59,7 +57,6 @@ type SingleAddressProps = {
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   address,
   ufvk,
-  screenName,
   show,
   total,
   index,
@@ -145,13 +142,12 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 
   const doCopy = () => {
     Clipboard.setString(ufvk ? ufvk : address ? address.address : '');
-    addLastSnackbar({
-      message: ufvk
+    addLastSnackbar(
+      ufvk
         ? (translate('seed.tapcopy-ufvk-message') as string)
         : (translate('history.addresscopied') as string),
-      duration: SnackbarDurationEnum.short,
-      screenName: [screenName],
-    });
+      SnackbarDurationEnum.short,
+    );
   };
 
   const doAddressList = () => {

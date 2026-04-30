@@ -503,7 +503,8 @@
     "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente esta frase semilla. Es la única manera que puedes restaurar/acceder tu monedero actual.",
     "text-no-readonly": "Introduce tu Frase Semilla (son 24 palabras)",
     "tapcopy": "Pulsar para copiar",
-    "tapcopy-seed-message": "Frase Semilla copiada al Portapapeles",
+    "tapcopy-seed-message": "Frase Semilla copiada al Portapapeles (se borrará en 60s)",
+    "clipboard-cleared": "Portapapeles borrado por seguridad",
     "tapcopy-birthday-message": "Cumpleaños copiado al Portapapeles",
     "birthday-readonly": "Cumpleaños del Monedero",
     "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas)\nRango de valores entre ",
@@ -517,7 +518,7 @@
     "tapreveal": "Pulsar para revelar",
     "showtransactions": "Ver Transacciones",
     "youreceived": "Recibiste",
-    "tapcopy-ufvk-message": "Clave de visualización copiada al portapapeles"
+    "tapcopy-ufvk-message": "Clave de visualización copiada al portapapeles (se borrará en 60s)"
   },
   "send": {
     "Broadcast": "Transmitida y esperando confirmación Tx:",

@@ -1,16 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
-import {
-  GlobalConst,
-  TranslateType,
-  SnackbarType,
-  ScreenEnum,
-} from './AppState';
+import { GlobalConst, TranslateType } from './AppState';
+import { SnackbarDurationEnum } from './AppState/enums/SnackbarDurationEnum';
 
 export const createAlert = async (
   setBackgroundError: (title: string, error: string) => void,
-  addLastSnackbar: (snackbar: SnackbarType) => void,
-  screenName: ScreenEnum[],
+  addLastSnackbar: (message: string, duration?: SnackbarDurationEnum) => void,
   title: string,
   error: string,
   toast: boolean,
@@ -29,7 +24,7 @@ export const createAlert = async (
   } else {
     if (toast) {
       setTimeout(() => {
-        addLastSnackbar({ message: error, screenName: screenName });
+        addLastSnackbar(error);
       }, 1 * 1000);
     } else {
       if (sendEmail) {

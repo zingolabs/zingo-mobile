@@ -59,6 +59,7 @@ class RPCModule: NSObject {
     var fileURL = URL(fileURLWithPath: filePath)
     var resourceValues = URLResourceValues()
     resourceValues.isExcludedFromBackup = true
+    resourceValues.fileProtection = .complete
     try? fileURL.setResourceValues(resourceValues)
   }
 

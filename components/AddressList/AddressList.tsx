@@ -33,8 +33,6 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
-import Snackbars from '../Components/Snackbars';
-import { ToastProvider, useToast } from 'react-native-toastier';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
@@ -52,9 +50,8 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       ? route.params.setIndex
       : () => {};
   const context = useContext(ContextAppLoaded);
-  const { translate, addresses, snackbars, removeFirstSnackbar } = context;
+  const { translate, addresses } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
   const screenName = ScreenEnum.AddressList;
 
   const [numAl, setNumAl] = useState<number>(50);
@@ -166,161 +163,150 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   //console.log('render Address Book - 4', currentItem, action, addressBook);
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <Header
+        title={`${translate('addresslist.title')} - ${
+          addressKind === AddressKindEnum.u
+            ? translate('addresslist.unified')
+            : translate('addresslist.transparent')
+        }`}
         screenName={screenName}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+        closeScreen={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
       />
-
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
+      <ScrollView
+        ref={scrollViewRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={100}
+        testID="addressbook.scroll-view"
+        keyboardShouldPersistTaps="handled"
+        style={{ height: '80%', maxHeight: '80%' }}
+        contentContainerStyle={{
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          justifyContent: 'flex-start',
         }}
       >
-        <Header
-          title={`${translate('addresslist.title')} - ${
-            addressKind === AddressKindEnum.u
-              ? translate('addresslist.unified')
-              : translate('addresslist.transparent')
-          }`}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-          closeScreen={() => {
-            clear();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
-        />
-        <ScrollView
-          ref={scrollViewRef}
-          onScroll={handleScroll}
-          scrollEventThrottle={100}
-          testID="addressbook.scroll-view"
-          keyboardShouldPersistTaps="handled"
-          style={{ height: '80%', maxHeight: '80%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-          }}
-        >
-          {addressesSliced.length === 0 && !loading && (
-            <View
-              style={{
-                height: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                marginTop: 30,
-              }}
-            >
-              <FadeText style={{ color: colors.primary }}>
-                {translate('addressbook.empty') as string}
-              </FadeText>
-            </View>
-          )}
-          {loading ? (
-            <ActivityIndicator
-              style={{ marginTop: 7, marginRight: 7 }}
-              size={25}
-              color={colors.primaryDisabled}
-            />
-          ) : (
-            <>
-              {addressesSliced.map((alItem, index) => {
-                return (
-                  <View key={`container-${index}-${alItem.address}`}>
-                    <AlSummaryLine
-                      key={`line-${index}-${alItem.address}`}
-                      index={index}
-                      setIndex={setIndex}
-                      item={alItem}
-                      closeScreen={() => {
-                        clear();
-                        if (navigation.canGoBack()) {
-                          navigation.goBack();
-                        }
-                      }}
-                      screenName={screenName}
-                    />
-                  </View>
-                );
-              })}
-            </>
-          )}
-          {loadMoreButton ? (
-            <View
-              style={{
-                height: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                marginTop: 5,
-                marginBottom: 30,
-              }}
-            >
-              <Button
-                type={ButtonTypeEnum.Secondary}
-                title={translate('addressbook.loadmore') as string}
-                onPress={loadMoreClicked}
-              />
-            </View>
-          ) : (
-            <>
-              {!!addressesSliced && !!addressesSliced.length && !loading && (
-                <View
-                  style={{
-                    height: 150,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    marginTop: 5,
-                    marginBottom: 30,
-                  }}
-                >
-                  <FadeText style={{ color: colors.primary }}>
-                    {translate('addressbook.end') as string}
-                  </FadeText>
-                </View>
-              )}
-            </>
-          )}
-        </ScrollView>
-        {!isAtTop && (
-          <Pressable
-            onPress={handleScrollToTop}
-            disabled={isScrollingToTop}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              bottom: 105,
-              right: 10,
-              paddingHorizontal: 5,
-              paddingVertical: 10,
-              backgroundColor: colors.sideMenuBackground,
-              borderRadius: 50,
-              transform: [{ scale: pressed ? 0.9 : 1 }],
-              borderWidth: 1,
-              borderColor: colors.zingo,
-              opacity: isScrollingToTop ? 0.5 : 1,
-            })}
+        {addressesSliced.length === 0 && !loading && (
+          <View
+            style={{
+              height: 150,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              marginTop: 30,
+            }}
           >
-            <FontAwesomeIcon
-              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-              size={20}
-              icon={faAngleUp}
-              color={colors.zingo}
-            />
-          </Pressable>
+            <FadeText style={{ color: colors.primary }}>
+              {translate('addressbook.empty') as string}
+            </FadeText>
+          </View>
         )}
-      </View>
-    </ToastProvider>
+        {loading ? (
+          <ActivityIndicator
+            style={{ marginTop: 7, marginRight: 7 }}
+            size={25}
+            color={colors.primaryDisabled}
+          />
+        ) : (
+          <>
+            {addressesSliced.map((alItem, index) => {
+              return (
+                <View key={`container-${index}-${alItem.address}`}>
+                  <AlSummaryLine
+                    key={`line-${index}-${alItem.address}`}
+                    index={index}
+                    setIndex={setIndex}
+                    item={alItem}
+                    closeScreen={() => {
+                      if (navigation.canGoBack()) {
+                        navigation.goBack();
+                      }
+                    }}
+                  />
+                </View>
+              );
+            })}
+          </>
+        )}
+        {loadMoreButton ? (
+          <View
+            style={{
+              height: 150,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              marginTop: 5,
+              marginBottom: 30,
+            }}
+          >
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={translate('addressbook.loadmore') as string}
+              onPress={loadMoreClicked}
+            />
+          </View>
+        ) : (
+          <>
+            {!!addressesSliced && !!addressesSliced.length && !loading && (
+              <View
+                style={{
+                  height: 150,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: 5,
+                  marginBottom: 30,
+                }}
+              >
+                <FadeText style={{ color: colors.primary }}>
+                  {translate('addressbook.end') as string}
+                </FadeText>
+              </View>
+            )}
+          </>
+        )}
+      </ScrollView>
+      {!isAtTop && (
+        <Pressable
+          onPress={handleScrollToTop}
+          disabled={isScrollingToTop}
+          style={({ pressed }) => ({
+            position: 'absolute',
+            bottom: 105,
+            right: 10,
+            paddingHorizontal: 5,
+            paddingVertical: 10,
+            backgroundColor: colors.sideMenuBackground,
+            borderRadius: 50,
+            transform: [{ scale: pressed ? 0.9 : 1 }],
+            borderWidth: 1,
+            borderColor: colors.zingo,
+            opacity: isScrollingToTop ? 0.5 : 1,
+          })}
+        >
+          <FontAwesomeIcon
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+            size={20}
+            icon={faAngleUp}
+            color={colors.zingo}
+          />
+        </Pressable>
+      )}
+    </View>
   );
 };
 

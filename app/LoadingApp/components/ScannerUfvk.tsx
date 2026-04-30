@@ -7,8 +7,6 @@ import Header from '../../../components/Header';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../types';
 import { View } from 'react-native';
-import Snackbars from '../../../components/Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
 import { ScreenEnum } from '../../AppState';
 
 type ScannerUfvkProps = {
@@ -20,7 +18,7 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({
   closeModal,
 }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, snackbars, removeFirstSnackbar } = context;
+  const { translate } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.ScannerUfvk;
 
@@ -32,32 +30,24 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({
   };
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <Header
+        title={translate('scanner.text') as string}
         screenName={screenName}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+        closeScreen={closeModal}
       />
-
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}
-      >
-        <Header
-          title={translate('scanner.text') as string}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-          closeScreen={closeModal}
-        />
-        <Scanner onRead={onRead} onClose={() => closeModal()} active={true} />
-      </View>
-    </ToastProvider>
+      <Scanner onRead={onRead} onClose={() => closeModal()} active={true} />
+    </View>
   );
 };
 

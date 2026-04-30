@@ -3,13 +3,14 @@ package org.ZingoLabs.Zingo
 import android.content.Context
 import android.util.Log
 import android.util.Base64
+import androidx.security.crypto.EncryptedFile
+import androidx.security.crypto.MasterKeys
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.IOException
 import org.ZingoLabs.Zingo.Constants.*
 import kotlinx.coroutines.*
 
@@ -22,6 +23,104 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     private fun getDocumentDirectory(): String {
         return applicationContext.filesDir.absolutePath
+    }
+
+    private fun buildEncryptedFile(fileName: String): EncryptedFile {
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        return EncryptedFile.Builder(
+            File(applicationContext.filesDir, fileName),
+            applicationContext,
+            masterKeyAlias,
+            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB,
+        ).build()
+    }
+
+    // Migrates a wallet file from the old format (raw binary) to the new format
+    // (encrypted Base64 text). Safe to call even if the file does not exist or
+    // is already in the new format.
+    //
+    // EncryptedFile stores its keyset in SharedPreferences keyed by file path, so
+    // we cannot use a temp-file-then-rename approach (the renamed file would be
+    // decrypted with the wrong keyset). Instead we keep a plain binary .migrating
+    // backup until the encrypted write is confirmed, then delete it.
+    fun migrateFileIfNeeded(fileName: String) {
+        val file = File(applicationContext.filesDir, fileName)
+        val backupFile = File(applicationContext.filesDir, "$fileName.migrating")
+
+        // Resume an interrupted migration: the original was deleted but the plain
+        // binary backup still exists — restore it so the normal path can retry.
+        if (!file.exists() && backupFile.exists()) {
+            Log.i("MAIN", "[$fileName] resuming interrupted migration: restoring binary backup")
+            if (!backupFile.renameTo(file)) {
+                Log.e("MAIN", "[$fileName] migration: could not restore backup, giving up")
+                return
+            }
+        }
+
+        if (!file.exists()) return
+
+        // Check if already encrypted — try reading it as EncryptedFile.
+        val alreadyEncrypted = try {
+            buildEncryptedFile(fileName).openFileInput().use { it.readBytes() }
+            true
+        } catch (_: Exception) {
+            false
+        }
+
+        if (alreadyEncrypted) {
+            Log.i("MAIN", "[$fileName] already encrypted, skipping migration")
+            backupFile.delete() // clean up any stale backup from a previous run
+            return
+        }
+
+        Log.i("MAIN", "[$fileName] not yet encrypted, starting migration")
+
+        // Read the old binary content.
+        val oldBytes = try {
+            applicationContext.openFileInput(fileName).use { it.readBytes() }
+        } catch (e: Exception) {
+            Log.e("MAIN", "[$fileName] migration: could not read old file, aborting: $e")
+            return
+        }
+
+        val base64Content = Base64.encodeToString(oldBytes, Base64.NO_WRAP)
+
+        // Save a plain binary backup before touching the original.
+        // If the process dies after we delete the original, the next startup
+        // will find this backup and restore it before retrying.
+        try {
+            file.copyTo(backupFile, overwrite = true)
+        } catch (e: Exception) {
+            Log.e("MAIN", "[$fileName] migration: could not create backup, aborting: $e")
+            return
+        }
+
+        // Delete original and write encrypted version using the correct file name.
+        // EncryptedFile keys its keyset by file path, so writing with the final
+        // name here ensures readEncryptedFile() later uses the matching keyset.
+        file.delete()
+        try {
+            buildEncryptedFile(fileName).openFileOutput().use { out ->
+                out.write(base64Content.toByteArray(Charsets.UTF_8))
+            }
+        } catch (e: Exception) {
+            Log.e("MAIN", "[$fileName] migration: encrypted write failed, restoring backup: $e")
+            backupFile.renameTo(file)
+            return
+        }
+
+        // Verify the encrypted file is readable before discarding the backup.
+        try {
+            buildEncryptedFile(fileName).openFileInput().use { it.readBytes() }
+        } catch (e: Exception) {
+            Log.e("MAIN", "[$fileName] migration: verification failed, restoring backup: $e")
+            file.delete()
+            backupFile.renameTo(file)
+            return
+        }
+
+        backupFile.delete()
+        Log.i("MAIN", "[$fileName] migration complete")
     }
 
     fun fileExists(fileName: String): Boolean {
@@ -52,6 +151,39 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return file!!.delete()
     }
 
+    private fun readEncryptedFile(fileName: String): String {
+        return buildEncryptedFile(fileName).openFileInput().use { input ->
+            input.bufferedReader(Charsets.UTF_8).readText()
+        }
+    }
+
+    // Reads a wallet file as a Base64 string. First tries the new encrypted format;
+    // if that fails (migration not yet complete or interrupted), falls back to reading
+    // the old raw binary and encoding it — the format zingolib has always expected.
+    // This makes migration failures invisible to the user on startup and during backup.
+    private fun readFileAsB64(fileName: String): String {
+        return try {
+            readEncryptedFile(fileName)
+        } catch (e: Exception) {
+            Log.w("MAIN", "[$fileName] encrypted read failed, trying binary fallback: $e")
+            applicationContext.openFileInput(fileName).use { input ->
+                Base64.encodeToString(input.readBytes(), Base64.NO_WRAP)
+            }
+        }
+    }
+
+    private fun writeEncryptedFile(fileName: String, content: String) {
+        // EncryptedFile keys its keyset in SharedPreferences by file path, so
+        // temp-file-then-rename would decrypt with the wrong key. We delete the
+        // existing file first (required by openFileOutput) and write directly to
+        // the final name — the same keyset is reused on every write to that path.
+        val file = File(applicationContext.filesDir, fileName)
+        file.delete()
+        buildEncryptedFile(fileName).openFileOutput().use { out ->
+            out.write(content.toByteArray(Charsets.UTF_8))
+        }
+    }
+
     @ReactMethod
     fun walletExists(promise: Promise) {
         // Check if a wallet already exists
@@ -68,32 +200,26 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         try {
             uniffi.zingo.initLogging()
 
-            // Get the encoded wallet file
             val b64encoded: String = uniffi.zingo.saveToB64()
             if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
-                // with error don't save the file. Obviously.
                 Log.e("MAIN", "Error: [Native] Couldn't save the wallet. $b64encoded")
                 return false
             }
-            // Log.i("MAIN", b64encoded)
 
             val correct = uniffi.zingo.checkB64(b64encoded)
             if (correct == "false") {
-                Log.e("MAIN", "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect: $b64encoded")
+                Log.e("MAIN", "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect.")
                 return false
             }
 
-            // check if the content is correct. Stored Decoded.
-            val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            Log.i("MAIN", "[Native] file size: ${fileBytes.size} bytes")
-
-            if (fileBytes.size > 0) {
-                writeFile(WalletFileName.value, fileBytes)
-                return true
-            } else {
+            if (b64encoded.isEmpty()) {
                 Log.e("MAIN", "[Native] No need to save the wallet.")
                 return true
             }
+
+            Log.i("MAIN", "[Native] file size: ${b64encoded.length} chars (Base64)")
+            writeEncryptedFile(WalletFileName.value, b64encoded)
+            return true
         } catch (e: Exception) {
             Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the wallet. $e")
             return false
@@ -101,30 +227,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     private fun saveWalletBackupFile(): Boolean {
-        // Get the encoded wallet file
-        val fileBytes: ByteArray
-        try {
-            // Intentar leer el archivo
-            fileBytes = readFile(WalletFileName.value)
-        } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "Error: [Native] Wallet file not found", e)
-            return false
-        } catch (e: IOException) {
-            Log.e("MAIN", "Error: [Native] Couldn't read the wallet file", e)
-            return false
+        return try {
+            val content = readFileAsB64(WalletFileName.value)
+            writeEncryptedFile(WalletBackupFileName.value, content)
+            true
         } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't read the wallet file", e)
-            return false
+            Log.e("MAIN", "Error: [Native] Couldn't save the wallet backup: $e")
+            false
         }
-
-        try {
-            // Save file to disk
-            writeFile(WalletBackupFileName.value, fileBytes)
-        } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the wallet backup")
-            return false
-        }
-        return true
     }
 
     fun saveBackgroundFile(json: String) {
@@ -207,167 +317,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
         try {
-            // Read the file
-            val fileBytes = readFile(WalletFileName.value)
-
-            val middle0w = 0
-            val middle1w = 6000000 // 6_000_000 - 8 pieces
-            val middle2w = 12000000
-            val middle3w = 18000000
-            val middle4w = 24000000
-            val middle5w = 30000000
-            val middle6w = 36000000
-            val middle7w = 42000000
-            val middle8w: Int = fileBytes.size
-
-            var fileb64 = StringBuilder("")
-            if (middle8w <= middle1w) {
-                fileb64 = fileb64.append(
-                    Base64.encodeToString(
-                        fileBytes,
-                        middle0w,
-                        middle8w - middle0w,
-                        Base64.NO_WRAP
-                    )
-                )
-            } else {
-                fileb64 = fileb64.append(
-                    Base64.encodeToString(
-                        fileBytes,
-                        middle0w,
-                        middle1w - middle0w,
-                        Base64.NO_WRAP
-                    )
-                )
-                if (middle8w <= middle2w) {
-                    fileb64 = fileb64.append(
-                        Base64.encodeToString(
-                            fileBytes,
-                            middle1w,
-                            middle8w - middle1w,
-                            Base64.NO_WRAP
-                        )
-                    )
-                } else {
-                    fileb64 = fileb64.append(
-                        Base64.encodeToString(
-                            fileBytes,
-                            middle1w,
-                            middle2w - middle1w,
-                            Base64.NO_WRAP
-                        )
-                    )
-                    if (middle8w <= middle3w) {
-                        fileb64 = fileb64.append(
-                            Base64.encodeToString(
-                                fileBytes,
-                                middle2w,
-                                middle8w - middle2w,
-                                Base64.NO_WRAP
-                            )
-                        )
-                    } else {
-                        fileb64 = fileb64.append(
-                            Base64.encodeToString(
-                                fileBytes,
-                                middle2w,
-                                middle3w - middle2w,
-                                Base64.NO_WRAP
-                            )
-                        )
-                        if (middle8w <= middle4w) {
-                            fileb64 = fileb64.append(
-                                Base64.encodeToString(
-                                    fileBytes,
-                                    middle3w,
-                                    middle8w - middle3w,
-                                    Base64.NO_WRAP
-                                )
-                            )
-                        } else {
-                            fileb64 = fileb64.append(
-                                Base64.encodeToString(
-                                    fileBytes,
-                                    middle3w,
-                                    middle4w - middle3w,
-                                    Base64.NO_WRAP
-                                )
-                            )
-                            if (middle8w <= middle5w) {
-                                fileb64 = fileb64.append(
-                                    Base64.encodeToString(
-                                        fileBytes,
-                                        middle4w,
-                                        middle8w - middle4w,
-                                        Base64.NO_WRAP
-                                    )
-                                )
-                            } else {
-                                fileb64 = fileb64.append(
-                                    Base64.encodeToString(
-                                        fileBytes,
-                                        middle4w,
-                                        middle5w - middle4w,
-                                        Base64.NO_WRAP
-                                    )
-                                )
-                                if (middle8w <= middle6w) {
-                                    fileb64 = fileb64.append(
-                                        Base64.encodeToString(
-                                            fileBytes,
-                                            middle5w,
-                                            middle8w - middle5w,
-                                            Base64.NO_WRAP
-                                        )
-                                    )
-                                } else {
-                                    fileb64 = fileb64.append(
-                                        Base64.encodeToString(
-                                            fileBytes,
-                                            middle5w,
-                                            middle6w - middle5w,
-                                            Base64.NO_WRAP
-                                        )
-                                    )
-                                    if (middle8w <= middle7w) {
-                                        fileb64 = fileb64.append(
-                                            Base64.encodeToString(
-                                                fileBytes,
-                                                middle6w,
-                                                middle8w - middle6w,
-                                                Base64.NO_WRAP
-                                            )
-                                        )
-                                    } else {
-                                        fileb64 = fileb64.append(
-                                            Base64.encodeToString(
-                                                fileBytes,
-                                                middle6w,
-                                                middle7w - middle6w,
-                                                Base64.NO_WRAP
-                                            )
-                                        )
-                                        fileb64 = fileb64.append(
-                                            Base64.encodeToString(
-                                                fileBytes,
-                                                middle7w,
-                                                middle8w - middle7w,
-                                                Base64.NO_WRAP
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            // Migrate both files from old binary format to encrypted Base64 if needed.
+            // Safe to call even if files don't exist or are already migrated.
+            migrateFileIfNeeded(WalletFileName.value)
+            migrateFileIfNeeded(WalletBackupFileName.value)
 
             uniffi.zingo.initLogging()
 
-            Log.i("MAIN", "file size: $middle8w")
+            val fileb64 = readFileAsB64(WalletFileName.value)
+            Log.i("MAIN", "file size: ${fileb64.length} chars (Base64)")
 
-            val resp = uniffi.zingo.initFromB64(fileb64.toString(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromB64(fileb64, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
 
             return resp
         } catch (e: Exception) {
@@ -379,62 +339,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
-        val fileBytesBackup: ByteArray
-        val fileBytesWallet: ByteArray
-
-        // Read the file backup
         try {
-            fileBytesBackup = readFile(WalletBackupFileName.value)
+            val backup = readFileAsB64(WalletBackupFileName.value)
+            val wallet = readFileAsB64(WalletFileName.value)
+            writeEncryptedFile(WalletFileName.value, backup)
+            writeEncryptedFile(WalletBackupFileName.value, wallet)
+            promise.resolve(true)
         } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "Error: [Native] Backup file not found", e)
+            Log.e("MAIN", "Error: [Native] file not found during backup restore", e)
             promise.resolve(false)
-            return
-        } catch (e: IOException) {
-            Log.e("MAIN", "Error: [Native] reading the backup file", e)
-            promise.resolve(false)
-            return
         } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error, reading the backup file", e)
+            Log.e("MAIN", "Error: [Native] Unexpected error during backup restore: $e")
             promise.resolve(false)
-            return
         }
-
-        // Read the file wallet
-        try {
-            fileBytesWallet = readFile(WalletFileName.value)
-        } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "Error: [Native] Wallet file not found", e)
-            promise.resolve(false)
-            return
-        } catch (e: IOException) {
-            Log.e("MAIN", "Error: [Native] reading the wallet file", e)
-            promise.resolve(false)
-            return
-        } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error, reading the wallet file", e)
-            promise.resolve(false)
-            return
-        }
-
-        try {
-            // Save file to disk wallet (with the backup)
-            writeFile(WalletFileName.value, fileBytesBackup)
-        } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error, Couldn't save the wallet with the backup")
-            promise.resolve(false)
-            return
-        }
-
-        try {
-            // Save file to disk backup (with the wallet)
-            writeFile(WalletBackupFileName.value, fileBytesWallet)
-        } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error, Couldn't save the backup with the wallet")
-            promise.resolve(false)
-            return
-        }
-
-        promise.resolve(true)
     }
 
     @ReactMethod

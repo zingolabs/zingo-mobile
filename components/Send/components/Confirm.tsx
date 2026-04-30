@@ -27,8 +27,6 @@ import {
 import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
 import { RPCParseAddressStatusEnum } from '../../../app/rpc/enums/RPCParseAddressStatusEnum';
-import Snackbars from '../../Components/Snackbars';
-import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 
@@ -58,11 +56,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     addLastSnackbar,
     server,
     security,
-    snackbars,
-    removeFirstSnackbar,
   } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
   const screenName = ScreenEnum.Confirm;
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
@@ -318,10 +313,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     //console.log('BIOMETRIC --------> ', resultBio);
     if (resultBio === false) {
       // snack with Error
-      addLastSnackbar({
-        message: translate('biometrics-error') as string,
-        screenName: [screenName],
-      });
+      addLastSnackbar(translate('biometrics-error') as string);
     } else {
       await confirmSend(sendPageState);
     }
@@ -352,13 +344,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   }, []);
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
-
+    <View>
       <View
         style={{
           flex: 1,
@@ -374,7 +360,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           noPrivacy={true}
           noUfvkIcon={true}
           closeScreen={() => {
-            clear();
             if (navigation.canGoBack()) {
               navigation.goBack();
             }
@@ -575,7 +560,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           </View>
         </View>
       </View>
-    </ToastProvider>
+    </View>
   );
 };
 

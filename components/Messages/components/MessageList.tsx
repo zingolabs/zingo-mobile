@@ -62,8 +62,6 @@ import { createAlert } from '../../../app/createAlert';
 import selectingServer from '../../../app/selectingServer';
 import { serverUris } from '../../../app/uris';
 import Utils from '../../../app/utils';
-import { ToastProvider } from 'react-native-toastier';
-import Snackbars from '../../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type MessageListProps = DrawerScreenProps<
@@ -109,8 +107,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     doRefresh,
     somePending,
     zingolibVersion,
-    snackbars,
-    removeFirstSnackbar,
     setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -477,7 +473,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       createAlert(
         setBackgroundError,
         addLastSnackbar,
-        [screenName],
         translate('send.sending-error') as string,
         `${customError ? customError : error}`,
         false,
@@ -537,475 +532,461 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   //}
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
-
-      <KeyboardAvoidingView
-        behavior={
-          Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'
-        }
-        keyboardVerticalOffset={
-          Platform.OS === GlobalConst.platformOSios ? 10 : 0
-        }
+    <KeyboardAvoidingView
+      behavior={
+        Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'
+      }
+      keyboardVerticalOffset={
+        Platform.OS === GlobalConst.platformOSios ? 10 : 0
+      }
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <View
         style={{
           flex: 1,
           backgroundColor: colors.background,
         }}
       >
         <View
+          accessible={true}
+          accessibilityLabel={translate('history.title-acc') as string}
           style={{
-            flex: 1,
-            backgroundColor: colors.background,
+            display: 'flex',
+            justifyContent: 'flex-start',
+            width: '100%',
+            height: address
+              ? `${
+                  100 -
+                  ((memoFieldHeight +
+                    (keyboardVisible
+                      ? Platform.OS === GlobalConst.platformOSandroid
+                        ? 40
+                        : 60
+                      : 0)) *
+                    100) /
+                    dimensions.height
+                }%`
+              : '100%',
           }}
         >
-          <View
-            accessible={true}
-            accessibilityLabel={translate('history.title-acc') as string}
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-start',
-              width: '100%',
-              height: address
-                ? `${
-                    100 -
-                    ((memoFieldHeight +
-                      (keyboardVisible
-                        ? Platform.OS === GlobalConst.platformOSandroid
-                          ? 40
-                          : 60
-                        : 0)) *
-                      100) /
-                      dimensions.height
-                  }%`
-                : '100%',
-            }}
-          >
-            <Header
-              title={translate('messages.title') as string}
-              screenName={screenName}
-              toggleMenuDrawer={toggleMenuDrawer}
-              noBalance={true}
-              setPrivacyOption={setPrivacyOption}
-              addLastSnackbar={addLastSnackbar /* context */}
-            />
-            {!!address && (
-              <>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginHorizontal: 10,
-                    marginTop: 20,
-                    marginBottom: 10,
-                  }}
-                >
-                  <View style={{ minWidth: 50, marginRight: 5 }}>
-                    {!getLabelAndColor(address).initials ? (
-                      <FontAwesomeIcon
-                        style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                        size={40}
-                        icon={getIcon()}
-                        color={colors.text}
-                      />
-                    ) : (
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: 40,
-                          height: 40,
-                          backgroundColor: getLabelAndColor(address).color,
-                          borderColor: colors.zingo,
-                          borderWidth: 2,
-                          borderRadius: 22,
-                          marginLeft: 5,
-                          marginRight: 5,
-                          marginTop: 0,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontWeight: 'bold',
-                            fontSize: 20,
-                            color: Utils.getLabelColor(
-                              getLabelAndColor(address).color,
-                            ),
-                          }}
-                        >{`${getLabelAndColor(address).initials}`}</Text>
-                      </View>
-                    )}
-                  </View>
-                  <AddressItem
-                    address={address}
-                    screenName={screenName}
-                    oneLine={true}
-                    withIcon={true}
-                  />
-                </View>
-              </>
-            )}
-            {(loading || !firstScrollToBottomDone) && (
-              <ActivityIndicator
-                size="large"
-                color={colors.primary}
-                style={{ marginVertical: 20 }}
-              />
-            )}
-            <ScrollView
-              ref={scrollViewRef}
-              onScroll={handleScroll}
-              onLayout={e => {
-                const { height } = e.nativeEvent.layout;
-                //console.log('layout HEIGHT >>>>>>>>>>>>>', height);
-                setScrollViewHeight(height);
-              }}
-              onContentSizeChange={(_w: number, h: number) => {
-                //console.log('content HEIGHT >>>>>>>>>>>>>', h);
-                setContentScrollViewHeight(h);
-              }}
-              scrollEventThrottle={100}
-              accessible={true}
-              accessibilityLabel={translate('history.list-acc') as string}
-              refreshControl={
-                <RefreshControl
-                  refreshing={false}
-                  onRefresh={() => doRefresh(screenName)}
-                  tintColor={colors.text}
-                  title={translate('history.refreshing') as string}
-                />
-              }
-              style={{
-                flexGrow: 1,
-                marginTop: 10,
-                width: '100%',
-                opacity: loading || !firstScrollToBottomDone ? 0 : 1,
-              }}
-            >
-              {loadMoreButton ? (
-                <View
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    marginTop: 10,
-                    marginBottom: 10,
-                  }}
-                >
-                  <Button
-                    type={ButtonTypeEnum.Secondary}
-                    title={translate('history.loadmore') as string}
-                    onPress={loadMoreClicked}
-                  />
-                </View>
-              ) : (
-                <>
-                  {!!messagesSliced && !!messagesSliced.length ? (
-                    <View
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        marginTop: 10,
-                        marginBottom: 10,
-                      }}
-                    >
-                      <FadeText style={{ color: colors.primary }}>
-                        {translate('history.end') as string}
-                      </FadeText>
-                    </View>
+          <Header
+            title={translate('messages.title') as string}
+            screenName={screenName}
+            toggleMenuDrawer={toggleMenuDrawer}
+            noBalance={true}
+            setPrivacyOption={setPrivacyOption}
+            addLastSnackbar={addLastSnackbar /* context */}
+          />
+          {!!address && (
+            <>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginHorizontal: 10,
+                  marginTop: 20,
+                  marginBottom: 10,
+                }}
+              >
+                <View style={{ minWidth: 50, marginRight: 5 }}>
+                  {!getLabelAndColor(address).initials ? (
+                    <FontAwesomeIcon
+                      style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                      size={40}
+                      icon={getIcon()}
+                      color={colors.text}
+                    />
                   ) : (
                     <View
                       style={{
-                        display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        marginTop: 10,
-                        marginBottom: 10,
+                        justifyContent: 'center',
+                        width: 40,
+                        height: 40,
+                        backgroundColor: getLabelAndColor(address).color,
+                        borderColor: colors.zingo,
+                        borderWidth: 2,
+                        borderRadius: 22,
+                        marginLeft: 5,
+                        marginRight: 5,
+                        marginTop: 0,
                       }}
                     >
-                      <FadeText style={{ color: colors.primary }}>
-                        {translate('messages.empty') as string}
-                      </FadeText>
-                    </View>
-                  )}
-                </>
-              )}
-
-              {messagesSliced &&
-                messagesSliced.length > 0 &&
-                messagesSliced.map((vt, index) => {
-                  let txmonth = vt.time
-                    ? moment(vt.time * 1000).format('MMM YYYY')
-                    : '--- ----';
-
-                  var month = '';
-                  if (txmonth !== lastMonth) {
-                    month = txmonth;
-                    lastMonth = txmonth;
-                  }
-
-                  return (
-                    <MessageLine
-                      key={`${index}-${vt.txid}-${vt.kind}`}
-                      index={index}
-                      vt={vt}
-                      month={month}
-                      setValueTransferDetailModalShow={
-                        setValueTransferDetailModalShow
-                      }
-                      messageAddress={address}
-                      screenName={screenName}
-                    />
-                  );
-                })}
-              <View style={{ marginBottom: 10 }} />
-            </ScrollView>
-            {!isAtBottom &&
-              scrollable &&
-              !loading &&
-              firstScrollToBottomDone && (
-                <Pressable
-                  onPress={handleScrollToBottom}
-                  disabled={isScrollingToBottom}
-                  style={({ pressed }) => ({
-                    position: 'absolute',
-                    bottom: 30,
-                    right: 10,
-                    paddingHorizontal: 5,
-                    paddingVertical: 10,
-                    backgroundColor: colors.sideMenuBackground,
-                    borderRadius: 50,
-                    transform: [{ scale: pressed ? 0.9 : 1 }],
-                    borderWidth: 1,
-                    borderColor: colors.zingo,
-                    opacity: isScrollingToBottom ? 0.5 : 1,
-                  })}
-                >
-                  <FontAwesomeIcon
-                    style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                    size={20}
-                    icon={faAngleDown}
-                    color={colors.zingo}
-                  />
-                </Pressable>
-              )}
-          </View>
-          {!loading &&
-            firstScrollToBottomDone &&
-            address &&
-            selectServer !== SelectServerEnum.offline && (
-              <View
-                style={{
-                  height: `${
-                    ((memoFieldHeight +
-                      (keyboardVisible
-                        ? Platform.OS === GlobalConst.platformOSandroid
-                          ? 40
-                          : 60
-                        : 0)) *
-                      100) /
-                    dimensions.height
-                  }%`,
-                }}
-              >
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    margin: 10,
-                  }}
-                >
-                  <View
-                    accessible={true}
-                    accessibilityLabel={translate('send.memo-acc') as string}
-                    style={{
-                      flexGrow: 1,
-                      flexDirection: 'row',
-                      borderWidth: 2,
-                      borderRadius: 5,
-                      borderColor: colors.text,
-                      minHeight: 48,
-                      maxHeight: 90,
-                    }}
-                  >
-                    <TextInput
-                      placeholder={
-                        stillConfirming
-                          ? (translate('send.somefunds') as string)
-                          : spendable > 0
-                            ? (translate(
-                                'messages.message-placeholder',
-                              ) as string)
-                            : (translate(
-                                'messages.message-placeholder-error',
-                              ) as string)
-                      }
-                      placeholderTextColor={
-                        spendable > 0 ? colors.placeholder : colors.primary
-                      }
-                      multiline
-                      style={{
-                        flex: 1,
-                        color: colors.text,
-                        fontWeight: '600',
-                        fontSize: 14,
-                        minHeight: 48,
-                        maxHeight: 90,
-                        marginLeft: 5,
-                        backgroundColor: 'transparent',
-                        textAlignVertical: 'top',
-                      }}
-                      value={memo}
-                      onChangeText={(text: string) => {
-                        if (text !== memo) {
-                          setMemo(text);
-                        }
-                      }}
-                      onEndEditing={(
-                        e: NativeSyntheticEvent<TextInputEndEditingEventData>,
-                      ) => {
-                        if (e.nativeEvent.text !== memo) {
-                          setMemo(e.nativeEvent.text);
-                        }
-                      }}
-                      editable={!disableSend && spendable > 0}
-                      onContentSizeChange={(
-                        e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>,
-                      ) => {
-                        //console.log(e.nativeEvent.contentSize.height);
-                        if (e.nativeEvent.contentSize.height < 48) {
-                          setMemoFieldHeight(48 + 30);
-                        } else if (e.nativeEvent.contentSize.height < 90) {
-                          setMemoFieldHeight(
-                            e.nativeEvent.contentSize.height + 30,
-                          );
-                        } else {
-                          setMemoFieldHeight(90 + 30);
-                        }
-                        if (
-                          e.nativeEvent.contentSize.height >
-                            (Platform.OS === GlobalConst.platformOSandroid
-                              ? 70
-                              : 35) &&
-                          !memoIcon
-                        ) {
-                          setMemoIcon(true);
-                        }
-                        if (
-                          e.nativeEvent.contentSize.height <=
-                            (Platform.OS === GlobalConst.platformOSandroid
-                              ? 70
-                              : 35) &&
-                          memoIcon
-                        ) {
-                          setMemoIcon(false);
-                        }
-                      }}
-                      maxLength={GlobalConst.memoMaxLength}
-                    />
-                    {disableSend && (
-                      <ActivityIndicator
-                        style={{ marginTop: 7, marginRight: 7 }}
-                        size={25}
-                        color={colors.primaryDisabled}
-                      />
-                    )}
-                    {!!memo && !disableSend && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          setMemo('');
+                      <Text
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: 20,
+                          color: Utils.getLabelColor(
+                            getLabelAndColor(address).color,
+                          ),
                         }}
-                      >
-                        <FontAwesomeIcon
-                          style={{
-                            marginTop: 7,
-                            marginRight: memoIcon ? 0 : 7,
-                          }}
-                          size={25}
-                          icon={faXmark}
-                          color={colors.primaryDisabled}
-                        />
-                      </TouchableOpacity>
-                    )}
-                    {!!memoIcon && !disableSend && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          Keyboard.dismiss();
-                          setMemoModalShow();
-                        }}
-                      >
-                        <FontAwesomeIcon
-                          style={{ margin: 7 }}
-                          size={30}
-                          icon={faMagnifyingGlassPlus}
-                          color={colors.border}
-                        />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                  {validMemo === 1 && !disableSend && (
-                    <View style={{ alignSelf: 'center', marginLeft: 10 }}>
-                      <TouchableOpacity
-                        onPress={() => {
-                          if (!netInfo.isConnected) {
-                            addLastSnackbar({
-                              message: translate(
-                                'loadedapp.connection-error',
-                              ) as string,
-                              screenName: [screenName],
-                            });
-                            return;
-                          }
-                          confirmSend();
-                        }}
-                      >
-                        <FontAwesomeIcon
-                          size={30}
-                          icon={faPaperPlane}
-                          color={colors.primary}
-                        />
-                      </TouchableOpacity>
+                      >{`${getLabelAndColor(address).initials}`}</Text>
                     </View>
                   )}
                 </View>
-                {validMemo === -1 && (
+                <AddressItem
+                  address={address}
+                  screenName={screenName}
+                  oneLine={true}
+                  withIcon={true}
+                />
+              </View>
+            </>
+          )}
+          {(loading || !firstScrollToBottomDone) && (
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              style={{ marginVertical: 20 }}
+            />
+          )}
+          <ScrollView
+            ref={scrollViewRef}
+            onScroll={handleScroll}
+            onLayout={e => {
+              const { height } = e.nativeEvent.layout;
+              //console.log('layout HEIGHT >>>>>>>>>>>>>', height);
+              setScrollViewHeight(height);
+            }}
+            onContentSizeChange={(_w: number, h: number) => {
+              //console.log('content HEIGHT >>>>>>>>>>>>>', h);
+              setContentScrollViewHeight(h);
+            }}
+            scrollEventThrottle={100}
+            accessible={true}
+            accessibilityLabel={translate('history.list-acc') as string}
+            refreshControl={
+              <RefreshControl
+                refreshing={false}
+                onRefresh={() => doRefresh(screenName)}
+                tintColor={colors.text}
+                title={translate('history.refreshing') as string}
+              />
+            }
+            style={{
+              flexGrow: 1,
+              marginTop: 10,
+              width: '100%',
+              opacity: loading || !firstScrollToBottomDone ? 0 : 1,
+            }}
+          >
+            {loadMoreButton ? (
+              <View
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: 10,
+                  marginBottom: 10,
+                }}
+              >
+                <Button
+                  type={ButtonTypeEnum.Secondary}
+                  title={translate('history.loadmore') as string}
+                  onPress={loadMoreClicked}
+                />
+              </View>
+            ) : (
+              <>
+                {!!messagesSliced && !!messagesSliced.length ? (
                   <View
                     style={{
-                      flexDirection: 'row',
-                      justifyContent: 'flex-end',
+                      display: 'flex',
                       alignItems: 'center',
-                      marginRight: 10,
-                      marginTop: -28,
+                      justifyContent: 'flex-start',
+                      marginTop: 10,
+                      marginBottom: 10,
                     }}
                   >
-                    <FadeText
-                      style={{
-                        marginTop: 0,
-                        fontWeight: 'bold',
-                        fontSize: 12.5,
-                        color: 'red',
-                      }}
-                    >{`${Utils.countMemoBytes(memo, true, defaultUnifiedAddress)} `}</FadeText>
-                    <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
-                      {translate('loadedapp.of') as string}
+                    <FadeText style={{ color: colors.primary }}>
+                      {translate('history.end') as string}
                     </FadeText>
-                    <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
-                      {' ' + GlobalConst.memoMaxLength.toString() + ' '}
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      marginTop: 10,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <FadeText style={{ color: colors.primary }}>
+                      {translate('messages.empty') as string}
                     </FadeText>
                   </View>
                 )}
-              </View>
+              </>
             )}
+
+            {messagesSliced &&
+              messagesSliced.length > 0 &&
+              messagesSliced.map((vt, index) => {
+                let txmonth = vt.time
+                  ? moment(vt.time * 1000).format('MMM YYYY')
+                  : '--- ----';
+
+                var month = '';
+                if (txmonth !== lastMonth) {
+                  month = txmonth;
+                  lastMonth = txmonth;
+                }
+
+                return (
+                  <MessageLine
+                    key={`${index}-${vt.txid}-${vt.kind}`}
+                    index={index}
+                    vt={vt}
+                    month={month}
+                    setValueTransferDetailModalShow={
+                      setValueTransferDetailModalShow
+                    }
+                    messageAddress={address}
+                    screenName={screenName}
+                  />
+                );
+              })}
+            <View style={{ marginBottom: 10 }} />
+          </ScrollView>
+          {!isAtBottom && scrollable && !loading && firstScrollToBottomDone && (
+            <Pressable
+              onPress={handleScrollToBottom}
+              disabled={isScrollingToBottom}
+              style={({ pressed }) => ({
+                position: 'absolute',
+                bottom: 30,
+                right: 10,
+                paddingHorizontal: 5,
+                paddingVertical: 10,
+                backgroundColor: colors.sideMenuBackground,
+                borderRadius: 50,
+                transform: [{ scale: pressed ? 0.9 : 1 }],
+                borderWidth: 1,
+                borderColor: colors.zingo,
+                opacity: isScrollingToBottom ? 0.5 : 1,
+              })}
+            >
+              <FontAwesomeIcon
+                style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                size={20}
+                icon={faAngleDown}
+                color={colors.zingo}
+              />
+            </Pressable>
+          )}
         </View>
-      </KeyboardAvoidingView>
-    </ToastProvider>
+        {!loading &&
+          firstScrollToBottomDone &&
+          address &&
+          selectServer !== SelectServerEnum.offline && (
+            <View
+              style={{
+                height: `${
+                  ((memoFieldHeight +
+                    (keyboardVisible
+                      ? Platform.OS === GlobalConst.platformOSandroid
+                        ? 40
+                        : 60
+                      : 0)) *
+                    100) /
+                  dimensions.height
+                }%`,
+              }}
+            >
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  margin: 10,
+                }}
+              >
+                <View
+                  accessible={true}
+                  accessibilityLabel={translate('send.memo-acc') as string}
+                  style={{
+                    flexGrow: 1,
+                    flexDirection: 'row',
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    borderColor: colors.text,
+                    minHeight: 48,
+                    maxHeight: 90,
+                  }}
+                >
+                  <TextInput
+                    placeholder={
+                      stillConfirming
+                        ? (translate('send.somefunds') as string)
+                        : spendable > 0
+                          ? (translate(
+                              'messages.message-placeholder',
+                            ) as string)
+                          : (translate(
+                              'messages.message-placeholder-error',
+                            ) as string)
+                    }
+                    placeholderTextColor={
+                      spendable > 0 ? colors.placeholder : colors.primary
+                    }
+                    multiline
+                    style={{
+                      flex: 1,
+                      color: colors.text,
+                      fontWeight: '600',
+                      fontSize: 14,
+                      minHeight: 48,
+                      maxHeight: 90,
+                      marginLeft: 5,
+                      backgroundColor: 'transparent',
+                      textAlignVertical: 'top',
+                    }}
+                    value={memo}
+                    onChangeText={(text: string) => {
+                      if (text !== memo) {
+                        setMemo(text);
+                      }
+                    }}
+                    onEndEditing={(
+                      e: NativeSyntheticEvent<TextInputEndEditingEventData>,
+                    ) => {
+                      if (e.nativeEvent.text !== memo) {
+                        setMemo(e.nativeEvent.text);
+                      }
+                    }}
+                    editable={!disableSend && spendable > 0}
+                    onContentSizeChange={(
+                      e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>,
+                    ) => {
+                      //console.log(e.nativeEvent.contentSize.height);
+                      if (e.nativeEvent.contentSize.height < 48) {
+                        setMemoFieldHeight(48 + 30);
+                      } else if (e.nativeEvent.contentSize.height < 90) {
+                        setMemoFieldHeight(
+                          e.nativeEvent.contentSize.height + 30,
+                        );
+                      } else {
+                        setMemoFieldHeight(90 + 30);
+                      }
+                      if (
+                        e.nativeEvent.contentSize.height >
+                          (Platform.OS === GlobalConst.platformOSandroid
+                            ? 70
+                            : 35) &&
+                        !memoIcon
+                      ) {
+                        setMemoIcon(true);
+                      }
+                      if (
+                        e.nativeEvent.contentSize.height <=
+                          (Platform.OS === GlobalConst.platformOSandroid
+                            ? 70
+                            : 35) &&
+                        memoIcon
+                      ) {
+                        setMemoIcon(false);
+                      }
+                    }}
+                    maxLength={GlobalConst.memoMaxLength}
+                  />
+                  {disableSend && (
+                    <ActivityIndicator
+                      style={{ marginTop: 7, marginRight: 7 }}
+                      size={25}
+                      color={colors.primaryDisabled}
+                    />
+                  )}
+                  {!!memo && !disableSend && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setMemo('');
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        style={{
+                          marginTop: 7,
+                          marginRight: memoIcon ? 0 : 7,
+                        }}
+                        size={25}
+                        icon={faXmark}
+                        color={colors.primaryDisabled}
+                      />
+                    </TouchableOpacity>
+                  )}
+                  {!!memoIcon && !disableSend && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        Keyboard.dismiss();
+                        setMemoModalShow();
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        style={{ margin: 7 }}
+                        size={30}
+                        icon={faMagnifyingGlassPlus}
+                        color={colors.border}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+                {validMemo === 1 && !disableSend && (
+                  <View style={{ alignSelf: 'center', marginLeft: 10 }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (!netInfo.isConnected) {
+                          addLastSnackbar(
+                            translate('loadedapp.connection-error') as string,
+                          );
+                          return;
+                        }
+                        confirmSend();
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        size={30}
+                        icon={faPaperPlane}
+                        color={colors.primary}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+              {validMemo === -1 && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                    alignItems: 'center',
+                    marginRight: 10,
+                    marginTop: -28,
+                  }}
+                >
+                  <FadeText
+                    style={{
+                      marginTop: 0,
+                      fontWeight: 'bold',
+                      fontSize: 12.5,
+                      color: 'red',
+                    }}
+                  >{`${Utils.countMemoBytes(memo, true, defaultUnifiedAddress)} `}</FadeText>
+                  <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
+                    {translate('loadedapp.of') as string}
+                  </FadeText>
+                  <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
+                    {' ' + GlobalConst.memoMaxLength.toString() + ' '}
+                  </FadeText>
+                </View>
+              )}
+            </View>
+          )}
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 

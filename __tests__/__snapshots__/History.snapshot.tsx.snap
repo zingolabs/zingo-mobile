@@ -3,22 +3,18 @@
 exports[`Component History - test History currency USD, privacy high & mode advanced - snapshot 1`] = `
 <View
   style={
-    [
-      {
-        "flex": 1,
-      },
-      undefined,
-    ]
+    {
+      "flex": 1,
+    }
   }
 >
-  <View />
   <View
     accessibilityLabel="text translated"
     accessible={true}
     style={
       {
         "display": "flex",
-        "height": "100%",
+        "flex": 1,
         "justifyContent": "flex-start",
         "width": "100%",
       }
@@ -967,22 +963,18 @@ exports[`Component History - test History currency USD, privacy high & mode adva
 exports[`Component History - test History no currency, privacy normal & mode basic - snapshot 1`] = `
 <View
   style={
-    [
-      {
-        "flex": 1,
-      },
-      undefined,
-    ]
+    {
+      "flex": 1,
+    }
   }
 >
-  <View />
   <View
     accessibilityLabel="text translated"
     accessible={true}
     style={
       {
         "display": "flex",
-        "height": "100%",
+        "flex": 1,
         "justifyContent": "flex-start",
         "width": "100%",
       }

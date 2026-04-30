@@ -180,11 +180,10 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                   style={{ zIndex: 999 }}
                   onPress={() => {
                     Clipboard.setString(memo);
-                    addLastSnackbar({
-                      message: translate('history.memocopied') as string,
-                      duration: SnackbarDurationEnum.short,
-                      screenName: [screenName],
-                    });
+                    addLastSnackbar(
+                      translate('history.memocopied') as string,
+                      SnackbarDurationEnum.short,
+                    );
                   }}
                 >
                   <RegText selectable={true}>{memo}</RegText>
@@ -196,17 +195,15 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                   onPress={() => {
                     Clipboard.setString(memoUA);
                     if (!thisWalletAddress(memoUA)) {
-                      addLastSnackbar({
-                        message: translate('history.address-http') as string,
-                        duration: SnackbarDurationEnum.long,
-                        screenName: [screenName],
-                      });
+                      addLastSnackbar(
+                        translate('history.address-http') as string,
+                        SnackbarDurationEnum.long,
+                      );
                     }
-                    addLastSnackbar({
-                      message: translate('history.addresscopied') as string,
-                      duration: SnackbarDurationEnum.short,
-                      screenName: [screenName],
-                    });
+                    addLastSnackbar(
+                      translate('history.addresscopied') as string,
+                      SnackbarDurationEnum.short,
+                    );
                   }}
                 >
                   {!thisWalletAddress(memoUA) && memoUA !== messageAddress && (

@@ -503,7 +503,8 @@
     "text-readonly-server": "Antes de mudar para outro servidor, anote cuidadosamente suas frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-no-readonly": "Insira suas Frases de Recuperação (24 Frases)",
     "tapcopy": "Clique para Copiar",
-    "tapcopy-seed-message": "Frases de Recuperação copiada para a Área de Transferência",
+    "tapcopy-seed-message": "Frases de Recuperação copiada para a Área de Transferência (limpa em 60s)",
+    "clipboard-cleared": "Área de Transferência limpa por segurança",
     "tapcopy-birthday-message": "Aniversário copiado para a Área de Transferência",
     "birthday-readonly": "Aniversário da Carteira",
     "birthday-no-readonly": "Altura do bloco da primeira transação. (Tudo bem, se você não sabe)\nIntervalo de valores entre ",
@@ -517,7 +518,7 @@
     "tapreveal": "Toque para revelar",
     "showtransactions": "Mostrar Transações",
     "youreceived": "Você recebeu",
-    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência"
+    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência (limpa em 60s)"
   },
   "send": {
     "Broadcast": "Transmitido e aguardando confirmação Tx:",

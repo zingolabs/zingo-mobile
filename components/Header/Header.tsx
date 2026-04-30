@@ -23,7 +23,7 @@ import {
   ModeEnum,
   CurrencyEnum,
   PoolToShieldEnum,
-  SnackbarType,
+  SnackbarDurationEnum,
   ButtonTypeEnum,
   GlobalConst,
   SelectServerEnum,
@@ -70,7 +70,7 @@ type HeaderProps = {
   // privacy
   noPrivacy?: boolean;
   setPrivacyOption?: (value: boolean) => Promise<void>;
-  addLastSnackbar?: (snackbar: SnackbarType) => void;
+  addLastSnackbar?: (message: string, duration?: SnackbarDurationEnum) => void;
   // shielding
   setShieldingAmount?: (value: number) => void;
   setScrollToTop?: (value: boolean) => void;
@@ -313,10 +313,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       return;
     }
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({
-        message: translate('loadedapp.connection-error') as string,
-        screenName: [screenName],
-      });
+      addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }
 
@@ -335,7 +332,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
-          [screenName],
           translate(`history.shield-title-${pools}`) as string,
           `${translate(`history.shield-error-${pools}`)} ${shieldStr}`,
           true,
@@ -349,7 +345,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
-              [screenName],
               translate(`history.shield-title-${pools}`) as string,
               `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
               true,
@@ -359,7 +354,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
-              [screenName],
               translate(`history.shield-title-${pools}`) as string,
               `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txids.join(', ')}`,
               true,
@@ -370,7 +364,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           createAlert(
             setBackgroundError,
             addLastSnackbar,
-            [screenName],
             translate(`history.shield-title-${pools}`) as string,
             `${translate(`history.shield-message-${pools}`)} ${shieldStr}`,
             true,
@@ -475,10 +468,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (resultBio === false) {
       // snack with Error & closing the menu.
       if (addLastSnackbar) {
-        addLastSnackbar({
-          message: translate('biometrics-error') as string,
-          screenName: [screenName],
-        });
+        addLastSnackbar(translate('biometrics-error') as string);
       }
     } else {
       navigation.navigate(RouteEnum.Ufvk, {
@@ -492,15 +482,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       style={{ marginHorizontal: 5 }}
       onPress={() => {
         addLastSnackbar &&
-          addLastSnackbar({
-            message: `${translate('change-privacy')} ${
+          addLastSnackbar(
+            `${translate('change-privacy')} ${
               privacy
                 ? translate('settings.value-privacy-false')
                 : (((translate('settings.value-privacy-true') as string) +
                     translate('change-privacy-legend')) as string)
             }`,
-            screenName: [screenName],
-          });
+          );
         setPrivacyOption && setPrivacyOption(!privacy);
       }}
     >
@@ -972,10 +961,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   privacy={privacy}
                 />
                 <View style={{ marginLeft: 5 }}>
-                  <PriceFetcher
-                    setZecPrice={setZecPrice}
-                    screenName={screenName}
-                  />
+                  <PriceFetcher setZecPrice={setZecPrice} />
                 </View>
               </View>
             )}
@@ -1093,10 +1079,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   if (resultBio === false) {
                     // snack with Error & closing the menu.
                     if (addLastSnackbar) {
-                      addLastSnackbar({
-                        message: translate('biometrics-error') as string,
-                        screenName: [screenName],
-                      });
+                      addLastSnackbar(translate('biometrics-error') as string);
                     }
                   } else {
                     navigation.navigate(RouteEnum.Settings);

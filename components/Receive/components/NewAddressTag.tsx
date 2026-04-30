@@ -8,7 +8,6 @@ import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import { useToast } from 'react-native-toastier';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../../app/utils';
@@ -29,7 +28,6 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
 
   const [label, setLabel] = useState<string>('');
 
@@ -54,7 +52,6 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
 
     setLabel('');
     Keyboard.dismiss();
-    clear();
     setTimeout(() => {
       closeSheet();
     }, 100);
@@ -75,7 +72,6 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
         onPress={() => {
           setLabel('');
           Keyboard.dismiss();
-          clear();
           setTimeout(() => {
             closeSheet();
           }, 100);
@@ -153,7 +149,6 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             onPress={() => {
               setLabel('');
               Keyboard.dismiss();
-              clear();
               setTimeout(() => {
                 closeSheet();
               }, 100);

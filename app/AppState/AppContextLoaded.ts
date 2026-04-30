@@ -10,13 +10,13 @@ import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
-import SnackbarType from './types/SnackbarType';
 import SecurityType from './types/SecurityType';
 
 import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
@@ -84,10 +84,7 @@ export default interface AppContextLoaded {
   saplingPool: boolean;
   transparentPool: boolean;
 
-  // snackbar queue
-  snackbars: SnackbarType[];
-  addLastSnackbar: (snackbar: SnackbarType) => void;
-  removeFirstSnackbar: (s: ScreenEnum) => void;
+  addLastSnackbar: (message: string, duration?: SnackbarDurationEnum) => void;
 
   // if the App is stalled - restart is fired
   restartApp: (s: LoadedAppNavigationState) => void;

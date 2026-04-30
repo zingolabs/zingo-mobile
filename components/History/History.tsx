@@ -48,8 +48,6 @@ import {
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { isEqual } from 'lodash';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
-import { ToastProvider } from 'react-native-toastier';
-import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { Swipeable } from 'react-native-gesture-handler';
 import { RPCValueTransfersStatusEnum } from '../../app/rpc/enums/RPCValueTransfersStatusEnum';
@@ -110,8 +108,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     server,
     doRefresh,
     zenniesDonationAddress,
-    snackbars,
-    removeFirstSnackbar,
     setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -482,21 +478,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
   }, []);
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
-
+    <View style={{ flex: 1 }}>
       <View
         accessible={true}
         accessibilityLabel={translate('history.title-acc') as string}
         style={{
+          flex: 1,
           display: 'flex',
           justifyContent: 'flex-start',
           width: '100%',
-          height: '100%',
         }}
       >
         <Header
@@ -721,7 +711,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           )}
         </BottomSheetView>
       </BottomSheet>
-    </ToastProvider>
+    </View>
   );
 };
 

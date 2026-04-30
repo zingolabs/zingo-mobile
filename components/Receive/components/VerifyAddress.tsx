@@ -12,7 +12,6 @@ import {
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import { useToast } from 'react-native-toastier';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import RPCModule from '../../../app/RPCModule';
@@ -37,7 +36,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, server } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
 
   const [address, setAddress] = useState<string>('');
   const [errorAddress, setErrorAddress] = useState<string>('');
@@ -50,11 +48,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       if (verifyAddressStr) {
         if (verifyAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error new address ${verifyAddressStr}`);
-          addLastSnackbar({
-            message: verifyAddressStr,
-            duration: SnackbarDurationEnum.short,
-            screenName: [screenName],
-          });
+          addLastSnackbar(verifyAddressStr, SnackbarDurationEnum.short);
           setErrorAddress(verifyAddressStr);
         }
       } else {
@@ -72,7 +66,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
     }
 
     Keyboard.dismiss();
-    clear();
   };
 
   const updateAddress = async (addr: string) => {
@@ -98,7 +91,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       }
       if (error) {
         // Show the error message as a toast
-        addLastSnackbar({ message: error, screenName: [screenName] });
+        addLastSnackbar(error);
         //return;
       }
     } else {
@@ -121,7 +114,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         onPress={() => {
           setAddress('');
           Keyboard.dismiss();
-          clear();
           setTimeout(() => {
             closeSheet();
           }, 100);
@@ -224,7 +216,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             onPress={() => {
               setAddress('');
               Keyboard.dismiss();
-              clear();
               setTimeout(() => {
                 closeSheet();
               }, 100);

@@ -503,7 +503,8 @@
     "text-readonly-server": "Başka bir sunucuyu değiştirmeden önce, bu kurtarma ifadesini dikkatlice not alın. Mevcut cüzdanınıza erişmenin / onu geri yüklemenin tek yolu budur.",
     "text-no-readonly": "Seed ifadenizi girin (24 kelime)",
     "tapcopy": "Kopyalamak için tıkla",
-    "tapcopy-seed-message": "Seed panoya kopyalandı",
+    "tapcopy-seed-message": "Seed panoya kopyalandı (60 sn sonra temizlenecek)",
+    "clipboard-cleared": "Pano güvenlik için temizlendi",
     "tapcopy-birthday-message": "Cüzdan oluşturulma tarihi panoya kopyalandı",
     "birthday-readonly": "Cüzdan oluşturulma tarihi",
     "birthday-no-readonly": "İlk işlemin blok yüksekliği. (Bilmiyorsanız sorun değil) Değer aralığı arasında",
@@ -517,7 +518,7 @@
     "tapreveal": "Görüntülemek için dokunun",
     "showtransactions": "İşlemleri Göster",
     "youreceived": "Aldınız",
-    "tapcopy-ufvk-message": "Görüntüleme Anahtarı panoya kopyalandı"
+    "tapcopy-ufvk-message": "Görüntüleme Anahtarı panoya kopyalandı (60 sn sonra temizlenecek)"
   },
   "send": {
     "Broadcast": "Yayınlandı ve onay bekliyor: İşlem (Tx)",

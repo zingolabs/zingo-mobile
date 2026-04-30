@@ -14,8 +14,6 @@ import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
-import Snackbars from '../Components/Snackbars';
-import { ToastProvider, useToast } from 'react-native-toastier';
 import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRangeStatusType';
@@ -44,8 +42,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     backgroundSyncInfo,
     language,
     netInfo,
-    snackbars,
-    removeFirstSnackbar,
     info,
     zingolibVersion,
     setBackgroundError,
@@ -53,7 +49,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     setBackgroundSyncErrorInfo,
   } = context; //mode
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
   const screenName = ScreenEnum.SyncReport;
 
   const [maxBlocks, setMaxBlocks] = useState<number>(0);
@@ -184,7 +179,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     createAlert(
       setBackgroundError,
       addLastSnackbar,
-      [screenName],
       'Background Sync Error',
       error,
       false,
@@ -198,154 +192,311 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   //console.log('render sync report. background:', background);
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <Header
+        title={translate('report.title') as string}
         screenName={screenName}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+        closeScreen={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
       />
-
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
+      <ScrollView
+        testID="syncreport.scroll-view"
+        style={{ maxHeight: '90%' }}
+        contentContainerStyle={{
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          justifyContent: 'flex-start',
         }}
       >
-        <Header
-          title={translate('report.title') as string}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-          closeScreen={() => {
-            clear();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
-        />
-        <ScrollView
-          testID="syncreport.scroll-view"
-          style={{ maxHeight: '90%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-          }}
-        >
-          {(!netInfo.isConnected ||
-            netInfo.type === NetInfoStateType.cellular ||
-            netInfo.isConnectionExpensive) && (
+        {(!netInfo.isConnected ||
+          netInfo.type === NetInfoStateType.cellular ||
+          netInfo.isConnectionExpensive) && (
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'flex-end',
+              marginHorizontal: 20,
+            }}
+          >
+            <DetailLine label={translate('report.networkstatus') as string}>
+              <View style={{ display: 'flex', flexDirection: 'column' }}>
+                {!netInfo.isConnected && (
+                  <RegText color="red">
+                    {' '}
+                    {translate('report.nointernet') as string}{' '}
+                  </RegText>
+                )}
+                {netInfo.type === NetInfoStateType.cellular && (
+                  <RegText color="yellow">
+                    {' '}
+                    {translate('report.cellulardata') as string}{' '}
+                  </RegText>
+                )}
+                {netInfo.isConnectionExpensive && (
+                  <RegText color="yellow">
+                    {' '}
+                    {translate('report.connectionexpensive') as string}{' '}
+                  </RegText>
+                )}
+              </View>
+            </DetailLine>
+            <FontAwesomeIcon
+              icon={faCloudDownload}
+              color={!netInfo.isConnected ? 'red' : 'yellow'}
+              size={20}
+              style={{ marginBottom: 5, marginLeft: 5 }}
+            />
+          </View>
+        )}
+        {!!maxBlocks && netInfo.isConnected ? (
+          <>
             <View
               style={{
                 display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-end',
                 marginHorizontal: 20,
+                marginBottom: 30,
               }}
             >
               <DetailLine
-                label={translate('report.networkstatus') as string}
-                screenName={screenName}
-              >
-                <View style={{ display: 'flex', flexDirection: 'column' }}>
-                  {!netInfo.isConnected && (
-                    <RegText color="red">
-                      {' '}
-                      {translate('report.nointernet') as string}{' '}
-                    </RegText>
-                  )}
-                  {netInfo.type === NetInfoStateType.cellular && (
-                    <RegText color="yellow">
-                      {' '}
-                      {translate('report.cellulardata') as string}{' '}
-                    </RegText>
-                  )}
-                  {netInfo.isConnectionExpensive && (
-                    <RegText color="yellow">
-                      {' '}
-                      {translate('report.connectionexpensive') as string}{' '}
-                    </RegText>
-                  )}
-                </View>
-              </DetailLine>
-              <FontAwesomeIcon
-                icon={faCloudDownload}
-                color={!netInfo.isConnected ? 'red' : 'yellow'}
-                size={20}
-                style={{ marginBottom: 5, marginLeft: 5 }}
+                label={translate('report.syncstatus') as string}
+                value={
+                  syncInProgress
+                    ? (translate('report.running') as string) +
+                      ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned + '%' : ''}`
+                    : (translate('report.finished') as string)
+                }
               />
-            </View>
-          )}
-          {!!maxBlocks && netInfo.isConnected ? (
-            <>
+
               <View
                 style={{
-                  display: 'flex',
-                  marginHorizontal: 20,
-                  marginBottom: 30,
+                  height: 2,
+                  width: '100%',
+                  backgroundColor: 'white',
+                  marginTop: 15,
+                  marginBottom: 10,
                 }}
-              >
-                <DetailLine
-                  label={translate('report.syncstatus') as string}
-                  value={
-                    syncInProgress
-                      ? (translate('report.running') as string) +
-                        ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned + '%' : ''}`
-                      : (translate('report.finished') as string)
-                  }
-                  screenName={screenName}
-                />
+              />
 
-                <View
-                  style={{
-                    height: 2,
-                    width: '100%',
-                    backgroundColor: 'white',
-                    marginTop: 15,
-                    marginBottom: 10,
-                  }}
-                />
+              {!!maxBlocks && serverServer > 0 && serverWallet > 0 && (
+                <>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      width: '100%',
+                      justifyContent: 'space-between',
+                      marginTop: 10,
+                    }}
+                  >
+                    {labels.map((label: string) => (
+                      <Text key={label} style={{ color: colors.primary }}>
+                        {label}
+                      </Text>
+                    ))}
+                  </View>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      width: '100%',
+                    }}
+                  >
+                    {points.map((point: number) => (
+                      <View
+                        key={point}
+                        style={{
+                          height: 10,
+                          borderRightColor: colors.primary,
+                          borderRightWidth: 1,
+                          borderLeftColor: colors.primary,
+                          borderLeftWidth: 1,
+                          width: `${(points[1] * 100) / maxBlocks}%`,
+                        }}
+                      />
+                    ))}
+                  </View>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
+                      width: '100%',
+                      borderBottomColor: colors.primary,
+                      borderBottomWidth: 2,
+                      marginBottom: 0,
+                    }}
+                  >
+                    {server1Percent >= 0 && (
+                      <View
+                        style={{
+                          height: 10,
+                          backgroundColor: 'blue',
+                          borderLeftColor: colors.primary,
+                          borderLeftWidth: 1,
+                          borderRightColor: 'blue',
+                          borderRightWidth: server1Percent > 0 ? 1 : 0,
+                          width: `${server1Percent}%`,
+                        }}
+                      />
+                    )}
+                    {server2Percent >= 0 && (
+                      <View
+                        style={{
+                          height: 10,
+                          backgroundColor: 'yellow',
+                          borderRightColor: 'yellow',
+                          borderRightWidth: server2Percent > 0 ? 1 : 0,
+                          width: `${server2Percent}%`,
+                          borderBottomColor: 'blue',
+                          borderBottomWidth: 5,
+                        }}
+                      />
+                    )}
+                    {server3Percent >= 0 && (
+                      <View
+                        style={{
+                          height: 10,
+                          backgroundColor: '#333333',
+                          borderRightColor: colors.primary,
+                          borderRightWidth: 1,
+                          width: `${server3Percent}%`,
+                        }}
+                      />
+                    )}
+                  </View>
+                  {serverServer > 0 && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        marginTop: 5,
+                      }}
+                    >
+                      <Text style={{ color: colors.primary }}>
+                        {translate('report.server-title') as string}
+                      </Text>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: 10,
+                          height: 10,
+                          justifyContent: 'flex-start',
+                          backgroundColor: 'blue',
+                          margin: 5,
+                        }}
+                      />
+                      <Text style={{ color: colors.text }}>
+                        {serverServer + (translate('report.blocks') as string)}
+                      </Text>
+                    </View>
+                  )}
+                  {serverWallet > 0 && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        marginTop: 5,
+                      }}
+                    >
+                      <Text style={{ color: colors.primary }}>
+                        {translate('report.wallet') as string}
+                      </Text>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: 10,
+                          height: 10,
+                          justifyContent: 'flex-start',
+                          backgroundColor: 'yellow',
+                          margin: 5,
+                        }}
+                      />
+                      <Text
+                        testID="syncreport.wallettotalblocks"
+                        style={{ color: colors.text }}
+                      >
+                        {serverWallet + (translate('report.blocks') as string)}
+                      </Text>
+                    </View>
+                  )}
 
-                {!!maxBlocks && serverServer > 0 && serverWallet > 0 && (
-                  <>
+                  <View
+                    style={{
+                      height: 2,
+                      width: '100%',
+                      backgroundColor: 'white',
+                      marginTop: 15,
+                      marginBottom: 10,
+                    }}
+                  />
+                </>
+              )}
+
+              {!!maxBlocks && percentageOutputsScanned > 0 && (
+                <>
+                  <DetailLine label={translate('report.map') as string}>
                     <View
                       style={{
                         display: 'flex',
                         flexDirection: 'row',
                         width: '100%',
                         justifyContent: 'space-between',
-                        marginTop: 10,
+                        marginTop: 5,
                       }}
                     >
-                      {labels.map((label: string) => (
-                        <Text key={label} style={{ color: colors.primary }}>
-                          {label}
+                      <>
+                        <Text style={{ color: colors.text }}>{birthday}</Text>
+                        <Text style={{ color: colors.text }}>
+                          {info.latestBlock}
                         </Text>
-                      ))}
+                      </>
                     </View>
                     <View
                       style={{
                         display: 'flex',
                         flexDirection: 'row',
                         width: '100%',
+                        justifyContent: 'space-between',
                       }}
                     >
-                      {points.map((point: number) => (
+                      <>
                         <View
-                          key={point}
+                          style={{
+                            height: 10,
+                            borderLeftColor: colors.primary,
+                            borderLeftWidth: 1,
+                          }}
+                        />
+                        <View
                           style={{
                             height: 10,
                             borderRightColor: colors.primary,
                             borderRightWidth: 1,
-                            borderLeftColor: colors.primary,
-                            borderLeftWidth: 1,
-                            width: `${(points[1] * 100) / maxBlocks}%`,
                           }}
                         />
-                      ))}
+                      </>
                     </View>
                     <View
                       style={{
@@ -353,445 +504,263 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                         flexDirection: 'row',
                         justifyContent: 'flex-start',
                         width: '100%',
-                        borderBottomColor: colors.primary,
-                        borderBottomWidth: 2,
+                        borderBottomColor: 'green',
+                        borderBottomWidth: 0,
                         marginBottom: 0,
                       }}
                     >
-                      {server1Percent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            backgroundColor: 'blue',
-                            borderLeftColor: colors.primary,
-                            borderLeftWidth: 1,
-                            borderRightColor: 'blue',
-                            borderRightWidth: server1Percent > 0 ? 1 : 0,
-                            width: `${server1Percent}%`,
-                          }}
-                        />
-                      )}
-                      {server2Percent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            backgroundColor: 'yellow',
-                            borderRightColor: 'yellow',
-                            borderRightWidth: server2Percent > 0 ? 1 : 0,
-                            width: `${server2Percent}%`,
-                            borderBottomColor: 'blue',
-                            borderBottomWidth: 5,
-                          }}
-                        />
-                      )}
-                      {server3Percent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            backgroundColor: '#333333',
-                            borderRightColor: colors.primary,
-                            borderRightWidth: 1,
-                            width: `${server3Percent}%`,
-                          }}
-                        />
-                      )}
-                    </View>
-                    {serverServer > 0 && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}
-                      >
-                        <Text style={{ color: colors.primary }}>
-                          {translate('report.server-title') as string}
-                        </Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'blue',
-                            margin: 5,
-                          }}
-                        />
-                        <Text style={{ color: colors.text }}>
-                          {serverServer +
-                            (translate('report.blocks') as string)}
-                        </Text>
-                      </View>
-                    )}
-                    {serverWallet > 0 && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}
-                      >
-                        <Text style={{ color: colors.primary }}>
-                          {translate('report.wallet') as string}
-                        </Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'yellow',
-                            margin: 5,
-                          }}
-                        />
-                        <Text
-                          testID="syncreport.wallettotalblocks"
-                          style={{ color: colors.text }}
-                        >
-                          {serverWallet +
-                            (translate('report.blocks') as string)}
-                        </Text>
-                      </View>
-                    )}
-
-                    <View
-                      style={{
-                        height: 2,
-                        width: '100%',
-                        backgroundColor: 'white',
-                        marginTop: 15,
-                        marginBottom: 10,
-                      }}
-                    />
-                  </>
-                )}
-
-                {!!maxBlocks && percentageOutputsScanned > 0 && (
-                  <>
-                    <DetailLine
-                      label={translate('report.map') as string}
-                      screenName={screenName}
-                    >
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'space-between',
-                          marginTop: 5,
-                        }}
-                      >
-                        <>
-                          <Text style={{ color: colors.text }}>{birthday}</Text>
-                          <Text style={{ color: colors.text }}>
-                            {info.latestBlock}
-                          </Text>
-                        </>
-                      </View>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <>
-                          <View
-                            style={{
-                              height: 10,
-                              borderLeftColor: colors.primary,
-                              borderLeftWidth: 1,
-                            }}
-                          />
-                          <View
-                            style={{
-                              height: 10,
-                              borderRightColor: colors.primary,
-                              borderRightWidth: 1,
-                            }}
-                          />
-                        </>
-                      </View>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'flex-start',
-                          width: '100%',
-                          borderBottomColor: 'green',
-                          borderBottomWidth: 0,
-                          marginBottom: 0,
-                        }}
-                      >
-                        {!!syncingStatus.scan_ranges &&
-                          syncingStatus.scan_ranges.map(
-                            (range: RPCSyncScanRangeStatusType) => {
-                              const percent: number =
-                                ((range.end_block - range.start_block) * 100) /
-                                (info.latestBlock - birthday);
-                              return (
-                                <View
-                                  key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
-                                  style={{
-                                    height: 15,
-                                    width: `${percent}%`,
-                                    backgroundColor:
-                                      range.priority ===
-                                      RPCSyncScanRangePriorityStatusEnum.Scanning
-                                        ? 'orange' /* Scanning */
+                      {!!syncingStatus.scan_ranges &&
+                        syncingStatus.scan_ranges.map(
+                          (range: RPCSyncScanRangeStatusType) => {
+                            const percent: number =
+                              ((range.end_block - range.start_block) * 100) /
+                              (info.latestBlock - birthday);
+                            return (
+                              <View
+                                key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
+                                style={{
+                                  height: 15,
+                                  width: `${percent}%`,
+                                  backgroundColor:
+                                    range.priority ===
+                                    RPCSyncScanRangePriorityStatusEnum.Scanning
+                                      ? 'orange' /* Scanning */
+                                      : range.priority ===
+                                          RPCSyncScanRangePriorityStatusEnum.Scanned
+                                        ? 'green' /* Scanned  */
                                         : range.priority ===
-                                            RPCSyncScanRangePriorityStatusEnum.Scanned
+                                            RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping
                                           ? 'green' /* Scanned  */
                                           : range.priority ===
-                                              RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping
-                                            ? 'green' /* Scanned  */
+                                              RPCSyncScanRangePriorityStatusEnum.Historic
+                                            ? 'gray' /* Low priority */
                                             : range.priority ===
-                                                RPCSyncScanRangePriorityStatusEnum.Historic
-                                              ? 'gray' /* Low priority */
+                                                RPCSyncScanRangePriorityStatusEnum.OpenAdjacent
+                                              ? 'blue' /* High priority */
                                               : range.priority ===
-                                                  RPCSyncScanRangePriorityStatusEnum.OpenAdjacent
+                                                  RPCSyncScanRangePriorityStatusEnum.FoundNote
                                                 ? 'blue' /* High priority */
                                                 : range.priority ===
-                                                    RPCSyncScanRangePriorityStatusEnum.FoundNote
+                                                    RPCSyncScanRangePriorityStatusEnum.ChainTip
                                                   ? 'blue' /* High priority */
                                                   : range.priority ===
-                                                      RPCSyncScanRangePriorityStatusEnum.ChainTip
+                                                      RPCSyncScanRangePriorityStatusEnum.Verify
                                                     ? 'blue' /* High priority */
                                                     : range.priority ===
-                                                        RPCSyncScanRangePriorityStatusEnum.Verify
-                                                      ? 'blue' /* High priority */
-                                                      : range.priority ===
-                                                          RPCSyncScanRangePriorityStatusEnum.RefetchingNullifiers
-                                                        ? 'darkorange' /* Refetching spends */
-                                                        : 'red' /* error somehow */,
-                                  }}
-                                />
-                              );
-                            },
-                          )}
-                      </View>
-                    </DetailLine>
-                    <DetailLine
-                      label={translate('report.legend') as string}
-                      screenName={screenName}
+                                                        RPCSyncScanRangePriorityStatusEnum.RefetchingNullifiers
+                                                      ? 'darkorange' /* Refetching spends */
+                                                      : 'red' /* error somehow */,
+                                }}
+                              />
+                            );
+                          },
+                        )}
+                    </View>
+                  </DetailLine>
+                  <DetailLine label={translate('report.legend') as string}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        marginTop: 5,
+                        marginLeft: 10,
+                      }}
                     >
                       <View
                         style={{
                           display: 'flex',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'flex-start',
-                          marginTop: 5,
-                          marginLeft: 10,
+                          flexDirection: 'row',
+                          flexWrap: 'nowrap',
                         }}
                       >
                         <View
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            flexWrap: 'nowrap',
+                            width: 10,
+                            height: 10,
+                            justifyContent: 'flex-start',
+                            backgroundColor: 'green',
+                            margin: 5,
                           }}
-                        >
-                          <View
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              width: 10,
-                              height: 10,
-                              justifyContent: 'flex-start',
-                              backgroundColor: 'green',
-                              margin: 5,
-                            }}
-                          />
-                          <Text style={{ color: colors.text, marginRight: 10 }}>
-                            {translate('report.scanned') as string}
-                          </Text>
-                        </View>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            flexWrap: 'nowrap',
-                          }}
-                        >
-                          <View
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              width: 10,
-                              height: 10,
-                              justifyContent: 'flex-start',
-                              backgroundColor: 'orange',
-                              margin: 5,
-                            }}
-                          />
-                          <Text style={{ color: colors.text, marginRight: 10 }}>
-                            {translate('report.scanning') as string}
-                          </Text>
-                        </View>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            flexWrap: 'nowrap',
-                          }}
-                        >
-                          <View
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              width: 10,
-                              height: 10,
-                              justifyContent: 'flex-start',
-                              backgroundColor: 'darkorange',
-                              margin: 5,
-                            }}
-                          />
-                          <Text style={{ color: colors.text, marginRight: 10 }}>
-                            {translate('report.refetching') as string}
-                          </Text>
-                        </View>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            flexWrap: 'nowrap',
-                          }}
-                        >
-                          <View
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              width: 10,
-                              height: 10,
-                              justifyContent: 'flex-start',
-                              backgroundColor: 'gray',
-                              margin: 5,
-                            }}
-                          />
-                          <Text style={{ color: colors.text, marginRight: 10 }}>
-                            {translate('report.lowpriority') as string}
-                          </Text>
-                        </View>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            flexWrap: 'nowrap',
-                          }}
-                        >
-                          <View
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              width: 10,
-                              height: 10,
-                              justifyContent: 'flex-start',
-                              backgroundColor: 'blue',
-                              margin: 5,
-                            }}
-                          />
-                          <Text style={{ color: colors.text, marginRight: 10 }}>
-                            {translate('report.highpriority') as string}
-                          </Text>
-                        </View>
+                        />
+                        <Text style={{ color: colors.text, marginRight: 10 }}>
+                          {translate('report.scanned') as string}
+                        </Text>
                       </View>
-                    </DetailLine>
-                  </>
-                )}
-              </View>
-            </>
-          ) : (
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 20,
-              }}
-            >
-              <ActivityIndicator size="large" color={colors.primary} />
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          flexWrap: 'nowrap',
+                        }}
+                      >
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            width: 10,
+                            height: 10,
+                            justifyContent: 'flex-start',
+                            backgroundColor: 'orange',
+                            margin: 5,
+                          }}
+                        />
+                        <Text style={{ color: colors.text, marginRight: 10 }}>
+                          {translate('report.scanning') as string}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          flexWrap: 'nowrap',
+                        }}
+                      >
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            width: 10,
+                            height: 10,
+                            justifyContent: 'flex-start',
+                            backgroundColor: 'darkorange',
+                            margin: 5,
+                          }}
+                        />
+                        <Text style={{ color: colors.text, marginRight: 10 }}>
+                          {translate('report.refetching') as string}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          flexWrap: 'nowrap',
+                        }}
+                      >
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            width: 10,
+                            height: 10,
+                            justifyContent: 'flex-start',
+                            backgroundColor: 'gray',
+                            margin: 5,
+                          }}
+                        />
+                        <Text style={{ color: colors.text, marginRight: 10 }}>
+                          {translate('report.lowpriority') as string}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          flexWrap: 'nowrap',
+                        }}
+                      >
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            width: 10,
+                            height: 10,
+                            justifyContent: 'flex-start',
+                            backgroundColor: 'blue',
+                            margin: 5,
+                          }}
+                        />
+                        <Text style={{ color: colors.text, marginRight: 10 }}>
+                          {translate('report.highpriority') as string}
+                        </Text>
+                      </View>
+                    </View>
+                  </DetailLine>
+                </>
+              )}
             </View>
-          )}
-          {(Number(backgroundSyncInfo.date) > 0 ||
-            Number(backgroundSyncInfo.dateEnd) > 0 ||
-            !!backgroundSyncInfo.message ||
-            !!backgroundSyncInfo.error) && (
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                marginHorizontal: 20,
-                width: '100%',
-                marginBottom: 20,
-              }}
-            >
-              <DetailLine
-                label={translate('report.lastbackgroundsync') as string}
-                value={
-                  //background.batches.toString() +
-                  //translate('report.batches-date') +
-                  moment(
-                    Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000,
-                  ).format('YYYY MMM D h:mm:ss a') +
-                  (Number(backgroundSyncInfo.dateEnd) > 0 &&
-                  Number(backgroundSyncInfo.date) !==
-                    Number(backgroundSyncInfo.dateEnd)
-                    ? moment(
-                        Number(Number(backgroundSyncInfo.date).toFixed(0)) *
-                          1000,
-                      ).format('YYYY MMM D') ===
+          </>
+        ) : (
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 20,
+            }}
+          >
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        )}
+        {(Number(backgroundSyncInfo.date) > 0 ||
+          Number(backgroundSyncInfo.dateEnd) > 0 ||
+          !!backgroundSyncInfo.message ||
+          !!backgroundSyncInfo.error) && (
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              marginHorizontal: 20,
+              width: '100%',
+              marginBottom: 20,
+            }}
+          >
+            <DetailLine
+              label={translate('report.lastbackgroundsync') as string}
+              value={
+                //background.batches.toString() +
+                //translate('report.batches-date') +
+                moment(
+                  Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000,
+                ).format('YYYY MMM D h:mm:ss a') +
+                (Number(backgroundSyncInfo.dateEnd) > 0 &&
+                Number(backgroundSyncInfo.date) !==
+                  Number(backgroundSyncInfo.dateEnd)
+                  ? moment(
+                      Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000,
+                    ).format('YYYY MMM D') ===
+                    moment(
+                      Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) *
+                        1000,
+                    ).format('YYYY MMM D')
+                    ? ' - ' +
                       moment(
                         Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) *
                           1000,
-                      ).format('YYYY MMM D')
-                      ? ' - ' +
-                        moment(
-                          Number(
-                            Number(backgroundSyncInfo.dateEnd).toFixed(0),
-                          ) * 1000,
-                        ).format('h:mm:ss a')
-                      : ' - ' +
-                        moment(
-                          Number(
-                            Number(backgroundSyncInfo.dateEnd).toFixed(0),
-                          ) * 1000,
-                        ).format('YYYY MMM D h:mm:ss a')
-                    : '')
-                }
-                screenName={screenName}
+                      ).format('h:mm:ss a')
+                    : ' - ' +
+                      moment(
+                        Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) *
+                          1000,
+                      ).format('YYYY MMM D h:mm:ss a')
+                  : '')
+              }
+            />
+            {!!backgroundSyncInfo.message && (
+              <RegText style={{ marginBottom: 20 }} color={colors.text}>
+                {backgroundSyncInfo.message}
+              </RegText>
+            )}
+            {!!backgroundSyncInfo.error && (
+              <Button
+                type={ButtonTypeEnum.Primary}
+                title={translate('view-error') as string}
+                onPress={() => {
+                  reportError(
+                    backgroundSyncInfo.error ? backgroundSyncInfo.error : '',
+                  );
+                }}
+                twoButtons={true}
               />
-              {!!backgroundSyncInfo.message && (
-                <RegText style={{ marginBottom: 20 }} color={colors.text}>
-                  {backgroundSyncInfo.message}
-                </RegText>
-              )}
-              {!!backgroundSyncInfo.error && (
-                <Button
-                  type={ButtonTypeEnum.Primary}
-                  title={translate('view-error') as string}
-                  onPress={() => {
-                    reportError(
-                      backgroundSyncInfo.error ? backgroundSyncInfo.error : '',
-                    );
-                  }}
-                  twoButtons={true}
-                />
-              )}
-            </View>
-          )}
-        </ScrollView>
-      </View>
-    </ToastProvider>
+            )}
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 };
 
