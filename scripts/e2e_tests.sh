@@ -47,15 +47,18 @@ function wait_for() {
     fi
 }
 
-while getopts 'e:sx:h' OPTION; do
+while getopts 'a:e:sx:h' OPTION; do
     case "$OPTION" in
+        a)
+            arch="$OPTARG"
+            ;;
         e)
             test_name="$OPTARG"
             set_test_name=true
             ;;
         x)
             timeout_seconds="$OPTARG"
-            
+
             if [ -z "${timeout_seconds##*[!0-9]*}" ]; then
                 echo "Error: Timeout must be an integer" >&2
                 exit 1
@@ -63,6 +66,7 @@ while getopts 'e:sx:h' OPTION; do
             ;;
         h)
             echo -e "\nRun end-to-end tests. Requires Android SDK Command-line Tools."
+            echo -e "\n  -a\t\tSet ABI/architecture (optional, default: x86_64)"
             echo -e "\n  -e\t\tSelect test name"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
             echo -e "      \t\t  Default: 1800"
