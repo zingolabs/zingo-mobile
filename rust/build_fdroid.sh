@@ -72,19 +72,19 @@ rustup target add \
     x86_64-linux-android
 echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
-    && echo "linker = \"aarch64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"aarch64-linux-android26-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
-    && echo "linker = \"armv7a-linux-androideabi24-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"armv7a-linux-androideabi26-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
-    && echo "linker = \"i686-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"i686-linux-android26-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
-    && echo "linker = \"x86_64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"x86_64-linux-android26-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 
 # Install and setup OpenSSL
@@ -102,14 +102,14 @@ mkdir -p /opt/openssl-3.3.2/x86 \
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
     -mno-outline-atomics \
     -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 > /dev/null \
+    -D__ANDROID_API__=26 > /dev/null \
     && make -j$(nproc) > /dev/null \
     && make -j$(nproc) install > /dev/null \
     && make clean > /dev/null \
     && make distclean > /dev/null
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
     -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 > /dev/null \
+    -D__ANDROID_API__=26 > /dev/null \
     && make -j$(nproc) > /dev/null \
     && make -j$(nproc) install > /dev/null \
     && make clean > /dev/null \
@@ -117,14 +117,14 @@ mkdir -p /opt/openssl-3.3.2/x86 \
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
     -DBROKEN_CLANG_ATOMICS \
     -U__ANDROID_API__ \
-    -D__ANDROID_API__=24  > /dev/null \
+    -D__ANDROID_API__=26  > /dev/null \
     && make -j$(nproc) > /dev/null \
     && make -j$(nproc) install > /dev/null \
     && make clean  > /dev/null \
     && make distclean > /dev/null
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
     -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 > /dev/null \
+    -D__ANDROID_API__=26 > /dev/null \
     && make -j$(nproc) > /dev/null \
     && make -j$(nproc) install > /dev/null \
     && make clean > /dev/null \
@@ -141,8 +141,8 @@ cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
 cargo install --version 4.0.1 cargo-ndk
 
 export LIBCLANG_PATH=/usr/lib/llvm-16/lib
-export CARGO_NDK_PLATFORM=24
-export CARGO_NDK_ANDROID_PLATFORM=24
+export CARGO_NDK_PLATFORM=26
+export CARGO_NDK_ANDROID_PLATFORM=26
 
 export CARGO_FEATURE_STD="true"
 export OPENSSL_DIR=/opt/openssl-3.3.2/aarch64

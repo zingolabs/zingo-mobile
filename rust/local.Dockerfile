@@ -1,4 +1,4 @@
-FROM zingodevops/android_builder:017 AS build_android
+FROM zingodevops/android_builder:018 AS build_android
 
 RUN apt update \
     && apt upgrade -y \
@@ -31,9 +31,8 @@ RUN cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
 RUN cargo install --version 4.0.1 cargo-ndk
 
 ENV LIBCLANG_PATH=/usr/lib/llvm-18/lib
-# forcing to 24 API LEVEL
-ENV CARGO_NDK_PLATFORM=24
-ENV CARGO_NDK_ANDROID_PLATFORM=24
+ENV CARGO_NDK_PLATFORM=26
+ENV CARGO_NDK_ANDROID_PLATFORM=26
 
 RUN cargo ndk --target x86_64-linux-android build --release
 RUN llvm-strip --strip-all ../target/x86_64-linux-android/release/libzingo.so
