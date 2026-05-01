@@ -53,9 +53,11 @@ type StartMenuProps = {
   usingCustomServer: () => void;
   setCustomServerShow: (v: boolean) => void;
   walletExists: boolean;
+  hasBackupWallet: boolean;
   openCurrentWallet: () => void;
   createNewWallet: () => void;
   getwalletToRestore: () => void;
+  restoreLastBackup: () => void;
 };
 
 const StartMenu: React.FunctionComponent<StartMenuProps> = ({
@@ -74,9 +76,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   usingCustomServer,
   setCustomServerShow,
   walletExists,
+  hasBackupWallet,
   openCurrentWallet,
   createNewWallet,
   getwalletToRestore,
+  restoreLastBackup,
 }) => {
   const context = useContext(ContextAppLoading);
   const { netInfo, mode, translate, server, selectServer } = context;
@@ -157,24 +161,57 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                           title: translate('loadingapp.recoverkeys') as string,
                         },
                         { title: translate('loadingapp.custom') as string },
+                        ...(hasBackupWallet
+                          ? [
+                              {
+                                title: translate(
+                                  'loadedapp.restorebackupwallet',
+                                ) as string,
+                              },
+                            ]
+                          : []),
                       ]
-                    : [{ title: translate('loadingapp.custom') as string }]
+                    : [
+                        { title: translate('loadingapp.custom') as string },
+                        ...(hasBackupWallet
+                          ? [
+                              {
+                                title: translate(
+                                  'loadedapp.restorebackupwallet',
+                                ) as string,
+                              },
+                            ]
+                          : []),
+                      ]
                 }
                 onPress={(
                   e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>,
                 ) => {
-                  if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
+                  const idx = e.nativeEvent.index;
+                  const customIdx = hasRecoveryWalletInfoSaved ? 1 : 0;
+                  const backupIdx = customIdx + 1;
+                  if (hasRecoveryWalletInfoSaved && idx === 0) {
                     recoverRecoveryWalletInfo(true);
-                  } else if (
-                    hasRecoveryWalletInfoSaved &&
-                    e.nativeEvent.index === 1
-                  ) {
+                  } else if (idx === customIdx) {
                     customServer();
-                  } else if (
-                    !hasRecoveryWalletInfoSaved &&
-                    e.nativeEvent.index === 0
-                  ) {
-                    customServer();
+                  } else if (hasBackupWallet && idx === backupIdx) {
+                    Alert.alert(
+                      translate('loadedapp.restorebackupwallet') as string,
+                      translate(
+                        'loadedapp.alert-restorebackupwallet-body',
+                      ) as string,
+                      [
+                        {
+                          text: translate('confirm') as string,
+                          onPress: () => restoreLastBackup(),
+                        },
+                        {
+                          text: translate('cancel') as string,
+                          style: 'cancel',
+                        },
+                      ],
+                      { cancelable: false },
+                    );
                   }
                 }}
               >

@@ -149,6 +149,7 @@
     "report": "Senkronizasyon / Yeniden Tarama Raporu",
     "changewallet": "Başka bir cüzdana geç",
     "restorebackupwallet": "Son Cüzdan Yedeğini Geri Yükle",
+    "alert-restorebackupwallet-body": "Son cüzdan yedeğini geri yüklemek istediğinizi onaylayın.",
     "fundpools": "Fon Havuzları",
     "insight": "Finansal İçgörü",
     "loadwalletfromseed-basic": "başka bir cüzdanı geri yükle",
@@ -201,7 +202,8 @@
     "walletnotfound-error": "Hata: Herhangi bir cüzdan bulunamadı.",
     "backupnotfound-error": "Hata: Herhangi bir cüzdan yedeği bulunamadı.",
     "of": "of",
-    "deletewallet-error": "Hata: Mevcut cüzdan silinemedi."
+    "deletewallet-error": "Hata: Mevcut cüzdan silinemedi.",
+    "backupwallet-error": "Hata: Cüzdan yedeği kaydedilemedi."
   },
   "settings": {
     "memos": [

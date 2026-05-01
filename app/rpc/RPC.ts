@@ -1499,9 +1499,13 @@ export default class RPC {
 
     if (exists && exists !== GlobalConst.false) {
       await this.pauseSyncProcess();
-      await RPCModule.doSaveBackup();
-      const result = await RPCModule.deleteExistingWallet();
 
+      const backupResult = await RPCModule.doSaveBackup();
+      if (!backupResult || backupResult === GlobalConst.false) {
+        return this.translate('rpc.backupwallet-error');
+      }
+
+      const result = await RPCModule.deleteExistingWallet();
       if (!(result && result !== GlobalConst.false)) {
         return this.translate('rpc.deletewallet-error');
       }

@@ -149,6 +149,7 @@
     "report": "Sincronizar / Relatório de Rescan",
     "changewallet": "Abrir outra Carteira",
     "restorebackupwallet": "Restaurar Último Backup da Carteira",
+    "alert-restorebackupwallet-body": "Confirme que deseja restaurar o último backup da carteira.",
     "fundpools": "Fundos na Pool",
     "insight": "Visão Financeira",
     "loadwalletfromseed-basic": "Restaurar outra Carteira",
@@ -201,7 +202,8 @@
     "walletnotfound-error": "Erro: não foi possível encontrar nenhuma carteira.",
     "backupnotfound-error": "Erro: não foi possível encontrar nenhum backup de nenhuma carteira.",
     "of": "of",
-    "deletewallet-error": "Erro: não foi possível excluir a carteira atual."
+    "deletewallet-error": "Erro: não foi possível excluir a carteira atual.",
+    "backupwallet-error": "Erro: não foi possível salvar o backup da carteira."
   },
   "settings": {
     "memos": [

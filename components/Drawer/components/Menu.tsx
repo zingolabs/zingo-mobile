@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Dimensions } from 'react-native';
 
 import RegText from '../../../components/Components/RegText';
@@ -9,12 +9,17 @@ import { ContextAppLoaded } from '../../../app/context';
 import { ThemeType } from '../../../app/types';
 import simpleBiometrics from '../../../app/simpleBiometrics';
 import {
+  GlobalConst,
   MenuItemEnum,
   ModeEnum,
   ScreenEnum,
   SelectServerEnum,
 } from '../../../app/AppState';
-import { DrawerContentScrollView } from '@react-navigation/drawer';
+import RPCModule from '../../../app/RPCModule';
+import {
+  DrawerContentScrollView,
+  useDrawerStatus,
+} from '@react-navigation/drawer';
 
 type MenuProps = {
   onItemSelected: (item: MenuItemEnum) => void;
@@ -26,6 +31,17 @@ const Menu: React.FunctionComponent<MenuProps> = ({
   onItemSelected,
   toggleMenuDrawer,
 }) => {
+  const [hasBackupWallet, setHasBackupWallet] = useState(false);
+  const drawerStatus = useDrawerStatus();
+
+  useEffect(() => {
+    const checkBackup = async () => {
+      const exists = await RPCModule.walletBackupExists();
+      setHasBackupWallet(!!exists && exists !== GlobalConst.false);
+    };
+    checkBackup();
+  }, [drawerStatus]);
+
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -210,7 +226,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
               </RegText>
             )}
 
-          {mode !== ModeEnum.basic && (
+          {mode !== ModeEnum.basic && hasBackupWallet && (
             <RegText
               testID="menu.restorebackupwallet"
               onPress={() =>

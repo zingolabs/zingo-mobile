@@ -341,9 +341,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreExistingWalletBackup(promise: Promise) {
         try {
             val backup = readFileAsB64(WalletBackupFileName.value)
-            val wallet = readFileAsB64(WalletFileName.value)
-            writeEncryptedFile(WalletFileName.value, backup)
-            writeEncryptedFile(WalletBackupFileName.value, wallet)
+            if (fileExists(WalletFileName.value)) {
+                // Both files exist: swap wallet ↔ backup
+                val wallet = readFileAsB64(WalletFileName.value)
+                writeEncryptedFile(WalletFileName.value, backup)
+                writeEncryptedFile(WalletBackupFileName.value, wallet)
+            } else {
+                // No wallet exists: restore backup as wallet and delete backup
+                writeEncryptedFile(WalletFileName.value, backup)
+                deleteFile(WalletBackupFileName.value)
+            }
             promise.resolve(true)
         } catch (e: FileNotFoundException) {
             Log.e("MAIN", "Error: [Native] file not found during backup restore", e)

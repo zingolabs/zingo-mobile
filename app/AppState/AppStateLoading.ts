@@ -10,6 +10,7 @@ export default interface AppStateLoading {
   screen: number;
   actionButtonsDisabled: boolean;
   walletExists: boolean;
+  hasBackupWallet: boolean;
   customServerShow: boolean;
   customServerUri: string;
   customServerChainName: ChainNameEnum;
