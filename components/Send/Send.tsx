@@ -29,7 +29,12 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 import RNPickerSelect from 'react-native-picker-select';
 
@@ -104,7 +109,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setServerOption,
   //setSecurityOption,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
     translate,

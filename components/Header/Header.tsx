@@ -14,7 +14,12 @@ import {
   faGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Image, TouchableOpacity, View } from 'react-native';
 import {
@@ -109,7 +114,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   closeScreen,
   noUfvkIcon,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
     totalBalance,

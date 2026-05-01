@@ -8,7 +8,12 @@ import {
   Pressable,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -66,7 +71,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   showMoreOptions,
   setShowMoreOptions,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, mode, addressBook } = context;
   const { colors } = useTheme() as ThemeType;

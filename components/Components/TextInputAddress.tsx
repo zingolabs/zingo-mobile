@@ -1,7 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -30,7 +35,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   screenName,
   routeStack,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
   const { colors } = useTheme() as ThemeType;
@@ -57,14 +62,17 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   }, [address, server.chainName, setError, translate]);
 
   const setQrcodeModalShow = () => {
-    if (screenName === ScreenEnum.AddressBook) {
-      navigation.navigate(routeStack, {
-        screen: RouteEnum.ScannerAddress,
-        params: {
-          setAddress: (a: string) => setAddress(a),
-          active: true,
+    if (screenName === ScreenEnum.AddressBook && routeStack) {
+      (navigation.navigate as (name: string, params?: object) => void)(
+        routeStack,
+        {
+          screen: RouteEnum.ScannerAddress,
+          params: {
+            setAddress: (a: string) => setAddress(a),
+            active: true,
+          },
         },
-      });
+      );
     } else if (screenName === ScreenEnum.Receive) {
       navigation.navigate(RouteEnum.ScannerAddress, {
         setAddress: (a: string) => setAddress(a),

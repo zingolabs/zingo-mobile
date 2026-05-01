@@ -11,7 +11,12 @@ import {
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 
 import {
   AddressBookFileClass,
@@ -61,7 +66,7 @@ type ValueTransferDetailProps = DrawerScreenProps<
 const ValueTransferDetail: React.FunctionComponent<
   ValueTransferDetailProps
 > = ({ route }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
     info,
