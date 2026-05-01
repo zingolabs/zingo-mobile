@@ -16,3 +16,10 @@
 # Kotlin metadata — needed for Kotlin reflection used by jackson-module-kotlin
 -keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod
 -keep class kotlin.Metadata { *; }
+
+# JNA references AWT classes that don't exist on Android — suppress R8 warnings
+-dontwarn java.awt.**
+-dontwarn com.sun.jna.Native$AWT
+
+# kotlinx.datetime references kotlinx.serialization internally
+-dontwarn kotlinx.serialization.**
