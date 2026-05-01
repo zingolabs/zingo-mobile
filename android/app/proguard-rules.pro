@@ -1,12 +1,18 @@
-# Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in /usr/local/Cellar/android-sdk/24.3.3/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the proguardFiles
-# directive in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
-
-# Add any project specific keep options here:
+# Disable obfuscation — keep class names readable for crash reports
 -dontobfuscate
--dontusemixedcaseclassnames
+
+# UniFFI-generated Kotlin bindings (uniffi.zingo package).
+# These are loaded reflectively by JNA from the Rust side at runtime;
+# R8 cannot see the usage statically.
+-keep class uniffi.zingo.** { *; }
+-keepclassmembers class uniffi.zingo.** { *; }
+
+# JNA — used by UniFFI to call into libuniffi_zingo.so
+-keep class com.sun.jna.** { *; }
+-keepclassmembers class com.sun.jna.** { *; }
+-keep class * implements com.sun.jna.Library { *; }
+-keepclassmembers class * extends com.sun.jna.Structure { *; }
+
+# Kotlin metadata — needed for Kotlin reflection used by jackson-module-kotlin
+-keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod
+-keep class kotlin.Metadata { *; }
