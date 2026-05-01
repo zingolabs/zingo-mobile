@@ -13,9 +13,18 @@
 -keep class * implements com.sun.jna.Library { *; }
 -keepclassmembers class * extends com.sun.jna.Structure { *; }
 
-# Kotlin metadata — needed for Kotlin reflection used by jackson-module-kotlin
+# Kotlin metadata and reflection — required by jackson-module-kotlin to introspect
+# data class primary constructors. Both main APK and test APK run in the same
+# process on Android; stripping kotlin.reflect causes jacksonObjectMapper() to
+# fail with "no Creators" on any Kotlin data class.
 -keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod
 -keep class kotlin.Metadata { *; }
+-keep class kotlin.reflect.** { *; }
+-keep class kotlin.jvm.internal.** { *; }
+
+# Jackson Kotlin module — keep the module class and its ServiceLoader registration
+-keep class com.fasterxml.jackson.module.kotlin.** { *; }
+-keep class com.fasterxml.jackson.databind.** { *; }
 
 # JNA references AWT classes that don't exist on Android — suppress R8 warnings
 -dontwarn java.awt.**
