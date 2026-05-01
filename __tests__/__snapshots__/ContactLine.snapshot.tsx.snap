@@ -326,7 +326,7 @@ exports[`ContactLine - snapshots ContactLine no month header, protected 1`] = `
                     }
                   }
                 >
-                  Dec 31, 5:00 pm
+                  Jan 1, 12:00 am
                 </Text>
               </View>
               <View
@@ -853,7 +853,7 @@ exports[`ContactLine - snapshots ContactLine with month header 1`] = `
                     }
                   }
                 >
-                  Dec 31, 5:00 pm
+                  Jan 1, 12:00 am
                 </Text>
               </View>
               <View

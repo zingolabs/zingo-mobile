@@ -645,7 +645,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                 }
               }
             >
-              2023 Dec 31 5:00 pm
+              2024 Jan 1 12:00 am
             </Text>
           </View>
           <View
@@ -1690,7 +1690,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 }
               }
             >
-              2023 Dec 31 5:00 pm
+              2024 Jan 1 12:00 am
             </Text>
           </View>
           <View

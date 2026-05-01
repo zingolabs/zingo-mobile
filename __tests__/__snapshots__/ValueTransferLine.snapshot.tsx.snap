@@ -439,7 +439,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                       }
                     }
                   >
-                    Dec 31, 5:00 pm
+                    Jan 1, 12:00 am
                   </Text>
                   <
                     color="#888888"
@@ -1004,7 +1004,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                       }
                     }
                   >
-                    Dec 31, 5:00 pm
+                    Jan 1, 12:00 am
                   </Text>
                   <
                     color="#5a8c5a"
@@ -1528,7 +1528,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                       }
                     }
                   >
-                    Dec 31, 5:00 pm
+                    Jan 1, 12:00 am
                   </Text>
                   <
                     color="#5a8c5a"
@@ -2195,7 +2195,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                       }
                     }
                   >
-                    Dec 31, 5:00 pm
+                    Jan 1, 12:00 am
                   </Text>
                   <
                     color="#5a8c5a"
