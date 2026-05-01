@@ -1,0 +1,253 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`TransparentWarning - snapshot TransparentWarning renders correctly 1`] = `
+<View
+  onLayout={[Function]}
+  style={
+    {
+      "backgroundColor": "#011401",
+    }
+  }
+>
+  <View
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "opacity": 1,
+      }
+    }
+  >
+    <
+      color="#c3c3c3"
+      icon={
+        {
+          "icon": [
+            384,
+            512,
+            [
+              128473,
+              10005,
+              10006,
+              10060,
+              215,
+              "close",
+              "multiply",
+              "remove",
+              "times",
+            ],
+            "f00d",
+            "M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z",
+          ],
+          "iconName": "xmark",
+          "prefix": "fas",
+        }
+      }
+      size={30}
+      style={
+        {
+          "alignSelf": "flex-end",
+          "marginRight": 20,
+          "marginTop": 10,
+        }
+      }
+    />
+  </View>
+  <Text
+    style={
+      {
+        "alignSelf": "center",
+        "color": "#c3c3c3",
+        "fontSize": 18,
+        "fontWeight": "600",
+        "marginTop": 0,
+        "opacity": 1,
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    text translated
+  </Text>
+  <View
+    style={
+      {
+        "alignSelf": "center",
+        "backgroundColor": "#011401",
+        "borderRadius": 8,
+        "padding": 16,
+        "width": "90%",
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          {
+            "color": "#ffffff",
+            "fontSize": 16,
+            "marginBottom": 12,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#888888",
+            "fontSize": 16,
+            "marginBottom": 16,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#262527",
+            "borderColor": "#65491C",
+            "borderRadius": 8,
+            "borderWidth": 2,
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "opacity": 1,
+            "padding": 12,
+          }
+        }
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={15}
+          bbWidth={15}
+          fill="none"
+          focusable={false}
+          height={15}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#E1AA1B"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "marginRight": 8,
+              },
+              {
+                "flex": 0,
+                "height": 15,
+                "width": 15,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={15}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4292979227,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2}
+          >
+            <RNSVGPath
+              d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4M12 17h.01"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+        <Text
+          style={
+            {
+              "color": "#E1AA1B",
+              "fontSize": 12,
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;

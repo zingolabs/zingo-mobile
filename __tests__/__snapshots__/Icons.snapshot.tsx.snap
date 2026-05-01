@@ -1,0 +1,964 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Icon components - snapshots BiohazardIcon 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGCircle
+      cx={12}
+      cy={11.9}
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+      r={2}
+    />
+    <RNSVGPath
+      d="M6.7 3.4c-.9 2.5 0 5.2 2.2 6.7C6.5 9 3.7 9.6 2 11.6M8.9 10.1l1.4.8M17.3 3.4c.9 2.5 0 5.2-2.2 6.7 2.4-1.2 5.2-.6 6.9 1.5M15.1 10.1l-1.4.8M16.7 20.8c-2.6-.4-4.6-2.6-4.7-5.3-.2 2.6-2.1 4.8-4.7 5.2M12 13.9v1.6M13.5 5.4c-1-.2-2-.2-3 0M17 16.4c.7-.7 1.2-1.6 1.5-2.5M5.5 13.9c.3.9.8 1.8 1.5 2.5"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots ChevronDown 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGPath
+      d="m6 9 6 6 6-6"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots ChevronUp 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGPath
+      d="m18 15-6-6-6 6"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots CopyIcon 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGRect
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+      height={14}
+      rx={2}
+      ry={2}
+      width={14}
+      x={8}
+      y={8}
+    />
+    <RNSVGPath
+      d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots EyeIcon 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGPath
+      d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+    <RNSVGCircle
+      cx={12}
+      cy={12}
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+      r={3}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots FiltersIcon 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGPath
+      d="M2 5h20"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+    <RNSVGPath
+      d="M6 12h12"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+    <RNSVGPath
+      d="M9 19h6"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots ListIcon 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGPath
+      d="M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots ShieldIcon 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGPath
+      d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots SkullIcon 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGPath
+      d="m12.5 17-.5-1-.5 1h1z"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+    <RNSVGPath
+      d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+    <RNSVGCircle
+      cx={15}
+      cy={12}
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+      r={1}
+    />
+    <RNSVGCircle
+      cx={9}
+      cy={12}
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+      r={1}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots TriangleAlert 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGPath
+      d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4M12 17h.01"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots VerifyCheckIcon 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGPath
+      d="M21.801 10A10 10 0 1 1 17 3.335"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+    <RNSVGPath
+      d="m9 11 3 3L22 4"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots VerifyXIcon 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGCircle
+      cx={12}
+      cy={12}
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+      r={10}
+    />
+    <RNSVGPath
+      d="m15 9-6 6M9 9l6 6"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Icon components - snapshots XIcon 1`] = `
+<RNSVGSvgView
+  align="xMidYMid"
+  bbHeight={24}
+  bbWidth={24}
+  fill="none"
+  focusable={false}
+  height={24}
+  meetOrSlice={0}
+  minX={0}
+  minY={0}
+  stroke="#000000"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  strokeWidth={2}
+  style={
+    [
+      {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      {
+        "flex": 0,
+        "height": 24,
+        "width": 24,
+      },
+    ]
+  }
+  vbHeight={24}
+  vbWidth={24}
+  width={24}
+>
+  <RNSVGGroup
+    fill={null}
+    propList={
+      [
+        "fill",
+        "stroke",
+        "strokeWidth",
+        "strokeLinecap",
+        "strokeLinejoin",
+      ]
+    }
+    stroke={
+      {
+        "payload": 4278190080,
+        "type": 0,
+      }
+    }
+    strokeLinecap={1}
+    strokeLinejoin={1}
+    strokeWidth={2}
+  >
+    <RNSVGPath
+      d="M18 6 6 18M6 6l12 12"
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;

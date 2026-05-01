@@ -1,5 +1,8 @@
 import React from 'react';
 
+export const useDrawerStatus = jest.fn(() => 'closed');
+export const DrawerContentScrollView = ({ children }) => children;
+
 const mockNavigation = {
   navigate: jest.fn(),
   openDrawer: jest.fn(),
