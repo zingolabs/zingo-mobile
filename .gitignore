@@ -99,3 +99,5 @@ buck-out/
 
 # Claude Code
 .claude/
+# Jest coverage output
+coverage/
