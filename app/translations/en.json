@@ -149,6 +149,7 @@
     "report": "Sync / Rescan Report",
     "changewallet": "Change to another Wallet",
     "restorebackupwallet": "Restore Last Wallet Backup",
+    "alert-restorebackupwallet-body": "Confirm that you want to restore the last wallet backup.",
     "fundpools": "Fund Pools",
     "insight": "Financial Insight",
     "loadwalletfromseed-basic": "Restore another wallet",
@@ -201,7 +202,8 @@
     "walletnotfound-error": "Error: Couldn't find any wallet.",
     "backupnotfound-error": "Error: Couldn't find any backup of any wallet.",
     "of": "of",
-    "deletewallet-error": "Error: Couldn't delete the current wallet."
+    "deletewallet-error": "Error: Couldn't delete the current wallet.",
+    "backupwallet-error": "Error: Couldn't save the wallet backup."
   },
   "settings": {
     "memos": [

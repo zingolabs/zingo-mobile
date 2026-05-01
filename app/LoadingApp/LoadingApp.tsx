@@ -499,6 +499,7 @@ export class LoadingAppClass extends Component<
           : 0,
       actionButtonsDisabled: false,
       walletExists: false,
+      hasBackupWallet: false,
       customServerShow: false,
       customServerUri: '',
       customServerChainName: ChainNameEnum.mainChainName,
@@ -613,6 +614,10 @@ export class LoadingAppClass extends Component<
     // Second, check if a wallet exists. Do it async so the basic screen has time to render
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
     const exists = await RPCModule.walletExists();
+    const backupExists = await RPCModule.walletBackupExists();
+    if (backupExists && backupExists !== GlobalConst.false) {
+      this.setState({ hasBackupWallet: true });
+    }
 
     if (exists && exists !== GlobalConst.false) {
       this.setState({ walletExists: true });
@@ -1671,6 +1676,19 @@ export class LoadingAppClass extends Component<
     this.componentDidMount();
   };
 
+  restoreLastBackup = async () => {
+    this.setState({ screen: 0, actionButtonsDisabled: true });
+    const result = await RPCModule.restoreExistingWalletBackup();
+    if (!result || result === GlobalConst.false) {
+      this.addLastSnackbar(
+        this.state.translate('rpc.backupnotfound-error') as string,
+      );
+      this.setState({ screen: 1, actionButtonsDisabled: false });
+      return;
+    }
+    this.openCurrentWallet();
+  };
+
   async fetchZingolibVersion(): Promise<void> {
     try {
       const start = Date.now();
@@ -1707,6 +1725,7 @@ export class LoadingAppClass extends Component<
       wallet,
       actionButtonsDisabled,
       walletExists,
+      hasBackupWallet,
       customServerShow,
       customServerUri,
       customServerChainName,
@@ -1785,9 +1804,11 @@ export class LoadingAppClass extends Component<
               usingCustomServer={this.usingCustomServer}
               setCustomServerShow={this.setCustomServerShow}
               walletExists={walletExists}
+              hasBackupWallet={hasBackupWallet}
               openCurrentWallet={this.openCurrentWallet}
               createNewWallet={this.createNewWallet}
               getwalletToRestore={this.getwalletToRestore}
+              restoreLastBackup={this.restoreLastBackup}
             />
           )}
           {screen === 2 && wallet && (

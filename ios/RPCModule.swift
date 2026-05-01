@@ -392,12 +392,19 @@ class RPCModule: NSObject {
   func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
       let backupEncodedData = try self.readWalletBackup()
-      let walletEncodedData = try self.readWalletUtf8String()
       // check if the content is correct. Stored Encoded.
       let correct = checkB64(datab64: backupEncodedData)
       if correct == "true" {
-        try self.saveWalletFile(backupEncodedData)
-        try self.saveWalletBackupFile(walletEncodedData)
+        if try fileExists(Constants.WalletFileName.rawValue) == "true" {
+          // Both files exist: swap wallet ↔ backup
+          let walletEncodedData = try self.readWalletUtf8String()
+          try self.saveWalletFile(backupEncodedData)
+          try self.saveWalletBackupFile(walletEncodedData)
+        } else {
+          // No wallet exists: restore backup as wallet and delete backup
+          try self.saveWalletFile(backupEncodedData)
+          try self.deleteFile(Constants.WalletBackupFileName.rawValue)
+        }
         DispatchQueue.main.async {
           resolve("true")
         }

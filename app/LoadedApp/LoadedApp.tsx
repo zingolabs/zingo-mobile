@@ -1817,7 +1817,7 @@ export class LoadedAppClass extends Component<
       resultStr = (await this.rpc.changeWalletNoBackup()) as string;
     }
 
-    if (resultStr && resultStr.toLowerCase().startsWith(GlobalConst.error)) {
+    if (resultStr) {
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -1838,7 +1838,7 @@ export class LoadedAppClass extends Component<
   onClickOKRestoreBackup = async () => {
     const resultStr = (await this.rpc.restoreBackup()) as string;
 
-    if (resultStr && resultStr.toLowerCase().startsWith(GlobalConst.error)) {
+    if (resultStr) {
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,

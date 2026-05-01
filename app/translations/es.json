@@ -149,6 +149,7 @@
     "report": "Informe de Sincronización",
     "changewallet": "Abrir otro Monedero",
     "restorebackupwallet": "Restaurar Copia de Seguridad",
+    "alert-restorebackupwallet-body": "Confirma que deseas restaurar la última copia de seguridad del monedero.",
     "fundpools": "Agrupaciones de Fondos",
     "insight": "Visión Financiera",
     "loadwalletfromseed-basic": "Restaurar otro monedero",
@@ -201,7 +202,8 @@
     "walletnotfound-error": "Error: No se encuentra ningún monedero.",
     "backupnotfound-error": "Error: No se encuentra ninguna copia de seguridad de ningún monedero.",
     "of": "de",
-    "deletewallet-error": "Error: No se pudo borrar el monedero actual."
+    "deletewallet-error": "Error: No se pudo borrar el monedero actual.",
+    "backupwallet-error": "Error: No se pudo guardar la copia de seguridad del monedero."
   },
   "settings": {
     "memos": [
