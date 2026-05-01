@@ -12,7 +12,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import FadeText from './FadeText';
 import { ContextAppLoaded } from '../../app/context';
-import moment from 'moment';
 import RPC from '../../app/rpc';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
@@ -29,23 +28,18 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   textBefore,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode, language, currency } =
-    context;
+  const { translate, zecPrice, addLastSnackbar, mode, currency } = context;
   const { colors } = useTheme() as ThemeType;
 
   const [refreshMinutes, setRefreshMinutes] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
-
-  useEffect(() => {
     const fn = () => {
       if (zecPrice.date > 0) {
-        const date1 = moment();
-        const date2 = moment(zecPrice.date);
-        setRefreshMinutes(date1.diff(date2, 'minutes'));
+        setRefreshMinutes(
+          Utils.diffInMinutes(new Date(), new Date(zecPrice.date)),
+        );
       }
     };
 

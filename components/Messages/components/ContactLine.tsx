@@ -32,7 +32,6 @@ import {
   ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
-import moment from 'moment';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -112,10 +111,6 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
     const { memo } = Utils.splitMemo(_c.memos);
     return memo;
   };
-
-  useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
 
   useEffect(() => {
     setMessagesAddress(Utils.isMessagesAddress(c));
@@ -375,7 +370,11 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                   )}
                   <FadeText>
                     {c.time
-                      ? moment((c.time || 0) * 1000).format('MMM D, h:mm a')
+                      ? Utils.formatDate(
+                          (c.time || 0) * 1000,
+                          'MMM d, h:mm aaa',
+                          language,
+                        )
                       : ''}
                   </FadeText>
                 </View>

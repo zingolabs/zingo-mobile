@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Animated, Platform, View, TouchableOpacity } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -28,7 +28,6 @@ import {
   ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
-import moment from 'moment';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -105,10 +104,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
         : faArrowUp;
 
   const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
-
-  useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
 
   //useEffect(() => {
   //  setMessagesAddress(Utils.isMessagesAddress(vt));
@@ -506,7 +501,11 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   >
                     <FadeText>
                       {vt.time
-                        ? moment((vt.time || 0) * 1000).format('MMM D, h:mm a')
+                        ? Utils.formatDate(
+                            (vt.time || 0) * 1000,
+                            'MMM d, h:mm aaa',
+                            language,
+                          )
                         : '--'}
                     </FadeText>
                     {haveMemo && (

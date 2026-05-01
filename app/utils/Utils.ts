@@ -1,9 +1,13 @@
 import { getNumberFormatSettings } from 'react-native-localize';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
+import { format as dateFnsFormat, differenceInMinutes } from 'date-fns';
+import type { Locale } from 'date-fns';
+import {
+  enUS,
+  es as esLocale,
+  pt as ptLocale,
+  ru as ruLocale,
+  tr as trLocale,
+} from 'date-fns/locale';
 
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
@@ -503,7 +507,27 @@ export default class Utils {
     return len;
   };
 
-  static setMomentLocale = async (language: LanguageEnum) => {
-    moment.locale(language);
-  };
+  private static getDateFnsLocale(language: LanguageEnum) {
+    const locales = {
+      [LanguageEnum.es]: esLocale,
+      [LanguageEnum.pt]: ptLocale,
+      [LanguageEnum.ru]: ruLocale,
+      [LanguageEnum.tr]: trLocale,
+    } as Partial<Record<LanguageEnum, Locale>>;
+    return locales[language] ?? enUS;
+  }
+
+  static formatDate(
+    timestamp: number,
+    pattern: string,
+    language: LanguageEnum,
+  ): string {
+    return dateFnsFormat(new Date(timestamp), pattern, {
+      locale: Utils.getDateFnsLocale(language),
+    });
+  }
+
+  static diffInMinutes(from: Date, to: Date): number {
+    return differenceInMinutes(from, to);
+  }
 }

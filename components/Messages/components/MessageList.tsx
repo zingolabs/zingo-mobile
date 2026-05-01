@@ -25,7 +25,6 @@ import {
   TextInputContentSizeChangeEventData,
   Pressable,
 } from 'react-native';
-import moment from 'moment';
 
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -202,10 +201,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       return messages;
     }
   }, [messages, address, addressFilter]);
-
-  useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
 
   useEffect(() => {
     if (messages !== null) {
@@ -729,7 +724,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               messagesSliced.length > 0 &&
               messagesSliced.map((vt, index) => {
                 let txmonth = vt.time
-                  ? moment(vt.time * 1000).format('MMM YYYY')
+                  ? Utils.formatDate(vt.time * 1000, 'MMM yyyy', language)
                   : '--- ----';
 
                 var month = '';

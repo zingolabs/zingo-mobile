@@ -19,8 +19,6 @@ import {
   Pressable,
 } from 'react-native';
 
-import moment from 'moment';
-
 import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -264,10 +262,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
 
     return cont;
   };
-
-  useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
 
   useEffect(() => {
     if (valueTransfers !== null) {
@@ -671,7 +665,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               contacts.length > 0 &&
               contacts.map((c, index) => {
                 let txmonth =
-                  c && c.time ? moment(c.time * 1000).format('MMM YYYY') : '';
+                  c && c.time
+                    ? Utils.formatDate(c.time * 1000, 'MMM yyyy', language)
+                    : '';
 
                 var month = '';
                 if (txmonth !== lastMonth) {

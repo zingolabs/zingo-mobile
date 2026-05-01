@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -30,7 +30,6 @@ import {
   ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
-import moment from 'moment';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -98,10 +97,6 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
       : [];
     return address.length >= 1;
   };
-
-  useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
 
   //console.log('render ValueTransferLine - 5', index, nextLineWithSameTxid);
 
@@ -284,7 +279,11 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             <View>
               <FadeText>
                 {vt.time
-                  ? moment((vt.time || 0) * 1000).format('MMM D, h:mm a')
+                  ? Utils.formatDate(
+                      (vt.time || 0) * 1000,
+                      'MMM d, h:mm aaa',
+                      language,
+                    )
                   : '--'}
               </FadeText>
             </View>
