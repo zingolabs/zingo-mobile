@@ -30,5 +30,8 @@
 -dontwarn java.awt.**
 -dontwarn com.sun.jna.Native$AWT
 
+# Jackson's Java7SupportImpl references java.beans annotations not present on Android
+-dontwarn java.beans.**
+
 # kotlinx.datetime references kotlinx.serialization internally
 -dontwarn kotlinx.serialization.**
