@@ -75,7 +75,7 @@ jobs:
           java-version: '17'
 
       - name: Gradle setup cache (write-only)
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
           cache-write-only: true
@@ -137,7 +137,7 @@ jobs:
           java-version: '17'
 
       - name: Gradle setup cache (read/write)
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
           cache-read-only: false
@@ -293,7 +293,7 @@ jobs:
           java-version: '17'
 
       - name: Gradle setup cache (read-only)
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
           cache-write-only: false
