@@ -13,5 +13,15 @@ jobs:
 
       - run: yarn
 
-      - run: yarn test
+      - name: Audit dependencies
+        run: yarn audit --level critical
+
+      - run: yarn coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
 

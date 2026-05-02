@@ -7,7 +7,6 @@ import { useTheme } from '@react-navigation/native';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import DetailLine from '../Components/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
-import moment from 'moment';
 
 import Header from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
@@ -63,10 +62,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const [percentageOutputsScanned, setPercentageOutputsScanned] =
     useState<number>(0);
   const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
-
-  useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
 
   useEffect(() => {
     if (info.latestBlock) {
@@ -714,29 +709,39 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               value={
                 //background.batches.toString() +
                 //translate('report.batches-date') +
-                moment(
+                Utils.formatDate(
                   Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000,
-                ).format('YYYY MMM D h:mm:ss a') +
+                  'yyyy MMM d h:mm:ss aaa',
+                  language,
+                ) +
                 (Number(backgroundSyncInfo.dateEnd) > 0 &&
                 Number(backgroundSyncInfo.date) !==
                   Number(backgroundSyncInfo.dateEnd)
-                  ? moment(
+                  ? Utils.formatDate(
                       Number(Number(backgroundSyncInfo.date).toFixed(0)) * 1000,
-                    ).format('YYYY MMM D') ===
-                    moment(
+                      'yyyy MMM d',
+                      language,
+                    ) ===
+                    Utils.formatDate(
                       Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) *
                         1000,
-                    ).format('YYYY MMM D')
+                      'yyyy MMM d',
+                      language,
+                    )
                     ? ' - ' +
-                      moment(
+                      Utils.formatDate(
                         Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) *
                           1000,
-                      ).format('h:mm:ss a')
+                        'h:mm:ss aaa',
+                        language,
+                      )
                     : ' - ' +
-                      moment(
+                      Utils.formatDate(
                         Number(Number(backgroundSyncInfo.dateEnd).toFixed(0)) *
                           1000,
-                      ).format('YYYY MMM D h:mm:ss a')
+                        'yyyy MMM d h:mm:ss aaa',
+                        language,
+                      )
                   : '')
               }
             />

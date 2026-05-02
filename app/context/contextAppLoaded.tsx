@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { useShallowMemo } from './useShallowMemo';
 
 import {
   InfoType,
@@ -93,8 +94,9 @@ export const ContextAppLoadedProvider = ({
   children,
   value,
 }: ContextProviderProps) => {
+  const stableValue = useShallowMemo(value);
   return (
-    <ContextAppLoaded.Provider value={value}>
+    <ContextAppLoaded.Provider value={stableValue}>
       {children}
     </ContextAppLoaded.Provider>
   );

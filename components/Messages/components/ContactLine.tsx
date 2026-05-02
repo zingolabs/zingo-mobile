@@ -9,7 +9,12 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCircleCheck as faCircleCheckSolid,
@@ -32,7 +37,6 @@ import {
   ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
-import moment from 'moment';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -56,7 +60,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   addressProtected,
   screenName,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
     language,
@@ -112,10 +116,6 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
     const { memo } = Utils.splitMemo(_c.memos);
     return memo;
   };
-
-  useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
 
   useEffect(() => {
     setMessagesAddress(Utils.isMessagesAddress(c));
@@ -375,7 +375,11 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                   )}
                   <FadeText>
                     {c.time
-                      ? moment((c.time || 0) * 1000).format('MMM D, h:mm a')
+                      ? Utils.formatDate(
+                          (c.time || 0) * 1000,
+                          'MMM d, h:mm aaa',
+                          language,
+                        )
                       : ''}
                   </FadeText>
                 </View>

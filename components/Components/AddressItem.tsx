@@ -15,7 +15,12 @@ import {
   SelectServerEnum,
   ScreenEnum,
 } from '../../app/AppState';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -41,7 +46,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   addressProtected,
   ufvk,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
     translate,

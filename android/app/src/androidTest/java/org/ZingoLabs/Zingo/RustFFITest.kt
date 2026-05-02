@@ -3,8 +3,18 @@ package org.ZingoLabs.Zingo
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.experimental.categories.Category
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.core.type.TypeReference
+
+// Standard ObjectMapper with no Kotlin module — avoids kotlin-reflect dependency
+// that breaks under R8 in the release test APK. Data classes use var+defaults so
+// Jackson can use the no-arg constructor + setter injection.
+fun testMapper(): ObjectMapper = ObjectMapper()
+    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+inline fun <reified T> ObjectMapper.readValue(src: String): T =
+    readValue(src, object : TypeReference<T>() {})
 
 object Seeds {
     const val HOSPITAL = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
@@ -15,117 +25,117 @@ object Ufvk {
 }
 
 data class InitFromSeed (
-    val seed_phrase : String,
-    val birthday : Long,
-    val no_of_accounts: Long
+    var seed_phrase : String = "",
+    var birthday : Long = 0L,
+    var no_of_accounts: Long = 0L
 )
 
 data class InitFromUfvk (
-    val ufvk : String,
-    val birthday : Long
+    var ufvk : String = "",
+    var birthday : Long = 0L
 )
 
 data class ExportUfvk (
-    val ufvk : String,
-    val birthday : Long
+    var ufvk : String = "",
+    var birthday : Long = 0L
 )
 
 data class UnifiedAddress (
-	val account : Long?,
-    val address_index : Long?,
-	val has_orchard : Boolean?,
-    val has_sapling : Boolean?,
-    val has_transparent : Boolean?,
-    val encoded_address : String?,
-    val error : String?
+    var account : Long? = null,
+    var address_index : Long? = null,
+    var has_orchard : Boolean? = null,
+    var has_sapling : Boolean? = null,
+    var has_transparent : Boolean? = null,
+    var encoded_address : String? = null,
+    var error : String? = null
 )
 
 data class TransparentAddress (
-	val account : Long?,
-    val address_index : Long?,
-    val scope : String?,
-	val encoded_address : String?,
-    val error : String?
+    var account : Long? = null,
+    var address_index : Long? = null,
+    var scope : String? = null,
+    var encoded_address : String? = null,
+    var error : String? = null
 )
 
 data class Info (
-    val version : String,
-    val git_commit : String,
-    val server_uri : String,
-    val vendor : String,
-    val taddr_support : Boolean,
-    val chain_name : String,
-    val sapling_activation_height : Long,
-    val consensus_branch_id : String,
-    val latest_block_height : Long
+    var version : String = "",
+    var git_commit : String = "",
+    var server_uri : String = "",
+    var vendor : String = "",
+    var taddr_support : Boolean = false,
+    var chain_name : String = "",
+    var sapling_activation_height : Long = 0L,
+    var consensus_branch_id : String = "",
+    var latest_block_height : Long = 0L
 )
 
 data class Height (
-	val height : Long
+    var height : Long = 0L
 )
 
 data class ScanRanges (
-    val priority : String = "",
-    val start_block : String = "",
-    val end_block : String = ""
+    var priority : String = "",
+    var start_block : String = "",
+    var end_block : String = ""
 )
 
 data class SyncStatus (
-    val scan_ranges : List<ScanRanges> = emptyList(),
-    val sync_start_height : Long = 0L,
-    val session_blocks_scanned : Long = 0L,
-    val total_blocks_scanned : Long = 0L,
-    val percentage_session_blocks_scanned : Double = 0.0,
-    val percentage_total_blocks_scanned : Double = 0.0,
-    val session_sapling_outputs_scanned : Long = 0L,
-    val total_sapling_outputs_scanned : Long = 0L,
-    val session_orchard_outputs_scanned : Long = 0L,
-    val total_orchard_outputs_scanned : Long = 0L,
-    val percentage_session_outputs_scanned : Double = 0.0,
-    val percentage_total_outputs_scanned : Double = 0.0
+    var scan_ranges : List<ScanRanges> = emptyList(),
+    var sync_start_height : Long = 0L,
+    var session_blocks_scanned : Long = 0L,
+    var total_blocks_scanned : Long = 0L,
+    var percentage_session_blocks_scanned : Double = 0.0,
+    var percentage_total_blocks_scanned : Double = 0.0,
+    var session_sapling_outputs_scanned : Long = 0L,
+    var total_sapling_outputs_scanned : Long = 0L,
+    var session_orchard_outputs_scanned : Long = 0L,
+    var total_orchard_outputs_scanned : Long = 0L,
+    var percentage_session_outputs_scanned : Double = 0.0,
+    var percentage_total_outputs_scanned : Double = 0.0
 )
 
 data class Balance (
-    val total_sapling_balance : Long,
-    val confirmed_sapling_balance : Long,
-    val unconfirmed_sapling_balance : Long,
-    val total_orchard_balance : Long,
-    val confirmed_orchard_balance : Long,
-    val unconfirmed_orchard_balance : Long,
-    val total_transparent_balance : Long,
-    val confirmed_transparent_balance : Long,
-    val unconfirmed_transparent_balance : Long
+    var total_sapling_balance : Long = 0L,
+    var confirmed_sapling_balance : Long = 0L,
+    var unconfirmed_sapling_balance : Long = 0L,
+    var total_orchard_balance : Long = 0L,
+    var confirmed_orchard_balance : Long = 0L,
+    var unconfirmed_orchard_balance : Long = 0L,
+    var total_transparent_balance : Long = 0L,
+    var confirmed_transparent_balance : Long = 0L,
+    var unconfirmed_transparent_balance : Long = 0L
 )
 
 data class Send (
-    val address : String,
-    val amount : Long,
-    val memo : String?
+    var address : String = "",
+    var amount : Long = 0L,
+    var memo : String? = null
 )
 
 data class ValueTransfer (
-    val txid : String,
-    val datetime : Long,
-    val status: String,
-    val blockheight : Long,
-    val transaction_fee : Long?,
-    val zec_price : Long?,
-    val kind : String,
-    val value : Long,
-    val recipient_address : String?,
-    val pool_received : String?,
-    val memos : List<String>?,
+    var txid : String = "",
+    var datetime : Long = 0L,
+    var status: String = "",
+    var blockheight : Long = 0L,
+    var transaction_fee : Long? = null,
+    var zec_price : Long? = null,
+    var kind : String = "",
+    var value : Long = 0L,
+    var recipient_address : String? = null,
+    var pool_received : String? = null,
+    var memos : List<String>? = null,
 )
 
 data class ValueTransfers (
-    val value_transfers : List<ValueTransfer>,
-    val total : Long,
+    var value_transfers : List<ValueTransfer> = emptyList(),
+    var total : Long = 0L,
 )
 
 data class ParseResult (
-    val status: String,
-    val chain_name: String?,
-    val address_kind: String?
+    var status: String = "",
+    var chain_name: String? = null,
+    var address_kind: String? = null
 )
 
 val context = MainApplication.getAppContext()!!
@@ -133,7 +143,7 @@ val context = MainApplication.getAppContext()!!
 class ExecuteAddressesFromSeed {
     @Test
     fun executeAddressesFromSeed() {
-        val mapper = jacksonObjectMapper()
+        val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
@@ -181,7 +191,7 @@ class ExecuteAddressesFromSeed {
 class ExecuteAddressesFromUfvk {
     @Test
     fun executeAddressFromUfvk() {
-        val mapper = jacksonObjectMapper()
+        val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
@@ -232,7 +242,7 @@ class ExecuteAddressesFromUfvk {
 class ExecuteVersionFromSeed {
     @Test
     fun executeVersionFromSeed() {
-        val mapper = jacksonObjectMapper()
+        val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
@@ -267,7 +277,7 @@ class ExecuteVersionFromSeed {
 class ExecuteSyncFromSeed {
     @Test
     fun executeSyncFromSeed() {
-        val mapper = jacksonObjectMapper()
+        val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
@@ -333,7 +343,7 @@ class ExecuteSyncFromSeed {
 class ExecuteSendFromOrchard {
     @Test
     fun executeSendFromOrchard() {
-        val mapper = jacksonObjectMapper()
+        val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
@@ -444,7 +454,7 @@ class ExecuteSendFromOrchard {
 class UpdateCurrentPriceAndValueTransfersFromSeed {
     @Test
     fun updateCurrentPriceAndValueTransfersFromSeed() {
-        val mapper = jacksonObjectMapper()
+        val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
@@ -531,7 +541,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
 class ExecuteSaplingBalanceFromSeed {
     @Test
     fun executeSaplingBalanceFromSeed() {
-        val mapper = jacksonObjectMapper()
+        val mapper = testMapper()
 
         val rpcModule = RPCModule(MainApplication.getAppReactContext())
 
@@ -630,7 +640,7 @@ class ExecuteSaplingBalanceFromSeed {
 class ExecuteParseAddressForTex {
     @Test
     fun executeParseAddressForTex() {
-        val mapper = jacksonObjectMapper()
+        val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
@@ -676,7 +686,7 @@ class ExecuteParseAddressForTex {
 class ExecuteParseAddressInvalid {
     @Test
     fun executeParseAddressInvalid() {
-        val mapper = jacksonObjectMapper()
+        val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"

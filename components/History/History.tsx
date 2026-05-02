@@ -15,8 +15,12 @@ import {
   Platform,
   Pressable,
 } from 'react-native';
-import moment from 'moment';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
@@ -97,7 +101,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   //sendTransaction,
   //setServerOption,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -170,11 +174,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
           let lasttxmonth =
             lastData && lastData.time
-              ? moment(lastData.time * 1000).format('MMM YYYY')
+              ? Utils.formatDate(lastData.time * 1000, 'MMM yyyy', language)
               : '--- ----';
           let txmonth =
             data && data.time
-              ? moment(data.time * 1000).format('MMM YYYY')
+              ? Utils.formatDate(data.time * 1000, 'MMM yyyy', language)
               : '--- ----';
 
           if (txmonth !== lasttxmonth) {
@@ -215,7 +219,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           }
         },
       ),
-    [valueTransfersSliced],
+    [language, valueTransfersSliced],
   );
 
   const _dataProvider = useMemo(
@@ -298,10 +302,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
       );
     });
   }, [filterFailed, filterKind, filterMemos, filterWithFunds, valueTransfers]);
-
-  useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
 
   useEffect(() => {
     if (valueTransfers !== null) {
@@ -434,7 +434,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   ) => {
     let txmonth =
       data && data.time
-        ? moment(data.time * 1000).format('MMM YYYY')
+        ? Utils.formatDate(data.time * 1000, 'MMM yyyy', language)
         : '--- ----';
 
     return (

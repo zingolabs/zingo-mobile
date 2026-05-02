@@ -41,7 +41,7 @@ describe('Component Unified Address List - test', () => {
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     const props = makeDrawerProps(AddressKindEnum.u);
-    const al: any = render(
+    const al = render(
       <ContextAppLoadedProvider value={state}>
         <AddressList {...props} />
       </ContextAppLoadedProvider>,
@@ -54,7 +54,7 @@ describe('Component Unified Address List - test', () => {
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     const props = makeDrawerProps(AddressKindEnum.t);
-    const al: any = render(
+    const al = render(
       <ContextAppLoadedProvider value={state}>
         <AddressList {...props} />
       </ContextAppLoadedProvider>,

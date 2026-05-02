@@ -62,7 +62,7 @@ jobs:
     if: ${{ needs.android-check-build-cache.outputs.native-cache-found != 'true' || needs.android-check-build-cache.outputs.kotlin-cache-found != 'true' }}
     runs-on: ubuntu-24.04
     container:
-      image: zingodevops/android_builder:017
+      image: zingodevops/android_builder:018
     env:
       RUSTUP_HOME: ${{ github.workspace }}/.rustup
       CARGO_HOME:  ${{ github.workspace }}/.cargo
@@ -179,11 +179,11 @@ jobs:
           AR: llvm-ar
           LD: ld
           RANLIB: llvm-ranlib
-          CC: ${{ env.CC }}24-clang
+          CC: ${{ env.CC }}26-clang
           CARGO_FEATURE_STD: ${{ env.CARGO_FEATURE_STD }}
           LIBCLANG_PATH: /usr/lib/llvm-18/lib
-          CARGO_NDK_PLATFORM: 24
-          CARGO_NDK_ANDROID_PLATFORM: 24
+          CARGO_NDK_PLATFORM: 26
+          CARGO_NDK_ANDROID_PLATFORM: 26
 
       - name: LLVM Strip
         working-directory: ./rust/target

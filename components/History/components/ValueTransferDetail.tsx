@@ -10,9 +10,13 @@ import {
 } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import moment from 'moment';
 
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 
 import {
   AddressBookFileClass,
@@ -62,7 +66,7 @@ type ValueTransferDetailProps = DrawerScreenProps<
 const ValueTransferDetail: React.FunctionComponent<
   ValueTransferDetailProps
 > = ({ route }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
     info,
@@ -111,10 +115,6 @@ const ValueTransferDetail: React.FunctionComponent<
   const isTheFirstMount = useRef(true);
 
   const { memo, memoUA } = Utils.splitMemo(valueTransfer.memos);
-
-  useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
 
   useEffect(() => {
     const _index =
@@ -620,8 +620,10 @@ const ValueTransferDetail: React.FunctionComponent<
                 }}
               >
                 {valueTransfer.time
-                  ? moment((valueTransfer.time || 0) * 1000).format(
-                      'YYYY MMM D h:mm a',
+                  ? Utils.formatDate(
+                      (valueTransfer.time || 0) * 1000,
+                      'yyyy MMM d h:mm aaa',
+                      language,
                     )
                   : '--'}
               </RegText>

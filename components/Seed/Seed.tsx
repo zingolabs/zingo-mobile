@@ -9,7 +9,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import RegText from '../Components/RegText';
@@ -57,7 +62,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   keepAwake,
   setIsSeedViewModalOpen,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
     birthday: birthdayFromContext,
