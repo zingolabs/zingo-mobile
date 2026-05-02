@@ -94,7 +94,7 @@
     "babel-plugin-dynamic-import-node": "^2.3.3",
     "depcheck": "^1.4.7",
     "detox": "^20.41.3",
-    "eslint": "^9.17.0",
+    "eslint": "^10.3.0",
     "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-react-native": "^5.0.0",
     "jest": "^30.1.3",
