@@ -187,6 +187,7 @@ android {
             //vcsInfo.include false
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            testProguardFiles "proguard-test-rules.pro"
         }
     }
 
