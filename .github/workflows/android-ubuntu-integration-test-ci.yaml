@@ -69,7 +69,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -131,7 +131,7 @@ jobs:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -287,7 +287,7 @@ jobs:
           tool: nextest
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
