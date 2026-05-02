@@ -132,7 +132,7 @@ jobs:
           sudo cp ../target/universal/release/libzingo.a ./Generated/libuniffi_zingo.a
 
       - name: Upload native rust
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
           path: rust/lib/Generated

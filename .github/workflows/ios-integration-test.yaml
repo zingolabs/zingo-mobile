@@ -85,21 +85,21 @@ jobs:
             -quiet
 
       - name: Upload Build Result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: xctestrun-and-products
           path: ios/build/DerivedData/Build/Products
 
       - name: Upload IOS build reports (.xcresult)
         if: ${{ always() && !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-ios-integration-build-reports.xcresult
           path: ios/build/reports/Zingo-BuildForTesting.xcresult
 
       - name: Upload IOS build DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-ios-integration-build-derived-logs
           path: |
@@ -236,14 +236,14 @@ jobs:
 
   #     - name: Upload IOS test reports (.xcresult)
   #       if: ${{ always() && !cancelled() }}
-  #       uses: actions/upload-artifact@v4
+  #       uses: actions/upload-artifact@v7
   #       with:
   #         name: test-ios-integration-test-reports-${{ matrix.test }}.xcresult
   #         path: ios/build/reports/Zingo-Test.xcresult
 
   #     - name: Upload IOS DerivedData logs (optional)
   #       if: ${{ always() && !cancelled() }}
-  #       uses: actions/upload-artifact@v4
+  #       uses: actions/upload-artifact@v7
   #       with:
   #         name: test-ios-integration-test-derived-logs-${{ matrix.test }}
   #         path: |
