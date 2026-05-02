@@ -8,6 +8,7 @@ on:
 jobs:
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
+    secrets: inherit
 
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
