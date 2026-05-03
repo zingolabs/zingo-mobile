@@ -73,8 +73,6 @@ import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
-// @ts-ignore
-//import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 import { DrawerScreenProps } from '@react-navigation/drawer';
