@@ -20,7 +20,9 @@ jobs:
       - run: yarn
 
       - name: Audit dependencies
-        run: yarn audit --level critical
+        run: |
+          yarn audit --level critical || audit_code=$?
+          [ $((${audit_code:-0} & 16)) -eq 0 ]
 
       - run: yarn coverage
 
