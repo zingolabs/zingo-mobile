@@ -1,3 +1,5 @@
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
+
 export default {
   navigate: jest.fn(),
   goBack: jest.fn(),
@@ -20,4 +22,4 @@ export default {
   preload: jest.fn(),
   navigateDeprecated: jest.fn(),
   replaceParams: jest.fn(),
-} as any;
+} as unknown as NavigationProp<ParamListBase>;
