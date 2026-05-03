@@ -471,7 +471,14 @@ extension AppDelegate {
                 }
 
                 do {
-                  let data = syncStatusJson.data(using: .utf8)!
+                  guard let data = syncStatusJson.data(using: .utf8) else {
+                    NSLog("BGTask syncingProcessBackgroundTask - failed to encode syncStatusJson")
+                    if let task = self.bgTask {
+                      task.setTaskCompleted(success: false)
+                    }
+                    bgTask = nil
+                    return
+                  }
                   syncStatus = try JSONDecoder().decode(SyncStatus.self, from: data)
 
                   let percent =
