@@ -281,18 +281,18 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     filter,
   ]);
 
+  const handleScrollToTop = useCallback(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+    }
+  }, []);
+
   useEffect(() => {
     if (scrollToTop) {
       handleScrollToTop();
       setScrollToTop(false);
     }
-  }, [scrollToTop, setScrollToTop]);
-
-  const handleScrollToTop = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ y: 0, animated: true });
-    }
-  };
+  }, [scrollToTop, setScrollToTop, handleScrollToTop]);
 
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -314,15 +314,24 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     [isScrollingToTop],
   );
 
-  const setMessagesAddressModalShow = (c: ContactType) => {
-    navigation.navigate(RouteEnum.MessagesAddress, {
-      setScrollToBottom: setScrollToBottom,
-      scrollToBottom: scrollToBottom,
-      address: Utils.messagesAddress(c),
-      sendTransaction: sendTransaction,
-      setServerOption: setServerOption,
-    });
-  };
+  const setMessagesAddressModalShow = useCallback(
+    (c: ContactType) => {
+      navigation.navigate(RouteEnum.MessagesAddress, {
+        setScrollToBottom: setScrollToBottom,
+        scrollToBottom: scrollToBottom,
+        address: Utils.messagesAddress(c),
+        sendTransaction: sendTransaction,
+        setServerOption: setServerOption,
+      });
+    },
+    [
+      navigation,
+      scrollToBottom,
+      sendTransaction,
+      setServerOption,
+      setScrollToBottom,
+    ],
+  );
 
   const setMessagesAllModalShow = () => {
     navigation.navigate(RouteEnum.MessagesAll, {

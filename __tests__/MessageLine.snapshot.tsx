@@ -18,7 +18,10 @@ import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 
 const FIXED_TIME = 1704067200; // 2024-01-01 00:00:00 UTC (seconds)
-const fixedValueTransfers = mockValueTransfers.map(vt => ({ ...vt, time: FIXED_TIME }));
+const fixedValueTransfers = mockValueTransfers.map(vt => ({
+  ...vt,
+  time: FIXED_TIME,
+}));
 
 describe('MessageLine - snapshots', () => {
   const state = { ...defaultAppContextLoaded };
