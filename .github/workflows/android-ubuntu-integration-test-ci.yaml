@@ -188,6 +188,12 @@ jobs:
           echo "Disk space after cleanup:"
           df -h
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
       - name: Yarn install
         run: yarn
 
@@ -339,6 +345,12 @@ jobs:
 
           echo "Disk space after cleanup:"
           df -h
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
 
       - name: Yarn install
         run: yarn
