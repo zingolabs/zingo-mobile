@@ -1,5 +1,3 @@
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
-
 export default {
   navigate: jest.fn(),
   goBack: jest.fn(),
@@ -22,4 +20,5 @@ export default {
   preload: jest.fn(),
   navigateDeprecated: jest.fn(),
   replaceParams: jest.fn(),
-} as unknown as NavigationProp<ParamListBase>;
+  // as any: mock is shared across all screen types; no single NavigationProp type satisfies all
+} as any;
