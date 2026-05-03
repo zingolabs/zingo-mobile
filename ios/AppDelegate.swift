@@ -33,6 +33,27 @@ struct SyncStatus: Decodable {
     let percentage_total_outputs_scanned: Double?
 }
 
+private struct BackgroundTaskResult: Encodable {
+    let batches: String
+    let message: String
+    let date: String
+    let dateEnd: String
+    let error: String?
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(batches, forKey: .batches)
+        try container.encode(message, forKey: .message)
+        try container.encode(date, forKey: .date)
+        try container.encode(dateEnd, forKey: .dateEnd)
+        try container.encodeIfPresent(error, forKey: .error)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case batches, message, date, dateEnd, error
+    }
+}
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
@@ -207,7 +228,7 @@ extension AppDelegate {
             // save the background file
             let timeStamp = Date().timeIntervalSince1970
             let timeStampStr = String(format: "%.0f", timeStamp)
-            let jsonBackground = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStr)\"}"
+            let jsonBackground = buildBackgroundJSON(message: "Finished OK.", dateEnd: timeStampStr)
             do {
               try rpcmodule.saveBackgroundFile(jsonBackground)
               NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground)")
@@ -324,7 +345,7 @@ extension AppDelegate {
         // save the background file
         let timeStampStart = Date().timeIntervalSince1970
         self.timeStampStrStart = String(format: "%.0f", timeStampStart)
-        let jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"0\"}"
+        let jsonBackgroundStart = buildBackgroundJSON(message: "Starting OK.", dateEnd: "0")
         do {
           try rpcmodule.saveBackgroundFile(jsonBackgroundStart)
           NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart)")
@@ -338,7 +359,7 @@ extension AppDelegate {
           // save the background file
           let timeStampError = Date().timeIntervalSince1970
           let timeStampStrError = String(format: "%.0f", timeStampError)
-          let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"App in Foreground, Background task KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
+          let jsonBackgroundError = buildBackgroundJSON(message: "App in Foreground, Background task KO.", dateEnd: timeStampStrError)
           do {
             try rpcmodule.saveBackgroundFile(jsonBackgroundError)
             NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -362,9 +383,7 @@ extension AppDelegate {
           // save the background file
           let timeStampError = Date().timeIntervalSince1970
           let timeStampStrError = String(format: "%.0f", timeStampError)
-          let e = error.localizedDescription
-          let clean = e.replacingOccurrences(of: "\"", with: "")
-          let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Crypto provider default KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"Crypto provider default KO. \(clean)\"}"
+          let jsonBackgroundError = buildBackgroundJSON(message: "Crypto provider default KO.", dateEnd: timeStampStrError, error: "Crypto provider default KO. \(error.localizedDescription)")
           do {
             try rpcmodule.saveBackgroundFile(jsonBackgroundError)
             NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -401,9 +420,7 @@ extension AppDelegate {
               // save the background file
               let timeStampError = Date().timeIntervalSince1970
               let timeStampStrError = String(format: "%.0f", timeStampError)
-              let e = error.localizedDescription
-              let clean = e.replacingOccurrences(of: "\"", with: "")
-              let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"Run sync process KO. \(clean)\"}"
+              let jsonBackgroundError = buildBackgroundJSON(message: "Run sync process KO.", dateEnd: timeStampStrError, error: "Run sync process KO. \(error.localizedDescription)")
               do {
                 try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                 NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -433,7 +450,7 @@ extension AppDelegate {
                     // save the background file
                     let timeStampError = Date().timeIntervalSince1970
                     let timeStampStrError = String(format: "%.0f", timeStampError)
-                    let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"Status sync process KO. \(syncStatusJson)\"}"
+                    let jsonBackgroundError = buildBackgroundJSON(message: "Status sync process KO.", dateEnd: timeStampStrError, error: "Status sync process KO. \(syncStatusJson)")
                     do {
                       try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                       NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -453,9 +470,7 @@ extension AppDelegate {
                   // save the background file
                   let timeStampError = Date().timeIntervalSince1970
                   let timeStampStrError = String(format: "%.0f", timeStampError)
-                  let e = error.localizedDescription
-                  let clean = e.replacingOccurrences(of: "\"", with: "")
-                  let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"Status sync process KO. \(clean)\"}"
+                  let jsonBackgroundError = buildBackgroundJSON(message: "Status sync process KO.", dateEnd: timeStampStrError, error: "Status sync process KO. \(error.localizedDescription)")
                   do {
                     try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                     NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -497,9 +512,7 @@ extension AppDelegate {
                   // save the background file
                   let timeStampError = Date().timeIntervalSince1970
                   let timeStampStrError = String(format: "%.0f", timeStampError)
-                  let e = error.localizedDescription
-                  let clean = e.replacingOccurrences(of: "\"", with: "")
-                  let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync parsing process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"Status sync parsing process KO. \(clean)\"}"
+                  let jsonBackgroundError = buildBackgroundJSON(message: "Status sync parsing process KO.", dateEnd: timeStampStrError, error: "Status sync parsing process KO. \(error.localizedDescription)")
                   do {
                     try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                     NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -525,7 +538,7 @@ extension AppDelegate {
             // save the background file
             let timeStampError = Date().timeIntervalSince1970
             let timeStampStrError = String(format: "%.0f", timeStampError)
-            let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
+            let jsonBackgroundError = buildBackgroundJSON(message: "No active wallet KO.", dateEnd: timeStampStrError)
             do {
               try rpcmodule.saveBackgroundFile(jsonBackgroundError)
               NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -553,7 +566,7 @@ extension AppDelegate {
         // save the background file
         let timeStampEnd = Date().timeIntervalSince1970
         let timeStampStrEnd = String(format: "%.0f", timeStampEnd)
-        let jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrEnd)\"}"
+        let jsonBackgroundEnd = buildBackgroundJSON(message: "Finished OK.", dateEnd: timeStampStrEnd)
         do {
           try rpcmodule.saveBackgroundFile(jsonBackgroundEnd)
           NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundEnd)")
@@ -565,6 +578,21 @@ extension AppDelegate {
           task.setTaskCompleted(success: true)
         }
         bgTask = nil
+    }
+
+    private func buildBackgroundJSON(message: String, dateEnd: String, error: String? = nil) -> String {
+        let result = BackgroundTaskResult(
+            batches: "0",
+            message: message,
+            date: timeStampStrStart ?? "0",
+            dateEnd: dateEnd,
+            error: error
+        )
+        guard let data = try? JSONEncoder().encode(result),
+              let json = String(data: data, encoding: .utf8) else {
+            return "{\"message\": \"\(message)\"}"
+        }
+        return json
     }
 
     func loadWalletFile() {
