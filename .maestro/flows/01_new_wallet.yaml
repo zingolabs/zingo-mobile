@@ -1,0 +1,18 @@
+appId: org.ZingoLabs.Zingo
+---
+- launchApp:
+    clearState: true
+
+# Wait for start menu
+- assertVisible:
+    id: "loadingapp.createnewwallet"
+    timeout: 30000
+
+# Create new wallet
+- tapOn:
+    id: "loadingapp.createnewwallet"
+
+# Assert wallet is being set up (header or main screen appears)
+- assertVisible:
+    id: "header"
+    timeout: 60000
