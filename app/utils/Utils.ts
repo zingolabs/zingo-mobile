@@ -56,10 +56,10 @@ export default class Utils {
     let decimalPart = '';
 
     if (bigPart.indexOf(`${decimalSeparator}`) >= 0) {
-      decimalPart = bigPart.substr(bigPart.indexOf(`${decimalSeparator}`) + 1);
+      decimalPart = bigPart.slice(bigPart.indexOf(`${decimalSeparator}`) + 1);
       if (decimalPart.length > 4) {
-        smallPart = decimalPart.substr(4);
-        decimalPart = decimalPart.substr(
+        smallPart = decimalPart.slice(4);
+        decimalPart = decimalPart.slice(
           0,
           decimalPart.length - smallPart.length,
         );
@@ -93,10 +93,10 @@ export default class Utils {
     const chunkSize = Math.round(s.length / numChunks);
     const chunks = [];
     for (let i = 0; i < numChunks - 1; i++) {
-      chunks.push(s.substr(i * chunkSize, chunkSize));
+      chunks.push(s.slice(i * chunkSize, i * chunkSize + chunkSize));
     }
     // Last chunk might contain un-even length
-    chunks.push(s.substr((numChunks - 1) * chunkSize));
+    chunks.push(s.slice((numChunks - 1) * chunkSize));
 
     return chunks;
   }

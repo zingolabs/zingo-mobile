@@ -459,8 +459,12 @@ export default function LoadedApp(props: LoadedAppProps) {
               checkStr &&
               !checkStr.toLowerCase().startsWith(GlobalConst.error)
             ) {
-              const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
-              own = checkJSON.is_wallet_address;
+              try {
+                const checkJSON: RPCCheckAddressType = JSON.parse(checkStr);
+                own = checkJSON.is_wallet_address;
+              } catch {
+                own = false;
+              }
             } else {
               // error
               own = false;
@@ -508,8 +512,12 @@ export default function LoadedApp(props: LoadedAppProps) {
               checkStr &&
               !checkStr.toLowerCase().startsWith(GlobalConst.error)
             ) {
-              const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
-              own = checkJSON.is_wallet_address;
+              try {
+                const checkJSON: RPCCheckAddressType = JSON.parse(checkStr);
+                own = checkJSON.is_wallet_address;
+              } catch {
+                own = false;
+              }
             } else {
               // error
               own = false;

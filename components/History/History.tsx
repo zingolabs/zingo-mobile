@@ -142,20 +142,23 @@ const History: React.FunctionComponent<HistoryProps> = ({
     useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(
       null,
     );
-  const swipeablesRef = new Map<number, Swipeable>();
+  const swipeablesRef = useRef(new Map<number, Swipeable>());
 
-  const registerSwipeable = (key: number) => (ref: Swipeable) => {
-    swipeablesRef.set(key, ref);
-  };
+  const registerSwipeable = useCallback(
+    (key: number) => (ref: Swipeable) => {
+      swipeablesRef.current.set(key, ref);
+    },
+    [],
+  );
 
-  const closeAllSwipeables = (exceptKey?: number) => {
-    swipeablesRef.forEach((ref, k) => {
+  const closeAllSwipeables = useCallback((exceptKey?: number) => {
+    swipeablesRef.current.forEach((ref, k) => {
       if (k !== exceptKey) {
         // soporta ambas APIs según versión
         ref.close();
       }
     });
-  };
+  }, []);
 
   const layoutProvider = useMemo(
     () =>
@@ -399,21 +402,21 @@ const History: React.FunctionComponent<HistoryProps> = ({
     [isScrollingToTop],
   );
 
-  const setValueTransferDetailModalShow = (
-    index: number,
-    vt: ValueTransferType,
-  ) => {
-    navigation.navigate(RouteEnum.ValueTransferDetailStack, {
-      screen: RouteEnum.ValueTransferDetail,
-      params: {
-        index: index,
-        vt: vt,
-        valueTransfersSliced: valueTransfersSliced,
-        totalLength:
-          valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0,
-      },
-    });
-  };
+  const setValueTransferDetailModalShow = useCallback(
+    (index: number, vt: ValueTransferType) => {
+      navigation.navigate(RouteEnum.ValueTransferDetailStack, {
+        screen: RouteEnum.ValueTransferDetail,
+        params: {
+          index: index,
+          vt: vt,
+          valueTransfersSliced: valueTransfersSliced,
+          totalLength:
+            valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0,
+        },
+      });
+    },
+    [navigation, valueTransfersSliced, valueTransfersFiltered],
+  );
 
   /*
   const setMessagesAddressModalShow = (vt: ValueTransferType) => {

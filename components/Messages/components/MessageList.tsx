@@ -512,20 +512,20 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     });
   };
 
-  const setValueTransferDetailModalShow = async (
-    index: number,
-    vt: ValueTransferType,
-  ) => {
-    navigation.navigate(RouteEnum.ValueTransferDetailStack, {
-      screen: RouteEnum.ValueTransferDetail,
-      params: {
-        index: index,
-        vt: vt,
-        valueTransfersSliced: messagesSliced,
-        totalLength: messagesFiltered ? messagesFiltered.length : 0,
-      },
-    });
-  };
+  const setValueTransferDetailModalShow = useCallback(
+    async (index: number, vt: ValueTransferType) => {
+      navigation.navigate(RouteEnum.ValueTransferDetailStack, {
+        screen: RouteEnum.ValueTransferDetail,
+        params: {
+          index: index,
+          vt: vt,
+          valueTransfersSliced: messagesSliced,
+          totalLength: messagesFiltered ? messagesFiltered.length : 0,
+        },
+      });
+    },
+    [navigation, messagesSliced, messagesFiltered],
+  );
 
   //if (address) {
   //  console.log('render Messages', validMemo, 'memo local:', memo);

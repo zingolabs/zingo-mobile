@@ -14,6 +14,7 @@ import { ThemeType, AppStackParamList } from './app/types';
 import { ModeEnum, RouteEnum } from './app/AppState';
 
 import { BackHandler, LogBox, StatusBar } from 'react-native';
+import AppErrorBoundary from './components/ErrorBoundary/AppErrorBoundary';
 
 LogBox.ignoreLogs([
   '[Reanimated] Reduced motion setting is enabled on this device.',
@@ -145,29 +146,31 @@ const App: React.FunctionComponent = () => {
 
   //console.log('render App - 1');
   return (
-    <SafeAreaProvider>
-      <StatusBar backgroundColor={theme.colors.background} />
-      <NavigationContainer ref={navigationRef} theme={theme}>
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: theme.colors.background,
-          }}
-        >
-          <Stack.Navigator
-            initialRouteName={RouteEnum.LoadingApp}
-            screenOptions={{ headerShown: false, animation: 'none' }}
+    <AppErrorBoundary>
+      <SafeAreaProvider>
+        <StatusBar backgroundColor={theme.colors.background} />
+        <NavigationContainer ref={navigationRef} theme={theme}>
+          <SafeAreaView
+            style={{
+              flex: 1,
+              backgroundColor: theme.colors.background,
+            }}
           >
-            <Stack.Screen name={RouteEnum.LoadingApp}>
-              {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
-            </Stack.Screen>
-            <Stack.Screen name={RouteEnum.LoadedApp}>
-              {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
-            </Stack.Screen>
-          </Stack.Navigator>
-        </SafeAreaView>
-      </NavigationContainer>
-    </SafeAreaProvider>
+            <Stack.Navigator
+              initialRouteName={RouteEnum.LoadingApp}
+              screenOptions={{ headerShown: false, animation: 'none' }}
+            >
+              <Stack.Screen name={RouteEnum.LoadingApp}>
+                {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
+              </Stack.Screen>
+              <Stack.Screen name={RouteEnum.LoadedApp}>
+                {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
+              </Stack.Screen>
+            </Stack.Navigator>
+          </SafeAreaView>
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </AppErrorBoundary>
   );
 };
 
