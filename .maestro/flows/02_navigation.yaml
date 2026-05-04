@@ -1,0 +1,42 @@
+appId: org.ZingoLabs.Zingo
+---
+- launchApp:
+    clearState: true
+
+# Create wallet first to reach main app
+- assertVisible:
+    id: "loadingapp.createnewwallet"
+    timeout: 30000
+- tapOn:
+    id: "loadingapp.createnewwallet"
+- assertVisible:
+    id: "header"
+    timeout: 60000
+
+# Open drawer menu
+- tapOn:
+    id: "header.drawmenu"
+
+# Navigate to Settings
+- tapOn:
+    text: "Settings"
+
+# Assert Settings loaded
+- assertVisible:
+    id: "settings.scroll-view"
+    timeout: 10000
+
+# Go back
+- back
+
+# Open drawer again
+- tapOn:
+    id: "header.drawmenu"
+
+# Navigate to About
+- tapOn:
+    text: "About"
+
+- assertVisible:
+    text: "Zingo"
+    timeout: 10000

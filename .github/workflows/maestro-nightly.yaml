@@ -1,0 +1,44 @@
+name: Maestro Cloud E2E (Nightly)
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  create-cache-key:
+    uses: ./.github/workflows/create-cache-key.yaml
+
+  android-build:
+    uses: ./.github/workflows/android-build.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      arch: x86_64
+
+  maestro-cloud-android:
+    name: Maestro Cloud — Android
+    runs-on: ubuntu-24.04
+    needs: [create-cache-key, android-build]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-build-outputs-x86_64-${{ needs.create-cache-key.outputs.cache-key }}
+          path: android/app/build/outputs
+
+      - name: Find APK path
+        id: apk
+        run: |
+          APK=$(find android/app/build/outputs -name "*.apk" | grep -v androidTest | head -1)
+          echo "path=$APK" >> $GITHUB_OUTPUT
+
+      - name: Run Maestro Cloud
+        uses: mobile-dev-inc/action-maestro-cloud@v1
+        with:
+          api-key: ${{ secrets.MAESTRO_CLOUD_API_KEY }}
+          app-file: ${{ steps.apk.outputs.path }}
+          flows: .maestro/flows/
