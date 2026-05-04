@@ -9,36 +9,133 @@ jobs:
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
 
-  android-build:
-    uses: ./.github/workflows/android-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      arch: x86_64
-
   maestro-cloud-android:
     name: Maestro Cloud — Android
     runs-on: ubuntu-24.04
-    needs: [create-cache-key, android-build]
+    needs: create-cache-key
+    env:
+      ABI: x86_64
+      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Download APK artifact
-        uses: actions/download-artifact@v4
+      - name: Setup Java
+        uses: actions/setup-java@v5
         with:
-          name: android-build-outputs-x86_64-${{ needs.create-cache-key.outputs.cache-key }}
-          path: android/app/build/outputs
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Find APK path
-        id: apk
-        run: |
-          APK=$(find android/app/build/outputs -name "*.apk" | grep -v androidTest | head -1)
-          echo "path=$APK" >> $GITHUB_OUTPUT
+      - name: Gradle setup cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: wrapper
+          cache-read-only: true
+
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/src/main/jniLibs/${{ env.ABI }}
+          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Kotlin uniffi cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      - name: Yarn install
+        run: yarn
+
+      - name: Build APK
+        working-directory: android
+        run: ./gradlew assembleRelease -PsplitApk=true
 
       - name: Run Maestro Cloud
         uses: mobile-dev-inc/action-maestro-cloud@v1
         with:
           api-key: ${{ secrets.MAESTRO_CLOUD_API_KEY }}
-          app-file: ${{ steps.apk.outputs.path }}
+          app-file: android/app/build/outputs/apk/release/app-x86_64-release.apk
+          flows: .maestro/flows/
+
+  maestro-cloud-ios:
+    name: Maestro Cloud — iOS
+    runs-on: macos-15
+    needs: create-cache-key
+    env:
+      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
+
+    steps:
+      - name: Xcode 16.4
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: rust/lib/Generated
+          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Copy libs to ios folder
+        working-directory: rust/lib/Generated
+        run: cp ./*.* ../../../ios
+
+      - name: Install nvm with node 22.18.0
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          nvm install 22.18.0
+          nvm use 22.18.0
+
+      - name: Yarn install
+        run: yarn
+
+      - name: Pod install
+        uses: nick-fields/retry@v4
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 15
+          command: cd ios && pod install
+
+      - name: Build app
+        working-directory: ios
+        run: |
+          set -euxo pipefail
+          mkdir -p build/DerivedData
+          xcodebuild build \
+            -workspace Zingo.xcworkspace \
+            -scheme Zingo \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
+            -derivedDataPath "build/DerivedData" \
+            -quiet
+
+      - name: Zip app for Maestro Cloud
+        run: |
+          cd ios/build/DerivedData/Build/Products/Debug-iphonesimulator
+          zip -r Zingo.app.zip Zingo.app
+
+      - name: Run Maestro Cloud
+        uses: mobile-dev-inc/action-maestro-cloud@v1
+        with:
+          api-key: ${{ secrets.MAESTRO_CLOUD_API_KEY }}
+          app-file: ios/build/DerivedData/Build/Products/Debug-iphonesimulator/Zingo.app.zip
           flows: .maestro/flows/
