@@ -3,40 +3,32 @@ appId: org.ZingoLabs.Zingo
 - launchApp:
     clearState: true
 
-# Create wallet first to reach main app
-- assertVisible:
-    id: "loadingapp.createnewwallet"
-    timeout: 30000
-- tapOn:
-    id: "loadingapp.createnewwallet"
-- assertVisible:
-    id: "header"
+- extendedWaitUntil:
+    visible:
+      text: "My Receiving Address"
     timeout: 60000
 
-# Open drawer menu
+# Navigate to Send via bottom tab bar
 - tapOn:
-    id: "header.drawmenu"
-
-# Navigate to Settings
-- tapOn:
-    text: "Settings"
-
-# Assert Settings loaded
-- assertVisible:
-    id: "settings.scroll-view"
+    text: "SEND"
+- extendedWaitUntil:
+    visible:
+      id: "send.addressplaceholder"
     timeout: 10000
 
-# Go back
+# Go back to Receive
 - back
-
-# Open drawer again
-- tapOn:
-    id: "header.drawmenu"
-
-# Navigate to About
-- tapOn:
-    text: "About"
-
-- assertVisible:
-    text: "Zingo"
+- extendedWaitUntil:
+    visible:
+      text: "My Receiving Address"
     timeout: 10000
+
+# Navigate to Settings via gear icon in header
+- tapOn:
+    id: "header.settings"
+- extendedWaitUntil:
+    visible:
+      id: "settings.scroll-view"
+    timeout: 10000
+
+- back

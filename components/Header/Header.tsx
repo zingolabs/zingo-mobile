@@ -1071,7 +1071,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             <>
               <TouchableOpacity
                 style={{ marginRight: 5 }}
-                testID="header.drawmenu"
+                testID="header.settings"
                 onPress={async () => {
                   const resultBio = security.settingsScreen
                     ? await simpleBiometrics({ translate: translate })
