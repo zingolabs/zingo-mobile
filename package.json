@@ -52,7 +52,7 @@
     "react-native-context-menu-view": "^1.20.0",
     "react-native-device-info": "^14.1.1",
     "react-native-fs": "^2.20.0",
-    "react-native-gesture-handler": "2.31.1",
+    "react-native-gesture-handler": "2.31.2",
     "react-native-gifted-charts": "^1.4.64",
     "react-native-keychain": "^10.0.0",
     "react-native-linear-gradient": "^2.8.3",
