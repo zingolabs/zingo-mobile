@@ -129,14 +129,6 @@ jobs:
           retry_wait_seconds: 15
           command: cd ios && pod install
 
-      - name: Download Hermes dSYMs
-        run: |
-          RN_VERSION="0.81.4"
-          DSYM_DIR="ios/vendor/hermes-dsyms/RN-${RN_VERSION}/ios-arm64/release"
-          mkdir -p "${DSYM_DIR}"
-          curl -L "https://repo1.maven.org/maven2/com/facebook/react/react-native-artifacts/${RN_VERSION}/react-native-artifacts-${RN_VERSION}-hermes-framework-dSYM-release.tar.gz" \
-            | tar -xz -C "${DSYM_DIR}"
-
       - name: Build app
         working-directory: ios
         run: |

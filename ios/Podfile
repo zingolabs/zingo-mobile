@@ -45,5 +45,20 @@ target 'Zingo' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Download Hermes dSYMs if not present (needed for Release builds).
+    # Version is read from package.json so it stays in sync automatically.
+    require 'json'
+    ios_root   = Pod::Config.instance.installation_root.to_s
+    rn_version = JSON.parse(File.read(File.join(ios_root, '..', 'package.json'))).dig('dependencies', 'react-native').gsub(/[^0-9.]/, '')
+    dsym_base  = File.join(ios_root, "vendor/hermes-dsyms/RN-#{rn_version}/ios-arm64/release")
+    dsym_check = File.join(dsym_base, "react-native-artifacts-#{rn_version}-hermes-framework-dSYM-release/iphoneos/hermes.framework.dSYM")
+
+    unless File.exist?(dsym_check)
+      Pod::UI.puts "Downloading Hermes dSYMs for React Native #{rn_version}...".yellow
+      system("mkdir -p '#{dsym_base}'")
+      url = "https://repo1.maven.org/maven2/com/facebook/react/react-native-artifacts/#{rn_version}/react-native-artifacts-#{rn_version}-hermes-framework-dSYM-release.tar.gz"
+      system("curl -L '#{url}' | tar -xz -C '#{dsym_base}'")
+    end
   end
 end
