@@ -141,6 +141,7 @@ jobs:
             -configuration Release \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
             -derivedDataPath "build/DerivedData" \
+            DEBUG_INFORMATION_FORMAT=dwarf \
             -quiet
 
       - name: Zip app for Maestro Cloud
