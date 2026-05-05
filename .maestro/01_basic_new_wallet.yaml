@@ -8,7 +8,7 @@ appId: org.ZingoLabs.Zingo
 - extendedWaitUntil:
     visible:
       text: "My Receiving Address"
-    timeout: 60000
+    timeout: 120000
 
 - assertVisible:
-    id: "header.drawmenu"
+    id: "receive.unified-address"

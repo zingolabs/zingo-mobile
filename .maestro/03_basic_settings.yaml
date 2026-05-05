@@ -1,0 +1,27 @@
+appId: org.ZingoLabs.Zingo
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      text: "My Receiving Address"
+    timeout: 120000
+
+# Navigate to Settings via gear icon
+- tapOn:
+    id: "header.settings"
+- extendedWaitUntil:
+    visible:
+      id: "settings.scroll-view"
+    timeout: 10000
+
+# Verify key sections are present
+- assertVisible:
+    id: "settings.auto-server"
+- assertVisible:
+    id: "settings.securitytitle"
+- assertVisible:
+    id: "settings.button.save"
+
+- back

@@ -1,0 +1,31 @@
+appId: org.ZingoLabs.Zingo
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      text: "My Receiving Address"
+    timeout: 120000
+
+# Open drawer and verify basic-mode items are present
+- tapOn:
+    id: "header.drawmenu"
+- assertVisible:
+    id: "menu.about"
+- assertVisible:
+    id: "menu.addressbook"
+- assertVisible:
+    id: "menu.loadwalletfromseed"
+- assertVisible:
+    id: "menu.tipzingolabs"
+
+# Navigate to About and verify it loads
+- tapOn:
+    id: "menu.about"
+- extendedWaitUntil:
+    visible:
+      id: "about.scroll-view"
+    timeout: 10000
+
+- back

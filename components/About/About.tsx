@@ -48,6 +48,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
         }}
       />
       <ScrollView
+        testID="about.scroll-view"
         style={{ maxHeight: '90%' }}
         contentContainerStyle={{
           flexDirection: 'column',
