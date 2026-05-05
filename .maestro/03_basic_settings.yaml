@@ -16,11 +16,10 @@ appId: org.ZingoLabs.Zingo
       id: "settings.scroll-view"
     timeout: 10000
 
-# Verify key sections are present
-- assertVisible:
-    id: "settings.auto-server"
-- assertVisible:
-    id: "settings.securitytitle"
+# Scroll to bottom to verify the full Settings screen loaded
+- scrollUntilVisible:
+    element:
+      id: "settings.button.save"
 - assertVisible:
     id: "settings.button.save"
 

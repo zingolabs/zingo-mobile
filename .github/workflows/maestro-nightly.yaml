@@ -138,14 +138,14 @@ jobs:
             -workspace Zingo.xcworkspace \
             -scheme Zingo \
             -sdk iphonesimulator \
-            -configuration Debug \
+            -configuration Release \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
             -derivedDataPath "build/DerivedData" \
             -quiet
 
       - name: Zip app for Maestro Cloud
         run: |
-          cd ios/build/DerivedData/Build/Products/Debug-iphonesimulator
+          cd ios/build/DerivedData/Build/Products/Release-iphonesimulator
           zip -r Zingo.app.zip Zingo.app
 
       - name: Run Maestro Cloud
@@ -153,4 +153,4 @@ jobs:
         with:
           api-key: ${{ secrets.MAESTRO_CLOUD_API_KEY }}
           project-id: ${{ secrets.MAESTRO_CLOUD_PROJECT_ID }}
-          app-file: ios/build/DerivedData/Build/Products/Debug-iphonesimulator/Zingo.app.zip
+          app-file: ios/build/DerivedData/Build/Products/Release-iphonesimulator/Zingo.app.zip
