@@ -52,7 +52,7 @@ target 'Zingo' do
     ios_root   = Pod::Config.instance.installation_root.to_s
     rn_version = JSON.parse(File.read(File.join(ios_root, '..', 'package.json'))).dig('dependencies', 'react-native').gsub(/[^0-9.]/, '')
     dsym_base  = File.join(ios_root, "vendor/hermes-dsyms/RN-#{rn_version}/ios-arm64/release")
-    dsym_check = File.join(dsym_base, "react-native-artifacts-#{rn_version}-hermes-framework-dSYM-release/iphoneos/hermes.framework.dSYM")
+    dsym_check = File.join(dsym_base, "iphoneos/hermes.framework.dSYM")
 
     Pod::UI.puts "Hermes dSYM base: #{dsym_base}".cyan
     Pod::UI.puts "Hermes dSYM check: #{dsym_check}".cyan
