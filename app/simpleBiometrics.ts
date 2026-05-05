@@ -2,12 +2,17 @@ import { GlobalConst, TranslateType } from './AppState';
 
 import ReactNativeBiometrics from 'react-native-biometrics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DeviceInfo from 'react-native-device-info';
 
 type simpleBiometricsProps = {
   translate: (key: string) => TranslateType;
 };
 
 const simpleBiometrics = async (props: simpleBiometricsProps) => {
+  if (await DeviceInfo.isEmulator()) {
+    return true;
+  }
+
   const rnBiometrics = new ReactNativeBiometrics({
     allowDeviceCredentials: true,
   });
