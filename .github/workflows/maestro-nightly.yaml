@@ -129,6 +129,9 @@ jobs:
           retry_wait_seconds: 15
           command: cd ios && pod install
 
+      - name: Inspect Hermes dSYM tree
+        run: find ios/vendor/hermes-dsyms -maxdepth 6 2>/dev/null || echo "ios/vendor/hermes-dsyms not found"
+
       - name: Build app
         working-directory: ios
         run: |
