@@ -715,7 +715,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 "opacity": 1,
               }
             }
-            testID="header.drawmenu"
+            testID="header.settings"
           >
             <
               color="#ffffff"
@@ -2298,7 +2298,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 "opacity": 1,
               }
             }
-            testID="header.drawmenu"
+            testID="header.settings"
           >
             <
               color="#ffffff"

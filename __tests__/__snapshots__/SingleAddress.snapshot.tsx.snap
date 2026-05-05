@@ -489,6 +489,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               "paddingRight": 20,
             }
           }
+          testID="receive.unified-address"
         >
           <View
             style={
