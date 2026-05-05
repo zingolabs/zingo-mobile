@@ -5,7 +5,7 @@ appId: org.ZingoLabs.Zingo
 
 - extendedWaitUntil:
     visible:
-      text: "My Receiving Address"
+      id: "receive.title"
     timeout: 120000
 
 # Navigate to Settings via gear icon

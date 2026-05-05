@@ -274,6 +274,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               ? (translate('receive.title-basic-alone') as string)
               : (translate('receive.title-address') as string)
           }
+          testID="receive.title"
           screenName={screenName}
           toggleMenuDrawer={toggleMenuDrawer}
           noBalance={true}

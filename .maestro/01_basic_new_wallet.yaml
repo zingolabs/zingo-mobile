@@ -7,7 +7,7 @@ appId: org.ZingoLabs.Zingo
 # The app lands on the Receive screen.
 - extendedWaitUntil:
     visible:
-      text: "My Receiving Address"
+      id: "receive.title"
     timeout: 120000
 
 - assertVisible:

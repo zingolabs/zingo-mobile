@@ -5,7 +5,7 @@ appId: org.ZingoLabs.Zingo
 
 - extendedWaitUntil:
     visible:
-      text: "My Receiving Address"
+      id: "receive.title"
     timeout: 120000
 
 # Open drawer and navigate to Address Book
