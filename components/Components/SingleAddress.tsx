@@ -558,6 +558,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   address={address.address}
                   style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
                   onPress={() => show('EA')}
+                  testID={
+                    address.addressKind === AddressKindEnum.u
+                      ? 'receive.unified-address'
+                      : undefined
+                  }
                 />
               </View>
             )}

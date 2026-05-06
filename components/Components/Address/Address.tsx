@@ -10,6 +10,7 @@ type AddressProps = {
   endLength?: number;
   onPress?: () => void;
   style?: TextStyle;
+  testID?: string;
 };
 
 const Address: React.FunctionComponent<AddressProps> = ({
@@ -18,6 +19,7 @@ const Address: React.FunctionComponent<AddressProps> = ({
   endLength = 10,
   onPress,
   style,
+  testID,
 }) => {
   if (!address) {
     return null;
@@ -30,6 +32,7 @@ const Address: React.FunctionComponent<AddressProps> = ({
       type={ButtonTypeEnum.Ghost}
       onPress={onPress ? onPress : () => console.log('onPress')}
       title={shortAddress}
+      testID={testID}
       textStyle={{
         ...style,
         fontSize: 16,

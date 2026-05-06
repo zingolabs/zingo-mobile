@@ -202,6 +202,7 @@ exports[`Component About - test About - snapshot 1`] = `
         "maxHeight": "90%",
       }
     }
+    testID="about.scroll-view"
   >
     <View>
       <Text

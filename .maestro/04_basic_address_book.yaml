@@ -1,0 +1,25 @@
+appId: org.ZingoLabs.Zingo
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: "receive.title"
+    timeout: 120000
+
+# Open drawer and navigate to Address Book
+- tapOn:
+    id: "header.drawmenu"
+- tapOn:
+    id: "menu.addressbook"
+- extendedWaitUntil:
+    visible:
+      id: "addressbook.scroll-view"
+    timeout: 10000
+
+# Verify the add-new-contact button is present
+- assertVisible:
+    id: "addressbook.button.new"
+
+- back

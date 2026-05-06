@@ -9,12 +9,27 @@ jobs:
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
 
+  android-build:
+    uses: ./.github/workflows/android-build.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      arch: arm64-v8a
+
+  ios-build:
+    strategy:
+      fail-fast: false
+    uses: ./.github/workflows/ios-build.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+
   maestro-cloud-android:
     name: Maestro Cloud — Android
     runs-on: ubuntu-24.04
-    needs: create-cache-key
+    needs: [create-cache-key, android-build]
     env:
-      ABI: x86_64
+      ABI: arm64-v8a
       CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
 
     steps:
@@ -61,16 +76,16 @@ jobs:
         run: ./gradlew assembleRelease -PsplitApk=true
 
       - name: Run Maestro Cloud
-        uses: mobile-dev-inc/action-maestro-cloud@v2
+        uses: mobile-dev-inc/action-maestro-cloud@v2.0.2
         with:
           api-key: ${{ secrets.MAESTRO_CLOUD_API_KEY }}
-          app-file: android/app/build/outputs/apk/release/app-x86_64-release.apk
-          flows: .maestro/flows/
+          project-id: ${{ secrets.MAESTRO_CLOUD_PROJECT_ID }}
+          app-file: android/app/build/outputs/apk/release/app-arm64-v8a-release.apk
 
   maestro-cloud-ios:
     name: Maestro Cloud — iOS
     runs-on: macos-15
-    needs: create-cache-key
+    needs: [create-cache-key, ios-build]
     env:
       CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
 
@@ -114,6 +129,9 @@ jobs:
           retry_wait_seconds: 15
           command: cd ios && pod install
 
+      - name: Inspect Hermes dSYM tree
+        run: find ios/vendor/hermes-dsyms -maxdepth 6 2>/dev/null || echo "ios/vendor/hermes-dsyms not found"
+
       - name: Build app
         working-directory: ios
         run: |
@@ -123,19 +141,19 @@ jobs:
             -workspace Zingo.xcworkspace \
             -scheme Zingo \
             -sdk iphonesimulator \
-            -configuration Debug \
+            -configuration Release \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
             -derivedDataPath "build/DerivedData" \
             -quiet
 
       - name: Zip app for Maestro Cloud
         run: |
-          cd ios/build/DerivedData/Build/Products/Debug-iphonesimulator
+          cd ios/build/DerivedData/Build/Products/Release-iphonesimulator
           zip -r Zingo.app.zip Zingo.app
 
       - name: Run Maestro Cloud
-        uses: mobile-dev-inc/action-maestro-cloud@v2
+        uses: mobile-dev-inc/action-maestro-cloud@v2.0.2
         with:
           api-key: ${{ secrets.MAESTRO_CLOUD_API_KEY }}
-          app-file: ios/build/DerivedData/Build/Products/Debug-iphonesimulator/Zingo.app.zip
-          flows: .maestro/flows/
+          project-id: ${{ secrets.MAESTRO_CLOUD_PROJECT_ID }}
+          app-file: ios/build/DerivedData/Build/Products/Release-iphonesimulator/Zingo.app.zip

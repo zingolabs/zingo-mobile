@@ -717,7 +717,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               "opacity": 1,
             }
           }
-          testID="header.drawmenu"
+          testID="header.settings"
         >
           <
             color="#ffffff"
@@ -1345,7 +1345,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               "opacity": 1,
             }
           }
-          testID="header.drawmenu"
+          testID="header.settings"
         >
           <
             color="#ffffff"

@@ -632,7 +632,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             "opacity": 1,
           }
         }
-        testID="header.drawmenu"
+        testID="header.settings"
       >
         <
           color="#ffffff"

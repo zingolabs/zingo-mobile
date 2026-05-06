@@ -237,7 +237,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
             "opacity": 1,
           }
         }
-        testID="header.drawmenu"
+        testID="header.settings"
       >
         <
           color="#ffffff"
