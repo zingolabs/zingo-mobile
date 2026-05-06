@@ -152,7 +152,7 @@ jobs:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Download native rust
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
           path: rust/lib/Generated
