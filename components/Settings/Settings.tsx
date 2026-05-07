@@ -808,6 +808,41 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             justifyContent: 'flex-start',
           }}
         >
+          <View style={{ display: 'flex', margin: 10, marginTop: 15 }}>
+            <BoldText>
+              {translate('settings.nym-privacy-network') as string}
+            </BoldText>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => setNym(!nym)}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginHorizontal: 25,
+              marginVertical: 15,
+            }}
+          >
+            {nym ? (
+              <NymOn width={22} height={22} />
+            ) : (
+              <NymOff width={22} height={22} />
+            )}
+            <View style={{ flex: 1, marginLeft: 10 }}>
+              <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
+                {translate('settings.nym-network') as string}
+              </BoldText>
+              <FadeText>
+                {translate('settings.nym-enhanced-privacy') as string}
+              </FadeText>
+            </View>
+            {nym ? (
+              <SwitchOn width={40} height={19} />
+            ) : (
+              <SwitchOff width={40} height={19} />
+            )}
+          </TouchableOpacity>
+
           <View style={{ display: 'flex', margin: 10 }}>
             <BoldText>{translate('settings.mode-title') as string}</BoldText>
           </View>
@@ -1369,7 +1404,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <TouchableOpacity
                   onLongPress={() => setShowDeveloperOptions(true)}
                 >
-                  <BoldText>
+                  <BoldText style={{ textDecorationLine: 'underline' }}>
                     {
                       translate(
                         'settings.recoverywalletinfoondevice-title',
@@ -1408,41 +1443,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   </FadeText>
                 </View>
               )}
-
-              <View style={{ display: 'flex', margin: 10, marginTop: 15 }}>
-                <BoldText>
-                  {translate('settings.nym-privacy-network') as string}
-                </BoldText>
-              </View>
-
-              <TouchableOpacity
-                onPress={() => setNym(!nym)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginHorizontal: 25,
-                  marginVertical: 15,
-                }}
-              >
-                {nym ? (
-                  <NymOn width={22} height={22} />
-                ) : (
-                  <NymOff width={22} height={22} />
-                )}
-                <View style={{ flex: 1, marginLeft: 10 }}>
-                  <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
-                    {translate('settings.nym-network') as string}
-                  </BoldText>
-                  <FadeText>
-                    {translate('settings.nym-enhanced-privacy') as string}
-                  </FadeText>
-                </View>
-                {nym ? (
-                  <SwitchOn width={40} height={19} />
-                ) : (
-                  <SwitchOff width={40} height={19} />
-                )}
-              </TouchableOpacity>
 
               {showDeveloperOptions && (
                 <View style={{ width: '100%', marginBottom: 20 }}>
