@@ -81,6 +81,8 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
+  nym: false,
+  setNymOption: async () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

@@ -235,6 +235,9 @@ export default class SettingsFileImpl {
         // by default medium
         settings.blockExplorer = BlockExplorerEnum.Zcashexplorer;
       }
+      if (!settings.hasOwnProperty(SettingsNameEnum.nym)) {
+        settings.nym = false;
+      }
       return settings;
     } catch (err) {
       // The File doesn't exist, so return nothing
