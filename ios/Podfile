@@ -15,6 +15,8 @@ if linkage != nil
 end
 
 target 'Zingo' do
+  project 'Zingo.xcodeproj'
+
   # Pods for Zingo
   config = use_native_modules!
 

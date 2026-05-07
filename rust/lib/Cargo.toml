@@ -11,10 +11,9 @@ pepper-sync = { workspace = true }
 zcash_keys = { workspace = true }
 zcash_address = { workspace = true }
 zcash_protocol = { workspace = true }
-zcash_client_backend = { workspace = true }
 
 rusqlite = { version = "0.37.0", features = ["bundled"] }
-zingo_common_components = { workspace = true, features = ["for_test"] }
+zingo_common_components = { workspace = true }
 
 http = { workspace = true }
 json = { workspace = true }
@@ -28,9 +27,11 @@ tokio = { workspace = true }
 rustls = { workspace = true }
 serde_json = { workspace = true }
 bip0039 = { workspace = true }
+ed25519-zebra = { workspace = true }
 zip32 = { workspace = true }
 thiserror = { workspace = true }
 once_cell = { workspace = true }
+zingo-netutils = { workspace = true }
 
 [build-dependencies]
 uniffi_build = { workspace = true, features = ["builtin-bindgen"] }

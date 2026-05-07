@@ -255,7 +255,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             uniffi.zingo.initLogging()
 
             // Create a seed
-            val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt(), getDocumentDirectory())
             // Log.i("MAIN-Seed", resp)
 
             if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -275,7 +275,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         try {
             uniffi.zingo.initLogging()
 
-            val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt(), getDocumentDirectory())
             // Log.i("MAIN", resp)
 
             if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -295,7 +295,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         try {
             uniffi.zingo.initLogging()
 
-            val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt(), getDocumentDirectory())
             // Log.i("MAIN", resp)
 
             if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -327,7 +327,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             val fileb64 = readFileAsB64(WalletFileName.value)
             Log.i("MAIN", "file size: ${fileb64.length} chars (Base64)")
 
-            val resp = uniffi.zingo.initFromB64(fileb64, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromB64(fileb64, serveruri, chainhint, performancelevel, minconfirmations.toUInt(), getDocumentDirectory())
 
             return resp
         } catch (e: Exception) {
