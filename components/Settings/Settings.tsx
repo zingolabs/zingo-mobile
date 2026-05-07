@@ -1404,7 +1404,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <TouchableOpacity
                   onLongPress={() => setShowDeveloperOptions(true)}
                 >
-                  <BoldText style={{ textDecorationLine: 'underline' }}>
+                  <BoldText>
                     {
                       translate(
                         'settings.recoverywalletinfoondevice-title',
