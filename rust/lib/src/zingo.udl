@@ -15,8 +15,7 @@ namespace zingo {
       string serveruri,
       string chainhint,
       string performancelevel,
-      u32 minconfirmations,
-      string walletdir
+      u32 minconfirmations
   );
 
   [Throws=ZingolibError]
@@ -26,8 +25,7 @@ namespace zingo {
       string serveruri,
       string chainhint,
       string performancelevel,
-      u32 minconfirmations,
-      string walletdir
+      u32 minconfirmations
   );
 
   [Throws=ZingolibError]
@@ -37,8 +35,7 @@ namespace zingo {
       string serveruri,
       string chainhint,
       string performancelevel,
-      u32 minconfirmations,
-      string walletdir
+      u32 minconfirmations
   );
 
   [Throws=ZingolibError]
@@ -47,8 +44,7 @@ namespace zingo {
       string serveruri,
       string chainhint,
       string performancelevel,
-      u32 minconfirmations,
-      string walletdir
+      u32 minconfirmations
   );
 
   [Throws=ZingolibError]

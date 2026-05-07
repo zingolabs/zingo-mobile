@@ -262,13 +262,6 @@ fn parse_config_params(
     ))
 }
 
-fn wallet_dir_path(wallet_dir: &str) -> std::path::PathBuf {
-    if wallet_dir.is_empty() {
-        std::env::temp_dir()
-    } else {
-        std::path::PathBuf::from(wallet_dir)
-    }
-}
 
 pub fn init_logging() -> Result<String, ZingolibError> {
     with_panic_guard(|| {
@@ -290,7 +283,6 @@ pub fn init_new(
     chain_hint: String,
     performance_level: String,
     min_confirmations: u32,
-    wallet_dir: String,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
@@ -321,7 +313,6 @@ pub fn init_new(
         let config = ClientConfig::builder()
             .set_indexer_uri(lightwalletd_uri)
             .set_chain_type(chaintype)
-            .set_wallet_dir(wallet_dir_path(&wallet_dir))
             .set_wallet_config(WalletConfig::NewSeed {
                 no_of_accounts: NonZeroU32::try_from(1).expect("hard-coded integer"),
                 chain_height,
@@ -329,6 +320,10 @@ pub fn init_new(
             })
             .build();
         let lightclient = match LightClient::new(config, true) {
+            Ok(l) => l,
+            Err(e) => return Ok(format!("Error: {e}")),
+        };
+        let lightclient = match RT.block_on(async { lightclient.with_nym().await }) {
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
@@ -346,7 +341,6 @@ pub fn init_from_seed(
     chain_hint: String,
     performance_level: String,
     min_confirmations: u32,
-    wallet_dir: String,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
@@ -362,7 +356,6 @@ pub fn init_from_seed(
         let config = ClientConfig::builder()
             .set_indexer_uri(lightwalletd_uri)
             .set_chain_type(chaintype)
-            .set_wallet_dir(wallet_dir_path(&wallet_dir))
             .set_wallet_config(WalletConfig::MnemonicPhrase {
                 mnemonic_phrase: seed,
                 no_of_accounts: NonZeroU32::try_from(1).expect("hard-coded integer"),
@@ -371,6 +364,10 @@ pub fn init_from_seed(
             })
             .build();
         let lightclient = match LightClient::new(config, true) {
+            Ok(l) => l,
+            Err(e) => return Ok(format!("Error: {e}")),
+        };
+        let lightclient = match RT.block_on(async { lightclient.with_nym().await }) {
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
@@ -387,7 +384,6 @@ pub fn init_from_ufvk(
     chain_hint: String,
     performance_level: String,
     min_confirmations: u32,
-    wallet_dir: String,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
@@ -403,7 +399,6 @@ pub fn init_from_ufvk(
         let config = ClientConfig::builder()
             .set_indexer_uri(lightwalletd_uri)
             .set_chain_type(chaintype)
-            .set_wallet_dir(wallet_dir_path(&wallet_dir))
             .set_wallet_config(WalletConfig::Ufvk {
                 ufvk,
                 birthday,
@@ -411,6 +406,10 @@ pub fn init_from_ufvk(
             })
             .build();
         let lightclient = match LightClient::new(config, true) {
+            Ok(l) => l,
+            Err(e) => return Ok(format!("Error: {e}")),
+        };
+        let lightclient = match RT.block_on(async { lightclient.with_nym().await }) {
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
@@ -426,7 +425,6 @@ pub fn init_from_b64(
     chain_hint: String,
     performance_level: String,
     min_confirmations: u32,
-    wallet_dir: String,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
@@ -451,7 +449,8 @@ pub fn init_from_b64(
             }
         };
 
-        let dir = wallet_dir_path(&wallet_dir);
+        // TODO: replace with global wallet dir
+        let dir = std::env::temp_dir();
         let wallet_file = dir.join("zingo-mobile-wallet.dat");
         if let Err(e) = std::fs::write(&wallet_file, &decoded_bytes) {
             return Ok(format!("Error: writing wallet file: {e}"));
@@ -465,6 +464,10 @@ pub fn init_from_b64(
             .set_wallet_config(WalletConfig::Read)
             .build();
         let lightclient = match LightClient::new(config, false) {
+            Ok(l) => l,
+            Err(e) => return Ok(format!("Error: {e}")),
+        };
+        let lightclient = match RT.block_on(async { lightclient.with_nym().await }) {
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
