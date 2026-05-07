@@ -47,11 +47,11 @@ use zingolib::data::receivers::Receivers;
 use zingolib::data::receivers::transaction_request_from_receivers;
 use zingolib::lightclient::LightClient;
 use zingolib::utils::{conversion::address_from_str, conversion::txid_from_hex_encoded_str};
+use zingolib::wallet::WalletSettings;
 use zingolib::wallet::keys::{
     WalletAddressRef,
     unified::{ReceiverSelection, UnifiedKeyStore},
 };
-use zingolib::wallet::WalletSettings;
 
 use zingo_common_components::protocol::ActivationHeights;
 
@@ -234,8 +234,8 @@ fn parse_config_params(
     performance_level: String,
     min_confirmations: u32,
 ) -> Result<(http::Uri, ChainType, WalletSettings), String> {
-    let lightwalletd_uri = construct_lightwalletd_uri(Some(uri))
-        .map_err(|e| format!("Error: invalid URI: {e}"))?;
+    let lightwalletd_uri =
+        construct_lightwalletd_uri(Some(uri)).map_err(|e| format!("Error: invalid URI: {e}"))?;
     let chaintype = match chain_hint.as_str() {
         "main" => ChainType::Mainnet,
         "test" => ChainType::Testnet,
@@ -262,7 +262,6 @@ fn parse_config_params(
     ))
 }
 
-
 pub fn init_logging() -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         // this is only for Android
@@ -286,15 +285,12 @@ pub fn init_new(
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        let (lightwalletd_uri, chaintype, wallet_settings) = match parse_config_params(
-            server_uri,
-            chain_hint,
-            performance_level,
-            min_confirmations,
-        ) {
-            Ok(c) => c,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
+        let (lightwalletd_uri, chaintype, wallet_settings) =
+            match parse_config_params(server_uri, chain_hint, performance_level, min_confirmations)
+            {
+                Ok(c) => c,
+                Err(e) => return Ok(format!("Error: {e}")),
+            };
         let chain_height = match RT.block_on(async {
             let _ = rustls::crypto::ring::default_provider().install_default();
             let indexer = match zingo_netutils::GrpcIndexer::new(lightwalletd_uri.clone()) {
@@ -344,15 +340,12 @@ pub fn init_from_seed(
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        let (lightwalletd_uri, chaintype, wallet_settings) = match parse_config_params(
-            server_uri,
-            chain_hint,
-            performance_level,
-            min_confirmations,
-        ) {
-            Ok(c) => c,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
+        let (lightwalletd_uri, chaintype, wallet_settings) =
+            match parse_config_params(server_uri, chain_hint, performance_level, min_confirmations)
+            {
+                Ok(c) => c,
+                Err(e) => return Ok(format!("Error: {e}")),
+            };
         let config = ClientConfig::builder()
             .set_indexer_uri(lightwalletd_uri)
             .set_chain_type(chaintype)
@@ -387,15 +380,12 @@ pub fn init_from_ufvk(
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        let (lightwalletd_uri, chaintype, wallet_settings) = match parse_config_params(
-            server_uri,
-            chain_hint,
-            performance_level,
-            min_confirmations,
-        ) {
-            Ok(c) => c,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
+        let (lightwalletd_uri, chaintype, wallet_settings) =
+            match parse_config_params(server_uri, chain_hint, performance_level, min_confirmations)
+            {
+                Ok(c) => c,
+                Err(e) => return Ok(format!("Error: {e}")),
+            };
         let config = ClientConfig::builder()
             .set_indexer_uri(lightwalletd_uri)
             .set_chain_type(chaintype)
@@ -428,15 +418,12 @@ pub fn init_from_b64(
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        let (lightwalletd_uri, chaintype, _wallet_settings) = match parse_config_params(
-            server_uri,
-            chain_hint,
-            performance_level,
-            min_confirmations,
-        ) {
-            Ok(c) => c,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
+        let (lightwalletd_uri, chaintype, _wallet_settings) =
+            match parse_config_params(server_uri, chain_hint, performance_level, min_confirmations)
+            {
+                Ok(c) => c,
+                Err(e) => return Ok(format!("Error: {e}")),
+            };
         let decoded_bytes = match STANDARD.decode(&base64_data) {
             Ok(b) => b,
             Err(e) => {
@@ -449,24 +436,18 @@ pub fn init_from_b64(
             }
         };
 
-        // TODO: replace with global wallet dir
-        let dir = std::env::temp_dir();
-        let wallet_file = dir.join("zingo-mobile-wallet.dat");
-        if let Err(e) = std::fs::write(&wallet_file, &decoded_bytes) {
-            return Ok(format!("Error: writing wallet file: {e}"));
-        }
-
+        // wallet_dir is required by ClientConfig::build() on mobile (panics if None),
+        // but from_bytes does not read from disk — the path is only stored for future saves.
+        // TODO: replace temp_dir() with the real app documents directory once a global is in place.
         let config = ClientConfig::builder()
             .set_indexer_uri(lightwalletd_uri)
             .set_chain_type(chaintype)
-            .set_wallet_dir(dir)
-            .set_wallet_name("zingo-mobile-wallet.dat".to_string())
-            .set_wallet_config(WalletConfig::Read)
             .build();
-        let lightclient = match LightClient::new(config, false) {
+        let lightclient = match LightClient::from_bytes(decoded_bytes, config) {
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
+
         let lightclient = match RT.block_on(async { lightclient.with_nym().await }) {
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),

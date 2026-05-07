@@ -7238,7 +7238,7 @@ dependencies = [
 [[package]]
 name = "pepper-sync"
 version = "0.3.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_wallet_poc_2_2#3c0066a907175f74587999e1bf9b5c4c77c9e92a"
+source = "git+https://github.com/zingolabs/zingolib?branch=chore%2Fbytes-lightclients#3412db7f7271fe547584c0f9a66077889f3834d2"
 dependencies = [
  "bip32 0.6.0-pre.1",
  "byteorder",
@@ -13849,7 +13849,7 @@ dependencies = [
 [[package]]
 name = "zingo-memo"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_wallet_poc_2_2#3c0066a907175f74587999e1bf9b5c4c77c9e92a"
+source = "git+https://github.com/zingolabs/zingolib?branch=chore%2Fbytes-lightclients#3412db7f7271fe547584c0f9a66077889f3834d2"
 dependencies = [
  "zcash_address",
  "zcash_encoding",
@@ -13882,7 +13882,7 @@ dependencies = [
 [[package]]
 name = "zingo-price"
 version = "0.0.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_wallet_poc_2_2#3c0066a907175f74587999e1bf9b5c4c77c9e92a"
+source = "git+https://github.com/zingolabs/zingolib?branch=chore%2Fbytes-lightclients#3412db7f7271fe547584c0f9a66077889f3834d2"
 dependencies = [
  "byteorder",
  "reqwest 0.12.28",
@@ -13897,7 +13897,7 @@ dependencies = [
 [[package]]
 name = "zingo-status"
 version = "0.2.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_wallet_poc_2_2#3c0066a907175f74587999e1bf9b5c4c77c9e92a"
+source = "git+https://github.com/zingolabs/zingolib?branch=chore%2Fbytes-lightclients#3412db7f7271fe547584c0f9a66077889f3834d2"
 dependencies = [
  "byteorder",
  "zcash_protocol",
@@ -13920,7 +13920,7 @@ dependencies = [
 [[package]]
 name = "zingolib"
 version = "3.0.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_wallet_poc_2_2#3c0066a907175f74587999e1bf9b5c4c77c9e92a"
+source = "git+https://github.com/zingolabs/zingolib?branch=chore%2Fbytes-lightclients#3412db7f7271fe547584c0f9a66077889f3834d2"
 dependencies = [
  "append-only-vec",
  "bech32",
@@ -13977,7 +13977,7 @@ dependencies = [
 [[package]]
 name = "zingolib_testutils"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_wallet_poc_2_2#3c0066a907175f74587999e1bf9b5c4c77c9e92a"
+source = "git+https://github.com/zingolabs/zingolib?branch=chore%2Fbytes-lightclients#3412db7f7271fe547584c0f9a66077889f3834d2"
 dependencies = [
  "bip0039 0.14.0",
  "http 1.4.0",
