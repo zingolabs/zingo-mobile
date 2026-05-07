@@ -29,7 +29,6 @@ export default class SettingsFileClass {
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
-  nym: boolean;
 
   constructor(
     server: ServerType,
@@ -49,7 +48,6 @@ export default class SettingsFileClass {
     recoveryWalletInfoOnDevice: boolean,
     performanceLevel: RPCPerformanceLevelEnum,
     blockExplorer: BlockExplorerEnum,
-    nym: boolean,
   ) {
     this.server = server;
     this.currency = currency;
@@ -68,6 +66,5 @@ export default class SettingsFileClass {
     this.recoveryWalletInfoOnDevice = recoveryWalletInfoOnDevice;
     this.performanceLevel = performanceLevel;
     this.blockExplorer = blockExplorer;
-    this.nym = nym;
   }
 }

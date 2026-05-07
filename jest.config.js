@@ -6,11 +6,6 @@ module.exports = {
   modulePathIgnorePatterns: ['e2e'],
   transform: {
     '\\.[jt]sx?$': 'babel-jest',
-    '^.+\\.(bmp|gif|jpg|jpeg|mp4|png|psd|webp)$':
-      '<rootDir>/node_modules/react-native/jest/assetFileTransformer.js',
-  },
-  moduleNameMapper: {
-    '\\.svg$': '<rootDir>/__mocks__/svgMock.js',
   },
   setupFiles: ['./node_modules/react-native-gesture-handler/jestSetup.js'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],

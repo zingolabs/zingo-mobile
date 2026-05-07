@@ -437,10 +437,7 @@
     "value-language-ru": "Ruso",
     "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
     "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!",
-    "value-language-tr": "Turco",
-    "nym-privacy-network": "Red de Privacidad",
-    "nym-network": "Red NYM",
-    "nym-enhanced-privacy": "Privacidad mejorada"
+    "value-language-tr": "Turco"
   },
   "info": {
     "version": "Versión",
@@ -575,10 +572,7 @@
     "lose-address-title": "SELECCIONAR UNA NUEVA DIRECCIÓN",
     "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?",
     "confirm-donation": "Donación",
-    "donation-minimum-message": "La cantidad mínima para donaciones es un Zenny (0,01 ZEC), inténtalo de nuevo y gracias.",
-    "nym-processing-title": "Procesando vía NYM",
-    "nym-enhanced": "NYM Mejorado",
-    "nym-warning": "Esta transacción será enrutada a través del mixnet de NYM para mayor privacidad. Puede tardar un poco más que las transacciones estándar."
+    "donation-minimum-message": "La cantidad mínima para donaciones es un Zenny (0,01 ZEC), inténtalo de nuevo y gracias."
   },
   "receive": {
     "u-title": "Blindadas",

@@ -125,7 +125,6 @@ export type ConfirmNavigationState = {
     includeUAMemo: boolean,
   ) => Promise<void>;
   sendPageState: SendPageStateClass;
-  nym: boolean;
 };
 
 export type MessagesAddressNavigationState = {

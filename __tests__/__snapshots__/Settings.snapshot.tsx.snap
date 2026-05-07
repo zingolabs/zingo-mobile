@@ -2919,53 +2919,18 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             }
           }
         >
-          <View
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": undefined,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={false}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
+          <Text
             style={
               {
-                "opacity": 1,
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "bold",
+                "opacity": 0.87,
               }
             }
           >
-            <Text
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "bold",
-                  "opacity": 0.87,
-                }
-              }
-            >
-              text translated
-            </Text>
-          </View>
+            text translated
+          </Text>
         </View>
         <View
           style={
@@ -3184,100 +3149,59 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             {
               "display": "flex",
               "margin": 10,
-              "marginTop": 15,
             }
           }
         >
-          <Text
-            style={
+          <View
+            accessibilityState={
               {
-                "color": "#c3c3c3",
-                "fontSize": 18,
-                "fontWeight": "bold",
-                "opacity": 0.87,
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
               }
             }
-          >
-            text translated
-          </Text>
-        </View>
-        <View
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
             }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "marginHorizontal": 25,
-              "marginVertical": 15,
-              "opacity": 1,
-            }
-          }
-        >
-          <View
-            height={22}
-            width={22}
-          />
-          <View
+            accessible={true}
+            collapsable={false}
+            focusable={false}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "flex": 1,
-                "marginLeft": 10,
+                "opacity": 1,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "bold",
-                  "opacity": 0.87,
-                }
-              }
-            >
-              text translated
-            </Text>
-            <Text
-              style={
-                {
-                  "color": "#c3c3c3",
+                  "borderColor": "red",
+                  "borderWidth": 1,
+                  "color": "#18bd18",
+                  "marginVertical": 10,
                   "opacity": 0.65,
+                  "padding": 5,
+                  "textAlign": "center",
                 }
               }
             >
               text translated
             </Text>
           </View>
-          <View
-            height={19}
-            width={40}
-          />
         </View>
       </View>
     </RCTScrollView>

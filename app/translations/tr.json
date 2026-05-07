@@ -437,10 +437,7 @@
     "value-language-ru": "Rusça",
     "walletkeyssaved": "Son Cüzdan Kurtarma Bilgisi cihazda güvenli bir şekilde saklandı.",
     "walletkeyswarning": "Bu, kurtarma ifadesi'inizi saklamak için denetlenmemiş kodun güvenliğine bağlı olan deneysel bir özelliktir. Lütfen önemli miktarda fon içeren seed'lerle kullanmayın!",
-    "value-language-tr": "Türkçe",
-    "nym-privacy-network": "Gizlilik Ağı",
-    "nym-network": "NYM Ağı",
-    "nym-enhanced-privacy": "Gelişmiş gizlilik"
+    "value-language-tr": "Türkçe"
   },
   "info": {
     "version": "Versiyon",
@@ -575,10 +572,7 @@
     "lose-address-title": "YENİ BİR ADRES SEÇ",
     "lose-address-alert": "Adres alanında zaten geçerli bir adresiniz var. Onu değiştirmek istiyor musunuz?",
     "confirm-donation": "Bağış",
-    "donation-minimum-message": "Bağışlar için minimum tutar bir Zenny'dir (0.01 ZEC). Lütfen tekrar deneyin ve teşekkürler.",
-    "nym-processing-title": "NYM üzerinden işleniyor",
-    "nym-enhanced": "NYM Gelişmiş",
-    "nym-warning": "Bu işlem, gelişmiş gizlilik için NYM mixnet'i üzerinden yönlendirilecektir. Standart işlemlerden biraz daha uzun sürebilir."
+    "donation-minimum-message": "Bağışlar için minimum tutar bir Zenny'dir (0.01 ZEC). Lütfen tekrar deneyin ve teşekkürler."
   },
   "receive": {
     "u-title": "Korumalı",

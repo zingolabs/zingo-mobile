@@ -4,5 +4,4 @@ export enum ButtonTypeEnum {
   Tertiary = 'Tertiary',
   Ghost = 'Ghost',
   Warning = 'Warning',
-  Nym = 'Nym',
 }

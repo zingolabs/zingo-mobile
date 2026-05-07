@@ -73,7 +73,6 @@ describe('Component Settings - test', () => {
           setRecoveryWalletInfoOnDeviceOption={onSetOption}
           setPerformanceLevelOption={onSetOption}
           setBlockExplorerOption={onSetOption}
-          setNymOption={onSetOption}
           toggleMenuDrawer={toggle}
         />
       </ContextAppLoadedProvider>,

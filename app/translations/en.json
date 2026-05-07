@@ -437,10 +437,7 @@
     "value-language-ru": "Russian",
     "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
     "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
-    "value-language-tr": "Turkish",
-    "nym-privacy-network": "Privacy Network",
-    "nym-network": "NYM Network",
-    "nym-enhanced-privacy": "Enhanced privacy"
+    "value-language-tr": "Turkish"
   },
   "info": {
     "version": "Version",
@@ -575,10 +572,7 @@
     "lose-address-title": "SELECT A NEW ADDRESS",
     "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
     "confirm-donation": "Donation",
-    "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks.",
-    "nym-processing-title": "Processing via NYM",
-    "nym-enhanced": "NYM Enhanced",
-    "nym-warning": "This transaction will be routed through the NYM mixnet for enhanced privacy. This may take slightly longer than standard transactions."
+    "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks."
   },
   "receive": {
     "u-title": "Shielded",

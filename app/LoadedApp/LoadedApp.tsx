@@ -202,7 +202,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
     BlockExplorerEnum.Zcashexplorer,
   );
-  const [nym, setNym] = useState<boolean>(false);
   const [zenniesDonationAddress, setZenniesDonationAddress] =
     useState<string>('');
   const file = useMemo(
@@ -411,11 +410,6 @@ export default function LoadedApp(props: LoadedAppProps) {
           blockExplorer,
         );
       }
-      if (settings.nym === true || settings.nym === false) {
-        setNym(settings.nym);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, false);
-      }
 
       // reading background task info
       const backgroundSyncInfoJson = await BackgroundFileImpl.readBackground();
@@ -593,7 +587,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         firstLaunchingMessage={firstLaunchingMessage}
         performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
-        nym={nym}
       />
     );
   }
@@ -650,7 +643,6 @@ type LoadedAppClassProps = {
   firstLaunchingMessage: LaunchingModeEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
-  nym: boolean;
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
@@ -723,7 +715,6 @@ export class LoadedAppClass extends Component<
       zenniesDonationAddress: props.zenniesDonationAddress,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
-      setNymOption: this.setNymOption,
 
       // context settings
       server: props.server,
@@ -739,7 +730,6 @@ export class LoadedAppClass extends Component<
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
-      nym: props.nym,
 
       // state
       navigationHome: null,
@@ -1805,13 +1795,6 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  setNymOption = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value);
-    this.setState({
-      nym: value,
-    });
-  };
-
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
@@ -2114,7 +2097,6 @@ export class LoadedAppClass extends Component<
       zenniesDonationAddress: this.state.zenniesDonationAddress,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
-      setNymOption: this.setNymOption,
 
       // context settings
       server: this.state.server,
@@ -2130,7 +2112,6 @@ export class LoadedAppClass extends Component<
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
-      nym: this.state.nym,
     };
 
     const fnTabBarIcon = (
@@ -2410,7 +2391,6 @@ export class LoadedAppClass extends Component<
                     }
                     setPerformanceLevelOption={this.setPerformanceLevelOption}
                     setBlockExplorerOption={this.setBlockExplorerOption}
-                    setNymOption={this.setNymOption}
                     toggleMenuDrawer={
                       () => props.navigation.toggleDrawer() /* header */
                     }
