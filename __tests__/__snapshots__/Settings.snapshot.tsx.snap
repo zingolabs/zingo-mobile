@@ -44,6 +44,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "display": "flex",
               "flexDirection": "row",
               "flexWrap": "wrap",
+              "gap": 8,
               "justifyContent": "center",
               "marginHorizontal": 5,
               "marginTop": 12,

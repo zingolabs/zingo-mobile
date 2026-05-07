@@ -4,7 +4,6 @@ import { View, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
 
 import FadeText from '../../Components/FadeText';
-import BoldText from '../../Components/BoldText';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
 import CurrencyAmount from '../../Components/CurrencyAmount';
@@ -388,16 +387,16 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               padding: 10,
               borderWidth: 1,
               borderRadius: 10,
-              borderColor: colors.border,
+              borderColor: nym ? '#07FF94' : colors.border,
             }}
           >
-            <BoldText
+            <RegText
               style={{ textAlign: 'center', textTransform: 'capitalize' }}
             >
               {nym
                 ? (translate('send.nym-processing-title') as string)
                 : (translate('send.sending-title') as string)}
-            </BoldText>
+            </RegText>
 
             <ZecAmount
               currencyName={info.currencyName}

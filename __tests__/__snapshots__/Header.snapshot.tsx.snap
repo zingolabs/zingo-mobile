@@ -23,6 +23,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             "display": "flex",
             "flexDirection": "row",
             "flexWrap": "wrap",
+            "gap": 8,
             "justifyContent": "center",
             "marginHorizontal": 5,
             "marginTop": 12,
@@ -33,6 +34,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           style={
             {
               "flexDirection": "row",
+              "gap": 8,
               "minHeight": 29,
             }
           }
@@ -42,11 +44,8 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "justifyContent": "center",
-                "margin": 0,
-                "marginHorizontal": 2.5,
                 "minHeight": 25,
                 "minWidth": 25,
-                "padding": 0,
               }
             }
           >
@@ -663,6 +662,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
             "display": "flex",
             "flexDirection": "row",
             "flexWrap": "wrap",
+            "gap": 8,
             "justifyContent": "center",
             "marginHorizontal": 5,
             "marginTop": 12,

@@ -30,6 +30,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             "display": "flex",
             "flexDirection": "row",
             "flexWrap": "wrap",
+            "gap": 8,
             "justifyContent": "center",
             "marginHorizontal": 5,
             "marginTop": 12,
@@ -66,7 +67,6 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           onStartShouldSetResponder={[Function]}
           style={
             {
-              "marginHorizontal": 5,
               "opacity": 1,
             }
           }
@@ -88,8 +88,6 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                   "display": "flex",
                   "flexDirection": "row",
                   "justifyContent": "center",
-                  "margin": 0,
-                  "marginHorizontal": 2.5,
                   "minHeight": 25,
                   "minWidth": 25,
                   "padding": 0,
@@ -919,6 +917,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             "display": "flex",
             "flexDirection": "row",
             "flexWrap": "wrap",
+            "gap": 8,
             "justifyContent": "center",
             "marginHorizontal": 5,
             "marginTop": 12,
@@ -955,7 +954,6 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           onStartShouldSetResponder={[Function]}
           style={
             {
-              "marginHorizontal": 5,
               "opacity": 1,
             }
           }
@@ -977,8 +975,6 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   "display": "flex",
                   "flexDirection": "row",
                   "justifyContent": "center",
-                  "margin": 0,
-                  "marginHorizontal": 2.5,
                   "minHeight": 25,
                   "minWidth": 25,
                   "padding": 0,

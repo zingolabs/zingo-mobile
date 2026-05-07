@@ -41,6 +41,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               "display": "flex",
               "flexDirection": "row",
               "flexWrap": "wrap",
+              "gap": 8,
               "justifyContent": "center",
               "marginHorizontal": 5,
               "marginTop": 12,
@@ -51,6 +52,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             style={
               {
                 "flexDirection": "row",
+                "gap": 8,
                 "minHeight": 29,
               }
             }
@@ -60,11 +62,8 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 {
                   "alignItems": "center",
                   "justifyContent": "center",
-                  "margin": 0,
-                  "marginHorizontal": 2.5,
                   "minHeight": 25,
                   "minWidth": 25,
-                  "padding": 0,
                 }
               }
             >
@@ -167,7 +166,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             onStartShouldSetResponder={[Function]}
             style={
               {
-                "marginHorizontal": 5,
                 "opacity": 1,
               }
             }
@@ -189,8 +187,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     "display": "flex",
                     "flexDirection": "row",
                     "justifyContent": "center",
-                    "margin": 0,
-                    "marginHorizontal": 2.5,
                     "minHeight": 25,
                     "minWidth": 25,
                     "padding": 0,
@@ -837,6 +833,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               "display": "flex",
               "flexDirection": "row",
               "flexWrap": "wrap",
+              "gap": 8,
               "justifyContent": "center",
               "marginHorizontal": 5,
               "marginTop": 12,
@@ -847,6 +844,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             style={
               {
                 "flexDirection": "row",
+                "gap": 8,
                 "minHeight": 29,
               }
             }
@@ -856,11 +854,8 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 {
                   "alignItems": "center",
                   "justifyContent": "center",
-                  "margin": 0,
-                  "marginHorizontal": 2.5,
                   "minHeight": 25,
                   "minWidth": 25,
-                  "padding": 0,
                 }
               }
             >

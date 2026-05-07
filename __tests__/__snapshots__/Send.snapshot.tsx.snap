@@ -39,6 +39,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 "display": "flex",
                 "flexDirection": "row",
                 "flexWrap": "wrap",
+                "gap": 8,
                 "justifyContent": "center",
                 "marginHorizontal": 5,
                 "marginTop": 12,
@@ -49,6 +50,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               style={
                 {
                   "flexDirection": "row",
+                  "gap": 8,
                   "minHeight": 29,
                 }
               }
@@ -58,11 +60,8 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   {
                     "alignItems": "center",
                     "justifyContent": "center",
-                    "margin": 0,
-                    "marginHorizontal": 2.5,
                     "minHeight": 25,
                     "minWidth": 25,
-                    "padding": 0,
                   }
                 }
               >
@@ -165,7 +164,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "marginHorizontal": 5,
                   "opacity": 1,
                 }
               }
@@ -187,8 +185,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       "display": "flex",
                       "flexDirection": "row",
                       "justifyContent": "center",
-                      "margin": 0,
-                      "marginHorizontal": 2.5,
                       "minHeight": 25,
                       "minWidth": 25,
                       "padding": 0,
@@ -1766,6 +1762,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 "display": "flex",
                 "flexDirection": "row",
                 "flexWrap": "wrap",
+                "gap": 8,
                 "justifyContent": "center",
                 "marginHorizontal": 5,
                 "marginTop": 12,
@@ -1776,6 +1773,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               style={
                 {
                   "flexDirection": "row",
+                  "gap": 8,
                   "minHeight": 29,
                 }
               }
@@ -1785,11 +1783,8 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   {
                     "alignItems": "center",
                     "justifyContent": "center",
-                    "margin": 0,
-                    "marginHorizontal": 2.5,
                     "minHeight": 25,
                     "minWidth": 25,
-                    "padding": 0,
                   }
                 }
               >

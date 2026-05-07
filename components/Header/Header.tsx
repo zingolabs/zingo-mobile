@@ -486,7 +486,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const privacyComponent = () => (
     <TouchableOpacity
-      style={{ marginHorizontal: 5 }}
       onPress={() => {
         addLastSnackbar &&
           addLastSnackbar(
@@ -514,8 +513,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: colors.card,
-            margin: 0,
-            marginHorizontal: 2.5,
             padding: 0,
             minWidth: 25,
             minHeight: 25,
@@ -560,10 +557,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               flexWrap: 'wrap',
               marginTop: 12,
               marginHorizontal: 5,
+              gap: 8,
             }}
           >
             {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
-              <View style={{ minHeight: 29, flexDirection: 'row' }}>
+              <View style={{ minHeight: 29, flexDirection: 'row', gap: 8 }}>
                 {netInfo.isConnected && !(percentageOutputsScanned === 0) ? (
                   <>
                     {!syncInProgress && (
@@ -571,8 +569,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         style={{
                           alignItems: 'center',
                           justifyContent: 'center',
-                          margin: 0,
-                          marginHorizontal: 2.5,
                           padding: 1,
                           borderColor: colors.primary,
                           borderWidth: 1,
@@ -608,8 +604,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         style={{
                           alignItems: 'center',
                           justifyContent: 'center',
-                          margin: 0,
-                          marginHorizontal: 2.5,
                           padding: 1,
                           borderColor: colors.syncing,
                           borderWidth: 1,
@@ -714,8 +708,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         style={{
                           alignItems: 'center',
                           justifyContent: 'center',
-                          margin: 0,
-                          marginHorizontal: 2.5,
                           padding: 1,
                           borderColor: colors.primaryDisabled,
                           borderWidth: 1,
@@ -761,9 +753,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     style={{
                       alignItems: 'center',
                       justifyContent: 'center',
-                      margin: 0,
-                      marginHorizontal: 2.5,
-                      padding: 0,
                       minWidth: 25,
                       minHeight: 25,
                     }}
@@ -826,7 +815,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {!noSyncingStatus && nym && (
               <View
                 style={{
-                  marginLeft: 10,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
