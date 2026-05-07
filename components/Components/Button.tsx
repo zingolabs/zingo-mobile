@@ -60,11 +60,18 @@ const Button: React.FunctionComponent<ButtonProps> = ({
                 backgroundColor: 'transparent',
                 color: colors.money,
               }
-            : {
-                // error
-                backgroundColor: colors.primary,
-                width: twoButtons ? '40%' : '80%',
-              };
+            : type === ButtonTypeEnum.Nym
+              ? {
+                  backgroundColor: disabled ? '#4DAF7C' : '#07FF94',
+                  borderColor: disabled ? '#4DAF7C' : '#07FF94',
+                  borderWidth: 2,
+                  width: twoButtons ? '40%' : '80%',
+                }
+              : {
+                  // error
+                  backgroundColor: colors.primary,
+                  width: twoButtons ? '40%' : '80%',
+                };
 
   const styleButtonCommon: TextStyle = {
     padding: 0,
@@ -96,10 +103,14 @@ const Button: React.FunctionComponent<ButtonProps> = ({
                 color: colors.text,
                 textTransform: 'lowercase',
               }
-            : {
-                // error
-                color: colors.background,
-              };
+            : type === ButtonTypeEnum.Nym
+              ? {
+                  color: colors.background,
+                }
+              : {
+                  // error
+                  color: colors.background,
+                };
   const styleTextCommon: TextStyle = {
     fontWeight: 'bold',
     textTransform: 'uppercase',

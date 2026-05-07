@@ -56,6 +56,7 @@ import RPCModule from '../../app/RPCModule';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { isEqual } from 'lodash';
 import { TriangleAlert } from '../Components/Icons/TriangleAlert';
+import NymOn from '../../assets/img/nym-on.svg';
 
 type HeaderProps = {
   // general
@@ -130,6 +131,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     selectServer,
     setZecPrice,
     backgroundSyncInfo,
+    nym,
   } = context;
 
   let translate: (key: string) => TranslateType,
@@ -819,6 +821,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     {translate('settings.server-offline') as string}
                   </FadeText>
                 </View>
+              </View>
+            )}
+            {!noSyncingStatus && nym && (
+              <View
+                style={{
+                  marginLeft: 10,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <NymOn width={16} height={16} />
               </View>
             )}
             {mode !== ModeEnum.basic &&

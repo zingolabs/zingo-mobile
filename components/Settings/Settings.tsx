@@ -48,6 +48,10 @@ import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevel
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
+import NymOn from '../../assets/img/nym-on.svg';
+import NymOff from '../../assets/img/nym-off.svg';
+import SwitchOn from '../../assets/img/switch-on.svg';
+import SwitchOff from '../../assets/img/switch-off.svg';
 
 type SettingsProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -70,6 +74,7 @@ type SettingsProps = DrawerScreenProps<
   setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
   setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
+  setNymOption: (value: boolean) => Promise<void>;
   toggleMenuDrawer: () => void;
 };
 
@@ -92,6 +97,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setRecoveryWalletInfoOnDeviceOption,
   setPerformanceLevelOption,
   setBlockExplorerOption,
+  setNymOption,
   toggleMenuDrawer,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -112,6 +118,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
+    nym: nymContext,
     readOnly,
     setPrivacyOption,
     setBackgroundError,
@@ -232,6 +239,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     useState<RPCPerformanceLevelEnum>(performanceLevelContext);
   const [blockExplorer, setBlockExplorer] =
     useState<BlockExplorerEnum>(blockExplorerContext);
+  const [nym, setNym] = useState<boolean>(nymContext);
 
   const [autoIcon, setAutoIcon] = useState<IconDefinition>(farCircle);
   const [listIcon, setListIcon] = useState<IconDefinition>(farCircle);
@@ -369,7 +377,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel &&
-      blockExplorerContext === blockExplorer
+      blockExplorerContext === blockExplorer &&
+      nymContext === nym
     ) {
       setDisabledButton(true);
     } else {
@@ -400,6 +409,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevelContext,
     blockExplorer,
     blockExplorerContext,
+    nym,
+    nymContext,
     securityContext,
     selectServer,
     selectServerContext,
@@ -442,7 +453,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel &&
-      blockExplorerContext === blockExplorer
+      blockExplorerContext === blockExplorer &&
+      nymContext === nym
     ) {
       addLastSnackbar(translate('settings.nochanges') as string);
       return;
@@ -582,6 +594,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (blockExplorerContext !== blockExplorer) {
       await setBlockExplorerOption(blockExplorer);
     }
+    if (nymContext !== nym) {
+      await setNymOption(nym);
+    }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
@@ -637,6 +652,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
       setPerformanceLevel(performanceLevelContext);
       setBlockExplorer(blockExplorerContext);
+      setNym(nymContext);
     }
     navigation.navigate(RouteEnum.HomeStack);
   };
@@ -1350,13 +1366,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               )}
 
               <View style={{ display: 'flex', margin: 10 }}>
-                <BoldText>
-                  {
-                    translate(
-                      'settings.recoverywalletinfoondevice-title',
-                    ) as string
-                  }
-                </BoldText>
+                <TouchableOpacity
+                  onLongPress={() => setShowDeveloperOptions(true)}
+                >
+                  <BoldText>
+                    {
+                      translate(
+                        'settings.recoverywalletinfoondevice-title',
+                      ) as string
+                    }
+                  </BoldText>
+                </TouchableOpacity>
               </View>
 
               <View style={{ display: 'flex', marginLeft: 25 }}>
@@ -1389,24 +1409,40 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 </View>
               )}
 
-              <View style={{ display: 'flex', margin: 10 }}>
-                <TouchableOpacity
-                  onLongPress={() => setShowDeveloperOptions(true)}
-                >
-                  <FadeText
-                    style={{
-                      color: colors.primary,
-                      textAlign: 'center',
-                      marginVertical: 10,
-                      padding: 5,
-                      borderColor: 'red',
-                      borderWidth: 1,
-                    }}
-                  >
-                    {translate('settings.walletkeyswarning') as string}
-                  </FadeText>
-                </TouchableOpacity>
+              <View style={{ display: 'flex', margin: 10, marginTop: 15 }}>
+                <BoldText>
+                  {translate('settings.nym-privacy-network') as string}
+                </BoldText>
               </View>
+
+              <TouchableOpacity
+                onPress={() => setNym(!nym)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginHorizontal: 25,
+                  marginVertical: 15,
+                }}
+              >
+                {nym ? (
+                  <NymOn width={22} height={22} />
+                ) : (
+                  <NymOff width={22} height={22} />
+                )}
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
+                    {translate('settings.nym-network') as string}
+                  </BoldText>
+                  <FadeText>
+                    {translate('settings.nym-enhanced-privacy') as string}
+                  </FadeText>
+                </View>
+                {nym ? (
+                  <SwitchOn width={40} height={19} />
+                ) : (
+                  <SwitchOff width={40} height={19} />
+                )}
+              </TouchableOpacity>
 
               {showDeveloperOptions && (
                 <View style={{ width: '100%', marginBottom: 20 }}>
