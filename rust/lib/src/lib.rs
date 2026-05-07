@@ -307,6 +307,7 @@ pub fn init_new(
             Err(e) => return Ok(e),
         };
         let config = ClientConfig::builder()
+            .set_wallet_dir(std::env::temp_dir())
             .set_indexer_uri(lightwalletd_uri)
             .set_chain_type(chaintype)
             .set_wallet_config(WalletConfig::NewSeed {
@@ -347,6 +348,7 @@ pub fn init_from_seed(
                 Err(e) => return Ok(format!("Error: {e}")),
             };
         let config = ClientConfig::builder()
+            .set_wallet_dir(std::env::temp_dir())
             .set_indexer_uri(lightwalletd_uri)
             .set_chain_type(chaintype)
             .set_wallet_config(WalletConfig::MnemonicPhrase {
@@ -387,6 +389,7 @@ pub fn init_from_ufvk(
                 Err(e) => return Ok(format!("Error: {e}")),
             };
         let config = ClientConfig::builder()
+            .set_wallet_dir(std::env::temp_dir())
             .set_indexer_uri(lightwalletd_uri)
             .set_chain_type(chaintype)
             .set_wallet_config(WalletConfig::Ufvk {
