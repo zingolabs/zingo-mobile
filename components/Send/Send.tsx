@@ -43,7 +43,7 @@ import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import NymOn from '../../assets/img/nym-on.svg';
 import NymOff from '../../assets/img/nym-off.svg';
-import SwitchOn from '../../assets/img/switch-on.svg';
+import SwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import Swap from '../../assets/img/swap.svg';
 import ErrorText from '../Components/ErrorText';

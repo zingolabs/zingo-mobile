@@ -135,4 +135,5 @@ export default interface AppContextLoaded {
   blockExplorer: BlockExplorerEnum;
   nym: boolean;
   setNymOption: (value: boolean) => Promise<void>;
+  setModeOption: (value: string) => Promise<void>;
 }

@@ -724,6 +724,7 @@ export class LoadedAppClass extends Component<
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
       setNymOption: this.setNymOption,
+      setModeOption: this.setModeOption,
 
       // context settings
       server: props.server,
@@ -2115,6 +2116,7 @@ export class LoadedAppClass extends Component<
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
       setNymOption: this.setNymOption,
+      setModeOption: this.setModeOption,
 
       // context settings
       server: this.state.server,

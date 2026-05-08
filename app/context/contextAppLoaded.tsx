@@ -83,6 +83,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
   nym: false,
   setNymOption: async () => {},
+  setModeOption: async () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);
