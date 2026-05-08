@@ -443,6 +443,7 @@ pub fn init_from_b64(
         // but from_bytes does not read from disk — the path is only stored for future saves.
         // TODO: replace temp_dir() with the real app documents directory once a global is in place.
         let config = ClientConfig::builder()
+            .set_wallet_dir(std::env::temp_dir())
             .set_indexer_uri(lightwalletd_uri)
             .set_chain_type(chaintype)
             .build();
