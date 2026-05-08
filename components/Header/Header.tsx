@@ -56,6 +56,7 @@ import RPCModule from '../../app/RPCModule';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { isEqual } from 'lodash';
 import { TriangleAlert } from '../Components/Icons/TriangleAlert';
+import NymOn from '../../assets/img/nym-on.svg';
 
 type HeaderProps = {
   // general
@@ -130,6 +131,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     selectServer,
     setZecPrice,
     backgroundSyncInfo,
+    nym,
   } = context;
 
   let translate: (key: string) => TranslateType,
@@ -484,7 +486,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const privacyComponent = () => (
     <TouchableOpacity
-      style={{ marginHorizontal: 5 }}
       onPress={() => {
         addLastSnackbar &&
           addLastSnackbar(
@@ -512,8 +513,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: colors.card,
-            margin: 0,
-            marginHorizontal: 2.5,
             padding: 0,
             minWidth: 25,
             minHeight: 25,
@@ -558,10 +557,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               flexWrap: 'wrap',
               marginTop: 12,
               marginHorizontal: 5,
+              gap: 8,
             }}
           >
             {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
-              <View style={{ minHeight: 29, flexDirection: 'row' }}>
+              <View style={{ minHeight: 29, flexDirection: 'row', gap: 8 }}>
                 {netInfo.isConnected && !(percentageOutputsScanned === 0) ? (
                   <>
                     {!syncInProgress && (
@@ -569,8 +569,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         style={{
                           alignItems: 'center',
                           justifyContent: 'center',
-                          margin: 0,
-                          marginHorizontal: 2.5,
                           padding: 1,
                           borderColor: colors.primary,
                           borderWidth: 1,
@@ -606,8 +604,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         style={{
                           alignItems: 'center',
                           justifyContent: 'center',
-                          margin: 0,
-                          marginHorizontal: 2.5,
                           padding: 1,
                           borderColor: colors.syncing,
                           borderWidth: 1,
@@ -712,8 +708,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         style={{
                           alignItems: 'center',
                           justifyContent: 'center',
-                          margin: 0,
-                          marginHorizontal: 2.5,
                           padding: 1,
                           borderColor: colors.primaryDisabled,
                           borderWidth: 1,
@@ -759,9 +753,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     style={{
                       alignItems: 'center',
                       justifyContent: 'center',
-                      margin: 0,
-                      marginHorizontal: 2.5,
-                      padding: 0,
                       minWidth: 25,
                       minHeight: 25,
                     }}
@@ -819,6 +810,16 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     {translate('settings.server-offline') as string}
                   </FadeText>
                 </View>
+              </View>
+            )}
+            {!noSyncingStatus && nym && (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <NymOn width={16} height={16} />
               </View>
             )}
             {mode !== ModeEnum.basic &&

@@ -31,6 +31,7 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
               "display": "flex",
               "flexDirection": "row",
               "flexWrap": "wrap",
+              "gap": 8,
               "justifyContent": "center",
               "marginHorizontal": 5,
               "marginTop": 12,
@@ -67,7 +68,6 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
             onStartShouldSetResponder={[Function]}
             style={
               {
-                "marginHorizontal": 5,
                 "opacity": 1,
               }
             }
@@ -89,8 +89,6 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
                     "display": "flex",
                     "flexDirection": "row",
                     "justifyContent": "center",
-                    "margin": 0,
-                    "marginHorizontal": 2.5,
                     "minHeight": 25,
                     "minWidth": 25,
                     "padding": 0,
@@ -314,6 +312,7 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
               "display": "flex",
               "flexDirection": "row",
               "flexWrap": "wrap",
+              "gap": 8,
               "justifyContent": "center",
               "marginHorizontal": 5,
               "marginTop": 12,
@@ -350,7 +349,6 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
             onStartShouldSetResponder={[Function]}
             style={
               {
-                "marginHorizontal": 5,
                 "opacity": 1,
               }
             }
@@ -372,8 +370,6 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
                     "display": "flex",
                     "flexDirection": "row",
                     "justifyContent": "center",
-                    "margin": 0,
-                    "marginHorizontal": 2.5,
                     "minHeight": 25,
                     "minWidth": 25,
                     "padding": 0,
@@ -597,6 +593,7 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
               "display": "flex",
               "flexDirection": "row",
               "flexWrap": "wrap",
+              "gap": 8,
               "justifyContent": "center",
               "marginHorizontal": 5,
               "marginTop": 12,
@@ -633,7 +630,6 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
             onStartShouldSetResponder={[Function]}
             style={
               {
-                "marginHorizontal": 5,
                 "opacity": 1,
               }
             }
@@ -655,8 +651,6 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
                     "display": "flex",
                     "flexDirection": "row",
                     "justifyContent": "center",
-                    "margin": 0,
-                    "marginHorizontal": 2.5,
                     "minHeight": 25,
                     "minWidth": 25,
                     "padding": 0,
@@ -880,6 +874,7 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
               "display": "flex",
               "flexDirection": "row",
               "flexWrap": "wrap",
+              "gap": 8,
               "justifyContent": "center",
               "marginHorizontal": 5,
               "marginTop": 12,
@@ -916,7 +911,6 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
             onStartShouldSetResponder={[Function]}
             style={
               {
-                "marginHorizontal": 5,
                 "opacity": 1,
               }
             }
@@ -938,8 +932,6 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
                     "display": "flex",
                     "flexDirection": "row",
                     "justifyContent": "center",
-                    "margin": 0,
-                    "marginHorizontal": 2.5,
                     "minHeight": 25,
                     "minWidth": 25,
                     "padding": 0,

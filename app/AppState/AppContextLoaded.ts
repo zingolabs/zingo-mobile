@@ -133,4 +133,7 @@ export default interface AppContextLoaded {
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
+  nym: boolean;
+  setNymOption: (value: boolean) => Promise<void>;
+  setModeOption: (value: string) => Promise<void>;
 }
