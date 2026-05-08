@@ -38,7 +38,14 @@ import {
 import { getNumberFormatSettings } from 'react-native-localize';
 import RNPickerSelect from 'react-native-picker-select';
 
+import { SvgXml } from 'react-native-svg';
 import FadeText from '../Components/FadeText';
+import BoldText from '../Components/BoldText';
+import NymOn from '../../assets/img/nym-on.svg';
+import NymOff from '../../assets/img/nym-off.svg';
+import SwitchOn from '../../assets/img/nym-switch-on.svg';
+import SwitchOff from '../../assets/img/switch-off.svg';
+import Swap from '../../assets/img/swap.svg';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
@@ -135,10 +142,16 @@ const Send: React.FunctionComponent<SendProps> = ({
     currency,
     zingolibVersion,
     setPrivacyOption,
+    nym: nymContext,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Send;
+  const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
+  <svg viewBox="0 0 88.03 147.85">
+    <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
+  </svg>`;
 
+  const [nym, setNym] = useState<boolean>(nymContext);
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
@@ -156,6 +169,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
   const [negativeMaxAmount, setNegativeMaxAmount] = useState<boolean>(false);
+  const [inputZec, setInputZec] = useState<boolean>(true);
   //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
   const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const [spendableBalanceLastError, setSpendableBalanceLastError] =
@@ -542,6 +556,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   useEffect(() => {
+    setNym(nymContext);
+  }, [nymContext]);
+
+  useEffect(() => {
     const stillConf =
       (totalBalance ? totalBalance.totalOrchardBalance : 0) !==
         (totalBalance ? totalBalance.confirmedOrchardBalance : 0) ||
@@ -773,6 +791,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     clearToAddr();
     setSpendable(0);
     setSpendableBalanceLastError('');
+    setNym(nymContext);
   };
 
   const buildSendState = () => {
@@ -965,6 +984,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
         calculateFeeWithPropose: calculateFeeWithPropose,
         sendPageState: buildSendState(),
+        nym: nym,
       },
     });
   };
@@ -1359,62 +1379,56 @@ const Send: React.FunctionComponent<SendProps> = ({
                 )}
               </View>
 
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}
-              >
+              <View style={{ display: 'flex', flexDirection: 'column' }}>
                 <View
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-start',
-                    width: '60%',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginTop: 5,
                   }}
                 >
+                  {inputZec ? (
+                    <SvgXml
+                      width={12}
+                      height={20}
+                      xml={zecIconXml}
+                      fill={colors.text}
+                      style={{ marginRight: 5 }}
+                    />
+                  ) : (
+                    <RegText style={{ marginRight: 5, fontSize: 20 }}>
+                      $
+                    </RegText>
+                  )}
                   <View
+                    accessible={true}
+                    accessibilityLabel={
+                      inputZec
+                        ? (translate('send.zec-acc') as string)
+                        : (translate('send.usd-acc') as string)
+                    }
                     style={{
-                      display: 'flex',
+                      flex: 1,
                       flexDirection: 'row',
-                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      borderColor: colors.text,
+                      minWidth: 48,
+                      minHeight: 48,
                     }}
                   >
-                    <RegText
-                      style={{
-                        marginTop: 18,
-                        marginRight: 5,
-                        fontSize: 20,
-                        transform: [{ scaleY: 1.5 }],
-                      }}
-                    >
-                      {'\u1647'}
-                    </RegText>
-                    <View
-                      accessible={true}
-                      accessibilityLabel={translate('send.zec-acc') as string}
-                      style={{
-                        flexGrow: 1,
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        borderColor: colors.text,
-                        marginTop: 5,
-                        width: '75%',
-                        minWidth: 48,
-                        minHeight: 48,
-                      }}
-                    >
+                    {inputZec ? (
                       <TextInput
                         testID="send.amount"
                         placeholder={`#${decimalSeparator}########`}
                         placeholderTextColor={colors.placeholder}
                         keyboardType="numeric"
                         style={{
+                          flex: 1,
                           color: colors.text,
                           fontWeight: '600',
                           fontSize: 16,
-                          minWidth: 48,
                           minHeight: 48,
                           marginLeft: 5,
                           backgroundColor: 'transparent',
@@ -1432,62 +1446,174 @@ const Send: React.FunctionComponent<SendProps> = ({
                         editable={true}
                         maxLength={20}
                       />
-                    </View>
-                  </View>
-
-                  <View style={{ display: 'flex', flexDirection: 'column' }}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (
-                          spendableBalanceLastError &&
-                          mode === ModeEnum.advanced
-                        ) {
-                          Alert.alert(
-                            translate('send.spendable') as string,
-                            spendableBalanceLastError,
-                            [
-                              {
-                                text: translate('support') as string,
-                                onPress: async () =>
-                                  sendEmail(
-                                    translate,
-                                    zingolibVersion,
-                                    translate('send.spendable') as string,
-                                    spendableBalanceLastError,
-                                  ),
-                              },
-                              {
-                                text: translate('cancel') as string,
-                                style: 'cancel',
-                              },
-                            ],
-                            { cancelable: false },
-                          );
+                    ) : (
+                      <TextInput
+                        placeholder={`#${decimalSeparator}##`}
+                        placeholderTextColor={colors.placeholder}
+                        keyboardType="numeric"
+                        style={{
+                          flex: 1,
+                          color: colors.text,
+                          fontWeight: '600',
+                          fontSize: 16,
+                          minHeight: 48,
+                          marginLeft: 5,
+                          backgroundColor: 'transparent',
+                        }}
+                        value={amountCurrencyText}
+                        onChangeText={(text: string) =>
+                          updateToField(
+                            null,
+                            null,
+                            text.substring(0, 15),
+                            null,
+                            null,
+                          )
                         }
+                        editable={true}
+                        maxLength={15}
+                      />
+                    )}
+                    {(inputZec ? amountText : amountCurrencyText) ? (
+                      <TouchableOpacity
+                        onPress={() =>
+                          inputZec
+                            ? updateToField(null, '', null, null, null)
+                            : updateToField(null, null, '', null, null)
+                        }
+                      >
+                        <FontAwesomeIcon
+                          style={{ marginRight: 5 }}
+                          size={20}
+                          icon={faXmark}
+                          color={colors.primaryDisabled}
+                        />
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                  {(currency === CurrencyEnum.USDCurrency ||
+                    currency === CurrencyEnum.USDTORCurrency) && (
+                    <>
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (
+                            inputZec &&
+                            !amountCurrencyText &&
+                            amountText &&
+                            zecPrice.zecPrice > 0
+                          ) {
+                            const zecVal =
+                              Utils.parseStringLocaleToNumberFloat(amountText);
+                            if (!isNaN(zecVal)) {
+                              setAmountCurrencyText(
+                                Utils.parseNumberFloatToStringLocale(
+                                  zecVal * zecPrice.zecPrice,
+                                  2,
+                                ),
+                              );
+                            }
+                          }
+                          setInputZec(!inputZec);
+                        }}
+                        disabled={!zecPrice.zecPrice || zecPrice.zecPrice <= 0}
+                        style={{ marginHorizontal: 8 }}
+                      >
+                        <Swap
+                          width={28}
+                          height={28}
+                          color={
+                            !zecPrice.zecPrice || zecPrice.zecPrice <= 0
+                              ? colors.primaryDisabled
+                              : colors.primary
+                          }
+                        />
+                      </TouchableOpacity>
+                      {inputZec ? (
+                        <CurrencyAmount
+                          style={{ marginTop: 0, marginBottom: 0 }}
+                          price={zecPrice.zecPrice}
+                          amtZec={
+                            Utils.parseStringLocaleToNumberFloat(amountText) ||
+                            0
+                          }
+                          currency={currency}
+                          privacy={privacy}
+                        />
+                      ) : (
+                        <ZecAmount
+                          style={{ marginLeft: 0 }}
+                          currencyName={info.currencyName}
+                          color={colors.text}
+                          size={20}
+                          amtZec={
+                            Utils.parseStringLocaleToNumberFloat(amountText) ||
+                            0
+                          }
+                          privacy={privacy}
+                        />
+                      )}
+                      <View style={{ marginLeft: inputZec ? 5 : 2 }}>
+                        <PriceFetcher setZecPrice={setZecPrice} />
+                      </View>
+                    </>
+                  )}
+                </View>
+
+                <View style={{ display: 'flex', flexDirection: 'column' }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (
+                        spendableBalanceLastError &&
+                        mode === ModeEnum.advanced
+                      ) {
+                        Alert.alert(
+                          translate('send.spendable') as string,
+                          spendableBalanceLastError,
+                          [
+                            {
+                              text: translate('support') as string,
+                              onPress: async () =>
+                                sendEmail(
+                                  translate,
+                                  zingolibVersion,
+                                  translate('send.spendable') as string,
+                                  spendableBalanceLastError,
+                                ),
+                            },
+                            {
+                              text: translate('cancel') as string,
+                              style: 'cancel',
+                            },
+                          ],
+                          { cancelable: false },
+                        );
+                      }
+                    }}
+                  >
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        marginTop: 0,
                       }}
                     >
-                      <View
+                      <RegText
                         style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 0,
+                          fontSize: 14,
+                          color:
+                            spendableBalanceLastError &&
+                            mode === ModeEnum.advanced
+                              ? 'red'
+                              : colors.money,
                         }}
                       >
-                        <RegText
-                          style={{
-                            fontSize: 14,
-                            color:
-                              spendableBalanceLastError &&
-                              mode === ModeEnum.advanced
-                                ? 'red'
-                                : colors.money,
-                          }}
-                        >
-                          {translate('send.spendable') as string}
-                        </RegText>
+                        {translate('send.spendable') as string}
+                      </RegText>
+                      {inputZec ? (
                         <ZecAmount
+                          style={{ marginLeft: 0 }}
                           currencyName={info.currencyName}
                           color={
                             stillConfirming ||
@@ -1501,285 +1627,171 @@ const Send: React.FunctionComponent<SendProps> = ({
                           amtZec={maxAmount}
                           privacy={privacy}
                         />
-                      </View>
-                    </TouchableOpacity>
-                    {donation &&
-                      server.chainName === ChainNameEnum.mainChainName &&
-                      !donationAddress && (
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            marginTop: 0,
-                            backgroundColor: colors.card,
-                            padding: 5,
-                            borderRadius: 10,
-                          }}
-                        >
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
-                            size={20}
-                            color={colors.primary}
-                            style={{ marginRight: 5 }}
-                          />
-                          <FadeText>{'( '}</FadeText>
-                          <FadeText>
-                            {(translate('send.confirm-donation') as string) +
-                              ': ' +
-                              Utils.getZenniesDonationAmount() +
-                              ' '}
-                          </FadeText>
-                          <FadeText>{')'}</FadeText>
-                        </View>
+                      ) : (
+                        <CurrencyAmount
+                          style={{ fontSize: 15 }}
+                          price={zecPrice.zecPrice}
+                          amtZec={maxAmount}
+                          currency={currency}
+                          privacy={privacy}
+                        />
                       )}
-                    {validAddress !== 0 &&
-                      validAmount !== 0 &&
-                      (fee > 0 || !!proposeSendLastError) && (
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            marginTop: 0,
-                            backgroundColor: colors.card,
-                            padding: 5,
-                            borderRadius: 10,
+                    </View>
+                  </TouchableOpacity>
+                  {donation &&
+                    server.chainName === ChainNameEnum.mainChainName &&
+                    !donationAddress && (
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          marginTop: 0,
+                          backgroundColor: colors.card,
+                          padding: 5,
+                          borderRadius: 10,
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={20}
+                          color={colors.primary}
+                          style={{ marginRight: 5 }}
+                        />
+                        <FadeText>{'( '}</FadeText>
+                        <FadeText>
+                          {(translate('send.confirm-donation') as string) +
+                            ': ' +
+                            Utils.getZenniesDonationAmount() +
+                            ' '}
+                        </FadeText>
+                        <FadeText>{')'}</FadeText>
+                      </View>
+                    )}
+                  {validAddress !== 0 &&
+                    validAmount !== 0 &&
+                    (fee > 0 || !!proposeSendLastError) && (
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          marginTop: 0,
+                          backgroundColor: colors.card,
+                          padding: 5,
+                          borderRadius: 10,
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={20}
+                          color={colors.primary}
+                          style={{ marginRight: 5 }}
+                        />
+                        <FadeText>{'( '}</FadeText>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (
+                              proposeSendLastError &&
+                              mode === ModeEnum.advanced
+                            ) {
+                              Alert.alert(
+                                translate('send.fee') as string,
+                                proposeSendLastError,
+                                [
+                                  {
+                                    text: translate('support') as string,
+                                    onPress: async () =>
+                                      sendEmail(
+                                        translate,
+                                        zingolibVersion,
+                                        translate('send.fee') as string,
+                                        proposeSendLastError,
+                                      ),
+                                  },
+                                  {
+                                    text: translate('cancel') as string,
+                                    style: 'cancel',
+                                  },
+                                ],
+                                { cancelable: false },
+                              );
+                            }
                           }}
                         >
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
-                            size={20}
-                            color={colors.primary}
-                            style={{ marginRight: 5 }}
-                          />
-                          <FadeText>{'( '}</FadeText>
-                          <TouchableOpacity
-                            onPress={() => {
-                              if (
+                          <FadeText
+                            style={{
+                              color:
                                 proposeSendLastError &&
                                 mode === ModeEnum.advanced
-                              ) {
-                                Alert.alert(
-                                  translate('send.fee') as string,
-                                  proposeSendLastError,
-                                  [
-                                    {
-                                      text: translate('support') as string,
-                                      onPress: async () =>
-                                        sendEmail(
-                                          translate,
-                                          zingolibVersion,
-                                          translate('send.fee') as string,
-                                          proposeSendLastError,
-                                        ),
-                                    },
-                                    {
-                                      text: translate('cancel') as string,
-                                      style: 'cancel',
-                                    },
-                                  ],
-                                  { cancelable: false },
-                                );
-                              }
+                                  ? 'red'
+                                  : colors.money,
                             }}
                           >
-                            <FadeText
-                              style={{
-                                color:
-                                  proposeSendLastError &&
-                                  mode === ModeEnum.advanced
-                                    ? 'red'
-                                    : colors.money,
-                              }}
-                            >
-                              {(translate('send.fee') as string) +
-                                ': ' +
-                                Utils.parseNumberFloatToStringLocale(fee, 8) +
-                                ' '}
-                            </FadeText>
-                          </TouchableOpacity>
-                          <FadeText>{')'}</FadeText>
-                        </View>
-                      )}
-                    {stillConfirming && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          navigation.navigate(RouteEnum.Pools);
-                        }}
-                      >
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            marginTop: 0,
-                            backgroundColor: colors.card,
-                            padding: 5,
-                            borderRadius: 10,
-                          }}
-                        >
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
-                            size={20}
-                            color={colors.primary}
-                            style={{ marginRight: 5 }}
-                          />
-                          <FadeText style={{ fontSize: 12.5 }}>
-                            {translate('send.somefunds') as string}
+                            {(translate('send.fee') as string) +
+                              ': ' +
+                              Utils.parseNumberFloatToStringLocale(fee, 8) +
+                              ' '}
                           </FadeText>
-                        </View>
-                      </TouchableOpacity>
+                        </TouchableOpacity>
+                        <FadeText>{')'}</FadeText>
+                      </View>
                     )}
-                    {showShieldInfo && mode === ModeEnum.advanced && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          navigation.navigate(RouteEnum.Pools);
-                        }}
-                      >
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            marginTop: 0,
-                            backgroundColor: colors.card,
-                            padding: 5,
-                            borderRadius: 10,
-                          }}
-                        >
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
-                            size={20}
-                            color={colors.primary}
-                            style={{ marginRight: 5 }}
-                          />
-                          <FadeText>
-                            {translate('send.needtoshield') as string}
-                          </FadeText>
-                        </View>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                </View>
-
-                {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) &&
-                  (currency === CurrencyEnum.USDCurrency ||
-                    currency === CurrencyEnum.USDTORCurrency) && (
-                    <View
-                      style={{
-                        width: '35%',
-                        marginTop: 5,
-                        alignItems: 'flex-start',
-                      }}
-                    >
-                      <PriceFetcher
-                        setZecPrice={setZecPrice}
-                        textBefore={translate('send.nofetchprice') as string}
-                      />
-                    </View>
-                  )}
-
-                {!!zecPrice.zecPrice &&
-                  zecPrice.zecPrice > 0 &&
-                  (currency === CurrencyEnum.USDCurrency ||
-                    currency === CurrencyEnum.USDTORCurrency) && (
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-start',
-                        width: '35%',
+                  {stillConfirming && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.navigate(RouteEnum.Pools);
                       }}
                     >
                       <View
                         style={{
                           display: 'flex',
                           flexDirection: 'row',
-                          justifyContent: 'flex-start',
+                          marginTop: 0,
+                          backgroundColor: colors.card,
+                          padding: 5,
+                          borderRadius: 10,
                         }}
                       >
-                        <RegText style={{ marginTop: 17, marginRight: 5 }}>
-                          $
-                        </RegText>
-                        <View
-                          accessible={true}
-                          accessibilityLabel={
-                            translate('send.usd-acc') as string
-                          }
-                          style={{
-                            flexGrow: 1,
-                            borderWidth: 1,
-                            borderRadius: 5,
-                            borderColor: colors.text,
-                            marginTop: 5,
-                            width: '55%',
-                            minWidth: 48,
-                            minHeight: 48,
-                          }}
-                        >
-                          <TextInput
-                            placeholder={`#${decimalSeparator}##`}
-                            placeholderTextColor={colors.placeholder}
-                            keyboardType="numeric"
-                            style={{
-                              color: colors.text,
-                              fontWeight: '600',
-                              fontSize: 16,
-                              minWidth: 48,
-                              minHeight: 48,
-                              marginLeft: 5,
-                              backgroundColor: 'transparent',
-                            }}
-                            value={amountCurrencyText}
-                            onChangeText={(text: string) =>
-                              updateToField(
-                                null,
-                                null,
-                                text.substring(0, 15),
-                                null,
-                                null,
-                              )
-                            }
-                            editable={true}
-                            maxLength={15}
-                          />
-                        </View>
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={20}
+                          color={colors.primary}
+                          style={{ marginRight: 5 }}
+                        />
+                        <FadeText style={{ fontSize: 12.5 }}>
+                          {translate('send.somefunds') as string}
+                        </FadeText>
                       </View>
-
+                    </TouchableOpacity>
+                  )}
+                  {showShieldInfo && mode === ModeEnum.advanced && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.navigate(RouteEnum.Pools);
+                      }}
+                    >
                       <View
                         style={{
-                          flexDirection: 'column',
-                          justifyContent: 'flex-start',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          marginTop: 0,
+                          backgroundColor: colors.card,
+                          padding: 5,
+                          borderRadius: 10,
                         }}
                       >
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'flex-start',
-                          }}
-                        >
-                          <RegText style={{ marginTop: 0, fontSize: 12.5 }}>
-                            {translate('send.spendable') as string}
-                          </RegText>
-                          <CurrencyAmount
-                            style={{ marginTop: 1, fontSize: 12.5 }}
-                            price={zecPrice.zecPrice}
-                            amtZec={maxAmount}
-                            currency={currency}
-                            privacy={privacy}
-                          />
-                        </View>
-                        <View
-                          style={{
-                            marginLeft: 5,
-                            flexDirection: 'row',
-                            justifyContent: 'flex-start',
-                            marginTop: -10,
-                          }}
-                        >
-                          <View style={{ width: '5%' }} />
-                          <PriceFetcher setZecPrice={setZecPrice} />
-                        </View>
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={20}
+                          color={colors.primary}
+                          style={{ marginRight: 5 }}
+                        />
+                        <FadeText>
+                          {translate('send.needtoshield') as string}
+                        </FadeText>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                   )}
+                </View>
               </View>
 
               {memoEnabled === true && (
@@ -1957,6 +1969,36 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </>
               )}
             </View>
+            <TouchableOpacity
+              onPress={() => setNym(!nym)}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginHorizontal: 20,
+                marginTop: 15,
+                marginBottom: 20,
+              }}
+            >
+              {nym ? (
+                <NymOn width={22} height={22} />
+              ) : (
+                <NymOff width={22} height={22} />
+              )}
+              <View style={{ flex: 1, marginLeft: 10 }}>
+                <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
+                  {translate('settings.nym-network') as string}
+                </BoldText>
+                <FadeText>
+                  {translate('settings.nym-enhanced-privacy') as string}
+                </FadeText>
+              </View>
+              {nym ? (
+                <SwitchOn width={40} height={19} />
+              ) : (
+                <SwitchOff width={40} height={19} />
+              )}
+            </TouchableOpacity>
+
             <View
               style={{
                 flexGrow: 1,
@@ -1976,25 +2018,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                 }}
               >
                 <Button
-                  type={ButtonTypeEnum.Secondary}
-                  title={translate('send.clear') as string}
-                  onPress={() => {
-                    defaultValueFee();
-                    defaultValuesSpendableMaxAmount();
-                    clearState();
-                    setPickerTempSelectedAddress('');
-                    Keyboard.dismiss();
-                  }}
-                  twoButtons={true}
-                />
-                <Button
                   testID={
                     sendButtonEnabled ? 'send.button' : 'send.button-disabled'
                   }
                   accessible={true}
                   accessibilityLabel={'title ' + translate('send.button')}
-                  type={ButtonTypeEnum.Primary}
-                  style={{ marginLeft: 10 }}
+                  type={nym ? ButtonTypeEnum.Nym : ButtonTypeEnum.Primary}
                   title={
                     validAmount === 1 &&
                     amountText &&
@@ -2077,7 +2106,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     Keyboard.dismiss();
                     setSendButtonEnabled(true);
                   }}
-                  twoButtons={true}
                 />
               </View>
               {server.chainName === ChainNameEnum.mainChainName &&

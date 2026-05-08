@@ -66,13 +66,13 @@ describe('Component Settings - test', () => {
           setLanguageOption={onSetOption}
           setSendAllOption={onSetOption}
           setDonationOption={onSetOption}
-          setModeOption={onSetOption}
           setSecurityOption={onSetOption}
           setSelectServerOption={onSetOption}
           setRescanMenuOption={onSetOption}
           setRecoveryWalletInfoOnDeviceOption={onSetOption}
           setPerformanceLevelOption={onSetOption}
           setBlockExplorerOption={onSetOption}
+          setNymOption={onSetOption}
           toggleMenuDrawer={toggle}
         />
       </ContextAppLoadedProvider>,

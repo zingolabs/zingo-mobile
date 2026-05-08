@@ -49,6 +49,7 @@ function makeProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Confirm> {
         sendAllAmount: false,
         calculateFeeWithPropose: jest.fn(async () => {}),
         sendPageState: mockSendPageState,
+        nym: false,
       },
     },
   };

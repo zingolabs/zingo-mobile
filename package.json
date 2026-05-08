@@ -100,6 +100,7 @@
     "eslint-plugin-react-native": "^5.0.0",
     "jest": "^30.3.0",
     "prettier": "^3.6.2",
+    "react-native-svg-transformer": "^1.5.3",
     "react-test-renderer": "19.1.0",
     "rimraf": "^6.0.1",
     "typescript": "5.5.4"

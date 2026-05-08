@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
 
 import FadeText from '../../Components/FadeText';
-import BoldText from '../../Components/BoldText';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
 import CurrencyAmount from '../../Components/CurrencyAmount';
@@ -89,6 +89,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       ? route.params.sendPageState
       : ({} as SendPageStateClass),
   );
+  const nym: boolean =
+    !!route.params && route.params.nym !== undefined ? route.params.nym : false;
 
   const [memoTotal, setMemoTotal] = useState<string>(
     Utils.buildMemo(
@@ -344,7 +346,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   }, []);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <View
         style={{
           flex: 1,
@@ -385,14 +387,16 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               padding: 10,
               borderWidth: 1,
               borderRadius: 10,
-              borderColor: colors.border,
+              borderColor: nym ? '#07FF94' : colors.border,
             }}
           >
-            <BoldText
+            <RegText
               style={{ textAlign: 'center', textTransform: 'capitalize' }}
             >
-              {translate('send.sending-title') as string}
-            </BoldText>
+              {nym
+                ? (translate('send.nym-processing-title') as string)
+                : (translate('send.sending-title') as string)}
+            </RegText>
 
             <ZecAmount
               currencyName={info.currencyName}
@@ -415,16 +419,25 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               <FadeText>
                 {translate('send.confirm-privacy-level') as string}
               </FadeText>
-              {!privacyLevel ? (
-                <ActivityIndicator
-                  size={
-                    Platform.OS === GlobalConst.platformOSios ? 'small' : 12
-                  }
-                  color={colors.primary}
-                />
-              ) : (
-                <RegText>{privacyLevel}</RegText>
-              )}
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+              >
+                {!privacyLevel ? (
+                  <ActivityIndicator
+                    size={
+                      Platform.OS === GlobalConst.platformOSios ? 'small' : 12
+                    }
+                    color={colors.primary}
+                  />
+                ) : (
+                  <RegText>{privacyLevel}</RegText>
+                )}
+                {nym && (
+                  <RegText style={{ color: '#07FF94' }}>
+                    {translate('send.nym-enhanced') as string}
+                  </RegText>
+                )}
+              </View>
             </View>
           </View>
 
@@ -529,6 +542,29 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               </View>
             );
           })}
+          {nym && (
+            <View
+              style={{
+                margin: 10,
+                padding: 10,
+                borderWidth: 1,
+                borderRadius: 10,
+                borderColor: '#07FF94',
+                backgroundColor: '#07252B',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <TriangleAlert
+                size={24}
+                color={'#07FF94'}
+                style={{ marginRight: 6 }}
+              />
+              <RegText style={{ flex: 1, fontSize: 13, color: '#87919B' }}>
+                {translate('send.nym-warning') as string}
+              </RegText>
+            </View>
+          )}
           <View style={{ marginBottom: 30 }} />
         </ScrollView>
 
@@ -549,7 +585,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             }}
           >
             <Button
-              type={ButtonTypeEnum.Primary}
+              type={nym ? ButtonTypeEnum.Nym : ButtonTypeEnum.Primary}
               title={
                 sendAllAmount
                   ? (translate('send.confirm-button-all') as string)

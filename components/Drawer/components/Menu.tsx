@@ -1,6 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Dimensions } from 'react-native';
+import { View, Text, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 import RegText from '../../../components/Components/RegText';
 
@@ -47,6 +49,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
     translate,
     readOnly,
     mode,
+    setModeOption,
     valueTransfersTotal,
     addLastSnackbar,
     security,
@@ -284,22 +287,75 @@ const Menu: React.FunctionComponent<MenuProps> = ({
       </DrawerContentScrollView>
       <View
         style={{
-          padding: 10,
-          position: 'absolute',
-          bottom: 5,
-          flexDirection: 'row',
+          paddingHorizontal: 15,
+          paddingBottom: 0,
+          paddingTop: 10,
           backgroundColor: colors.sideMenuBackground,
         }}
       >
-        <Text style={{ fontSize: 8, color: colors.border }}>Version : </Text>
-        <Text style={{ fontSize: 8, color: colors.primaryDisabled }}>
-          {translate('version') as string}
-        </Text>
+        <TouchableOpacity
+          onPress={() =>
+            setModeOption(
+              mode === ModeEnum.basic ? ModeEnum.advanced : ModeEnum.basic,
+            )
+          }
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: colors.zingo,
+            borderRadius: 10,
+            padding: 10,
+          }}
+        >
+          <Image
+            source={require('../../../assets/img/logobig-zingo.png')}
+            style={{
+              width: 32,
+              height: 32,
+              resizeMode: 'contain',
+              borderRadius: 8,
+            }}
+          />
+          <Text
+            style={{
+              flex: 1,
+              marginLeft: 10,
+              fontWeight: 'bold',
+              fontSize: 18,
+              color: colors.text,
+            }}
+          >
+            {'Zingo '}
+            <Text
+              style={{
+                color: colors.primary,
+                fontWeight: 'bold',
+                fontSize: 14,
+              }}
+            >
+              {translate(`settings.value-mode-${mode}`) as string}
+            </Text>
+          </Text>
+          <FontAwesomeIcon
+            icon={faChevronRight}
+            size={22}
+            color={colors.zingo}
+          />
+        </TouchableOpacity>
         <Text
-          style={{ fontSize: 8, color: colors.border, marginLeft: 10 }}
-        >{`${translate(
-          'settings.mode',
-        )}${translate(`settings.value-mode-${mode}`)}`}</Text>
+          style={{
+            fontSize: 8,
+            color: colors.border,
+            marginTop: 12,
+            marginBottom: 12,
+          }}
+        >
+          {'Version: '}
+          <Text style={{ color: colors.primaryDisabled }}>
+            {translate('version') as string}
+          </Text>
+        </Text>
       </View>
     </View>
   );
