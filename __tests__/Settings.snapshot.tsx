@@ -66,7 +66,6 @@ describe('Component Settings - test', () => {
           setLanguageOption={onSetOption}
           setSendAllOption={onSetOption}
           setDonationOption={onSetOption}
-          setModeOption={onSetOption}
           setSecurityOption={onSetOption}
           setSelectServerOption={onSetOption}
           setRescanMenuOption={onSetOption}

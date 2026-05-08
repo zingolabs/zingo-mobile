@@ -85,7 +85,6 @@ type SettingsProps = DrawerScreenProps<
   setLanguageOption: (value: LanguageEnum, reset: boolean) => Promise<void>;
   setSendAllOption: (value: boolean) => Promise<void>;
   setDonationOption: (value: boolean) => Promise<void>;
-  setModeOption: (value: string) => Promise<void>;
   setSecurityOption: (value: SecurityType) => Promise<void>;
   setSelectServerOption: (value: string) => Promise<void>;
   setRescanMenuOption: (value: boolean) => Promise<void>;
@@ -108,7 +107,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setLanguageOption,
   setSendAllOption,
   setDonationOption,
-  setModeOption,
   setSecurityOption,
   setSelectServerOption,
   setRescanMenuOption,
@@ -127,7 +125,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     sendAll: sendAllContext,
     donation: donationContext,
     privacy: privacyContext,
-    mode: modeContext,
+    mode,
     netInfo,
     addLastSnackbar,
     security: securityContext,
@@ -219,7 +217,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
   const [donation, setDonation] = useState<boolean>(donationContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
-  const [mode, setMode] = useState<string>(modeContext);
   // security checks box.
   const [startApp, setStartApp] = useState<boolean>(securityContext.startApp);
   const [foregroundApp, setForegroundApp] = useState<boolean>(
@@ -386,7 +383,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       sendAllContext === sendAll &&
       donationContext === donation &&
       privacyContext === privacy &&
-      modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
@@ -412,8 +408,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     languageContext,
     listServerChainName,
     listServerUri,
-    mode,
-    modeContext,
     privacy,
     privacyContext,
     recoveryWalletInfoOnDevice,
@@ -462,7 +456,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       sendAllContext === sendAll &&
       donationContext === donation &&
       privacyContext === privacy &&
-      modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
@@ -591,9 +584,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (privacyContext !== privacy) {
       await setPrivacyOption(privacy);
     }
-    if (modeContext !== mode) {
-      await setModeOption(mode);
-    }
     if (!isEqual(securityContext, securityObject())) {
       await setSecurityOption(securityObject());
     }
@@ -656,7 +646,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const navigateToHome = (reset: boolean) => {
     if (reset) {
       // reset all settings - no save changes
-      setMode(modeContext);
       setCurrency(currencyContext);
       setLanguage(languageContext);
       setDonation(donationContext);
@@ -958,7 +947,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </RNPickerSelect>
           </View>
 
-          {modeContext !== ModeEnum.basic && (
+          {mode !== ModeEnum.basic && (
             <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View
@@ -1011,7 +1000,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </View>
           )}
 
-          {modeContext !== ModeEnum.basic && !readOnly && (
+          {mode !== ModeEnum.basic && !readOnly && (
             <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View
@@ -1065,7 +1054,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </View>
           )}
 
-          {modeContext !== ModeEnum.basic && !readOnly && (
+          {mode !== ModeEnum.basic && !readOnly && (
             <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View
@@ -1118,7 +1107,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </View>
           )}
 
-          {modeContext !== ModeEnum.basic && (
+          {mode !== ModeEnum.basic && (
             <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View
@@ -1172,7 +1161,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </View>
           )}
 
-          {modeContext !== ModeEnum.basic && (
+          {mode !== ModeEnum.basic && (
             <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View
@@ -1253,7 +1242,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </View>
           )}
 
-          {modeContext !== ModeEnum.basic && (
+          {mode !== ModeEnum.basic && (
             <View
               style={{
                 flexDirection: 'row',
@@ -1315,7 +1304,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </View>
           )}
 
-          {modeContext !== ModeEnum.basic && (
+          {mode !== ModeEnum.basic && (
             <View
               style={{
                 flexDirection: 'row',
@@ -1440,7 +1429,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             )}
           </View>
 
-          {modeContext !== ModeEnum.basic && (
+          {mode !== ModeEnum.basic && (
             <>
               <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
                 <BoldText>

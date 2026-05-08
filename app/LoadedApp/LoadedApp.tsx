@@ -2403,7 +2403,6 @@ export class LoadedAppClass extends Component<
                     setLanguageOption={this.setLanguageOption}
                     setSendAllOption={this.setSendAllOption}
                     setDonationOption={this.setDonationOption}
-                    setModeOption={this.setModeOption}
                     setSecurityOption={this.setSecurityOption}
                     setSelectServerOption={this.setSelectServerOption}
                     setRescanMenuOption={this.setRescanMenuOption}
