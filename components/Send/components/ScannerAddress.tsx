@@ -6,7 +6,7 @@ import Scanner from '../../Scanner';
 import { GlobalConst, RouteEnum, ScreenEnum } from '../../../app/AppState';
 import Header from '../../Header';
 import { useTheme } from '@react-navigation/native';
-import { AppDrawerParamList, ThemeType } from '../../../app/types';
+import { AppDrawerParamList } from '../../../app/types';
 
 import { View } from 'react-native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -26,7 +26,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
       : () => {};
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ScannerAddress;
 
   const [active, setActive] = useState<boolean>(

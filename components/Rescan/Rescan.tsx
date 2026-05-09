@@ -6,7 +6,7 @@ import { useTheme } from '@react-navigation/native';
 
 import RegText from '../Components/RegText';
 import Button from '../Components/Button';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import {
@@ -29,7 +29,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   const context = useContext(ContextAppLoaded);
   const { birthday, translate, netInfo, addLastSnackbar, selectServer } =
     context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Rescan;
 
   const doRescanAndClose = async () => {

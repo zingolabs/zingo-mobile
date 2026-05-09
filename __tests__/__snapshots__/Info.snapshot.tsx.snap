@@ -159,9 +159,9 @@ exports[`Component Info - test Info - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }
@@ -269,8 +269,8 @@ exports[`Component Info - test Info - snapshot 1`] = `
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -335,8 +335,8 @@ exports[`Component Info - test Info - snapshot 1`] = `
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -401,8 +401,8 @@ exports[`Component Info - test Info - snapshot 1`] = `
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -467,8 +467,8 @@ exports[`Component Info - test Info - snapshot 1`] = `
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -533,8 +533,8 @@ exports[`Component Info - test Info - snapshot 1`] = `
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -622,7 +622,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#ffffff",
+                        "color": "#c3c3c3",
                         "fontSize": 20,
                         "fontWeight": "700",
                       }

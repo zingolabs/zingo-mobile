@@ -29,7 +29,6 @@ import {
   TransparentAddressClass,
   ScreenEnum,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -63,7 +62,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
     addresses,
     addLastSnackbar,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const { memo, memoUA } = Utils.splitMemo(vt.memos);
 

@@ -36,7 +36,7 @@ import {
   //ServerType,
   ValueTransferType,
 } from '../../app/AppState';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
@@ -114,7 +114,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     zenniesDonationAddress,
     setPrivacyOption,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.History;
 
   const [numVt, setNumVt] = useState<number>(50);
@@ -532,7 +532,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           >
             <FiltersIcon
               style={{ marginLeft: 5, marginRight: 5 }}
-              color={colors.zingo}
+              color={colors.muted}
               size={24}
             />
             {(!!filterKind ||
@@ -664,7 +664,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   borderRadius: 50,
                   transform: [{ scale: pressed ? 0.9 : 1 }],
                   borderWidth: 1,
-                  borderColor: colors.zingo,
+                  borderColor: colors.muted,
                   opacity: isScrollingToTop ? 0.5 : 1,
                 })}
               >
@@ -672,7 +672,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                   size={20}
                   icon={faAngleUp}
-                  color={colors.zingo}
+                  color={colors.muted}
                 />
               </Pressable>
             )}

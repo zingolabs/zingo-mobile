@@ -5,7 +5,7 @@ import { View, ScrollView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import DetailLine from '../Components/DetailLine';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
@@ -24,7 +24,7 @@ type InfoProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Info>;
 const Info: React.FunctionComponent<InfoProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, currency, zecPrice, setZecPrice } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Info;
 
   return (

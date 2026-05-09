@@ -159,9 +159,9 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }
@@ -383,9 +383,9 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }

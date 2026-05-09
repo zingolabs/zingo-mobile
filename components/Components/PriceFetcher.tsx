@@ -14,7 +14,6 @@ import FadeText from './FadeText';
 import { ContextAppLoaded } from '../../app/context';
 import { getZecPrice } from '../../app/walletBackend';
 import RegText from './RegText';
-import { ThemeType } from '../../app/types';
 import { CurrencyEnum, ModeEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
 
@@ -29,7 +28,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, zecPrice, addLastSnackbar, mode, currency } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [refreshMinutes, setRefreshMinutes] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);

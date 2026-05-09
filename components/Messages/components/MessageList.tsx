@@ -54,7 +54,7 @@ import {
   ToAddrClass,
   ValueTransferType,
 } from '../../../app/AppState';
-import { AppDrawerParamList, ThemeType } from '../../../app/types';
+import { AppDrawerParamList } from '../../../app/types';
 import FadeText from '../../Components/FadeText';
 import Button from '../../Components/Button';
 import MessageLine from './MessageLine';
@@ -113,7 +113,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     zingolibVersion,
     setPrivacyOption,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.MessagesList;
 
   const [numVt, setNumVt] = useState<number>(50);
@@ -609,7 +609,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                         width: 40,
                         height: 40,
                         backgroundColor: getLabelAndColor(address).color,
-                        borderColor: colors.zingo,
+                        borderColor: colors.muted,
                         borderWidth: 2,
                         borderRadius: 22,
                         marginLeft: 5,
@@ -768,7 +768,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                 borderRadius: 50,
                 transform: [{ scale: pressed ? 0.9 : 1 }],
                 borderWidth: 1,
-                borderColor: colors.zingo,
+                borderColor: colors.muted,
                 opacity: isScrollingToBottom ? 0.5 : 1,
               })}
             >
@@ -776,7 +776,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                 style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                 size={20}
                 icon={faAngleDown}
-                color={colors.zingo}
+                color={colors.muted}
               />
             </Pressable>
           )}

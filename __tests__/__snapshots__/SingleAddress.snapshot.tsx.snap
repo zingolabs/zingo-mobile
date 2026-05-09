@@ -57,7 +57,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
+                  "fontSize": 15,
                   "fontWeight": "bold",
                   "marginRight": 10,
                   "opacity": 0.9,
@@ -158,7 +158,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             <View
               style={
                 {
-                  "borderColor": "#888888",
+                  "borderColor": undefined,
                   "borderRadius": 30,
                   "marginHorizontal": 10,
                   "paddingHorizontal": 5,
@@ -204,7 +204,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             <View
               style={
                 {
-                  "borderColor": "#888888",
+                  "borderColor": undefined,
                   "borderRadius": 30,
                   "marginHorizontal": 10,
                   "paddingHorizontal": 5,
@@ -213,7 +213,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               }
             >
               <
-                color="#ffffff"
+                color="#c3c3c3"
                 icon={
                   {
                     "icon": [
@@ -290,7 +290,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#888888",
+                "color": undefined,
                 "fontSize": 16,
                 "textDecorationLine": "underline",
               }
@@ -329,8 +329,8 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             {
               "alignItems": "center",
               "backgroundColor": "transparent",
-              "borderRadius": 10,
-              "color": "#ffffff",
+              "borderRadius": 24,
+              "color": "#c3c3c3",
               "justifyContent": "center",
               "maxWidth": "90%",
               "minHeight": 48,
@@ -360,13 +360,13 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "#ffffff",
+                  "color": "#c3c3c3",
                   "fontFamily": "monospace",
                   "fontSize": 16,
-                  "fontWeight": "bold",
+                  "fontWeight": "600",
                   "opacity": 0.8,
                   "textAlign": "center",
-                  "textTransform": "lowercase",
+                  "textTransform": "none",
                 }
               }
             >
@@ -419,7 +419,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               "alignItems": "center",
               "backgroundColor": "#18bd18",
               "borderColor": "#18bd18",
-              "borderRadius": 10,
+              "borderRadius": 24,
               "borderWidth": 2,
               "justifyContent": "center",
               "maxWidth": "90%",
@@ -452,9 +452,9 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
                 {
                   "color": "#011401",
                   "fontSize": 16,
-                  "fontWeight": "bold",
+                  "fontWeight": "600",
                   "textAlign": "center",
-                  "textTransform": "uppercase",
+                  "textTransform": "none",
                 }
               }
             />
@@ -592,7 +592,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
             <View
               style={
                 {
-                  "borderColor": "#888888",
+                  "borderColor": undefined,
                   "borderRadius": 30,
                   "marginHorizontal": 10,
                   "paddingHorizontal": 5,
@@ -635,8 +635,8 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
           {
             "alignItems": "center",
             "backgroundColor": "transparent",
-            "borderRadius": 10,
-            "color": "#ffffff",
+            "borderRadius": 24,
+            "color": "#c3c3c3",
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -665,13 +665,13 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
           <Text
             style={
               {
-                "color": "#ffffff",
+                "color": "#c3c3c3",
                 "fontFamily": "monospace",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "opacity": 0.8,
                 "textAlign": "center",
-                "textTransform": "lowercase",
+                "textTransform": "none",
               }
             }
           >

@@ -32,7 +32,7 @@ import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import { checkServerURI, parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Components/Button';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 
 import Header from '../Header';
@@ -199,7 +199,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     BLOCKEXPLORERMENU = blockExplorersArray as Options[];
   }
 
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Settings;
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
@@ -933,7 +933,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   style={{
                     marginRight: 5,
                     fontWeight: '400',
-                    color: colors.zingo,
+                    color: colors.text,
                   }}
                 >
                   {translate(`settings.value-language-${language}`) as string}
@@ -941,7 +941,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <FontAwesomeIcon
                   icon={faChevronRight}
                   size={16}
-                  color={colors.zingo}
+                  color={colors.text}
                 />
               </View>
             </RNPickerSelect>
@@ -1285,7 +1285,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     style={{
                       marginRight: 5,
                       fontWeight: '400',
-                      color: colors.zingo,
+                      color: colors.text,
                     }}
                   >
                     {
@@ -1297,7 +1297,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   <FontAwesomeIcon
                     icon={faChevronRight}
                     size={16}
-                    color={colors.zingo}
+                    color={colors.text}
                   />
                 </View>
               </RNPickerSelect>
@@ -1326,7 +1326,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     style={{
                       marginRight: 5,
                       fontWeight: '400',
-                      color: colors.zingo,
+                      color: colors.text,
                     }}
                   >
                     {securityLabel}
@@ -1334,7 +1334,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   <FontAwesomeIcon
                     icon={faChevronRight}
                     size={16}
-                    color={colors.zingo}
+                    color={colors.text}
                   />
                 </View>
               </TouchableOpacity>

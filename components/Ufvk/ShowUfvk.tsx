@@ -21,7 +21,7 @@ import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import Button from '../Components/Button';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
@@ -74,7 +74,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     setPrivacyOption,
     recoveryWalletInfoOnDevice,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ShowUfvk;
 
   const [times, setTimes] = useState<number>(0);

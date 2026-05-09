@@ -7,7 +7,7 @@ import { useTheme } from '@react-navigation/native';
 import ZecAmount from '../Components/ZecAmount';
 import BoldText from '../Components/BoldText';
 import DetailLine from '../Components/DetailLine';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -33,7 +33,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
     transparentPool,
     setPrivacyOption,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Pools;
 
   //console.log('render pools. Balance:', totalBalance, orchardPool, saplingPool, transparentPool);
@@ -178,7 +178,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                           totalBalance.confirmedSaplingBalance > 0 &&
                           totalBalance.confirmedSaplingBalance ===
                             totalBalance.totalSaplingBalance
-                            ? colors.syncing
+                            ? colors.active
                             : 'red'
                         }
                         privacy={privacy}

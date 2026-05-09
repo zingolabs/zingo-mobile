@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
 
 type RegTextProps = {
   style?: TextStyle;
@@ -20,12 +19,12 @@ const RegText: React.FunctionComponent<RegTextProps> = ({
   children,
   selectable,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const styleSum: TextStyle = {
     color: color || colors.text,
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '400',
     opacity: 1,
     ...style,
   };

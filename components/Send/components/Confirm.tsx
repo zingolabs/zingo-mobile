@@ -14,7 +14,7 @@ import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
 import simpleBiometrics from '../../../app/simpleBiometrics';
 
-import { AppDrawerParamList, ThemeType } from '../../../app/types';
+import { AppDrawerParamList } from '../../../app/types';
 import Utils from '../../../app/utils';
 import {
   ButtonTypeEnum,
@@ -57,7 +57,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     server,
     security,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Confirm;
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);

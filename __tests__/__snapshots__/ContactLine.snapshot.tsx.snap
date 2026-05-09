@@ -177,7 +177,7 @@ exports[`ContactLine - snapshots ContactLine no month header, protected 1`] = `
               }
             >
               <
-                color="#ffffff"
+                color="#c3c3c3"
                 icon={
                   {
                     "icon": [
@@ -263,7 +263,7 @@ exports[`ContactLine - snapshots ContactLine no month header, protected 1`] = `
                   {
                     "alignItems": "center",
                     "backgroundColor": "#FF5733",
-                    "borderColor": "#888888",
+                    "borderColor": undefined,
                     "borderRadius": 22,
                     "borderWidth": 2,
                     "height": 40,
@@ -310,8 +310,8 @@ exports[`ContactLine - snapshots ContactLine no month header, protected 1`] = `
                   style={
                     {
                       "color": "#c3c3c3",
-                      "fontSize": 18,
-                      "fontWeight": "600",
+                      "fontSize": 15,
+                      "fontWeight": "400",
                       "opacity": 1,
                     }
                   }
@@ -704,7 +704,7 @@ exports[`ContactLine - snapshots ContactLine with month header 1`] = `
               }
             >
               <
-                color="#ffffff"
+                color="#c3c3c3"
                 icon={
                   {
                     "icon": [
@@ -790,7 +790,7 @@ exports[`ContactLine - snapshots ContactLine with month header 1`] = `
                   {
                     "alignItems": "center",
                     "backgroundColor": "#FF5733",
-                    "borderColor": "#888888",
+                    "borderColor": undefined,
                     "borderRadius": 22,
                     "borderWidth": 2,
                     "height": 40,
@@ -837,8 +837,8 @@ exports[`ContactLine - snapshots ContactLine with month header 1`] = `
                   style={
                     {
                       "color": "#c3c3c3",
-                      "fontSize": 18,
-                      "fontWeight": "600",
+                      "fontSize": 15,
+                      "fontWeight": "400",
                       "opacity": 1,
                     }
                   }

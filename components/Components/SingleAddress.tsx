@@ -15,7 +15,6 @@ import {
   useTheme,
 } from '@react-navigation/native';
 
-import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
   AddressKindEnum,
@@ -74,7 +73,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, mode, addressBook } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
   const contentHeight = useRef(0);
@@ -409,7 +408,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       >
                         <Text
                           style={{
-                            color: colors.zingo,
+                            color: colors.muted,
                             textDecorationLine: 'underline',
                             marginTop: 15,
                             minHeight: 48,
@@ -457,14 +456,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   <View
                     style={{
                       borderRadius: 30,
-                      borderColor: colors.zingo,
+                      borderColor: colors.muted,
                       paddingHorizontal: 5,
                       paddingVertical: 5,
                       marginHorizontal: 10,
                     }}
                   >
                     <CopyIcon
-                      color={colors.money}
+                      color={colors.text}
                       size={24}
                       opacity={0.9}
                       style={{ margin: 3 }}
@@ -477,7 +476,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       <View
                         style={{
                           borderRadius: 30,
-                          borderColor: colors.zingo,
+                          borderColor: colors.muted,
                           paddingHorizontal: 5,
                           paddingVertical: 5,
                           marginHorizontal: 10,
@@ -487,7 +486,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           style={{ margin: 5, opacity: 0.9 }}
                           size={24}
                           icon={faCircleCheck}
-                          color={colors.money}
+                          color={colors.text}
                         />
                       </View>
                     </TouchableOpacity>
@@ -496,14 +495,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         <View
                           style={{
                             borderRadius: 30,
-                            borderColor: colors.zingo,
+                            borderColor: colors.muted,
                             paddingHorizontal: 5,
                             paddingVertical: 5,
                             marginHorizontal: 10,
                           }}
                         >
                           <ListIcon
-                            color={colors.money}
+                            color={colors.text}
                             size={24}
                             opacity={0.9}
                             style={{ margin: 3 }}
@@ -518,7 +517,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             {ufvk && (
               <Address
                 address={ufvk}
-                style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+                style={{ color: colors.text, fontSize: 18, opacity: 0.8 }}
                 onPress={() => show('EA')}
               />
             )}
@@ -535,7 +534,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 {contactFromAddress() ? (
                   <Text
                     style={{
-                      color: colors.zingo,
+                      color: colors.muted,
                       fontSize: 16,
                     }}
                   >
@@ -545,7 +544,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   <TouchableOpacity onPress={() => show('NAT')}>
                     <Text
                       style={{
-                        color: colors.zingo,
+                        color: colors.muted,
                         textDecorationLine: 'underline',
                         fontSize: 16,
                       }}
@@ -556,7 +555,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 )}
                 <Address
                   address={address.address}
-                  style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+                  style={{ color: colors.text, fontSize: 18, opacity: 0.8 }}
                   onPress={() => show('EA')}
                   testID={
                     address.addressKind === AddressKindEnum.u
@@ -612,7 +611,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           color={
                             showMoreOptions
                               ? colors.warning.primary
-                              : colors.zingo
+                              : colors.muted
                           }
                           style={{ marginRight: 16 }}
                         />
@@ -621,7 +620,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                             fontSize: 16,
                             color: showMoreOptions
                               ? colors.warning.primary
-                              : colors.zingo,
+                              : colors.muted,
                           }}
                         >
                           {translate('receive.danger-zone') as string}{' '}
@@ -635,7 +634,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         ) : (
                           <ChevronDown
                             size={20}
-                            color={colors.zingo}
+                            color={colors.muted}
                             style={{ marginLeft: 16 }}
                           />
                         )}

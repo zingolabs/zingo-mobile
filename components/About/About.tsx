@@ -5,7 +5,7 @@ import { View, ScrollView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import FadeText from '../Components/FadeText';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import DetailLine from '../Components/DetailLine';
@@ -17,7 +17,7 @@ type AboutProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.About>;
 const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const { zingolibVersion, translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.About;
 
   const arrayTxtObject = translate('about.copyright');

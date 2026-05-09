@@ -4,7 +4,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import RegText from '../../../components/Components/RegText';
-import { AppDrawerParamList, ThemeType } from '../../types';
+import { AppDrawerParamList } from '../../types';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';
 import { RouteEnum, ScreenEnum } from '../../AppState';
@@ -20,7 +20,7 @@ const ComputingTxContent: React.FunctionComponent<
 > = ({}) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ComputingTxContext;
 
   return (

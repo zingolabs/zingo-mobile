@@ -25,7 +25,7 @@ import {
   TransparentAddressClass,
   UnifiedAddressClass,
 } from '../../app/AppState';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import AlSummaryLine from './components/AlSummaryLine';
@@ -51,7 +51,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       : () => {};
   const context = useContext(ContextAppLoaded);
   const { translate, addresses } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.AddressList;
 
   const [numAl, setNumAl] = useState<number>(50);
@@ -294,7 +294,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             borderRadius: 50,
             transform: [{ scale: pressed ? 0.9 : 1 }],
             borderWidth: 1,
-            borderColor: colors.zingo,
+            borderColor: colors.muted,
             opacity: isScrollingToTop ? 0.5 : 1,
           })}
         >
@@ -302,7 +302,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
             size={20}
             icon={faAngleUp}
-            color={colors.zingo}
+            color={colors.muted}
           />
         </Pressable>
       )}

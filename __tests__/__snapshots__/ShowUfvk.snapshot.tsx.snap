@@ -238,9 +238,9 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "#ffffff",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "color": "#c3c3c3",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
               "paddingHorizontal": 5,
             }
@@ -519,9 +519,9 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "#ffffff",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "color": "#c3c3c3",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
               "paddingHorizontal": 5,
             }
@@ -800,9 +800,9 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "#ffffff",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "color": "#c3c3c3",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
               "paddingHorizontal": 5,
             }
@@ -1081,9 +1081,9 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "#ffffff",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "color": "#c3c3c3",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
               "paddingHorizontal": 5,
             }

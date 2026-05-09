@@ -3,7 +3,6 @@ import React from 'react';
 import { TouchableOpacity, Text, View, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { ThemeType } from '../../app/types';
 import { ButtonTypeEnum } from '../../app/AppState';
 
 type ButtonProps = {
@@ -31,7 +30,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   testID,
   twoButtons,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const styleButton: TextStyle =
     type === ButtonTypeEnum.Primary
@@ -58,7 +57,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           : type === ButtonTypeEnum.Ghost
             ? {
                 backgroundColor: 'transparent',
-                color: colors.money,
+                color: colors.text,
               }
             : type === ButtonTypeEnum.Nym
               ? {
@@ -77,7 +76,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     padding: 0,
     paddingLeft: 20,
     paddingRight: 20,
-    borderRadius: 10,
+    borderRadius: 24,
     maxWidth: '90%',
     minWidth: '30%',
     minHeight: 48,
@@ -101,7 +100,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           : type === ButtonTypeEnum.Ghost
             ? {
                 color: colors.text,
-                textTransform: 'lowercase',
+                textTransform: 'none',
               }
             : type === ButtonTypeEnum.Nym
               ? {
@@ -112,8 +111,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
                   color: colors.background,
                 };
   const styleTextCommon: TextStyle = {
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
+    fontWeight: '600',
+    textTransform: 'none',
     fontSize: 16,
     textAlign: 'center',
   };

@@ -37,7 +37,6 @@ import {
   UfvkActionEnum,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
-import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import PriceFetcher from '../Components/PriceFetcher';
 import RegText from '../Components/RegText';
@@ -159,7 +158,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     privacy = context.privacy;
   }
 
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const opacityValue = useRef(new Animated.Value(1)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -605,7 +604,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           alignItems: 'center',
                           justifyContent: 'center',
                           padding: 1,
-                          borderColor: colors.syncing,
+                          borderColor: colors.active,
                           borderWidth: 1,
                           borderRadius: 10,
                           minWidth: 25,
@@ -631,7 +630,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                             >
                               <FontAwesomeIcon
                                 icon={faPlay}
-                                color={colors.syncing}
+                                color={colors.active}
                                 size={19}
                               />
                               {viewSyncStatus && (
@@ -671,7 +670,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                               >
                                 <FontAwesomeIcon
                                   icon={faPlay}
-                                  color={colors.syncing}
+                                  color={colors.active}
                                   size={19}
                                 />
                                 {viewSyncStatus && (
@@ -789,7 +788,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   marginHorizontal: 2.5,
                   paddingHorizontal: 5,
                   paddingVertical: 1,
-                  borderColor: colors.zingo,
+                  borderColor: colors.muted,
                   borderWidth: 1,
                   borderRadius: 10,
                   minWidth: 25,
@@ -1023,7 +1022,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               >
                 <FontAwesomeIcon
                   icon={faBars}
-                  size={40}
+                  size={24}
                   color={colors.border}
                 />
               </TouchableOpacity>
@@ -1046,14 +1045,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     <FontAwesomeIcon
                       icon={faSnowflake}
                       size={24}
-                      color={colors.zingo}
+                      color={colors.muted}
                     />
                   </TouchableOpacity>
                 ) : (
                   <FontAwesomeIcon
                     icon={faSnowflake}
                     size={24}
-                    color={colors.zingo}
+                    color={colors.muted}
                   />
                 )}
               </>
@@ -1094,7 +1093,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               >
                 <FontAwesomeIcon
                   icon={faGear}
-                  size={35}
+                  size={24}
                   color={colors.border}
                 />
               </TouchableOpacity>
@@ -1136,7 +1135,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               </TouchableOpacity>
               <RegText
                 testID={testID}
-                color={colors.money}
+                color={colors.text}
                 style={{ paddingHorizontal: 5 }}
               >
                 {title}
@@ -1148,7 +1147,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
               <RegText
                 testID={testID}
-                color={colors.money}
+                color={colors.text}
                 style={{ paddingHorizontal: 5, textAlign: 'center' }}
               >
                 {title}

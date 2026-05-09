@@ -36,7 +36,6 @@ import {
   GlobalConst,
   ScreenEnum,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -69,7 +68,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
     selectServer,
     setSendPageState,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
 
@@ -177,7 +176,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     style={{ opacity: 0.8 }}
                     size={30}
                     icon={faComments}
-                    color={colors.money}
+                    color={colors.text}
                   />
                 </TouchableOpacity>
               </View>
@@ -338,7 +337,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                       width: 40,
                       height: 40,
                       backgroundColor: c.color,
-                      borderColor: colors.zingo,
+                      borderColor: colors.muted,
                       borderWidth: 2,
                       borderRadius: 22,
                       marginLeft: 5,

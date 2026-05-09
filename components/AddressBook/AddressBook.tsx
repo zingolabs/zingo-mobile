@@ -27,7 +27,7 @@ import {
   RouteEnum,
   ScreenEnum,
 } from '../../app/AppState';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import AbDetail from './components/AbDetail';
@@ -56,7 +56,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addressBook, zenniesDonationAddress } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.AddressBook;
 
   const [numAb, setNumAb] = useState<number>(50);
@@ -326,7 +326,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     : colors.sideMenuBackground,
                 borderRadius: 15,
                 borderColor:
-                  filter === FilterEnum.all ? colors.primary : colors.zingo,
+                  filter === FilterEnum.all ? colors.primary : colors.muted,
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
@@ -338,7 +338,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                   color:
                     filter === FilterEnum.all
                       ? colors.sideMenuBackground
-                      : colors.zingo,
+                      : colors.muted,
                   fontWeight: 'bold',
                 }}
               >
@@ -363,7 +363,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 borderColor:
                   filter === FilterEnum.contacts
                     ? colors.primary
-                    : colors.zingo,
+                    : colors.muted,
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
@@ -375,7 +375,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                   color:
                     filter === FilterEnum.contacts
                       ? colors.sideMenuBackground
-                      : colors.zingo,
+                      : colors.muted,
                   fontWeight: 'bold',
                 }}
               >
@@ -398,7 +398,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     : colors.sideMenuBackground,
                 borderRadius: 15,
                 borderColor:
-                  filter === FilterEnum.wallet ? colors.primary : colors.zingo,
+                  filter === FilterEnum.wallet ? colors.primary : colors.muted,
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
@@ -410,7 +410,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                   color:
                     filter === FilterEnum.wallet
                       ? colors.sideMenuBackground
-                      : colors.zingo,
+                      : colors.muted,
                   fontWeight: 'bold',
                 }}
               >
@@ -594,7 +594,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             borderRadius: 50,
             transform: [{ scale: pressed ? 0.9 : 1 }],
             borderWidth: 1,
-            borderColor: colors.zingo,
+            borderColor: colors.muted,
             opacity: isScrollingToTop ? 0.5 : 1,
           })}
         >
@@ -602,7 +602,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
             size={20}
             icon={faAngleUp}
-            color={colors.zingo}
+            color={colors.muted}
           />
         </Pressable>
       )}

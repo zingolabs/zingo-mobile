@@ -37,7 +37,7 @@ import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
-import { AppDrawerParamList, ThemeType } from '../../../app/types';
+import { AppDrawerParamList } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import BoldText from '../../Components/BoldText';
@@ -85,7 +85,7 @@ const ValueTransferDetail: React.FunctionComponent<
     setPrivacyOption,
     blockExplorer,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ValueTransferDetail;
 
   const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(
@@ -149,7 +149,7 @@ const ValueTransferDetail: React.FunctionComponent<
   useEffect(() => {
     const spendCo =
       valueTransfer.status === RPCValueTransfersStatusEnum.failed
-        ? colors.zingo
+        ? colors.muted
         : valueTransfer.confirmations >= 0 &&
             valueTransfer.confirmations < GlobalConst.minConfirmations
           ? colors.primaryDisabled
@@ -162,7 +162,7 @@ const ValueTransferDetail: React.FunctionComponent<
     colors.primary,
     colors.primaryDisabled,
     colors.text,
-    colors.zingo,
+    colors.muted,
     valueTransfer.confirmations,
     valueTransfer.kind,
     valueTransfer.status,
@@ -529,7 +529,7 @@ const ValueTransferDetail: React.FunctionComponent<
                 <FontAwesomeIcon
                   style={{ marginRight: 5 }}
                   icon={faTriangleExclamation}
-                  color={colors.syncing}
+                  color={colors.active}
                   size={15}
                 />
               )}

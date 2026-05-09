@@ -4,7 +4,6 @@ import { View } from 'react-native';
 import { Svg, Circle, Text as SVGText } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 
-import { ThemeType } from '../../app/types';
 
 type circularProgressProps = {
   bgColor?: string;
@@ -20,7 +19,7 @@ type circularProgressProps = {
 const CircularProgress: React.FunctionComponent<
   circularProgressProps
 > = props => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const { size, strokeWidth, text, progressPercent } = props;
   const radius = (size - strokeWidth) / 2;
   const circum = radius * 2 * Math.PI;

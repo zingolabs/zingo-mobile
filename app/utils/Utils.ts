@@ -79,7 +79,17 @@ export default class Utils {
       smallPart = '0000';
     }
 
-    return { bigPart: intPart + decimalSeparator + decimalPart, smallPart };
+    // Trim trailing zeros from the first 4 decimal digits only when the
+    // sub-decimal part (digits 5-8) is also all zeros — preserves positional
+    // alignment when smallPart carries significant digits.
+    const trimmedDecimal =
+      smallPart === '0000' ? decimalPart.replace(/0+$/, '') : decimalPart;
+    return {
+      bigPart: trimmedDecimal
+        ? intPart + decimalSeparator + trimmedDecimal
+        : String(intPart),
+      smallPart,
+    };
   }
 
   static splitStringIntoChunks(s: string, numChunks: number): string[] {

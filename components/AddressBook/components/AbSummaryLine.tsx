@@ -28,7 +28,6 @@ import {
   SelectServerEnum,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
-import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 
 type AbSummaryLineProps = {
@@ -64,7 +63,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
     selectServer,
     setSendPageState,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const displayAddress: string = item.address
     ? Utils.trimToSmall(item.address, 7)
@@ -110,7 +109,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           marginTop: 15,
           paddingBottom: 15,
           borderBottomWidth: addressProtected ? 3 : 1,
-          borderBottomColor: addressProtected ? colors.zingo : colors.border,
+          borderBottomColor: addressProtected ? colors.muted : colors.border,
           opacity: addressProtected ? 0.5 : 1,
         }}
       >
@@ -137,7 +136,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 icon={item.own ? faWallet : faAddressCard}
                 color={
                   addressProtected || item.own
-                    ? colors.zingo
+                    ? colors.muted
                     : item.color
                       ? item.color
                       : colors.primarydisabled
@@ -147,7 +146,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{
                   fontSize: 18,
                   marginHorizontal: 10,
-                  color: addressProtected ? colors.zingo : colors.primary,
+                  color: addressProtected ? colors.muted : colors.primary,
                   opacity: 1,
                   fontWeight: 'bold',
                 }}
@@ -160,7 +159,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{ marginHorizontal: 10 }}
                 size={24}
                 icon={faQrcode}
-                color={colors.zingo}
+                color={colors.muted}
               />
               <FadeText
                 style={{
@@ -195,7 +194,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{ opacity: 0.8 }}
                 size={25}
                 icon={faPencil}
-                color={colors.money}
+                color={colors.text}
               />
             </TouchableOpacity>
           </View>
@@ -254,7 +253,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{ opacity: 0.8 }}
                 size={25}
                 icon={faTrashCan}
-                color={colors.money}
+                color={colors.text}
               />
             </TouchableOpacity>
           </View>

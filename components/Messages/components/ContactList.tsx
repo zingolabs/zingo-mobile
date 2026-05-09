@@ -40,7 +40,7 @@ import {
   UnifiedAddressClass,
   ValueTransferType,
 } from '../../../app/AppState';
-import { AppDrawerParamList, ThemeType } from '../../../app/types';
+import { AppDrawerParamList } from '../../../app/types';
 import FadeText from '../../Components/FadeText';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
@@ -92,7 +92,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     doRefresh,
     zenniesDonationAddress,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ContactList;
 
   const [contacts, setContacts] = useState<ContactType[]>([]);
@@ -501,7 +501,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                     : colors.sideMenuBackground,
                 borderRadius: 15,
                 borderColor:
-                  filter === FilterEnum.all ? colors.primary : colors.zingo,
+                  filter === FilterEnum.all ? colors.primary : colors.muted,
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
@@ -513,7 +513,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   color:
                     filter === FilterEnum.all
                       ? colors.sideMenuBackground
-                      : colors.zingo,
+                      : colors.muted,
                   fontWeight: 'bold',
                 }}
               >
@@ -537,7 +537,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 borderColor:
                   filter === FilterEnum.contacts
                     ? colors.primary
-                    : colors.zingo,
+                    : colors.muted,
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
@@ -549,7 +549,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   color:
                     filter === FilterEnum.contacts
                       ? colors.sideMenuBackground
-                      : colors.zingo,
+                      : colors.muted,
                   fontWeight: 'bold',
                 }}
               >
@@ -573,7 +573,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 borderColor:
                   filter === FilterEnum.noContacts
                     ? colors.primary
-                    : colors.zingo,
+                    : colors.muted,
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
@@ -585,7 +585,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   color:
                     filter === FilterEnum.noContacts
                       ? colors.sideMenuBackground
-                      : colors.zingo,
+                      : colors.muted,
                   fontWeight: 'bold',
                 }}
               >
@@ -603,7 +603,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 style={{ margin: 0 }}
                 size={30}
                 icon={faMagnifyingGlass}
-                color={colors.zingo}
+                color={colors.muted}
               />
             </TouchableOpacity>
           )}
@@ -617,7 +617,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             >
               <View
                 style={{
-                  backgroundColor: colors.zingo,
+                  backgroundColor: colors.muted,
                   borderRadius: 15,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -740,7 +740,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 borderRadius: 50,
                 transform: [{ scale: pressed ? 0.9 : 1 }],
                 borderWidth: 1,
-                borderColor: colors.zingo,
+                borderColor: colors.muted,
                 opacity: isScrollingToTop ? 0.5 : 1,
               })}
             >
@@ -748,7 +748,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                 size={20}
                 icon={faAngleUp}
-                color={colors.zingo}
+                color={colors.muted}
               />
             </Pressable>
           )}

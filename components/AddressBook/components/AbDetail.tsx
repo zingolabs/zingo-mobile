@@ -12,7 +12,6 @@ import {
   ScreenEnum,
   //SecurityType,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import TextInputAddress from '../../Components/TextInputAddress';
@@ -49,7 +48,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addressBook } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [label, setLabel] = useState<string>(item.label);
   const [address, setAddress] = useState<string>(item.address);

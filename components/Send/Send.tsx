@@ -70,7 +70,7 @@ import {
 import { parseZcashURI, serverUris } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
@@ -144,7 +144,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setPrivacyOption,
     nym: nymContext,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Send;
   const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
   <svg viewBox="0 0 88.03 147.85">
@@ -1606,7 +1606,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             spendableBalanceLastError &&
                             mode === ModeEnum.advanced
                               ? 'red'
-                              : colors.money,
+                              : colors.text,
                         }}
                       >
                         {translate('send.spendable') as string}
@@ -1621,7 +1621,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             (spendableBalanceLastError &&
                               mode === ModeEnum.advanced)
                               ? 'red'
-                              : colors.money
+                              : colors.text
                           }
                           size={15}
                           amtZec={maxAmount}
@@ -1723,7 +1723,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 proposeSendLastError &&
                                 mode === ModeEnum.advanced
                                   ? 'red'
-                                  : colors.money,
+                                  : colors.text,
                             }}
                           >
                             {(translate('send.fee') as string) +

@@ -67,8 +67,8 @@ exports[`AddressItem - snapshots AddressItem known contact from address book wit
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
             }
           }
@@ -124,8 +124,8 @@ exports[`AddressItem - snapshots AddressItem known contact from address book wit
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
             }
           }
@@ -265,8 +265,8 @@ exports[`AddressItem - snapshots AddressItem oneLine mode 1`] = `
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
             }
           }
@@ -346,8 +346,8 @@ exports[`AddressItem - snapshots AddressItem privacy mode 1`] = `
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
             }
           }
@@ -427,8 +427,8 @@ exports[`AddressItem - snapshots AddressItem unknown address, no contact 1`] = `
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
             }
           }

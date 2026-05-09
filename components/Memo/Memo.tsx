@@ -15,7 +15,7 @@ import {
 
 import { useTheme } from '@react-navigation/native';
 import Button from '../Components/Button';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -39,7 +39,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ navigation, route }) => {
       : () => {};
   const context = useContext(ContextAppLoaded);
   const { translate, defaultUnifiedAddress } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Memo;
 
   const [memo, setMemo] = useState<string>(

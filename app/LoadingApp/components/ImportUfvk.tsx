@@ -18,7 +18,6 @@ import FadeText from '../../../components/Components/FadeText';
 import RegText from '../../../components/Components/RegText';
 import Button from '../../../components/Components/Button';
 import ScannerUfvk from './ScannerUfvk';
-import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
 import Header from '../../../components/Header';
 import RPCModule from '../../RPCModule';
@@ -47,7 +46,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, mode, addLastSnackbar, selectServer } =
     context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ImportUfvk;
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');

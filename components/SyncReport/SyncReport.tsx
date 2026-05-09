@@ -4,7 +4,7 @@ import { View, ScrollView, Text, ActivityIndicator } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import DetailLine from '../Components/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
 
@@ -47,7 +47,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     addLastSnackbar,
     setBackgroundSyncErrorInfo,
   } = context; //mode
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.SyncReport;
 
   const [maxBlocks, setMaxBlocks] = useState<number>(0);

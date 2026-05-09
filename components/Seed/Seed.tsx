@@ -20,7 +20,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
   ModeEnum,
@@ -75,7 +75,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     setPrivacyOption,
     recoveryWalletInfoOnDevice,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   // when this screen is open from LoadingApp (new wallet)
   // is using the standard modal from react-native
   const screenName = ScreenEnum.Seed;

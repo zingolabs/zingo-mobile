@@ -8,7 +8,6 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
 import Button from '../../../components/Components/Button';
-import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
 import WalletType from '../../AppState/types/WalletType';
 import {
@@ -46,7 +45,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
     addLastSnackbar,
     setPrivacyOption,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Seed;
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);

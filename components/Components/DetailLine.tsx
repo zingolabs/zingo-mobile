@@ -6,7 +6,6 @@ import { useTheme } from '@react-navigation/native';
 
 import FadeText from './FadeText';
 import RegText from './RegText';
-import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { SnackbarDurationEnum } from '../../app/AppState';
 
@@ -23,7 +22,7 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({
   children,
   testID,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const context = useContext(ContextAppLoaded);
   const { addLastSnackbar, translate } = context;
 

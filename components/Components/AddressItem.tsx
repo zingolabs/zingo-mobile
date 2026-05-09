@@ -21,7 +21,6 @@ import {
   useNavigation,
   useTheme,
 } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
@@ -60,7 +59,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     selectServer,
     setSendPageState,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [expandAddress, setExpandAddress] = useState<boolean>(false);
   const [expandContact, setExpandContact] = useState<boolean>(false);

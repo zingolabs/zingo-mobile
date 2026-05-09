@@ -163,7 +163,7 @@ const SERVER_DEFAULT_0: ServerType = {
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
-  const theme = useTheme() as ThemeType;
+  const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(
     CurrencyEnum.USDCurrency,
@@ -2172,7 +2172,7 @@ export class LoadedAppClass extends Component<
           <FontAwesomeIcon
             size={25}
             icon={iconName}
-            color={focused ? colors.background : colors.money}
+            color={focused ? colors.background : colors.text}
           />
         </View>
       );
@@ -2236,13 +2236,14 @@ export class LoadedAppClass extends Component<
                             tabBarLabelStyle: {
                               alignSelf: 'center',
                               fontSize: 14,
+                              textTransform: 'none',
                             },
                             tabBarItemStyle: {
                               height: 60,
                             },
                             tabBarActiveTintColor: colors.background,
                             tabBarActiveBackgroundColor: colors.primaryDisabled,
-                            tabBarInactiveTintColor: colors.money,
+                            tabBarInactiveTintColor: colors.text,
                             tabBarInactiveBackgroundColor:
                               colors.sideMenuBackground,
                             tabBarStyle: {

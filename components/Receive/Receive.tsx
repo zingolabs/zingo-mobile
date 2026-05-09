@@ -19,7 +19,7 @@ import { useTheme } from '@react-navigation/native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '../Components/SingleAddress';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 
@@ -67,7 +67,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, addresses, defaultUnifiedAddress, mode, addLastSnackbar } =
     context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Receive;
 
   const [index, setIndex] = useState<number>(0);

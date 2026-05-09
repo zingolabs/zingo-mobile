@@ -23,7 +23,6 @@ import { faEllipsisV, faWifi } from '@fortawesome/free-solid-svg-icons';
 
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
-import { ThemeType } from '../../types';
 import {
   ButtonTypeEnum,
   ChainNameEnum,
@@ -84,7 +83,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 }) => {
   const context = useContext(ContextAppLoading);
   const { netInfo, mode, translate, server, selectServer } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   return (
     <View
@@ -273,11 +272,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             style={{ marginBottom: 30, display: 'flex', alignItems: 'center' }}
           >
             <Text
-              style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}
+              style={{ color: colors.muted, fontSize: 40, fontWeight: 'bold' }}
             >
               {translate('zingo') as string}
             </Text>
-            <Text style={{ color: colors.zingo, fontSize: 15 }}>
+            <Text style={{ color: colors.muted, fontSize: 15 }}>
               {translate('version') as string}
             </Text>
             <Image
@@ -341,7 +340,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                     paddingVertical: 1,
                     borderColor: customServerOffline
                       ? colors.primary
-                      : colors.zingo,
+                      : colors.muted,
                     borderWidth: customServerOffline ? 2 : 1,
                     borderRadius: 10,
                     minWidth: 25,
@@ -356,7 +355,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                     >
                       <FontAwesomeIcon
                         icon={faWifi}
-                        color={customServerOffline ? 'red' : colors.zingo}
+                        color={customServerOffline ? 'red' : colors.muted}
                         size={18}
                       />
                       <FadeText style={{ marginLeft: 10, marginRight: 5 }}>

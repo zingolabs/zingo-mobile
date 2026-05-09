@@ -75,7 +75,6 @@ exports[`AbSummaryLine - snapshots AbSummaryLine normal contact 1`] = `
           }
         >
           <
-            color="#888888"
             icon={
               {
                 "icon": [
@@ -118,7 +117,6 @@ exports[`AbSummaryLine - snapshots AbSummaryLine normal contact 1`] = `
           }
         >
           <
-            color="#888888"
             icon={
               {
                 "icon": [
@@ -201,7 +199,7 @@ exports[`AbSummaryLine - snapshots AbSummaryLine normal contact 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [
@@ -340,7 +338,7 @@ exports[`AbSummaryLine - snapshots AbSummaryLine normal contact 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [
@@ -383,7 +381,7 @@ exports[`AbSummaryLine - snapshots AbSummaryLine protected address 1`] = `
   <View
     style={
       {
-        "borderBottomColor": "#888888",
+        "borderBottomColor": undefined,
         "borderBottomWidth": 3,
         "display": "flex",
         "flexDirection": "row",
@@ -445,7 +443,6 @@ exports[`AbSummaryLine - snapshots AbSummaryLine protected address 1`] = `
           }
         >
           <
-            color="#888888"
             icon={
               {
                 "icon": [
@@ -473,7 +470,7 @@ exports[`AbSummaryLine - snapshots AbSummaryLine protected address 1`] = `
           <Text
             style={
               {
-                "color": "#888888",
+                "color": undefined,
                 "fontSize": 18,
                 "fontWeight": "bold",
                 "marginHorizontal": 10,
@@ -492,7 +489,6 @@ exports[`AbSummaryLine - snapshots AbSummaryLine protected address 1`] = `
           }
         >
           <
-            color="#888888"
             icon={
               {
                 "icon": [
@@ -608,7 +604,6 @@ exports[`AbSummaryLine - snapshots AbSummaryLine readOnly mode 1`] = `
           }
         >
           <
-            color="#888888"
             icon={
               {
                 "icon": [
@@ -651,7 +646,6 @@ exports[`AbSummaryLine - snapshots AbSummaryLine readOnly mode 1`] = `
           }
         >
           <
-            color="#888888"
             icon={
               {
                 "icon": [
@@ -734,7 +728,7 @@ exports[`AbSummaryLine - snapshots AbSummaryLine readOnly mode 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [
@@ -807,7 +801,7 @@ exports[`AbSummaryLine - snapshots AbSummaryLine readOnly mode 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [

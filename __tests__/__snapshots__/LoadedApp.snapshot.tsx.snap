@@ -38,7 +38,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "#888888",
+            "color": undefined,
             "fontSize": 40,
             "fontWeight": "bold",
           }
@@ -49,7 +49,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "#888888",
+            "color": undefined,
             "fontSize": 15,
           }
         }

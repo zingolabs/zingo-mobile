@@ -5,7 +5,6 @@ import Scanner from '../../../components/Scanner';
 import Header from '../../../components/Header';
 
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../types';
 import { View } from 'react-native';
 import { ScreenEnum } from '../../AppState';
 
@@ -19,7 +18,7 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({
 }) => {
   const context = useContext(ContextAppLoading);
   const { translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ScannerUfvk;
 
   const onRead = async (scandata: string) => {

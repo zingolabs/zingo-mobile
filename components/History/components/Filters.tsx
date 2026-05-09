@@ -4,7 +4,6 @@ import { View, TouchableOpacity, ScrollView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { ButtonTypeEnum, FilterEnum } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
@@ -38,7 +37,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [filterWithFundsLocal, setFilterWithFundsLocal] =
     useState<boolean>(filterWithFunds);
@@ -126,7 +125,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   borderColor:
                     filterKindLocal === FilterEnum.sent
                       ? colors.primary
-                      : colors.zingo,
+                      : colors.muted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -138,7 +137,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                     color:
                       filterKindLocal === FilterEnum.sent
                         ? colors.sideMenuBackground
-                        : colors.zingo,
+                        : colors.muted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -165,7 +164,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   borderColor:
                     filterKindLocal === FilterEnum.received
                       ? colors.primary
-                      : colors.zingo,
+                      : colors.muted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -177,7 +176,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                     color:
                       filterKindLocal === FilterEnum.received
                         ? colors.sideMenuBackground
-                        : colors.zingo,
+                        : colors.muted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -204,7 +203,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   borderColor:
                     filterKindLocal === FilterEnum.shielded
                       ? colors.primary
-                      : colors.zingo,
+                      : colors.muted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -216,7 +215,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                     color:
                       filterKindLocal === FilterEnum.shielded
                         ? colors.sideMenuBackground
-                        : colors.zingo,
+                        : colors.muted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -237,7 +236,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   borderRadius: 15,
                   borderColor: filterFailedLocal
                     ? colors.primary
-                    : colors.zingo,
+                    : colors.muted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -248,7 +247,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   style={{
                     color: filterFailedLocal
                       ? colors.sideMenuBackground
-                      : colors.zingo,
+                      : colors.muted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -267,7 +266,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                     ? colors.primary
                     : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filterMemosLocal ? colors.primary : colors.zingo,
+                  borderColor: filterMemosLocal ? colors.primary : colors.muted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -278,7 +277,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   style={{
                     color: filterMemosLocal
                       ? colors.sideMenuBackground
-                      : colors.zingo,
+                      : colors.muted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -299,7 +298,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   borderRadius: 15,
                   borderColor: filterWithFundsLocal
                     ? colors.primary
-                    : colors.zingo,
+                    : colors.muted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -309,7 +308,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   style={{
                     color: filterWithFundsLocal
                       ? colors.sideMenuBackground
-                      : colors.zingo,
+                      : colors.muted,
                     fontWeight: 'bold',
                   }}
                 >

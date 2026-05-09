@@ -3,10 +3,9 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { ToastConfigParams } from 'react-native-toast-message';
-import { ThemeType } from './types';
 
 const AppInfoToast: React.FC<ToastConfigParams<undefined>> = ({ text1 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   return (
     <View style={{ width: '100%', paddingHorizontal: 10 }}>
       <View
@@ -16,11 +15,11 @@ const AppInfoToast: React.FC<ToastConfigParams<undefined>> = ({ text1 }) => {
           paddingRight: 15,
           paddingVertical: 10,
           borderWidth: 0.5,
-          borderColor: colors.zingo,
+          borderColor: colors.muted,
           borderRadius: 6,
         }}
       >
-        <Text style={{ color: colors.money, fontSize: 15 }}>{text1}</Text>
+        <Text style={{ color: colors.text, fontSize: 15 }}>{text1}</Text>
       </View>
     </View>
   );

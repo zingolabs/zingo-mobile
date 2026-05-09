@@ -4,7 +4,6 @@ import { View, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { AddressBookFileClass, ButtonTypeEnum } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
@@ -27,7 +26,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [label, setLabel] = useState<string>('');
 

@@ -107,7 +107,7 @@ describe('Component Components - test', () => {
 
   test('ZecAmount - zero amount should display formatted zero', () => {
     render(<ZecAmount amtZec={0} currencyName={CurrencyNameEnum.ZEC} />);
-    expect(screen.getByText('0.0000')).toBeTruthy();
+    expect(screen.getByText('0')).toBeTruthy();
   });
 
   test('ZecAmount - negative amount should display formatted value', () => {

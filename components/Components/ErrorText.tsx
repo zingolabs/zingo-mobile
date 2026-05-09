@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
 
 type ErrorTextProps = {
   style?: TextStyle;
@@ -16,7 +15,7 @@ const ErrorText: React.FunctionComponent<ErrorTextProps> = ({
   testID,
   selectable,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   return (
     <Text

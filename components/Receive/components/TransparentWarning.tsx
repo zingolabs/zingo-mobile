@@ -3,7 +3,6 @@ import { useContext } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -21,7 +20,7 @@ const TransparentWarning = ({
   closeSheet,
   setHeightLayout,
 }: TransparentWarningProps) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const { translate } = useContext(ContextAppLoaded);
 
   return (
@@ -62,10 +61,10 @@ const TransparentWarning = ({
         }}
       >
         <View>
-          <Text style={{ color: colors.money, fontSize: 16, marginBottom: 12 }}>
+          <Text style={{ color: colors.text, fontSize: 16, marginBottom: 12 }}>
             {translate('receive.modal-transparent.message') as string}
           </Text>
-          <Text style={{ color: colors.zingo, fontSize: 16, marginBottom: 16 }}>
+          <Text style={{ color: colors.muted, fontSize: 16, marginBottom: 16 }}>
             {translate('receive.modal-transparent.recommendation') as string}
           </Text>
           <TouchableOpacity

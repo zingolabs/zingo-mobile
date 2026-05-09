@@ -237,9 +237,9 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }
@@ -516,9 +516,9 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }
@@ -795,9 +795,9 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }
@@ -846,7 +846,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         style={
           {
             "color": "#c3c3c3",
-            "fontSize": 18,
+            "fontSize": 15,
             "fontWeight": "900",
             "marginTop": 0,
             "opacity": 1,
@@ -907,8 +907,8 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 18,
-                "fontWeight": "600",
+                "fontSize": 15,
+                "fontWeight": "400",
                 "opacity": 1,
                 "textAlign": "center",
               }
@@ -1035,8 +1035,8 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 18,
-                "fontWeight": "600",
+                "fontSize": 15,
+                "fontWeight": "400",
                 "opacity": 1,
                 "textAlign": "center",
               }
@@ -1099,7 +1099,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           "alignItems": "center",
           "backgroundColor": "#18bd18",
           "borderColor": "#18bd18",
-          "borderRadius": 10,
+          "borderRadius": 24,
           "borderWidth": 2,
           "justifyContent": "center",
           "maxWidth": "90%",
@@ -1132,9 +1132,9 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
             {
               "color": "#011401",
               "fontSize": 16,
-              "fontWeight": "bold",
+              "fontWeight": "600",
               "textAlign": "center",
-              "textTransform": "uppercase",
+              "textTransform": "none",
             }
           }
         />
@@ -1381,9 +1381,9 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }
@@ -1660,9 +1660,9 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }

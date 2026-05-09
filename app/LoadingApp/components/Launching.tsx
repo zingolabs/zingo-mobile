@@ -4,7 +4,6 @@ import { Text, View, ActivityIndicator } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
-import { ThemeType } from '../../types';
 import {
   ButtonTypeEnum,
   LaunchingModeEnum,
@@ -21,7 +20,7 @@ type LaunchingProps = {
 };
 
 const Launching: React.FunctionComponent<LaunchingProps> = props => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   return (
     <View
@@ -53,11 +52,11 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
           }}
         >
           <Text
-            style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}
+            style={{ color: colors.muted, fontSize: 40, fontWeight: 'bold' }}
           >
             {props.translate('zingo') as string}
           </Text>
-          <Text style={{ color: colors.zingo, fontSize: 15 }}>
+          <Text style={{ color: colors.muted, fontSize: 15 }}>
             {props.translate('version') as string}
           </Text>
         </View>

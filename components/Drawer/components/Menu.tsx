@@ -8,7 +8,6 @@ import RegText from '../../../components/Components/RegText';
 
 import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
-import { ThemeType } from '../../../app/types';
 import simpleBiometrics from '../../../app/simpleBiometrics';
 import {
   GlobalConst,
@@ -57,7 +56,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
     selectServer,
     netInfo,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const dimensions = {
     width: Dimensions.get('window').width,
@@ -115,7 +114,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
         }}
       >
         <RegText
-          color={colors.money}
+          color={colors.text}
           style={{ marginVertical: 10, marginLeft: 30 }}
         >
           {translate('loadedapp.options') as string}
@@ -303,7 +302,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
             flexDirection: 'row',
             alignItems: 'center',
             borderWidth: 1,
-            borderColor: colors.zingo,
+            borderColor: colors.muted,
             borderRadius: 10,
             padding: 10,
           }}
@@ -340,7 +339,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
           <FontAwesomeIcon
             icon={faChevronRight}
             size={22}
-            color={colors.zingo}
+            color={colors.muted}
           />
         </TouchableOpacity>
         <Text

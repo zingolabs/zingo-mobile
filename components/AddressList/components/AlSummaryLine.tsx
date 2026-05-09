@@ -19,7 +19,6 @@ import {
   SnackbarDurationEnum,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
-import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 
 type AlSummaryLineProps = {
@@ -36,7 +35,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addressBook, addLastSnackbar } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const displayAddress: string = item.address
     ? Utils.trimToSmall(item.address, 7)
@@ -136,7 +135,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
               style={{ opacity: 0.8 }}
               size={25}
               icon={faCopy}
-              color={colors.money}
+              color={colors.text}
             />
           </TouchableOpacity>
         </View>

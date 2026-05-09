@@ -2,7 +2,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import RegText from '../../Components/RegText';
@@ -24,7 +23,7 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
   button,
   setHeightLayout,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   return (
     <View

@@ -3,7 +3,6 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCashRegister } from '@fortawesome/free-solid-svg-icons';
 import { ChainNameEnum, TranslateType } from '../../app/AppState';
@@ -21,7 +20,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
   translate,
   disabled,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   return (
     <View

@@ -237,9 +237,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }
@@ -426,7 +426,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           style={
             {
               "color": "#18bd18",
-              "fontSize": 18,
+              "fontSize": 16,
               "fontWeight": "bold",
               "opacity": 0.87,
               "textAlign": "center",
@@ -492,7 +492,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               <Text
                 style={
                   {
-                    "color": "#ffffff",
+                    "color": "#c3c3c3",
                     "fontSize": 36,
                     "fontWeight": "700",
                     "margin": 0,
@@ -506,7 +506,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               <Text
                 style={
                   {
-                    "color": "#ffffff",
+                    "color": "#c3c3c3",
                     "fontSize": 25.2,
                     "margin": 0,
                     "marginBottom": 2.4,
@@ -559,8 +559,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -590,8 +590,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -658,8 +658,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -692,8 +692,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 18,
-                "fontWeight": "600",
+                "fontSize": 15,
+                "fontWeight": "400",
                 "opacity": 1,
               }
             }
@@ -783,7 +783,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                   <Text
                     style={
                       {
-                        "color": "#ffffff",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -797,7 +797,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                   <Text
                     style={
                       {
-                        "color": "#ffffff",
+                        "color": "#c3c3c3",
                         "fontSize": 12.6,
                         "margin": 0,
                         "marginBottom": 1.2,
@@ -869,8 +869,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -1124,9 +1124,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }
@@ -1313,7 +1313,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 18,
+              "fontSize": 16,
               "fontWeight": "bold",
               "opacity": 0.87,
               "textAlign": "center",
@@ -1379,7 +1379,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               <Text
                 style={
                   {
-                    "color": "#ffffff",
+                    "color": "#c3c3c3",
                     "fontSize": 36,
                     "fontWeight": "700",
                     "margin": 0,
@@ -1393,7 +1393,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               <Text
                 style={
                   {
-                    "color": "#ffffff",
+                    "color": "#c3c3c3",
                     "fontSize": 25.2,
                     "margin": 0,
                     "marginBottom": 2.4,
@@ -1446,8 +1446,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -1477,8 +1477,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -1545,8 +1545,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }
@@ -1638,7 +1638,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   <Text
                     style={
                       {
-                        "color": "#ffffff",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -1740,8 +1740,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                     style={
                       {
                         "color": "#c3c3c3",
-                        "fontSize": 18,
-                        "fontWeight": "600",
+                        "fontSize": 15,
+                        "fontWeight": "400",
                         "opacity": 1,
                       }
                     }
@@ -1892,7 +1892,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   <Text
                     style={
                       {
-                        "color": "#ffffff",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -1906,7 +1906,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   <Text
                     style={
                       {
-                        "color": "#ffffff",
+                        "color": "#c3c3c3",
                         "fontSize": 12.6,
                         "margin": 0,
                         "marginBottom": 1.2,
@@ -1978,8 +1978,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "fontSize": 15,
+                  "fontWeight": "400",
                   "opacity": 1,
                 }
               }

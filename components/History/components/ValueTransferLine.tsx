@@ -32,7 +32,6 @@ import {
   SelectServerEnum,
   ScreenEnum,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -78,7 +77,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     selectServer,
     setSendPageState,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   //const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
 
@@ -90,7 +89,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
 
   const amountColor =
     vt.status === RPCValueTransfersStatusEnum.failed
-      ? colors.zingo
+      ? colors.muted
       : vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations
         ? colors.primaryDisabled
         : vt.kind === ValueTransferKindEnum.Received ||
@@ -168,7 +167,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     setMessagesAddressModalShow(true);
                     swipeable.reset();
                   }}>
-                  <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
+                  <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.text} />
                 </TouchableOpacity>
               </View>
             )}
@@ -220,7 +219,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   style={{ opacity: 0.8 }}
                   size={30}
                   icon={faFileLines}
-                  color={colors.money}
+                  color={colors.text}
                 />
               </TouchableOpacity>
             </View>
@@ -374,7 +373,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   color={
                     vt.status === RPCValueTransfersStatusEnum.transmitted ||
                     vt.status === RPCValueTransfersStatusEnum.calculated
-                      ? colors.syncing
+                      ? colors.active
                       : amountColor
                   }
                 />
@@ -417,7 +416,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       fontWeight: 'bold',
                       color:
                         vt.status === RPCValueTransfersStatusEnum.failed
-                          ? colors.zingo
+                          ? colors.muted
                           : vt.kind === ValueTransferKindEnum.Received ||
                               vt.kind === ValueTransferKindEnum.Shield
                             ? colors.primary
@@ -520,7 +519,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                         icon={faComment}
                         color={
                           vt.status === RPCValueTransfersStatusEnum.failed
-                            ? colors.zingo
+                            ? colors.muted
                             : colors.primaryDisabled
                         }
                       />
@@ -541,7 +540,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 currencyName={info.currencyName}
                 color={
                   vt.status === RPCValueTransfersStatusEnum.failed
-                    ? colors.zingo
+                    ? colors.muted
                     : amountColor
                 }
                 amtZec={vt.amount}
@@ -563,7 +562,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   <FontAwesomeIcon
                     style={{ marginRight: 5 }}
                     icon={faTriangleExclamation}
-                    color={colors.syncing}
+                    color={colors.active}
                     size={15}
                   />
                 )}

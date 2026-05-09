@@ -188,7 +188,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
                 "prefix": "fas",
               }
             }
-            size={40}
+            size={24}
           />
         </View>
       </View>
@@ -256,7 +256,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
               "prefix": "fas",
             }
           }
-          size={35}
+          size={24}
         />
       </View>
     </View>
@@ -287,9 +287,9 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
       <Text
         style={
           {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
             "textAlign": "center",
@@ -387,7 +387,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
               style={
                 {
                   "color": "#18bd18",
-                  "fontSize": 18,
+                  "fontSize": 15,
                   "fontWeight": "bold",
                   "opacity": 1,
                   "textDecorationLine": "underline",
@@ -496,7 +496,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
             style={
               {
                 "backgroundColor": "#040C17",
-                "borderColor": "#888888",
+                "borderColor": undefined,
                 "borderRadius": 15,
                 "borderWidth": 1,
                 "marginHorizontal": 0,
@@ -508,7 +508,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
             <Text
               style={
                 {
-                  "color": "#888888",
+                  "color": undefined,
                   "fontWeight": "bold",
                   "opacity": 0.65,
                 }
@@ -556,7 +556,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
             style={
               {
                 "backgroundColor": "#040C17",
-                "borderColor": "#888888",
+                "borderColor": undefined,
                 "borderRadius": 15,
                 "borderWidth": 1,
                 "marginHorizontal": 10,
@@ -568,7 +568,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
             <Text
               style={
                 {
-                  "color": "#888888",
+                  "color": undefined,
                   "fontWeight": "bold",
                   "opacity": 0.65,
                 }
@@ -613,7 +613,6 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
           }
         >
           <
-            color="#888888"
             icon={
               {
                 "icon": [

@@ -17,7 +17,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
 import FadeText from '../Components/FadeText';
@@ -57,7 +57,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar, setPrivacyOption } =
     context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Insight;
 
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
@@ -121,12 +121,12 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             address: item.address,
             tag: item.tag,
             svg: {
-              fill: item.address === 'fee' ? colors.zingo : randomColors[index],
+              fill: item.address === 'fee' ? colors.muted : randomColors[index],
             },
-            color: item.address === 'fee' ? colors.zingo : randomColors[index],
+            color: item.address === 'fee' ? colors.muted : randomColors[index],
             labelLineConfig: {
               color:
-                item.address === 'fee' ? colors.zingo : randomColors[index],
+                item.address === 'fee' ? colors.muted : randomColors[index],
             },
             key: `pie-${index}`,
           };
@@ -136,7 +136,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
       setExpandAddress(newExpandAddress);
       setLoading(false);
     })();
-  }, [colors.zingo, tab]);
+  }, [colors.muted, tab]);
 
   const selectExpandAddress = (index: number) => {
     let newExpandAddress = Array(expandAddress.length).fill(false);
