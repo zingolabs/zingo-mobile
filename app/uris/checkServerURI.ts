@@ -1,6 +1,6 @@
 import { ChainNameEnum, GlobalConst } from '../AppState';
 import RPCModule from '../RPCModule';
-import { RPCInfoType } from '../rpc/types/RPCInfoType';
+import { RPCInfoType } from '../walletBackend/types/RPCInfoType';
 
 type checkServerURIReturn = {
   result: boolean;

@@ -1,0 +1,48 @@
+import {
+  TotalBalanceClass,
+  InfoType,
+  TranslateType,
+  ValueTransferType,
+  UnifiedAddressClass,
+  TransparentAddressClass,
+  ServerType,
+} from '../../AppState';
+import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
+import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
+
+/**
+ * All callbacks and settings required by WalletBackend and its sub-services.
+ *
+ * Pass an instance of this type to the WalletBackend constructor. Every
+ * sub-service receives the same config reference — add new callbacks here
+ * rather than threading parameters through individual constructors.
+ */
+export type WalletBackendConfig = {
+  /** Called whenever balances are refreshed from the native layer. */
+  onBalanceChanged: (balance: TotalBalanceClass) => void;
+  /** Called with the full list of value transfers (transactions). */
+  onValueTransfersChanged: (list: ValueTransferType[], total: number) => void;
+  /** Called with the filtered list of memo-bearing transfers (messages). */
+  onMessagesChanged: (list: ValueTransferType[], total: number) => void;
+  /** Called with the combined unified + transparent address list. */
+  onAddressesChanged: (
+    addresses: (UnifiedAddressClass | TransparentAddressClass)[],
+  ) => void;
+  /** Called with server/chain info including latest block height. */
+  onInfoChanged: (info: InfoType) => void;
+  /** Called every poll cycle with current sync progress. */
+  onSyncStatusChanged: (status: RPCSyncStatusType) => void;
+  onZingolibVersionChanged: (version: string) => void;
+  /** Called with the wallet birthday block height after each fetch. */
+  onBirthdayChanged: (birthday: number) => void;
+  /** Called on any non-fatal RPC error; display or log in the consumer. */
+  onError: (error: string) => void;
+  /** i18n helper — must be bound to the active locale in the consumer. */
+  translate: (key: string) => TranslateType;
+  /** Prevent device sleep while true (e.g. during active sync/send). */
+  keepAwake: (keep: boolean) => void;
+  /** When true, only the UFVK is available; no seed phrase operations. */
+  readOnly: boolean;
+  server: ServerType;
+  performanceLevel: RPCPerformanceLevelEnum;
+};

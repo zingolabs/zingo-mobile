@@ -19,7 +19,7 @@ import { parseZcashURI } from '../../../app/uris';
 import TextInputAddress from '../../Components/TextInputAddress';
 import FadeText from '../../Components/FadeText';
 import RegText from '../../Components/RegText';
-import { RPCCheckAddressType } from '../../../app/rpc/types/RPCCheckAddressType';
+import { RPCCheckAddressType } from '../../../app/walletBackend/types/RPCCheckAddressType';
 import { VerifyCheckIcon } from '../../Components/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '../../Components/Icons/VerifyXIcon';
 

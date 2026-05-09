@@ -44,16 +44,16 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import Button from '../Components/Button';
-import RPC from '../../app/rpc';
-import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
+import { shieldFunds } from '../../app/walletBackend';
+import { RPCShieldType } from '../../app/walletBackend/types/RPCShieldType';
 import { createAlert } from '../../app/createAlert';
 import { Animated } from 'react-native';
 import FadeText from '../Components/FadeText';
 import simpleBiometrics from '../../app/simpleBiometrics';
 import Utils from '../../app/utils';
-import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
+import { RPCShieldProposeType } from '../../app/walletBackend/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
-import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
+import { RPCSyncStatusType } from '../../app/walletBackend/types/RPCSyncStatusType';
 import { isEqual } from 'lodash';
 import { TriangleAlert } from '../Components/Icons/TriangleAlert';
 import NymOn from '../../assets/img/nym-on.svg';
@@ -332,7 +332,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
     await RPCModule.shieldProcess();
-    const shieldStr = await RPC.rpcShieldFunds();
+    const shieldStr = await shieldFunds();
 
     if (shieldStr) {
       if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {

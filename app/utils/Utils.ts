@@ -26,10 +26,10 @@ import {
 import randomColor from 'randomcolor';
 import RPCModule from '../RPCModule';
 import { Buffer } from 'buffer';
-import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
-import { RPCParseAddressStatusEnum } from '../rpc/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../rpc/enums/RPCReceiversEnum';
+import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
+import { RPCParseAddressStatusEnum } from '../walletBackend/enums/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '../walletBackend/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '../walletBackend/enums/RPCReceiversEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
