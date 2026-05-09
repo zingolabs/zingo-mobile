@@ -39,7 +39,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
 import RPCModule from '../../app/RPCModule';
-import { RPCCheckAddressType } from '../../app/rpc/types/RPCCheckAddressType';
+import { RPCCheckAddressType } from '../../app/walletBackend/types/RPCCheckAddressType';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type AddressBookProps = DrawerScreenProps<

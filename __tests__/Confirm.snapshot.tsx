@@ -22,9 +22,9 @@ import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import { RPCParseAddressStatusEnum } from '../app/rpc/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '../app/rpc/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../app/rpc/enums/RPCReceiversEnum';
+import { RPCParseAddressStatusEnum } from '../app/walletBackend/enums/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '../app/walletBackend/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '../app/walletBackend/enums/RPCReceiversEnum';
 import { ChainNameEnum } from '../app/AppState';
 
 function makeProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Confirm> {

@@ -76,12 +76,12 @@ import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
-import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
+import { RPCSendProposeType } from '../../app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
-import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
-import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
+import { RPCParseAddressType } from '../../app/walletBackend/types/RPCParseAddressType';
+import { RPCSpendablebalanceType } from '../../app/walletBackend/types/RPCSpendablebalanceType';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
