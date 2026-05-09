@@ -334,6 +334,9 @@ dependencies {
     // uniffi needs this
     implementation "net.java.dev.jna:jna:5.18.1@aar"
 
+    // rustls-platform-verifier Android component (required for Nym TLS on Android)
+    implementation "rustls:rustls-platform-verifier:0.1.1"
+
     // back navigation implementation
     implementation 'androidx.activity:activity:1.10.1'
 

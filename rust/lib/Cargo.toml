@@ -33,6 +33,10 @@ thiserror = { workspace = true }
 once_cell = { workspace = true }
 zingo-netutils = { workspace = true }
 
+[target.'cfg(target_os = "android")'.dependencies]
+jni = { version = "0.21", default-features = false }
+rustls-platform-verifier = "0.6"
+
 [build-dependencies]
 uniffi_build = { workspace = true, features = ["builtin-bindgen"] }
 

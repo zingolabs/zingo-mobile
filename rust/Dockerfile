@@ -39,7 +39,7 @@ ENV AR=llvm-ar
 ENV LD=ld
 ENV RANLIB=llvm-ranlib
 
-# aarch64
+# aarch64 only (debug build — other ABIs disabled temporarily)
 # this is for indexmap 1.9.3 -> forcing `features = ["std"]`
 ENV CARGO_FEATURE_STD=true
 ENV CC=aarch64-linux-android26-clang
@@ -53,37 +53,7 @@ RUN llvm-objcopy \
     ../target/aarch64-linux-android/release/libzingo.so
 RUN sha256sum ../target/aarch64-linux-android/release/libzingo.so
 
-# armv7
-ENV CARGO_FEATURE_STD=false
-ENV CC=armv7a-linux-androideabi26-clang
-
-RUN cargo ndk --target armv7-linux-androideabi build --release
-RUN llvm-strip --strip-all ../target/armv7-linux-androideabi/release/libzingo.so
-RUN llvm-objcopy \
-    --remove-section .comment \
-    ../target/armv7-linux-androideabi/release/libzingo.so
-RUN sha256sum ../target/armv7-linux-androideabi/release/libzingo.so
-
-# i686 - x86
-ENV CARGO_FEATURE_STD=false
-ENV CC=i686-linux-android26-clang
-
-#-DBROKEN_CLANG_ATOMICS
-RUN cargo ndk --target i686-linux-android build --release
-RUN llvm-strip --strip-all ../target/i686-linux-android/release/libzingo.so
-RUN llvm-objcopy \
-    --remove-section .comment \
-    ../target/i686-linux-android/release/libzingo.so
-RUN sha256sum ../target/i686-linux-android/release/libzingo.so
-
-# x86_64
-ENV CARGO_FEATURE_STD=false
-ENV CC=x86_64-linux-android26-clang
-
-RUN cargo ndk --target x86_64-linux-android build --release
-RUN llvm-strip --strip-all ../target/x86_64-linux-android/release/libzingo.so
-RUN llvm-objcopy \
-    --remove-section .comment \
-    ../target/x86_64-linux-android/release/libzingo.so
-RUN sha256sum ../target/x86_64-linux-android/release/libzingo.so
+# armv7 disabled
+# i686 disabled
+# x86_64 disabled
 

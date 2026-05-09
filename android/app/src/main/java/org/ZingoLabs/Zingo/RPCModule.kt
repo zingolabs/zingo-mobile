@@ -17,6 +17,15 @@ import kotlinx.coroutines.*
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext) {
     private val applicationContext: Context = reactContext?.applicationContext ?: MainApplication.getAppContext()!!
 
+    companion object {
+        @JvmStatic
+        external fun initRustlsPlatformVerifier(context: Context)
+    }
+
+    init {
+        initRustlsPlatformVerifier(applicationContext)
+    }
+
     override fun getName(): String {
         return "RPCModule"
     }

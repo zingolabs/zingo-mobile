@@ -9,6 +9,18 @@ use android_logger::{Config, FilterBuilder};
 #[cfg(target_os = "android")]
 use log::Level;
 
+#[cfg(target_os = "android")]
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_org_ZingoLabs_Zingo_RPCModule_initRustlsPlatformVerifier<'local>(
+    mut env: jni::JNIEnv<'local>,
+    _class: jni::objects::JClass<'local>,
+    context: jni::objects::JObject<'local>,
+) {
+    if let Err(e) = rustls_platform_verifier::android::init_with_env(&mut env, context) {
+        log::error!("rustls-platform-verifier init failed: {e:?}");
+    }
+}
+
 use std::any::Any;
 use std::backtrace::Backtrace;
 use std::num::NonZeroU32;
@@ -298,7 +310,7 @@ pub fn init_new(
                 Err(e) => return Err(format!("Error: creating indexer: {e}")),
             };
             indexer
-                .get_latest_block(false)
+                .get_latest_block()
                 .await
                 .map(|b| b.height as u32)
                 .map_err(|e| format!("Error: {e}"))
@@ -322,7 +334,10 @@ pub fn init_new(
         };
         let lightclient = match RT.block_on(async { lightclient.with_nym().await }) {
             Ok(l) => l,
-            Err(e) => return Ok(format!("Error: {e}")),
+            Err(e) => {
+                log::error!("NYM init_new error: {e:?}");
+                return Ok(format!("Error: {e}"));
+            }
         };
         let _ = store_client(lightclient);
 
@@ -364,7 +379,10 @@ pub fn init_from_seed(
         };
         let lightclient = match RT.block_on(async { lightclient.with_nym().await }) {
             Ok(l) => l,
-            Err(e) => return Ok(format!("Error: {e}")),
+            Err(e) => {
+                log::error!("NYM init_from_seed error: {e:?}");
+                return Ok(format!("Error: {e}"));
+            }
         };
         let _ = store_client(lightclient);
 
@@ -404,7 +422,10 @@ pub fn init_from_ufvk(
         };
         let lightclient = match RT.block_on(async { lightclient.with_nym().await }) {
             Ok(l) => l,
-            Err(e) => return Ok(format!("Error: {e}")),
+            Err(e) => {
+                log::error!("NYM init_from_ufvk error: {e:?}");
+                return Ok(format!("Error: {e}"));
+            }
         };
         let _ = store_client(lightclient);
 
@@ -454,7 +475,10 @@ pub fn init_from_b64(
 
         let lightclient = match RT.block_on(async { lightclient.with_nym().await }) {
             Ok(l) => l,
-            Err(e) => return Ok(format!("Error: {e}")),
+            Err(e) => {
+                log::error!("NYM init_from_b64 error: {e:?}");
+                return Ok(format!("Error: {e}"));
+            }
         };
         let has_seed = lightclient.mnemonic_phrase().is_some();
         let _ = store_client(lightclient);
@@ -528,7 +552,7 @@ pub fn get_latest_block_server(server_uri: String) -> Result<String, ZingolibErr
             Err(e) => return Ok(format!("Error: creating indexer: {e}")),
         };
         Ok(
-            match RT.block_on(async move { indexer.get_latest_block(false).await }) {
+            match RT.block_on(async move { indexer.get_latest_block().await }) {
                 Ok(block_id) => block_id.height.to_string(),
                 Err(e) => format!("Error: {e}"),
             },

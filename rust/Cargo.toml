@@ -27,7 +27,7 @@ zcash_transparent = "0.6"
 zebra-chain = "5.0.0"
 
 zingo_common_components = "0.3.0"
-zingo-netutils = { git = "https://github.com/zingolabs/zingo-common", branch = "chore/echo-server" }
+zingo-netutils = { git = "https://github.com/zingolabs/zingo-common", branch = "chore/echo-server-no-hickory-dns" }
 
 bip0039 = { version = "0.13", features = ["rand"] }
 ed25519-zebra = { version = "4", features = ["std"] }
@@ -53,7 +53,7 @@ debug = 1
 lto = "thin"
 codegen-units = 1
 overflow-checks = true
-panic = "abort"
+# panic = "abort"  # temporarily disabled for debugging with_nym() crash
 opt-level = "z"
 
 [profile.test]

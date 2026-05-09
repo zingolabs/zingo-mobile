@@ -30,6 +30,18 @@ allprojects {
      google()
      mavenCentral()
      maven { url 'https://www.jitpack.io' }
+     // rustls-platform-verifier Android component (TLS for Nym proxy).
+     // Located dynamically from the local Cargo cache (~/.cargo/registry/src).
+     // On CI machines where cargo is not installed, this block is skipped and
+     // the dependency must be available via another repo or pre-cached.
+     def cargoHome = System.getenv("CARGO_HOME") ?: "${System.properties['user.home']}/.cargo"
+     def verifierMaven = new File(cargoHome, "registry/src").listFiles()?.collectMany { indexDir ->
+       indexDir.listFiles()?.findAll { it.name.startsWith("rustls-platform-verifier-android-") }
+         ?.collect { new File(it, "maven") } ?: []
+     }?.find { it.exists() }
+     if (verifierMaven != null) {
+       maven { url = uri(verifierMaven) }
+     }
    }
  }
  
