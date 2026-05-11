@@ -307,9 +307,9 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
             {
               "color": "#18bd18",
               "fontSize": 16,
-              "fontWeight": "bold",
+              "fontWeight": "600",
               "textAlign": "center",
-              "textTransform": "uppercase",
+              "textTransform": "none",
             }
           }
         >
@@ -385,9 +385,9 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
             {
               "color": "#011401",
               "fontSize": 16,
-              "fontWeight": "bold",
+              "fontWeight": "600",
               "textAlign": "center",
-              "textTransform": "uppercase",
+              "textTransform": "none",
             }
           }
         >
@@ -708,9 +708,9 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
             {
               "color": "#18bd18",
               "fontSize": 16,
-              "fontWeight": "bold",
+              "fontWeight": "600",
               "textAlign": "center",
-              "textTransform": "uppercase",
+              "textTransform": "none",
             }
           }
         >
@@ -786,9 +786,9 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
             {
               "color": "#011401",
               "fontSize": 16,
-              "fontWeight": "bold",
+              "fontWeight": "600",
               "textAlign": "center",
-              "textTransform": "uppercase",
+              "textTransform": "none",
             }
           }
         >
@@ -1131,9 +1131,9 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
             {
               "color": "#18bd18",
               "fontSize": 16,
-              "fontWeight": "bold",
+              "fontWeight": "600",
               "textAlign": "center",
-              "textTransform": "uppercase",
+              "textTransform": "none",
             }
           }
         >
@@ -1209,9 +1209,9 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
             {
               "color": "#011401",
               "fontSize": 16,
-              "fontWeight": "bold",
+              "fontWeight": "600",
               "textAlign": "center",
-              "textTransform": "uppercase",
+              "textTransform": "none",
             }
           }
         >
