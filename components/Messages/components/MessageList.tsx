@@ -597,7 +597,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   {!getLabelAndColor(address).initials ? (
                     <FontAwesomeIcon
                       style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                      size={40}
+                      size={32}
                       icon={getIcon()}
                       color={colors.text}
                     />
@@ -774,7 +774,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             >
               <FontAwesomeIcon
                 style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                size={20}
+                size={16}
                 icon={faAngleDown}
                 color={colors.zingo}
               />
@@ -898,7 +898,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   {disableSend && (
                     <ActivityIndicator
                       style={{ marginTop: 7, marginRight: 7 }}
-                      size={25}
+                      size={20}
                       color={colors.primaryDisabled}
                     />
                   )}
@@ -913,7 +913,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                           marginTop: 7,
                           marginRight: memoIcon ? 0 : 7,
                         }}
-                        size={25}
+                        size={20}
                         icon={faXmark}
                         color={colors.primaryDisabled}
                       />
@@ -928,7 +928,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                     >
                       <FontAwesomeIcon
                         style={{ margin: 7 }}
-                        size={30}
+                        size={24}
                         icon={faMagnifyingGlassPlus}
                         color={colors.border}
                       />
@@ -949,7 +949,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                       }}
                     >
                       <FontAwesomeIcon
-                        size={30}
+                        size={24}
                         icon={faPaperPlane}
                         color={colors.primary}
                       />

@@ -91,7 +91,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       <ZecAmount
                         testID="orchard-total-balance"
                         amtZec={totalBalance.totalOrchardBalance}
-                        size={18}
+                        size={14}
                         currencyName={info.currencyName}
                         style={{
                           opacity:
@@ -112,7 +112,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       <ZecAmount
                         testID="orchard-confirmed-balance"
                         amtZec={totalBalance.confirmedOrchardBalance}
-                        size={18}
+                        size={14}
                         currencyName={info.currencyName}
                         color={
                           totalBalance.confirmedOrchardBalance > 0 &&
@@ -151,7 +151,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       <ZecAmount
                         testID="sapling-total-balance"
                         amtZec={totalBalance.totalSaplingBalance}
-                        size={18}
+                        size={14}
                         currencyName={info.currencyName}
                         style={{
                           opacity:
@@ -172,7 +172,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       <ZecAmount
                         testID="sapling-confirmed-balance"
                         amtZec={totalBalance.confirmedSaplingBalance}
-                        size={18}
+                        size={14}
                         currencyName={info.currencyName}
                         color={
                           totalBalance.confirmedSaplingBalance > 0 &&
@@ -211,7 +211,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       <ZecAmount
                         testID="transparent-balance"
                         amtZec={totalBalance.totalTransparentBalance}
-                        size={18}
+                        size={14}
                         currencyName={info.currencyName}
                         color={'red'}
                         privacy={privacy}
@@ -227,7 +227,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       <ZecAmount
                         testID="transparent-confirmed-balance"
                         amtZec={totalBalance.confirmedTransparentBalance}
-                        size={18}
+                        size={14}
                         currencyName={info.currencyName}
                         color={'red'}
                         privacy={privacy}
@@ -253,7 +253,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                   >
                     <FontAwesomeIcon
                       icon={faInfoCircle}
-                      size={20}
+                      size={16}
                       color={colors.primary}
                       style={{ marginRight: 5 }}
                     />
@@ -274,7 +274,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                 >
                   <FontAwesomeIcon
                     icon={faInfoCircle}
-                    size={20}
+                    size={16}
                     color={colors.primary}
                     style={{ marginRight: 5 }}
                   />

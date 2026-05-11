@@ -168,7 +168,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     setMessagesAddressModalShow(true);
                     swipeable.reset();
                   }}>
-                  <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
+                  <FontAwesomeIcon style={{ opacity: 0.8 }} size={24} icon={faComments} color={colors.money} />
                 </TouchableOpacity>
               </View>
             )}
@@ -218,7 +218,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               >
                 <FontAwesomeIcon
                   style={{ opacity: 0.8 }}
-                  size={30}
+                  size={24}
                   icon={faFileLines}
                   color={colors.money}
                 />
@@ -251,7 +251,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     }}
                   >
                     <FontAwesomeIcon
-                      size={30}
+                      size={24}
                       icon={faPaperPlane}
                       color={colors.primary}
                     />
@@ -369,7 +369,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               <View style={{ display: 'flex' }}>
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={30}
+                  size={24}
                   icon={icon}
                   color={
                     vt.status === RPCValueTransfersStatusEnum.transmitted ||
@@ -516,7 +516,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     {haveMemo && (
                       <FontAwesomeIcon
                         style={{ marginLeft: 10 }}
-                        size={15}
+                        size={12}
                         icon={faComment}
                         color={
                           vt.status === RPCValueTransfersStatusEnum.failed
@@ -537,7 +537,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   opacity:
                     vt.status === RPCValueTransfersStatusEnum.failed ? 0.7 : 1,
                 }}
-                size={18}
+                size={14}
                 currencyName={info.currencyName}
                 color={
                   vt.status === RPCValueTransfersStatusEnum.failed
@@ -564,7 +564,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     style={{ marginRight: 5 }}
                     icon={faTriangleExclamation}
                     color={colors.syncing}
-                    size={15}
+                    size={12}
                   />
                 )}
                 <FadeText

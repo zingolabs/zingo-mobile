@@ -14,8 +14,8 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
     style={
       {
         "color": "#ffffff",
-        "fontSize": 18,
-        "fontWeight": "600",
+        "fontSize": 15,
+        "fontWeight": "400",
         "marginLeft": 30,
         "marginVertical": 10,
         "opacity": 1,
@@ -46,7 +46,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -61,7 +61,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -76,7 +76,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -91,7 +91,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -106,7 +106,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -121,7 +121,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -136,7 +136,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -151,7 +151,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -166,7 +166,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -181,7 +181,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -196,7 +196,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -311,7 +311,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
             "prefix": "fas",
           }
         }
-        size={22}
+        size={18}
       />
     </View>
     <Text
@@ -353,8 +353,8 @@ exports[`Menu - snapshots Menu basic mode, no value transfers 1`] = `
     style={
       {
         "color": "#ffffff",
-        "fontSize": 18,
-        "fontWeight": "600",
+        "fontSize": 15,
+        "fontWeight": "400",
         "marginLeft": 30,
         "marginVertical": 10,
         "opacity": 1,
@@ -385,7 +385,7 @@ exports[`Menu - snapshots Menu basic mode, no value transfers 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -400,7 +400,7 @@ exports[`Menu - snapshots Menu basic mode, no value transfers 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -415,7 +415,7 @@ exports[`Menu - snapshots Menu basic mode, no value transfers 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -430,7 +430,7 @@ exports[`Menu - snapshots Menu basic mode, no value transfers 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -445,7 +445,7 @@ exports[`Menu - snapshots Menu basic mode, no value transfers 1`] = `
         {
           "color": "#c3c3c3",
           "fontSize": 14,
-          "fontWeight": "600",
+          "fontWeight": "400",
           "opacity": 1,
           "paddingTop": 25,
         }
@@ -560,7 +560,7 @@ exports[`Menu - snapshots Menu basic mode, no value transfers 1`] = `
             "prefix": "fas",
           }
         }
-        size={22}
+        size={18}
       />
     </View>
     <Text

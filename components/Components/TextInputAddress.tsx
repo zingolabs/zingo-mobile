@@ -154,7 +154,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 >
                   <FontAwesomeIcon
                     style={{ marginRight: 5 }}
-                    size={25}
+                    size={20}
                     icon={faXmark}
                     color={colors.primaryDisabled}
                   />
@@ -171,7 +171,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
               >
                 <FontAwesomeIcon
                   style={{ marginRight: 5 }}
-                  size={35}
+                  size={28}
                   icon={faQrcode}
                   color={colors.border}
                 />

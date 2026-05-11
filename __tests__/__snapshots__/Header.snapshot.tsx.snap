@@ -102,7 +102,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={20}
+                size={16}
               />
             </View>
           </View>
@@ -174,7 +174,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                 style={
                   {
                     "color": "#c3c3c3",
-                    "fontSize": 36,
+                    "fontSize": 28,
                     "fontWeight": "700",
                     "margin": 0,
                     "padding": 0,
@@ -188,9 +188,9 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                 style={
                   {
                     "color": "#c3c3c3",
-                    "fontSize": 25.2,
+                    "fontSize": 19.599999999999998,
                     "margin": 0,
-                    "marginBottom": 2.4,
+                    "marginBottom": 1.8666666666666667,
                     "padding": 0,
                   }
                 }
@@ -269,7 +269,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                   "prefix": "fas",
                 }
               }
-              size={25}
+              size={20}
             />
           </View>
         </View>
@@ -426,7 +426,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={20}
+                size={16}
               />
             </View>
           </View>
@@ -505,7 +505,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={40}
+            size={32}
           />
         </View>
       </View>
@@ -573,7 +573,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               "prefix": "fas",
             }
           }
-          size={35}
+          size={28}
         />
       </View>
     </View>
@@ -606,8 +606,8 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           {
             "color": "#ffffff",
             "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
             "textAlign": "center",
           }
@@ -780,7 +780,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
           style={
             {
               "marginHorizontal": 10,
@@ -793,8 +793,8 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
           {
             "color": "#ffffff",
             "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
           }
         }

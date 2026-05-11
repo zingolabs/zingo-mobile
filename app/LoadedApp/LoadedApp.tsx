@@ -2167,10 +2167,13 @@ export class LoadedAppClass extends Component<
         iconName = faCog;
       }
 
+      // faDownload renders visually smaller than other icons at the same size
+      const iconSize = route.name === RouteEnum.Receive ? 24 : 20;
+
       return (
         <View>
           <FontAwesomeIcon
-            size={25}
+            size={iconSize}
             icon={iconName}
             color={focused ? colors.background : colors.money}
           />

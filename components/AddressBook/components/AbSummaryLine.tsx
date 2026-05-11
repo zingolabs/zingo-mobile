@@ -133,7 +133,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             <View style={{ flexDirection: 'row', marginBottom: 5 }}>
               <FontAwesomeIcon
                 style={{ marginHorizontal: 10 }}
-                size={24}
+                size={20}
                 icon={item.own ? faWallet : faAddressCard}
                 color={
                   addressProtected || item.own
@@ -158,7 +158,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             <View style={{ flexDirection: 'row' }}>
               <FontAwesomeIcon
                 style={{ marginHorizontal: 10 }}
-                size={24}
+                size={20}
                 icon={faQrcode}
                 color={colors.zingo}
               />
@@ -193,7 +193,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             >
               <FontAwesomeIcon
                 style={{ opacity: 0.8 }}
-                size={25}
+                size={20}
                 icon={faPencil}
                 color={colors.money}
               />
@@ -231,7 +231,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 }}
               >
                 <FontAwesomeIcon
-                  size={30}
+                  size={24}
                   icon={faPaperPlane}
                   color={colors.primary}
                 />
@@ -252,7 +252,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             >
               <FontAwesomeIcon
                 style={{ opacity: 0.8 }}
-                size={25}
+                size={20}
                 icon={faTrashCan}
                 color={colors.money}
               />

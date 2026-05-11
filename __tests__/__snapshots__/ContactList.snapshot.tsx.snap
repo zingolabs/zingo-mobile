@@ -109,7 +109,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={20}
+                size={16}
               />
             </View>
           </View>
@@ -188,7 +188,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
                 "prefix": "fas",
               }
             }
-            size={40}
+            size={32}
           />
         </View>
       </View>
@@ -256,7 +256,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
               "prefix": "fas",
             }
           }
-          size={35}
+          size={28}
         />
       </View>
     </View>
@@ -289,8 +289,8 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
           {
             "color": "#ffffff",
             "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
             "textAlign": "center",
           }
@@ -387,7 +387,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
               style={
                 {
                   "color": "#18bd18",
-                  "fontSize": 18,
+                  "fontSize": 15,
                   "fontWeight": "bold",
                   "opacity": 1,
                   "textDecorationLine": "underline",
@@ -630,7 +630,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
                 "prefix": "fas",
               }
             }
-            size={30}
+            size={24}
             style={
               {
                 "margin": 0,

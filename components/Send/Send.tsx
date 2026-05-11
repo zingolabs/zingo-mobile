@@ -1137,7 +1137,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       >
                         <FontAwesomeIcon
                           style={{ marginRight: 5 }}
-                          size={25}
+                          size={20}
                           icon={faXmark}
                           color={colors.primaryDisabled}
                         />
@@ -1269,7 +1269,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           >
                             <FontAwesomeIcon
                               style={{ marginRight: 7 }}
-                              size={39}
+                              size={32}
                               icon={faAddressCard}
                               color={colors.primary}
                             />
@@ -1277,7 +1277,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         ) : (
                           <FontAwesomeIcon
                             style={{ marginRight: 7 }}
-                            size={39}
+                            size={32}
                             icon={faAddressCard}
                             color={colors.primaryDisabled}
                           />
@@ -1294,7 +1294,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     >
                       <FontAwesomeIcon
                         style={{ marginRight: 5 }}
-                        size={35}
+                        size={28}
                         icon={faQrcode}
                         color={colors.border}
                       />
@@ -1484,7 +1484,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       >
                         <FontAwesomeIcon
                           style={{ marginRight: 5 }}
-                          size={20}
+                          size={16}
                           icon={faXmark}
                           color={colors.primaryDisabled}
                         />
@@ -1544,7 +1544,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{ marginLeft: 0 }}
                           currencyName={info.currencyName}
                           color={colors.text}
-                          size={20}
+                          size={16}
                           amtZec={
                             Utils.parseStringLocaleToNumberFloat(amountText) ||
                             0
@@ -1623,7 +1623,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               ? 'red'
                               : colors.money
                           }
-                          size={15}
+                          size={12}
                           amtZec={maxAmount}
                           privacy={privacy}
                         />
@@ -1653,7 +1653,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       >
                         <FontAwesomeIcon
                           icon={faInfoCircle}
-                          size={20}
+                          size={16}
                           color={colors.primary}
                           style={{ marginRight: 5 }}
                         />
@@ -1682,7 +1682,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       >
                         <FontAwesomeIcon
                           icon={faInfoCircle}
-                          size={20}
+                          size={16}
                           color={colors.primary}
                           style={{ marginRight: 5 }}
                         />
@@ -1753,7 +1753,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       >
                         <FontAwesomeIcon
                           icon={faInfoCircle}
-                          size={20}
+                          size={16}
                           color={colors.primary}
                           style={{ marginRight: 5 }}
                         />
@@ -1781,7 +1781,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       >
                         <FontAwesomeIcon
                           icon={faInfoCircle}
-                          size={20}
+                          size={16}
                           color={colors.primary}
                           style={{ marginRight: 5 }}
                         />
@@ -1920,7 +1920,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               marginTop: 7,
                               marginRight: memoIcon ? 0 : 7,
                             }}
-                            size={25}
+                            size={20}
                             icon={faXmark}
                             color={colors.primaryDisabled}
                           />
@@ -1934,7 +1934,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         >
                           <FontAwesomeIcon
                             style={{ margin: 7 }}
-                            size={30}
+                            size={24}
                             icon={faMagnifyingGlassPlus}
                             color={colors.border}
                           />
@@ -2175,7 +2175,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           </Text>
                           <FontAwesomeIcon
                             style={{ marginTop: 3 }}
-                            size={20}
+                            size={16}
                             icon={faMoneyCheckDollar}
                             color={colors.primary}
                           />

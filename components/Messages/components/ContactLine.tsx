@@ -175,7 +175,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                 >
                   <FontAwesomeIcon
                     style={{ opacity: 0.8 }}
-                    size={30}
+                    size={24}
                     icon={faComments}
                     color={colors.money}
                   />
@@ -238,7 +238,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     }}
                   >
                     <FontAwesomeIcon
-                      size={30}
+                      size={24}
                       icon={faPaperPlane}
                       color={colors.primary}
                     />
@@ -326,7 +326,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                 {!getLabel(c) ? (
                   <FontAwesomeIcon
                     style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                    size={40}
+                    size={32}
                     icon={getIcon()}
                     color={getAmountColor(c)}
                   />

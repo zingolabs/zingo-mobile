@@ -402,7 +402,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               currencyName={info.currencyName}
               amtZec={sendingTotal}
               privacy={false}
-              size={36}
+              size={28}
               smallPrefix={true}
             />
             <CurrencyAmount
@@ -453,7 +453,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           >
             <ZecAmount
               currencyName={info.currencyName}
-              size={18}
+              size={14}
               amtZec={calculatedFee}
               privacy={privacy}
             />
@@ -490,7 +490,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                     >
                       <ZecAmount
                         currencyName={info.currencyName}
-                        size={18}
+                        size={14}
                         amtZec={donationAmount}
                         privacy={privacy}
                       />
@@ -517,7 +517,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 >
                   <ZecAmount
                     currencyName={info.currencyName}
-                    size={18}
+                    size={14}
                     amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                     privacy={privacy}
                   />
@@ -556,7 +556,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               }}
             >
               <TriangleAlert
-                size={24}
+                size={20}
                 color={'#07FF94'}
                 style={{ marginRight: 6 }}
               />

@@ -339,7 +339,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
           </Text>
           <FontAwesomeIcon
             icon={faChevronRight}
-            size={22}
+            size={18}
             color={colors.zingo}
           />
         </TouchableOpacity>

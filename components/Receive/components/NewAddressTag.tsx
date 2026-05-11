@@ -78,7 +78,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
         }}
       >
         <FontAwesomeIcon
-          size={30}
+          size={24}
           icon={faXmark}
           color={colors.text}
           style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}

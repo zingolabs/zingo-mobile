@@ -148,7 +148,7 @@ exports[`Component About - test About - snapshot 1`] = `
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
           style={
             {
               "marginHorizontal": 10,
@@ -161,8 +161,8 @@ exports[`Component About - test About - snapshot 1`] = `
           {
             "color": "#ffffff",
             "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
           }
         }

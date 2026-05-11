@@ -247,7 +247,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               >
                 <FontAwesomeIcon
                   style={{ margin: 0 }}
-                  size={25}
+                  size={20}
                   icon={faXmark}
                   color={colors.primaryDisabled}
                 />
@@ -259,7 +259,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               }}
             >
               <FontAwesomeIcon
-                size={35}
+                size={28}
                 icon={faQrcode}
                 color={colors.border}
               />

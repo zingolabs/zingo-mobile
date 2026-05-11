@@ -68,7 +68,7 @@ exports[`ExpandedAddress - snapshots ExpandedAddress with title and button 1`] =
           "prefix": "fas",
         }
       }
-      size={30}
+      size={24}
       style={
         {
           "alignSelf": "flex-end",
@@ -83,8 +83,8 @@ exports[`ExpandedAddress - snapshots ExpandedAddress with title and button 1`] =
       {
         "alignSelf": "center",
         "color": "#c3c3c3",
-        "fontSize": 18,
-        "fontWeight": "600",
+        "fontSize": 15,
+        "fontWeight": "400",
         "marginTop": 0,
         "opacity": 1,
         "paddingHorizontal": 10,
@@ -247,7 +247,7 @@ exports[`ExpandedAddress - snapshots ExpandedAddress without optional props 1`] 
           "prefix": "fas",
         }
       }
-      size={30}
+      size={24}
       style={
         {
           "alignSelf": "flex-end",
@@ -262,8 +262,8 @@ exports[`ExpandedAddress - snapshots ExpandedAddress without optional props 1`] 
       {
         "alignSelf": "center",
         "color": "#c3c3c3",
-        "fontSize": 18,
-        "fontWeight": "600",
+        "fontSize": 15,
+        "fontWeight": "400",
         "marginTop": 0,
         "opacity": 1,
         "paddingHorizontal": 10,

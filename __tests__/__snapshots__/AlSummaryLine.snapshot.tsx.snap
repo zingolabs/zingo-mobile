@@ -88,7 +88,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine address with contact label 1`] 
                 "prefix": "fas",
               }
             }
-            size={24}
+            size={20}
             style={
               {
                 "marginHorizontal": 10,
@@ -131,7 +131,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine address with contact label 1`] 
                 "prefix": "fas",
               }
             }
-            size={24}
+            size={20}
             style={
               {
                 "marginHorizontal": 10,
@@ -214,7 +214,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine address with contact label 1`] 
               "prefix": "fas",
             }
           }
-          size={25}
+          size={20}
           style={
             {
               "opacity": 0.8,
@@ -283,7 +283,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine address with contact label 1`] 
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
         />
       </View>
     </View>
@@ -379,7 +379,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine transparent address 1`] = `
                 "prefix": "fas",
               }
             }
-            size={24}
+            size={20}
             style={
               {
                 "marginHorizontal": 10,
@@ -422,7 +422,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine transparent address 1`] = `
                 "prefix": "fas",
               }
             }
-            size={24}
+            size={20}
             style={
               {
                 "marginHorizontal": 10,
@@ -505,7 +505,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine transparent address 1`] = `
               "prefix": "fas",
             }
           }
-          size={25}
+          size={20}
           style={
             {
               "opacity": 0.8,
@@ -574,7 +574,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine transparent address 1`] = `
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
         />
       </View>
     </View>
@@ -670,7 +670,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine unified address 1`] = `
                 "prefix": "fas",
               }
             }
-            size={24}
+            size={20}
             style={
               {
                 "marginHorizontal": 10,
@@ -713,7 +713,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine unified address 1`] = `
                 "prefix": "fas",
               }
             }
-            size={24}
+            size={20}
             style={
               {
                 "marginHorizontal": 10,
@@ -796,7 +796,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine unified address 1`] = `
               "prefix": "fas",
             }
           }
-          size={25}
+          size={20}
           style={
             {
               "opacity": 0.8,
@@ -865,7 +865,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine unified address 1`] = `
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
         />
       </View>
     </View>

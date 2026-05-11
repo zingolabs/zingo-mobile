@@ -147,7 +147,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   style={{ width: 40, padding: 10 }}
                   icon={faEllipsisV}
                   color={'#ffffff'}
-                  size={40}
+                  size={32}
                 />
               </ContextMenu>
             ) : (
@@ -219,7 +219,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   style={{ width: 40, padding: 10 }}
                   icon={faEllipsisV}
                   color={'#ffffff'}
-                  size={40}
+                  size={32}
                 />
               </ContextMenu>
             )}
@@ -246,7 +246,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 style={{ width: 40, padding: 10 }}
                 icon={faEllipsisV}
                 color={'#ffffff'}
-                size={40}
+                size={32}
               />
             </ContextMenu>
           )}
@@ -357,7 +357,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                       <FontAwesomeIcon
                         icon={faWifi}
                         color={customServerOffline ? 'red' : colors.zingo}
-                        size={18}
+                        size={14}
                       />
                       <FadeText style={{ marginLeft: 10, marginRight: 5 }}>
                         {translate('settings.server-offline') as string}
