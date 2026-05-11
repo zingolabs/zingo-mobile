@@ -217,7 +217,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
                     "prefix": "fas",
                   }
                 }
-                size={35}
+                size={28}
                 style={
                   {
                     "marginRight": 5,
@@ -618,7 +618,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
                     "prefix": "fas",
                   }
                 }
-                size={35}
+                size={28}
                 style={
                   {
                     "marginRight": 5,
@@ -1019,7 +1019,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
                     "prefix": "fas",
                   }
                 }
-                size={35}
+                size={28}
                 style={
                   {
                     "marginRight": 5,

@@ -519,11 +519,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           }}
         >
           {privacy ? (
-            <FontAwesomeIcon icon={faLock} size={25} color={colors.primary} />
+            <FontAwesomeIcon icon={faLock} size={20} color={colors.primary} />
           ) : (
             <FontAwesomeIcon
               icon={faLockOpen}
-              size={25}
+              size={20}
               color={colors.primaryDisabled}
             />
           )}
@@ -589,7 +589,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           <FontAwesomeIcon
                             icon={faCheck}
                             color={colors.primary}
-                            size={19}
+                            size={16}
                           />
                           {viewSyncStatus && (
                             <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
@@ -632,7 +632,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                               <FontAwesomeIcon
                                 icon={faPlay}
                                 color={colors.syncing}
-                                size={19}
+                                size={16}
                               />
                               {viewSyncStatus && (
                                 <FadeText
@@ -672,7 +672,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                 <FontAwesomeIcon
                                   icon={faPlay}
                                   color={colors.syncing}
-                                  size={19}
+                                  size={16}
                                 />
                                 {viewSyncStatus && (
                                   <FadeText
@@ -733,7 +733,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                             <FontAwesomeIcon
                               icon={faWifi}
                               color={colors.primaryDisabled}
-                              size={19}
+                              size={16}
                             />
                             {false && (
                               <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
@@ -761,7 +761,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                       <FontAwesomeIcon
                         icon={faCloudDownload}
                         color={!netInfo.isConnected ? 'red' : 'yellow'}
-                        size={20}
+                        size={16}
                       />
                     ) : (
                       <TouchableOpacity
@@ -772,7 +772,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         <FontAwesomeIcon
                           icon={faCloudDownload}
                           color={!netInfo.isConnected ? 'red' : 'yellow'}
-                          size={20}
+                          size={16}
                         />
                       </TouchableOpacity>
                     )}
@@ -805,7 +805,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     paddingHorizontal: 3,
                   }}
                 >
-                  <FontAwesomeIcon icon={faWifi} color={'red'} size={18} />
+                  <FontAwesomeIcon icon={faWifi} color={'red'} size={14} />
                   <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                     {translate('settings.server-offline') as string}
                   </FadeText>
@@ -847,7 +847,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                       navigation.navigate(RouteEnum.SyncReport);
                     }}
                   >
-                    <TriangleAlert color={colors.warning.primary} size={24} />
+                    <TriangleAlert color={colors.warning.primary} size={20} />
                   </TouchableOpacity>
                 </View>
               )}
@@ -870,7 +870,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               <ZecAmount
                 currencyName={info.currencyName}
                 color={colors.text}
-                size={36}
+                size={28}
                 amtZec={
                   totalBalance
                     ? totalBalance.totalOrchardBalance +
@@ -909,7 +909,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     >
                       <FontAwesomeIcon
                         icon={faInfoCircle}
-                        size={25}
+                        size={20}
                         color={colors.primary}
                       />
                     </View>
@@ -937,7 +937,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 <ZecAmount
                   currencyName={info.currencyName}
                   color={colors.primary}
-                  size={18}
+                  size={14}
                   amtZec={
                     totalBalance.totalOrchardBalance +
                     totalBalance.totalSaplingBalance
@@ -1023,7 +1023,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               >
                 <FontAwesomeIcon
                   icon={faBars}
-                  size={40}
+                  size={32}
                   color={colors.border}
                 />
               </TouchableOpacity>
@@ -1045,14 +1045,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   <TouchableOpacity onPress={() => ufvkShowModal()}>
                     <FontAwesomeIcon
                       icon={faSnowflake}
-                      size={24}
+                      size={20}
                       color={colors.zingo}
                     />
                   </TouchableOpacity>
                 ) : (
                   <FontAwesomeIcon
                     icon={faSnowflake}
-                    size={24}
+                    size={20}
                     color={colors.zingo}
                   />
                 )}
@@ -1094,7 +1094,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               >
                 <FontAwesomeIcon
                   icon={faGear}
-                  size={35}
+                  size={28}
                   color={colors.border}
                 />
               </TouchableOpacity>
@@ -1129,7 +1129,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               <TouchableOpacity onPress={() => closeScreen()}>
                 <FontAwesomeIcon
                   style={{ marginHorizontal: 10 }}
-                  size={30}
+                  size={24}
                   icon={faChevronLeft}
                   color={colors.primary}
                 />

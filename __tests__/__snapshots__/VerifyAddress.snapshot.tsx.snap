@@ -68,7 +68,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
           "prefix": "fas",
         }
       }
-      size={30}
+      size={24}
       style={
         {
           "alignSelf": "flex-end",
@@ -216,7 +216,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
                     "prefix": "fas",
                   }
                 }
-                size={35}
+                size={28}
                 style={
                   {
                     "marginRight": 5,

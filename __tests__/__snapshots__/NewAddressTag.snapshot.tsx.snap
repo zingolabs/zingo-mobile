@@ -68,7 +68,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
           "prefix": "fas",
         }
       }
-      size={30}
+      size={24}
       style={
         {
           "alignSelf": "flex-end",

@@ -124,7 +124,7 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
                   "prefix": "fas",
                 }
               }
-              size={35}
+              size={28}
               style={
                 {
                   "marginRight": 5,
@@ -285,7 +285,7 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
                   "prefix": "fas",
                 }
               }
-              size={35}
+              size={28}
               style={
                 {
                   "marginRight": 5,

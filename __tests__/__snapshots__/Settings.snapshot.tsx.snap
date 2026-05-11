@@ -124,7 +124,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                   "prefix": "fas",
                 }
               }
-              size={40}
+              size={32}
             />
           </View>
         </View>
@@ -220,7 +220,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={30}
+            size={24}
             style={
               {
                 "marginHorizontal": 10,
@@ -500,7 +500,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       "prefix": "fas",
                     }
                   }
-                  size={18}
+                  size={14}
                 />
               </View>
             </View>
@@ -634,7 +634,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       "prefix": "fas",
                     }
                   }
-                  size={18}
+                  size={14}
                 />
               </View>
             </View>
@@ -768,7 +768,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       "prefix": "fas",
                     }
                   }
-                  size={18}
+                  size={14}
                 />
               </View>
             </View>
@@ -902,7 +902,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       "prefix": "fas",
                     }
                   }
-                  size={18}
+                  size={14}
                 />
               </View>
             </View>
@@ -1071,7 +1071,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       "prefix": "fas",
                     }
                   }
-                  size={18}
+                  size={14}
                 />
               </View>
             </View>
@@ -1239,7 +1239,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={16}
+                size={12}
               />
             </View>
           </View>
@@ -1325,7 +1325,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={18}
+                size={14}
               />
             </View>
           </View>
@@ -1616,7 +1616,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       "prefix": "far",
                     }
                   }
-                  size={20}
+                  size={16}
                 />
                 <Text
                   style={
@@ -1720,7 +1720,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       "prefix": "fas",
                     }
                   }
-                  size={20}
+                  size={16}
                 />
                 <Text
                   style={
@@ -1867,7 +1867,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       "prefix": "far",
                     }
                   }
-                  size={20}
+                  size={16}
                 />
                 <Text
                   style={
@@ -2055,7 +2055,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           "prefix": "fas",
         }
       }
-      size={30}
+      size={24}
       style={
         {
           "alignSelf": "flex-end",

@@ -118,7 +118,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         "prefix": "fas",
                       }
                     }
-                    size={20}
+                    size={16}
                   />
                 </View>
               </View>
@@ -208,7 +208,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         "prefix": "fas",
                       }
                     }
-                    size={25}
+                    size={20}
                   />
                 </View>
               </View>
@@ -269,7 +269,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     style={
                       {
                         "color": "#c3c3c3",
-                        "fontSize": 36,
+                        "fontSize": 28,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -349,7 +349,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       "prefix": "fas",
                     }
                   }
-                  size={25}
+                  size={20}
                 />
               </View>
             </View>
@@ -506,7 +506,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         "prefix": "fas",
                       }
                     }
-                    size={20}
+                    size={16}
                   />
                 </View>
               </View>
@@ -585,7 +585,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     "prefix": "fas",
                   }
                 }
-                size={40}
+                size={32}
               />
             </View>
           </View>
@@ -653,7 +653,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   "prefix": "fas",
                 }
               }
-              size={35}
+              size={28}
             />
           </View>
         </View>
@@ -887,7 +887,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                           "prefix": "fas",
                         }
                       }
-                      size={25}
+                      size={20}
                       style={
                         {
                           "marginRight": 5,
@@ -946,7 +946,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                           "prefix": "fas",
                         }
                       }
-                      size={35}
+                      size={28}
                       style={
                         {
                           "marginRight": 5,
@@ -1113,7 +1113,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                           "prefix": "fas",
                         }
                       }
-                      size={20}
+                      size={16}
                       style={
                         {
                           "marginRight": 5,
@@ -1307,7 +1307,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                             "prefix": "fas",
                           }
                         }
-                        size={20}
+                        size={16}
                       />
                     </View>
                   </View>
@@ -1435,7 +1435,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                             style={
                               {
                                 "color": "red",
-                                "fontSize": 15,
+                                "fontSize": 12,
                                 "fontWeight": "700",
                                 "margin": 0,
                                 "padding": 0,
@@ -1512,7 +1512,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                           "prefix": "fas",
                         }
                       }
-                      size={20}
+                      size={16}
                       style={
                         {
                           "marginRight": 5,
@@ -1807,7 +1807,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       "prefix": "fas",
                     }
                   }
-                  size={20}
+                  size={16}
                 />
               </View>
             </View>
@@ -1878,7 +1878,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     style={
                       {
                         "color": "#c3c3c3",
-                        "fontSize": 36,
+                        "fontSize": 28,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -1892,9 +1892,9 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     style={
                       {
                         "color": "#c3c3c3",
-                        "fontSize": 25.2,
+                        "fontSize": 19.599999999999998,
                         "margin": 0,
-                        "marginBottom": 2.4,
+                        "marginBottom": 1.8666666666666667,
                         "padding": 0,
                       }
                     }
@@ -1979,7 +1979,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     "prefix": "fas",
                   }
                 }
-                size={40}
+                size={32}
               />
             </View>
           </View>
@@ -2047,7 +2047,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   "prefix": "fas",
                 }
               }
-              size={35}
+              size={28}
             />
           </View>
         </View>
@@ -2281,7 +2281,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                           "prefix": "fas",
                         }
                       }
-                      size={25}
+                      size={20}
                       style={
                         {
                           "marginRight": 5,
@@ -2340,7 +2340,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                           "prefix": "fas",
                         }
                       }
-                      size={35}
+                      size={28}
                       style={
                         {
                           "marginRight": 5,
@@ -2507,7 +2507,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                           "prefix": "fas",
                         }
                       }
-                      size={20}
+                      size={16}
                       style={
                         {
                           "marginRight": 5,
@@ -2639,7 +2639,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             style={
                               {
                                 "color": "red",
-                                "fontSize": 15,
+                                "fontSize": 12,
                                 "fontWeight": "700",
                                 "margin": 0,
                                 "padding": 0,
@@ -2653,9 +2653,9 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             style={
                               {
                                 "color": "red",
-                                "fontSize": 10.5,
+                                "fontSize": 8.399999999999999,
                                 "margin": 0,
-                                "marginBottom": 1,
+                                "marginBottom": 0.8,
                                 "padding": 0,
                               }
                             }
@@ -2731,7 +2731,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                           "prefix": "fas",
                         }
                       }
-                      size={20}
+                      size={16}
                       style={
                         {
                           "marginRight": 5,

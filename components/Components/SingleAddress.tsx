@@ -202,7 +202,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 >
                   <TriangleAlert
                     color={colors.warning.primary}
-                    size={24}
+                    size={20}
                     style={{ marginRight: 10 }}
                   />
                   <Text
@@ -240,7 +240,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 >
                   <ShieldIcon
                     color={colors.background}
-                    size={24}
+                    size={20}
                     style={{ marginRight: 5 }}
                   />
                   <Text
@@ -282,7 +282,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   >
                     <ShieldIcon
                       color={colors.primary}
-                      size={24}
+                      size={20}
                       style={{ marginRight: 10 }}
                     />
                     <RegText
@@ -329,7 +329,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   >
                     <EyeIcon
                       color={colors.warning.primaryDark}
-                      size={24}
+                      size={20}
                       style={{ marginRight: 10 }}
                     />
                     <RegText
@@ -465,7 +465,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   >
                     <CopyIcon
                       color={colors.money}
-                      size={24}
+                      size={20}
                       opacity={0.9}
                       style={{ margin: 3 }}
                     />
@@ -485,7 +485,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       >
                         <FontAwesomeIcon
                           style={{ margin: 5, opacity: 0.9 }}
-                          size={24}
+                          size={20}
                           icon={faCircleCheck}
                           color={colors.money}
                         />
@@ -504,7 +504,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         >
                           <ListIcon
                             color={colors.money}
-                            size={24}
+                            size={20}
                             opacity={0.9}
                             style={{ margin: 3 }}
                           />
@@ -608,7 +608,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         }}
                       >
                         <TriangleAlert
-                          size={24}
+                          size={20}
                           color={
                             showMoreOptions
                               ? colors.warning.primary
@@ -628,13 +628,13 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         </Text>
                         {showMoreOptions ? (
                           <ChevronUp
-                            size={20}
+                            size={16}
                             color={colors.warning.primary}
                             style={{ marginLeft: 16 }}
                           />
                         ) : (
                           <ChevronDown
-                            size={20}
+                            size={16}
                             color={colors.zingo}
                             style={{ marginLeft: 16 }}
                           />

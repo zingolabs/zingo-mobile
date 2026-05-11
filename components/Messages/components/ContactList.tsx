@@ -423,7 +423,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               {loading && (
                 <ActivityIndicator
                   style={{ marginRight: 7 }}
-                  size={25}
+                  size={20}
                   color={colors.primaryDisabled}
                 />
               )}
@@ -436,7 +436,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 >
                   <FontAwesomeIcon
                     style={{ marginRight: 7 }}
-                    size={25}
+                    size={20}
                     icon={faXmark}
                     color={colors.primaryDisabled}
                   />
@@ -601,7 +601,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             >
               <FontAwesomeIcon
                 style={{ margin: 0 }}
-                size={30}
+                size={24}
                 icon={faMagnifyingGlass}
                 color={colors.zingo}
               />
@@ -746,7 +746,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             >
               <FontAwesomeIcon
                 style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                size={20}
+                size={16}
                 icon={faAngleUp}
                 color={colors.zingo}
               />

@@ -158,7 +158,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "opacity": 0.8,
@@ -229,7 +229,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
               />
             </View>
           </View>
@@ -304,7 +304,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "marginLeft": 5,
@@ -459,7 +459,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                         "prefix": "fas",
                       }
                     }
-                    size={15}
+                    size={12}
                     style={
                       {
                         "marginLeft": 10,
@@ -530,7 +530,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                     style={
                       {
                         "color": "#888888",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -544,9 +544,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                     style={
                       {
                         "color": "#888888",
-                        "fontSize": 12.6,
+                        "fontSize": 9.799999999999999,
                         "margin": 0,
-                        "marginBottom": 1.2,
+                        "marginBottom": 0.9333333333333333,
                         "padding": 0,
                       }
                     }
@@ -723,7 +723,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "opacity": 0.8,
@@ -794,7 +794,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
               />
             </View>
           </View>
@@ -871,7 +871,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "marginLeft": 5,
@@ -946,7 +946,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                         "prefix": "fas",
                       }
                     }
-                    size={15}
+                    size={12}
                     style={
                       {
                         "marginLeft": 10,
@@ -1017,7 +1017,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                     style={
                       {
                         "color": "#5a8c5a",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -1031,9 +1031,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                     style={
                       {
                         "color": "#5a8c5a",
-                        "fontSize": 12.6,
+                        "fontSize": 9.799999999999999,
                         "margin": 0,
-                        "marginBottom": 1.2,
+                        "marginBottom": 0.9333333333333333,
                         "padding": 0,
                       }
                     }
@@ -1237,7 +1237,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "opacity": 0.8,
@@ -1317,7 +1317,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "marginLeft": 5,
@@ -1392,7 +1392,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                         "prefix": "fas",
                       }
                     }
-                    size={15}
+                    size={12}
                     style={
                       {
                         "marginLeft": 10,
@@ -1463,7 +1463,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                     style={
                       {
                         "color": "#18bd18",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -1477,9 +1477,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                     style={
                       {
                         "color": "#18bd18",
-                        "fontSize": 12.6,
+                        "fontSize": 9.799999999999999,
                         "margin": 0,
-                        "marginBottom": 1.2,
+                        "marginBottom": 0.9333333333333333,
                         "padding": 0,
                       }
                     }
@@ -1680,7 +1680,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "opacity": 0.8,
@@ -1751,7 +1751,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
               />
             </View>
           </View>
@@ -1826,7 +1826,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "marginLeft": 5,
@@ -1981,7 +1981,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                         "prefix": "fas",
                       }
                     }
-                    size={15}
+                    size={12}
                     style={
                       {
                         "marginLeft": 10,
@@ -2052,7 +2052,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                     style={
                       {
                         "color": "#c3c3c3",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -2066,9 +2066,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                     style={
                       {
                         "color": "#c3c3c3",
-                        "fontSize": 12.6,
+                        "fontSize": 9.799999999999999,
                         "margin": 0,
-                        "marginBottom": 1.2,
+                        "marginBottom": 0.9333333333333333,
                         "padding": 0,
                       }
                     }

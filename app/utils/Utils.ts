@@ -79,6 +79,12 @@ export default class Utils {
       smallPart = '0000';
     }
 
+    // Trim trailing zeros from decimalPart only when smallPart has no significant digits.
+    // When smallPart is non-zero we preserve all four positions for visual alignment.
+    if (smallPart === '0000') {
+      decimalPart = decimalPart.replace(/0+$/, '') || '0';
+    }
+
     return { bigPart: intPart + decimalSeparator + decimalPart, smallPart };
   }
 

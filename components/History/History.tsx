@@ -533,7 +533,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             <FiltersIcon
               style={{ marginLeft: 5, marginRight: 5 }}
               color={colors.zingo}
-              size={24}
+              size={20}
             />
             {(!!filterKind ||
               filterFailed ||
@@ -670,7 +670,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               >
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={20}
+                  size={16}
                   icon={faAngleUp}
                   color={colors.zingo}
                 />

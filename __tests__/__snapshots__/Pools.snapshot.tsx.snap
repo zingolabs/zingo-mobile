@@ -109,7 +109,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={25}
+                size={20}
               />
             </View>
           </View>
@@ -226,7 +226,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
           style={
             {
               "marginHorizontal": 10,
@@ -387,7 +387,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     style={
                       {
                         "color": "#ffffff",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -395,7 +395,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     }
                     testID="orchard-total-balance.big-part"
                   >
-                     0.6000
+                     0.6
                   </Text>
                 </View>
               </View>
@@ -476,7 +476,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     style={
                       {
                         "color": "red",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -484,7 +484,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     }
                     testID="orchard-confirmed-balance.big-part"
                   >
-                     0.3000
+                     0.3
                   </Text>
                 </View>
               </View>
@@ -598,7 +598,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     style={
                       {
                         "color": "#ffffff",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -606,7 +606,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     }
                     testID="sapling-total-balance.big-part"
                   >
-                     0.4000
+                     0.4
                   </Text>
                 </View>
               </View>
@@ -687,7 +687,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     style={
                       {
                         "color": "red",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -695,7 +695,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     }
                     testID="sapling-confirmed-balance.big-part"
                   >
-                     0.2000
+                     0.2
                   </Text>
                 </View>
               </View>
@@ -808,7 +808,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     style={
                       {
                         "color": "red",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -822,9 +822,9 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     style={
                       {
                         "color": "red",
-                        "fontSize": 12.6,
+                        "fontSize": 9.799999999999999,
                         "margin": 0,
-                        "marginBottom": 1.2,
+                        "marginBottom": 0.9333333333333333,
                         "padding": 0,
                       }
                     }
@@ -911,7 +911,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     style={
                       {
                         "color": "red",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -925,9 +925,9 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     style={
                       {
                         "color": "red",
-                        "fontSize": 12.6,
+                        "fontSize": 9.799999999999999,
                         "margin": 0,
-                        "marginBottom": 1.2,
+                        "marginBottom": 0.9333333333333333,
                         "padding": 0,
                       }
                     }
@@ -969,7 +969,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={20}
+            size={16}
             style={
               {
                 "marginRight": 5,

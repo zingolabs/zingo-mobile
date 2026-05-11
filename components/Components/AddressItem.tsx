@@ -210,7 +210,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               >
                 <FontAwesomeIcon
                   style={{ marginTop: 3 }}
-                  size={25}
+                  size={20}
                   icon={faUserPlus}
                   color={colors.primary}
                 />
@@ -223,7 +223,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             >
               <FontAwesomeIcon
                 style={{ marginTop: 3 }}
-                size={30}
+                size={24}
                 icon={faUserPlus}
                 color={colors.primary}
               />
@@ -256,7 +256,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               >
                 <FontAwesomeIcon
                   style={{ marginTop: 3 }}
-                  size={30}
+                  size={24}
                   icon={faPaperPlane}
                   color={colors.primary}
                 />

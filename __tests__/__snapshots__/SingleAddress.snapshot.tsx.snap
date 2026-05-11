@@ -230,7 +230,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
                     "prefix": "far",
                   }
                 }
-                size={24}
+                size={20}
                 style={
                   {
                     "margin": 5,

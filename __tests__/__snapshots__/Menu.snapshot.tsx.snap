@@ -311,7 +311,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
             "prefix": "fas",
           }
         }
-        size={22}
+        size={18}
       />
     </View>
     <Text
@@ -560,7 +560,7 @@ exports[`Menu - snapshots Menu basic mode, no value transfers 1`] = `
             "prefix": "fas",
           }
         }
-        size={22}
+        size={18}
       />
     </View>
     <Text

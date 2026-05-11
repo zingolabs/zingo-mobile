@@ -218,7 +218,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
         {loading ? (
           <ActivityIndicator
             style={{ marginTop: 7, marginRight: 7 }}
-            size={25}
+            size={20}
             color={colors.primaryDisabled}
           />
         ) : (
@@ -300,7 +300,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
         >
           <FontAwesomeIcon
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-            size={20}
+            size={16}
             icon={faAngleUp}
             color={colors.zingo}
           />

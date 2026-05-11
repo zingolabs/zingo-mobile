@@ -68,7 +68,7 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
           "prefix": "fas",
         }
       }
-      size={30}
+      size={24}
       style={
         {
           "alignSelf": "flex-end",
@@ -399,7 +399,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
           "prefix": "fas",
         }
       }
-      size={30}
+      size={24}
       style={
         {
           "alignSelf": "flex-end",
@@ -568,7 +568,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
               "prefix": "fas",
             }
           }
-          size={15}
+          size={12}
           style={
             {
               "marginRight": 20,

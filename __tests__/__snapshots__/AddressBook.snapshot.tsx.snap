@@ -148,7 +148,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
           style={
             {
               "marginHorizontal": 10,
@@ -419,7 +419,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
     <View>
       <ActivityIndicator
         color="#5a8c5a"
-        size={25}
+        size={20}
         style={
           {
             "marginRight": 7,

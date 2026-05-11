@@ -109,7 +109,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                     "prefix": "fas",
                   }
                 }
-                size={25}
+                size={20}
               />
             </View>
           </View>
@@ -226,7 +226,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
           style={
             {
               "marginHorizontal": 10,
@@ -328,7 +328,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             "prefix": "fas",
           }
         }
-        size={30}
+        size={24}
       />
     </View>
     <Text
@@ -391,7 +391,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             "prefix": "fas",
           }
         }
-        size={30}
+        size={24}
       />
     </View>
   </View>
@@ -493,7 +493,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                 style={
                   {
                     "color": "#ffffff",
-                    "fontSize": 36,
+                    "fontSize": 28,
                     "fontWeight": "700",
                     "margin": 0,
                     "padding": 0,
@@ -507,9 +507,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                 style={
                   {
                     "color": "#ffffff",
-                    "fontSize": 25.2,
+                    "fontSize": 19.599999999999998,
                     "margin": 0,
-                    "marginBottom": 2.4,
+                    "marginBottom": 1.8666666666666667,
                     "padding": 0,
                   }
                 }
@@ -784,7 +784,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                     style={
                       {
                         "color": "#ffffff",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -798,9 +798,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                     style={
                       {
                         "color": "#ffffff",
-                        "fontSize": 12.6,
+                        "fontSize": 9.799999999999999,
                         "margin": 0,
-                        "marginBottom": 1.2,
+                        "marginBottom": 0.9333333333333333,
                         "padding": 0,
                       }
                     }
@@ -996,7 +996,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                     "prefix": "fas",
                   }
                 }
-                size={25}
+                size={20}
               />
             </View>
           </View>
@@ -1113,7 +1113,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
           style={
             {
               "marginHorizontal": 10,
@@ -1215,7 +1215,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             "prefix": "fas",
           }
         }
-        size={30}
+        size={24}
       />
     </View>
     <Text
@@ -1278,7 +1278,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             "prefix": "fas",
           }
         }
-        size={30}
+        size={24}
       />
     </View>
   </View>
@@ -1380,7 +1380,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 style={
                   {
                     "color": "#ffffff",
-                    "fontSize": 36,
+                    "fontSize": 28,
                     "fontWeight": "700",
                     "margin": 0,
                     "padding": 0,
@@ -1394,9 +1394,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 style={
                   {
                     "color": "#ffffff",
-                    "fontSize": 25.2,
+                    "fontSize": 19.599999999999998,
                     "margin": 0,
-                    "marginBottom": 2.4,
+                    "marginBottom": 1.8666666666666667,
                     "padding": 0,
                   }
                 }
@@ -1639,7 +1639,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                     style={
                       {
                         "color": "#ffffff",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -1800,7 +1800,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "marginTop": 3,
@@ -1893,7 +1893,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                     style={
                       {
                         "color": "#ffffff",
-                        "fontSize": 18,
+                        "fontSize": 14,
                         "fontWeight": "700",
                         "margin": 0,
                         "padding": 0,
@@ -1907,9 +1907,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                     style={
                       {
                         "color": "#ffffff",
-                        "fontSize": 12.6,
+                        "fontSize": 9.799999999999999,
                         "margin": 0,
-                        "marginBottom": 1.2,
+                        "marginBottom": 0.9333333333333333,
                         "padding": 0,
                       }
                     }

@@ -120,7 +120,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                       "prefix": "fas",
                     }
                   }
-                  size={20}
+                  size={16}
                 />
               </View>
             </View>
@@ -210,7 +210,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                       "prefix": "fas",
                     }
                   }
-                  size={25}
+                  size={20}
                 />
               </View>
             </View>
@@ -271,7 +271,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   style={
                     {
                       "color": "#c3c3c3",
-                      "fontSize": 36,
+                      "fontSize": 28,
                       "fontWeight": "700",
                       "margin": 0,
                       "padding": 0,
@@ -351,7 +351,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     "prefix": "fas",
                   }
                 }
-                size={25}
+                size={20}
               />
             </View>
           </View>
@@ -508,7 +508,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                       "prefix": "fas",
                     }
                   }
-                  size={20}
+                  size={16}
                 />
               </View>
             </View>
@@ -587,7 +587,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   "prefix": "fas",
                 }
               }
-              size={40}
+              size={32}
             />
           </View>
         </View>
@@ -655,7 +655,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 "prefix": "fas",
               }
             }
-            size={35}
+            size={28}
           />
         </View>
       </View>
@@ -878,7 +878,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     "prefix": "fas",
                   }
                 }
-                size={20}
+                size={16}
               />
             </View>
           </View>
@@ -949,7 +949,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   style={
                     {
                       "color": "#c3c3c3",
-                      "fontSize": 36,
+                      "fontSize": 28,
                       "fontWeight": "700",
                       "margin": 0,
                       "padding": 0,
@@ -963,9 +963,9 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   style={
                     {
                       "color": "#c3c3c3",
-                      "fontSize": 25.2,
+                      "fontSize": 19.599999999999998,
                       "margin": 0,
-                      "marginBottom": 2.4,
+                      "marginBottom": 1.8666666666666667,
                       "padding": 0,
                     }
                   }
@@ -1050,7 +1050,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   "prefix": "fas",
                 }
               }
-              size={40}
+              size={32}
             />
           </View>
         </View>
@@ -1118,7 +1118,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 "prefix": "fas",
               }
             }
-            size={35}
+            size={28}
           />
         </View>
       </View>

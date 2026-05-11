@@ -84,7 +84,7 @@ exports[`Component PriceFetcher - test PriceFetcher - snapshot 1`] = `
           "prefix": "fas",
         }
       }
-      size={20}
+      size={16}
     />
   </View>
 </View>

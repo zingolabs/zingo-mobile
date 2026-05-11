@@ -110,7 +110,7 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
                       "prefix": "fas",
                     }
                   }
-                  size={25}
+                  size={20}
                 />
               </View>
             </View>
@@ -227,7 +227,7 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={30}
+            size={24}
             style={
               {
                 "marginHorizontal": 10,
@@ -391,7 +391,7 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
                       "prefix": "fas",
                     }
                   }
-                  size={25}
+                  size={20}
                 />
               </View>
             </View>
@@ -508,7 +508,7 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={30}
+            size={24}
             style={
               {
                 "marginHorizontal": 10,
@@ -672,7 +672,7 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
                       "prefix": "fas",
                     }
                   }
-                  size={25}
+                  size={20}
                 />
               </View>
             </View>
@@ -789,7 +789,7 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={30}
+            size={24}
             style={
               {
                 "marginHorizontal": 10,
@@ -953,7 +953,7 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
                       "prefix": "fas",
                     }
                   }
-                  size={25}
+                  size={20}
                 />
               </View>
             </View>
@@ -1070,7 +1070,7 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={30}
+            size={24}
             style={
               {
                 "marginHorizontal": 10,

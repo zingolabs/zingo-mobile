@@ -68,7 +68,7 @@ exports[`ExpandedAddress - snapshots ExpandedAddress with title and button 1`] =
           "prefix": "fas",
         }
       }
-      size={30}
+      size={24}
       style={
         {
           "alignSelf": "flex-end",
@@ -247,7 +247,7 @@ exports[`ExpandedAddress - snapshots ExpandedAddress without optional props 1`] 
           "prefix": "fas",
         }
       }
-      size={30}
+      size={24}
       style={
         {
           "alignSelf": "flex-end",

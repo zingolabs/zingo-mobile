@@ -194,7 +194,7 @@ exports[`ContactLine - snapshots ContactLine no month header, protected 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "opacity": 0.8,
@@ -614,7 +614,7 @@ exports[`ContactLine - snapshots ContactLine with month header 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
               />
             </View>
           </View>
@@ -721,7 +721,7 @@ exports[`ContactLine - snapshots ContactLine with month header 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={30}
+                size={24}
                 style={
                   {
                     "opacity": 0.8,

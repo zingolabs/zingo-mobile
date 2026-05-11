@@ -109,7 +109,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
                     "prefix": "fas",
                   }
                 }
-                size={20}
+                size={16}
               />
             </View>
           </View>
@@ -188,7 +188,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
                 "prefix": "fas",
               }
             }
-            size={40}
+            size={32}
           />
         </View>
       </View>
@@ -256,7 +256,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
               "prefix": "fas",
             }
           }
-          size={35}
+          size={28}
         />
       </View>
     </View>
@@ -630,7 +630,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
                 "prefix": "fas",
               }
             }
-            size={30}
+            size={24}
             style={
               {
                 "margin": 0,

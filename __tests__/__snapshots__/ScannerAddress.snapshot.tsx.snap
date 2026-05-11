@@ -148,7 +148,7 @@ exports[`ScannerAddress - snapshots ScannerAddress active 1`] = `
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
           style={
             {
               "marginHorizontal": 10,
@@ -347,7 +347,7 @@ exports[`ScannerAddress - snapshots ScannerAddress inactive 1`] = `
               "prefix": "fas",
             }
           }
-          size={30}
+          size={24}
           style={
             {
               "marginHorizontal": 10,

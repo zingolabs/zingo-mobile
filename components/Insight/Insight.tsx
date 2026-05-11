@@ -176,7 +176,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             {(!expandAddress[index] || item.address === 'fee') && (
               <FontAwesomeIcon
                 style={{ margin: 5 }}
-                size={45}
+                size={36}
                 icon={faQrcode}
                 color={item.svg.fill}
               />
@@ -249,7 +249,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             {tab === 'sent' ? (
               <ZecAmount
                 currencyName={info.currencyName}
-                size={15}
+                size={12}
                 amtZec={item.value}
                 style={{ marginHorizontal: 5 }}
                 privacy={privacy}

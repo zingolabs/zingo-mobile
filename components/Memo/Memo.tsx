@@ -173,7 +173,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ navigation, route }) => {
               >
                 <FontAwesomeIcon
                   style={{ margin: 10 }}
-                  size={25}
+                  size={20}
                   icon={faXmark}
                   color={colors.primaryDisabled}
                 />
