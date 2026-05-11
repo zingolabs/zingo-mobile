@@ -565,9 +565,9 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
               {
                 "color": "#18bd18",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >
@@ -642,9 +642,9 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >
@@ -1222,9 +1222,9 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "color": "#18bd18",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >
@@ -1299,9 +1299,9 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >

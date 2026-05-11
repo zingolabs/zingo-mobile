@@ -239,9 +239,9 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
               {
                 "color": "#18bd18",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >
@@ -316,9 +316,9 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >
@@ -655,9 +655,9 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
               {
                 "color": "#18bd18",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >
@@ -732,9 +732,9 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >

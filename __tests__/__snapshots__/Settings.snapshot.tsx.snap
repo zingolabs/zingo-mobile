@@ -1984,9 +1984,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >

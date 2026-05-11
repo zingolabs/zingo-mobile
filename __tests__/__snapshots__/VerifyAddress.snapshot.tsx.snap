@@ -316,9 +316,9 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               {
                 "color": "#18bd18",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >
@@ -393,9 +393,9 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >
