@@ -1,4 +1,4 @@
 #! /usr/bin/env bash
 
 # build image
-podman build --target build_android --tag devlocal/build_android .
+docker build --target build_android --tag localhost/devlocal/build_android .

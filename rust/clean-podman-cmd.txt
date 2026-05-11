@@ -1,9 +1,0 @@
-Windows (Podman Desktop):
-podman system prune -a --volumes
-
-Ubuntu (rootless):
-podman system prune -a --volumes
-
-Stop/start Podman machine (Windows/Mac):
-podman machine stop
-podman machine start
