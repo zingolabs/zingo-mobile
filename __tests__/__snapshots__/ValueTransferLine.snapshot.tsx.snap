@@ -388,8 +388,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                           style={
                             {
                               "color": "#c3c3c3",
-                              "fontSize": 18,
-                              "fontWeight": "600",
+                              "fontSize": 15,
+                              "fontWeight": "400",
                               "opacity": 1,
                             }
                           }
@@ -1910,8 +1910,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                           style={
                             {
                               "color": "#c3c3c3",
-                              "fontSize": 18,
-                              "fontWeight": "600",
+                              "fontSize": 15,
+                              "fontWeight": "400",
                               "opacity": 1,
                             }
                           }

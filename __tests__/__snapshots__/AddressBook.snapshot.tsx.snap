@@ -160,8 +160,8 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }

@@ -160,8 +160,8 @@ exports[`ScannerAddress - snapshots ScannerAddress active 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }
@@ -359,8 +359,8 @@ exports[`ScannerAddress - snapshots ScannerAddress inactive 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }

@@ -687,8 +687,8 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           style={
             {
               "color": "#ffffff",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
               "paddingHorizontal": 5,
               "textAlign": "center",
@@ -1150,8 +1150,8 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           style={
             {
               "color": "#ffffff",
-              "fontSize": 18,
-              "fontWeight": "600",
+              "fontSize": 15,
+              "fontWeight": "400",
               "opacity": 1,
               "paddingHorizontal": 5,
               "textAlign": "center",

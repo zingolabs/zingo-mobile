@@ -288,8 +288,8 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
             "textAlign": "center",
@@ -387,7 +387,7 @@ exports[`ContactList - snapshots ContactList advanced mode 1`] = `
               style={
                 {
                   "color": "#18bd18",
-                  "fontSize": 18,
+                  "fontSize": 15,
                   "fontWeight": "bold",
                   "opacity": 1,
                   "textDecorationLine": "underline",

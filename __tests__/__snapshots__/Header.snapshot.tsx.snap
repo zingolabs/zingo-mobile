@@ -605,8 +605,8 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
             "textAlign": "center",
@@ -792,8 +792,8 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "600",
+            "fontSize": 15,
+            "fontWeight": "400",
             "opacity": 1,
             "paddingHorizontal": 5,
           }

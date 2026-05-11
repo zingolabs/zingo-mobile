@@ -77,7 +77,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     padding: 0,
     paddingLeft: 20,
     paddingRight: 20,
-    borderRadius: 10,
+    borderRadius: 24,
     maxWidth: '90%',
     minWidth: '30%',
     minHeight: 48,
