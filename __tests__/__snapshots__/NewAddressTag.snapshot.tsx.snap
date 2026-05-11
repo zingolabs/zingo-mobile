@@ -239,9 +239,9 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
               {
                 "color": "#18bd18",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >
@@ -316,9 +316,9 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "textAlign": "center",
-                "textTransform": "uppercase",
+                "textTransform": "none",
               }
             }
           >

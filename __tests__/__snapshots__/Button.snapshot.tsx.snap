@@ -67,9 +67,9 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
         {
           "color": "#011401",
           "fontSize": 16,
-          "fontWeight": "bold",
+          "fontWeight": "600",
           "textAlign": "center",
-          "textTransform": "uppercase",
+          "textTransform": "none",
         }
       }
     >
@@ -146,9 +146,9 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
         {
           "color": "#18bd18",
           "fontSize": 16,
-          "fontWeight": "bold",
+          "fontWeight": "600",
           "textAlign": "center",
-          "textTransform": "uppercase",
+          "textTransform": "none",
         }
       }
     >

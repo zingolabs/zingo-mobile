@@ -363,10 +363,10 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
                   "color": "#ffffff",
                   "fontFamily": "monospace",
                   "fontSize": 16,
-                  "fontWeight": "bold",
+                  "fontWeight": "600",
                   "opacity": 0.8,
                   "textAlign": "center",
-                  "textTransform": "lowercase",
+                  "textTransform": "none",
                 }
               }
             >
@@ -452,9 +452,9 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
                 {
                   "color": "#011401",
                   "fontSize": 16,
-                  "fontWeight": "bold",
+                  "fontWeight": "600",
                   "textAlign": "center",
-                  "textTransform": "uppercase",
+                  "textTransform": "none",
                 }
               }
             />
@@ -668,10 +668,10 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
                 "color": "#ffffff",
                 "fontFamily": "monospace",
                 "fontSize": 16,
-                "fontWeight": "bold",
+                "fontWeight": "600",
                 "opacity": 0.8,
                 "textAlign": "center",
-                "textTransform": "lowercase",
+                "textTransform": "none",
               }
             }
           >
