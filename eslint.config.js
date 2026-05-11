@@ -7,7 +7,7 @@ const compat = new FlatCompat({
 
 module.exports = [
   {
-    ignores: ['e2e/**', 'node_modules/**', 'coverage/**'],
+    ignores: ['e2e/**', 'node_modules/**', 'coverage/**', 'rust/target/**'],
   },
   ...compat.extends('@react-native'),
 ];

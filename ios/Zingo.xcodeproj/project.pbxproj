@@ -25,9 +25,9 @@
 		1FA935B32BE457B100117DF5 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */; };
 		1FC1E2172BE443270064963B /* ZingoTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC1E2162BE443270064963B /* ZingoTest.swift */; };
 		1FE8E9AC296B85FC004A256B /* BackgroundTasks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */; };
-		4DF9B7F8F373B71E87204D77 /* libPods-Zingo-ZingoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F485475339DD6C17E5E1064 /* libPods-Zingo-ZingoTests.a */; };
+		7A4E8047ED67EFCCB3BCAE19 /* libPods-Zingo-ZingoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 81CFC173D2C9DA39636BF066 /* libPods-Zingo-ZingoTests.a */; };
+		7C3CADB8D26D2BFFC2D7AA34 /* libPods-Zingo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B6AAD03967962F5F5A3AB136 /* libPods-Zingo.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		B0DB2CAFC12945017E9B10BB /* libPods-Zingo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3D3A346753D828A41978D47 /* libPods-Zingo.a */; };
 		FBBD6650421A473A90DAF827 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB06295A2A14F70A7A5B566 /* SceneDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +44,7 @@
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* ZingoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZingoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		103BD015F1861A6BA40A059A /* Pods-Zingo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo.release.xcconfig"; path = "Target Support Files/Pods-Zingo/Pods-Zingo.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Zingo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zingo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Zingo/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Zingo/Info.plist; sourceTree = "<group>"; };
@@ -61,15 +62,14 @@
 		1FA935B62BE474CD00117DF5 /* ZingoTest-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZingoTest-Bridging-Header.h"; sourceTree = "<group>"; };
 		1FC1E2162BE443270064963B /* ZingoTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZingoTest.swift; sourceTree = "<group>"; };
 		1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BackgroundTasks.framework; path = System/Library/Frameworks/BackgroundTasks.framework; sourceTree = SDKROOT; };
-		28DE9A0D9FC51E1AB113B092 /* Pods-Zingo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo.release.xcconfig"; path = "Target Support Files/Pods-Zingo/Pods-Zingo.release.xcconfig"; sourceTree = "<group>"; };
+		2BFE5E36E5D66183BCE2B41A /* Pods-Zingo-ZingoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo-ZingoTests.release.xcconfig"; path = "Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests.release.xcconfig"; sourceTree = "<group>"; };
 		2DB06295A2A14F70A7A5B566 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		6F485475339DD6C17E5E1064 /* libPods-Zingo-ZingoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Zingo-ZingoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37E3C2E87F7D719A1A3FE5B5 /* Pods-Zingo-ZingoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo-ZingoTests.debug.xcconfig"; path = "Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Zingo/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		8A797832F28FA2B7B312E895 /* Pods-Zingo-ZingoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo-ZingoTests.debug.xcconfig"; path = "Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests.debug.xcconfig"; sourceTree = "<group>"; };
-		8F6D56FAE3176564EDD57755 /* Pods-Zingo-ZingoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo-ZingoTests.release.xcconfig"; path = "Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests.release.xcconfig"; sourceTree = "<group>"; };
-		A29FBE52BBC3141CAD770691 /* Pods-Zingo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo.debug.xcconfig"; path = "Target Support Files/Pods-Zingo/Pods-Zingo.debug.xcconfig"; sourceTree = "<group>"; };
-		C3D3A346753D828A41978D47 /* libPods-Zingo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Zingo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		81CFC173D2C9DA39636BF066 /* libPods-Zingo-ZingoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Zingo-ZingoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6AAD03967962F5F5A3AB136 /* libPods-Zingo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Zingo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F9AFDC1093C6E0CB8D09EEEC /* Pods-Zingo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo.debug.xcconfig"; path = "Target Support Files/Pods-Zingo/Pods-Zingo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,7 +79,7 @@
 			files = (
 				1FA935B32BE457B100117DF5 /* SystemConfiguration.framework in Frameworks */,
 				1FA935B22BE4569D00117DF5 /* libuniffi_zingo.a in Frameworks */,
-				4DF9B7F8F373B71E87204D77 /* libPods-Zingo-ZingoTests.a in Frameworks */,
+				7A4E8047ED67EFCCB3BCAE19 /* libPods-Zingo-ZingoTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,7 +90,7 @@
 				1FE8E9AC296B85FC004A256B /* BackgroundTasks.framework in Frameworks */,
 				1F7D321D2B71D44800D2879C /* SystemConfiguration.framework in Frameworks */,
 				1F8815602BD31176006490E1 /* libuniffi_zingo.a in Frameworks */,
-				B0DB2CAFC12945017E9B10BB /* libPods-Zingo.a in Frameworks */,
+				7C3CADB8D26D2BFFC2D7AA34 /* libPods-Zingo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,8 +139,8 @@
 				1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */,
 				1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				C3D3A346753D828A41978D47 /* libPods-Zingo.a */,
-				6F485475339DD6C17E5E1064 /* libPods-Zingo-ZingoTests.a */,
+				B6AAD03967962F5F5A3AB136 /* libPods-Zingo.a */,
+				81CFC173D2C9DA39636BF066 /* libPods-Zingo-ZingoTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -182,10 +182,10 @@
 		8BB7EBE9935B479E64CBB9A8 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				A29FBE52BBC3141CAD770691 /* Pods-Zingo.debug.xcconfig */,
-				28DE9A0D9FC51E1AB113B092 /* Pods-Zingo.release.xcconfig */,
-				8A797832F28FA2B7B312E895 /* Pods-Zingo-ZingoTests.debug.xcconfig */,
-				8F6D56FAE3176564EDD57755 /* Pods-Zingo-ZingoTests.release.xcconfig */,
+				F9AFDC1093C6E0CB8D09EEEC /* Pods-Zingo.debug.xcconfig */,
+				103BD015F1861A6BA40A059A /* Pods-Zingo.release.xcconfig */,
+				37E3C2E87F7D719A1A3FE5B5 /* Pods-Zingo-ZingoTests.debug.xcconfig */,
+				2BFE5E36E5D66183BCE2B41A /* Pods-Zingo-ZingoTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -197,12 +197,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ZingoTests" */;
 			buildPhases = (
-				7B3EAF2374BE14D98FC8CF44 /* [CP] Check Pods Manifest.lock */,
+				BA9470E2F6216BFAFB600A58 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				8B087439E8FBF914D9F67B33 /* [CP] Embed Pods Frameworks */,
-				229E4B1D3670578E7D5CC716 /* [CP] Copy Pods Resources */,
+				05061832213D8B1BB5BD8591 /* [CP] Embed Pods Frameworks */,
+				84529EAA143FF7D30711B1CD /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -218,15 +218,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Zingo" */;
 			buildPhases = (
-				7680CD9507007C4752CBE9E8 /* [CP] Check Pods Manifest.lock */,
+				C8EB043D686DAACCADEF5EC4 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				1F67CE4E2E6798530075192B /* ShellScript */,
-				E5CC994FCE9870A9F57BFB5D /* [CP] Embed Pods Frameworks */,
-				839543063EF8548A6C694CE8 /* [CP] Copy Pods Resources */,
+				B8F8CB97F29D13582BAD61BA /* [CP] Embed Pods Frameworks */,
+				673D653E52C3D3E6D16ECA36 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -308,7 +308,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nexport NODE_BINARY=$(which node)\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \". $WITH_ENVIRONMENT && $REACT_NATIVE_XCODE\"\n";
+		};
+		05061832213D8B1BB5BD8591 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 		1F67CE4E2E6798530075192B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -327,7 +344,24 @@
 			shellPath = /bin/sh;
 			shellScript = "set -euo pipefail\n\n# Solo para Archive/Release\nif [ \"${CONFIGURATION}\" != \"Release\" ]; then\n  exit 0\nfi\n\n# Ruta donde guardaste el dSYM de Hermes\nHERMES_DSYM_SRC=\"${PROJECT_DIR}/vendor/hermes-dsyms/RN-0.81.4/ios-arm64/release/iphoneos/hermes.framework.dSYM\"\n\n# Carpeta donde Xcode recopila los dSYM al archivar\nDSYM_DST=\"${DWARF_DSYM_FOLDER_PATH}\"\n\nif [ -d \"${HERMES_DSYM_SRC}\" ]; then\n  echo \"Copiando Hermes dSYM a ${DSYM_DST}\"\n  rsync -a \"${HERMES_DSYM_SRC}\" \"${DSYM_DST}/\"\nelse\n  echo \"ERROR: No se encontró Hermes.framework.dSYM en ${HERMES_DSYM_SRC}\" >&2\n  exit 1\nfi\n";
 		};
-		229E4B1D3670578E7D5CC716 /* [CP] Copy Pods Resources */ = {
+		673D653E52C3D3E6D16ECA36 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		84529EAA143FF7D30711B1CD /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -344,29 +378,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7680CD9507007C4752CBE9E8 /* [CP] Check Pods Manifest.lock */ = {
+		B8F8CB97F29D13582BAD61BA /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Zingo-checkManifestLockResult.txt",
+				"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7B3EAF2374BE14D98FC8CF44 /* [CP] Check Pods Manifest.lock */ = {
+		BA9470E2F6216BFAFB600A58 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -388,55 +417,26 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		839543063EF8548A6C694CE8 /* [CP] Copy Pods Resources */ = {
+		C8EB043D686DAACCADEF5EC4 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Zingo-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		8B087439E8FBF914D9F67B33 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E5CC994FCE9870A9F57BFB5D /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-frameworks.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -499,7 +499,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8A797832F28FA2B7B312E895 /* Pods-Zingo-ZingoTests.debug.xcconfig */;
+			baseConfigurationReference = 37E3C2E87F7D719A1A3FE5B5 /* Pods-Zingo-ZingoTests.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 788KRST4S8;
@@ -534,7 +534,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8F6D56FAE3176564EDD57755 /* Pods-Zingo-ZingoTests.release.xcconfig */;
+			baseConfigurationReference = 2BFE5E36E5D66183BCE2B41A /* Pods-Zingo-ZingoTests.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -566,7 +566,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A29FBE52BBC3141CAD770691 /* Pods-Zingo.debug.xcconfig */;
+			baseConfigurationReference = F9AFDC1093C6E0CB8D09EEEC /* Pods-Zingo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -608,7 +608,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 28DE9A0D9FC51E1AB113B092 /* Pods-Zingo.release.xcconfig */;
+			baseConfigurationReference = 103BD015F1861A6BA40A059A /* Pods-Zingo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
