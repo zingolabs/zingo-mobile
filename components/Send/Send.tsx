@@ -870,7 +870,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         console.log(serverChecked);
         console.log(fasterServer);
         if (fasterServer.uri !== server.uri) {
-          setServerOption(fasterServer, selectServer, false, true);
+          await setServerOption(fasterServer, selectServer, false, true);
         }
 
         try {

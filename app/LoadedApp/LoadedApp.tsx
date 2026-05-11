@@ -913,7 +913,7 @@ export class LoadedAppClass extends Component<
     const initialUrl = await Linking.getInitialURL();
     console.log('Received initial deep link URI');
     if (initialUrl !== null) {
-      this.readUrl(initialUrl);
+      await this.readUrl(initialUrl);
 
       this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
         screen: RouteEnum.Send,
@@ -925,7 +925,7 @@ export class LoadedAppClass extends Component<
       async ({ url }) => {
         console.log('Received deep link URI event');
         if (url !== null) {
-          this.readUrl(url);
+          await this.readUrl(url);
         }
 
         this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
