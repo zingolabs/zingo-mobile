@@ -238,9 +238,9 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "opacity": 1,
+            "fontSize": 18,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
           }
         }
@@ -517,9 +517,9 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "opacity": 1,
+            "fontSize": 18,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
           }
         }
@@ -796,9 +796,9 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "opacity": 1,
+            "fontSize": 18,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
           }
         }
@@ -1382,9 +1382,9 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "opacity": 1,
+            "fontSize": 18,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
           }
         }
@@ -1661,9 +1661,9 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         style={
           {
             "color": "#ffffff",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "opacity": 1,
+            "fontSize": 18,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
           }
         }

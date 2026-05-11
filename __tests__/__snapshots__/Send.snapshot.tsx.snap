@@ -685,9 +685,9 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             style={
               {
                 "color": "#ffffff",
-                "fontSize": 15,
-                "fontWeight": "400",
-                "opacity": 1,
+                "fontSize": 18,
+                "fontWeight": "bold",
+                "opacity": 0.87,
                 "paddingHorizontal": 5,
                 "textAlign": "center",
               }
@@ -2079,9 +2079,9 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             style={
               {
                 "color": "#ffffff",
-                "fontSize": 15,
-                "fontWeight": "400",
-                "opacity": 1,
+                "fontSize": 18,
+                "fontWeight": "bold",
+                "opacity": 0.87,
                 "paddingHorizontal": 5,
                 "textAlign": "center",
               }

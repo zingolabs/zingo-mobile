@@ -174,9 +174,9 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           style={
             {
               "color": "#ffffff",
-              "fontSize": 15,
-              "fontWeight": "400",
-              "opacity": 1,
+              "fontSize": 18,
+              "fontWeight": "bold",
+              "opacity": 0.87,
               "paddingHorizontal": 5,
             }
           }

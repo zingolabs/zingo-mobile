@@ -238,9 +238,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         style={
           {
             "color": "#ffffff",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "opacity": 1,
+            "fontSize": 18,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
           }
         }
@@ -1125,9 +1125,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         style={
           {
             "color": "#ffffff",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "opacity": 1,
+            "fontSize": 18,
+            "fontWeight": "bold",
+            "opacity": 0.87,
             "paddingHorizontal": 5,
           }
         }

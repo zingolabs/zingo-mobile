@@ -41,6 +41,7 @@ import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import PriceFetcher from '../Components/PriceFetcher';
 import RegText from '../Components/RegText';
+import BoldText from '../Components/BoldText';
 import ZecAmount from '../Components/ZecAmount';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import Button from '../Components/Button';
@@ -1134,25 +1135,23 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   color={colors.primary}
                 />
               </TouchableOpacity>
-              <RegText
+              <BoldText
                 testID={testID}
-                color={colors.money}
-                style={{ paddingHorizontal: 5 }}
+                style={{ color: colors.money, fontSize: 18, paddingHorizontal: 5 }}
               >
                 {title}
-              </RegText>
+              </BoldText>
               <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
             </>
           ) : (
             <>
               <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-              <RegText
+              <BoldText
                 testID={testID}
-                color={colors.money}
-                style={{ paddingHorizontal: 5, textAlign: 'center' }}
+                style={{ color: colors.money, fontSize: 18, paddingHorizontal: 5, textAlign: 'center' }}
               >
                 {title}
-              </RegText>
+              </BoldText>
               <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
             </>
           )}
