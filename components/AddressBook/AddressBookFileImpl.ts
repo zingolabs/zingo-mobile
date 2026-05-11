@@ -114,14 +114,11 @@ export default class AddressBookFileImpl {
   ): Promise<AddressBookFileClass[]> {
     try {
       const fileName = await this.getFileName();
-      RNFS.writeFile(fileName, JSON.stringify(newAddressBook), GlobalConst.utf8)
-        .then(() => {
-          //console.log('FILE WRITTEN!')
-        })
-        .catch(err => {
-          console.log('address book write file:', err.message);
-          return [] as AddressBookFileClass[];
-        });
+      await RNFS.writeFile(
+        fileName,
+        JSON.stringify(newAddressBook),
+        GlobalConst.utf8,
+      );
       return newAddressBook;
     } catch (err) {
       return [] as AddressBookFileClass[];

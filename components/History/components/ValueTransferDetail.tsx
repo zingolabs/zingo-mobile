@@ -179,7 +179,7 @@ const ValueTransferDetail: React.FunctionComponent<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [valueTransfer.address]);
 
-  const handleTxIDClick = (txid?: string) => {
+  const handleTxIDClick = async (txid?: string) => {
     if (!txid) {
       return;
     }
@@ -189,13 +189,12 @@ const ValueTransferDetail: React.FunctionComponent<
       server.chainName,
       blockExplorer,
     );
-    Linking.canOpenURL(url).then(supported => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        console.log("Don't know how to open URI: " + url);
-      }
-    });
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      console.log("Don't know how to open URI: " + url);
+    }
   };
 
   // if the App is syncing, the VT list will change (new items).

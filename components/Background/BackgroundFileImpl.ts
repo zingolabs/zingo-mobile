@@ -14,13 +14,11 @@ export default class BackgroundFileImpl {
 
     //console.log(' background write', newBackground);
 
-    RNFS.writeFile(fileName, JSON.stringify(newBackground), GlobalConst.utf8)
-      .then(() => {
-        //console.log('FILE WRITTEN!')
-      })
-      .catch(err => {
-        console.log('background write file:', err.message);
-      });
+    await RNFS.writeFile(
+      fileName,
+      JSON.stringify(newBackground),
+      GlobalConst.utf8,
+    );
   }
 
   // [{"batches": "622", "date": "1673817518.324613" }]
