@@ -26,7 +26,7 @@ export type AppStackParamList = {
  * Used for methods like navigateToLoadingApp and onClickOKChangeWallet
  */
 export type LoadingAppNavigationState = {
-  screen?: number;
+  screen?: RouteEnum;
   startingApp?: boolean;
   biometricsFailed?: boolean;
   newWallet?: boolean;

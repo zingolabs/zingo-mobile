@@ -677,6 +677,7 @@ export class LoadedAppClass extends Component<
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
   screenName = ScreenEnum.LoadedApp;
+  private drawerNav: DrawerContentComponentProps['navigation'] | null = null;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -743,7 +744,6 @@ export class LoadedAppClass extends Component<
       nym: props.nym,
 
       // state
-      navigationHome: null,
       appStateStatus:
         Platform.OS === GlobalConst.platformOSios
           ? AppStateStatusEnum.active
@@ -915,7 +915,7 @@ export class LoadedAppClass extends Component<
     if (initialUrl !== null) {
       await this.readUrl(initialUrl);
 
-      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
+      this.drawerNav?.navigate(RouteEnum.HomeStack, {
         screen: RouteEnum.Send,
       });
     }
@@ -928,7 +928,7 @@ export class LoadedAppClass extends Component<
           await this.readUrl(url);
         }
 
-        this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
+        this.drawerNav?.navigate(RouteEnum.HomeStack, {
           screen: RouteEnum.Send,
         });
       },
@@ -1114,7 +1114,7 @@ export class LoadedAppClass extends Component<
           // I need to check this out in the seed screen.
           if (!this.state.isSeedViewModalOpen) {
             this.setIsSeedViewModalOpen(true);
-            this.state.navigationHome?.navigate(RouteEnum.Seed, {
+            this.drawerNav?.navigate(RouteEnum.Seed, {
               action: SeedActionEnum.view,
             });
           }
@@ -1422,54 +1422,54 @@ export class LoadedAppClass extends Component<
   onMenuItemSelected = async (item: MenuItemEnum) => {
     // Depending on the menu item, open the appropriate screen
     if (item === MenuItemEnum.About) {
-      this.state.navigationHome?.navigate(RouteEnum.About);
+      this.drawerNav?.navigate(RouteEnum.About);
       return;
     } else if (item === MenuItemEnum.Rescan) {
-      this.state.navigationHome?.navigate(RouteEnum.Rescan);
+      this.drawerNav?.navigate(RouteEnum.Rescan);
       return;
     } else if (item === MenuItemEnum.Info) {
-      this.state.navigationHome?.navigate(RouteEnum.Info);
+      this.drawerNav?.navigate(RouteEnum.Info);
       return;
     } else if (item === MenuItemEnum.SyncReport) {
-      this.state.navigationHome?.navigate(RouteEnum.SyncReport);
+      this.drawerNav?.navigate(RouteEnum.SyncReport);
       return;
     } else if (item === MenuItemEnum.FundPools) {
-      this.state.navigationHome?.navigate(RouteEnum.Pools);
+      this.drawerNav?.navigate(RouteEnum.Pools);
       return;
     } else if (item === MenuItemEnum.Insight) {
-      this.state.navigationHome?.navigate(RouteEnum.InsightStack, {
+      this.drawerNav?.navigate(RouteEnum.InsightStack, {
         screen: RouteEnum.Insight,
       });
       return;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
-        this.state.navigationHome?.navigate(RouteEnum.Ufvk, {
+        this.drawerNav?.navigate(RouteEnum.Ufvk, {
           action: UfvkActionEnum.view,
         });
       } else {
-        this.state.navigationHome?.navigate(RouteEnum.Seed, {
+        this.drawerNav?.navigate(RouteEnum.Seed, {
           action: SeedActionEnum.view,
         });
       }
       return;
     } else if (item === MenuItemEnum.ChangeWallet) {
       if (this.state.readOnly) {
-        this.state.navigationHome?.navigate(RouteEnum.Ufvk, {
+        this.drawerNav?.navigate(RouteEnum.Ufvk, {
           action: UfvkActionEnum.change,
         });
       } else {
-        this.state.navigationHome?.navigate(RouteEnum.Seed, {
+        this.drawerNav?.navigate(RouteEnum.Seed, {
           action: SeedActionEnum.change,
         });
       }
       return;
     } else if (item === MenuItemEnum.RestoreWalletBackup) {
       if (this.state.readOnly) {
-        this.state.navigationHome?.navigate(RouteEnum.Ufvk, {
+        this.drawerNav?.navigate(RouteEnum.Ufvk, {
           action: UfvkActionEnum.backup,
         });
       } else {
-        this.state.navigationHome?.navigate(RouteEnum.Seed, {
+        this.drawerNav?.navigate(RouteEnum.Seed, {
           action: SeedActionEnum.backup,
         });
       }
@@ -1484,7 +1484,7 @@ export class LoadedAppClass extends Component<
             text: translate('confirm') as string,
             onPress: async () =>
               await this.onClickOKChangeWallet({
-                screen: 3,
+                screen: RouteEnum.ImportUfvk,
                 startingApp: false,
               }),
           },
@@ -1546,7 +1546,7 @@ export class LoadedAppClass extends Component<
 
         this.setSendPageState(newSendPageState);
       }
-      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
+      this.drawerNav?.navigate(RouteEnum.HomeStack, {
         screen: RouteEnum.Send,
       });
     } else if (item === MenuItemEnum.Support) {
@@ -1637,11 +1637,11 @@ export class LoadedAppClass extends Component<
     if (error) {
       // I need to open the modal ASAP, and keep going with the toast.
       if (this.state.readOnly) {
-        this.state.navigationHome?.navigate(RouteEnum.Ufvk, {
+        this.drawerNav?.navigate(RouteEnum.Ufvk, {
           action: UfvkActionEnum.server,
         });
       } else {
-        this.state.navigationHome?.navigate(RouteEnum.Seed, {
+        this.drawerNav?.navigate(RouteEnum.Seed, {
           action: SeedActionEnum.server,
         });
       }
@@ -1815,7 +1815,7 @@ export class LoadedAppClass extends Component<
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
     await this.rpc.clearTimers();
-    if (!!state.screen && state.screen === 3) {
+    if (state.screen === RouteEnum.ImportUfvk) {
       await this.setModeOption(ModeEnum.advanced);
     }
     this.props.navigationApp.reset({
@@ -2005,7 +2005,7 @@ export class LoadedAppClass extends Component<
   // in a component which can live in differents screens
   launchAddressBook = (address: string, screenName: ScreenEnum) => {
     if (screenName === ScreenEnum.LoadedApp || screenName === ScreenEnum.Send) {
-      this.state.navigationHome?.navigate(RouteEnum.AddressBookStack, {
+      this.drawerNav?.navigate(RouteEnum.AddressBookStack, {
         screen: RouteEnum.AddressBook,
         params: {
           currentAddress: address,
@@ -2013,7 +2013,7 @@ export class LoadedAppClass extends Component<
         },
       });
     } else if (screenName === ScreenEnum.ValueTransferDetail) {
-      this.state.navigationHome?.navigate(RouteEnum.ValueTransferDetailStack, {
+      this.drawerNav?.navigate(RouteEnum.ValueTransferDetailStack, {
         screen: RouteEnum.AddressBook,
         params: {
           currentAddress: address,
@@ -2021,7 +2021,7 @@ export class LoadedAppClass extends Component<
         },
       });
     } else if (screenName === ScreenEnum.Confirm) {
-      this.state.navigationHome?.navigate(RouteEnum.ConfirmStack, {
+      this.drawerNav?.navigate(RouteEnum.ConfirmStack, {
         screen: RouteEnum.AddressBook,
         params: {
           currentAddress: address,
@@ -2029,7 +2029,7 @@ export class LoadedAppClass extends Component<
         },
       });
     } else if (screenName === ScreenEnum.Insight) {
-      this.state.navigationHome?.navigate(RouteEnum.InsightStack, {
+      this.drawerNav?.navigate(RouteEnum.InsightStack, {
         screen: RouteEnum.AddressBook,
         params: {
           currentAddress: address,
@@ -2054,10 +2054,8 @@ export class LoadedAppClass extends Component<
   setNavigationHome = (
     navigationHome: DrawerContentComponentProps['navigation'],
   ) => {
-    if (!this.state.navigationHome) {
-      this.setState({
-        navigationHome,
-      });
+    if (!this.drawerNav) {
+      this.drawerNav = navigationHome;
     }
   };
 

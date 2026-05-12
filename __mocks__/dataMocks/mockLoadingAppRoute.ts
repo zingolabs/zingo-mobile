@@ -9,7 +9,7 @@ export const mockLoadingAppRoute: RouteProp<
   key: 'LoadingApp-test',
   name: RouteEnum.LoadingApp,
   params: {
-    screen: 0,
+    screen: RouteEnum.Launching,
     startingApp: true,
     biometricsFailed: false,
     newWallet: false,
