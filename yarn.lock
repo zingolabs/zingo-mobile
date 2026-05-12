@@ -1740,10 +1740,10 @@
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
-"@react-navigation/drawer@^7.5.8":
-  version "7.9.11"
-  resolved "https://registry.yarnpkg.com/@react-navigation/drawer/-/drawer-7.9.11.tgz#f1478f851170f5e98a3306a6de751a68fa695c84"
-  integrity sha512-g9e1umVkvuF+/Y6r7HoK7cxeyoC86gwiR6L67AeXTmewPcfZ0GNlvHLuSTZL5P/BvRuS4KdyLyDwRu8uIzLL8A==
+"@react-navigation/drawer@^7.10.0":
+  version "7.10.0"
+  resolved "https://registry.yarnpkg.com/@react-navigation/drawer/-/drawer-7.10.0.tgz#b9a5cf648ea30af91273300d81a39f747599a61e"
+  integrity sha512-PfLQ97BTEGHGAl0dCQ2aeQ7JtQnLSdnTLogiGI4DUR7ADykjLanJ/OZLozgLnGtnU8FyajvB3Yuw8VOjOPF+Og==
   dependencies:
     "@react-navigation/elements" "^2.9.17"
     color "^4.2.3"
