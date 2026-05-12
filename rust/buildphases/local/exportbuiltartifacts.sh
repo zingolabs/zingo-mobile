@@ -9,7 +9,7 @@ mkdir -p ../android/app/src/main/jniLibs/x86_64
 mkdir -p ../android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
 mkdir -p ../android/app/build/generated/source/uniffi/release/java/uniffi/zingo
 
-id=$(docker create devlocal/build_android)
+id=$(docker create localhost/devlocal/build_android)
 
 docker cp \
     $id:/opt/zingo/rust/target/x86_64-linux-android/release/libzingo.so \
