@@ -139,6 +139,21 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
                 val syncing = uniffi.zingo.runSync()
                 Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
+                if (syncing.lowercase().startsWith(ErrorPrefix.value)) {
+                    val timeStampError = Date().time / 1000
+                    val timeStampStrError = timeStampError.toString()
+                    val payload = JSONObject().apply {
+                        put("batches", "0")
+                        put("message", "Run sync process KO.")
+                        put("date", "$timeStampStrStart")
+                        put("dateEnd", "$timeStampStrError")
+                        put("error", "Run sync process KO. $syncing")
+                    }
+                    val jsonBackgroundError = payload.toString()
+                    rpcModule.saveBackgroundFile(jsonBackgroundError)
+                    Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+                    return Result.failure()
+                }
             } catch (t: Throwable) {
                 Log.i("SCHEDULED_TASK_RUN", "Run Sync unknown error: $t")
                 // save the background JSON file
