@@ -1137,7 +1137,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               </TouchableOpacity>
               <BoldText
                 testID={testID}
-                style={{ color: colors.money, fontSize: 18, paddingHorizontal: 5 }}
+                style={{
+                  color: colors.money,
+                  fontSize: 18,
+                  paddingHorizontal: 5,
+                }}
               >
                 {title}
               </BoldText>
@@ -1148,7 +1152,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
               <BoldText
                 testID={testID}
-                style={{ color: colors.money, fontSize: 18, paddingHorizontal: 5, textAlign: 'center' }}
+                style={{
+                  color: colors.money,
+                  fontSize: 18,
+                  paddingHorizontal: 5,
+                  textAlign: 'center',
+                }}
               >
                 {title}
               </BoldText>

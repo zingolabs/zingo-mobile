@@ -50,7 +50,9 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
         if (!cancelled) {
           //console.log(r);
           setValidAddress(r.isValid ? 1 : -1);
-          setError(r.isValid ? '' : (translate('send.invalidaddress') as string));
+          setError(
+            r.isValid ? '' : (translate('send.invalidaddress') as string),
+          );
         }
       });
     } else {
