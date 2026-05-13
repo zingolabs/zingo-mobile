@@ -2,10 +2,8 @@ import ServerType from './types/ServerType';
 
 import { AppStateStatus } from 'react-native';
 import { SelectServerEnum } from './enums/SelectServerEnum';
-import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
 export default interface AppStateLoaded {
-  navigationHome: DrawerContentComponentProps['navigation'] | null;
   appStateStatus: AppStateStatus;
 
   // change server helper

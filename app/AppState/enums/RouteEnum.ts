@@ -1,4 +1,10 @@
 export enum RouteEnum {
+  // Loading screens
+  Launching = 'Launching',
+  StartMenu = 'StartMenu',
+  NewSeed = 'NewSeed',
+  ImportUfvk = 'ImportUfvk',
+
   // Stack
   LoadingApp = 'LoadingApp',
   LoadedApp = 'LoadedApp',
