@@ -33,7 +33,7 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
-import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
+import { RPCAddressScopeEnum } from '../../app/walletBackend/types/rpcAddressTypes';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type AddressListProps = DrawerScreenProps<

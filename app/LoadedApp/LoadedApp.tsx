@@ -39,7 +39,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import RPC from '../rpc';
+import WalletBackend from '../walletBackend';
 import RPCModule from '../RPCModule';
 import {
   AppStateLoaded,
@@ -91,7 +91,6 @@ import { createAlert } from '../createAlert';
 import { sendEmail } from '../sendEmail';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
@@ -110,10 +109,9 @@ import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
 import MessageList from '../../components/Messages/components/MessageList';
-import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
-import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
-import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCSyncStatusType } from '../walletBackend/types/rpcSyncTypes';
+import { RPCCheckAddressType } from '../walletBackend/types/rpcAddressTypes';
+import { RPCPerformanceLevelEnum } from '../walletBackend/types/rpcSyncTypes';
 import { AddressList } from '../../components/AddressList';
 import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
@@ -672,7 +670,7 @@ export class LoadedAppClass extends Component<
   LoadedAppClassProps,
   LoadedAppClassState
 > {
-  rpc: RPC;
+  rpc: WalletBackend;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
@@ -755,7 +753,7 @@ export class LoadedAppClass extends Component<
       isSeedViewModalOpen: false,
     };
 
-    this.rpc = new RPC(
+    this.rpc = new WalletBackend(
       this.setTotalBalance,
       this.setValueTransfersList,
       this.setMessagesList,
@@ -1586,8 +1584,7 @@ export class LoadedAppClass extends Component<
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType & RPCUfvkType =
-            await JSON.parse(result);
+          const resultJson: { error?: string } = await JSON.parse(result);
           if (!resultJson.error) {
             // Load the wallet and navigate to the ValueTransfers screen
             if (toast && selectServer !== SelectServerEnum.offline) {
@@ -1764,7 +1761,7 @@ export class LoadedAppClass extends Component<
     if (!value) {
       await removeRecoveryWalletInfo();
     } else {
-      const wallet = await RPC.rpcFetchWallet(this.state.readOnly);
+      const wallet = await WalletBackend.rpcFetchWallet(this.state.readOnly);
       if (wallet) {
         await createUpdateRecoveryWalletInfo(wallet);
       }
@@ -1889,7 +1886,7 @@ export class LoadedAppClass extends Component<
       const resultStrServerPromise = await RPCModule.changeServerProcess(
         this.state.newServer.uri,
       );
-      const timeoutServerPromise = new Promise((_, reject) => {
+      const timeoutServerPromise = new Promise<string>((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 15 seconds'));
         }, 15 * 1000);

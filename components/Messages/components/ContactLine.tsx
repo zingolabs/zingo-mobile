@@ -41,7 +41,7 @@ import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import Utils from '../../../app/utils';
-import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/types/rpcTransactionTypes';
 import RegText from '../../Components/RegText';
 
 type ContactLineProps = {

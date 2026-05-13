@@ -61,7 +61,7 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
-import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../../app/walletBackend/types/rpcSyncTypes';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';

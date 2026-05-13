@@ -49,16 +49,15 @@ import {
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import RPC from '../rpc';
+import WalletBackend from '../walletBackend';
 import { ThemeType } from '../types';
 import { ContextAppLoadingProvider } from '../context';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
-import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
+import { RPCWalletKindType } from '../walletBackend/types/rpcWalletTypes';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import Launching from './components/Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
@@ -73,10 +72,9 @@ import {
 // no lazy load because slowing down screens.
 import ImportUfvk from './components/ImportUfvk';
 import { sendEmail } from '../sendEmail';
-import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
+import { RPCWalletKindEnum } from '../walletBackend/types/rpcWalletTypes';
 import StartMenu from './components/StartMenu';
-import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../walletBackend/types/rpcSyncTypes';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
 
@@ -637,8 +635,7 @@ export class LoadingAppClass extends Component<
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType & RPCUfvkType =
-            await JSON.parse(result);
+          const resultJson: { error?: string } = await JSON.parse(result);
           if (!resultJson.error) {
             // Load the wallet and navigate to the vts screen
             let readOnly: boolean = false;
@@ -670,7 +667,7 @@ export class LoadingAppClass extends Component<
               transparentPool = walletKindJSON.transparent;
               // if the seed & birthday are not stored in Keychain/Keystore, do it now.
               if (this.state.recoveryWalletInfoOnDevice) {
-                const wallet = await RPC.rpcFetchWallet(readOnly);
+                const wallet = await WalletBackend.rpcFetchWallet(readOnly);
                 if (wallet) {
                   await createUpdateRecoveryWalletInfo(wallet);
                 }
@@ -1264,48 +1261,17 @@ export class LoadingAppClass extends Component<
       return;
     }
     this.setState({ actionButtonsDisabled: true });
-    let seed: string = await RPCModule.createNewWallet(
-      this.state.server.uri,
-      this.state.server.chainName,
-      this.state.performanceLevel,
-      GlobalConst.minConfirmations.toString(),
-    );
+    try {
+      const seedInfo = await RPCModule.createNewWallet(
+        this.state.server.uri,
+        this.state.server.chainName,
+        this.state.performanceLevel,
+        GlobalConst.minConfirmations.toString(),
+      );
 
-    if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
-      let seedJSON = {} as RPCSeedType;
-      try {
-        seedJSON = await JSON.parse(seed);
-        if (seedJSON.error) {
-          this.setState({ actionButtonsDisabled: false });
-          createAlert(
-            this.setBackgroundError,
-            this.addLastSnackbar,
-            this.state.translate('loadingapp.creatingwallet-label') as string,
-            seedJSON.error,
-            false,
-            this.state.translate,
-            sendEmail,
-            this.state.zingolibVersion,
-          );
-          return;
-        }
-      } catch (e: unknown) {
-        this.setState({ actionButtonsDisabled: false });
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadingapp.creatingwallet-label') as string,
-          e instanceof Error ? e.message : String(e),
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
-        );
-        return;
-      }
       const wallet: WalletType = {
-        seed: seedJSON.seed_phrase || '',
-        birthday: seedJSON.birthday || 0,
+        seed: seedInfo.seed_phrase,
+        birthday: seedInfo.birthday,
       };
       // storing the seed & birthday in KeyChain/KeyStore
       if (this.state.recoveryWalletInfoOnDevice) {
@@ -1329,9 +1295,10 @@ export class LoadingAppClass extends Component<
       ) {
         await RPCModule.createTorClientProcess();
       }
-    } else {
+    } catch (error: unknown) {
+      this.setState({ actionButtonsDisabled: false });
       this.walletErrorHandle(
-        seed,
+        error instanceof Error ? error.message : String(error),
         this.state.translate('loadingapp.creatingwallet-label') as string,
         RouteEnum.StartMenu,
         false,
@@ -1430,126 +1397,107 @@ export class LoadingAppClass extends Component<
       type = RestoreFromTypeEnum.ufvkRestoreFrom;
     }
 
-    let result: string;
-    if (type === RestoreFromTypeEnum.seedRestoreFrom) {
-      result = await RPCModule.restoreWalletFromSeed(
-        seedUfvk.toLowerCase(),
-        walletBirthday || '0',
-        this.state.server.uri,
-        this.state.server.chainName,
-        this.state.performanceLevel,
-        GlobalConst.minConfirmations.toString(),
-      );
-    } else {
-      result = await RPCModule.restoreWalletFromUfvk(
-        seedUfvk.toLowerCase(),
-        walletBirthday || '0',
-        this.state.server.uri,
-        this.state.server.chainName,
-        this.state.performanceLevel,
-        GlobalConst.minConfirmations.toString(),
-      );
-    }
-
-    let error = false;
-    let errorText = '';
-    if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
-      try {
-        // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(result);
-        if (!resultJson.error) {
-          // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
-          await SettingsFileImpl.writeSettings(
-            SettingsNameEnum.basicFirstViewSeed,
-            true,
-          );
-          // Load the wallet and navigate to the vts screen
-          let readOnly: boolean = false;
-          let orchardPool: boolean = false;
-          let saplingPool: boolean = false;
-          let transparentPool: boolean = false;
-          const walletKindStr: string = await RPCModule.walletKindInfo();
-          console.log('KIND...', walletKindStr);
-          try {
-            const walletKindJSON: RPCWalletKindType =
-              await JSON.parse(walletKindStr);
-            // there are 4 kinds:
-            // 1. seed
-            // 2. USK
-            // 3. UFVK - watch-only wallet
-            // 4. No keys - watch-only wallet (possibly an error)
-
-            if (
-              walletKindJSON.kind ===
-                RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-              walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-            ) {
-              readOnly = true;
-            } else {
-              readOnly = false;
-            }
-            orchardPool = walletKindJSON.orchard;
-            saplingPool = walletKindJSON.sapling;
-            transparentPool = walletKindJSON.transparent;
-            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-            if (this.state.recoveryWalletInfoOnDevice) {
-              const wallet = await RPC.rpcFetchWallet(readOnly);
-              if (wallet) {
-                await createUpdateRecoveryWalletInfo(wallet);
-              }
-            } else {
-              // needs to delete the seed from the Keychain/Keystore, do it now.
-              if (this.state.hasRecoveryWalletInfoSaved) {
-                await removeRecoveryWalletInfo();
-              }
-            }
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-          } catch (e) {
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-            this.addLastSnackbar(walletKindStr);
-          }
-          // creating tor cliente if needed
-          if (
-            this.state.currency === CurrencyEnum.USDTORCurrency ||
-            this.state.currency === CurrencyEnum.USDCurrency
-          ) {
-            await RPCModule.createTorClientProcess();
-          }
-          this.navigateToLoadedApp(
-            readOnly,
-            orchardPool,
-            saplingPool,
-            transparentPool,
-            true,
-            this.state.firstLaunchingMessage,
-          );
-        } else {
-          error = true;
-          errorText = resultJson.error;
-        }
-      } catch (e: unknown) {
-        error = true;
-        errorText = e instanceof Error ? e.message : String(e);
+    try {
+      if (type === RestoreFromTypeEnum.seedRestoreFrom) {
+        await RPCModule.restoreWalletFromSeed(
+          seedUfvk.toLowerCase(),
+          walletBirthday || '0',
+          this.state.server.uri,
+          this.state.server.chainName,
+          this.state.performanceLevel,
+          GlobalConst.minConfirmations.toString(),
+        );
+      } else {
+        await RPCModule.restoreWalletFromUfvk(
+          seedUfvk.toLowerCase(),
+          walletBirthday || '0',
+          this.state.server.uri,
+          this.state.server.chainName,
+          this.state.performanceLevel,
+          GlobalConst.minConfirmations.toString(),
+        );
       }
-    } else {
-      error = true;
-      errorText = result;
-    }
-    if (error) {
+
+      // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.basicFirstViewSeed,
+        true,
+      );
+      // Load the wallet and navigate to the vts screen
+      let readOnly: boolean = false;
+      let orchardPool: boolean = false;
+      let saplingPool: boolean = false;
+      let transparentPool: boolean = false;
+      const walletKindStr: string = await RPCModule.walletKindInfo();
+      console.log('KIND...', walletKindStr);
+      try {
+        const walletKindJSON: RPCWalletKindType =
+          await JSON.parse(walletKindStr);
+        // there are 4 kinds:
+        // 1. seed
+        // 2. USK
+        // 3. UFVK - watch-only wallet
+        // 4. No keys - watch-only wallet (possibly an error)
+
+        if (
+          walletKindJSON.kind ===
+            RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
+          walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
+        ) {
+          readOnly = true;
+        } else {
+          readOnly = false;
+        }
+        orchardPool = walletKindJSON.orchard;
+        saplingPool = walletKindJSON.sapling;
+        transparentPool = walletKindJSON.transparent;
+        // if the seed & birthday are not stored in Keychain/Keystore, do it now.
+        if (this.state.recoveryWalletInfoOnDevice) {
+          const wallet = await WalletBackend.rpcFetchWallet(readOnly);
+          if (wallet) {
+            await createUpdateRecoveryWalletInfo(wallet);
+          }
+        } else {
+          // needs to delete the seed from the Keychain/Keystore, do it now.
+          if (this.state.hasRecoveryWalletInfoSaved) {
+            await removeRecoveryWalletInfo();
+          }
+        }
+        this.setState({
+          readOnly,
+          orchardPool,
+          saplingPool,
+          transparentPool,
+          actionButtonsDisabled: false,
+        });
+      } catch (e) {
+        this.setState({
+          readOnly,
+          orchardPool,
+          saplingPool,
+          transparentPool,
+          actionButtonsDisabled: false,
+        });
+        this.addLastSnackbar(walletKindStr);
+      }
+      // creating tor cliente if needed
+      if (
+        this.state.currency === CurrencyEnum.USDTORCurrency ||
+        this.state.currency === CurrencyEnum.USDCurrency
+      ) {
+        await RPCModule.createTorClientProcess();
+      }
+      this.navigateToLoadedApp(
+        readOnly,
+        orchardPool,
+        saplingPool,
+        transparentPool,
+        true,
+        this.state.firstLaunchingMessage,
+      );
+    } catch (error: unknown) {
       this.walletErrorHandle(
-        errorText,
+        error instanceof Error ? error.message : String(error),
         this.state.translate('loadingapp.readingwallet-label') as string,
         RouteEnum.ImportUfvk,
         false,

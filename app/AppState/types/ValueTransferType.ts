@@ -1,6 +1,6 @@
 import { ValueTransferKindEnum } from '../enums/ValueTransferKindEnum';
 import { PoolEnum } from '../enums/PoolEnum';
-import { RPCValueTransfersStatusEnum } from '../../rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '../../walletBackend/types/rpcTransactionTypes';
 
 export default interface ValueTransferType {
   txid: string;

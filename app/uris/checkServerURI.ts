@@ -1,6 +1,6 @@
 import { ChainNameEnum, GlobalConst } from '../AppState';
 import RPCModule from '../RPCModule';
-import { RPCInfoType } from '../rpc/types/RPCInfoType';
+import { RPCInfoType } from '../walletBackend/types/rpcWalletTypes';
 
 type checkServerURIReturn = {
   result: boolean;
@@ -16,7 +16,7 @@ const checkServerURI = async (
 
   try {
     const resultStrServerPromise = await RPCModule.changeServerProcess(uri);
-    const timeoutServerPromise = new Promise((_, reject) => {
+    const timeoutServerPromise = new Promise<string>((_, reject) => {
       setTimeout(() => {
         reject(new Error('Promise changeserver Timeout 15 seconds'));
       }, 15 * 1000);
@@ -42,7 +42,7 @@ const checkServerURI = async (
       if (uri) {
         // the new server is not Offline mode.
         const infoStrPromise = await RPCModule.infoServerInfo();
-        const timeoutInfoPromise = new Promise((resolve, reject) => {
+        const timeoutInfoPromise = new Promise<string>((_, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 15 seconds'));
           }, 15 * 1000);
@@ -74,31 +74,9 @@ const checkServerURI = async (
         }
       } else {
         // the new server is empty -> means Offline mode.
-        const balanceStrPromise = await RPCModule.getBalanceInfo();
-        const timeoutInfoPromise = new Promise((resolve, reject) => {
-          setTimeout(() => {
-            reject(new Error('Promise info Timeout 15 seconds'));
-          }, 15 * 1000);
-        });
-
-        const balanceStr: string = await Promise.race([
-          balanceStrPromise,
-          timeoutInfoPromise,
-        ]);
-        //console.log(balanceStr);
-
-        if (
-          balanceStr &&
-          balanceStr.toLowerCase().startsWith(GlobalConst.error)
-        ) {
-          //console.log('info', infoStr);
-          // I have to restore the old server again.
-          await RPCModule.changeServerProcess(oldUri);
-          // error, no timeout
-          return { result: false, timeout: false, newChainName };
-        } else {
-          newChainName = undefined;
-        }
+        // getBalanceInfo throws on error; the outer catch handles it.
+        await RPCModule.getBalanceInfo();
+        newChainName = undefined;
       }
     }
   } catch (error: unknown) {

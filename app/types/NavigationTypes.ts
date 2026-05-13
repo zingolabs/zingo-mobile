@@ -9,7 +9,7 @@ import {
   UfvkActionEnum,
   ValueTransferType,
 } from '../AppState';
-import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
+import { RPCParseAddressType } from '../walletBackend/types/rpcAddressTypes';
 
 /**
  * Root navigation parameter list for the main stack navigator

@@ -3,7 +3,7 @@ import {
   LanguageEnum,
   BlockExplorerEnum,
 } from '../../app/AppState';
-import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../../app/walletBackend/types/rpcSyncTypes';
 
 export const mockTranslate = (p: string) => {
   if (p === 'about.copyright') {

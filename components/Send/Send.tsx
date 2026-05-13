@@ -76,12 +76,11 @@ import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
-import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
+import type { ProposalInfo } from '../../app/walletBackend/types/rpcTransactionTypes';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
-import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
-import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
+import { RPCParseAddressType } from '../../app/walletBackend/types/rpcAddressTypes';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
@@ -198,23 +197,13 @@ const Send: React.FunctionComponent<SendProps> = ({
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
 
-  const runSendPropose = async (proposeJSON: string): Promise<string> => {
+  const runSendPropose = async (proposeJSON: string): Promise<ProposalInfo | null> => {
     try {
-      const proposeStr: string = await RPCModule.sendProcess(proposeJSON);
-      if (proposeStr) {
-        if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error propose ${proposeStr}`);
-          return proposeStr;
-        }
-      } else {
-        console.log('Internal Error propose');
-        return 'Error: Internal RPC Error: propose';
-      }
-
-      return proposeStr;
+      return await RPCModule.sendProcess(proposeJSON);
     } catch (error) {
       console.log(`Critical Error propose ${error}`);
-      return `Error: ${error}`;
+      setProposeSendLastError(`Error: ${error}`);
+      return null;
     }
   };
 
@@ -292,64 +281,17 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       // fee
       let proposeFee = 0;
-      const runProposeStr = await runSendPropose(JSON.stringify(sendJson));
+      const runProposeResult = await runSendPropose(JSON.stringify(sendJson));
 
       // discard result if a newer calculation (or a clear) has superseded this one
       if (feeCalculationGenRef.current !== generation) {
         return;
       }
 
-      //Alert.alert('Calculating the FEE ' + command, runProposeStr);
-      if (
-        runProposeStr &&
-        runProposeStr.toLowerCase().startsWith(GlobalConst.error)
-      ) {
-        // snack with error
-        console.log(runProposeStr);
-        setProposeSendLastError(runProposeStr);
-        //Alert.alert('Calculating the FEE', runProposeStr);
-      } else {
-        try {
-          let runProposeJson: RPCSendProposeType;
-          runProposeJson = await JSON.parse(runProposeStr);
-          if (runProposeJson.error) {
-            // snack with error
-            console.log('SEND error', runProposeJson.error);
-            setProposeSendLastError(runProposeJson.error);
-            //Alert.alert('Calculating the FEE', runProposeJson.error);
-          } else {
-            if (runProposeJson.fee !== undefined) {
-              console.log('FEE', runProposeJson.fee);
-              proposeFee = runProposeJson.fee / 10 ** 8;
-              setProposeSendLastError('');
-            }
-            if (runProposeJson.amount !== undefined) {
-              const newAmount =
-                runProposeJson.amount / 10 ** 8 -
-                (donation &&
-                server.chainName === ChainNameEnum.mainChainName &&
-                !donationAddress
-                  ? Utils.parseStringLocaleToNumberFloat(
-                      Utils.getZenniesDonationAmount(),
-                    )
-                  : 0);
-              console.log('AMOUNT', newAmount);
-              updateToField(
-                null,
-                Utils.parseNumberFloatToStringLocale(newAmount, 8),
-                null,
-                null,
-                null,
-              );
-              setProposeSendLastError('');
-            }
-          }
-        } catch (e) {
-          // snack with error
-          console.log(runProposeStr);
-          setProposeSendLastError(runProposeStr);
-          //Alert.alert('Calculating the FEE', runProposeJson.error);
-        }
+      if (runProposeResult !== null) {
+        console.log('FEE', runProposeResult.fee);
+        proposeFee = runProposeResult.fee / 10 ** 8;
+        setProposeSendLastError('');
       }
       setFee(proposeFee);
     },
@@ -412,7 +354,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         //Alert.alert('Calculating the FEE', runProposeStr);
       } else {
         try {
-          const runSpendableBalanceJson: RPCSpendablebalanceType =
+          const runSpendableBalanceJson: { spendable_balance?: number } =
             await JSON.parse(runSpendableBalanceStr);
           if (runSpendableBalanceJson.spendable_balance) {
             console.log(

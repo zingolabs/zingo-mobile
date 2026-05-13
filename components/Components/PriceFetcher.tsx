@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import FadeText from './FadeText';
 import { ContextAppLoaded } from '../../app/context';
-import RPC from '../../app/rpc';
+import WalletBackend from '../../app/walletBackend';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
 import { CurrencyEnum, ModeEnum } from '../../app/AppState';
@@ -66,7 +66,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     let price: number;
     let error: string;
     // first attempt
-    ({ price, error } = await RPC.rpcGetZecPrice(withTor));
+    ({ price, error } = await WalletBackend.rpcGetZecPrice(withTor));
     //console.log('first price fetching', price, error);
     // values:
     // 0   - initial/default value
@@ -75,7 +75,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     // > 0 - real value
     if (price <= 0) {
       // second attempt
-      ({ price, error } = await RPC.rpcGetZecPrice(withTor));
+      ({ price, error } = await WalletBackend.rpcGetZecPrice(withTor));
       //console.log('second price fetching', price, error);
     }
 

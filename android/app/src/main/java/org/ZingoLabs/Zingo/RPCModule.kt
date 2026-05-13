@@ -5,10 +5,12 @@ import android.util.Log
 import android.util.Base64
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.WritableMap
 import java.io.File
 import java.io.FileNotFoundException
 import org.ZingoLabs.Zingo.Constants.*
@@ -254,19 +256,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         try {
             uniffi.zingo.initLogging()
 
-            // Create a seed
             val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt())
-            // Log.i("MAIN-Seed", resp)
-
-            if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-                saveWalletFile()
-            }
-
-            promise.resolve(resp)
+            saveWalletFile()
+            promise.resolve(resp.toWritableMap())
         } catch (e: Exception) {
             val errorMessage = "Error: [Native] create new wallet: ${e.localizedMessage}"
             Log.e("MAIN", errorMessage, e)
-            promise.resolve(errorMessage)
+            promise.reject("ZINGO_ERROR", errorMessage, e)
         }
     }
 
@@ -276,17 +272,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             uniffi.zingo.initLogging()
 
             val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
-            // Log.i("MAIN", resp)
-
-            if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-                saveWalletFile()
-            }
-
-            promise.resolve(resp)
+            saveWalletFile()
+            promise.resolve(resp.toWritableMap())
         } catch (e: Exception) {
             val errorMessage = "Error: [Native] restore wallet from seed: ${e.localizedMessage}"
             Log.e("MAIN", errorMessage, e)
-            promise.resolve(errorMessage)
+            promise.reject("ZINGO_ERROR", errorMessage, e)
         }
     }
 
@@ -296,19 +287,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             uniffi.zingo.initLogging()
 
             val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
-            // Log.i("MAIN", resp)
-
-            if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-                saveWalletFile()
-            }
-
-            promise.resolve(resp)
+            saveWalletFile()
+            promise.resolve(resp.toWritableMap())
         } catch (e: Exception) {
             val errorMessage = "Error: [Native] restore wallet from ufvk: ${e.localizedMessage}"
             Log.e("MAIN", errorMessage, e)
-            promise.resolve(errorMessage)
+            promise.reject("ZINGO_ERROR", errorMessage, e)
         }
-}
+    }
 
     @ReactMethod
     fun loadExistingWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
@@ -396,7 +382,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -417,7 +403,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -438,7 +424,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -452,14 +438,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.getLatestBlockWallet()
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] get latest block wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -480,7 +466,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -501,7 +487,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -522,7 +508,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -543,7 +529,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -564,7 +550,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -580,12 +566,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
                     val save = saveWalletFile()
                     if (!save) {
-                        val errorMessage = "Error: [Native] sync run process: Couldn't save the wallet."
-                        Log.e("MAIN", errorMessage)
-
+                        Log.e("MAIN", "Error: [Native] sync run process: Couldn't save the wallet.")
                         withContext(Dispatchers.Main) {
-                            promise.resolve(errorMessage)
+                            promise.reject("SAVE_ERROR", "Couldn't save the wallet after sync")
                         }
+                        return@launch
                     }
                 }
 
@@ -597,7 +582,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -618,7 +603,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -639,7 +624,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -660,7 +645,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -681,7 +666,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -695,14 +680,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.getSeed()
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] seed: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -716,14 +701,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.getUfvk()
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] ufvk: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -744,7 +729,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -765,7 +750,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -786,7 +771,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -807,7 +792,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -828,7 +813,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -849,7 +834,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -863,14 +848,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.getBalance()
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] balance: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -891,7 +876,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -912,7 +897,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -933,7 +918,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -954,7 +939,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -975,7 +960,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -996,7 +981,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1010,56 +995,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.getSpendableBalanceTotal()
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] spendable balance total: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
-    }
-
-    @ReactMethod
-    fun getOptionWalletInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getOptionWallet()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] get option wallet: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
-    }
-
-    @ReactMethod
-    fun setOptionWalletProcess(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.setOptionWallet()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] set option wallet: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1080,7 +1023,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1101,7 +1044,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1122,7 +1065,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1143,7 +1086,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1164,7 +1107,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1185,7 +1128,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1206,7 +1149,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1220,14 +1163,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.getWalletSaveRequired()
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] get wallet save required: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1248,7 +1191,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1262,14 +1205,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.getConfigWalletPerformance()
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] get wallet config performance level: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1283,14 +1226,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.getWalletVersion()
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] get wallet version: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1304,14 +1247,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.send(send_json)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] send: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1325,14 +1268,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.shield()
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] shield: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
@@ -1346,17 +1289,80 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.confirm()
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
+                    promise.resolve(resp.toWritableMap())
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] confirm: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
+                    promise.reject("ZINGO_ERROR", errorMessage, e)
                 }
             }
         }
     }
 
+}
+
+// UniFFI struct → React Native bridge conversions.
+// putDouble is used for u64 fields: WritableMap has no putLong, and all ZEC amounts
+// fit safely within IEEE 754 double's 2^53 exact integer range.
+
+private fun uniffi.zingo.BalancesInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    putDouble("total_orchard_balance",           totalOrchardBalance.toDouble())
+    putDouble("total_sapling_balance",           totalSaplingBalance.toDouble())
+    putDouble("total_transparent_balance",       totalTransparentBalance.toDouble())
+    putDouble("confirmed_orchard_balance",       confirmedOrchardBalance.toDouble())
+    putDouble("confirmed_sapling_balance",       confirmedSaplingBalance.toDouble())
+    putDouble("confirmed_transparent_balance",   confirmedTransparentBalance.toDouble())
+    putDouble("unconfirmed_orchard_balance",     unconfirmedOrchardBalance.toDouble())
+    putDouble("unconfirmed_sapling_balance",     unconfirmedSaplingBalance.toDouble())
+    putDouble("unconfirmed_transparent_balance", unconfirmedTransparentBalance.toDouble())
+}
+
+private fun uniffi.zingo.SpendableBalanceInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    putDouble("spendable_balance", spendableBalance.toDouble())
+}
+
+private fun uniffi.zingo.WalletHeightInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    putInt("height", height.toInt())
+}
+
+private fun uniffi.zingo.WalletVersionInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    putInt("current_version", currentVersion.toInt())
+    putInt("read_version", readVersion.toInt())
+}
+
+private fun uniffi.zingo.WalletSaveRequiredInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    putBoolean("save_required", saveRequired)
+}
+
+private fun uniffi.zingo.SeedInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    putString("seed_phrase", seedPhrase)
+    putInt("birthday", birthday.toInt())
+    putInt("no_of_accounts", noOfAccounts.toInt())
+}
+
+private fun uniffi.zingo.UfvkInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    putString("ufvk", ufvk)
+    putInt("birthday", birthday.toInt())
+}
+
+private fun uniffi.zingo.ProposalInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    putDouble("fee", fee.toDouble())
+}
+
+private fun uniffi.zingo.ShieldProposalInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    putDouble("fee", fee.toDouble())
+    putDouble("value_to_shield", valueToShield.toDouble())
+}
+
+private fun uniffi.zingo.ConfirmInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    val arr = Arguments.createArray()
+    txids.forEach { arr.pushString(it) }
+    putArray("txids", arr)
+}
+
+private fun uniffi.zingo.PerformanceInfo.toWritableMap(): WritableMap = Arguments.createMap().apply {
+    putString("performance_level", performanceLevel)
 }

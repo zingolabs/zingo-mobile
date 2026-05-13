@@ -30,8 +30,8 @@ import ContextMenu, {
   ContextMenuOnPressNativeEvent,
 } from 'react-native-context-menu-view';
 import RPCModule from '../../../app/RPCModule';
-import { RPCUnifiedAddressType } from '../../../app/rpc/types/RPCUnifiedAddressType';
-import { RPCTransparentAddressType } from '../../../app/rpc/types/RPCTransparentAddressType';
+import { RPCUnifiedAddressType } from '../../../app/walletBackend/types/rpcAddressTypes';
+import { RPCTransparentAddressType } from '../../../app/walletBackend/types/rpcAddressTypes';
 import Utils from '../../../app/utils';
 import { AddressBookFileImpl } from '../../AddressBook';
 

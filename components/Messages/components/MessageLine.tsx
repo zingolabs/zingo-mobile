@@ -35,7 +35,7 @@ import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import RegText from '../../Components/RegText';
 import Utils from '../../../app/utils';
-import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/types/rpcTransactionTypes';
 
 type MessageLineProps = {
   index: number;

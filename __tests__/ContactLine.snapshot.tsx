@@ -21,7 +21,7 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { RPCValueTransfersStatusEnum } from '../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '../app/walletBackend/types/rpcTransactionTypes';
 
 const FIXED_TIME = 1704067200; // 2024-01-01 00:00:00 UTC (seconds)
 

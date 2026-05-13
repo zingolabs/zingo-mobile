@@ -14,7 +14,7 @@ import {
   SelectServerEnum,
   BlockExplorerEnum,
 } from '../AppState';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../walletBackend/types/rpcSyncTypes';
 
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,

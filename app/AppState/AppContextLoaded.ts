@@ -19,10 +19,10 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
-import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
+import { RPCSyncStatusType } from '../walletBackend/types/rpcSyncTypes';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../walletBackend/types/rpcSyncTypes';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
 export default interface AppContextLoaded {

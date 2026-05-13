@@ -38,7 +38,7 @@ import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import WalletType from '../../app/AppState/types/WalletType';
-import RPC from '../../app/rpc/RPC';
+import WalletBackend from '../../app/walletBackend';
 
 type TextsType = {
   new: string[];
@@ -103,8 +103,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       try {
         const seedInfo = recoveryWalletInfoOnDevice
           ? await getRecoveryWalletInfo()
-          : ((await RPC.rpcFetchWallet(false)) ?? ({} as WalletType));
-        const ufvkInfo = await RPC.rpcFetchWallet(true);
+          : ((await WalletBackend.rpcFetchWallet(false)) ?? ({} as WalletType));
+        const ufvkInfo = await WalletBackend.rpcFetchWallet(true);
         setFetchedWallet({ ...seedInfo, ufvk: ufvkInfo?.ufvk });
       } catch (e) {
         console.log('Error fetching wallet info for seed screen', e);

@@ -1,8 +1,69 @@
 [Error]
-enum ZingolibError {
-    "LightclientNotInitialized",
-    "LightclientLockPoisoned",
-    "Panic"
+interface ZingolibError {
+    LightclientNotInitialized();
+    LightclientLockPoisoned();
+    Panic(string message);
+    InvalidInput(string message);
+    ProposalFailed(string message);
+    SendFailed(string message);
+    WalletError(string message);
+};
+
+dictionary BalancesInfo {
+    u64 total_orchard_balance;
+    u64 total_sapling_balance;
+    u64 total_transparent_balance;
+    u64 confirmed_orchard_balance;
+    u64 confirmed_sapling_balance;
+    u64 confirmed_transparent_balance;
+    u64 unconfirmed_orchard_balance;
+    u64 unconfirmed_sapling_balance;
+    u64 unconfirmed_transparent_balance;
+};
+
+dictionary SpendableBalanceInfo {
+    u64 spendable_balance;
+};
+
+dictionary WalletHeightInfo {
+    u32 height;
+};
+
+dictionary WalletVersionInfo {
+    u32 current_version;
+    u32 read_version;
+};
+
+dictionary WalletSaveRequiredInfo {
+    boolean save_required;
+};
+
+dictionary SeedInfo {
+    string seed_phrase;
+    u32 birthday;
+    u32 no_of_accounts;
+};
+
+dictionary UfvkInfo {
+    string ufvk;
+    u32 birthday;
+};
+
+dictionary ProposalInfo {
+    u64 fee;
+};
+
+dictionary ShieldProposalInfo {
+    u64 fee;
+    u64 value_to_shield;
+};
+
+dictionary ConfirmInfo {
+    sequence<string> txids;
+};
+
+dictionary PerformanceInfo {
+    string performance_level;
 };
 
 namespace zingo {
@@ -11,7 +72,7 @@ namespace zingo {
   string init_logging();
 
   [Throws=ZingolibError]
-  string init_new(
+  SeedInfo init_new(
       string serveruri,
       string chainhint,
       string performancelevel,
@@ -19,7 +80,7 @@ namespace zingo {
   );
 
   [Throws=ZingolibError]
-  string init_from_seed(
+  SeedInfo init_from_seed(
       string seed,
       u32 birthday,
       string serveruri,
@@ -29,7 +90,7 @@ namespace zingo {
   );
 
   [Throws=ZingolibError]
-  string init_from_ufvk(
+  UfvkInfo init_from_ufvk(
       string ufvk,
       u32 birthday,
       string serveruri,
@@ -60,7 +121,7 @@ namespace zingo {
   );
 
   [Throws=ZingolibError]
-  string get_latest_block_wallet();
+  WalletHeightInfo get_latest_block_wallet();
 
   [Throws=ZingolibError]
   string get_developer_donation_address();
@@ -79,7 +140,7 @@ namespace zingo {
 
   [Throws=ZingolibError]
   string run_sync();
-  
+
   [Throws=ZingolibError]
   string pause_sync();
 
@@ -93,10 +154,10 @@ namespace zingo {
   string info_server();
 
   [Throws=ZingolibError]
-  string get_seed();
+  SeedInfo get_seed();
 
   [Throws=ZingolibError]
-  string get_ufvk();
+  UfvkInfo get_ufvk();
 
   [Throws=ZingolibError]
   string change_server(
@@ -125,7 +186,7 @@ namespace zingo {
   );
 
   [Throws=ZingolibError]
-  string get_balance();
+  BalancesInfo get_balance();
 
   [Throws=ZingolibError]
   string get_total_memobytes_to_address();
@@ -148,18 +209,12 @@ namespace zingo {
 
   [Throws=ZingolibError]
   string get_spendable_balance_with_address(
-    string address, 
+    string address,
     string zennies
   );
 
   [Throws=ZingolibError]
-  string get_spendable_balance_total();
-
-  [Throws=ZingolibError]
-  string set_option_wallet();
-
-  [Throws=ZingolibError]
-  string get_option_wallet();
+  SpendableBalanceInfo get_spendable_balance_total();
 
   [Throws=ZingolibError]
   string create_tor_client(
@@ -189,7 +244,7 @@ namespace zingo {
   );
 
   [Throws=ZingolibError]
-  string get_wallet_save_required();
+  WalletSaveRequiredInfo get_wallet_save_required();
 
   [Throws=ZingolibError]
   string set_config_wallet_to_test();
@@ -201,19 +256,19 @@ namespace zingo {
   );
 
   [Throws=ZingolibError]
-  string get_config_wallet_performance();
+  PerformanceInfo get_config_wallet_performance();
 
   [Throws=ZingolibError]
-  string get_wallet_version();
+  WalletVersionInfo get_wallet_version();
 
   [Throws=ZingolibError]
-  string send(
+  ProposalInfo send(
     string send_json
   );
 
   [Throws=ZingolibError]
-  string shield();
+  ShieldProposalInfo shield();
 
   [Throws=ZingolibError]
-  string confirm();
+  ConfirmInfo confirm();
 };

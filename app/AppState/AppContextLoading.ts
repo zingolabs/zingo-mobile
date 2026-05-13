@@ -11,7 +11,7 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../walletBackend/types/rpcSyncTypes';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
 export default interface AppContextLoading {

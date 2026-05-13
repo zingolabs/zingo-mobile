@@ -24,11 +24,11 @@ import {
   RouteEnum,
   SendPageStateClass,
 } from '../../../app/AppState';
-import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
-import { RPCParseAddressStatusEnum } from '../../../app/rpc/enums/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '../../../app/walletBackend/types/rpcAddressTypes';
+import { RPCReceiversEnum } from '../../../app/walletBackend/types/rpcAddressTypes';
+import { RPCParseAddressStatusEnum } from '../../../app/walletBackend/types/rpcAddressTypes';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
+import { RPCParseAddressType } from '../../../app/walletBackend/types/rpcAddressTypes';
 
 type ConfirmProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Confirm>;
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import { isEqual } from 'lodash';
-import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
+import { RPCSyncStatusType } from '../walletBackend/types/rpcSyncTypes';
 
 /**
  * Derives display-ready sync state from the raw RPC sync status.

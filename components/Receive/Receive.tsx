@@ -34,7 +34,7 @@ import {
   SnackbarDurationEnum,
   RouteEnum,
 } from '../../app/AppState';
-import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
+import { RPCAddressScopeEnum } from '../../app/walletBackend/types/rpcAddressTypes';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,

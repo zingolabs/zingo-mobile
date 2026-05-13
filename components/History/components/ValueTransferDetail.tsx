@@ -50,7 +50,7 @@ import {
   faChevronDown,
   faChevronUp,
 } from '@fortawesome/free-solid-svg-icons';
-import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/types/rpcTransactionTypes';
 import Button from '../../Components/Button';
 import RPCModule from '../../../app/RPCModule';
 import { createAlert } from '../../../app/createAlert';

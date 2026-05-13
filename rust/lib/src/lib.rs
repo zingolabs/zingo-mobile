@@ -57,12 +57,77 @@ use zingo_common_components::protocol::activation_heights::for_test::all_height_
 
 #[derive(Debug, thiserror::Error)]
 pub enum ZingolibError {
-    #[error("Error: Lightclient is not initialized")]
+    #[error("Lightclient is not initialized")]
     LightclientNotInitialized,
-    #[error("Error: Lightclient lock poisoned")]
+    #[error("Lightclient lock poisoned")]
     LightclientLockPoisoned,
-    #[error("Error: panic: {0}")]
-    Panic(String),
+    #[error("Panic: {message}")]
+    Panic { message: String },
+    #[error("Invalid input: {message}")]
+    InvalidInput { message: String },
+    #[error("Proposal failed: {message}")]
+    ProposalFailed { message: String },
+    #[error("Send failed: {message}")]
+    SendFailed { message: String },
+    #[error("Wallet error: {message}")]
+    WalletError { message: String },
+}
+
+pub struct BalancesInfo {
+    pub total_orchard_balance: u64,
+    pub total_sapling_balance: u64,
+    pub total_transparent_balance: u64,
+    pub confirmed_orchard_balance: u64,
+    pub confirmed_sapling_balance: u64,
+    pub confirmed_transparent_balance: u64,
+    pub unconfirmed_orchard_balance: u64,
+    pub unconfirmed_sapling_balance: u64,
+    pub unconfirmed_transparent_balance: u64,
+}
+
+pub struct SpendableBalanceInfo {
+    pub spendable_balance: u64,
+}
+
+pub struct WalletHeightInfo {
+    pub height: u32,
+}
+
+pub struct WalletVersionInfo {
+    pub current_version: u32,
+    pub read_version: u32,
+}
+
+pub struct WalletSaveRequiredInfo {
+    pub save_required: bool,
+}
+
+pub struct SeedInfo {
+    pub seed_phrase: String,
+    pub birthday: u32,
+    pub no_of_accounts: u32,
+}
+
+pub struct UfvkInfo {
+    pub ufvk: String,
+    pub birthday: u32,
+}
+
+pub struct ProposalInfo {
+    pub fee: u64,
+}
+
+pub struct ShieldProposalInfo {
+    pub fee: u64,
+    pub value_to_shield: u64,
+}
+
+pub struct ConfirmInfo {
+    pub txids: Vec<String>,
+}
+
+pub struct PerformanceInfo {
+    pub performance_level: String,
 }
 
 pub fn with_panic_guard<T, F>(f: F) -> Result<T, ZingolibError>
@@ -72,7 +137,7 @@ where
     install_panic_hook_once();
     match panic::catch_unwind(f) {
         Ok(res) => res,
-        Err(payload) => Err(ZingolibError::Panic(format_panic_text(payload))),
+        Err(payload) => Err(ZingolibError::Panic { message: format_panic_text(payload) }),
     }
 }
 
@@ -293,32 +358,22 @@ pub fn init_new(
     chain_hint: String,
     performance_level: String,
     min_confirmations: u32,
-) -> Result<String, ZingolibError> {
+) -> Result<SeedInfo, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        let (config, lightwalletd_uri) = match construct_uri_load_config(
-            server_uri,
-            chain_hint,
-            performance_level,
-            min_confirmations,
-        ) {
-            Ok(c) => c,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
-        let chain_height = match RT.block_on(async move {
-            zingolib::grpc_connector::get_latest_block(lightwalletd_uri)
-                .await
-                .map(|block_id| BlockHeight::from_u32(block_id.height as u32))
-        }) {
-            Ok(h) => h,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
-        let lightclient = match LightClient::new(config, chain_height, false) {
-            Ok(l) => l,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
+        let (config, lightwalletd_uri) =
+            construct_uri_load_config(server_uri, chain_hint, performance_level, min_confirmations)
+                .map_err(|e| ZingolibError::InvalidInput { message: e })?;
+        let chain_height = RT
+            .block_on(async move {
+                zingolib::grpc_connector::get_latest_block(lightwalletd_uri)
+                    .await
+                    .map(|block_id| BlockHeight::from_u32(block_id.height as u32))
+            })
+            .map_err(|e| ZingolibError::WalletError { message: e.to_string() })?;
+        let lightclient = LightClient::new(config, chain_height, false)
+            .map_err(|e| ZingolibError::WalletError { message: e.to_string() })?;
         let _ = store_client(lightclient);
-
         get_seed()
     })
 }
@@ -331,23 +386,15 @@ pub fn init_from_seed(
     chain_hint: String,
     performance_level: String,
     min_confirmations: u32,
-) -> Result<String, ZingolibError> {
+) -> Result<SeedInfo, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        let (config, _lightwalletd_uri) = match construct_uri_load_config(
-            server_uri,
-            chain_hint,
-            performance_level,
-            min_confirmations,
-        ) {
-            Ok(c) => c,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
-        let mnemonic = match Mnemonic::from_phrase(seed) {
-            Ok(m) => m,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
-        let wallet = match LightWallet::new(
+        let (config, _lightwalletd_uri) =
+            construct_uri_load_config(server_uri, chain_hint, performance_level, min_confirmations)
+                .map_err(|e| ZingolibError::InvalidInput { message: e })?;
+        let mnemonic = Mnemonic::from_phrase(seed)
+            .map_err(|e| ZingolibError::InvalidInput { message: e.to_string() })?;
+        let wallet = LightWallet::new(
             config.chain,
             WalletBase::Mnemonic {
                 mnemonic,
@@ -355,16 +402,11 @@ pub fn init_from_seed(
             },
             BlockHeight::from_u32(birthday),
             config.wallet_settings.clone(),
-        ) {
-            Ok(w) => w,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
-        let lightclient = match LightClient::create_from_wallet(wallet, config, false) {
-            Ok(l) => l,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
+        )
+        .map_err(|e| ZingolibError::WalletError { message: e.to_string() })?;
+        let lightclient = LightClient::create_from_wallet(wallet, config, false)
+            .map_err(|e| ZingolibError::WalletError { message: e.to_string() })?;
         let _ = store_client(lightclient);
-
         get_seed()
     })
 }
@@ -376,33 +418,22 @@ pub fn init_from_ufvk(
     chain_hint: String,
     performance_level: String,
     min_confirmations: u32,
-) -> Result<String, ZingolibError> {
+) -> Result<UfvkInfo, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        let (config, _lightwalletd_uri) = match construct_uri_load_config(
-            server_uri,
-            chain_hint,
-            performance_level,
-            min_confirmations,
-        ) {
-            Ok(c) => c,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
-        let wallet = match LightWallet::new(
+        let (config, _lightwalletd_uri) =
+            construct_uri_load_config(server_uri, chain_hint, performance_level, min_confirmations)
+                .map_err(|e| ZingolibError::InvalidInput { message: e })?;
+        let wallet = LightWallet::new(
             config.chain,
             WalletBase::Ufvk(ufvk),
             BlockHeight::from_u32(birthday),
             config.wallet_settings.clone(),
-        ) {
-            Ok(w) => w,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
-        let lightclient = match LightClient::create_from_wallet(wallet, config, false) {
-            Ok(l) => l,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
+        )
+        .map_err(|e| ZingolibError::WalletError { message: e.to_string() })?;
+        let lightclient = LightClient::create_from_wallet(wallet, config, false)
+            .map_err(|e| ZingolibError::WalletError { message: e.to_string() })?;
         let _ = store_client(lightclient);
-
         get_ufvk()
     })
 }
@@ -448,7 +479,42 @@ pub fn init_from_b64(
         };
         let _ = store_client(lightclient);
 
-        if has_seed { get_seed() } else { get_ufvk() }
+        // init_from_b64 still returns String — inline the wallet read to avoid type mismatch
+        let mut guard = LIGHTCLIENT
+            .write()
+            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
+        if let Some(lc) = &mut *guard {
+            Ok(if has_seed {
+                RT.block_on(async move {
+                    let wallet = lc.wallet.read().await;
+                    match wallet.recovery_info() {
+                        Some(info) => serde_json::to_string_pretty(&info)
+                            .unwrap_or_else(|_| "Error: init_from_b64: failed to serialize seed".to_string()),
+                        None => "Error: init_from_b64: no mnemonic found".to_string(),
+                    }
+                })
+            } else {
+                RT.block_on(async move {
+                    let wallet = lc.wallet.read().await;
+                    let ufvk: UnifiedFullViewingKey = match wallet
+                        .unified_key_store
+                        .get(&AccountId::ZERO)
+                        .expect("account 0 must always exist")
+                        .try_into()
+                    {
+                        Ok(ufvk) => ufvk,
+                        Err(e) => return format!("Error: {e}"),
+                    };
+                    object! {
+                        "ufvk" => ufvk.encode(&wallet.network),
+                        "birthday" => u32::from(wallet.birthday)
+                    }
+                    .pretty(2)
+                })
+            })
+        } else {
+            Err(ZingolibError::LightclientNotInitialized)
+        }
     })
 }
 
@@ -522,7 +588,7 @@ pub fn get_latest_block_server(server_uri: String) -> Result<String, ZingolibErr
     })
 }
 
-pub fn get_latest_block_wallet() -> Result<String, ZingolibError> {
+pub fn get_latest_block_wallet() -> Result<WalletHeightInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
@@ -530,7 +596,9 @@ pub fn get_latest_block_wallet() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 let wallet = lightclient.wallet.read().await;
-                object! { "height" => json::JsonValue::from(wallet.sync_state.last_known_chain_height().map_or(0, u32::from))}.pretty(2)
+                WalletHeightInfo {
+                    height: wallet.sync_state.last_known_chain_height().map_or(0, u32::from),
+                }
             }))
         } else {
             Err(ZingolibError::LightclientNotInitialized)
@@ -671,51 +739,50 @@ pub fn info_server() -> Result<String, ZingolibError> {
 
 // TODO: rename "get_seed_phrase" or "get_mnemonic_phrase"
 // or if other recovery info is being used could rename "get_recovery_info" ?
-pub fn get_seed() -> Result<String, ZingolibError> {
+pub fn get_seed() -> Result<SeedInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            Ok(RT.block_on(async move {
+            RT.block_on(async move {
                 let wallet = lightclient.wallet.read().await;
                 match wallet.recovery_info() {
-                    Some(recovery_info) => serde_json::to_string_pretty(&recovery_info)
-                        .unwrap_or_else(|_| "Error: get seed. failed to serialize".to_string()),
-                    None => {
-                        "Error: get seed. no mnemonic found. wallet loaded from key.".to_string()
-                    }
+                    Some(info) => Ok(SeedInfo {
+                        seed_phrase: info.seed_phrase.clone(),
+                        birthday: info.birthday as u32,
+                        no_of_accounts: info.no_of_accounts,
+                    }),
+                    None => Err(ZingolibError::WalletError {
+                        message: "no mnemonic found — wallet loaded from key".to_string(),
+                    }),
                 }
-            }))
+            })
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
     })
 }
 
-pub fn get_ufvk() -> Result<String, ZingolibError> {
+pub fn get_ufvk() -> Result<UfvkInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            Ok(RT.block_on(async move {
+            RT.block_on(async move {
                 let wallet = lightclient.wallet.read().await;
-                let ufvk: UnifiedFullViewingKey = match wallet
+                let ufvk: UnifiedFullViewingKey = wallet
                     .unified_key_store
                     .get(&AccountId::ZERO)
                     .expect("account 0 must always exist")
                     .try_into()
-                {
-                    Ok(ufvk) => ufvk,
-                    Err(e) => return format!("Error: {e}"),
-                };
-                object! {
-                    "ufvk" => ufvk.encode(&wallet.network),
-                    "birthday" => u32::from(wallet.birthday)
-                }
-                .pretty(2)
-            }))
+                    .map_err(|e| ZingolibError::WalletError { message: format!("{e}") })?;
+                Ok(UfvkInfo {
+                    ufvk: ufvk.encode(&wallet.network),
+                    birthday: u32::from(wallet.birthday),
+                })
+            })
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
@@ -954,18 +1021,38 @@ pub fn get_messages(address: String) -> Result<String, ZingolibError> {
     })
 }
 
-pub fn get_balance() -> Result<String, ZingolibError> {
+pub fn get_balance() -> Result<BalancesInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            Ok(RT.block_on(async move {
-                match lightclient.account_balance(AccountId::ZERO).await {
-                    Ok(bal) => json::JsonValue::from(bal).pretty(2),
-                    Err(e) => format!("Error: {e}"),
-                }
-            }))
+            RT.block_on(async move {
+                let bal = lightclient
+                    .account_balance(AccountId::ZERO)
+                    .await
+                    .map_err(|e| ZingolibError::WalletError { message: e.to_string() })?;
+                let j = json::JsonValue::from(bal);
+                Ok(BalancesInfo {
+                    total_orchard_balance: j["total_orchard_balance"].as_u64().unwrap_or(0),
+                    total_sapling_balance: j["total_sapling_balance"].as_u64().unwrap_or(0),
+                    total_transparent_balance: j["total_transparent_balance"].as_u64().unwrap_or(0),
+                    confirmed_orchard_balance: j["confirmed_orchard_balance"].as_u64().unwrap_or(0),
+                    confirmed_sapling_balance: j["confirmed_sapling_balance"].as_u64().unwrap_or(0),
+                    confirmed_transparent_balance: j["confirmed_transparent_balance"]
+                        .as_u64()
+                        .unwrap_or(0),
+                    unconfirmed_orchard_balance: j["unconfirmed_orchard_balance"]
+                        .as_u64()
+                        .unwrap_or(0),
+                    unconfirmed_sapling_balance: j["unconfirmed_sapling_balance"]
+                        .as_u64()
+                        .unwrap_or(0),
+                    unconfirmed_transparent_balance: j["unconfirmed_transparent_balance"]
+                        .as_u64()
+                        .unwrap_or(0),
+                })
+            })
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
@@ -1115,37 +1202,27 @@ pub fn get_spendable_balance_with_address(
     })
 }
 
-pub fn get_spendable_balance_total() -> Result<String, ZingolibError> {
+pub fn get_spendable_balance_total() -> Result<SpendableBalanceInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            Ok(RT.block_on(async move {
+            RT.block_on(async move {
                 let wallet = lightclient.wallet.read().await;
-                let spendable_balance =
-                    match wallet.shielded_spendable_balance(AccountId::ZERO, false) {
-                        Ok(bal) => bal,
-                        Err(e) => return format!("Error: {e}"),
-                    };
-                object! {
-                    "spendable_balance" => spendable_balance.into_u64(),
-                }
-                .pretty(2)
-            }))
+                let spendable_balance = wallet
+                    .shielded_spendable_balance(AccountId::ZERO, false)
+                    .map_err(|e| ZingolibError::WalletError { message: e.to_string() })?;
+                Ok(SpendableBalanceInfo {
+                    spendable_balance: spendable_balance.into_u64(),
+                })
+            })
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
     })
 }
 
-pub fn set_option_wallet() -> Result<String, ZingolibError> {
-    with_panic_guard(|| Ok("Error: unimplemented".to_string()))
-}
-
-pub fn get_option_wallet() -> Result<String, ZingolibError> {
-    with_panic_guard(|| Ok("Error: unimplemented".to_string()))
-}
 
 pub fn create_tor_client(data_dir: String) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
@@ -1353,7 +1430,7 @@ pub fn check_my_address(address: String) -> Result<String, ZingolibError> {
     })
 }
 
-pub fn get_wallet_save_required() -> Result<String, ZingolibError> {
+pub fn get_wallet_save_required() -> Result<WalletSaveRequiredInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
@@ -1361,8 +1438,8 @@ pub fn get_wallet_save_required() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 let wallet = lightclient.wallet.read().await;
-                object! { "save_required" => wallet.save_required }.pretty(2)
-            }))
+                Ok(WalletSaveRequiredInfo { save_required: wallet.save_required })
+            })?)
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
@@ -1418,7 +1495,7 @@ pub fn set_config_wallet_to_prod(
     })
 }
 
-pub fn get_config_wallet_performance() -> Result<String, ZingolibError> {
+pub fn get_config_wallet_performance() -> Result<PerformanceInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
@@ -1432,15 +1509,15 @@ pub fn get_config_wallet_performance() -> Result<String, ZingolibError> {
                     PerformanceLevel::High => "High",
                     PerformanceLevel::Maximum => "Maximum",
                 };
-                object! { "performance_level" => performance_level }.pretty(2)
-            }))
+                Ok(PerformanceInfo { performance_level: performance_level.to_string() })
+            })?)
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
     })
 }
 
-pub fn get_wallet_version() -> Result<String, ZingolibError> {
+pub fn get_wallet_version() -> Result<WalletVersionInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
@@ -1448,14 +1525,11 @@ pub fn get_wallet_version() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 let wallet = lightclient.wallet.read().await;
-                let current_version = wallet.current_version();
-                let read_version = wallet.read_version();
-                object! {
-                    "current_version" => current_version,
-                    "read_version" => read_version
-                }
-                .pretty(2)
-            }))
+                Ok(WalletVersionInfo {
+                    current_version: wallet.current_version() as u32,
+                    read_version: wallet.read_version() as u32,
+                })
+            })?)
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
@@ -1479,41 +1553,49 @@ fn interpret_memo_string(memo_str: String) -> Result<MemoBytes, String> {
         .map_err(|_| format!("Error: creating output. Memo '{:?}' is too long", memo_str))
 }
 
-pub fn send(send_json: String) -> Result<String, ZingolibError> {
+pub fn send(send_json: String) -> Result<ProposalInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            Ok(RT.block_on(async move {
-                let json_args = match json::parse(&send_json) {
-                    Ok(parsed) => parsed,
-                    Err(_) => return "Error: it is not a valid JSON".to_string(),
-                };
+            RT.block_on(async move {
+                let json_args = json::parse(&send_json).map_err(|_| ZingolibError::InvalidInput {
+                    message: "not a valid JSON".to_string(),
+                })?;
 
                 let mut receivers = Receivers::new();
                 for j in json_args.members() {
                     let recipient_address = match j["address"].as_str() {
-                        Some(addr) => match ZcashAddress::try_from_encoded(addr) {
-                            Ok(a) => a,
-                            Err(e) => return format!("Error: Invalid address: {e}"),
-                        },
-                        None => return "Error: Missing address".to_string(),
+                        Some(addr) => ZcashAddress::try_from_encoded(addr).map_err(|e| {
+                            ZingolibError::InvalidInput {
+                                message: format!("Invalid address: {e}"),
+                            }
+                        })?,
+                        None => {
+                            return Err(ZingolibError::InvalidInput {
+                                message: "Missing address".to_string(),
+                            })
+                        }
                     };
 
                     let amount = match j["amount"].as_u64() {
-                        Some(a) => match Zatoshis::from_u64(a) {
-                            Ok(a) => a,
-                            Err(e) => return format!("Error: Invalid amount: {e}"),
-                        },
-                        None => return "Missing amount".to_string(),
+                        Some(a) => Zatoshis::from_u64(a).map_err(|e| ZingolibError::InvalidInput {
+                            message: format!("Invalid amount: {e}"),
+                        })?,
+                        None => {
+                            return Err(ZingolibError::InvalidInput {
+                                message: "Missing amount".to_string(),
+                            })
+                        }
                     };
 
                     let memo = if let Some(m) = j["memo"].as_str() {
-                        match interpret_memo_string(m.to_string()) {
-                            Ok(memo_bytes) => Some(memo_bytes),
-                            Err(e) => return format!("Error: Invalid memo: {e}"),
-                        }
+                        Some(interpret_memo_string(m.to_string()).map_err(|e| {
+                            ZingolibError::InvalidInput {
+                                message: format!("Invalid memo: {e}"),
+                            }
+                        })?)
                     } else {
                         None
                     };
@@ -1525,89 +1607,88 @@ pub fn send(send_json: String) -> Result<String, ZingolibError> {
                     });
                 }
 
-                let request = match transaction_request_from_receivers(receivers) {
-                    Ok(request) => request,
-                    Err(e) => return format!("Error: Request Error: {e}"),
-                };
+                let request =
+                    transaction_request_from_receivers(receivers).map_err(|e| {
+                        ZingolibError::InvalidInput {
+                            message: format!("Request error: {e}"),
+                        }
+                    })?;
 
-                match lightclient.propose_send(request, AccountId::ZERO).await {
-                    Ok(proposal) => {
-                        let fee = match total_fee(&proposal) {
-                            Ok(fee) => fee,
-                            Err(e) => return object! { "error" => e.to_string() }.pretty(2),
-                        };
-                        object! { "fee" => fee.into_u64() }
-                    }
-                    Err(e) => {
-                        object! { "error" => e.to_string() }
-                    }
-                }
-                .pretty(2)
-            }))
+                let proposal = lightclient
+                    .propose_send(request, AccountId::ZERO)
+                    .await
+                    .map_err(|e| ZingolibError::ProposalFailed {
+                        message: e.to_string(),
+                    })?;
+
+                let fee = total_fee(&proposal).map_err(|e| ZingolibError::ProposalFailed {
+                    message: e.to_string(),
+                })?;
+
+                Ok(ProposalInfo { fee: fee.into_u64() })
+            })
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
     })
 }
 
-pub fn shield() -> Result<String, ZingolibError> {
+pub fn shield() -> Result<ShieldProposalInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            Ok(RT.block_on(async move {
-                match lightclient.propose_shield(AccountId::ZERO).await {
-                    Ok(proposal) => {
-                        if proposal.steps().len() != 1 {
-                            return object! { "error" => "shielding transactions should not have multiple proposal steps" }.pretty(2);
-                        }
-                        let step = proposal.steps().first();
-                        let Some(value_to_shield) = step
-                            .balance()
-                            .proposed_change()
-                            .iter()
-                            .try_fold(Zatoshis::ZERO, |acc, c| acc + c.value()) else {
-                                return object! { "error" => "shield amount outside valid range of zatoshis" }
-                                    .pretty(2);
-                        };
-                        let fee = step.balance().fee_required();
-                        object! {
-                            "value_to_shield" => value_to_shield.into_u64(),
-                            "fee" => fee.into_u64(),
-                        }
-                    }
-                    Err(e) => {
-                        object! { "error" => e.to_string() }
-                    }
+            RT.block_on(async move {
+                let proposal = lightclient
+                    .propose_shield(AccountId::ZERO)
+                    .await
+                    .map_err(|e| ZingolibError::ProposalFailed { message: e.to_string() })?;
+
+                if proposal.steps().len() != 1 {
+                    return Err(ZingolibError::ProposalFailed {
+                        message: "shielding transactions should not have multiple proposal steps"
+                            .to_string(),
+                    });
                 }
-                .pretty(2)
-            }))
+                let step = proposal.steps().first();
+                let value_to_shield = step
+                    .balance()
+                    .proposed_change()
+                    .iter()
+                    .try_fold(Zatoshis::ZERO, |acc, c| acc + c.value())
+                    .ok_or_else(|| ZingolibError::ProposalFailed {
+                        message: "shield amount outside valid range of zatoshis".to_string(),
+                    })?;
+                let fee = step.balance().fee_required();
+
+                Ok(ShieldProposalInfo {
+                    fee: fee.into_u64(),
+                    value_to_shield: value_to_shield.into_u64(),
+                })
+            })
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
     })
 }
 
-pub fn confirm() -> Result<String, ZingolibError> {
+pub fn confirm() -> Result<ConfirmInfo, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            Ok(RT.block_on(async move {
-                match lightclient
+            RT.block_on(async move {
+                let txids = lightclient
                     .send_stored_proposal(true)
-                    .await {
-                    Ok(txids) => {
-                        object! { "txids" => txids.iter().map(|txid| txid.to_string()).collect::<Vec<_>>() }
-                    }
-                    Err(e) => {
-                        object! { "error" => e.to_string() }
-                    }
-                }
-                .pretty(2)
-            }))
+                    .await
+                    .map_err(|e| ZingolibError::SendFailed { message: e.to_string() })?;
+
+                Ok(ConfirmInfo {
+                    txids: txids.iter().map(|txid| txid.to_string()).collect(),
+                })
+            })
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }

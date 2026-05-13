@@ -16,9 +16,7 @@ import {
 import TotalBalanceClass from '../AppState/classes/TotalBalanceClass';
 import NetInfoType from '../AppState/types/NetInfoType';
 import { createAlert } from '../createAlert';
-import RPC from '../rpc';
-import { RPCShieldProposeType } from '../rpc/types/RPCShieldProposeType';
-import { RPCShieldType } from '../rpc/types/RPCShieldType';
+import RPC from '../walletBackend';
 import RPCModule from '../RPCModule';
 import Utils from '../utils';
 
@@ -82,30 +80,21 @@ export function useShieldFunds({
   const shieldProposeLockRef = useRef<boolean>(false);
 
   useEffect(() => {
-    const runShieldPropose = async (): Promise<string> => {
+    const runShieldPropose = async (): Promise<void> => {
+      if (shieldProposeLockRef.current) {
+        return;
+      }
+      shieldProposeLockRef.current = true;
       try {
-        if (shieldProposeLockRef.current) {
-          return 'Error: shield propose already running...';
-        }
-        shieldProposeLockRef.current = true;
-        const proposeStr: string = await RPCModule.shieldProcess();
-        if (proposeStr) {
-          if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-            console.log(`Error propose ${proposeStr}`);
-            shieldProposeLockRef.current = false;
-            return proposeStr;
-          }
-        } else {
-          console.log('Internal Error propose');
-          shieldProposeLockRef.current = false;
-          return 'Error: Internal RPC Error: propose';
-        }
-        shieldProposeLockRef.current = false;
-        return proposeStr;
+        const proposal = await RPCModule.shieldProcess();
+        setShieldingFee(proposal.fee / 10 ** 8);
+        setShieldingAmount?.(proposal.value_to_shield / 10 ** 8);
       } catch (error) {
-        console.log(`Critical Error propose ${error}`);
+        console.log('Error shield proposing', error);
+        setShieldingFee(0);
+        setShieldingAmount?.(0);
+      } finally {
         shieldProposeLockRef.current = false;
-        return `Error: ${error}`;
       }
     };
 
@@ -115,36 +104,7 @@ export function useShieldFunds({
       selectServer !== SelectServerEnum.offline &&
       (somePending ? 0 : (totalBalance?.confirmedTransparentBalance ?? 0)) > 0
     ) {
-      (async () => {
-        let proposeFee = 0;
-        let proposeAmount = 0;
-        const runProposeStr = await runShieldPropose();
-        if (
-          runProposeStr &&
-          runProposeStr.toLowerCase().startsWith(GlobalConst.error)
-        ) {
-          console.log('Error shield proposing', runProposeStr);
-        } else {
-          try {
-            const runProposeJson: RPCShieldProposeType =
-              JSON.parse(runProposeStr);
-            if (runProposeJson.error) {
-              console.log('Error shield proposing', runProposeJson.error);
-            } else {
-              if (runProposeJson.fee) {
-                proposeFee = runProposeJson.fee / 10 ** 8;
-              }
-              if (runProposeJson.value_to_shield) {
-                proposeAmount = runProposeJson.value_to_shield / 10 ** 8;
-              }
-            }
-          } catch (e) {
-            console.log('Error shield proposing', e);
-          }
-        }
-        setShieldingFee(proposeFee);
-        setShieldingAmount(proposeAmount);
-      })();
+      runShieldPropose();
     } else {
       setShieldingFee(0);
       setShieldingAmount?.(0);
@@ -178,60 +138,36 @@ export function useShieldFunds({
     const pools: PoolToShieldEnum = PoolToShieldEnum.transparentPoolToShield;
 
     navigation.navigate(RouteEnum.Computing);
+    // Re-propose immediately before confirm so the stored proposal is fresh.
     await RPCModule.shieldProcess();
-    const shieldStr = await RPC.rpcShieldFunds();
+    const txidsStr = await RPC.rpcShieldFunds();
 
-    if (shieldStr) {
-      if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          translate(`history.shield-title-${pools}`) as string,
-          `${translate(`history.shield-error-${pools}`)} ${shieldStr}`,
-          true,
-          translate,
-        );
-      } else {
-        try {
-          const shieldJSON: RPCShieldType = JSON.parse(shieldStr);
-          if (shieldJSON.error) {
-            createAlert(
-              setBackgroundError,
-              addLastSnackbar,
-              translate(`history.shield-title-${pools}`) as string,
-              `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
-              true,
-              translate,
-            );
-          } else if (shieldJSON.txids) {
-            createAlert(
-              setBackgroundError,
-              addLastSnackbar,
-              translate(`history.shield-title-${pools}`) as string,
-              `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txids.join(', ')}`,
-              true,
-              translate,
-            );
-          }
-        } catch (e) {
-          createAlert(
-            setBackgroundError,
-            addLastSnackbar,
-            translate(`history.shield-title-${pools}`) as string,
-            `${translate(`history.shield-message-${pools}`)} ${shieldStr}`,
-            true,
-            translate,
-          );
-        }
-      }
-      setScrollToTop?.(true);
-      setScrollToBottom?.(true);
-      setShieldingFee(0);
-      setShieldingAmount?.(0);
-      navigation.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.History,
-      });
+    if (txidsStr.toLowerCase().startsWith(GlobalConst.error)) {
+      createAlert(
+        setBackgroundError,
+        addLastSnackbar,
+        translate(`history.shield-title-${pools}`) as string,
+        `${translate(`history.shield-error-${pools}`)} ${txidsStr}`,
+        true,
+        translate,
+      );
+    } else {
+      createAlert(
+        setBackgroundError,
+        addLastSnackbar,
+        translate(`history.shield-title-${pools}`) as string,
+        `${translate(`history.shield-message-${pools}`)} ${txidsStr}`,
+        true,
+        translate,
+      );
     }
+    setScrollToTop?.(true);
+    setScrollToBottom?.(true);
+    setShieldingFee(0);
+    setShieldingAmount?.(0);
+    navigation.navigate(RouteEnum.HomeStack, {
+      screen: RouteEnum.History,
+    });
   }, [
     setBackgroundError,
     addLastSnackbar,

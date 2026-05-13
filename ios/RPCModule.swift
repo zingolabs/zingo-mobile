@@ -236,120 +236,111 @@ class RPCModule: NSObject {
   }
 
   func fnCreateNewWallet(
-    serveruri: String, 
-    chainhint: String, 
-    performancelevel: String, 
+    serveruri: String,
+    chainhint: String,
+    performancelevel: String,
     minconfirmations: String
-  ) throws -> String {
+  ) throws -> SeedInfo {
     let seed = try initNew(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
-    let seedStr = String(seed)
-    if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-      try self.saveWalletInternal()
-    }
-    return seedStr
+    try self.saveWalletInternal()
+    return seed
   }
 
   @objc(createNewWallet:chainhint:performancelevel:minconfirmations:resolve:reject:)
   func createNewWallet(
-    _ serveruri: String, 
-    chainhint: String, 
-    performancelevel: String, 
-    minconfirmations: String, 
-    resolve: @escaping RCTPromiseResolveBlock, 
+    _ serveruri: String,
+    chainhint: String,
+    performancelevel: String,
+    minconfirmations: String,
+    resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
     do {
-      let seedStr = try self.fnCreateNewWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+      let seedInfo = try self.fnCreateNewWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
       DispatchQueue.main.async {
-        resolve(seedStr)
+        resolve(seedInfo.toDictionary())
       }
     } catch {
       let err = "Error: [Native] Creating a new wallet. \(error.localizedDescription)"
       NSLog(err)
       DispatchQueue.main.async {
-        resolve(err)
+        reject("ZINGO_ERROR", err, error as NSError)
       }
     }
   }
   
   func fnRestoreWalletFromSeed(
-    restoreSeed: String, 
-    birthday: String, 
-    serveruri: String, 
-    chainhint: String, 
-    performancelevel: String, 
+    restoreSeed: String,
+    birthday: String,
+    serveruri: String,
+    chainhint: String,
+    performancelevel: String,
     minconfirmations: String
-  ) throws -> String {
+  ) throws -> SeedInfo {
     let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
-    let seedStr = String(seed)
-    if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-      try self.saveWalletInternal()
-    }
-    return seedStr
+    try self.saveWalletInternal()
+    return seed
   }
 
   @objc(restoreWalletFromSeed:birthday:serveruri:chainhint:performancelevel:minconfirmations:resolve:reject:)
   func restoreWalletFromSeed(
-    _ restoreSeed: String, 
-    birthday: String, 
-    serveruri: String, 
-    chainhint: String, 
+    _ restoreSeed: String,
+    birthday: String,
+    serveruri: String,
+    chainhint: String,
     performancelevel: String,
     minconfirmations: String,
-    resolve: @escaping RCTPromiseResolveBlock, 
+    resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
     do {
-      let seedStr = try self.fnRestoreWalletFromSeed(restoreSeed: restoreSeed, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+      let seedInfo = try self.fnRestoreWalletFromSeed(restoreSeed: restoreSeed, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
       DispatchQueue.main.async {
-        resolve(seedStr)
+        resolve(seedInfo.toDictionary())
       }
     } catch {
       let err = "Error: [Native] Restoring a wallet with seed. \(error.localizedDescription)"
       NSLog(err)
       DispatchQueue.main.async {
-        resolve(err)
+        reject("ZINGO_ERROR", err, error as NSError)
       }
     }
   }
   
   func fnRestoreWalletFromUfvk(
-    restoreUfvk: String, 
+    restoreUfvk: String,
     birthday: String,
-    serveruri: String, 
-    chainhint: String, 
-    performancelevel: String, 
+    serveruri: String,
+    chainhint: String,
+    performancelevel: String,
     minconfirmations: String
-  ) throws -> String {
+  ) throws -> UfvkInfo {
     let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
-    let ufvkStr = String(ufvk)
-    if !ufvkStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-      try self.saveWalletInternal()
-    }
-    return ufvkStr
+    try self.saveWalletInternal()
+    return ufvk
   }
 
   @objc(restoreWalletFromUfvk:birthday:serveruri:chainhint:performancelevel:minconfirmations:resolve:reject:)
   func restoreWalletFromUfvk(
-    _ restoreUfvk: String, 
-    birthday: String, 
-    serveruri: String, 
-    chainhint: String, 
+    _ restoreUfvk: String,
+    birthday: String,
+    serveruri: String,
+    chainhint: String,
     performancelevel: String,
     minconfirmations: String,
-    resolve: @escaping RCTPromiseResolveBlock, 
+    resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
     do {
-      let ufvkStr = try self.fnRestoreWalletFromUfvk(restoreUfvk: restoreUfvk, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+      let ufvkInfo = try self.fnRestoreWalletFromUfvk(restoreUfvk: restoreUfvk, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
       DispatchQueue.main.async {
-        resolve(ufvkStr)
+        resolve(ufvkInfo.toDictionary())
       }
     } catch {
       let err = "Error: [Native] Restoring a wallet with ufvk. \(error.localizedDescription)"
       NSLog(err)
       DispatchQueue.main.async {
-        resolve(err)
+        reject("ZINGO_ERROR", err, error as NSError)
       }
     }
   }
@@ -383,7 +374,7 @@ class RPCModule: NSObject {
       let err = "Error: [Native] Loading existing wallet. \(error.localizedDescription)"
       NSLog(err)
       DispatchQueue.main.async {
-        resolve(err)
+        reject("ZINGO_ERROR", err, error as NSError)
       }
     }
   }
@@ -443,7 +434,7 @@ class RPCModule: NSObject {
 
   @objc(doSave:reject:)
   func doSave(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    let dict: [String: Any] = ["resolve": resolve]
+    let dict: [String: Any] = ["resolve": resolve, "reject": reject]
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
             self.fnDoSave(dict)
@@ -472,7 +463,7 @@ class RPCModule: NSObject {
 
   @objc(doSaveBackup:reject:)
   func doSaveBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    let dict: [String: Any] = ["resolve": resolve]
+    let dict: [String: Any] = ["resolve": resolve, "reject": reject]
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
             self.fndoSaveBackup(dict)
@@ -481,6 +472,7 @@ class RPCModule: NSObject {
   }
 
   func fnGetLatestBlockServerInfo(_ dict: [AnyHashable: Any]) {
+    let reject = dict["reject"] as? RCTPromiseRejectBlock
     if let serveruri = dict["serveruri"] as? String,
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       do {
@@ -493,15 +485,16 @@ class RPCModule: NSObject {
         let err = "Error: [Native] Get server latest block. \(error.localizedDescription)"
         NSLog(err)
         DispatchQueue.main.async {
-          resolve(err)
+          reject?("ZINGO_ERROR", err, nil)
         }
       }
     } else {
       let err = "Error: [Native] Get server latest block. Argument problem."
       NSLog(err)
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
       }
     }
@@ -509,7 +502,7 @@ class RPCModule: NSObject {
   
   @objc(getLatestBlockServerInfo:resolve:reject:)
   func getLatestBlockServerInfo(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["serveruri": serveruri, "resolve": resolve]
+      let dict: [String: Any] = ["serveruri": serveruri, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetLatestBlockServerInfo(dict)
@@ -519,17 +512,17 @@ class RPCModule: NSObject {
 
   func fnGetLatestBlockWalletInfo(_ dict: [AnyHashable: Any]) {
     if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try getLatestBlockWallet()
-          let respStr = String(resp)
           DispatchQueue.main.async {
-            resolve(respStr)
+            resolve(resp.toDictionary())
           }
         } catch {
           let err = "Error: [Native] Get wallet latest block. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
     } else {
@@ -540,7 +533,7 @@ class RPCModule: NSObject {
   
   @objc(getLatestBlockWalletInfo:reject:)
   func getLatestBlockWalletInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetLatestBlockWalletInfo(dict)
@@ -550,6 +543,7 @@ class RPCModule: NSObject {
 
   func fnGetDonationAddress(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try getDeveloperDonationAddress()
           let respStr = String(resp)
@@ -560,7 +554,7 @@ class RPCModule: NSObject {
           let err = "Error: [Native] Get developer donation address. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -571,7 +565,7 @@ class RPCModule: NSObject {
   
   @objc(getDonationAddress:reject:)
   func getDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetDonationAddress(dict)
@@ -581,6 +575,7 @@ class RPCModule: NSObject {
 
   func fnGetZenniesDonationAddress(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try getZenniesForZingoDonationAddress()
           let respStr = String(resp)
@@ -591,7 +586,7 @@ class RPCModule: NSObject {
           let err = "Error: [Native] Get zennies donation address. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -602,7 +597,7 @@ class RPCModule: NSObject {
   
   @objc(getZenniesDonationAddress:reject:)
   func getZenniesDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetZenniesDonationAddress(dict)
@@ -612,6 +607,7 @@ class RPCModule: NSObject {
 
   func fnGetValueTransfersList(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try getValueTransfers()
             let respStr = String(resp)
@@ -622,7 +618,7 @@ class RPCModule: NSObject {
             let err = "Error: [Native] Get value transfers. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }          
           }
       } else {
@@ -633,7 +629,7 @@ class RPCModule: NSObject {
 
   @objc(getValueTransfersList:reject:)
   func getValueTransfersList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetValueTransfersList(dict)
@@ -643,6 +639,7 @@ class RPCModule: NSObject {
 
   func fnSetCryptoDefaultProvider(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try setCryptoDefaultProviderToRing()
           let respStr = String(resp)
@@ -653,7 +650,7 @@ class RPCModule: NSObject {
           let err = "Error: [Native] Setting the crypto provider to ring by default. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -664,7 +661,7 @@ class RPCModule: NSObject {
 
   @objc(setCryptoDefaultProvider:reject:)
   func setCryptoDefaultProvider(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnSetCryptoDefaultProvider(dict)
@@ -674,6 +671,7 @@ class RPCModule: NSObject {
 
   func fnPollSyncInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try pollSync()
           let respStr = String(resp)
@@ -684,7 +682,7 @@ class RPCModule: NSObject {
           let err = "Error: [Native] Sync poll info. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -695,7 +693,7 @@ class RPCModule: NSObject {
 
   @objc(pollSyncInfo:reject:)
   func pollSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnPollSyncInfo(dict)
@@ -705,6 +703,7 @@ class RPCModule: NSObject {
 
   func fnRunSyncProcess(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         var respStr: String = ""
         do {
           let resp = try runSync()
@@ -720,7 +719,7 @@ class RPCModule: NSObject {
           let err = "Error: [Native] Sync run process. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -731,7 +730,7 @@ class RPCModule: NSObject {
 
   @objc(runSyncProcess:reject:)
   func runSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnRunSyncProcess(dict)
@@ -741,6 +740,7 @@ class RPCModule: NSObject {
 
   func fnPauseSyncProcess(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try pauseSync()
             let respStr = String(resp)
@@ -751,7 +751,7 @@ class RPCModule: NSObject {
             let err = "Error: [Native] Sync pause process. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       } else {
@@ -762,7 +762,7 @@ class RPCModule: NSObject {
 
   @objc(pauseSyncProcess:reject:)
   func pauseSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnPauseSyncProcess(dict)
@@ -772,6 +772,7 @@ class RPCModule: NSObject {
 
   func fnStatusSyncInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         var respStr: String = ""
         do {
           let resp = try statusSync()
@@ -783,7 +784,7 @@ class RPCModule: NSObject {
           let err = "Error: [Native] Sync Status info. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -794,7 +795,7 @@ class RPCModule: NSObject {
 
   @objc(statusSyncInfo:reject:)
   func statusSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnStatusSyncInfo(dict)
@@ -804,6 +805,7 @@ class RPCModule: NSObject {
 
   func fnRunRescanProcess(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try runRescan()
             let respStr = String(resp)
@@ -814,7 +816,7 @@ class RPCModule: NSObject {
             let err = "Error: [Native] Rescan run process. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       } else {
@@ -825,7 +827,7 @@ class RPCModule: NSObject {
 
   @objc(runRescanProcess:reject:)
   func runRescanProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnRunRescanProcess(dict)
@@ -835,6 +837,7 @@ class RPCModule: NSObject {
 
   func fnInfoServerInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try infoServer()
             let respStr = String(resp)
@@ -845,7 +848,7 @@ class RPCModule: NSObject {
             let err = "Error: [Native] info server. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       } else {
@@ -856,7 +859,7 @@ class RPCModule: NSObject {
 
   @objc(infoServerInfo:reject:)
   func infoServerInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnInfoServerInfo(dict)
@@ -866,17 +869,17 @@ class RPCModule: NSObject {
 
   func fnGetSeedInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try getSeed()
-          let respStr = String(resp)
           DispatchQueue.main.async {
-            resolve(respStr)
+            resolve(resp.toDictionary())
           }
         } catch {
           let err = "Error: [Native] seed. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -887,7 +890,7 @@ class RPCModule: NSObject {
 
   @objc(getSeedInfo:reject:)
   func getSeedInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetSeedInfo(dict)
@@ -897,17 +900,17 @@ class RPCModule: NSObject {
 
   func fnGetUfvkInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try getUfvk()
-          let respStr = String(resp)
           DispatchQueue.main.async {
-            resolve(respStr)
+            resolve(resp.toDictionary())
           }
         } catch {
           let err = "Error: [Native] ufvk. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -918,7 +921,7 @@ class RPCModule: NSObject {
 
   @objc(getUfvkInfo:reject:)
   func getUfvkInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetUfvkInfo(dict)
@@ -927,6 +930,7 @@ class RPCModule: NSObject {
   }
 
   func fnChangeServerProcess(_ dict: [AnyHashable: Any]) {
+      let reject = dict["reject"] as? RCTPromiseRejectBlock
       if let serveruri = dict["serveruri"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
@@ -939,15 +943,16 @@ class RPCModule: NSObject {
           let err = "Error: [Native] change server. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
           let err = "Error: [Native] change server. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       }
@@ -955,7 +960,7 @@ class RPCModule: NSObject {
 
   @objc(changeServerProcess:resolve:reject:)
   func changeServerProcess(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["serveruri": serveruri, "resolve": resolve]
+      let dict: [String: Any] = ["serveruri": serveruri, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnChangeServerProcess(dict)
@@ -965,6 +970,7 @@ class RPCModule: NSObject {
 
   func fnWalletKindInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try walletKind()
           let respStr = String(resp)
@@ -975,7 +981,7 @@ class RPCModule: NSObject {
           let err = "Error: [Native] wallet kind. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -986,7 +992,7 @@ class RPCModule: NSObject {
 
   @objc(walletKindInfo:reject:)
   func walletKindInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnWalletKindInfo(dict)
@@ -995,6 +1001,7 @@ class RPCModule: NSObject {
   }
 
   func fnParseAddressInfo(_ dict: [AnyHashable: Any]) {
+      let reject = dict["reject"] as? RCTPromiseRejectBlock
       if let address = dict["address"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
@@ -1007,15 +1014,16 @@ class RPCModule: NSObject {
           let err = "Error: [Native] parse address. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
           let err = "Error: [Native] parse address. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       }
@@ -1023,7 +1031,7 @@ class RPCModule: NSObject {
 
   @objc(parseAddressInfo:resolve:reject:)
   func parseAddressInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["address": address, "resolve": resolve]
+      let dict: [String: Any] = ["address": address, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnParseAddressInfo(dict)
@@ -1032,6 +1040,7 @@ class RPCModule: NSObject {
   }
 
   func fnParseUfvkInfo(_ dict: [AnyHashable: Any]) {
+      let reject = dict["reject"] as? RCTPromiseRejectBlock
       if let ufvk = dict["ufvk"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
@@ -1044,15 +1053,16 @@ class RPCModule: NSObject {
           let err = "Error: [Native] parse ufvk. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
           let err = "Error: [Native] parse ufvk. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       }
@@ -1060,7 +1070,7 @@ class RPCModule: NSObject {
 
   @objc(parseUfvkInfo:resolve:reject:)
   func parseUfvkInfo(_ ufvk: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["ufvk": ufvk, "resolve": resolve]
+      let dict: [String: Any] = ["ufvk": ufvk, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnParseUfvkInfo(dict)
@@ -1070,6 +1080,7 @@ class RPCModule: NSObject {
 
   func fnGetVersionInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try getVersion()
             let respStr = String(resp)
@@ -1080,7 +1091,7 @@ class RPCModule: NSObject {
             let err = "Error: [Native] version. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }          
           }
       } else {
@@ -1091,7 +1102,7 @@ class RPCModule: NSObject {
 
   @objc(getVersionInfo:reject:)
   func getVersionInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetVersionInfo(dict)
@@ -1100,6 +1111,7 @@ class RPCModule: NSObject {
   }
 
   func fnGetMessagesInfo(_ dict: [AnyHashable: Any]) {
+      let reject = dict["reject"] as? RCTPromiseRejectBlock
       if let address = dict["address"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           do {
@@ -1112,15 +1124,16 @@ class RPCModule: NSObject {
             let err = "Error: [Native] messages. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }          
           }
       } else {
           let err = "Error: [Native] messages. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       }
@@ -1128,7 +1141,7 @@ class RPCModule: NSObject {
 
   @objc(getMessagesInfo:resolve:reject:)
   func getMessagesInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["address": address, "resolve": resolve]
+      let dict: [String: Any] = ["address": address, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetMessagesInfo(dict)
@@ -1138,18 +1151,18 @@ class RPCModule: NSObject {
 
 func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try getBalance()
-            let respStr = String(resp)
             DispatchQueue.main.async {
-              resolve(respStr)
+              resolve(resp.toDictionary())
             }
           } catch {
             let err = "Error: [Native] balance. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
-            }          
+              reject?("ZINGO_ERROR", err, nil)
+            }
           }
       } else {
           let err = "Error: [Native] balance. Command arguments problem."
@@ -1159,7 +1172,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getBalanceInfo:reject:)
   func getBalanceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetBalanceInfo(dict)
@@ -1169,6 +1182,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnGetTotalMemobytesToAddressInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try getTotalMemobytesToAddress()
           let respStr = String(resp)
@@ -1179,7 +1193,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] memobytes to address. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -1190,7 +1204,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getTotalMemobytesToAddressInfo:reject:)
   func getTotalMemobytesToAddressInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetTotalMemobytesToAddressInfo(dict)
@@ -1200,6 +1214,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnGetTotalValueToAddressInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try getTotalValueToAddress()
           let respStr = String(resp)
@@ -1210,7 +1225,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] value to address. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -1221,7 +1236,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getTotalValueToAddressInfo:reject:)
   func getTotalValueToAddressInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetTotalValueToAddressInfo(dict)
@@ -1231,6 +1246,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnGetTotalSpendsToAddressInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try getTotalSpendsToAddress()
           let respStr = String(resp)
@@ -1241,7 +1257,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] spends to address. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -1252,7 +1268,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getTotalSpendsToAddressInfo:reject:)
   func getTotalSpendsToAddressInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetTotalSpendsToAddressInfo(dict)
@@ -1261,6 +1277,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnZecPriceInfo(_ dict: [AnyHashable: Any]) {
+      let reject = dict["reject"] as? RCTPromiseRejectBlock
       if let tor = dict["tor"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
@@ -1273,15 +1290,16 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] zec price. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
           let err = "Error: [Native] zec price. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       }
@@ -1289,7 +1307,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(zecPriceInfo:resolve:reject:)
   func zecPriceInfo(_ tor: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["tor": tor, "resolve": resolve]
+      let dict: [String: Any] = ["tor": tor, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnZecPriceInfo(dict)
@@ -1298,6 +1316,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnRemoveTransactionProcess(_ dict: [AnyHashable: Any]) {
+      let reject = dict["reject"] as? RCTPromiseRejectBlock
       if let txid = dict["txid"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
@@ -1310,15 +1329,16 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] remove transaction. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
           let err = "Error: [Native] remove transaction. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       }
@@ -1326,7 +1346,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(removeTransactionProcess:resolve:reject:)
   func removeTransactionProcess(_ txid: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["txid": txid, "resolve": resolve]
+      let dict: [String: Any] = ["txid": txid, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnRemoveTransactionProcess(dict)
@@ -1335,6 +1355,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnGetSpendableBalanceWithAddressInfo(_ dict: [AnyHashable: Any]) {
+      let reject = dict["reject"] as? RCTPromiseRejectBlock
       if let address = dict["address"] as? String,
           let zennies = dict["zennies"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
@@ -1348,15 +1369,16 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] spendable balance address. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
           let err = "Error: [Native] spendable balance address. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       }
@@ -1364,7 +1386,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getSpendableBalanceWithAddressInfo:zennies:resolve:reject:)
   func getSpendableBalanceWithAddressInfo(_ address: String, zennies: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["address": address, "zennies": zennies, "resolve": resolve]
+      let dict: [String: Any] = ["address": address, "zennies": zennies, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetSpendableBalanceWithAddressInfo(dict)
@@ -1374,17 +1396,17 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnGetSpendableBalanceTotalInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try getSpendableBalanceTotal()
-            let respStr = String(resp)
             DispatchQueue.main.async {
-              resolve(respStr)
+              resolve(resp.toDictionary())
             }
           } catch {
             let err = "Error: [Native] spendable balance total. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       } else {
@@ -1395,7 +1417,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getSpendableBalanceTotalInfo:reject:)
   func getSpendableBalanceTotalInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetSpendableBalanceTotalInfo(dict)
@@ -1403,70 +1425,9 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  func fnGetOptionWalletInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try getOptionWallet()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] get option wallet. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] get option wallet. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
-  @objc(getOptionWalletInfo:reject:)
-  func getOptionWalletInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetOptionWalletInfo(dict)
-        }
-      }
-  }
-
-  func fnSetOptionWalletProcess(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try setOptionWallet()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] set option wallet. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] set option wallet. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
-  @objc(setOptionWalletProcess:reject:)
-  func setOptionWalletProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnSetOptionWalletProcess(dict)
-        }
-      }
-  }
-
   func fnCreateTorClientProcess(_ dict: [AnyHashable: Any]) throws {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try createTorClient(datadir: try getDocumentsDirectory())
           let respStr = String(resp)
@@ -1477,7 +1438,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] create tor client. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -1488,7 +1449,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(createTorClientProcess:reject:)
   func createTorClientProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           do {
@@ -1496,7 +1457,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           } catch {
             let err = "Error: [Native] create tor client. Document dir."
             NSLog(err)
-            resolve(err)
+            reject("ZINGO_ERROR", err, nil)
           }
         }
       }
@@ -1504,6 +1465,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnRemoveTorClientProcess(_ dict: [AnyHashable: Any]) throws {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try removeTorClient()
           let respStr = String(resp)
@@ -1514,7 +1476,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] remove tor client. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -1525,7 +1487,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(removeTorClientProcess:reject:)
   func removeTorClientProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           do {
@@ -1533,7 +1495,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           } catch {
             let err = "Error: [Native] remove tor client. Document dir."
             NSLog(err)
-            resolve(err)
+            reject("ZINGO_ERROR", err, nil)
           }
         }
       }
@@ -1541,6 +1503,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnGetUnifiedAddressesInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try getUnifiedAddresses()
             let respStr = String(resp)
@@ -1551,7 +1514,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
             let err = "Error: [Native] unified addresses. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }          
           }
       } else {
@@ -1562,7 +1525,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getUnifiedAddressesInfo:reject:)
   func getUnifiedAddressesInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetUnifiedAddressesInfo(dict)
@@ -1572,6 +1535,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnGetTransparentAddressesInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try getTransparentAddresses()
             let respStr = String(resp)
@@ -1582,7 +1546,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
             let err = "Error: [Native] transparent addresses. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       } else {
@@ -1593,7 +1557,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getTransparentAddressesInfo:reject:)
   func getTransparentAddressesInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetTransparentAddressesInfo(dict)
@@ -1602,6 +1566,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnCreateNewUnifiedAddressProcess(_ dict: [AnyHashable: Any]) {
+      let reject = dict["reject"] as? RCTPromiseRejectBlock
       if let receivers = dict["receivers"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
@@ -1614,15 +1579,16 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] create new unified address. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
           let err = "Error: [Native] create new unified address. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       }
@@ -1630,7 +1596,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(createNewUnifiedAddressProcess:resolve:reject:)
   func createNewUnifiedAddressProcess(_ receivers: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["receivers": receivers, "resolve": resolve]
+      let dict: [String: Any] = ["receivers": receivers, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnCreateNewUnifiedAddressProcess(dict)
@@ -1640,6 +1606,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnCreateNewTransparentAddressProcess(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try createNewTransparentAddress()
           let respStr = String(resp)
@@ -1650,7 +1617,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] create new transparent address. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -1661,7 +1628,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(createNewTransparentAddressProcess:reject:)
   func createNewTransparentAddressProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnCreateNewTransparentAddressProcess(dict)
@@ -1670,6 +1637,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnCheckMyAddressInfo(_ dict: [AnyHashable: Any]) {
+      let reject = dict["reject"] as? RCTPromiseRejectBlock
       if let address = dict["address"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
@@ -1682,15 +1650,16 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] check address. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
           let err = "Error: [Native] check address. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       }
@@ -1698,7 +1667,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(checkMyAddressInfo:resolve:reject:)
   func checkMyAddressInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["address": address, "resolve": resolve]
+      let dict: [String: Any] = ["address": address, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnCheckMyAddressInfo(dict)
@@ -1708,18 +1677,18 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnGetWalletSaveRequiredInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try getWalletSaveRequired()
-          let respStr = String(resp)
           DispatchQueue.main.async {
-            resolve(respStr)
+            resolve(resp.toDictionary())
           }
         } catch {
           let err = "Error: [Native] get wallet save required. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
-          }          
+            reject?("ZINGO_ERROR", err, nil)
+          }
         }
       } else {
           let err = "Error: [Native] get wallet save required. Command arguments problem."
@@ -1729,7 +1698,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getWalletSaveRequiredInfo:reject:)
   func getWalletSaveRequiredInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetWalletSaveRequiredInfo(dict)
@@ -1738,6 +1707,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnSetConfigWalletToProdProcess(_ dict: [AnyHashable: Any]) {
+      let reject = dict["reject"] as? RCTPromiseRejectBlock
       if let performancelevel = dict["performancelevel"] as? String,
           let minconfirmations = dict["minconfirmations"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
@@ -1751,15 +1721,16 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           let err = "Error: [Native] set wallet config prod. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
           let err = "Error: [Native] set wallet config prod. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
             DispatchQueue.main.async {
-              resolve(err)
+              reject?("ZINGO_ERROR", err, nil)
             }
           }
       }
@@ -1767,7 +1738,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(setConfigWalletToProdProcess:minconfirmations:resolve:reject:)
   func setConfigWalletToProdProcess(_ performancelevel: String, minconfirmations: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["performancelevel": performancelevel, "minconfirmations": minconfirmations, "resolve": resolve]
+      let dict: [String: Any] = ["performancelevel": performancelevel, "minconfirmations": minconfirmations, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnSetConfigWalletToProdProcess(dict)
@@ -1777,18 +1748,18 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnGetConfigWalletPerformanceInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try getConfigWalletPerformance()
-            let respStr = String(resp)
             DispatchQueue.main.async {
-              resolve(respStr)
+              resolve(resp.toDictionary())
             }
           } catch {
             let err = "Error: [Native] get wallet config performance level. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
-            }          
+              reject?("ZINGO_ERROR", err, nil)
+            }
           }
       } else {
           let err = "Error: [Native] get wallet config performance level. Command arguments problem."
@@ -1798,7 +1769,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getConfigWalletPerformanceInfo:reject:)
   func getConfigWalletPerformanceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetConfigWalletPerformanceInfo(dict)
@@ -1808,18 +1779,18 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnGetWalletVersionInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
           do {
             let resp = try getWalletVersion()
-            let respStr = String(resp)
             DispatchQueue.main.async {
-              resolve(respStr)
+              resolve(resp.toDictionary())
             }
           } catch {
             let err = "Error: [Native] get wallet version. \(error.localizedDescription)"
             NSLog(err)
             DispatchQueue.main.async {
-              resolve(err)
-            }          
+              reject?("ZINGO_ERROR", err, nil)
+            }
           }
       } else {
           let err = "Error: [Native] get wallet version. Command arguments problem."
@@ -1829,7 +1800,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(getWalletVersionInfo:reject:)
   func getWalletVersionInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetWalletVersionInfo(dict)
@@ -1838,35 +1809,33 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnSendProcess(_ dict: [AnyHashable: Any]) {
+    let reject = dict["reject"] as? RCTPromiseRejectBlock
     if let send_json = dict["send_json"] as? String,
         let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       do {
         let resp = try send(sendJson: send_json)
-        let respStr = String(resp)
         DispatchQueue.main.async {
-          resolve(respStr)
+          resolve(resp.toDictionary())
         }
       } catch {
         let err = "Error: [Native] send. \(error.localizedDescription)"
         NSLog(err)
         DispatchQueue.main.async {
-          resolve(err)
+          reject?("ZINGO_ERROR", err, nil)
         }
       }
     } else {
         let err = "Error: [Native] send. Command arguments problem."
         NSLog(err)
-        if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          DispatchQueue.main.async {
-            resolve(err)
-          }
+        DispatchQueue.main.async {
+          reject?("ZINGO_ERROR", err, nil)
         }
     }
   }
 
   @objc(sendProcess:resolve:reject:)
   func sendProcess(_ send_json: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["send_json": send_json, "resolve": resolve]
+      let dict: [String: Any] = ["send_json": send_json, "resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnSendProcess(dict)
@@ -1876,17 +1845,17 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnShieldProcess(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try shield()
-          let respStr = String(resp)
           DispatchQueue.main.async {
-            resolve(respStr)
+            resolve(resp.toDictionary())
           }
         } catch {
           let err = "Error: [Native] shield. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -1897,7 +1866,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(shieldProcess:reject:)
   func shieldProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnShieldProcess(dict)
@@ -1907,17 +1876,17 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   func fnConfirmProcess(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let reject = dict["reject"] as? RCTPromiseRejectBlock
         do {
           let resp = try confirm()
-          let respStr = String(resp)
           DispatchQueue.main.async {
-            resolve(respStr)
+            resolve(resp.toDictionary())
           }
         } catch {
           let err = "Error: [Native] confirm. \(error.localizedDescription)"
           NSLog(err)
           DispatchQueue.main.async {
-            resolve(err)
+            reject?("ZINGO_ERROR", err, nil)
           }
         }
       } else {
@@ -1928,7 +1897,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
 
   @objc(confirmProcess:reject:)
   func confirmProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+      let dict: [String: Any] = ["resolve": resolve, "reject": reject]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnConfirmProcess(dict)
@@ -1936,4 +1905,83 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
+}
+
+// UniFFI struct → React Native bridge conversions.
+// Double is used for UInt64 fields: all ZEC amounts fit within IEEE 754 double's 2^53 exact range.
+
+extension BalancesInfo {
+  func toDictionary() -> [String: Any] {
+    return [
+      "total_orchard_balance":           Double(totalOrchardBalance),
+      "total_sapling_balance":           Double(totalSaplingBalance),
+      "total_transparent_balance":       Double(totalTransparentBalance),
+      "confirmed_orchard_balance":       Double(confirmedOrchardBalance),
+      "confirmed_sapling_balance":       Double(confirmedSaplingBalance),
+      "confirmed_transparent_balance":   Double(confirmedTransparentBalance),
+      "unconfirmed_orchard_balance":     Double(unconfirmedOrchardBalance),
+      "unconfirmed_sapling_balance":     Double(unconfirmedSaplingBalance),
+      "unconfirmed_transparent_balance": Double(unconfirmedTransparentBalance),
+    ]
+  }
+}
+
+extension SpendableBalanceInfo {
+  func toDictionary() -> [String: Any] {
+    return ["spendable_balance": Double(spendableBalance)]
+  }
+}
+
+extension WalletHeightInfo {
+  func toDictionary() -> [String: Any] {
+    return ["height": height]
+  }
+}
+
+extension WalletVersionInfo {
+  func toDictionary() -> [String: Any] {
+    return ["current_version": currentVersion, "read_version": readVersion]
+  }
+}
+
+extension WalletSaveRequiredInfo {
+  func toDictionary() -> [String: Any] {
+    return ["save_required": saveRequired]
+  }
+}
+
+extension SeedInfo {
+  func toDictionary() -> [String: Any] {
+    return ["seed_phrase": seedPhrase, "birthday": birthday, "no_of_accounts": noOfAccounts]
+  }
+}
+
+extension UfvkInfo {
+  func toDictionary() -> [String: Any] {
+    return ["ufvk": ufvk, "birthday": birthday]
+  }
+}
+
+extension ProposalInfo {
+  func toDictionary() -> [String: Any] {
+    return ["fee": Double(fee)]
+  }
+}
+
+extension ShieldProposalInfo {
+  func toDictionary() -> [String: Any] {
+    return ["fee": Double(fee), "value_to_shield": Double(valueToShield)]
+  }
+}
+
+extension ConfirmInfo {
+  func toDictionary() -> [String: Any] {
+    return ["txids": txids]
+  }
+}
+
+extension PerformanceInfo {
+  func toDictionary() -> [String: Any] {
+    return ["performance_level": performanceLevel]
+  }
 }
