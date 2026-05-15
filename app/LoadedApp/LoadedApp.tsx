@@ -39,7 +39,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import WalletBackend from '../walletBackend';
+import WalletBackend, { fetchWallet } from '../walletBackend';
 import RPCModule from '../RPCModule';
 import {
   AppStateLoaded,
@@ -1764,7 +1764,7 @@ export class LoadedAppClass extends Component<
     if (!value) {
       await removeRecoveryWalletInfo();
     } else {
-      const wallet = await RPC.rpcFetchWallet(this.state.readOnly);
+      const wallet = await fetchWallet(this.state.readOnly);
       if (wallet) {
         await createUpdateRecoveryWalletInfo(wallet);
       }

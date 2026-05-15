@@ -16,9 +16,9 @@ import {
 import TotalBalanceClass from '../AppState/classes/TotalBalanceClass';
 import NetInfoType from '../AppState/types/NetInfoType';
 import { createAlert } from '../createAlert';
-import RPC from '../rpc';
-import { RPCShieldProposeType } from '../rpc/types/RPCShieldProposeType';
-import { RPCShieldType } from '../rpc/types/RPCShieldType';
+import { shieldFunds as executeShieldFunds } from '../walletBackend';
+import { RPCShieldProposeType } from '../walletBackend/types/RPCShieldProposeType';
+import { RPCShieldType } from '../walletBackend/types/RPCShieldType';
 import RPCModule from '../RPCModule';
 import Utils from '../utils';
 
@@ -179,7 +179,7 @@ export function useShieldFunds({
 
     navigation.navigate(RouteEnum.Computing);
     await RPCModule.shieldProcess();
-    const shieldStr = await RPC.rpcShieldFunds();
+    const shieldStr = await executeShieldFunds();
 
     if (shieldStr) {
       if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
