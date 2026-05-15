@@ -81,7 +81,7 @@ namespace zingo {
 
   [Throws=ZingolibError]
   SeedInfo init_from_seed(
-      string seed,
+      string seed_phrase,
       u32 birthday,
       string serveruri,
       string chainhint,

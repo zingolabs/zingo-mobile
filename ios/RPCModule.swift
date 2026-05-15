@@ -277,7 +277,7 @@ class RPCModule: NSObject {
     performancelevel: String,
     minconfirmations: String
   ) throws -> SeedInfo {
-    let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initFromSeed(seedPhrase: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     try self.saveWalletInternal()
     return seed
   }

@@ -378,9 +378,8 @@ pub fn init_new(
     })
 }
 
-// TODO: change `seed` to `seed_phrase` or `mnemonic_phrase`
 pub fn init_from_seed(
-    seed: String,
+    seed_phrase: String,
     birthday: u32,
     server_uri: String,
     chain_hint: String,
@@ -392,7 +391,7 @@ pub fn init_from_seed(
         let (config, _lightwalletd_uri) =
             construct_uri_load_config(server_uri, chain_hint, performance_level, min_confirmations)
                 .map_err(|e| ZingolibError::InvalidInput { message: e })?;
-        let mnemonic = Mnemonic::from_phrase(seed)
+        let mnemonic = Mnemonic::from_phrase(seed_phrase)
             .map_err(|e| ZingolibError::InvalidInput { message: e.to_string() })?;
         let wallet = LightWallet::new(
             config.chain,
