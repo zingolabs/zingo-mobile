@@ -1750,10 +1750,10 @@
     react-native-drawer-layout "^4.2.3"
     use-latest-callback "^0.2.4"
 
-"@react-navigation/elements@^2.6.4", "@react-navigation/elements@^2.9.17":
-  version "2.9.17"
-  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.17.tgz#2ad61b9e7b5441ce9ae039b51cfc779515dd3256"
-  integrity sha512-Prax9RDS6l32npcl4PzvL88VoXe9HdtcIUP2+rim3DLVSZceD6oreA+cmPBUjeLFjsnxKlU3pTRby3RpYJ5/xw==
+"@react-navigation/elements@^2.9.17", "@react-navigation/elements@^2.9.18":
+  version "2.9.18"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.18.tgz#6197631c44dde42c63b623df4f4d3276611aa1b2"
+  integrity sha512-mKEvDr6CkCVYZSb8W9WubNseihL+1c8M7ktZJCTCbMk8rQgdQfkdRNwpSUQKspdGpUHCb9cyzvaiuzl1NtjVgw==
   dependencies:
     color "^4.2.3"
     use-latest-callback "^0.2.4"
