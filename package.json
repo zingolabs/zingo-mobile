@@ -19,7 +19,11 @@
     "build:debug:split": "cd android && ./gradlew assembleDebug -PsplitApk=true && cd ..",
     "cargo:update": "cd rust && cargo update -p zingolib -p regchest_utils --aggressive && cd ..",
     "cargo:clean": "cd rust && cargo clean && cd ..",
-    "cargo:check": "cd rust && cargo check && cd .."
+    "cargo:check": "cd rust && cargo check && cd ..",
+    "rust:android": "node rust/android/build_android.mjs",
+    "rust:android-local": "node rust/android/build_android_local.mjs",
+    "rust:ios": "node rust/ios/build_ios.mjs",
+    "rust:ios-sim": "node rust/ios/build_ios_sim.mjs"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.0.1",
