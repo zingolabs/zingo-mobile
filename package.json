@@ -50,7 +50,7 @@
     "react-native-biometrics": "^3.0.1",
     "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-context-menu-view": "^1.20.0",
-    "react-native-device-info": "^14.1.1",
+    "react-native-device-info": "^15.0.2",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "2.31.2",
     "react-native-gifted-charts": "^1.4.64",
