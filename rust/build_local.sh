@@ -31,7 +31,7 @@ if [ "$#" -eq 0 ];
 then
   for phase in "${PHASES[@]}"
   do
-    ./buildphases/local/$phase.sh;
+    ./android/buildphases/local/$phase.sh;
   done
   exit 0;
 else
@@ -39,7 +39,7 @@ else
   do
     if [ "$1" == "$phase" ];
     then
-      ./buildphases/local/$1.sh;
+      ./android/buildphases/local/$1.sh;
       exit 0;
     fi
   done
