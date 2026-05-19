@@ -12,17 +12,17 @@
 ## Building for physical device
 1. Clone the repository.
 2. Go to the cloned repo `cd zingo-mobile`.
-3. From the root of the project, build the Rust universal lib for iOS device:
+3. From the root of the project, install JS deps: `yarn`
+4. Build the Rust universal lib for iOS device:
    `yarn rust:ios` — may take a long time on first run.
-4. From the root of the project, run: `yarn`
 5. In the `ios` directory, run: `pod install`
 
 ## Building for simulator
 1. Clone the repository.
 2. Go to the cloned repo `cd zingo-mobile`.
-3. From the root of the project, build the Rust universal lib for iOS simulator:
+3. From the root of the project, install JS deps: `yarn`
+4. Build the Rust universal lib for iOS simulator:
    `yarn rust:ios-sim` — may take a long time on first run.
-4. From the root of the project, run: `yarn`
 5. In the `ios` directory, run: `pod install`
 
 ## Launching the app
