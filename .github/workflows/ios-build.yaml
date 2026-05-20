@@ -97,7 +97,7 @@ jobs:
         run: brew install protobuf
 
       - name: Install iOS Rust targets (device + simulator)
-        run: sudo rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
+        run: rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
 
       # this issue is solved in bindgen 0.70
       # But we have a dependency that are using a incompatible version 0.69.
