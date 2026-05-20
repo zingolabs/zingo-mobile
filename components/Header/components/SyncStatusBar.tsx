@@ -87,7 +87,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
         }}
       >
         {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
-          <View style={{ minHeight: 29, flexDirection: 'row', gap: 8 }}>
+          <View style={{ minHeight: 29, flexDirection: 'row', gap: 8, alignItems: 'center' }}>
             {netInfo.isConnected && !(percentageOutputsScanned === 0) ? (
               <>
                 {!syncInProgress && (

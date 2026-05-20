@@ -169,9 +169,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            paddingBottom: 0,
             backgroundColor: colors.card,
             paddingTop: 10,
+            paddingBottom: 10,
             minHeight: !noDrawMenu ? 60 : 25,
           }}
         >
@@ -224,10 +224,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             padding: 11.5,
             position: 'absolute',
             left: 0,
+            top: 10,
           }}
         >
           <View
-            style={{ alignItems: 'center', flexDirection: 'row', height: 40 }}
+            style={{ alignItems: 'center', flexDirection: 'row' }}
           >
             {!noDrawMenu && (
               <TouchableOpacity
@@ -282,6 +283,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             padding: 13,
             position: 'absolute',
             right: 0,
+            top: 10,
           }}
         >
           {!noDrawMenu && screenName !== ScreenEnum.Settings ? (
