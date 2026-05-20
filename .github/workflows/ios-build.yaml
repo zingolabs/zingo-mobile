@@ -81,17 +81,17 @@ jobs:
           echo "$first_line" | grep -vqE '\b(branch|tag)[[:space:]]*='
 
           cd rust
-          sudo rustup default stable
-          sudo cargo update -p zingolib -p regchest_utils --aggressive
+          rustup default stable
+          cargo update -p zingolib -p regchest_utils --aggressive
 
       - name: Cargo default stable
         run: |
-          sudo rustup update
-          sudo rustup upgrade
-          sudo rustup default stable
+          rustup update
+          rustup upgrade
+          rustup default stable
 
       - name: Install bindgen-cli (needed by aws-lc-sys, ring etc.)
-        run: sudo cargo install --force --locked bindgen-cli
+        run: cargo install --force --locked bindgen-cli
 
       - name: Install protoc
         run: brew install protobuf
