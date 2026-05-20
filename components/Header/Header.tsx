@@ -2,7 +2,6 @@
 import {
   faBars,
   faChevronLeft,
-  faGear,
   faSnowflake,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -31,6 +30,8 @@ import { useSyncStatus } from '../../app/hooks/useSyncStatus';
 import BoldText from '../Components/BoldText';
 import SyncStatusBar from './components/SyncStatusBar';
 import BalanceRow from './components/BalanceRow';
+import { MessagesIcon } from '../Components/Icons/MessagesIcon';
+import { MessagesIcon as BoltIcon } from '../Components/Icons/BoltIcon';
 
 type HeaderProps = {
   // general
@@ -64,6 +65,8 @@ type HeaderProps = {
   setBackgroundError?: (title: string, error: string) => void;
   // first funds received legend for the Seed screen
   receivedLegend?: boolean;
+  // show messages icon next to settings
+  showMessagesIcon?: boolean;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -88,6 +91,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setScrollToBottom,
   closeScreen,
   noUfvkIcon,
+  showMessagesIcon,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -281,7 +285,18 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           }}
         >
           {!noDrawMenu && screenName !== ScreenEnum.Settings ? (
-            <>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+              {showMessagesIcon && (
+                <TouchableOpacity
+                  testID="header.messages"
+                  onPress={() => navigation.navigate(RouteEnum.Messages)}
+                >
+                  <MessagesIcon
+                    size={26}
+                    color={colors.border}
+                  />
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 style={{ marginRight: 5 }}
                 testID="header.settings"
@@ -296,13 +311,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   }
                 }}
               >
-                <FontAwesomeIcon
-                  icon={faGear}
+                <BoltIcon
                   size={28}
                   color={colors.border}
                 />
               </TouchableOpacity>
-            </>
+            </View>
           ) : (
             <Image
               source={require('../../assets/img/logobig-zingo.png')}

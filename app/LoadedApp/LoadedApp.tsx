@@ -108,6 +108,7 @@ import Settings from '../../components/Settings';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
+import MessageList from '../../components/Messages/components/MessageList';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
@@ -2065,6 +2066,7 @@ export class LoadedAppClass extends Component<
       totalBalance,
       translate,
       scrollToTop,
+      scrollToBottom,
       addresses,
       somePending,
       selectServer,
@@ -2594,6 +2596,21 @@ export class LoadedAppClass extends Component<
                 name={RouteEnum.ScannerAddress}
                 component={ScannerAddress}
               />
+              <Drawer.Screen name={RouteEnum.Messages}>
+                {props => (
+                  <MessageList
+                    {...props}
+                    toggleMenuDrawer={() =>
+                      props.navigation.toggleDrawer()
+                    }
+                    closeScreen={() => props.navigation.goBack()}
+                    setScrollToBottom={this.setScrollToBottom}
+                    scrollToBottom={scrollToBottom}
+                    sendTransaction={this.sendTransaction}
+                    setServerOption={this.setServerOption}
+                  />
+                )}
+              </Drawer.Screen>
               <Drawer.Screen
                 name={RouteEnum.MessagesAddress}
                 component={MessagesAddress}

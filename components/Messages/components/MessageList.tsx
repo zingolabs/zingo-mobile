@@ -76,6 +76,7 @@ type MessageListProps = DrawerScreenProps<
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
   address?: string;
+  closeScreen?: () => void;
   closeModal?: () => void;
   sendTransaction?: (s: SendPageStateClass) => Promise<String>;
   setServerOption?: (
@@ -91,6 +92,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   setScrollToBottom,
   scrollToBottom,
   address,
+  closeScreen,
   sendTransaction,
   setServerOption,
 }) => {
@@ -576,6 +578,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             title={translate('messages.title') as string}
             screenName={screenName}
             toggleMenuDrawer={toggleMenuDrawer}
+            closeScreen={closeScreen}
             noBalance={true}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar /* context */}
@@ -675,7 +678,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               opacity: loading || !firstScrollToBottomDone ? 0 : 1,
             }}
           >
-            {loadMoreButton ? (
+            {loadMoreButton && (
               <View
                 style={{
                   display: 'flex',
@@ -691,38 +694,22 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   onPress={loadMoreClicked}
                 />
               </View>
-            ) : (
-              <>
-                {!!messagesSliced && !!messagesSliced.length ? (
-                  <View
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      marginTop: 10,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <FadeText style={{ color: colors.primary }}>
-                      {translate('history.end') as string}
-                    </FadeText>
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      marginTop: 10,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <FadeText style={{ color: colors.primary }}>
-                      {translate('messages.empty') as string}
-                    </FadeText>
-                  </View>
-                )}
-              </>
+            )}
+
+            {!loadMoreButton && !!messagesSliced && !messagesSliced.length && (
+              <View
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: 10,
+                  marginBottom: 10,
+                }}
+              >
+                <FadeText style={{ color: colors.primary }}>
+                  {translate('messages.empty') as string}
+                </FadeText>
+              </View>
             )}
 
             {messagesSliced &&
@@ -752,6 +739,21 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   />
                 );
               })}
+            {!loadMoreButton && !!messagesSliced && !!messagesSliced.length && (
+              <View
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: 10,
+                  marginBottom: 10,
+                }}
+              >
+                <FadeText style={{ color: colors.primary }}>
+                  {translate('history.end') as string}
+                </FadeText>
+              </View>
+            )}
             <View style={{ marginBottom: 10 }} />
           </ScrollView>
           {!isAtBottom && scrollable && !loading && firstScrollToBottomDone && (

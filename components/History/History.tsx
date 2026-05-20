@@ -503,6 +503,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           setScrollToTop={setScrollToTop}
           setScrollToBottom={setScrollToBottom}
           setBackgroundError={setBackgroundError /* context */}
+          showMessagesIcon={true}
         />
         <View
           style={{
