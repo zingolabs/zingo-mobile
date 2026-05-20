@@ -52,11 +52,7 @@ const PrivacyToggle: React.FC<PrivacyToggleProps> = React.memo(
             }}
           >
             {privacy ? (
-              <FontAwesomeIcon
-                icon={faLock}
-                size={20}
-                color={colors.primary}
-              />
+              <FontAwesomeIcon icon={faLock} size={20} color={colors.primary} />
             ) : (
               <FontAwesomeIcon
                 icon={faLockOpen}
