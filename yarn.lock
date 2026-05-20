@@ -1750,7 +1750,7 @@
     react-native-drawer-layout "^4.2.4"
     use-latest-callback "^0.2.4"
 
-"@react-navigation/elements@^2.9.17", "@react-navigation/elements@^2.9.18":
+"@react-navigation/elements@^2.9.18":
   version "2.9.18"
   resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.18.tgz#6197631c44dde42c63b623df4f4d3276611aa1b2"
   integrity sha512-mKEvDr6CkCVYZSb8W9WubNseihL+1c8M7ktZJCTCbMk8rQgdQfkdRNwpSUQKspdGpUHCb9cyzvaiuzl1NtjVgw==
