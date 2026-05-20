@@ -2,7 +2,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Dimensions, Image, TouchableOpacity } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
+import { advancedTheme, basicTheme } from '../../../App';
 
 import RegText from '../../../components/Components/RegText';
 
@@ -329,17 +330,24 @@ const Menu: React.FunctionComponent<MenuProps> = ({
             {'Zingo '}
             <Text
               style={{
-                color: colors.primary,
+                color:
+                  mode === ModeEnum.basic
+                    ? advancedTheme.colors.primary
+                    : basicTheme.colors.primary,
                 fontWeight: 'bold',
                 fontSize: 14,
               }}
             >
-              {translate(`settings.value-mode-${mode}`) as string}
+              {
+                translate(
+                  `settings.value-mode-${mode === ModeEnum.basic ? ModeEnum.advanced : ModeEnum.basic}`,
+                ) as string
+              }
             </Text>
           </Text>
           <FontAwesomeIcon
-            icon={faChevronRight}
-            size={22}
+            icon={faArrowsRotate}
+            size={18}
             color={colors.zingo}
           />
         </TouchableOpacity>
@@ -354,6 +362,11 @@ const Menu: React.FunctionComponent<MenuProps> = ({
           {'Version: '}
           <Text style={{ color: colors.primaryDisabled }}>
             {translate('version') as string}
+          </Text>
+          {'   '}
+          {translate('settings.mode') as string}
+          <Text style={{ color: colors.primaryDisabled }}>
+            {translate(`settings.value-mode-${mode}`) as string}
           </Text>
         </Text>
       </View>

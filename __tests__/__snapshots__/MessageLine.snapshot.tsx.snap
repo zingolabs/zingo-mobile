@@ -112,8 +112,8 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 18,
-                "fontWeight": "600",
+                "fontSize": 15,
+                "fontWeight": "400",
                 "opacity": 1,
               }
             }
@@ -475,8 +475,8 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
                   style={
                     {
                       "color": "#c3c3c3",
-                      "fontSize": 18,
-                      "fontWeight": "600",
+                      "fontSize": 15,
+                      "fontWeight": "400",
                       "opacity": 1,
                     }
                   }
@@ -535,8 +535,8 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 18,
-                "fontWeight": "600",
+                "fontSize": 15,
+                "fontWeight": "400",
                 "opacity": 1,
               }
             }

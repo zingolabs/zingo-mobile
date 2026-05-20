@@ -252,7 +252,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             <FontAwesomeIcon
               icon={faCloudDownload}
               color={!netInfo.isConnected ? 'red' : 'yellow'}
-              size={20}
+              size={16}
               style={{ marginBottom: 5, marginLeft: 5 }}
             />
           </View>

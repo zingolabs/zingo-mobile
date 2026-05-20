@@ -182,8 +182,8 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
 
-          sudo docker image prune --all --force || true
-          sudo docker builder prune -a || true
+          podman image prune --all --force || true
+          podman system prune --all --force || true
 
           echo "Disk space after cleanup:"
           df -h
@@ -267,7 +267,6 @@ jobs:
 
       - name: Grant permissions
         run: |
-          sudo chmod 777 /var/run/docker.sock
           sudo chmod 777 ./scripts/ci/android_integration_tests_ci.sh
 
       - name: Enable KVM
@@ -340,8 +339,8 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
 
-          sudo docker image prune --all --force || true
-          sudo docker builder prune -a || true
+          podman image prune --all --force || true
+          podman system prune --all --force || true
 
           echo "Disk space after cleanup:"
           df -h
@@ -361,21 +360,21 @@ jobs:
           name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
           path: android/app/build/outputs
 
-      #- name: Pull docker image
-      #  run: docker pull zingodevops/regchest:013
+      #- name: Pull ci-build image
+      #  run: podman pull zingodevops/regchest:013
 
-      - name: Pull ci-build docker image
-        run: docker pull zingodevops/ci-build:010
+      - name: Pull ci-build image
+        run: podman pull docker.io/zingodevops/ci-build:010
 
       - name: Extract binaries & params from image
         run: |
           set -euxo pipefail
-          cid=$(docker create zingodevops/ci-build:010)
+          cid=$(podman create docker.io/zingodevops/ci-build:010)
           mkdir -p rust/test_binaries/bins
-          docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
-          docker rm "$cid"
+          podman cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
+          podman cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
+          podman cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
+          podman rm "$cid"
 
       - name: binaries env var
         run: |

@@ -702,7 +702,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               icon={
                 typeOption(item.value) === valueOption ? faDotCircle : farCircle
               }
-              size={20}
+              size={16}
               color={colors.border}
             />
             <RegText key={'text-' + item.value} style={{ marginLeft: 10 }}>
@@ -940,7 +940,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 </RegText>
                 <FontAwesomeIcon
                   icon={faChevronRight}
-                  size={16}
+                  size={12}
                   color={colors.zingo}
                 />
               </View>
@@ -970,7 +970,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   >
                     <FontAwesomeIcon
                       icon={faInfoCircle}
-                      size={18}
+                      size={14}
                       color={colors.text}
                     />
                   </TouchableOpacity>
@@ -1023,7 +1023,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   >
                     <FontAwesomeIcon
                       icon={faInfoCircle}
-                      size={18}
+                      size={14}
                       color={colors.text}
                     />
                   </TouchableOpacity>
@@ -1077,7 +1077,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   >
                     <FontAwesomeIcon
                       icon={faInfoCircle}
-                      size={18}
+                      size={14}
                       color={colors.text}
                     />
                   </TouchableOpacity>
@@ -1130,7 +1130,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   >
                     <FontAwesomeIcon
                       icon={faInfoCircle}
-                      size={18}
+                      size={14}
                       color={colors.text}
                     />
                   </TouchableOpacity>
@@ -1192,7 +1192,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   >
                     <FontAwesomeIcon
                       icon={faInfoCircle}
-                      size={18}
+                      size={14}
                       color={colors.text}
                     />
                   </TouchableOpacity>
@@ -1296,7 +1296,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   </RegText>
                   <FontAwesomeIcon
                     icon={faChevronRight}
-                    size={16}
+                    size={12}
                     color={colors.zingo}
                   />
                 </View>
@@ -1333,7 +1333,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   </RegText>
                   <FontAwesomeIcon
                     icon={faChevronRight}
-                    size={16}
+                    size={12}
                     color={colors.zingo}
                   />
                 </View>
@@ -1362,7 +1362,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               >
                 <FontAwesomeIcon
                   icon={faInfoCircle}
-                  size={18}
+                  size={14}
                   color={colors.text}
                 />
               </TouchableOpacity>
@@ -1476,7 +1476,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       {offlineIcon && (
                         <FontAwesomeIcon
                           icon={offlineIcon}
-                          size={20}
+                          size={16}
                           color={colors.border}
                         />
                       )}
@@ -1524,7 +1524,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       {autoIcon && (
                         <FontAwesomeIcon
                           icon={autoIcon}
-                          size={20}
+                          size={16}
                           color={colors.border}
                         />
                       )}
@@ -1607,7 +1607,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         {listIcon && (
                           <FontAwesomeIcon
                             icon={listIcon}
-                            size={20}
+                            size={16}
                             color={colors.border}
                           />
                         )}
@@ -1639,7 +1639,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       {listIcon && (
                         <FontAwesomeIcon
                           icon={listIcon}
-                          size={20}
+                          size={16}
                           color={colors.border}
                         />
                       )}
@@ -1688,7 +1688,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       {customIcon && (
                         <FontAwesomeIcon
                           icon={customIcon}
-                          size={20}
+                          size={16}
                           color={colors.border}
                         />
                       )}
@@ -1861,7 +1861,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             onPress={() => securityBottomSheetRef.current?.close()}
           >
             <FontAwesomeIcon
-              size={30}
+              size={24}
               icon={faXmark}
               color={colors.text}
               style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}

@@ -43,22 +43,26 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 
   useEffect(() => {
-    const parseAddress = async (
-      addr: string,
-    ): Promise<{ isValid: boolean; onlyOrchardUA: string }> => {
-      return await Utils.isValidAddress(addr, server.chainName);
-    };
+    let cancelled = false;
 
     if (address) {
-      parseAddress(address).then(r => {
-        //console.log(r);
-        setValidAddress(r.isValid ? 1 : -1);
-        setError(r.isValid ? '' : (translate('send.invalidaddress') as string));
+      Utils.isValidAddress(address, server.chainName).then(r => {
+        if (!cancelled) {
+          //console.log(r);
+          setValidAddress(r.isValid ? 1 : -1);
+          setError(
+            r.isValid ? '' : (translate('send.invalidaddress') as string),
+          );
+        }
       });
     } else {
       setValidAddress(0);
       setError('');
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [address, server.chainName, setError, translate]);
 
   const setQrcodeModalShow = () => {
@@ -154,7 +158,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 >
                   <FontAwesomeIcon
                     style={{ marginRight: 5 }}
-                    size={25}
+                    size={20}
                     icon={faXmark}
                     color={colors.primaryDisabled}
                   />
@@ -171,7 +175,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
               >
                 <FontAwesomeIcon
                   style={{ marginRight: 5 }}
-                  size={35}
+                  size={28}
                   icon={faQrcode}
                   color={colors.border}
                 />

@@ -32,13 +32,11 @@ export default class SettingsFileImpl {
 
     //console.log(' settings write', newSettings);
 
-    RNFS.writeFile(fileName, JSON.stringify(newSettings), GlobalConst.utf8)
-      .then(() => {
-        //console.log('FILE WRITTEN!')
-      })
-      .catch(err => {
-        console.log('settings write file:', err.message);
-      });
+    await RNFS.writeFile(
+      fileName,
+      JSON.stringify(newSettings),
+      GlobalConst.utf8,
+    );
   }
 
   // Read the server setting

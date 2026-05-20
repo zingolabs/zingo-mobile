@@ -48,7 +48,7 @@ const basicPalette: string[] = [
   '#040C17',
 ];
 
-const advancedTheme: ThemeType = {
+export const advancedTheme: ThemeType = {
   ...DefaultTheme,
   dark: true,
   colors: {
@@ -86,7 +86,7 @@ const advancedTheme: ThemeType = {
   },
 };
 
-const basicTheme: ThemeType = {
+export const basicTheme: ThemeType = {
   ...DefaultTheme,
   dark: true,
   colors: {

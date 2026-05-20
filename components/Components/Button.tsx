@@ -77,7 +77,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     padding: 0,
     paddingLeft: 20,
     paddingRight: 20,
-    borderRadius: 10,
+    borderRadius: 24,
     maxWidth: '90%',
     minWidth: '30%',
     minHeight: 48,
@@ -101,7 +101,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           : type === ButtonTypeEnum.Ghost
             ? {
                 color: colors.text,
-                textTransform: 'lowercase',
+                textTransform: 'none',
               }
             : type === ButtonTypeEnum.Nym
               ? {
@@ -112,8 +112,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
                   color: colors.background,
                 };
   const styleTextCommon: TextStyle = {
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
+    fontWeight: '600',
+    textTransform: 'none',
     fontSize: 16,
     textAlign: 'center',
   };

@@ -179,7 +179,7 @@ const ValueTransferDetail: React.FunctionComponent<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [valueTransfer.address]);
 
-  const handleTxIDClick = (txid?: string) => {
+  const handleTxIDClick = async (txid?: string) => {
     if (!txid) {
       return;
     }
@@ -189,13 +189,12 @@ const ValueTransferDetail: React.FunctionComponent<
       server.chainName,
       blockExplorer,
     );
-    Linking.canOpenURL(url).then(supported => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        console.log("Don't know how to open URI: " + url);
-      }
-    });
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      console.log("Don't know how to open URI: " + url);
+    }
   };
 
   // if the App is syncing, the VT list will change (new items).
@@ -355,7 +354,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   ? colors.primaryDisabled
                   : colors.primary
               }
-              size={30}
+              size={24}
             />
           </TouchableOpacity>
           <FadeText>{(valueTransferIndex + 1).toString()}</FadeText>
@@ -371,7 +370,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   ? colors.primaryDisabled
                   : colors.primary
               }
-              size={30}
+              size={24}
             />
           </TouchableOpacity>
         </View>
@@ -470,7 +469,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   : 1,
             }}
             currencyName={info.currencyName}
-            size={36}
+            size={28}
             amtZec={valueTransfer.amount}
             privacy={privacy}
             smallPrefix={true}
@@ -530,7 +529,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   style={{ marginRight: 5 }}
                   icon={faTriangleExclamation}
                   color={colors.syncing}
-                  size={15}
+                  size={12}
                 />
               )}
               {(valueTransfer.status ===
@@ -748,7 +747,7 @@ const ValueTransferDetail: React.FunctionComponent<
                         : 1,
                   }}
                   amtZec={valueTransfer.fee}
-                  size={18}
+                  size={14}
                   currencyName={info.currencyName}
                   privacy={privacy}
                 />
@@ -816,7 +815,7 @@ const ValueTransferDetail: React.FunctionComponent<
                       : 1,
                 }}
                 amtZec={valueTransfer.amount}
-                size={18}
+                size={14}
                 currencyName={info.currencyName}
                 privacy={privacy}
               />
@@ -868,7 +867,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     <FontAwesomeIcon
                       icon={faTriangleExclamation}
                       color={'red'}
-                      size={18}
+                      size={14}
                     />
                   )}
                   <RegText

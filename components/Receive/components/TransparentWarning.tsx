@@ -41,7 +41,7 @@ const TransparentWarning = ({
         }}
       >
         <FontAwesomeIcon
-          size={30}
+          size={24}
           icon={faXmark}
           color={colors.text}
           style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
@@ -86,7 +86,7 @@ const TransparentWarning = ({
             }}
           >
             <TriangleAlert
-              size={15}
+              size={12}
               style={{ marginRight: 8 }}
               color={colors.warning.title}
             />

@@ -207,7 +207,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       <FontAwesomeIcon
                         icon={faTriangleExclamation}
                         color={'red'}
-                        size={18}
+                        size={14}
                       />
                       <RegText
                         style={{

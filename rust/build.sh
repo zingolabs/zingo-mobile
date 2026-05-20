@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -e
 
-PHASES=("constructdockerimages" "exportbuiltartifacts");
+PHASES=("constructimages" "exportbuiltartifacts");
 DOCPHASES="";
 for phase in "${PHASES[@]}"
 do

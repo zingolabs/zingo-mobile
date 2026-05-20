@@ -124,15 +124,27 @@ describe('Utils.splitZecAmountIntoBigSmall', () => {
     expect(result.smallPart).toBe('6789');
   });
 
-  test('pads short decimals with zeros', () => {
+  test('trims trailing zeros from decimalPart when smallPart is all zeros', () => {
     const result = Utils.splitZecAmountIntoBigSmall(1.0);
-    expect(result.bigPart).toBe('1.0000');
+    expect(result.bigPart).toBe('1.0');
     expect(result.smallPart).toBe('0000');
+  });
+
+  test('trims trailing zeros mid-decimal when smallPart is all zeros', () => {
+    const result = Utils.splitZecAmountIntoBigSmall(1.23);
+    expect(result.bigPart).toBe('1.23');
+    expect(result.smallPart).toBe('0000');
+  });
+
+  test('preserves trailing zeros in decimalPart when smallPart carries significant digits', () => {
+    const result = Utils.splitZecAmountIntoBigSmall(1.23001234);
+    expect(result.bigPart).toBe('1.2300');
+    expect(result.smallPart).toBe('1234');
   });
 
   test('handles zero', () => {
     const result = Utils.splitZecAmountIntoBigSmall(0);
-    expect(result.bigPart).toBe('0.0000');
+    expect(result.bigPart).toBe('0.0');
     expect(result.smallPart).toBe('0000');
   });
 });

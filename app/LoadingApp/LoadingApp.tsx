@@ -496,7 +496,7 @@ export class LoadingAppClass extends Component<
       screen:
         !!props.route.params && props.route.params.screen !== undefined
           ? props.route.params.screen
-          : 0,
+          : RouteEnum.Launching,
       actionButtonsDisabled: false,
       walletExists: false,
       hasBackupWallet: false,
@@ -735,7 +735,7 @@ export class LoadingAppClass extends Component<
         await this.walletErrorHandle(
           errorText,
           this.state.translate('loadingapp.readingwallet-label') as string,
-          1,
+          RouteEnum.StartMenu,
           true,
         );
       }
@@ -753,7 +753,7 @@ export class LoadingAppClass extends Component<
           // go to the initial menu, giving the opportunity to the user
           // to use the seed & birthday recovered from the device.
           this.setState({
-            screen: 1,
+            screen: RouteEnum.StartMenu,
             walletExists: false,
             actionButtonsDisabled: false,
           });
@@ -765,7 +765,7 @@ export class LoadingAppClass extends Component<
             this.state.selectServer === SelectServerEnum.offline
           ) {
             this.setState({
-              screen: 1,
+              screen: RouteEnum.StartMenu,
               walletExists: false,
               actionButtonsDisabled: false,
             });
@@ -789,7 +789,7 @@ export class LoadingAppClass extends Component<
           true,
         );
         this.setState(state => ({
-          screen: state.screen === 3 ? 3 : 1,
+          screen: state.screen === RouteEnum.ImportUfvk ? RouteEnum.ImportUfvk : RouteEnum.StartMenu,
           walletExists: false,
           actionButtonsDisabled: false,
         }));
@@ -851,7 +851,7 @@ export class LoadingAppClass extends Component<
               isConnectionExpensive:
                 state.details && state.details.isConnectionExpensive,
             },
-            screen: screen === 3 ? 3 : screen !== 0 ? 1 : 0,
+            screen: screen === RouteEnum.ImportUfvk ? RouteEnum.ImportUfvk : screen !== RouteEnum.Launching ? RouteEnum.StartMenu : RouteEnum.Launching,
             //actionButtonsDisabled: true,
           });
           if (isConnected !== state.isConnected) {
@@ -871,9 +871,9 @@ export class LoadingAppClass extends Component<
                   customServerShow: true,
                 });
               }
-              if (screen !== 0) {
+              if (screen !== RouteEnum.Launching) {
                 this.setState({
-                  screen: screen === 3 ? 3 : screen !== 0 ? 1 : 0,
+                  screen: screen === RouteEnum.ImportUfvk ? RouteEnum.ImportUfvk : RouteEnum.StartMenu,
                 });
               }
             }
@@ -998,7 +998,7 @@ export class LoadingAppClass extends Component<
   walletErrorHandle = async (
     result: string,
     title: string,
-    screen: number,
+    screen: RouteEnum,
     start: boolean,
   ) => {
     // first check the actual server
@@ -1318,7 +1318,7 @@ export class LoadingAppClass extends Component<
       // basic mode -> same screen.
       this.setState(state => ({
         wallet,
-        screen: goSeedScreen ? 2 : state.screen,
+        screen: goSeedScreen ? RouteEnum.NewSeed : state.screen,
         actionButtonsDisabled: false,
         walletExists: true,
       }));
@@ -1333,14 +1333,14 @@ export class LoadingAppClass extends Component<
       this.walletErrorHandle(
         seed,
         this.state.translate('loadingapp.creatingwallet-label') as string,
-        1,
+        RouteEnum.StartMenu,
         false,
       );
     }
   };
 
   getwalletToRestore = async () => {
-    this.setState({ wallet: {} as WalletType, screen: 3 });
+    this.setState({ wallet: {} as WalletType, screen: RouteEnum.ImportUfvk });
   };
 
   doRestore = async (seedUfvk: string, birthday: number) => {
@@ -1551,7 +1551,7 @@ export class LoadingAppClass extends Component<
       this.walletErrorHandle(
         errorText,
         this.state.translate('loadingapp.readingwallet-label') as string,
-        3,
+        RouteEnum.ImportUfvk,
         false,
       );
     }
@@ -1601,7 +1601,7 @@ export class LoadingAppClass extends Component<
     // if the user selects advanced mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen
     // the result will be the same -> create a new wallet.
-    this.setState({ mode, screen: 0 }, () => {
+    this.setState({ mode, screen: RouteEnum.Launching }, () => {
       this.componentDidMount();
     });
   };
@@ -1677,13 +1677,13 @@ export class LoadingAppClass extends Component<
   };
 
   restoreLastBackup = async () => {
-    this.setState({ screen: 0, actionButtonsDisabled: true });
+    this.setState({ screen: RouteEnum.Launching, actionButtonsDisabled: true });
     const result = await RPCModule.restoreExistingWalletBackup();
     if (!result || result === GlobalConst.false) {
       this.addLastSnackbar(
         this.state.translate('rpc.backupnotfound-error') as string,
       );
-      this.setState({ screen: 1, actionButtonsDisabled: false });
+      this.setState({ screen: RouteEnum.StartMenu, actionButtonsDisabled: false });
       return;
     }
     this.openCurrentWallet();
@@ -1775,7 +1775,7 @@ export class LoadingAppClass extends Component<
     return (
       <>
         <ContextAppLoadingProvider value={context}>
-          {screen === 0 && (
+          {screen === RouteEnum.Launching && (
             <Launching
               translate={translate}
               firstLaunchingMessage={firstLaunchingMessage}
@@ -1787,7 +1787,7 @@ export class LoadingAppClass extends Component<
               }}
             />
           )}
-          {screen === 1 && (
+          {screen === RouteEnum.StartMenu && (
             <StartMenu
               actionButtonsDisabled={actionButtonsDisabled}
               hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
@@ -1811,11 +1811,11 @@ export class LoadingAppClass extends Component<
               restoreLastBackup={this.restoreLastBackup}
             />
           )}
-          {screen === 2 && wallet && (
+          {screen === RouteEnum.NewSeed && wallet && (
             <Modal
               animationType="slide"
               transparent={true}
-              visible={screen === 2}
+              visible={screen === RouteEnum.NewSeed}
               onRequestClose={() =>
                 this.navigateToLoadedApp(
                   readOnly,
@@ -1842,16 +1842,16 @@ export class LoadingAppClass extends Component<
               />
             </Modal>
           )}
-          {screen === 3 && (
+          {screen === RouteEnum.ImportUfvk && (
             <Modal
               animationType="slide"
               transparent={true}
-              visible={screen === 3}
-              onRequestClose={() => this.setState({ screen: 1 })}
+              visible={screen === RouteEnum.ImportUfvk}
+              onRequestClose={() => this.setState({ screen: RouteEnum.StartMenu })}
             >
               <ImportUfvk
                 onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                onClickCancel={() => this.setState({ screen: 1 })}
+                onClickCancel={() => this.setState({ screen: RouteEnum.StartMenu })}
               />
             </Modal>
           )}

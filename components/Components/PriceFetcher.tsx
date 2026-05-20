@@ -184,7 +184,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
             )}
             <FontAwesomeIcon
               icon={faRefresh}
-              size={20}
+              size={16}
               color={colors.primary}
             />
             {refreshMinutes > 0 && (

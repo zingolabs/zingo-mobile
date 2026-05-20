@@ -87,7 +87,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
             <View style={{ flexDirection: 'row', marginBottom: 5 }}>
               <FontAwesomeIcon
                 style={{ marginHorizontal: 10 }}
-                size={24}
+                size={20}
                 icon={faTags}
                 color={colors.text}
               />
@@ -106,7 +106,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
             <View style={{ flexDirection: 'row' }}>
               <FontAwesomeIcon
                 style={{ marginHorizontal: 10 }}
-                size={24}
+                size={20}
                 icon={faWallet}
                 color={colors.text}
               />
@@ -134,7 +134,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
           >
             <FontAwesomeIcon
               style={{ opacity: 0.8 }}
-              size={25}
+              size={20}
               icon={faCopy}
               color={colors.money}
             />
@@ -149,7 +149,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
               doQr();
             }}
           >
-            <FontAwesomeIcon size={30} icon={faQrcode} color={colors.text} />
+            <FontAwesomeIcon size={24} icon={faQrcode} color={colors.text} />
           </TouchableOpacity>
         </View>
       </View>

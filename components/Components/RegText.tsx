@@ -24,8 +24,8 @@ const RegText: React.FunctionComponent<RegTextProps> = ({
 
   const styleSum: TextStyle = {
     color: color || colors.text,
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '400',
     opacity: 1,
     ...style,
   };
