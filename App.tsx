@@ -151,6 +151,7 @@ const App: React.FunctionComponent = () => {
         <StatusBar backgroundColor={theme.colors.background} />
         <NavigationContainer ref={navigationRef} theme={theme}>
           <SafeAreaView
+            edges={['top', 'left', 'right']}
             style={{
               flex: 1,
               backgroundColor: theme.colors.background,

@@ -7,9 +7,11 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import {
+  BottomTabBarHeightCallbackContext,
+  BottomTabBarProps,
+} from '@react-navigation/bottom-tabs';
 import { TabActions } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faHouse,
@@ -64,8 +66,8 @@ const CustomTabBar = ({
   state,
   navigation,
 }: BottomTabBarProps): React.ReactElement => {
-  const insets = useSafeAreaInsets();
   const { mode, totalBalance, somePending } = useContext(ContextAppLoaded);
+  const reportHeight = useContext(BottomTabBarHeightCallbackContext);
 
   const bubbleAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
   if (!bubbleAnimsRef.current) {
@@ -171,11 +173,14 @@ const CustomTabBar = ({
 
   return (
     <View
-      style={[styles.wrapper, { bottom: insets.bottom }]}
+      style={[styles.wrapper, { bottom: 25 }]}
       pointerEvents="box-none"
     >
       {/* Shadow wrapper — kept separate from pill so overflow:hidden doesn't clip the shadow */}
-      <View style={styles.shadowWrap}>
+      <View
+        style={styles.shadowWrap}
+        onLayout={e => reportHeight?.(e.nativeEvent.layout.height)}
+      >
         <View style={styles.pill}>
           {state.routes.map((route, index) => {
             const isFocused = index === state.index;
