@@ -310,7 +310,7 @@ pub fn init_new(
                 Err(e) => return Err(format!("Error: creating indexer: {e}")),
             };
             indexer
-                .get_latest_block()
+                .get_latest_block(false)
                 .await
                 .map(|b| b.height as u32)
                 .map_err(|e| format!("Error: {e}"))
@@ -552,7 +552,7 @@ pub fn get_latest_block_server(server_uri: String) -> Result<String, ZingolibErr
             Err(e) => return Ok(format!("Error: creating indexer: {e}")),
         };
         Ok(
-            match RT.block_on(async move { indexer.get_latest_block().await }) {
+            match RT.block_on(async move { indexer.get_latest_block(false).await }) {
                 Ok(block_id) => block_id.height.to_string(),
                 Err(e) => format!("Error: {e}"),
             },

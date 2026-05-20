@@ -13890,7 +13890,7 @@ dependencies = [
  "zcash_address",
  "zcash_keys",
  "zcash_protocol",
- "zingo-netutils 4.0.0 (git+https://github.com/zingolabs/zingo-common?branch=chore%2Fecho-server-no-hickory-dns)",
+ "zingo-netutils",
  "zingo_common_components",
  "zingolib",
  "zip32",
@@ -13927,18 +13927,6 @@ dependencies = [
  "tower 0.5.3",
  "webpki-roots 0.26.11",
  "zcash_client_backend",
-]
-
-[[package]]
-name = "zingo-netutils"
-version = "4.0.0"
-source = "git+https://github.com/zingolabs/zingo-common?branch=chore%2Fecho-server-no-hickory-dns#bd0b598464bacaa40ea068fffecaef8a218ad94d"
-dependencies = [
- "http 1.4.0",
- "lightwallet-protocol",
- "thiserror 1.0.69",
- "tokio-rustls 0.26.4",
- "tonic",
 ]
 
 [[package]]
@@ -14028,7 +14016,7 @@ dependencies = [
  "zcash_protocol",
  "zcash_transparent",
  "zingo-memo",
- "zingo-netutils 4.0.0 (git+https://github.com/zingolabs/zingo-common?branch=chore%2Fecho-server)",
+ "zingo-netutils",
  "zingo-price",
  "zingo-status",
  "zingo_common_components",

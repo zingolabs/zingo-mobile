@@ -115,8 +115,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const { colors } = useTheme() as ThemeType;
 
-  const { percentageOutputsScanned, syncInProgress, viewSyncStatus, opacityValue } =
-    useSyncStatus({ syncingStatus, noSyncingStatus });
+  const {
+    percentageOutputsScanned,
+    syncInProgress,
+    viewSyncStatus,
+    opacityValue,
+  } = useSyncStatus({ syncingStatus, noSyncingStatus });
 
   const {
     showShieldButton,
@@ -286,9 +290,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     ? await simpleBiometrics({ translate })
                     : true;
                   if (resultBio === false) {
-                    addLastSnackbar?.(
-                      translate('biometrics-error') as string,
-                    );
+                    addLastSnackbar?.(translate('biometrics-error') as string);
                   } else {
                     navigation.navigate(RouteEnum.Settings);
                   }

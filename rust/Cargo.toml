@@ -27,7 +27,7 @@ zcash_transparent = "0.6"
 zebra-chain = "5.0.0"
 
 zingo_common_components = "0.3.0"
-zingo-netutils = { git = "https://github.com/zingolabs/zingo-common", branch = "chore/echo-server-no-hickory-dns" }
+zingo-netutils = { git = "https://github.com/zingolabs/zingo-common", branch = "chore/echo-server" }
 
 bip0039 = { version = "0.13", features = ["rand"] }
 ed25519-zebra = { version = "4", features = ["std"] }

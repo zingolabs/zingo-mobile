@@ -789,7 +789,10 @@ export class LoadingAppClass extends Component<
           true,
         );
         this.setState(state => ({
-          screen: state.screen === RouteEnum.ImportUfvk ? RouteEnum.ImportUfvk : RouteEnum.StartMenu,
+          screen:
+            state.screen === RouteEnum.ImportUfvk
+              ? RouteEnum.ImportUfvk
+              : RouteEnum.StartMenu,
           walletExists: false,
           actionButtonsDisabled: false,
         }));
@@ -851,7 +854,12 @@ export class LoadingAppClass extends Component<
               isConnectionExpensive:
                 state.details && state.details.isConnectionExpensive,
             },
-            screen: screen === RouteEnum.ImportUfvk ? RouteEnum.ImportUfvk : screen !== RouteEnum.Launching ? RouteEnum.StartMenu : RouteEnum.Launching,
+            screen:
+              screen === RouteEnum.ImportUfvk
+                ? RouteEnum.ImportUfvk
+                : screen !== RouteEnum.Launching
+                  ? RouteEnum.StartMenu
+                  : RouteEnum.Launching,
             //actionButtonsDisabled: true,
           });
           if (isConnected !== state.isConnected) {
@@ -873,7 +881,10 @@ export class LoadingAppClass extends Component<
               }
               if (screen !== RouteEnum.Launching) {
                 this.setState({
-                  screen: screen === RouteEnum.ImportUfvk ? RouteEnum.ImportUfvk : RouteEnum.StartMenu,
+                  screen:
+                    screen === RouteEnum.ImportUfvk
+                      ? RouteEnum.ImportUfvk
+                      : RouteEnum.StartMenu,
                 });
               }
             }
@@ -1683,7 +1694,10 @@ export class LoadingAppClass extends Component<
       this.addLastSnackbar(
         this.state.translate('rpc.backupnotfound-error') as string,
       );
-      this.setState({ screen: RouteEnum.StartMenu, actionButtonsDisabled: false });
+      this.setState({
+        screen: RouteEnum.StartMenu,
+        actionButtonsDisabled: false,
+      });
       return;
     }
     this.openCurrentWallet();
@@ -1847,11 +1861,15 @@ export class LoadingAppClass extends Component<
               animationType="slide"
               transparent={true}
               visible={screen === RouteEnum.ImportUfvk}
-              onRequestClose={() => this.setState({ screen: RouteEnum.StartMenu })}
+              onRequestClose={() =>
+                this.setState({ screen: RouteEnum.StartMenu })
+              }
             >
               <ImportUfvk
                 onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                onClickCancel={() => this.setState({ screen: RouteEnum.StartMenu })}
+                onClickCancel={() =>
+                  this.setState({ screen: RouteEnum.StartMenu })
+                }
               />
             </Modal>
           )}
