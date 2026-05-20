@@ -51,6 +51,12 @@ function capture(cmd, args) {
 
 const env = { ...process.env, IPHONEOS_DEPLOYMENT_TARGET: '16.0' };
 
+// 0. Clean up legacy artifacts from the pre-xcframework build flow. Idempotent:
+//    after the first run on a clean checkout these files are gone forever.
+for (const stale of ['libuniffi_zingo.a', 'zingoFFI.h', 'zingoFFI.modulemap']) {
+  rmSync(join(REPO_IOS_DIR, stale), { force: true });
+}
+
 run('rustup', ['default', 'stable'], { env });
 
 if (!capture('bindgen', ['--version'])) {
