@@ -22,7 +22,6 @@ import {
   faRefresh,
   faPaperPlane,
   faClockRotateLeft,
-  faComments,
 } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
@@ -109,7 +108,6 @@ import Settings from '../../components/Settings';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
-import MessageList from '../../components/Messages/components/MessageList';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
@@ -2067,7 +2065,6 @@ export class LoadedAppClass extends Component<
       totalBalance,
       translate,
       scrollToTop,
-      scrollToBottom,
       addresses,
       somePending,
       selectServer,
@@ -2159,8 +2156,6 @@ export class LoadedAppClass extends Component<
         }
       } else if (route.name === RouteEnum.Receive) {
         iconName = faDownload;
-      } else if (route.name === RouteEnum.Messages) {
-        iconName = faComments;
       } else {
         iconName = faCog;
       }
@@ -2228,11 +2223,7 @@ export class LoadedAppClass extends Component<
                                     ? (translate(
                                         'loadedapp.receive-menu',
                                       ) as string)
-                                    : route.name === RouteEnum.Messages
-                                      ? (translate(
-                                          'loadedapp.messages-menu',
-                                        ) as string)
-                                      : '',
+                                    : '',
                             tabBarLabelPosition: 'below-icon',
                             tabBarLabelStyle: {
                               alignSelf: 'center',
@@ -2331,27 +2322,6 @@ export class LoadedAppClass extends Component<
                                 alone={false /* receive */}
                                 setSecurityOption={this.setSecurityOption}
                                 setAddressBook={this.setAddressBook}
-                              />
-                            )}
-                          </Tab.Screen>
-                          <Tab.Screen name={RouteEnum.Messages}>
-                            {propsTab => (
-                              <MessageList
-                                {...propsTab}
-                                toggleMenuDrawer={
-                                  () =>
-                                    props.navigation.toggleDrawer() /* header */
-                                }
-                                setScrollToBottom={
-                                  this.setScrollToBottom /* header & messages */
-                                }
-                                scrollToBottom={scrollToBottom /* messages */}
-                                sendTransaction={
-                                  this.sendTransaction /* messages */
-                                }
-                                setServerOption={
-                                  this.setServerOption /* messages */
-                                }
                               />
                             )}
                           </Tab.Screen>
