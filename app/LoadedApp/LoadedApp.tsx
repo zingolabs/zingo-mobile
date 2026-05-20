@@ -11,18 +11,7 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import {
-  BottomTabBarButtonProps,
-  createBottomTabNavigator,
-} from '@react-navigation/bottom-tabs';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faDownload,
-  faCog,
-  faRefresh,
-  faPaperPlane,
-  faClockRotateLeft,
-} from '@fortawesome/free-solid-svg-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -105,7 +94,7 @@ import History from '../../components/History';
 import Send from '../../components/Send';
 import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
-import { PlatformPressable } from '@react-navigation/elements';
+import CustomTabBar from '../../components/TabBar/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
 import MessageList from '../../components/Messages/components/MessageList';
@@ -654,18 +643,9 @@ type LoadedAppClassProps = {
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
 
-const TabPressable: React.FC<
-  BottomTabBarButtonProps & { colors: ThemeType }
-> = ({ colors, ...props }) => {
-  return (
-    <PlatformPressable {...props} android_ripple={{ color: colors.primary }} />
-  );
-};
-
-const renderTabPressable =
-  (colors: ThemeType) => (props: BottomTabBarButtonProps) => (
-    <TabPressable {...props} colors={colors} />
-  );
+const renderTabBar = (props: import('@react-navigation/bottom-tabs').BottomTabBarProps) => (
+  <CustomTabBar {...props} />
+);
 
 export class LoadedAppClass extends Component<
   LoadedAppClassProps,
@@ -2064,7 +2044,6 @@ export class LoadedAppClass extends Component<
       valueTransfersTotal,
       readOnly,
       totalBalance,
-      translate,
       scrollToTop,
       scrollToBottom,
       addresses,
@@ -2132,50 +2111,6 @@ export class LoadedAppClass extends Component<
       nym: this.state.nym,
     };
 
-    const fnTabBarIcon = (
-      route: { name: string; key: string },
-      focused: boolean,
-    ) => {
-      var iconName;
-
-      if (route.name === RouteEnum.History) {
-        iconName = faClockRotateLeft;
-      } else if (route.name === RouteEnum.Send) {
-        if (
-          mode === ModeEnum.basic &&
-          !!totalBalance &&
-          ((totalBalance.totalOrchardBalance > 0 &&
-            totalBalance.confirmedOrchardBalance === 0) ||
-            (totalBalance.totalSaplingBalance > 0 &&
-              totalBalance.confirmedSaplingBalance === 0) ||
-            (totalBalance.totalTransparentBalance > 0 &&
-              totalBalance.confirmedTransparentBalance === 0)) &&
-          somePending
-        ) {
-          iconName = faRefresh;
-        } else {
-          iconName = faPaperPlane;
-        }
-      } else if (route.name === RouteEnum.Receive) {
-        iconName = faDownload;
-      } else {
-        iconName = faCog;
-      }
-
-      // faDownload renders visually smaller than other icons at the same size
-      const iconSize = route.name === RouteEnum.Receive ? 24 : 20;
-
-      return (
-        <View>
-          <FontAwesomeIcon
-            size={iconSize}
-            icon={iconName}
-            color={focused ? colors.background : colors.money}
-          />
-        </View>
-      );
-    };
-
     return (
       <>
         <ContextAppLoadedProvider value={context}>
@@ -2203,71 +2138,12 @@ export class LoadedAppClass extends Component<
                         <Tab.Navigator
                           detachInactiveScreens={true}
                           initialRouteName={RouteEnum.History}
-                          screenOptions={({
-                            route,
-                          }: {
-                            route: { name: string; key: string };
-                          }) => ({
-                            tabBarIcon: ({ focused }) =>
-                              fnTabBarIcon(route, focused),
-                            tabBarIconStyle: {
-                              alignSelf: 'center',
-                              marginBottom: 2,
-                            },
-                            tabBarLabel:
-                              route.name === RouteEnum.History
-                                ? (translate(
-                                    'loadedapp.history-menu',
-                                  ) as string)
-                                : route.name === RouteEnum.Send
-                                  ? (translate('loadedapp.send-menu') as string)
-                                  : route.name === RouteEnum.Receive
-                                    ? (translate(
-                                        'loadedapp.receive-menu',
-                                      ) as string)
-                                    : '',
-                            tabBarLabelPosition: 'below-icon',
-                            tabBarLabelStyle: {
-                              alignSelf: 'center',
-                              fontSize: 14,
-                            },
-                            tabBarItemStyle: {
-                              height: 60,
-                            },
-                            tabBarActiveTintColor: colors.background,
-                            tabBarActiveBackgroundColor: colors.primaryDisabled,
-                            tabBarInactiveTintColor: colors.money,
-                            tabBarInactiveBackgroundColor:
-                              colors.sideMenuBackground,
-                            tabBarStyle: {
-                              borderTopWidth: 1,
-                              height: 60,
-                            },
+                          tabBar={renderTabBar}
+                          screenOptions={{
                             headerShown: false,
-                            tabBarButton: renderTabPressable(colors),
-                          })}
+                            sceneStyle: { paddingBottom: 65 },
+                          }}
                         >
-                          <Tab.Screen name={RouteEnum.History}>
-                            {propsTab => (
-                              <History
-                                {...propsTab}
-                                toggleMenuDrawer={
-                                  () =>
-                                    props.navigation.toggleDrawer() /* header */
-                                }
-                                setShieldingAmount={
-                                  this.setShieldingAmount /* header */
-                                }
-                                setScrollToTop={
-                                  this.setScrollToTop /* header & history */
-                                }
-                                scrollToTop={scrollToTop /* history */}
-                                setScrollToBottom={
-                                  this.setScrollToBottom /* header & messages */
-                                }
-                              />
-                            )}
-                          </Tab.Screen>
                           {!readOnly &&
                             selectServer !== SelectServerEnum.offline &&
                             (mode === ModeEnum.advanced ||
@@ -2313,6 +2189,27 @@ export class LoadedAppClass extends Component<
                                 )}
                               </Tab.Screen>
                             )}
+                          <Tab.Screen name={RouteEnum.History}>
+                            {propsTab => (
+                              <History
+                                {...propsTab}
+                                toggleMenuDrawer={
+                                  () =>
+                                    props.navigation.toggleDrawer() /* header */
+                                }
+                                setShieldingAmount={
+                                  this.setShieldingAmount /* header */
+                                }
+                                setScrollToTop={
+                                  this.setScrollToTop /* header & history */
+                                }
+                                scrollToTop={scrollToTop /* history */}
+                                setScrollToBottom={
+                                  this.setScrollToBottom /* header & messages */
+                                }
+                              />
+                            )}
+                          </Tab.Screen>
                           <Tab.Screen name={RouteEnum.Receive}>
                             {propsTab => (
                               <Receive
