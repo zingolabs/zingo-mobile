@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useRef } from 'react';
 import {
   Animated,
   Easing,
-  Platform,
   Pressable,
   StyleSheet,
   View,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import {
   BottomTabBarHeightCallbackContext,
   BottomTabBarProps,
@@ -157,12 +157,13 @@ const CustomTabBar = ({
   };
 
   return (
-    <View style={[styles.wrapper]} pointerEvents="box-none">
-      {/* Shadow wrapper — kept separate from pill so overflow:hidden doesn't clip the shadow */}
-      <View
-        style={styles.shadowWrap}
-        onLayout={e => reportHeight?.(e.nativeEvent.layout.height)}
-      >
+    <View style={styles.wrapper} pointerEvents="box-none">
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.3)']}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+      <View onLayout={e => reportHeight?.(e.nativeEvent.layout.height)}>
         <View style={styles.pill}>
           {state.routes.map((route, index) => {
             const isFocused = index === state.index;
@@ -212,18 +213,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
+    bottom: 0,
     alignItems: 'center',
-    bottom: 25,
-  },
-  shadowWrap: {
-    borderRadius: 999,
-    // iOS
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 14,
-    // Android
-    elevation: Platform.OS === 'android' ? 6 : 0,
+    paddingBottom: 25,
   },
   pill: {
     flexDirection: 'row',
