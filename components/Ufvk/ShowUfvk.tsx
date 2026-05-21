@@ -35,9 +35,10 @@ import {
   SnackbarDurationEnum,
   UfvkActionEnum,
 } from '../../app/AppState';
-import BottomSheet, {
+import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
+  BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import ExpandedAddress from '../Receive/components/ExpandedAddress';
@@ -106,7 +107,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   }, [recoveryWalletInfoOnDevice]);
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
 
   const snapPoints = useMemo(() => {
     let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
@@ -122,13 +123,12 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
 
   const show = useCallback((_sheetType: 'EA') => {
     setSheetType(_sheetType);
-    bottomSheetRef.current?.snapToIndex(0);
+    bottomSheetRef.current?.present();
   }, []);
 
   const hide = useCallback(() => {
     setSheetType(null);
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
+    bottomSheetRef.current?.dismiss();
   }, []);
 
   useEffect(() => {
@@ -369,9 +369,8 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           </>
         )}
       </View>
-      <BottomSheet
+      <BottomSheetModal
         ref={bottomSheetRef}
-        index={-1}
         snapPoints={snapPoints}
         enableDynamicSizing={false}
         enablePanDownToClose
@@ -393,7 +392,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
             />
           )}
         </BottomSheetView>
-      </BottomSheet>
+      </BottomSheetModal>
     </View>
   );
 };

@@ -42,7 +42,11 @@ function resolveIcons(
   somePending: boolean,
 ) {
   if (routeName === RouteEnum.History) {
-    return { solidIcon: faHouse, regularIcon: faHouseRegular, iconSize: ICON_SIZE };
+    return {
+      solidIcon: faHouse,
+      regularIcon: faHouseRegular,
+      iconSize: ICON_SIZE,
+    };
   }
   if (routeName === RouteEnum.Send) {
     const isPending =
@@ -57,9 +61,17 @@ function resolveIcons(
       somePending;
     return isPending
       ? { solidIcon: faRefresh, regularIcon: faRefresh, iconSize: 25 }
-      : { solidIcon: faPaperPlaneSolid, regularIcon: faPaperPlaneRegular, iconSize: 25 };
+      : {
+          solidIcon: faPaperPlaneSolid,
+          regularIcon: faPaperPlaneRegular,
+          iconSize: 25,
+        };
   }
-  return { solidIcon: faDownload, regularIcon: faDownload, iconSize: ICON_SIZE };
+  return {
+    solidIcon: faDownload,
+    regularIcon: faDownload,
+    iconSize: ICON_SIZE,
+  };
 }
 
 const CustomTabBar = ({
@@ -80,7 +92,7 @@ const CustomTabBar = ({
   }
   const bubbleAnims = bubbleAnimsRef.current;
 
-const pressAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
+  const pressAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
   if (!pressAnimsRef.current) {
     pressAnimsRef.current = Object.fromEntries(
       state.routes.map(r => [r.key, new Animated.Value(1)]),
@@ -145,10 +157,7 @@ const pressAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
   };
 
   return (
-    <View
-      style={[styles.wrapper, { bottom: 25 }]}
-      pointerEvents="box-none"
-    >
+    <View style={[styles.wrapper]} pointerEvents="box-none">
       {/* Shadow wrapper — kept separate from pill so overflow:hidden doesn't clip the shadow */}
       <View
         style={styles.shadowWrap}
@@ -204,6 +213,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
+    bottom: 25,
   },
   shadowWrap: {
     borderRadius: 999,

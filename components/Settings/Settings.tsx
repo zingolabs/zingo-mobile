@@ -55,9 +55,10 @@ import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
-import BottomSheet, {
+import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
+  BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
@@ -719,7 +720,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setCustomServerChainName(chain);
   };
 
-  const securityBottomSheetRef = useRef<BottomSheet>(null);
+  const securityBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const renderBackdropSecurity = (props: BottomSheetBackdropProps) => (
     <BottomSheetBackdrop
@@ -1319,7 +1320,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 {translate('settings.security-title') as string}
               </BoldText>
               <TouchableOpacity
-                onPress={() => securityBottomSheetRef.current?.snapToIndex(0)}
+                onPress={() => securityBottomSheetRef.current?.present()}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <RegText
@@ -1846,9 +1847,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           />
         </View>
       </View>
-      <BottomSheet
+      <BottomSheetModal
         ref={securityBottomSheetRef}
-        index={-1}
         snapPoints={['65%']}
         enableDynamicSizing={false}
         enablePanDownToClose
@@ -1929,7 +1929,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             translate('settings.security-restorewalletbackupscreen') as string,
           )}
         </BottomSheetView>
-      </BottomSheet>
+      </BottomSheetModal>
     </KeyboardAvoidingView>
   );
 };

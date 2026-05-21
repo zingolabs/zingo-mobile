@@ -55,9 +55,10 @@ import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/Re
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { Swipeable } from 'react-native-gesture-handler';
 import { RPCValueTransfersStatusEnum } from '../../app/rpc/enums/RPCValueTransfersStatusEnum';
-import BottomSheet, {
+import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
+  BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
@@ -137,7 +138,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [heightLayout, setHeightLayout] = useState<number>(10);
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const scrollViewRef =
     useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(
       null,
@@ -474,8 +475,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   );
 
   const hide = useCallback(() => {
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
+    bottomSheetRef.current?.dismiss();
     setShowFilters(false);
     setHeightLayout(10);
   }, []);
@@ -520,7 +520,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           <Pressable
             onPress={() => {
               setShowFilters(true);
-              bottomSheetRef.current?.snapToIndex(0);
+              bottomSheetRef.current?.present();
             }}
             style={{
               marginTop: -35,
@@ -680,20 +680,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
           </>
         )}
       </View>
-      <BottomSheet
+      <BottomSheetModal
         ref={bottomSheetRef}
-        index={-1}
         snapPoints={snapPoints}
         enableDynamicSizing={false}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
         handleStyle={{ display: 'none' }}
         backgroundStyle={{ backgroundColor: colors.background }}
-        onChange={index => {
-          if (index === -1) {
-            setShowFilters(false);
-          }
-        }}
+        onDismiss={() => setShowFilters(false)}
         backdropComponent={renderBackdrop}
       >
         <BottomSheetView
@@ -714,7 +709,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             />
           )}
         </BottomSheetView>
-      </BottomSheet>
+      </BottomSheetModal>
     </View>
   );
 };
