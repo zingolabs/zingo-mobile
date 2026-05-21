@@ -124,16 +124,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Native rust cache
+      # Restore the xcframework produced by .github/workflows/ios-build.yaml.
+      # That reusable workflow saves both artefacts directly under `ios/` so the
+      # xcodebuild step below can reference them without any copying.
+      - name: Native iOS xcframework cache
         uses: actions/cache/restore@v5
         with:
-          path: rust/lib/Generated
-          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+          path: |
+            ios/Zingolib.xcframework
+            ios/zingo.swift
+          key: native-ios-xcframework-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
-
-      - name: Copy libs to ios folder
-        working-directory: rust/lib/Generated
-        run: cp ./*.* ../../../ios
 
       - name: Install nvm with node 22.18.0
         run: |
