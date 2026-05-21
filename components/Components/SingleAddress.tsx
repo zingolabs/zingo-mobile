@@ -88,28 +88,26 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const isUnified = address?.addressKind === AddressKindEnum.u;
 
   const toggle = () => {
-    setShowMoreOptions &&
-      setShowMoreOptions(prev => {
-        const next = !prev;
+    if (!setShowMoreOptions) return;
+    const next = !showMoreOptions;
 
-        animatedHeight.value = withTiming(next ? contentHeight.current : 0, {
-          duration: 300,
-          easing: Easing.out(Easing.cubic),
-        });
+    animatedHeight.value = withTiming(next ? contentHeight.current : 0, {
+      duration: 300,
+      easing: Easing.out(Easing.cubic),
+    });
 
-        animatedOpacity.value = withTiming(next ? 1 : 0, {
-          duration: 300,
-          easing: Easing.out(Easing.cubic),
-        });
+    animatedOpacity.value = withTiming(next ? 1 : 0, {
+      duration: 300,
+      easing: Easing.out(Easing.cubic),
+    });
 
-        if (!prev) {
-          setTimeout(() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
-          }, 200);
-        }
+    if (next) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 200);
+    }
 
-        return next;
-      });
+    setShowMoreOptions(next);
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -169,7 +167,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         style={{ width: '100%' }}
         contentContainerStyle={{
           alignItems: 'center',
-          paddingBottom: 20,
+          paddingBottom: 100,
         }}
       >
         {ufvk ||
