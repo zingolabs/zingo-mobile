@@ -745,8 +745,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       (async () => {
         const donationA =
           addressText === (await Utils.getDonationAddress(server.chainName)) ||
-          addressText === zenniesDonationAddress ||
-          addressText === (await Utils.getNymDonationAddress(server.chainName));
+          addressText === zenniesDonationAddress;
         setDonationAddress(donationA);
       })();
     } else {

@@ -1,5 +1,7 @@
 # Zingo Android and iOS apps
+
 App Store: [https://apps.apple.com/app/zingo/id1668209531](https://apps.apple.com/app/zingo/id1668209531)
+
 Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo](https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo)
 
 # Security Vulnerability Disclosure

@@ -267,17 +267,6 @@ const Menu: React.FunctionComponent<MenuProps> = ({
                 {translate('loadedapp.tipzingolabs-basic') as string}
               </RegText>
             )}
-          {mode !== ModeEnum.basic &&
-            !readOnly &&
-            selectServer !== SelectServerEnum.offline && (
-              <RegText
-                testID="menu.votefornym"
-                onPress={() => onItemSelectedWrapper(MenuItemEnum.VoteForNym)}
-                style={item}
-              >
-                {translate('loadedapp.votefornym') as string}
-              </RegText>
-            )}
           <RegText
             onPress={() => onItemSelectedWrapper(MenuItemEnum.Support)}
             style={item}

@@ -186,21 +186,6 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
           "paddingTop": 25,
         }
       }
-      testID="menu.votefornym"
-    >
-      text translated
-    </Text>
-    <Text
-      onPress={[Function]}
-      style={
-        {
-          "color": "#c3c3c3",
-          "fontSize": 14,
-          "fontWeight": "400",
-          "opacity": 1,
-          "paddingTop": 25,
-        }
-      }
     >
       text translated
     </Text>
