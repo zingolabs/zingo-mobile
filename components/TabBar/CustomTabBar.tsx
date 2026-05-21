@@ -29,7 +29,7 @@ import TotalBalanceClass from '../../app/AppState/classes/TotalBalanceClass';
 
 const ICON_SIZE = 28;
 const BUBBLE_V_MARGIN = 4;
-const TAB_H_PADDING = 20;
+const TAB_H_PADDING = 30;
 const TAB_V_PADDING = 10;
 const PILL_BG = '#040C17';
 const PILL_BORDER = '#071A35';
@@ -42,7 +42,7 @@ function resolveIcons(
   somePending: boolean,
 ) {
   if (routeName === RouteEnum.History) {
-    return { solidIcon: faHouse, regularIcon: faHouseRegular };
+    return { solidIcon: faHouse, regularIcon: faHouseRegular, iconSize: ICON_SIZE };
   }
   if (routeName === RouteEnum.Send) {
     const isPending =
@@ -56,10 +56,10 @@ function resolveIcons(
           totalBalance.confirmedTransparentBalance === 0)) &&
       somePending;
     return isPending
-      ? { solidIcon: faRefresh, regularIcon: faRefresh }
-      : { solidIcon: faPaperPlaneSolid, regularIcon: faPaperPlaneRegular };
+      ? { solidIcon: faRefresh, regularIcon: faRefresh, iconSize: 25 }
+      : { solidIcon: faPaperPlaneSolid, regularIcon: faPaperPlaneRegular, iconSize: 25 };
   }
-  return { solidIcon: faDownload, regularIcon: faDownload };
+  return { solidIcon: faDownload, regularIcon: faDownload, iconSize: ICON_SIZE };
 }
 
 const CustomTabBar = ({
@@ -80,15 +80,7 @@ const CustomTabBar = ({
   }
   const bubbleAnims = bubbleAnimsRef.current;
 
-  const iconAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
-  if (!iconAnimsRef.current) {
-    iconAnimsRef.current = Object.fromEntries(
-      state.routes.map(r => [r.key, new Animated.Value(1)]),
-    );
-  }
-  const iconAnims = iconAnimsRef.current;
-
-  const pressAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
+const pressAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
   if (!pressAnimsRef.current) {
     pressAnimsRef.current = Object.fromEntries(
       state.routes.map(r => [r.key, new Animated.Value(1)]),
@@ -99,7 +91,6 @@ const CustomTabBar = ({
   useEffect(() => {
     state.routes.forEach(r => {
       if (!bubbleAnims[r.key]) bubbleAnims[r.key] = new Animated.Value(0);
-      if (!iconAnims[r.key]) iconAnims[r.key] = new Animated.Value(1);
       if (!pressAnims[r.key]) pressAnims[r.key] = new Animated.Value(1);
     });
   }, [state.routes.length]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -115,24 +106,6 @@ const CustomTabBar = ({
         }),
       ),
     ).start();
-
-    const focusedKey = state.routes[state.index]?.key;
-    if (focusedKey && iconAnims[focusedKey]) {
-      Animated.sequence([
-        Animated.timing(iconAnims[focusedKey], {
-          toValue: 1.2,
-          duration: 110,
-          easing: Easing.out(Easing.quad),
-          useNativeDriver: true,
-        }),
-        Animated.timing(iconAnims[focusedKey], {
-          toValue: 1,
-          duration: 110,
-          easing: Easing.out(Easing.quad),
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }
   }, [state.index]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePressIn = (key: string) => {
@@ -184,7 +157,7 @@ const CustomTabBar = ({
         <View style={styles.pill}>
           {state.routes.map((route, index) => {
             const isFocused = index === state.index;
-            const { solidIcon, regularIcon } = resolveIcons(
+            const { solidIcon, regularIcon, iconSize } = resolveIcons(
               route.name,
               mode,
               totalBalance,
@@ -210,15 +183,11 @@ const CustomTabBar = ({
                 <Animated.View
                   style={{ transform: [{ scale: pressAnims[route.key] }] }}
                 >
-                  <Animated.View
-                    style={{ transform: [{ scale: iconAnims[route.key] }] }}
-                  >
-                    <FontAwesomeIcon
-                      icon={isFocused ? solidIcon : regularIcon}
-                      size={ICON_SIZE}
-                      color={isFocused ? PILL_BG : '#FFFFFF'}
-                    />
-                  </Animated.View>
+                  <FontAwesomeIcon
+                    icon={isFocused ? solidIcon : regularIcon}
+                    size={iconSize}
+                    color={isFocused ? PILL_BG : '#FFFFFF'}
+                  />
                 </Animated.View>
               </Pressable>
             );
