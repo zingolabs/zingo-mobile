@@ -99,14 +99,26 @@ jobs:
           disable-animations: true
           script: |
             adb install -r android/app/build/outputs/apk/release/app-x86_64-release.apk
+            # Start a background logcat capture so we have device-side logs in
+            # case Maestro times out waiting on a UI element. The maestro run
+            # itself decides exit code.
+            adb logcat -c
+            adb logcat > /tmp/maestro-logcat.log 2>&1 &
+            LOGCAT_PID=$!
+            set +e
             maestro test .maestro/
+            EXIT=$?
+            kill $LOGCAT_PID 2>/dev/null || true
+            exit $EXIT
 
       - name: Upload Maestro report on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: maestro-android-report
-          path: ~/.maestro/tests/**
+          path: |
+            ~/.maestro/tests/**
+            /tmp/maestro-logcat.log
 
   maestro-ios:
     name: Maestro — iOS
@@ -159,13 +171,13 @@ jobs:
       - name: Inspect Hermes dSYM tree
         run: find ios/vendor/hermes-dsyms -maxdepth 6 2>/dev/null || echo "ios/vendor/hermes-dsyms not found"
 
-      # Build in Debug configuration to match ios-integration-test.yaml. Release
-      # would trigger the `[CP-User] [Hermes] Replace Hermes for the right
-      # configuration` Pods script, which expects a vendored release dSYM at
-      # ios/vendor/hermes-dsyms/RN-<ver>/ios-arm64/release/iphoneos/ that is
-      # gitignored and therefore absent on CI runners. Debug avoids the swap.
-      # For Maestro tests on simulator the optimisation level doesn't matter —
-      # behaviour is identical for the user-facing flows we exercise.
+      # Build in Release configuration. Maestro exercises the running RN app on
+      # the simulator — Debug builds expect a Metro packager on localhost:8081
+      # to load the JS bundle at runtime, which CI does not run; Release
+      # embeds the bundle in the app. The Hermes dSYM swap that previously
+      # failed here is now satisfied: Podfile.lock is pinned to hermes-engine
+      # matching the react-native version in package.json, so pod install's
+      # post_install hook downloads the matching dSYMs.
       - name: Build app
         working-directory: ios
         run: |
@@ -175,7 +187,7 @@ jobs:
             -workspace Zingo.xcworkspace \
             -scheme Zingo \
             -sdk iphonesimulator \
-            -configuration Debug \
+            -configuration Release \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
             -derivedDataPath "build/DerivedData" \
             -quiet
@@ -194,7 +206,7 @@ jobs:
       - name: Install app on simulator
         run: |
           xcrun simctl install booted \
-            ios/build/DerivedData/Build/Products/Debug-iphonesimulator/Zingo.app
+            ios/build/DerivedData/Build/Products/Release-iphonesimulator/Zingo.app
 
       - name: Run Maestro tests
         run: maestro test .maestro/
