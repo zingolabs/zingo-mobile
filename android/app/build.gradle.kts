@@ -332,6 +332,20 @@ dependencies {
     // uniffi needs this
     implementation("net.java.dev.jna:jna:5.18.1@aar")
 
+    // rustls-platform-verifier Android companion AAR. Bundles the Kotlin class
+    // `org.rustls.platformverifier.CertificateVerifier` that the Rust crate
+    // looks up via JNI to delegate TLS certificate validation to Android's
+    // system trust store. Without this, `init_from_b64` (and any other call
+    // that opens a TLS connection to lightwalletd) fails with
+    // ClassNotFoundException and the wallet cannot be opened.
+    //
+    // The AAR comes from the companion crate `rustls-platform-verifier-android`
+    // (currently 0.1.1, paired with rustls-platform-verifier 0.6.x). When the
+    // Rust crate is bumped to a different major, copy the new AAR from
+    // ~/.cargo/registry/src/.../rustls-platform-verifier-android-<ver>/maven/
+    // and update this line.
+    implementation(files("libs/rustls-platform-verifier-0.1.1.aar"))
+
     // back navigation implementation
     implementation("androidx.activity:activity:1.10.1")
 
