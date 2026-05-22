@@ -7,7 +7,7 @@ extern crate android_logger;
 #[cfg(target_os = "android")]
 use android_logger::{Config, FilterBuilder};
 #[cfg(target_os = "android")]
-use log::Level;
+use log::LevelFilter;
 
 #[cfg(target_os = "android")]
 #[unsafe(no_mangle)]
@@ -81,11 +81,32 @@ pub fn with_panic_guard<T, F>(f: F) -> Result<T, ZingolibError>
 where
     F: FnOnce() -> Result<T, ZingolibError> + UnwindSafe,
 {
+    ensure_android_logger();
     install_panic_hook_once();
     match panic::catch_unwind(f) {
         Ok(res) => res,
         Err(payload) => Err(ZingolibError::Panic(format_panic_text(payload))),
     }
+}
+
+static LOGGER_INIT_ONCE: Once = Once::new();
+
+fn ensure_android_logger() {
+    LOGGER_INIT_ONCE.call_once(|| {
+        #[cfg(target_os = "android")]
+        android_logger::init_once(
+            Config::default()
+                // Explicit tag so logcat filtering is unambiguous and short.
+                // Filter by tag with `adb logcat -s zingo_rs:V`.
+                .with_tag("zingo_rs")
+                .with_max_level(LevelFilter::Trace)
+                .with_filter(
+                    FilterBuilder::new()
+                        .parse("debug,zingo=trace,zingo_netutils=debug,nym_sdk=debug")
+                        .build(),
+                ),
+        );
+    });
 }
 
 #[derive(Clone, Default)]
@@ -275,18 +296,11 @@ fn parse_config_params(
 }
 
 pub fn init_logging() -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        // this is only for Android
-        #[cfg(target_os = "android")]
-        android_logger::init_once(
-            Config::default().with_min_level(Level::Trace).with_filter(
-                FilterBuilder::new()
-                    .parse("debug,hello::crate=zingolib")
-                    .build(),
-            ),
-        );
-        Ok("OK".to_string())
-    })
+    // ensure_android_logger() is already called from with_panic_guard, so
+    // by the time we get here the logger is up. This function remains as
+    // a public FFI entry point for Kotlin's RPCModule, but it is now
+    // redundant — any FFI call sets up logging on its first invocation.
+    with_panic_guard(|| Ok("OK".to_string()))
 }
 
 pub fn init_new(
@@ -304,7 +318,6 @@ pub fn init_new(
                 Err(e) => return Ok(format!("Error: {e}")),
             };
         let chain_height = match RT.block_on(async {
-            let _ = rustls::crypto::ring::default_provider().install_default();
             let indexer = match zingo_netutils::GrpcIndexer::new(lightwalletd_uri.clone()) {
                 Ok(i) => i,
                 Err(e) => return Err(format!("Error: creating indexer: {e}")),
@@ -546,7 +559,6 @@ pub fn get_latest_block_server(server_uri: String) -> Result<String, ZingolibErr
                 return Ok(format!("Error: failed to parse uri. {e}"));
             }
         };
-        let _ = rustls::crypto::ring::default_provider().install_default();
         let indexer = match zingo_netutils::GrpcIndexer::new(lightwalletd_uri) {
             Ok(i) => i,
             Err(e) => return Ok(format!("Error: creating indexer: {e}")),

@@ -169,20 +169,19 @@ dependencies = [
 
 [[package]]
 name = "android_log-sys"
-version = "0.2.0"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85965b6739a430150bdd138e2374a98af0c3ee0d030b3bb7fc3bddff58d0102e"
+checksum = "84521a3cf562bc62942e294181d9eef17eb38ceb8c68677bc49f144e4c3d4f8d"
 
 [[package]]
 name = "android_logger"
-version = "0.11.3"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8619b80c242aa7bd638b5c7ddd952addeecb71f69c75e33f1d47b2804f8f883a"
+checksum = "05b07e8e73d720a1f2e4b6014766e6039fd2e96a4fa44e2a78d0e1fa2ff49826"
 dependencies = [
  "android_log-sys",
- "env_logger 0.10.2",
+ "env_filter",
  "log",
- "once_cell",
 ]
 
 [[package]]
@@ -827,7 +826,7 @@ dependencies = [
  "bitflags 2.10.0",
  "cexpr",
  "clang-sys",
- "itertools 0.10.5",
+ "itertools 0.13.0",
  "proc-macro2",
  "quote",
  "regex",
@@ -930,8 +929,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90dbd31c98227229239363921e60fcf5e558e43ec69094d46fc4996f08d1d5bc"
 dependencies = [
  "bitcoin_hashes",
- "rand 0.7.3",
- "rand_core 0.5.1",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
  "serde",
  "unicode-normalization",
  "zeroize",
@@ -2427,8 +2426,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd5f2b7218a51c827a11d22d1439b598121fac94bf9b99452e4afffe512d78c9"
 dependencies = [
  "heck",
- "indexmap 1.9.3",
- "itertools 0.10.5",
+ "indexmap 2.13.0",
+ "itertools 0.14.0",
  "proc-macro-crate",
  "proc-macro2",
  "quote",
@@ -2603,7 +2602,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2868,6 +2867,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "env_filter"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1bf3c259d255ca70051b30e2e95b5446cdb8949ac4cd22c0d7fd634d89f568e2"
+dependencies = [
+ "log",
+ "regex",
+]
+
+[[package]]
 name = "env_home"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2920,7 +2929,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -4063,7 +4072,7 @@ dependencies = [
  "libc",
  "percent-encoding",
  "pin-project-lite",
- "socket2 0.5.10",
+ "socket2 0.6.1",
  "tokio",
  "tower-service",
  "tracing",
@@ -4356,7 +4365,7 @@ checksum = "3640c1c38b8e4e43584d8df18be5fc6b0aa314ce6ebf51b53313d4306cca8e46"
 dependencies = [
  "hermit-abi",
  "libc",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -4630,7 +4639,7 @@ version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d463f34ca3c400fde3a054da0e0b8c6ffa21e4590922f3e18281bb5eeef4cbdc"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5330,7 +5339,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5448,21 +5457,62 @@ dependencies = [
  "ecdsa",
  "hex",
  "humantime-serde",
- "nym-coconut-dkg-common",
- "nym-compact-ecash",
- "nym-config",
- "nym-contracts-common",
- "nym-credentials-interface",
- "nym-crypto",
- "nym-ecash-signer-check-types",
- "nym-ecash-time",
- "nym-kkt-ciphersuite",
- "nym-mixnet-contract-common",
- "nym-network-defaults",
- "nym-node-requests",
- "nym-noise-keys",
- "nym-serde-helpers",
- "nym-ticketbooks-merkle",
+ "nym-coconut-dkg-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-compact-ecash 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-config 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ecash-signer-check-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-kkt-ciphersuite 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-node-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-noise-keys 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-serde-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ticketbooks-merkle 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "schemars 0.8.22",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "strum 0.28.0",
+ "strum_macros 0.28.0",
+ "tendermint",
+ "tendermint-rpc",
+ "thiserror 2.0.17",
+ "time",
+ "tracing",
+ "utoipa",
+]
+
+[[package]]
+name = "nym-api-requests"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bs58",
+ "celes",
+ "cosmrs",
+ "cosmwasm-std",
+ "ecdsa",
+ "hex",
+ "humantime-serde",
+ "nym-coconut-dkg-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-compact-ecash 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-config 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ecash-signer-check-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-kkt-ciphersuite 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-node-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-noise-keys 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-serde-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ticketbooks-merkle 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "schemars 0.8.22",
  "serde",
  "serde_json",
@@ -5484,13 +5534,31 @@ source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#478
 dependencies = [
  "async-trait",
  "log",
- "nym-credential-storage",
- "nym-credentials",
- "nym-credentials-interface",
- "nym-crypto",
- "nym-ecash-time",
- "nym-task",
- "nym-validator-client",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-bandwidth-controller"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "async-trait",
+ "log",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "thiserror 2.0.17",
 ]
@@ -5499,6 +5567,21 @@ dependencies = [
 name = "nym-bin-common"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
+dependencies = [
+ "const-str",
+ "log",
+ "schemars 0.8.22",
+ "serde",
+ "tracing",
+ "tracing-subscriber",
+ "utoipa",
+ "vergen",
+]
+
+[[package]]
+name = "nym-bin-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
 dependencies = [
  "const-str",
  "log",
@@ -5543,29 +5626,89 @@ dependencies = [
  "humantime",
  "hyper 1.8.1",
  "hyper-util",
- "nym-bandwidth-controller",
- "nym-client-core-config-types",
- "nym-client-core-gateways-storage",
- "nym-client-core-surb-storage",
- "nym-credential-storage",
- "nym-credentials-interface",
- "nym-crypto",
- "nym-ecash-time",
- "nym-gateway-client",
- "nym-gateway-requests",
- "nym-http-api-client",
- "nym-id",
- "nym-mixnet-client",
- "nym-mixnet-contract-common",
- "nym-network-defaults",
- "nym-nonexhaustive-delayqueue",
- "nym-pemstore",
- "nym-sphinx",
- "nym-statistics-common",
- "nym-task",
- "nym-topology",
- "nym-validator-client",
- "nym-wasm-utils",
+ "nym-bandwidth-controller 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-client-core-config-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-client-core-gateways-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-client-core-surb-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-gateway-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-gateway-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-id 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-mixnet-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-nonexhaustive-delayqueue 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-statistics-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-wasm-utils 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "si-scale",
+ "thiserror 2.0.17",
+ "time",
+ "tokio",
+ "tokio-stream",
+ "tokio-tungstenite",
+ "tokio_with_wasm",
+ "tracing",
+ "tungstenite",
+ "url",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wasmtimer",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-client-core"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "async-trait",
+ "base64 0.22.1",
+ "bs58",
+ "cfg-if",
+ "futures",
+ "getrandom 0.3.3",
+ "gloo-timers",
+ "http-body-util",
+ "humantime",
+ "hyper 1.8.1",
+ "hyper-util",
+ "nym-bandwidth-controller 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-client-core-config-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-client-core-gateways-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-client-core-surb-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-gateway-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-gateway-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-id 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-mixnet-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-nonexhaustive-delayqueue 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-statistics-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-wasm-utils 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "serde",
@@ -5593,11 +5736,27 @@ version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "humantime-serde",
- "nym-config",
- "nym-pemstore",
- "nym-sphinx-addressing",
- "nym-sphinx-params",
- "nym-statistics-common",
+ "nym-config 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-statistics-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "thiserror 2.0.17",
+ "url",
+]
+
+[[package]]
+name = "nym-client-core-config-types"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "humantime-serde",
+ "nym-config 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-statistics-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "thiserror 2.0.17",
  "url",
@@ -5610,9 +5769,29 @@ source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#478
 dependencies = [
  "anyhow",
  "async-trait",
- "nym-crypto",
- "nym-gateway-client",
- "nym-gateway-requests",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-gateway-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-gateway-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "sqlx",
+ "thiserror 2.0.17",
+ "time",
+ "tokio",
+ "tracing",
+ "url",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-client-core-gateways-storage"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-gateway-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-gateway-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "sqlx",
  "thiserror 2.0.17",
@@ -5631,10 +5810,29 @@ dependencies = [
  "anyhow",
  "async-trait",
  "dashmap",
- "nym-crypto",
- "nym-sphinx",
- "nym-sqlx-pool-guard",
- "nym-task",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sqlx-pool-guard 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "sqlx",
+ "thiserror 2.0.17",
+ "time",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "nym-client-core-surb-storage"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "dashmap",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sqlx-pool-guard 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "sqlx",
  "thiserror 2.0.17",
  "time",
@@ -5652,14 +5850,37 @@ dependencies = [
  "cw-utils",
  "cw2",
  "cw4",
- "nym-contracts-common",
- "nym-multisig-contract-common",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-multisig-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+]
+
+[[package]]
+name = "nym-coconut-dkg-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-utils",
+ "cw2",
+ "cw4",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-multisig-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
 ]
 
 [[package]]
 name = "nym-common"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
+dependencies = [
+ "tracing",
+ "tracing-test",
+]
+
+[[package]]
+name = "nym-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
 dependencies = [
  "tracing",
  "tracing-test",
@@ -5678,8 +5899,31 @@ dependencies = [
  "group",
  "itertools 0.14.0",
  "nym-bls12_381-fork",
- "nym-network-defaults",
- "nym-pemstore",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "serde",
+ "sha2 0.10.9",
+ "subtle 2.6.1",
+ "thiserror 2.0.17",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-compact-ecash"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bincode 1.3.3",
+ "bs58",
+ "cfg-if",
+ "digest 0.10.7",
+ "ff",
+ "group",
+ "itertools 0.14.0",
+ "nym-bls12_381-fork",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "serde",
  "sha2 0.10.9",
@@ -5696,7 +5940,22 @@ dependencies = [
  "dirs",
  "handlebars",
  "log",
- "nym-network-defaults",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "thiserror 2.0.17",
+ "toml 0.8.23",
+ "url",
+]
+
+[[package]]
+name = "nym-config"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "dirs",
+ "handlebars",
+ "log",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "thiserror 2.0.17",
  "toml 0.8.23",
@@ -5719,6 +5978,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-contracts-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bs58",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus",
+ "schemars 0.8.22",
+ "serde",
+ "thiserror 2.0.17",
+ "vergen",
+]
+
+[[package]]
 name = "nym-credential-storage"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
@@ -5727,10 +6001,31 @@ dependencies = [
  "async-trait",
  "bincode 1.3.3",
  "log",
- "nym-compact-ecash",
- "nym-credentials",
- "nym-ecash-time",
- "nym-sqlx-pool-guard",
+ "nym-compact-ecash 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sqlx-pool-guard 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "sqlx",
+ "thiserror 2.0.17",
+ "time",
+ "tokio",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-credential-storage"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bincode 1.3.3",
+ "log",
+ "nym-compact-ecash 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sqlx-pool-guard 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "sqlx",
  "thiserror 2.0.17",
@@ -5745,14 +6040,33 @@ version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "log",
- "nym-bandwidth-controller",
- "nym-client-core",
- "nym-config",
- "nym-credential-storage",
- "nym-credentials",
- "nym-credentials-interface",
- "nym-ecash-time",
- "nym-validator-client",
+ "nym-bandwidth-controller 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-client-core 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-config 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "thiserror 2.0.17",
+ "time",
+ "tokio",
+]
+
+[[package]]
+name = "nym-credential-utils"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "log",
+ "nym-bandwidth-controller 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-client-core 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-config 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "thiserror 2.0.17",
  "time",
  "tokio",
@@ -5766,16 +6080,40 @@ dependencies = [
  "bincode 1.3.3",
  "cosmrs",
  "log",
- "nym-api-requests",
+ "nym-api-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
  "nym-bls12_381-fork",
- "nym-credentials-interface",
- "nym-crypto",
- "nym-ecash-contract-common",
- "nym-ecash-time",
- "nym-http-api-client",
- "nym-network-defaults",
- "nym-serde-helpers",
- "nym-validator-client",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ecash-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-serde-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "thiserror 2.0.17",
+ "time",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-credentials"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bincode 1.3.3",
+ "cosmrs",
+ "log",
+ "nym-api-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-bls12_381-fork",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ecash-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-serde-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "thiserror 2.0.17",
  "time",
@@ -5788,10 +6126,29 @@ version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "nym-bls12_381-fork",
- "nym-compact-ecash",
- "nym-ecash-time",
- "nym-network-defaults",
- "nym-upgrade-mode-check",
+ "nym-compact-ecash 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-upgrade-mode-check 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "serde",
+ "strum 0.28.0",
+ "strum_macros 0.28.0",
+ "thiserror 2.0.17",
+ "time",
+ "utoipa",
+]
+
+[[package]]
+name = "nym-credentials-interface"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-bls12_381-fork",
+ "nym-compact-ecash 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ecash-time 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-upgrade-mode-check 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "serde",
  "strum 0.28.0",
@@ -5823,8 +6180,43 @@ dependencies = [
  "jwt-simple",
  "libcrux-curve25519",
  "libcrux-psq",
- "nym-pemstore",
- "nym-sphinx-types",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "rand 0.9.2",
+ "serde",
+ "serde_bytes",
+ "sha2 0.10.9",
+ "subtle-encoding",
+ "thiserror 2.0.17",
+ "x25519-dalek",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-crypto"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "aead",
+ "aes",
+ "aes-gcm-siv",
+ "base64 0.22.1",
+ "blake3",
+ "bs58",
+ "cipher",
+ "ctr",
+ "curve25519-dalek",
+ "digest 0.10.7",
+ "ed25519-dalek",
+ "generic-array 0.14.7",
+ "hkdf",
+ "hmac 0.12.1",
+ "jwt-simple",
+ "libcrux-curve25519",
+ "libcrux-psq",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "rand 0.9.2",
  "serde",
@@ -5846,7 +6238,21 @@ dependencies = [
  "cosmwasm-std",
  "cw-controllers",
  "cw-utils",
- "nym-multisig-contract-common",
+ "nym-multisig-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-ecash-contract-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bs58",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-controllers",
+ "cw-utils",
+ "nym-multisig-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "thiserror 2.0.17",
 ]
 
@@ -5855,8 +6261,24 @@ name = "nym-ecash-signer-check-types"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-coconut-dkg-common",
- "nym-crypto",
+ "nym-coconut-dkg-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "semver",
+ "serde",
+ "thiserror 2.0.17",
+ "time",
+ "tracing",
+ "url",
+ "utoipa",
+]
+
+[[package]]
+name = "nym-ecash-signer-check-types"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-coconut-dkg-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "semver",
  "serde",
  "thiserror 2.0.17",
@@ -5871,7 +6293,16 @@ name = "nym-ecash-time"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-compact-ecash",
+ "nym-compact-ecash 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "time",
+]
+
+[[package]]
+name = "nym-ecash-time"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-compact-ecash 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "time",
 ]
 
@@ -5888,6 +6319,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-exit-policy"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror 2.0.17",
+ "tracing",
+ "utoipa",
+]
+
+[[package]]
 name = "nym-gateway-client"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
@@ -5895,20 +6338,59 @@ dependencies = [
  "futures",
  "getrandom 0.2.17",
  "gloo-utils",
- "nym-bandwidth-controller",
- "nym-credential-storage",
- "nym-credentials",
- "nym-credentials-interface",
- "nym-crypto",
- "nym-gateway-requests",
- "nym-http-api-client",
- "nym-network-defaults",
- "nym-pemstore",
- "nym-sphinx",
- "nym-statistics-common",
- "nym-task",
- "nym-validator-client",
- "nym-wasm-utils",
+ "nym-bandwidth-controller 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-gateway-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-statistics-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-wasm-utils 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "serde",
+ "si-scale",
+ "thiserror 2.0.17",
+ "time",
+ "tokio",
+ "tokio-stream",
+ "tokio-tungstenite",
+ "tracing",
+ "tungstenite",
+ "url",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wasmtimer",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-gateway-client"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "futures",
+ "getrandom 0.2.17",
+ "gloo-utils",
+ "nym-bandwidth-controller 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-gateway-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-statistics-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-wasm-utils 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "serde",
  "si-scale",
@@ -5934,14 +6416,44 @@ dependencies = [
  "bs58",
  "futures",
  "generic-array 0.14.7",
- "nym-credentials",
- "nym-credentials-interface",
- "nym-crypto",
- "nym-pemstore",
- "nym-serde-helpers",
- "nym-sphinx",
- "nym-statistics-common",
- "nym-task",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-serde-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-statistics-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "serde",
+ "serde_json",
+ "strum 0.28.0",
+ "subtle 2.6.1",
+ "thiserror 2.0.17",
+ "time",
+ "tokio",
+ "tracing",
+ "tungstenite",
+ "wasmtimer",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-gateway-requests"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bs58",
+ "futures",
+ "generic-array 0.14.7",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-serde-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-statistics-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "serde",
  "serde_json",
@@ -5969,6 +6481,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-group-contract-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "cosmwasm-schema",
+ "cw-controllers",
+ "cw4",
+ "schemars 0.8.22",
+ "serde",
+]
+
+[[package]]
 name = "nym-http-api-client"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
@@ -5983,10 +6507,10 @@ dependencies = [
  "inventory",
  "itertools 0.14.0",
  "mime",
- "nym-bin-common",
- "nym-http-api-client-macro",
- "nym-http-api-common",
- "nym-network-defaults",
+ "nym-bin-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-http-api-client-macro 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-http-api-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
  "once_cell",
  "reqwest 0.13.3",
  "rustls 0.23.40",
@@ -6002,9 +6526,55 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-http-api-client"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "async-trait",
+ "bincode 1.3.3",
+ "bytes",
+ "cfg-if",
+ "encoding_rs",
+ "hickory-resolver",
+ "http 1.4.0",
+ "inventory",
+ "itertools 0.14.0",
+ "mime",
+ "nym-bin-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-http-api-client-macro 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-http-api-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "once_cell",
+ "reqwest 0.13.3",
+ "rustls 0.23.40",
+ "serde",
+ "serde_json",
+ "serde_plain",
+ "serde_yaml",
+ "thiserror 2.0.17",
+ "tokio",
+ "tracing",
+ "url",
+ "wasmtimer",
+ "webpki-roots 0.26.11",
+]
+
+[[package]]
 name = "nym-http-api-client-macro"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
+dependencies = [
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.114",
+ "uuid",
+]
+
+[[package]]
+name = "nym-http-api-client-macro"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -6025,12 +6595,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-http-api-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bincode 1.3.3",
+ "serde",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
 name = "nym-id"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-credential-storage",
- "nym-credentials",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "thiserror 2.0.17",
+ "time",
+ "tracing",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-id"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "thiserror 2.0.17",
  "time",
  "tracing",
@@ -6044,10 +6638,31 @@ source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#478
 dependencies = [
  "bincode 1.3.3",
  "bytes",
- "nym-bin-common",
- "nym-crypto",
- "nym-service-provider-requests-common",
- "nym-sphinx",
+ "nym-bin-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-service-provider-requests-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "semver",
+ "serde",
+ "thiserror 2.0.17",
+ "time",
+ "tokio",
+ "tokio-util",
+ "tracing",
+]
+
+[[package]]
+name = "nym-ip-packet-requests"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bincode 1.3.3",
+ "bytes",
+ "nym-bin-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-service-provider-requests-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "semver",
  "serde",
@@ -6069,10 +6684,31 @@ dependencies = [
  "libcrux-ml-kem",
  "libcrux-psq",
  "num_enum",
- "nym-crypto",
- "nym-kkt-ciphersuite",
- "nym-kkt-context",
- "nym-pemstore",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-kkt-ciphersuite 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-kkt-context 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.9.2",
+ "strum 0.28.0",
+ "thiserror 2.0.17",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-kkt"
+version = "0.1.0"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "libcrux-chacha20poly1305",
+ "libcrux-ecdh",
+ "libcrux-kem",
+ "libcrux-ml-kem",
+ "libcrux-psq",
+ "num_enum",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-kkt-ciphersuite 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-kkt-context 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.9.2",
  "strum 0.28.0",
  "thiserror 2.0.17",
@@ -6094,12 +6730,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-kkt-ciphersuite"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "blake3",
+ "libcrux-sha3",
+ "num_enum",
+ "semver",
+ "strum 0.28.0",
+ "strum_macros 0.28.0",
+ "thiserror 2.0.17",
+]
+
+[[package]]
 name = "nym-kkt-context"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "num_enum",
- "nym-kkt-ciphersuite",
+ "nym-kkt-ciphersuite 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-kkt-context"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "num_enum",
+ "nym-kkt-ciphersuite 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "thiserror 2.0.17",
 ]
 
@@ -6112,10 +6772,31 @@ dependencies = [
  "bytes",
  "libcrux-psq",
  "num_enum",
- "nym-common",
- "nym-crypto",
- "nym-kkt",
- "nym-kkt-ciphersuite",
+ "nym-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-kkt 0.1.0 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-kkt-ciphersuite 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.9.2",
+ "thiserror 2.0.17",
+ "tls_codec",
+ "tokio",
+ "tracing",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-lp"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bs58",
+ "bytes",
+ "libcrux-psq",
+ "num_enum",
+ "nym-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-kkt 0.1.0 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-kkt-ciphersuite 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.9.2",
  "thiserror 2.0.17",
  "tls_codec",
@@ -6136,15 +6817,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-metrics"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "dashmap",
+ "lazy_static",
+ "prometheus",
+ "tracing",
+]
+
+[[package]]
 name = "nym-mixnet-client"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "dashmap",
  "futures",
- "nym-noise",
- "nym-sphinx",
- "nym-task",
+ "nym-noise 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "tracing",
+]
+
+[[package]]
+name = "nym-mixnet-client"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "dashmap",
+ "futures",
+ "nym-noise 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "tokio",
  "tokio-stream",
  "tokio-util",
@@ -6162,7 +6870,28 @@ dependencies = [
  "cw-controllers",
  "cw-storage-plus",
  "humantime-serde",
- "nym-contracts-common",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "schemars 0.8.22",
+ "semver",
+ "serde",
+ "serde_repr",
+ "thiserror 2.0.17",
+ "time",
+ "utoipa",
+]
+
+[[package]]
+name = "nym-mixnet-contract-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bs58",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-controllers",
+ "cw-storage-plus",
+ "humantime-serde",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "schemars 0.8.22",
  "semver",
  "serde",
@@ -6176,6 +6905,22 @@ dependencies = [
 name = "nym-multisig-contract-common"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus",
+ "cw-utils",
+ "cw3",
+ "cw4",
+ "schemars 0.8.22",
+ "serde",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-multisig-contract-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -6206,19 +6951,61 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-network-defaults"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "cargo_metadata 0.19.2",
+ "dotenvy",
+ "log",
+ "regex",
+ "schemars 0.8.22",
+ "serde",
+ "serde_json",
+ "tracing",
+ "url",
+ "utoipa",
+]
+
+[[package]]
 name = "nym-node-requests"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "celes",
  "humantime-serde",
- "nym-bin-common",
- "nym-crypto",
- "nym-exit-policy",
- "nym-kkt-ciphersuite",
- "nym-noise-keys",
- "nym-upgrade-mode-check",
- "nym-wireguard-types",
+ "nym-bin-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-exit-policy 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-kkt-ciphersuite 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-noise-keys 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-upgrade-mode-check 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-wireguard-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "schemars 0.8.22",
+ "serde",
+ "serde_json",
+ "strum 0.28.0",
+ "strum_macros 0.28.0",
+ "thiserror 2.0.17",
+ "time",
+ "url",
+ "utoipa",
+]
+
+[[package]]
+name = "nym-node-requests"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "celes",
+ "humantime-serde",
+ "nym-bin-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-exit-policy 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-kkt-ciphersuite 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-noise-keys 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-upgrade-mode-check 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-wireguard-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "schemars 0.8.22",
  "serde",
  "serde_json",
@@ -6238,8 +7025,29 @@ dependencies = [
  "arc-swap",
  "bytes",
  "futures",
- "nym-crypto",
- "nym-noise-keys",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-noise-keys 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "pin-project",
+ "sha2 0.10.9",
+ "snow",
+ "strum 0.28.0",
+ "strum_macros 0.28.0",
+ "thiserror 2.0.17",
+ "tokio",
+ "tokio-util",
+ "tracing",
+]
+
+[[package]]
+name = "nym-noise"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "arc-swap",
+ "bytes",
+ "futures",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-noise-keys 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "pin-project",
  "sha2 0.10.9",
  "snow",
@@ -6256,7 +7064,18 @@ name = "nym-noise-keys"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-crypto",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "schemars 0.8.22",
+ "serde",
+ "utoipa",
+]
+
+[[package]]
+name = "nym-noise-keys"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "schemars 0.8.22",
  "serde",
  "utoipa",
@@ -6274,6 +7093,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-nonexhaustive-delayqueue"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "wasmtimer",
+]
+
+[[package]]
 name = "nym-ordered-buffer"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
@@ -6283,9 +7113,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-ordered-buffer"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "log",
+ "thiserror 2.0.17",
+]
+
+[[package]]
 name = "nym-outfox"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
+dependencies = [
+ "blake3",
+ "chacha20 0.9.1",
+ "chacha20poly1305",
+ "sphinx-packet",
+ "thiserror 2.0.17",
+ "x25519-dalek",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-outfox"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
 dependencies = [
  "blake3",
  "chacha20 0.9.1",
@@ -6307,6 +7160,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-pemstore"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "pem",
+ "tracing",
+ "zeroize",
+]
+
+[[package]]
 name = "nym-performance-contract-common"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
@@ -6314,7 +7177,21 @@ dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-controllers",
- "nym-contracts-common",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "schemars 0.8.22",
+ "serde",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-performance-contract-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-controllers",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "schemars 0.8.22",
  "serde",
  "thiserror 2.0.17",
@@ -6338,29 +7215,87 @@ dependencies = [
  "http 1.4.0",
  "httpcodec",
  "log",
- "nym-bandwidth-controller",
- "nym-bin-common",
- "nym-client-core",
- "nym-credential-storage",
- "nym-credential-utils",
- "nym-credentials",
- "nym-credentials-interface",
- "nym-crypto",
- "nym-gateway-requests",
- "nym-http-api-client",
- "nym-ip-packet-requests",
- "nym-lp",
- "nym-network-defaults",
- "nym-ordered-buffer",
- "nym-service-providers-common",
- "nym-socks5-client-core",
- "nym-socks5-requests",
- "nym-sphinx",
- "nym-sphinx-addressing",
- "nym-statistics-common",
- "nym-task",
- "nym-topology",
- "nym-validator-client",
+ "nym-bandwidth-controller 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-bin-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-client-core 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credential-utils 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-gateway-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ip-packet-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-lp 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ordered-buffer 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-service-providers-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-socks5-client-core 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-socks5-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-statistics-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "semver",
+ "serde",
+ "tap",
+ "tempfile",
+ "thiserror 2.0.17",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "toml 0.8.23",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "uuid",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-sdk"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bincode 1.3.3",
+ "bip39",
+ "bytecodec",
+ "bytes",
+ "clap",
+ "dashmap",
+ "dirs",
+ "futures",
+ "http 1.4.0",
+ "httpcodec",
+ "log",
+ "nym-bandwidth-controller 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-bin-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-client-core 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credential-utils 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-gateway-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ip-packet-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-lp 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ordered-buffer 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-service-providers-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-socks5-client-core 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-socks5-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-statistics-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "semver",
  "serde",
@@ -6391,9 +7326,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-serde-helpers"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "base64 0.22.1",
+ "bs58",
+ "hex",
+ "serde",
+ "time",
+]
+
+[[package]]
 name = "nym-service-provider-requests-common"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
+dependencies = [
+ "serde",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-service-provider-requests-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
 dependencies = [
  "serde",
  "thiserror 2.0.17",
@@ -6406,8 +7362,22 @@ source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#478
 dependencies = [
  "async-trait",
  "log",
- "nym-bin-common",
- "nym-sphinx-anonymous-replies",
+ "nym-bin-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-anonymous-replies 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-service-providers-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "async-trait",
+ "log",
+ "nym-bin-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-anonymous-replies 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "serde_json",
  "thiserror 2.0.17",
@@ -6422,19 +7392,52 @@ dependencies = [
  "dirs",
  "futures",
  "log",
- "nym-bandwidth-controller",
- "nym-client-core",
- "nym-config",
- "nym-contracts-common",
- "nym-credential-storage",
- "nym-mixnet-contract-common",
- "nym-network-defaults",
- "nym-service-providers-common",
- "nym-socks5-proxy-helpers",
- "nym-socks5-requests",
- "nym-sphinx",
- "nym-task",
- "nym-validator-client",
+ "nym-bandwidth-controller 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-client-core 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-config 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-service-providers-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-socks5-proxy-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-socks5-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "pin-project",
+ "rand 0.8.5",
+ "reqwest 0.13.3",
+ "schemars 0.8.22",
+ "serde",
+ "tap",
+ "thiserror 2.0.17",
+ "tokio",
+ "url",
+]
+
+[[package]]
+name = "nym-socks5-client-core"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "anyhow",
+ "dirs",
+ "futures",
+ "log",
+ "nym-bandwidth-controller 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-client-core 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-config 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-credential-storage 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-service-providers-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-socks5-proxy-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-socks5-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "pin-project",
  "rand 0.8.5",
  "reqwest 0.13.3",
@@ -6454,9 +7457,24 @@ dependencies = [
  "bytes",
  "futures",
  "log",
- "nym-ordered-buffer",
- "nym-socks5-requests",
- "nym-task",
+ "nym-ordered-buffer 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-socks5-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "tokio",
+ "tokio-util",
+]
+
+[[package]]
+name = "nym-socks5-proxy-helpers"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bytes",
+ "futures",
+ "log",
+ "nym-ordered-buffer 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-socks5-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "tokio",
  "tokio-util",
 ]
@@ -6468,9 +7486,25 @@ source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#478
 dependencies = [
  "bincode 1.3.3",
  "log",
- "nym-exit-policy",
- "nym-service-providers-common",
- "nym-sphinx-addressing",
+ "nym-exit-policy 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-service-providers-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "serde_json",
+ "tap",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-socks5-requests"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bincode 1.3.3",
+ "log",
+ "nym-exit-policy 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-service-providers-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "serde_json",
  "tap",
@@ -6482,19 +7516,45 @@ name = "nym-sphinx"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-crypto",
- "nym-metrics",
- "nym-sphinx-acknowledgements",
- "nym-sphinx-addressing",
- "nym-sphinx-anonymous-replies",
- "nym-sphinx-chunking",
- "nym-sphinx-cover",
- "nym-sphinx-forwarding",
- "nym-sphinx-framing",
- "nym-sphinx-params",
- "nym-sphinx-routing",
- "nym-sphinx-types",
- "nym-topology",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-metrics 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-acknowledgements 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-anonymous-replies 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-chunking 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-cover 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-forwarding 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-framing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-routing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
+ "rand_distr",
+ "thiserror 2.0.17",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "nym-sphinx"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-metrics 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-acknowledgements 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-anonymous-replies 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-chunking 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-cover 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-forwarding 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-framing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-routing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "rand_distr",
@@ -6508,13 +7568,30 @@ name = "nym-sphinx-acknowledgements"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-crypto",
- "nym-pemstore",
- "nym-sphinx-addressing",
- "nym-sphinx-params",
- "nym-sphinx-routing",
- "nym-sphinx-types",
- "nym-topology",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-routing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "thiserror 2.0.17",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-sphinx-acknowledgements"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-pemstore 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-routing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "thiserror 2.0.17",
  "zeroize",
@@ -6525,8 +7602,19 @@ name = "nym-sphinx-addressing"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-crypto",
- "nym-sphinx-types",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-sphinx-addressing"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "thiserror 2.0.17",
 ]
@@ -6537,12 +7625,30 @@ version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "bs58",
- "nym-crypto",
- "nym-sphinx-addressing",
- "nym-sphinx-params",
- "nym-sphinx-routing",
- "nym-sphinx-types",
- "nym-topology",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-routing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "thiserror 2.0.17",
+ "tracing",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "nym-sphinx-anonymous-replies"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bs58",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-routing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "thiserror 2.0.17",
  "tracing",
@@ -6556,11 +7662,30 @@ source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#478
 dependencies = [
  "dashmap",
  "log",
- "nym-crypto",
- "nym-metrics",
- "nym-sphinx-addressing",
- "nym-sphinx-params",
- "nym-sphinx-types",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-metrics 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "serde",
+ "thiserror 2.0.17",
+ "utoipa",
+ "wasmtimer",
+]
+
+[[package]]
+name = "nym-sphinx-chunking"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "dashmap",
+ "log",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-metrics 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "serde",
  "thiserror 2.0.17",
@@ -6573,15 +7698,33 @@ name = "nym-sphinx-cover"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-crypto",
- "nym-sphinx-acknowledgements",
- "nym-sphinx-addressing",
- "nym-sphinx-chunking",
- "nym-sphinx-forwarding",
- "nym-sphinx-params",
- "nym-sphinx-routing",
- "nym-sphinx-types",
- "nym-topology",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-acknowledgements 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-chunking 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-forwarding 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-routing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-sphinx-cover"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-acknowledgements 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-chunking 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-forwarding 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-routing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-topology 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "thiserror 2.0.17",
 ]
@@ -6591,10 +7734,22 @@ name = "nym-sphinx-forwarding"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-sphinx-addressing",
- "nym-sphinx-anonymous-replies",
- "nym-sphinx-params",
- "nym-sphinx-types",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-anonymous-replies 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-sphinx-forwarding"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-anonymous-replies 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "thiserror 2.0.17",
 ]
 
@@ -6605,11 +7760,28 @@ source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#478
 dependencies = [
  "bytes",
  "cfg-if",
- "nym-sphinx-acknowledgements",
- "nym-sphinx-addressing",
- "nym-sphinx-forwarding",
- "nym-sphinx-params",
- "nym-sphinx-types",
+ "nym-sphinx-acknowledgements 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-forwarding 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "thiserror 2.0.17",
+ "tokio-util",
+ "tracing",
+]
+
+[[package]]
+name = "nym-sphinx-framing"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "bytes",
+ "cfg-if",
+ "nym-sphinx-acknowledgements 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-forwarding 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-params 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "thiserror 2.0.17",
  "tokio-util",
  "tracing",
@@ -6620,8 +7792,19 @@ name = "nym-sphinx-params"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-crypto",
- "nym-sphinx-types",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-sphinx-params"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "thiserror 2.0.17",
 ]
@@ -6631,8 +7814,18 @@ name = "nym-sphinx-routing"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-sphinx-addressing",
- "nym-sphinx-types",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-sphinx-routing"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "thiserror 2.0.17",
 ]
 
@@ -6641,7 +7834,17 @@ name = "nym-sphinx-types"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-outfox",
+ "nym-outfox 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "sphinx-packet",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-sphinx-types"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-outfox 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "sphinx-packet",
  "thiserror 2.0.17",
 ]
@@ -6659,17 +7862,54 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-sqlx-pool-guard"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "proc_pidinfo",
+ "sqlx",
+ "tokio",
+ "tracing",
+ "windows",
+]
+
+[[package]]
 name = "nym-statistics-common"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "futures",
  "log",
- "nym-credentials-interface",
- "nym-crypto",
- "nym-metrics",
- "nym-sphinx",
- "nym-task",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-metrics 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "si-scale",
+ "strum 0.28.0",
+ "strum_macros 0.28.0",
+ "sysinfo 0.37.2",
+ "thiserror 2.0.17",
+ "time",
+ "tokio",
+ "wasmtimer",
+]
+
+[[package]]
+name = "nym-statistics-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "futures",
+ "log",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-metrics 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-task 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "serde_json",
  "sha2 0.10.9",
@@ -6701,12 +7941,44 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-task"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "cfg-if",
+ "futures",
+ "log",
+ "thiserror 2.0.17",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wasmtimer",
+]
+
+[[package]]
 name = "nym-ticketbooks-merkle"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
- "nym-credentials-interface",
- "nym-serde-helpers",
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-serde-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rs_merkle",
+ "schemars 0.8.22",
+ "serde",
+ "sha2 0.10.9",
+ "time",
+ "utoipa",
+]
+
+[[package]]
+name = "nym-ticketbooks-merkle"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "nym-credentials-interface 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-serde-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rs_merkle",
  "schemars 0.8.22",
  "serde",
@@ -6721,11 +7993,31 @@ version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "async-trait",
- "nym-api-requests",
- "nym-crypto",
- "nym-mixnet-contract-common",
- "nym-sphinx-addressing",
- "nym-sphinx-types",
+ "nym-api-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "rand 0.8.5",
+ "reqwest 0.13.3",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.17",
+ "time",
+ "tracing",
+]
+
+[[package]]
+name = "nym-topology"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "async-trait",
+ "nym-api-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-addressing 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sphinx-types 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "rand 0.8.5",
  "reqwest 0.13.3",
  "serde",
@@ -6741,8 +8033,25 @@ version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "jwt-simple",
- "nym-crypto",
- "nym-http-api-client",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "reqwest 0.13.3",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.17",
+ "time",
+ "tracing",
+ "utoipa",
+]
+
+[[package]]
+name = "nym-upgrade-mode-check"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "jwt-simple",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "reqwest 0.13.3",
  "serde",
  "serde_json",
@@ -6773,20 +8082,70 @@ dependencies = [
  "flate2",
  "futures",
  "itertools 0.14.0",
- "nym-api-requests",
- "nym-coconut-dkg-common",
- "nym-compact-ecash",
- "nym-config",
- "nym-contracts-common",
- "nym-ecash-contract-common",
- "nym-group-contract-common",
- "nym-http-api-client",
- "nym-mixnet-contract-common",
- "nym-multisig-contract-common",
- "nym-network-defaults",
- "nym-performance-contract-common",
- "nym-serde-helpers",
- "nym-vesting-contract-common",
+ "nym-api-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-coconut-dkg-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-compact-ecash 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-config 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-ecash-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-group-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-multisig-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-performance-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-serde-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-vesting-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "prost 0.13.5",
+ "reqwest 0.13.3",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tendermint-rpc",
+ "thiserror 2.0.17",
+ "time",
+ "tokio",
+ "tracing",
+ "url",
+ "wasmtimer",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-validator-client"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "async-trait",
+ "base64 0.22.1",
+ "bip32 0.5.3",
+ "bip39",
+ "colored",
+ "cosmrs",
+ "cosmwasm-std",
+ "cw-controllers",
+ "cw-utils",
+ "cw2",
+ "cw3",
+ "cw4",
+ "eyre",
+ "flate2",
+ "futures",
+ "itertools 0.14.0",
+ "nym-api-requests 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-coconut-dkg-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-compact-ecash 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-config 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-ecash-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-group-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-multisig-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-network-defaults 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-performance-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-serde-helpers 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-vesting-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "prost 0.13.5",
  "reqwest 0.13.3",
  "serde",
@@ -6809,8 +8168,21 @@ source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#478
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
- "nym-contracts-common",
- "nym-mixnet-contract-common",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "thiserror 2.0.17",
+]
+
+[[package]]
+name = "nym-vesting-contract-common"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "nym-contracts-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-mixnet-contract-common 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "thiserror 2.0.17",
 ]
@@ -6831,12 +8203,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "nym-wasm-utils"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "futures",
+ "getrandom 0.2.17",
+ "gloo-net",
+ "gloo-utils",
+ "js-sys",
+ "tungstenite",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+]
+
+[[package]]
 name = "nym-wireguard-types"
 version = "1.20.4"
 source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1#47871a658bfb022448ad49ac33c7828e91d05a68"
 dependencies = [
  "base64 0.22.1",
- "nym-crypto",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "serde",
+ "thiserror 2.0.17",
+ "x25519-dalek",
+ "zeroize",
+]
+
+[[package]]
+name = "nym-wireguard-types"
+version = "1.20.4"
+source = "git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix#6e2abc66bc1a21ac755a321458454495d323d4f0"
+dependencies = [
+ "base64 0.22.1",
+ "nym-crypto 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "serde",
  "thiserror 2.0.17",
  "x25519-dalek",
@@ -7721,7 +9121,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "343d3bd7056eda839b03204e68deff7d1b13aba7af2b2fd16890697274262ee7"
 dependencies = [
  "heck",
- "itertools 0.10.5",
+ "itertools 0.14.0",
  "log",
  "multimap",
  "petgraph",
@@ -7742,7 +9142,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a56d757972c98b346a9b766e3f02746cde6dd1cd1d1d563472929fdd74bec4d"
 dependencies = [
  "anyhow",
- "itertools 0.10.5",
+ "itertools 0.14.0",
  "proc-macro2",
  "quote",
  "syn 2.0.114",
@@ -7755,7 +9155,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "27c6023962132f4b30eb4c172c91ce92d933da334c59c23cddee82358ddafb0b"
 dependencies = [
  "anyhow",
- "itertools 0.10.5",
+ "itertools 0.14.0",
  "proc-macro2",
  "quote",
  "syn 2.0.114",
@@ -7900,7 +9300,7 @@ dependencies = [
  "quinn-udp",
  "rustc-hash 2.1.1",
  "rustls 0.23.40",
- "socket2 0.5.10",
+ "socket2 0.6.1",
  "thiserror 2.0.17",
  "tokio",
  "tracing",
@@ -7938,9 +9338,9 @@ dependencies = [
  "cfg_aliases",
  "libc",
  "once_cell",
- "socket2 0.5.10",
+ "socket2 0.6.1",
  "tracing",
- "windows-sys 0.59.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -8686,7 +10086,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -8778,7 +10178,7 @@ dependencies = [
  "security-framework 3.5.1",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -10114,7 +11514,7 @@ dependencies = [
  "getrandom 0.3.3",
  "once_cell",
  "rustix",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -12591,7 +13991,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -13890,7 +15290,7 @@ dependencies = [
  "zcash_address",
  "zcash_keys",
  "zcash_protocol",
- "zingo-netutils",
+ "zingo-netutils 4.0.0 (git+https://github.com/zingolabs/zingo-common?branch=chore%2Fecho-server-zingo-mobile-fix)",
  "zingo_common_components",
  "zingolib",
  "zip32",
@@ -13915,9 +15315,31 @@ dependencies = [
  "http 1.4.0",
  "hyper-util",
  "lightwallet-protocol",
- "nym-http-api-client",
- "nym-sdk",
- "nym-validator-client",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-sdk 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1)",
+ "thiserror 1.0.69",
+ "tokio",
+ "tokio-rustls 0.26.4",
+ "tokio-socks",
+ "tokio-stream",
+ "tonic",
+ "tower 0.5.3",
+ "webpki-roots 0.26.11",
+ "zcash_client_backend",
+]
+
+[[package]]
+name = "zingo-netutils"
+version = "4.0.0"
+source = "git+https://github.com/zingolabs/zingo-common?branch=chore%2Fecho-server-zingo-mobile-fix#8a160b64bc27d3a61c06ff2f3e86fd1423ee6f4c"
+dependencies = [
+ "http 1.4.0",
+ "hyper-util",
+ "lightwallet-protocol",
+ "nym-http-api-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-sdk 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
+ "nym-validator-client 1.20.4 (git+https://github.com/zingolabs/nym.git?branch=nym_wallet_poc_2_1-zingo-mobile-fix)",
  "thiserror 1.0.69",
  "tokio",
  "tokio-rustls 0.26.4",
@@ -14016,7 +15438,7 @@ dependencies = [
  "zcash_protocol",
  "zcash_transparent",
  "zingo-memo",
- "zingo-netutils",
+ "zingo-netutils 4.0.0 (git+https://github.com/zingolabs/zingo-common?branch=chore%2Fecho-server)",
  "zingo-price",
  "zingo-status",
  "zingo_common_components",
