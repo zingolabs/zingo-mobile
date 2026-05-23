@@ -16,6 +16,7 @@ import { HouseOutlineIcon } from '../Components/Icons/HouseOutlineIcon';
 import { SendFilledIcon } from '../Components/Icons/SendFilledIcon';
 import { SendOutlineIcon } from '../Components/Icons/SendOutlineIcon';
 import { ReceiveIcon } from '../Components/Icons/ReceiveIcon';
+import { ReceiveFilledIcon } from '../Components/Icons/ReceiveFilledIcon';
 
 const ICON_SIZE = 28;
 const SEND_SIZE = 25;
@@ -63,7 +64,11 @@ function renderNavIcon(
       <SendOutlineIcon size={SEND_SIZE} color={color} />
     );
   }
-  return <ReceiveIcon size={ICON_SIZE} color={color} />;
+  return isFocused ? (
+    <ReceiveFilledIcon size={ICON_SIZE} color={color} />
+  ) : (
+    <ReceiveIcon size={ICON_SIZE} color={color} />
+  );
 }
 
 const CustomTabBar = ({
