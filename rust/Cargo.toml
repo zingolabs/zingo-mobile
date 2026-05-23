@@ -54,7 +54,7 @@ debug = 1
 lto = "thin"
 codegen-units = 1
 overflow-checks = true
-# panic = "abort"  # temporarily disabled for debugging with_nym() crash
+panic = "abort"
 opt-level = "z"
 
 [profile.test]
