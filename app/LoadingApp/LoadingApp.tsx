@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -1841,19 +1842,26 @@ export class LoadingAppClass extends Component<
                 )
               }
             >
-              <NewSeed
-                wallet={this.state.wallet}
-                onClickOK={() =>
-                  this.navigateToLoadedApp(
-                    readOnly,
-                    orchardPool,
-                    saplingPool,
-                    transparentPool,
-                    true,
-                    firstLaunchingMessage,
-                  )
-                }
-              />
+              {/* iOS renders Modals in a separate UIWindow, outside the app's
+                  view tree. The app-level SafeAreaProvider in App.tsx is not
+                  reachable from here, so SafeAreaView inside <NewSeed/> reads
+                  zero insets. Wrapping the Modal content with its own
+                  SafeAreaProvider rehydrates the context. No-op on Android. */}
+              <SafeAreaProvider>
+                <NewSeed
+                  wallet={this.state.wallet}
+                  onClickOK={() =>
+                    this.navigateToLoadedApp(
+                      readOnly,
+                      orchardPool,
+                      saplingPool,
+                      transparentPool,
+                      true,
+                      firstLaunchingMessage,
+                    )
+                  }
+                />
+              </SafeAreaProvider>
             </Modal>
           )}
           {screen === RouteEnum.ImportUfvk && (
@@ -1865,12 +1873,14 @@ export class LoadingAppClass extends Component<
                 this.setState({ screen: RouteEnum.StartMenu })
               }
             >
-              <ImportUfvk
-                onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                onClickCancel={() =>
-                  this.setState({ screen: RouteEnum.StartMenu })
-                }
-              />
+              <SafeAreaProvider>
+                <ImportUfvk
+                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                  onClickCancel={() =>
+                    this.setState({ screen: RouteEnum.StartMenu })
+                  }
+                />
+              </SafeAreaProvider>
             </Modal>
           )}
         </ContextAppLoadingProvider>

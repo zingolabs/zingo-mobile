@@ -10,6 +10,7 @@ import {
   Modal,
   Keyboard,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -144,18 +145,26 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={
-        Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'
-      }
-      keyboardVerticalOffset={
-        Platform.OS === GlobalConst.platformOSios ? 10 : 0
-      }
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-      }}
+    // SafeAreaView wraps the KeyboardAvoidingView because this screen is
+    // rendered inside a transparent Modal in LoadingApp.tsx. iOS does not
+    // auto-apply safe-area insets to transparent Modals (Android does), so
+    // without this the Header collides with the status bar/notch.
+    <SafeAreaView
+      edges={['top']}
+      style={{ flex: 1, backgroundColor: colors.background }}
     >
+      <KeyboardAvoidingView
+        behavior={
+          Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'
+        }
+        keyboardVerticalOffset={
+          Platform.OS === GlobalConst.platformOSios ? 10 : 0
+        }
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+        }}
+      >
       <View
         style={{
           flex: 1,
@@ -355,7 +364,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           />
         </View>
       </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
