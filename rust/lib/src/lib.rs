@@ -81,7 +81,7 @@ pub fn with_panic_guard<T, F>(f: F) -> Result<T, ZingolibError>
 where
     F: FnOnce() -> Result<T, ZingolibError> + UnwindSafe,
 {
-    ensure_android_logger();
+    ensure_logger();
     install_panic_hook_once();
     match panic::catch_unwind(f) {
         Ok(res) => res,
@@ -91,7 +91,7 @@ where
 
 static LOGGER_INIT_ONCE: Once = Once::new();
 
-fn ensure_android_logger() {
+fn ensure_logger() {
     LOGGER_INIT_ONCE.call_once(|| {
         #[cfg(target_os = "android")]
         android_logger::init_once(
@@ -106,6 +106,15 @@ fn ensure_android_logger() {
                         .build(),
                 ),
         );
+
+        // On iOS bridge `log` to Apple's unified logging. Records appear under
+        // subsystem `org.ZingoLabs.Zingo` in Console.app and
+        // `xcrun simctl spawn booted log stream`. `.ok()` ignores SetLoggerError
+        // (a previously-installed logger from somewhere else in the process).
+        #[cfg(target_os = "ios")]
+        let _ = oslog::OsLogger::new("org.ZingoLabs.Zingo")
+            .level_filter(log::LevelFilter::Trace)
+            .init();
     });
 }
 
@@ -293,14 +302,6 @@ fn parse_config_params(
             min_confirmations: NonZeroU32::try_from(min_confirmations).unwrap(),
         },
     ))
-}
-
-pub fn init_logging() -> Result<String, ZingolibError> {
-    // ensure_android_logger() is already called from with_panic_guard, so
-    // by the time we get here the logger is up. This function remains as
-    // a public FFI entry point for Kotlin's RPCModule, but it is now
-    // redundant — any FFI call sets up logging on its first invocation.
-    with_panic_guard(|| Ok("OK".to_string()))
 }
 
 pub fn init_new(

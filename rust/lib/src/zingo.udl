@@ -8,9 +8,6 @@ enum ZingolibError {
 namespace zingo {
 
   [Throws=ZingolibError]
-  string init_logging();
-
-  [Throws=ZingolibError]
   string init_new(
       string serveruri,
       string chainhint,

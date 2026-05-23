@@ -829,8 +829,6 @@ internal interface IntegrityCheckingUniffiLib : Library {
 
     fun uniffi_zingo_checksum_func_init_from_ufvk(): Short
 
-    fun uniffi_zingo_checksum_func_init_logging(): Short
-
     fun uniffi_zingo_checksum_func_init_new(): Short
 
     fun uniffi_zingo_checksum_func_parse_address(): Short
@@ -1022,8 +1020,6 @@ internal interface UniffiLib : Library {
         `minconfirmations`: Int,
         uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-
-    fun uniffi_zingo_fn_func_init_logging(uniffi_out_err: UniffiRustCallStatus): RustBuffer.ByValue
 
     fun uniffi_zingo_fn_func_init_new(
         `serveruri`: RustBuffer.ByValue,
@@ -1411,9 +1407,6 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_init_from_ufvk() != 19876.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_zingo_checksum_func_init_logging() != 36145.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_init_new() != 57404.toShort()) {
@@ -1996,14 +1989,6 @@ fun `initFromUfvk`(
                 FfiConverterUInt.lower(`minconfirmations`),
                 _status,
             )
-        },
-    )
-
-@Throws(ZingolibException::class)
-fun `initLogging`(): kotlin.String =
-    FfiConverterString.lift(
-        uniffiRustCallWithError(ZingolibException) { _status ->
-            UniffiLib.INSTANCE.uniffi_zingo_fn_func_init_logging(_status)
         },
     )
 

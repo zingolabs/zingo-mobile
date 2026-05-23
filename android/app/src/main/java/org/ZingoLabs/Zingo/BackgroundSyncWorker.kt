@@ -133,7 +133,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
         if (exists) {
             try {
-                uniffi.zingo.initLogging()
                 // load the wallet file
                 loadWalletFile()
 

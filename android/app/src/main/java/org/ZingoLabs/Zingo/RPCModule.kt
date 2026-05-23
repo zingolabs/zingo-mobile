@@ -207,7 +207,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     fun saveWalletFile(): Boolean {
         try {
-            uniffi.zingo.initLogging()
 
             val b64encoded: String = uniffi.zingo.saveToB64()
             if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
@@ -261,7 +260,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun createNewWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         try {
-            uniffi.zingo.initLogging()
 
             // Create a seed
             val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt())
@@ -282,7 +280,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun restoreWalletFromSeed(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         try {
-            uniffi.zingo.initLogging()
 
             val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
             // Log.i("MAIN", resp)
@@ -302,7 +299,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         try {
-            uniffi.zingo.initLogging()
 
             val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
             // Log.i("MAIN", resp)
@@ -331,7 +327,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             migrateFileIfNeeded(WalletFileName.value)
             migrateFileIfNeeded(WalletBackupFileName.value)
 
-            uniffi.zingo.initLogging()
 
             val fileb64 = readFileAsB64(WalletFileName.value)
             Log.i("MAIN", "file size: ${fileb64.length} chars (Base64)")
@@ -394,7 +389,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun doSave(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = saveWalletFile()
 
                 withContext(Dispatchers.Main) {
@@ -415,7 +409,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun doSaveBackup(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = saveWalletBackupFile()
 
                 withContext(Dispatchers.Main) {
@@ -436,7 +429,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getLatestBlockServerInfo(serveruri: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getLatestBlockServer(serveruri)
 
                 withContext(Dispatchers.Main) {
@@ -457,7 +449,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getLatestBlockWalletInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getLatestBlockWallet()
 
                 withContext(Dispatchers.Main) {
@@ -478,7 +469,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getDonationAddress(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getDeveloperDonationAddress()
 
                 withContext(Dispatchers.Main) {
@@ -499,7 +489,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getZenniesDonationAddress(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getZenniesForZingoDonationAddress()
 
                 withContext(Dispatchers.Main) {
@@ -520,7 +509,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getValueTransfersList(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getValueTransfers()
 
                 withContext(Dispatchers.Main) {
@@ -541,7 +529,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun setCryptoDefaultProvider(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.setCryptoDefaultProviderToRing()
 
                 withContext(Dispatchers.Main) {
@@ -562,7 +549,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun pollSyncInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.pollSync()
 
                 withContext(Dispatchers.Main) {
@@ -583,7 +569,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun runSyncProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.runSync()
 
                 if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -616,7 +601,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun pauseSyncProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.pauseSync()
 
                 withContext(Dispatchers.Main) {
@@ -637,7 +621,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun statusSyncInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.statusSync()
 
                 withContext(Dispatchers.Main) {
@@ -658,7 +641,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun runRescanProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.runRescan()
 
                 withContext(Dispatchers.Main) {
@@ -679,7 +661,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun infoServerInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.infoServer()
 
                 withContext(Dispatchers.Main) {
@@ -700,7 +681,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getSeedInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getSeed()
 
                 withContext(Dispatchers.Main) {
@@ -721,7 +701,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getUfvkInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getUfvk()
 
                 withContext(Dispatchers.Main) {
@@ -742,7 +721,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun changeServerProcess(serveruri: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.changeServer(serveruri)
 
                 withContext(Dispatchers.Main) {
@@ -763,7 +741,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun walletKindInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.walletKind()
 
                 withContext(Dispatchers.Main) {
@@ -784,7 +761,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun parseAddressInfo(address: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.parseAddress(address)
 
                 withContext(Dispatchers.Main) {
@@ -805,7 +781,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun parseUfvkInfo(ufvk: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.parseUfvk(ufvk)
 
                 withContext(Dispatchers.Main) {
@@ -826,7 +801,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getVersionInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getVersion()
 
                 withContext(Dispatchers.Main) {
@@ -847,7 +821,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getMessagesInfo(address: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getMessages(address)
 
                 withContext(Dispatchers.Main) {
@@ -868,7 +841,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getBalanceInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getBalance()
 
                 withContext(Dispatchers.Main) {
@@ -889,7 +861,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getTotalMemobytesToAddressInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getTotalMemobytesToAddress()
 
                 withContext(Dispatchers.Main) {
@@ -910,7 +881,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getTotalValueToAddressInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getTotalValueToAddress()
 
                 withContext(Dispatchers.Main) {
@@ -931,7 +901,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getTotalSpendsToAddressInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getTotalSpendsToAddress()
 
                 withContext(Dispatchers.Main) {
@@ -952,7 +921,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun zecPriceInfo(tor: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.zecPrice(tor)
 
                 withContext(Dispatchers.Main) {
@@ -973,7 +941,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun removeTransactionProcess(txid: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.removeTransaction(txid)
 
                 withContext(Dispatchers.Main) {
@@ -994,7 +961,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getSpendableBalanceWithAddressInfo(address: String, zennies: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getSpendableBalanceWithAddress(address, zennies)
 
                 withContext(Dispatchers.Main) {
@@ -1015,7 +981,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getSpendableBalanceTotalInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getSpendableBalanceTotal()
 
                 withContext(Dispatchers.Main) {
@@ -1036,7 +1001,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getOptionWalletInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getOptionWallet()
 
                 withContext(Dispatchers.Main) {
@@ -1057,7 +1021,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun setOptionWalletProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.setOptionWallet()
 
                 withContext(Dispatchers.Main) {
@@ -1078,7 +1041,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun createTorClientProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.createTorClient(getDocumentDirectory())
 
                 withContext(Dispatchers.Main) {
@@ -1099,7 +1061,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun removeTorClientProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.removeTorClient()
 
                 withContext(Dispatchers.Main) {
@@ -1120,7 +1081,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getUnifiedAddressesInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getUnifiedAddresses()
 
                 withContext(Dispatchers.Main) {
@@ -1141,7 +1101,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getTransparentAddressesInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getTransparentAddresses()
 
                 withContext(Dispatchers.Main) {
@@ -1162,7 +1121,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun createNewUnifiedAddressProcess(receivers: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.createNewUnifiedAddress(receivers)
 
                 withContext(Dispatchers.Main) {
@@ -1183,7 +1141,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun createNewTransparentAddressProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.createNewTransparentAddress()
 
                 withContext(Dispatchers.Main) {
@@ -1204,7 +1161,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun checkMyAddressInfo(address: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.checkMyAddress(address)
 
                 withContext(Dispatchers.Main) {
@@ -1225,7 +1181,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getWalletSaveRequiredInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getWalletSaveRequired()
 
                 withContext(Dispatchers.Main) {
@@ -1246,7 +1201,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun setConfigWalletToProdProcess(performancelevel: String, minconfirmations: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.setConfigWalletToProd(performancelevel, minconfirmations.toUInt())
 
                 withContext(Dispatchers.Main) {
@@ -1267,7 +1221,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getConfigWalletPerformanceInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getConfigWalletPerformance()
 
                 withContext(Dispatchers.Main) {
@@ -1288,7 +1241,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getWalletVersionInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getWalletVersion()
 
                 withContext(Dispatchers.Main) {
@@ -1309,7 +1261,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun sendProcess(send_json: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.send(send_json)
 
                 withContext(Dispatchers.Main) {
@@ -1330,7 +1281,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun shieldProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.shield()
 
                 withContext(Dispatchers.Main) {
@@ -1351,7 +1301,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun confirmProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.confirm()
 
                 withContext(Dispatchers.Main) {

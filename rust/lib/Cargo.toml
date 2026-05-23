@@ -37,6 +37,9 @@ zingo-netutils = { workspace = true }
 jni = { version = "0.21", default-features = false }
 rustls-platform-verifier = "0.6"
 
+[target.'cfg(target_os = "ios")'.dependencies]
+oslog = { workspace = true }
+
 [build-dependencies]
 uniffi_build = { workspace = true, features = ["builtin-bindgen"] }
 
