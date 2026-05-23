@@ -1513,42 +1513,6 @@ export class LoadedAppClass extends Component<
     } else if (item === MenuItemEnum.AddressBook) {
       this.launchAddressBook('', this.screenName);
       return;
-    } else if (item === MenuItemEnum.VoteForNym) {
-      let update = false;
-      if (
-        this.state.sendPageState.toaddr.to &&
-        this.state.sendPageState.toaddr.to !==
-          (await Utils.getNymDonationAddress(this.state.server.chainName))
-      ) {
-        await ShowAddressAlertAsync(this.state.translate)
-          .then(async () => {
-            // fill the fields in the screen with the donation data
-            update = true;
-          })
-          .catch(() => {});
-      } else {
-        // fill the fields in the screen with the donation data
-        update = true;
-      }
-      if (update) {
-        const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
-        let uriToAddr: ToAddrClass = new ToAddrClass(0);
-        const to = new ToAddrClass(0);
-
-        to.to = await Utils.getNymDonationAddress(this.state.server.chainName);
-        to.amount = Utils.getNymDonationAmount();
-        to.memo = Utils.getNymDonationMemo(this.state.translate);
-        to.includeUAMemo = true;
-
-        uriToAddr = to;
-
-        newSendPageState.toaddr = uriToAddr;
-
-        this.setSendPageState(newSendPageState);
-      }
-      this.drawerNav?.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.Send,
-      });
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
       await sendEmail(this.state.translate, this.state.zingolibVersion);
