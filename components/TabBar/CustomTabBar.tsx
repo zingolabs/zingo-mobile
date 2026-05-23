@@ -1,11 +1,5 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import {
-  Animated,
-  Easing,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {
   BottomTabBarHeightCallbackContext,
@@ -13,21 +7,18 @@ import {
 } from '@react-navigation/bottom-tabs';
 import { TabActions } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faHouse,
-  faRefresh,
-  faPaperPlane as faPaperPlaneSolid,
-  faDownload,
-} from '@fortawesome/free-solid-svg-icons';
-import {
-  faHouse as faHouseRegular,
-  faPaperPlane as faPaperPlaneRegular,
-} from '@fortawesome/free-regular-svg-icons';
+import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { ModeEnum, RouteEnum } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import TotalBalanceClass from '../../app/AppState/classes/TotalBalanceClass';
+import { HouseFilledIcon } from '../Components/Icons/HouseFilledIcon';
+import { HouseOutlineIcon } from '../Components/Icons/HouseOutlineIcon';
+import { SendFilledIcon } from '../Components/Icons/SendFilledIcon';
+import { SendOutlineIcon } from '../Components/Icons/SendOutlineIcon';
+import { ReceiveIcon } from '../Components/Icons/ReceiveIcon';
 
 const ICON_SIZE = 28;
+const SEND_SIZE = 25;
 const BUBBLE_V_MARGIN = 4;
 const TAB_H_PADDING = 30;
 const TAB_V_PADDING = 10;
@@ -35,18 +26,20 @@ const PILL_BG = '#040C17';
 const PILL_BORDER = '#071A35';
 const BUBBLE_COLOR = '#149D05';
 
-function resolveIcons(
+function renderNavIcon(
   routeName: string,
+  isFocused: boolean,
   mode: ModeEnum,
   totalBalance: TotalBalanceClass | null,
   somePending: boolean,
-) {
+  color: string,
+): React.ReactElement {
   if (routeName === RouteEnum.History) {
-    return {
-      solidIcon: faHouse,
-      regularIcon: faHouseRegular,
-      iconSize: ICON_SIZE,
-    };
+    return isFocused ? (
+      <HouseFilledIcon size={ICON_SIZE} color={color} />
+    ) : (
+      <HouseOutlineIcon size={ICON_SIZE} color={color} />
+    );
   }
   if (routeName === RouteEnum.Send) {
     const isPending =
@@ -59,19 +52,18 @@ function resolveIcons(
         (totalBalance.totalTransparentBalance > 0 &&
           totalBalance.confirmedTransparentBalance === 0)) &&
       somePending;
-    return isPending
-      ? { solidIcon: faRefresh, regularIcon: faRefresh, iconSize: 25 }
-      : {
-          solidIcon: faPaperPlaneSolid,
-          regularIcon: faPaperPlaneRegular,
-          iconSize: 25,
-        };
+    if (isPending) {
+      return (
+        <FontAwesomeIcon icon={faRefresh} size={SEND_SIZE} color={color} />
+      );
+    }
+    return isFocused ? (
+      <SendFilledIcon size={SEND_SIZE} color={color} />
+    ) : (
+      <SendOutlineIcon size={SEND_SIZE} color={color} />
+    );
   }
-  return {
-    solidIcon: faDownload,
-    regularIcon: faDownload,
-    iconSize: ICON_SIZE,
-  };
+  return <ReceiveIcon size={ICON_SIZE} color={color} />;
 }
 
 const CustomTabBar = ({
@@ -167,12 +159,7 @@ const CustomTabBar = ({
         <View style={styles.pill}>
           {state.routes.map((route, index) => {
             const isFocused = index === state.index;
-            const { solidIcon, regularIcon, iconSize } = resolveIcons(
-              route.name,
-              mode,
-              totalBalance,
-              somePending,
-            );
+            const color = isFocused ? PILL_BG : '#FFFFFF';
             return (
               <Pressable
                 key={route.key}
@@ -193,11 +180,14 @@ const CustomTabBar = ({
                 <Animated.View
                   style={{ transform: [{ scale: pressAnims[route.key] }] }}
                 >
-                  <FontAwesomeIcon
-                    icon={isFocused ? solidIcon : regularIcon}
-                    size={iconSize}
-                    color={isFocused ? PILL_BG : '#FFFFFF'}
-                  />
+                  {renderNavIcon(
+                    route.name,
+                    isFocused,
+                    mode,
+                    totalBalance,
+                    somePending,
+                    color,
+                  )}
                 </Animated.View>
               </Pressable>
             );
