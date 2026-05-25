@@ -16,6 +16,25 @@ zingodisclosure@proton.me
 
  Please see the platform specific [iOS](./docs/ios_developer_quickstart.md) and [Android](./docs/android_developer_quickstart.md) "quickstart" documentation.
 
+## Releasing
+
+Zingo ships as two parallel apps from this repo:
+
+- **Production** (`org.ZingoLabs.Zingo`) — App Store + Play Production.
+- **Beta** (`org.ZingoLabs.Zingo.Beta`) — TestFlight External + Play Open Testing.
+
+Both share the same JS bundle and Rust libs; only the native shell differs
+(bundle ID, display name, icon with `BETA` band). Version/build bumps are
+scoped per channel via:
+
+```bash
+yarn release:prod:prep <version> <build>
+yarn release:beta:prep <version> <build>
+```
+
+Full step-by-step for both stores, signing setup, and the underlying iOS/Android
+flavor architecture: see [docs/release_quickstart.md](./docs/release_quickstart.md).
+
 ## Testing
 ### Prerequisites
 Integration tests and end-to-end tests require a regtest server. On linux hosts, these may be run
