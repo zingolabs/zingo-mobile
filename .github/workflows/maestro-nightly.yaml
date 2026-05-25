@@ -113,7 +113,7 @@ jobs:
 
       - name: Upload Maestro report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: maestro-android-report
           path: |
@@ -213,7 +213,7 @@ jobs:
 
       - name: Upload Maestro report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: maestro-ios-report
           path: ~/.maestro/tests/**
