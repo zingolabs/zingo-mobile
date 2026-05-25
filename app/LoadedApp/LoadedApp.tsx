@@ -81,6 +81,7 @@ import {
   SnackbarDurationEnum,
 } from '../AppState';
 import Utils from '../utils';
+import { getZingoVersion } from '../utils/zingoVersion';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
@@ -270,7 +271,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       // If the App is mounting this component, I know I have to update the version prop in settings.
       await SettingsFileImpl.writeSettings(
         SettingsNameEnum.version,
-        translate('version') as string,
+        getZingoVersion(),
       );
 
       //I have to check what language is in the settings

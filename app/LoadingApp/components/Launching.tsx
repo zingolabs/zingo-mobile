@@ -11,6 +11,7 @@ import {
   TranslateType,
 } from '../../AppState';
 import Button from '../../../components/Components/Button';
+import { getZingoVersion } from '../../utils/zingoVersion';
 
 type LaunchingProps = {
   translate: (key: string) => TranslateType;
@@ -58,7 +59,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
             {props.translate('zingo') as string}
           </Text>
           <Text style={{ color: colors.zingo, fontSize: 15 }}>
-            {props.translate('version') as string}
+            {getZingoVersion()}
           </Text>
         </View>
         <View

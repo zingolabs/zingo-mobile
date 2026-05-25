@@ -11,6 +11,7 @@ import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import { ThemeType } from '../../../app/types';
 import simpleBiometrics from '../../../app/simpleBiometrics';
+import { getZingoVersion } from '../../../app/utils/zingoVersion';
 import {
   GlobalConst,
   MenuItemEnum,
@@ -350,7 +351,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
         >
           {'Version: '}
           <Text style={{ color: colors.primaryDisabled }}>
-            {translate('version') as string}
+            {getZingoVersion()}
           </Text>
           {'   '}
           {translate('settings.mode') as string}

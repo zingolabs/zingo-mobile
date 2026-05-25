@@ -348,7 +348,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -euo pipefail\n\n# Solo para Archive/Release y Release-Beta\ncase \"${CONFIGURATION}\" in Release|Release-Beta) ;; *) exit 0;; esac\n\n# Leer la versión de react-native desde package.json (alineado con el\n# post_install hook del Podfile que descarga los dSYMs en esa misma ruta).\nRN_VERSION=$(node -p \"require('${PROJECT_DIR}/../package.json').dependencies['react-native'].replace(/[^0-9.]/g, '')\")\n\n# Ruta donde el Podfile post_install descargó el dSYM de Hermes\nHERMES_DSYM_SRC=\"${PROJECT_DIR}/vendor/hermes-dsyms/RN-${RN_VERSION}/ios-arm64/release/iphoneos/hermes.framework.dSYM\"\n\n# Carpeta donde Xcode recopila los dSYM al archivar\nDSYM_DST=\"${DWARF_DSYM_FOLDER_PATH}\"\n\nif [ -d \"${HERMES_DSYM_SRC}\" ]; then\n  echo \"Copiando Hermes dSYM (RN ${RN_VERSION}) a ${DSYM_DST}\"\n  rsync -a \"${HERMES_DSYM_SRC}\" \"${DSYM_DST}/\"\nelse\n  echo \"ERROR: No se encontró Hermes.framework.dSYM en ${HERMES_DSYM_SRC}\" >&2\n  exit 1\nfi\n";
+			shellScript = "set -euo pipefail\n\n# Solo para Archive/Release y Release-Beta\ncase \"${CONFIGURATION}\" in Release|Release-Beta) ;; *) exit 0;; esac\n\n# Cargar NODE_BINARY de .xcode.env (Xcode no sourcea ~/.zshrc).\nif [ -f \"${PROJECT_DIR}/.xcode.env\" ]; then . \"${PROJECT_DIR}/.xcode.env\"; fi\nif [ -f \"${PROJECT_DIR}/.xcode.env.local\" ]; then . \"${PROJECT_DIR}/.xcode.env.local\"; fi\nNODE_BIN=\"${NODE_BINARY:-node}\"\n\n# Leer la versión de react-native desde package.json (alineado con el\n# post_install hook del Podfile que descarga los dSYMs en esa misma ruta).\nRN_VERSION=$(\"$NODE_BIN\" -p \"require('${PROJECT_DIR}/../package.json').dependencies['react-native'].replace(/[^0-9.]/g, '')\")\n\n# Ruta donde el Podfile post_install descargó el dSYM de Hermes\nHERMES_DSYM_SRC=\"${PROJECT_DIR}/vendor/hermes-dsyms/RN-${RN_VERSION}/ios-arm64/release/iphoneos/hermes.framework.dSYM\"\n\n# Carpeta donde Xcode recopila los dSYM al archivar\nDSYM_DST=\"${DWARF_DSYM_FOLDER_PATH}\"\n\nif [ -d \"${HERMES_DSYM_SRC}\" ]; then\n  echo \"Copiando Hermes dSYM (RN ${RN_VERSION}) a ${DSYM_DST}\"\n  rsync -a \"${HERMES_DSYM_SRC}\" \"${DSYM_DST}/\"\nelse\n  echo \"ERROR: No se encontró Hermes.framework.dSYM en ${HERMES_DSYM_SRC}\" >&2\n  exit 1\nfi\n";
 		};
 		673D653E52C3D3E6D16ECA36 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -818,7 +818,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Zingo/Zingo.entitlements;
-				CURRENT_PROJECT_VERSION = 307;
+				CURRENT_PROJECT_VERSION = 308;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
@@ -842,7 +842,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.ZingoLabs.Zingo.beta;
+				PRODUCT_BUNDLE_IDENTIFIER = org.ZingoLabs.Zingo.Beta;
 				PRODUCT_NAME = Zingo;
 				SWIFT_OBJC_BRIDGING_HEADER = "RPCModule-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -860,7 +860,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Zingo/Zingo.entitlements;
-				CURRENT_PROJECT_VERSION = 307;
+				CURRENT_PROJECT_VERSION = 308;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
@@ -884,7 +884,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.ZingoLabs.Zingo.beta;
+				PRODUCT_BUNDLE_IDENTIFIER = org.ZingoLabs.Zingo.Beta;
 				PRODUCT_NAME = Zingo;
 				SWIFT_OBJC_BRIDGING_HEADER = "RPCModule-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";

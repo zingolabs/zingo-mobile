@@ -56,6 +56,7 @@ import { ContextAppLoadingProvider } from '../context';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
+import { getZingoVersion } from '../utils/zingoVersion';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
@@ -190,7 +191,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         setFirstLaunchingMessage(LaunchingModeEnum.installing);
       } else if (
         settings.version === '' ||
-        settings.version !== (translate('version') as string)
+        settings.version !== getZingoVersion()
       ) {
         // this is an update
         setFirstLaunchingMessage(LaunchingModeEnum.updating);
