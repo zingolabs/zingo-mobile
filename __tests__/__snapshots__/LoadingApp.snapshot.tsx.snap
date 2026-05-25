@@ -54,7 +54,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
           }
         }
       >
-        version
+        zingo-2.0.19 (307)
       </Text>
     </View>
     <View
