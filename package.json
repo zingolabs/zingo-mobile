@@ -56,7 +56,7 @@
     "react-native-device-info": "^15.0.2",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "2.31.2",
-    "react-native-gifted-charts": "^1.4.64",
+    "react-native-gifted-charts": "^1.4.77",
     "react-native-keychain": "^10.0.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-localize": "^3.5.2",
