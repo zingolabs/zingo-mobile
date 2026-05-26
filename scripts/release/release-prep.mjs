@@ -89,14 +89,14 @@ if (channel === 'prod') {
     return JSON.stringify(pkg, null, 2) + '\n';
   });
 
-  // iOS prod = target Zingo configs with AppIcon (no -Beta suffix).
-  patch(PBXPROJ, src => patchPbxprojForChannel(src, 'AppIcon', version, build));
+  // iOS prod = target Zingo configs with "AppIcon-Prod".
+  patch(PBXPROJ, src => patchPbxprojForChannel(src, '"AppIcon-Prod"', version, build));
 
   // Android prod = defaultConfig.
   patch(GRADLE, src =>
     src
       .replace(/versionCode = \d+ \/\/ Real.*$/m, `versionCode = ${build} // Real (prod baseline; beta flavor overrides below)`)
-      .replace(/versionName = "zingo-[^"]+" \/\/ Real$/m, `versionName = "zingo-${version}" // Real`),
+      .replace(/versionName = "[^"]+" \/\/ Real$/m, `versionName = "${version}" // Real`),
   );
 }
 

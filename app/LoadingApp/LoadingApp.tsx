@@ -56,7 +56,7 @@ import { ContextAppLoadingProvider } from '../context';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
-import { getZingoVersion } from '../utils/zingoVersion';
+import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
@@ -169,7 +169,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const i18n = useMemo(() => new I18n(file), [file]);
 
   const translate: (key: string) => TranslateType = (key: string) =>
-    i18n.t(key);
+    substituteZingoName(i18n.t(key) as TranslateType);
 
   useEffect(() => {
     (async () => {

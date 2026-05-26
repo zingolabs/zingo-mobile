@@ -45,6 +45,7 @@ import { ListIcon } from './Icons/ListIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import Address from './Address/Address';
+import { getZingoLogo } from '../../app/utils/ZingoAppData';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -382,10 +383,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       size={200}
                       ecl="L"
                       backgroundColor={colors.text}
-                      logo={require('../../assets/img/logobig-zingo.png')}
+                      logo={getZingoLogo()}
                       logoSize={30}
                       logoBackgroundColor={colors.text}
-                      logoBorderRadius={5} /* android not soported */
+                      logoBorderRadius={7} /* android not soported */
                       logoMargin={3}
                     />
                   ) : (
@@ -427,10 +428,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   size={200}
                   ecl="L"
                   backgroundColor={colors.text}
-                  logo={require('../../assets/img/logobig-zingo.png')}
+                  logo={getZingoLogo()}
                   logoSize={30}
                   logoBackgroundColor={colors.text}
-                  logoBorderRadius={5} /* android not soported */
+                  logoBorderRadius={7} /* android not soported */
                   logoMargin={3}
                 />
               )}

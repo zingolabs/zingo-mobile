@@ -325,7 +325,8 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           </View>
         )}
 
-        {!noSyncingStatus && nym && (
+        {/* NYM feature hidden for now — will be enabled in the future */}
+        {false && !noSyncingStatus && nym && (
           <View
             style={{
               alignItems: 'center',

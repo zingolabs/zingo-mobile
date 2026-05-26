@@ -857,39 +857,42 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             paddingBottom: 40,
           }}
         >
-          <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-            <BoldText>
-              {translate('settings.nym-privacy-network') as string}
-            </BoldText>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: 5,
-              }}
-            >
-              {nym ? (
-                <NymOn width={22} height={22} />
-              ) : (
-                <NymOff width={22} height={22} />
-              )}
-              <View style={{ flex: 1, marginLeft: 10 }}>
-                <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
-                  {translate('settings.nym-network') as string}
-                </BoldText>
-                <FadeText>
-                  {translate('settings.nym-enhanced-privacy') as string}
-                </FadeText>
-              </View>
-              <TouchableOpacity onPress={() => setNym(!nym)}>
+          {/* NYM feature hidden for now — will be enabled in the future */}
+          {false && (
+            <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+              <BoldText>
+                {translate('settings.nym-privacy-network') as string}
+              </BoldText>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: 5,
+                }}
+              >
                 {nym ? (
-                  <NymSwitchOn width={40} height={19} />
+                  <NymOn width={22} height={22} />
                 ) : (
-                  <SwitchOff width={40} height={19} />
+                  <NymOff width={22} height={22} />
                 )}
-              </TouchableOpacity>
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
+                    {translate('settings.nym-network') as string}
+                  </BoldText>
+                  <FadeText>
+                    {translate('settings.nym-enhanced-privacy') as string}
+                  </FadeText>
+                </View>
+                <TouchableOpacity onPress={() => setNym(!nym)}>
+                  {nym ? (
+                    <NymSwitchOn width={40} height={19} />
+                  ) : (
+                    <SwitchOff width={40} height={19} />
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          )}
 
           <View
             style={{
