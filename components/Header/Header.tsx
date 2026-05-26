@@ -25,6 +25,7 @@ import {
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import simpleBiometrics from '../../app/simpleBiometrics';
+import { getZingoLogo } from '../../app/utils/ZingoAppData';
 import { useShieldFunds } from '../../app/hooks/useShieldFunds';
 import { useSyncStatus } from '../../app/hooks/useSyncStatus';
 import BoldText from '../Components/BoldText';
@@ -321,12 +322,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             </View>
           ) : (
             <Image
-              source={require('../../assets/img/logobig-zingo.png')}
+              source={getZingoLogo()}
               style={{
                 width: 38,
                 height: 38,
                 resizeMode: 'contain',
-                borderRadius: 10,
+                borderRadius: 8,
               }}
             />
           )}

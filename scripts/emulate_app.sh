@@ -236,7 +236,7 @@ else
     yarn
 
     echo -e "\nBuilding APKs..."
-    ./gradlew assembleRelease -PsplitApk=true
+    ./gradlew assembleProdRelease -PsplitApk=true
 
     # Create test report directory
     test_report_dir="app/build/outputs/emulate_app_reports/${abi}"
@@ -259,7 +259,7 @@ else
     step_complete=false
     until [[ $step_complete == true ]]; do
         if adb -s emulator-5554 install -r -t -d --abi "${abi}" \
-                "app/build/outputs/apk/release/app-${abi}-release.apk" &> "${test_report_dir}/apk_installation.txt"; then
+                "app/build/outputs/apk/prod/release/app-prod-${abi}-release.apk" &> "${test_report_dir}/apk_installation.txt"; then
             step_complete=true
             echo "Successfully installed APKs"
         fi              

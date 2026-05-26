@@ -81,7 +81,7 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
           }
           style={
             {
-              "borderRadius": 10,
+              "borderRadius": 8,
               "height": 38,
               "resizeMode": "contain",
               "width": 38,
@@ -1118,7 +1118,7 @@ exports[`Confirm - snapshots Confirm no currency, privacy off 1`] = `
           }
           style={
             {
-              "borderRadius": 10,
+              "borderRadius": 8,
               "height": 38,
               "resizeMode": "contain",
               "width": 38,

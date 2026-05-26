@@ -69,6 +69,7 @@ import {
   SnackbarDurationEnum,
 } from '../AppState';
 import Utils from '../utils';
+import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
@@ -207,7 +208,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const i18n = useMemo(() => new I18n(file), [file]);
 
   const translate: (key: string) => TranslateType = (key: string) =>
-    i18n.t(key);
+    substituteZingoName(i18n.t(key) as TranslateType);
   const readOnly =
     !!props.route.params && props.route.params.readOnly !== undefined
       ? props.route.params.readOnly
@@ -259,7 +260,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       // If the App is mounting this component, I know I have to update the version prop in settings.
       await SettingsFileImpl.writeSettings(
         SettingsNameEnum.version,
-        translate('version') as string,
+        getZingoVersion(),
       );
 
       //I have to check what language is in the settings
@@ -1493,42 +1494,6 @@ export class LoadedAppClass extends Component<
     } else if (item === MenuItemEnum.AddressBook) {
       this.launchAddressBook('', this.screenName);
       return;
-    } else if (item === MenuItemEnum.VoteForNym) {
-      let update = false;
-      if (
-        this.state.sendPageState.toaddr.to &&
-        this.state.sendPageState.toaddr.to !==
-          (await Utils.getNymDonationAddress(this.state.server.chainName))
-      ) {
-        await ShowAddressAlertAsync(this.state.translate)
-          .then(async () => {
-            // fill the fields in the screen with the donation data
-            update = true;
-          })
-          .catch(() => {});
-      } else {
-        // fill the fields in the screen with the donation data
-        update = true;
-      }
-      if (update) {
-        const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
-        let uriToAddr: ToAddrClass = new ToAddrClass(0);
-        const to = new ToAddrClass(0);
-
-        to.to = await Utils.getNymDonationAddress(this.state.server.chainName);
-        to.amount = Utils.getNymDonationAmount();
-        to.memo = Utils.getNymDonationMemo(this.state.translate);
-        to.includeUAMemo = true;
-
-        uriToAddr = to;
-
-        newSendPageState.toaddr = uriToAddr;
-
-        this.setSendPageState(newSendPageState);
-      }
-      this.drawerNav?.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.Send,
-      });
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
       await sendEmail(this.state.translate, this.state.zingolibVersion);

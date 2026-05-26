@@ -74,7 +74,7 @@ exports[`ScannerAddress - snapshots ScannerAddress active 1`] = `
         }
         style={
           {
-            "borderRadius": 10,
+            "borderRadius": 8,
             "height": 38,
             "resizeMode": "contain",
             "width": 38,
@@ -273,7 +273,7 @@ exports[`ScannerAddress - snapshots ScannerAddress inactive 1`] = `
         }
         style={
           {
-            "borderRadius": 10,
+            "borderRadius": 8,
             "height": 38,
             "resizeMode": "contain",
             "width": 38,
