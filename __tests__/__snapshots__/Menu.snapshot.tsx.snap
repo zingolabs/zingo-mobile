@@ -248,7 +248,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
         }
         style={
           {
-            "borderRadius": 8,
+            "borderRadius": 7,
             "height": 32,
             "resizeMode": "contain",
             "width": 32,
@@ -319,7 +319,7 @@ exports[`Menu - snapshots Menu advanced mode, online 1`] = `
           }
         }
       >
-        text translated
+        2.0.19 (307)
       </Text>
          
       text translated
@@ -510,7 +510,7 @@ exports[`Menu - snapshots Menu basic mode, no value transfers 1`] = `
         }
         style={
           {
-            "borderRadius": 8,
+            "borderRadius": 7,
             "height": 32,
             "resizeMode": "contain",
             "width": 32,
@@ -581,7 +581,7 @@ exports[`Menu - snapshots Menu basic mode, no value transfers 1`] = `
           }
         }
       >
-        text translated
+        2.0.19 (307)
       </Text>
          
       text translated

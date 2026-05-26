@@ -15,7 +15,7 @@ if linkage != nil
 end
 
 target 'Zingo' do
-  project 'Zingo.xcodeproj'
+  project 'Zingo.xcodeproj', 'Debug-Beta' => :debug, 'Release-Beta' => :release
 
   # Pods for Zingo
   config = use_native_modules!

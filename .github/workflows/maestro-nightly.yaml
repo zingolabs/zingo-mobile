@@ -75,7 +75,7 @@ jobs:
 
       - name: Build APK
         working-directory: android
-        run: ./gradlew assembleRelease -PsplitApk=true
+        run: ./gradlew assembleProdRelease -PsplitApk=true
 
       - name: Install Maestro CLI
         run: |
@@ -98,7 +98,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install -r android/app/build/outputs/apk/release/app-x86_64-release.apk
+            adb install -r android/app/build/outputs/apk/prod/release/app-prod-x86_64-release.apk
             # Start a background logcat capture so we have device-side logs in
             # case Maestro times out waiting on a UI element. The maestro run
             # itself decides exit code.
@@ -113,7 +113,7 @@ jobs:
 
       - name: Upload Maestro report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: maestro-android-report
           path: |
@@ -213,7 +213,7 @@ jobs:
 
       - name: Upload Maestro report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: maestro-ios-report
           path: ~/.maestro/tests/**

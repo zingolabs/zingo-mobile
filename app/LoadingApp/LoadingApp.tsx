@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -55,6 +56,7 @@ import { ContextAppLoadingProvider } from '../context';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
+import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
@@ -167,7 +169,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const i18n = useMemo(() => new I18n(file), [file]);
 
   const translate: (key: string) => TranslateType = (key: string) =>
-    i18n.t(key);
+    substituteZingoName(i18n.t(key) as TranslateType);
 
   useEffect(() => {
     (async () => {
@@ -189,7 +191,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         setFirstLaunchingMessage(LaunchingModeEnum.installing);
       } else if (
         settings.version === '' ||
-        settings.version !== (translate('version') as string)
+        settings.version !== getZingoVersion()
       ) {
         // this is an update
         setFirstLaunchingMessage(LaunchingModeEnum.updating);
@@ -1841,19 +1843,26 @@ export class LoadingAppClass extends Component<
                 )
               }
             >
-              <NewSeed
-                wallet={this.state.wallet}
-                onClickOK={() =>
-                  this.navigateToLoadedApp(
-                    readOnly,
-                    orchardPool,
-                    saplingPool,
-                    transparentPool,
-                    true,
-                    firstLaunchingMessage,
-                  )
-                }
-              />
+              {/* iOS renders Modals in a separate UIWindow, outside the app's
+                  view tree. The app-level SafeAreaProvider in App.tsx is not
+                  reachable from here, so SafeAreaView inside <NewSeed/> reads
+                  zero insets. Wrapping the Modal content with its own
+                  SafeAreaProvider rehydrates the context. No-op on Android. */}
+              <SafeAreaProvider>
+                <NewSeed
+                  wallet={this.state.wallet}
+                  onClickOK={() =>
+                    this.navigateToLoadedApp(
+                      readOnly,
+                      orchardPool,
+                      saplingPool,
+                      transparentPool,
+                      true,
+                      firstLaunchingMessage,
+                    )
+                  }
+                />
+              </SafeAreaProvider>
             </Modal>
           )}
           {screen === RouteEnum.ImportUfvk && (
@@ -1865,12 +1874,14 @@ export class LoadingAppClass extends Component<
                 this.setState({ screen: RouteEnum.StartMenu })
               }
             >
-              <ImportUfvk
-                onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                onClickCancel={() =>
-                  this.setState({ screen: RouteEnum.StartMenu })
-                }
-              />
+              <SafeAreaProvider>
+                <ImportUfvk
+                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                  onClickCancel={() =>
+                    this.setState({ screen: RouteEnum.StartMenu })
+                  }
+                />
+              </SafeAreaProvider>
             </Modal>
           )}
         </ContextAppLoadingProvider>

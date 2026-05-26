@@ -12,6 +12,11 @@ import { ContextAppLoaded } from '../../../app/context';
 import { ThemeType } from '../../../app/types';
 import simpleBiometrics from '../../../app/simpleBiometrics';
 import {
+  getZingoLogo,
+  getZingoName,
+  getZingoVersion,
+} from '../../../app/utils/ZingoAppData';
+import {
   GlobalConst,
   MenuItemEnum,
   ModeEnum,
@@ -299,12 +304,12 @@ const Menu: React.FunctionComponent<MenuProps> = ({
           }}
         >
           <Image
-            source={require('../../../assets/img/logobig-zingo.png')}
+            source={getZingoLogo()}
             style={{
               width: 32,
               height: 32,
               resizeMode: 'contain',
-              borderRadius: 8,
+              borderRadius: 7,
             }}
           />
           <Text
@@ -316,7 +321,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
               color: colors.text,
             }}
           >
-            {'Zingo '}
+            {getZingoName() + ' '}
             <Text
               style={{
                 color:
@@ -350,7 +355,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
         >
           {'Version: '}
           <Text style={{ color: colors.primaryDisabled }}>
-            {translate('version') as string}
+            {getZingoVersion()}
           </Text>
           {'   '}
           {translate('settings.mode') as string}

@@ -81,6 +81,7 @@ import {
   SnackbarDurationEnum,
 } from '../AppState';
 import Utils from '../utils';
+import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
@@ -218,7 +219,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const i18n = useMemo(() => new I18n(file), [file]);
 
   const translate: (key: string) => TranslateType = (key: string) =>
-    i18n.t(key);
+    substituteZingoName(i18n.t(key) as TranslateType);
   const readOnly =
     !!props.route.params && props.route.params.readOnly !== undefined
       ? props.route.params.readOnly
@@ -270,7 +271,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       // If the App is mounting this component, I know I have to update the version prop in settings.
       await SettingsFileImpl.writeSettings(
         SettingsNameEnum.version,
-        translate('version') as string,
+        getZingoVersion(),
       );
 
       //I have to check what language is in the settings

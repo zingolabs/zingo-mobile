@@ -10,6 +10,7 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import DetailLine from '../Components/DetailLine';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';
+import { getZingoName, getZingoVersion } from '../../app/utils/ZingoAppData';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type AboutProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.About>;
@@ -34,7 +35,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
       }}
     >
       <Header
-        title={translate('zingo') + ' ' + translate('version')}
+        title={getZingoName() + ' ' + getZingoVersion()}
         screenName={screenName}
         noBalance={true}
         noSyncingStatus={true}
