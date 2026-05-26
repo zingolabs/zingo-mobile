@@ -386,7 +386,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       logo={getZingoLogo()}
                       logoSize={30}
                       logoBackgroundColor={colors.text}
-                      logoBorderRadius={5} /* android not soported */
+                      logoBorderRadius={7} /* android not soported */
                       logoMargin={3}
                     />
                   ) : (
@@ -431,7 +431,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   logo={getZingoLogo()}
                   logoSize={30}
                   logoBackgroundColor={colors.text}
-                  logoBorderRadius={5} /* android not soported */
+                  logoBorderRadius={7} /* android not soported */
                   logoMargin={3}
                 />
               )}

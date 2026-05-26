@@ -292,7 +292,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 height: 100,
                 resizeMode: 'contain',
                 marginTop: 10,
-                borderRadius: 10,
+                borderRadius: 22,
               }}
             />
           </View>

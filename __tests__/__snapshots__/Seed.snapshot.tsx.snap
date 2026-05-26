@@ -152,7 +152,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 10,
+            "borderRadius": 8,
             "height": 38,
             "resizeMode": "contain",
             "width": 38,
@@ -431,7 +431,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 10,
+            "borderRadius": 8,
             "height": 38,
             "resizeMode": "contain",
             "width": 38,
@@ -703,7 +703,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 10,
+            "borderRadius": 8,
             "height": 38,
             "resizeMode": "contain",
             "width": 38,
@@ -1289,7 +1289,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 10,
+            "borderRadius": 8,
             "height": 38,
             "resizeMode": "contain",
             "width": 38,
@@ -1568,7 +1568,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 10,
+            "borderRadius": 8,
             "height": 38,
             "resizeMode": "contain",
             "width": 38,

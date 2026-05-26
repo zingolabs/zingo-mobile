@@ -309,7 +309,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
               width: 32,
               height: 32,
               resizeMode: 'contain',
-              borderRadius: 8,
+              borderRadius: 7,
             }}
           />
           <Text

@@ -311,7 +311,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 width: 38,
                 height: 38,
                 resizeMode: 'contain',
-                borderRadius: 10,
+                borderRadius: 8,
               }}
             />
           )}
