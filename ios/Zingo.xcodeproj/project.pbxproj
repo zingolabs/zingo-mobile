@@ -584,6 +584,7 @@
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				INFOPLIST_FILE = Zingo/Info.plist;
+				BUNDLE_DISPLAY_NAME = Zingo;
 				INFOPLIST_KEY_CFBundleDisplayName = Zingo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -626,6 +627,7 @@
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				INFOPLIST_FILE = Zingo/Info.plist;
+				BUNDLE_DISPLAY_NAME = Zingo;
 				INFOPLIST_KEY_CFBundleDisplayName = Zingo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -824,6 +826,7 @@
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				INFOPLIST_FILE = Zingo/Info.plist;
+				BUNDLE_DISPLAY_NAME = "Zingo Beta";
 				INFOPLIST_KEY_CFBundleDisplayName = "Zingo Beta";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -866,6 +869,7 @@
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				INFOPLIST_FILE = Zingo/Info.plist;
+				BUNDLE_DISPLAY_NAME = "Zingo Beta";
 				INFOPLIST_KEY_CFBundleDisplayName = "Zingo Beta";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (

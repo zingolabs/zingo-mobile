@@ -167,7 +167,7 @@ exports[`Component About - test About - snapshot 1`] = `
           }
         }
       >
-        text translated zingo-2.0.19 (307)
+        Zingo 2.0.19 (307)
       </Text>
       <View
         style={

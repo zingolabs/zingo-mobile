@@ -121,7 +121,7 @@ android {
         minSdk = rootProject.extra["minSdkVersion"] as Int
         targetSdk = rootProject.extra["targetSdkVersion"] as Int
         versionCode = 307 // Real (prod baseline; beta flavor overrides below)
-        versionName = "zingo-2.0.19" // Real
+        versionName = "2.0.19" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {

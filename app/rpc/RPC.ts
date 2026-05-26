@@ -747,7 +747,20 @@ export default class RPC {
         return;
       }
 
-      const infoJSON: RPCInfoType = await JSON.parse(infoStr);
+      let infoJSON = {} as RPCInfoType;
+      try {
+        infoJSON = await JSON.parse(infoStr);
+      } catch (error) {
+        console.log('INFO PARSE JSON ERROR', infoStr, error);
+        this.fnSetLastError(`Error info parse: ${error} value: ${infoStr}`);
+        this.fnSetInfo({
+          latestBlock: 0,
+          serverUri: '',
+          version: '',
+        } as InfoType);
+        this.lastServerBlockHeight = 0;
+        return;
+      }
 
       const info: InfoType = {
         chainName: infoJSON.chain_name,
@@ -832,7 +845,18 @@ export default class RPC {
           console.log(`Error spendable balance ${spendableStr}`);
           this.fnSetLastError(`Error spendable balance: ${spendableStr}`);
         } else {
-          spendableJSON = await JSON.parse(spendableStr);
+          try {
+            spendableJSON = await JSON.parse(spendableStr);
+          } catch (error) {
+            console.log(
+              'SPENDABLE BALANCE PARSE JSON ERROR',
+              spendableStr,
+              error,
+            );
+            this.fnSetLastError(
+              `Error spendable balance parse: ${error} value: ${spendableStr}`,
+            );
+          }
         }
       } else {
         console.log('Internal Error spendable balance');
@@ -856,7 +880,16 @@ export default class RPC {
         console.log('Internal Error balance');
         return;
       }
-      const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
+      let balanceJSON = {} as RPCBalancesType;
+      try {
+        balanceJSON = await JSON.parse(balanceStr);
+      } catch (error) {
+        console.log('BALANCE PARSE JSON ERROR', balanceStr, error);
+        this.fnSetLastError(
+          `Error balance parse: ${error} value: ${balanceStr}`,
+        );
+        return;
+      }
 
       // Total Balance
       const balance: TotalBalanceClass = {
@@ -915,8 +948,20 @@ export default class RPC {
         console.log('Internal Error addresses');
         return;
       }
-      const unifiedAddressesJSON: RPCUnifiedAddressType[] =
-        (await JSON.parse(unifiedAddressesStr)) || [];
+      let unifiedAddressesJSON: RPCUnifiedAddressType[] = [];
+      try {
+        unifiedAddressesJSON = (await JSON.parse(unifiedAddressesStr)) || [];
+      } catch (error) {
+        console.log(
+          'UNIFIED ADDRESSES PARSE JSON ERROR',
+          unifiedAddressesStr,
+          error,
+        );
+        this.fnSetLastError(
+          `Error unified addresses parse: ${error} value: ${unifiedAddressesStr}`,
+        );
+        return;
+      }
 
       // TRANSPARENT
       const start2 = Date.now();
@@ -940,8 +985,21 @@ export default class RPC {
         console.log('Internal Error addresses');
         return;
       }
-      const transparentAddressesJSON: RPCTransparentAddressType[] =
-        (await JSON.parse(transparentAddressStr)) || [];
+      let transparentAddressesJSON: RPCTransparentAddressType[] = [];
+      try {
+        transparentAddressesJSON =
+          (await JSON.parse(transparentAddressStr)) || [];
+      } catch (error) {
+        console.log(
+          'TRANSPARENT ADDRESSES PARSE JSON ERROR',
+          transparentAddressStr,
+          error,
+        );
+        this.fnSetLastError(
+          `Error transparent addresses parse: ${error} value: ${transparentAddressStr}`,
+        );
+        return;
+      }
 
       let allAddresses: (UnifiedAddressClass | TransparentAddressClass)[] = [];
 
@@ -1200,8 +1258,20 @@ export default class RPC {
         console.log('Internal Error value transfers');
         return;
       }
-      const valueTransfersJSON: RPCValueTransfersType =
-        await JSON.parse(valueTransfersStr);
+      let valueTransfersJSON = {} as RPCValueTransfersType;
+      try {
+        valueTransfersJSON = await JSON.parse(valueTransfersStr);
+      } catch (error) {
+        console.log(
+          'VALUE TRANSFERS PARSE JSON ERROR',
+          valueTransfersStr,
+          error,
+        );
+        this.fnSetLastError(
+          `Error value transfers parse: ${error} value: ${valueTransfersStr}`,
+        );
+        return;
+      }
 
       let vtList: ValueTransferType[] = [];
 
@@ -1324,7 +1394,16 @@ export default class RPC {
         console.log('Internal Error value transfers messages');
         return;
       }
-      const messagesJSON: RPCValueTransfersType = await JSON.parse(messagesStr);
+      let messagesJSON = {} as RPCValueTransfersType;
+      try {
+        messagesJSON = await JSON.parse(messagesStr);
+      } catch (error) {
+        console.log('MESSAGES PARSE JSON ERROR', messagesStr, error);
+        this.fnSetLastError(
+          `Error value transfers messages parse: ${error} value: ${messagesStr}`,
+        );
+        return;
+      }
 
       let mList: ValueTransferType[] = [];
 

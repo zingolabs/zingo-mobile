@@ -1,5 +1,5 @@
 export const GlobalConst = {
-  error: 'error:',
+  error: 'error',
   zcash: 'zcash:',
   port80: '80',
   port443: '443',

@@ -18,7 +18,7 @@ import {
   ScreenEnum,
 } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { getZingoVersion } from '../../app/utils/zingoVersion';
+import { getZingoName, getZingoVersion } from '../../app/utils/ZingoAppData';
 
 type InfoProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Info>;
 
@@ -60,7 +60,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ navigation }) => {
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
           <DetailLine
             label={translate('info.version') as string}
-            value={translate('zingo') + ' ' + getZingoVersion()}
+            value={getZingoName() + ' ' + getZingoVersion()}
           />
           <DetailLine
             label={translate('info.serverversion') as string}

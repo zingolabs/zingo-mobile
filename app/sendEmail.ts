@@ -1,7 +1,7 @@
 import { Alert, Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { GlobalConst, TranslateType } from './AppState';
-import { getZingoVersion } from './utils/zingoVersion';
+import { getZingoVersion } from './utils/ZingoAppData';
 
 export const sendEmail = async (
   translate: (key: string) => TranslateType,

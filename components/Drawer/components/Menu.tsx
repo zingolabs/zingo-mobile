@@ -11,7 +11,7 @@ import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import { ThemeType } from '../../../app/types';
 import simpleBiometrics from '../../../app/simpleBiometrics';
-import { getZingoVersion } from '../../../app/utils/zingoVersion';
+import { getZingoName, getZingoVersion } from '../../../app/utils/ZingoAppData';
 import {
   GlobalConst,
   MenuItemEnum,
@@ -317,7 +317,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
               color: colors.text,
             }}
           >
-            {'Zingo '}
+            {getZingoName() + ' '}
             <Text
               style={{
                 color:

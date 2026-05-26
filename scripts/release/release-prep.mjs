@@ -96,7 +96,7 @@ if (channel === 'prod') {
   patch(GRADLE, src =>
     src
       .replace(/versionCode = \d+ \/\/ Real.*$/m, `versionCode = ${build} // Real (prod baseline; beta flavor overrides below)`)
-      .replace(/versionName = "zingo-[^"]+" \/\/ Real$/m, `versionName = "zingo-${version}" // Real`),
+      .replace(/versionName = "[^"]+" \/\/ Real$/m, `versionName = "${version}" // Real`),
   );
 }
 
