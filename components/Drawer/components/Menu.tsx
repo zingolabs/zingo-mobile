@@ -11,7 +11,11 @@ import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import { ThemeType } from '../../../app/types';
 import simpleBiometrics from '../../../app/simpleBiometrics';
-import { getZingoName, getZingoVersion } from '../../../app/utils/ZingoAppData';
+import {
+  getZingoLogo,
+  getZingoName,
+  getZingoVersion,
+} from '../../../app/utils/ZingoAppData';
 import {
   GlobalConst,
   MenuItemEnum,
@@ -300,7 +304,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
           }}
         >
           <Image
-            source={require('../../../assets/img/logobig-zingo.png')}
+            source={getZingoLogo()}
             style={{
               width: 32,
               height: 32,

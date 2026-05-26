@@ -24,6 +24,21 @@ export function getZingoName(): string {
   return getApplicationName();
 }
 
+// `require()` is resolved by Metro at bundle time, so both assets are shipped
+// in every build; the runtime check just picks which one to render.
+const PROD_LOGO = require('../../assets/img/logobig-zingo.png');
+const BETA_LOGO = require('../../assets/img/logobig-zingo-beta.png');
+
+/**
+ * Big Zingo logo asset (drawer header, splash, QR center, etc).
+ * Returns the beta-specific image when running the beta variant, otherwise the
+ * production logo. Detection follows the same runtime app-name signal as
+ * `getZingoName()`.
+ */
+export function getZingoLogo() {
+  return getApplicationName() === 'Zingo Beta' ? BETA_LOGO : PROD_LOGO;
+}
+
 /**
  * Substitute `{name}` placeholder with the runtime app name in any translation
  * result. Designed to be called from the `translate` wrapper so every i18n
