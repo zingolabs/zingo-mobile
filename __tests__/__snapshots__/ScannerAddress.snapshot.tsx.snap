@@ -17,7 +17,7 @@ exports[`ScannerAddress - snapshots ScannerAddress active 1`] = `
           "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
-          "paddingBottom": 0,
+          "paddingBottom": 10,
           "paddingTop": 10,
         }
       }
@@ -44,6 +44,7 @@ exports[`ScannerAddress - snapshots ScannerAddress active 1`] = `
           "left": 0,
           "padding": 11.5,
           "position": "absolute",
+          "top": 10,
         }
       }
     >
@@ -52,7 +53,6 @@ exports[`ScannerAddress - snapshots ScannerAddress active 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "height": 40,
           }
         }
       />
@@ -63,6 +63,7 @@ exports[`ScannerAddress - snapshots ScannerAddress active 1`] = `
           "padding": 13,
           "position": "absolute",
           "right": 0,
+          "top": 10,
         }
       }
     >
@@ -216,7 +217,7 @@ exports[`ScannerAddress - snapshots ScannerAddress inactive 1`] = `
           "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
-          "paddingBottom": 0,
+          "paddingBottom": 10,
           "paddingTop": 10,
         }
       }
@@ -243,6 +244,7 @@ exports[`ScannerAddress - snapshots ScannerAddress inactive 1`] = `
           "left": 0,
           "padding": 11.5,
           "position": "absolute",
+          "top": 10,
         }
       }
     >
@@ -251,7 +253,6 @@ exports[`ScannerAddress - snapshots ScannerAddress inactive 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "height": 40,
           }
         }
       />
@@ -262,6 +263,7 @@ exports[`ScannerAddress - snapshots ScannerAddress inactive 1`] = `
           "padding": 13,
           "position": "absolute",
           "right": 0,
+          "top": 10,
         }
       }
     >

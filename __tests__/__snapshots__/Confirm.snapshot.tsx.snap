@@ -24,7 +24,7 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
             "backgroundColor": "#011401",
             "display": "flex",
             "minHeight": 25,
-            "paddingBottom": 0,
+            "paddingBottom": 10,
             "paddingTop": 10,
           }
         }
@@ -51,6 +51,7 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
             "left": 0,
             "padding": 11.5,
             "position": "absolute",
+            "top": 10,
           }
         }
       >
@@ -59,7 +60,6 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "height": 40,
             }
           }
         />
@@ -70,6 +70,7 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
             "padding": 13,
             "position": "absolute",
             "right": 0,
+            "top": 10,
           }
         }
       >
@@ -1061,7 +1062,7 @@ exports[`Confirm - snapshots Confirm no currency, privacy off 1`] = `
             "backgroundColor": "#011401",
             "display": "flex",
             "minHeight": 25,
-            "paddingBottom": 0,
+            "paddingBottom": 10,
             "paddingTop": 10,
           }
         }
@@ -1088,6 +1089,7 @@ exports[`Confirm - snapshots Confirm no currency, privacy off 1`] = `
             "left": 0,
             "padding": 11.5,
             "position": "absolute",
+            "top": 10,
           }
         }
       >
@@ -1096,7 +1098,6 @@ exports[`Confirm - snapshots Confirm no currency, privacy off 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "height": 40,
             }
           }
         />
@@ -1107,6 +1108,7 @@ exports[`Confirm - snapshots Confirm no currency, privacy off 1`] = `
             "padding": 13,
             "position": "absolute",
             "right": 0,
+            "top": 10,
           }
         }
       >

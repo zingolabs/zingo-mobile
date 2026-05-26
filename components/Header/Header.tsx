@@ -228,9 +228,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             top: 10,
           }}
         >
-          <View
-            style={{ alignItems: 'center', flexDirection: 'row' }}
-          >
+          <View style={{ alignItems: 'center', flexDirection: 'row' }}>
             {!noDrawMenu && (
               <TouchableOpacity
                 style={{ marginRight: 5 }}
@@ -288,16 +286,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           }}
         >
           {!noDrawMenu && screenName !== ScreenEnum.Settings ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}
+            >
               {showMessagesIcon && (
                 <TouchableOpacity
                   testID="header.messages"
                   onPress={() => navigation.navigate(RouteEnum.Messages)}
                 >
-                  <MessagesIcon
-                    size={26}
-                    color={colors.border}
-                  />
+                  <MessagesIcon size={26} color={colors.border} />
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -314,10 +311,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   }
                 }}
               >
-                <BoltIcon
-                  size={28}
-                  color={colors.border}
-                />
+                <BoltIcon size={28} color={colors.border} />
               </TouchableOpacity>
             </View>
           ) : (

@@ -17,7 +17,7 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
           "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
-          "paddingBottom": 0,
+          "paddingBottom": 10,
           "paddingTop": 10,
         }
       }
@@ -44,6 +44,7 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
           "left": 0,
           "padding": 11.5,
           "position": "absolute",
+          "top": 10,
         }
       }
     >
@@ -52,7 +53,6 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "height": 40,
           }
         }
       />
@@ -63,6 +63,7 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
           "padding": 13,
           "position": "absolute",
           "right": 0,
+          "top": 10,
         }
       }
     >
@@ -241,7 +242,7 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
           "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
-          "paddingBottom": 0,
+          "paddingBottom": 10,
           "paddingTop": 10,
         }
       }
@@ -268,6 +269,7 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
           "left": 0,
           "padding": 11.5,
           "position": "absolute",
+          "top": 10,
         }
       }
     >
@@ -276,7 +278,6 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "height": 40,
           }
         }
       />
@@ -287,6 +288,7 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
           "padding": 13,
           "position": "absolute",
           "right": 0,
+          "top": 10,
         }
       }
     >
