@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -137,7 +138,12 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   //console.log('render seed', privacy);
 
   return (
-    <View
+    // SafeAreaView (instead of plain View) because this screen is rendered
+    // inside a transparent Modal in LoadingApp.tsx. iOS does not auto-apply
+    // safe-area insets to transparent Modals (Android does), so without this
+    // the Header collides with the status bar/notch.
+    <SafeAreaView
+      edges={['top']}
       style={{
         flex: 1,
         backgroundColor: colors.background,
@@ -280,7 +286,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           onPress={() => onClickOKHide()}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

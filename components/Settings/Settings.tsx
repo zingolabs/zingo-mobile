@@ -54,6 +54,7 @@ import {
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import ReactNativeBiometrics from 'react-native-biometrics';
 import RNPickerSelect from 'react-native-picker-select';
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -263,6 +264,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
   const [openInfoSection, setOpenInfoSection] = useState<string | null>(null);
+  const [deviceHasSecurity, setDeviceHasSecurity] = useState<boolean>(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const rnBiometrics = new ReactNativeBiometrics({
+          allowDeviceCredentials: true,
+        });
+        const { available } = await rnBiometrics.isSensorAvailable();
+        setDeviceHasSecurity(available);
+      } catch {
+        setDeviceHasSecurity(false);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -857,39 +873,42 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             paddingBottom: 40,
           }}
         >
-          <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-            <BoldText>
-              {translate('settings.nym-privacy-network') as string}
-            </BoldText>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: 5,
-              }}
-            >
-              {nym ? (
-                <NymOn width={22} height={22} />
-              ) : (
-                <NymOff width={22} height={22} />
-              )}
-              <View style={{ flex: 1, marginLeft: 10 }}>
-                <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
-                  {translate('settings.nym-network') as string}
-                </BoldText>
-                <FadeText>
-                  {translate('settings.nym-enhanced-privacy') as string}
-                </FadeText>
-              </View>
-              <TouchableOpacity onPress={() => setNym(!nym)}>
+          {/* NYM feature hidden for now — will be enabled in the future */}
+          {false && (
+            <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+              <BoldText>
+                {translate('settings.nym-privacy-network') as string}
+              </BoldText>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: 5,
+                }}
+              >
                 {nym ? (
-                  <NymSwitchOn width={40} height={19} />
+                  <NymOn width={22} height={22} />
                 ) : (
-                  <SwitchOff width={40} height={19} />
+                  <NymOff width={22} height={22} />
                 )}
-              </TouchableOpacity>
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
+                    {translate('settings.nym-network') as string}
+                  </BoldText>
+                  <FadeText>
+                    {translate('settings.nym-enhanced-privacy') as string}
+                  </FadeText>
+                </View>
+                <TouchableOpacity onPress={() => setNym(!nym)}>
+                  {nym ? (
+                    <NymSwitchOn width={40} height={19} />
+                  ) : (
+                    <SwitchOff width={40} height={19} />
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          )}
 
           <View
             style={{
@@ -898,7 +917,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               justifyContent: 'space-between',
               marginLeft: 25,
               marginRight: 25,
-              marginVertical: 15,
+              marginTop: 25,
+              marginBottom: 15,
             }}
           >
             <BoldText>
@@ -1307,37 +1327,56 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           {mode !== ModeEnum.basic && (
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
                 marginLeft: 25,
                 marginRight: 25,
                 marginVertical: 15,
               }}
             >
-              <BoldText testID="settings.securitytitle">
-                {translate('settings.security-title') as string}
-              </BoldText>
-              <TouchableOpacity
-                onPress={() => securityBottomSheetRef.current?.snapToIndex(0)}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <RegText
-                    style={{
-                      marginRight: 5,
-                      fontWeight: '400',
-                      color: colors.zingo,
-                    }}
-                  >
-                    {securityLabel}
-                  </RegText>
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    size={12}
-                    color={colors.zingo}
-                  />
-                </View>
-              </TouchableOpacity>
+                <BoldText testID="settings.securitytitle">
+                  {translate('settings.security-title') as string}
+                </BoldText>
+                <TouchableOpacity
+                  disabled={!deviceHasSecurity}
+                  onPress={() => securityBottomSheetRef.current?.snapToIndex(0)}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <RegText
+                      style={{
+                        marginRight: 5,
+                        fontWeight: '400',
+                        color: deviceHasSecurity
+                          ? colors.zingo
+                          : colors.primaryDisabled,
+                      }}
+                    >
+                      {deviceHasSecurity
+                        ? securityLabel
+                        : (translate(
+                            'settings.security-not-available',
+                          ) as string)}
+                    </RegText>
+                    {deviceHasSecurity && (
+                      <FontAwesomeIcon
+                        icon={faChevronRight}
+                        size={12}
+                        color={colors.zingo}
+                      />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              </View>
+              {!deviceHasSecurity && (
+                <FadeText style={{ marginTop: 6 }}>
+                  {translate('settings.security-device-locked-hint') as string}
+                </FadeText>
+              )}
             </View>
           )}
 

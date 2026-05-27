@@ -152,30 +152,6 @@ export default class Utils {
   }
 
   // NYM
-  static async getNymDonationAddress(
-    chainName: ChainNameEnum,
-  ): Promise<string> {
-    // donations only for mainnet.
-    if (chainName === ChainNameEnum.mainChainName) {
-      // UA -> we need a fresh one.
-      //const start = Date.now();
-      const ua: string = await RPCModule.getDonationAddress();
-      //console.log('=========================================== > get nym donation address - ', Date.now() - start);
-      return ua;
-    }
-    return '';
-  }
-
-  static getNymDonationAmount(): string {
-    const { decimalSeparator } = getNumberFormatSettings();
-
-    return '0' + decimalSeparator + '01';
-  }
-
-  static getNymDonationMemo(translate: (key: string) => TranslateType): string {
-    return translate('nym-donation') as string;
-  }
-
   static utf16Split(s: string, chunksize: number): string[] {
     const ans = [];
 
@@ -293,8 +269,7 @@ export default class Utils {
     const to = sendPageState.toaddr;
     const donationAddress: boolean =
       to.to === (await Utils.getDonationAddress(server.chainName)) ||
-      to.to === (await Utils.getZenniesDonationAddress(server.chainName)) ||
-      to.to === (await Utils.getNymDonationAddress(server.chainName));
+      to.to === (await Utils.getZenniesDonationAddress(server.chainName));
 
     const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
     const amount = parseInt(

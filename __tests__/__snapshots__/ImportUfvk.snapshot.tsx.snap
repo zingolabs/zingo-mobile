@@ -88,7 +88,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           }
           style={
             {
-              "borderRadius": 10,
+              "borderRadius": 8,
               "height": 38,
               "resizeMode": "contain",
               "width": 38,

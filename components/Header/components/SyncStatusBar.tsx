@@ -196,20 +196,15 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                               size={16}
                             />
                             {viewSyncStatus && (
-                              <FadeText
-                                style={{ fontSize: 10, marginLeft: 2 }}
-                              >
+                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                                 {translate('syncing') as string}
                               </FadeText>
                             )}
-                            {viewSyncStatus &&
-                              percentageOutputsScanned > 0 && (
-                                <FadeText
-                                  style={{ fontSize: 10, marginLeft: 2 }}
-                                >
-                                  {' - '}
-                                </FadeText>
-                              )}
+                            {viewSyncStatus && percentageOutputsScanned > 0 && (
+                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                                {' - '}
+                              </FadeText>
+                            )}
                             {percentageOutputsScanned > 0 && (
                               <FadeText
                                 style={{ fontSize: 10, marginLeft: 2 }}
@@ -330,7 +325,8 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           </View>
         )}
 
-        {!noSyncingStatus && nym && (
+        {/* NYM feature hidden for now — will be enabled in the future */}
+        {false && !noSyncingStatus && nym && (
           <View
             style={{
               alignItems: 'center',

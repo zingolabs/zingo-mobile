@@ -5,14 +5,14 @@ source ./scripts/emulator_read_target.sh
 
 echo -e "\nCleaning & Building APKs..."
 cd android
-./gradlew assembleRelease -PsplitApk=true
+./gradlew assembleProdRelease -PsplitApk=true
 cd ..
 
 echo -e "\nInstalling APKs..."
 i=0
 step_complete=false
 until [[ $step_complete == true ]]; do
-    if adb -s emulator-5554 install -r -t -d --abi "${abi}" "android/app/build/outputs/apk/release/app-${abi}-release.apk" &> "${output_dir}/emulator_install_apk.txt"; then
+    if adb -s emulator-5554 install -r -t -d --abi "${abi}" "android/app/build/outputs/apk/prod/release/app-prod-${abi}-release.apk" &> "${output_dir}/emulator_install_apk.txt"; then
         step_complete=true
         echo "Successfully installed APKs"
     fi              

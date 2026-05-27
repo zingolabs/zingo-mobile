@@ -33,6 +33,11 @@ import {
 } from '../../AppState';
 import Button from '../../../components/Components/Button';
 import { ContextAppLoading } from '../../context';
+import {
+  getZingoLogo,
+  getZingoName,
+  getZingoVersion,
+} from '../../utils/ZingoAppData';
 import BoldText from '../../../components/Components/BoldText';
 import FadeText from '../../../components/Components/FadeText';
 import ChainTypeToggle from '../../../components/Components/ChainTypeToggle';
@@ -275,19 +280,19 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             <Text
               style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}
             >
-              {translate('zingo') as string}
+              {getZingoName()}
             </Text>
             <Text style={{ color: colors.zingo, fontSize: 15 }}>
-              {translate('version') as string}
+              {getZingoVersion()}
             </Text>
             <Image
-              source={require('../../../assets/img/logobig-zingo.png')}
+              source={getZingoLogo()}
               style={{
                 width: 100,
                 height: 100,
                 resizeMode: 'contain',
                 marginTop: 10,
-                borderRadius: 10,
+                borderRadius: 22,
               }}
             />
           </View>

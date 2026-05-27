@@ -125,5 +125,10 @@ export function useSyncStatus({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncInProgress, noSyncingStatus]);
 
-  return { percentageOutputsScanned, syncInProgress, viewSyncStatus, opacityValue };
+  return {
+    percentageOutputsScanned,
+    syncInProgress,
+    viewSyncStatus,
+    opacityValue,
+  };
 }

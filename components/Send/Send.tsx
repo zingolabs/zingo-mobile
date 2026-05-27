@@ -745,8 +745,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       (async () => {
         const donationA =
           addressText === (await Utils.getDonationAddress(server.chainName)) ||
-          addressText === zenniesDonationAddress ||
-          addressText === (await Utils.getNymDonationAddress(server.chainName));
+          addressText === zenniesDonationAddress;
         setDonationAddress(donationA);
       })();
     } else {
@@ -1969,35 +1968,38 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </>
               )}
             </View>
-            <TouchableOpacity
-              onPress={() => setNym(!nym)}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginHorizontal: 20,
-                marginTop: 15,
-                marginBottom: 20,
-              }}
-            >
-              {nym ? (
-                <NymOn width={22} height={22} />
-              ) : (
-                <NymOff width={22} height={22} />
-              )}
-              <View style={{ flex: 1, marginLeft: 10 }}>
-                <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
-                  {translate('settings.nym-network') as string}
-                </BoldText>
-                <FadeText>
-                  {translate('settings.nym-enhanced-privacy') as string}
-                </FadeText>
-              </View>
-              {nym ? (
-                <SwitchOn width={40} height={19} />
-              ) : (
-                <SwitchOff width={40} height={19} />
-              )}
-            </TouchableOpacity>
+            {/* NYM feature hidden for now — will be enabled in the future */}
+            {false && (
+              <TouchableOpacity
+                onPress={() => setNym(!nym)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginHorizontal: 20,
+                  marginTop: 15,
+                  marginBottom: 20,
+                }}
+              >
+                {nym ? (
+                  <NymOn width={22} height={22} />
+                ) : (
+                  <NymOff width={22} height={22} />
+                )}
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
+                    {translate('settings.nym-network') as string}
+                  </BoldText>
+                  <FadeText>
+                    {translate('settings.nym-enhanced-privacy') as string}
+                  </FadeText>
+                </View>
+                {nym ? (
+                  <SwitchOn width={40} height={19} />
+                ) : (
+                  <SwitchOff width={40} height={19} />
+                )}
+              </TouchableOpacity>
+            )}
 
             <View
               style={{

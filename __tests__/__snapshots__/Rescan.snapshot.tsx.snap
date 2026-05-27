@@ -74,7 +74,7 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 10,
+            "borderRadius": 8,
             "height": 38,
             "resizeMode": "contain",
             "width": 38,

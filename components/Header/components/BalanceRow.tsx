@@ -159,8 +159,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
 
         {receivedLegend &&
           totalBalance &&
-          totalBalance.totalOrchardBalance +
-            totalBalance.totalSaplingBalance >
+          totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance >
             0 && (
             <View
               style={{
@@ -215,9 +214,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           !noBalance &&
           !calculateDisableButtonToShield() &&
           valueTransfersTotal !== null && (
-            <View
-              style={{ justifyContent: 'center', alignItems: 'center' }}
-            >
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
               <FadeText style={{ fontSize: 8 }}>
                 {(translate(
                   `history.shield-legend-${calculatePoolsToShield()}`,
