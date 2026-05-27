@@ -68,6 +68,8 @@ type HeaderProps = {
   receivedLegend?: boolean;
   // show messages icon next to settings
   showMessagesIcon?: boolean;
+  // optional layout reporting (used by History for bottom-sheet snap points)
+  onUsdRowLayout?: (height: number) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -93,6 +95,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   closeScreen,
   noUfvkIcon,
   showMessagesIcon,
+  onUsdRowLayout,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -217,6 +220,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             calculateDisableButtonToShield={calculateDisableButtonToShield}
             onPressShieldFunds={onPressShieldFunds}
             receivedLegend={receivedLegend}
+            onUsdRowLayout={onUsdRowLayout}
           />
         </View>
 
@@ -328,7 +332,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       </View>
 
-      <View>
+      {!!title && (
         <View
           style={{
             display: 'flex',
@@ -380,11 +384,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             </>
           )}
         </View>
-
-        <View
-          style={{ width: '100%', height: 1, backgroundColor: colors.primary }}
-        />
-      </View>
+      )}
     </>
   );
 };

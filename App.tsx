@@ -21,7 +21,7 @@ LogBox.ignoreLogs([
 ]);
 
 const advancePalette: string[] = [
-  '#06172d',
+  '#010A17',
   '#dadfe1',
   '#43a637',
   '#23692f',
@@ -35,7 +35,7 @@ const advancePalette: string[] = [
 ];
 
 const basicPalette: string[] = [
-  '#07182e',
+  '#010A17',
   '#dadfe1',
   '#15576f',
   '#4fa254',
@@ -68,6 +68,8 @@ export const advancedTheme: ThemeType = {
     syncing: '#ebff5a', // yellow
     notification: '',
     sideMenuBackground: advancePalette[10],
+    bottomSheetBackground: '#031124',
+    bottomSheetBorder: '#05234C',
     warning: {
       background: '#262527',
       border: '#65491C',
@@ -103,6 +105,8 @@ export const basicTheme: ThemeType = {
     syncing: '#ebff5a', // yellow
     notification: '',
     sideMenuBackground: basicPalette[10],
+    bottomSheetBackground: '#031124',
+    bottomSheetBorder: '#05234C',
     warning: {
       background: '#262527',
       border: '#65491C',

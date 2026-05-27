@@ -5,11 +5,8 @@ import { useTheme } from '@react-navigation/native';
 
 import { ButtonTypeEnum, FilterEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
-import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import FadeText from '../../Components/FadeText';
 
 type FiltersProps = {
@@ -63,33 +60,13 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
     <View
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
-        //console.log('LAYOUTTT', height);
+        // +80 to leave room for the custom sheet handle (title + close icon)
         setHeightLayout(height + 80);
       }}
       style={{
-        backgroundColor: colors.background,
+        backgroundColor: colors.bottomSheetBackground,
       }}
     >
-      <TouchableOpacity
-        onPress={() => {
-          clearLocal();
-          setTimeout(() => {
-            closeSheet();
-          }, 100);
-        }}
-      >
-        <FontAwesomeIcon
-          size={24}
-          icon={faXmark}
-          color={colors.text}
-          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
-        />
-      </TouchableOpacity>
-      <RegText
-        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
-      >
-        {translate('history.filters') as string}
-      </RegText>
       <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
         <ScrollView
           contentContainerStyle={{

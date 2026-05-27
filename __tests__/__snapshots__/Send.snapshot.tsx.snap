@@ -356,6 +356,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             </View>
           </View>
           <View
+            onLayout={[Function]}
             style={
               {
                 "alignItems": "center",
@@ -649,59 +650,48 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           </View>
         </View>
       </View>
-      <View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "justifyContent": "space-between",
+            "marginVertical": 5,
+            "width": "100%",
+          }
+        }
+      >
         <View
           style={
             {
-              "alignItems": "center",
-              "display": "flex",
-              "flexDirection": "row",
-              "flexWrap": "wrap",
-              "justifyContent": "space-between",
-              "marginVertical": 5,
-              "width": "100%",
+              "height": 30,
+              "marginHorizontal": 10,
+              "width": 30,
+            }
+          }
+        />
+        <Text
+          style={
+            {
+              "color": "#ffffff",
+              "fontSize": 18,
+              "fontWeight": "bold",
+              "opacity": 0.87,
+              "paddingHorizontal": 5,
+              "textAlign": "center",
             }
           }
         >
-          <View
-            style={
-              {
-                "height": 30,
-                "marginHorizontal": 10,
-                "width": 30,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "#ffffff",
-                "fontSize": 18,
-                "fontWeight": "bold",
-                "opacity": 0.87,
-                "paddingHorizontal": 5,
-                "textAlign": "center",
-              }
-            }
-          >
-            text translated
-          </Text>
-          <View
-            style={
-              {
-                "height": 30,
-                "marginHorizontal": 10,
-                "width": 30,
-              }
-            }
-          />
-        </View>
+          text translated
+        </Text>
         <View
           style={
             {
-              "backgroundColor": "#18bd18",
-              "height": 1,
-              "width": "100%",
+              "height": 30,
+              "marginHorizontal": 10,
+              "width": 30,
             }
           }
         />
@@ -1955,59 +1945,48 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           </View>
         </View>
       </View>
-      <View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "justifyContent": "space-between",
+            "marginVertical": 5,
+            "width": "100%",
+          }
+        }
+      >
         <View
           style={
             {
-              "alignItems": "center",
-              "display": "flex",
-              "flexDirection": "row",
-              "flexWrap": "wrap",
-              "justifyContent": "space-between",
-              "marginVertical": 5,
-              "width": "100%",
+              "height": 30,
+              "marginHorizontal": 10,
+              "width": 30,
+            }
+          }
+        />
+        <Text
+          style={
+            {
+              "color": "#ffffff",
+              "fontSize": 18,
+              "fontWeight": "bold",
+              "opacity": 0.87,
+              "paddingHorizontal": 5,
+              "textAlign": "center",
             }
           }
         >
-          <View
-            style={
-              {
-                "height": 30,
-                "marginHorizontal": 10,
-                "width": 30,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "#ffffff",
-                "fontSize": 18,
-                "fontWeight": "bold",
-                "opacity": 0.87,
-                "paddingHorizontal": 5,
-                "textAlign": "center",
-              }
-            }
-          >
-            text translated
-          </Text>
-          <View
-            style={
-              {
-                "height": 30,
-                "marginHorizontal": 10,
-                "width": 30,
-              }
-            }
-          />
-        </View>
+          text translated
+        </Text>
         <View
           style={
             {
-              "backgroundColor": "#18bd18",
-              "height": 1,
-              "width": "100%",
+              "height": 30,
+              "marginHorizontal": 10,
+              "width": 30,
             }
           }
         />

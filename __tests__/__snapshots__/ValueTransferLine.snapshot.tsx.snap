@@ -1511,7 +1511,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
   <View
     style={
       {
-        "backgroundColor": "#011401",
+        "backgroundColor": "#031124",
         "borderBottomWidth": 1,
         "borderColor": "#011401",
         "borderTopWidth": 1,

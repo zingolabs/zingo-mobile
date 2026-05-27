@@ -162,108 +162,97 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
       />
     </View>
   </View>
-  <View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "display": "flex",
+        "flexDirection": "row",
+        "flexWrap": "wrap",
+        "justifyContent": "space-between",
+        "marginVertical": 5,
+        "width": "100%",
+      }
+    }
+  >
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
       style={
         {
-          "alignItems": "center",
-          "display": "flex",
-          "flexDirection": "row",
-          "flexWrap": "wrap",
-          "justifyContent": "space-between",
-          "marginVertical": 5,
-          "width": "100%",
+          "opacity": 1,
         }
       }
     >
-      <View
-        accessibilityState={
+      <
+        color="#18bd18"
+        icon={
           {
-            "busy": undefined,
-            "checked": undefined,
-            "disabled": undefined,
-            "expanded": undefined,
-            "selected": undefined,
-          }
-        }
-        accessibilityValue={
-          {
-            "max": undefined,
-            "min": undefined,
-            "now": undefined,
-            "text": undefined,
-          }
-        }
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          {
-            "opacity": 1,
-          }
-        }
-      >
-        <
-          color="#18bd18"
-          icon={
-            {
-              "icon": [
-                320,
-                512,
-                [
-                  9001,
-                ],
-                "f053",
-                "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
+            "icon": [
+              320,
+              512,
+              [
+                9001,
               ],
-              "iconName": "chevron-left",
-              "prefix": "fas",
-            }
-          }
-          size={24}
-          style={
-            {
-              "marginHorizontal": 10,
-            }
-          }
-        />
-      </View>
-      <Text
-        style={
-          {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "bold",
-            "opacity": 0.87,
-            "paddingHorizontal": 5,
+              "f053",
+              "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
+            ],
+            "iconName": "chevron-left",
+            "prefix": "fas",
           }
         }
-      >
-        text translated
-      </Text>
-      <View
+        size={24}
         style={
           {
-            "height": 30,
             "marginHorizontal": 10,
-            "width": 30,
           }
         }
       />
     </View>
+    <Text
+      style={
+        {
+          "color": "#ffffff",
+          "fontSize": 18,
+          "fontWeight": "bold",
+          "opacity": 0.87,
+          "paddingHorizontal": 5,
+        }
+      }
+    >
+      text translated
+    </Text>
     <View
       style={
         {
-          "backgroundColor": "#18bd18",
-          "height": 1,
-          "width": "100%",
+          "height": 30,
+          "marginHorizontal": 10,
+          "width": 30,
         }
       }
     />
@@ -1050,108 +1039,97 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
       />
     </View>
   </View>
-  <View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "display": "flex",
+        "flexDirection": "row",
+        "flexWrap": "wrap",
+        "justifyContent": "space-between",
+        "marginVertical": 5,
+        "width": "100%",
+      }
+    }
+  >
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
       style={
         {
-          "alignItems": "center",
-          "display": "flex",
-          "flexDirection": "row",
-          "flexWrap": "wrap",
-          "justifyContent": "space-between",
-          "marginVertical": 5,
-          "width": "100%",
+          "opacity": 1,
         }
       }
     >
-      <View
-        accessibilityState={
+      <
+        color="#18bd18"
+        icon={
           {
-            "busy": undefined,
-            "checked": undefined,
-            "disabled": undefined,
-            "expanded": undefined,
-            "selected": undefined,
-          }
-        }
-        accessibilityValue={
-          {
-            "max": undefined,
-            "min": undefined,
-            "now": undefined,
-            "text": undefined,
-          }
-        }
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          {
-            "opacity": 1,
-          }
-        }
-      >
-        <
-          color="#18bd18"
-          icon={
-            {
-              "icon": [
-                320,
-                512,
-                [
-                  9001,
-                ],
-                "f053",
-                "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
+            "icon": [
+              320,
+              512,
+              [
+                9001,
               ],
-              "iconName": "chevron-left",
-              "prefix": "fas",
-            }
-          }
-          size={24}
-          style={
-            {
-              "marginHorizontal": 10,
-            }
-          }
-        />
-      </View>
-      <Text
-        style={
-          {
-            "color": "#ffffff",
-            "fontSize": 18,
-            "fontWeight": "bold",
-            "opacity": 0.87,
-            "paddingHorizontal": 5,
+              "f053",
+              "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
+            ],
+            "iconName": "chevron-left",
+            "prefix": "fas",
           }
         }
-      >
-        text translated
-      </Text>
-      <View
+        size={24}
         style={
           {
-            "height": 30,
             "marginHorizontal": 10,
-            "width": 30,
           }
         }
       />
     </View>
+    <Text
+      style={
+        {
+          "color": "#ffffff",
+          "fontSize": 18,
+          "fontWeight": "bold",
+          "opacity": 0.87,
+          "paddingHorizontal": 5,
+        }
+      }
+    >
+      text translated
+    </Text>
     <View
       style={
         {
-          "backgroundColor": "#18bd18",
-          "height": 1,
-          "width": "100%",
+          "height": 30,
+          "marginHorizontal": 10,
+          "width": 30,
         }
       }
     />

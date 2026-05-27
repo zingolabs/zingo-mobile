@@ -22,10 +22,11 @@ import {
   useTheme,
 } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
+  CurrencyEnum,
   FilterEnum,
   GlobalConst,
   RouteEnum,
@@ -38,6 +39,7 @@ import {
 } from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
+import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
@@ -55,7 +57,7 @@ import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/Re
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { Swipeable } from 'react-native-gesture-handler';
 import { RPCValueTransfersStatusEnum } from '../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import {
+import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetModal,
@@ -114,6 +116,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     doRefresh,
     zenniesDonationAddress,
     setPrivacyOption,
+    currency,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.History;
@@ -137,8 +140,13 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [heightLayout, setHeightLayout] = useState<number>(10);
+  // measured dynamically to compute history sheet snap points
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
+  const [usdRowH, setUsdRowH] = useState<number>(0);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const historySheetRef = useRef<BottomSheet>(null);
   const scrollViewRef =
     useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(
       null,
@@ -247,6 +255,50 @@ const History: React.FunctionComponent<HistoryProps> = ({
     }
     return [`${snap1}%`, `${snap2}%`];
   }, [heightLayout]);
+
+  // Bottom-sheet that hosts the history list itself. Snap points are ordered
+  // from smallest sheet height (most balance area visible above) to largest
+  // (only the top icons row visible above). Computed in absolute pixels from
+  // the Header's measured height + the USD row's measured height when shown.
+  //   - With USD: 3 snaps -> [ZEC+USD visible, only ZEC visible, only top icons visible]
+  //   - Without USD: 2 snaps -> [ZEC visible, only top icons visible]
+  // Top icons strip height is a code-side constant (~55 px) — same on any phone.
+  const TOP_ICONS_H = 55;
+  const SNAP_GAP = 4;
+  // Bump applied to the snaps that sit just below a balance row (low + mid);
+  // the max snap (just below the top icons strip) doesn't need it.
+  const BALANCE_SNAP_BUMP = 10;
+
+  useEffect(() => {
+    const withUsd =
+      currency === CurrencyEnum.USDCurrency ||
+      currency === CurrencyEnum.USDTORCurrency;
+    if (!withUsd) {
+      setUsdRowH(0);
+    }
+  }, [currency]);
+
+  const historySnapPoints = useMemo(() => {
+    const withUsd =
+      currency === CurrencyEnum.USDCurrency ||
+      currency === CurrencyEnum.USDTORCurrency;
+    // Until the layout reports the actual container + header heights, fall
+    // back to percentages.
+    if (containerH <= 0 || headerH <= 0) {
+      return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
+    }
+    const snapBase = containerH - headerH - SNAP_GAP;
+    const snapLow = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
+    const snapMid = Math.min(
+      Math.max(snapBase + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
+      containerH - TOP_ICONS_H - SNAP_GAP,
+    );
+    const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
+    if (withUsd && usdRowH > 0) {
+      return [snapLow, snapMid, snapMax];
+    }
+    return [snapLow, snapMax];
+  }, [currency, containerH, headerH, usdRowH]);
 
   const fetchValueTransfersFiltered = useMemo(() => {
     if (!valueTransfers) {
@@ -474,68 +526,49 @@ const History: React.FunctionComponent<HistoryProps> = ({
     />
   );
 
-  const hide = useCallback(() => {
-    bottomSheetRef.current?.dismiss();
-    setShowFilters(false);
-    setHeightLayout(10);
-  }, []);
-
-  return (
-    <View style={{ flex: 1 }}>
+  const renderHistoryHandle = useCallback(
+    () => (
       <View
-        accessible={true}
-        accessibilityLabel={translate('history.title-acc') as string}
         style={{
-          flex: 1,
-          display: 'flex',
-          justifyContent: 'flex-start',
-          width: '100%',
+          paddingTop: 8,
+          paddingBottom: 6,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
         }}
       >
-        <Header
-          testID="valuetransfer text"
-          title={translate('history.title') as string}
-          toggleMenuDrawer={toggleMenuDrawer}
-          setPrivacyOption={setPrivacyOption}
-          addLastSnackbar={addLastSnackbar /* context */}
-          screenName={screenName}
-          setShieldingAmount={setShieldingAmount}
-          setScrollToTop={setScrollToTop}
-          setScrollToBottom={setScrollToBottom}
-          setBackgroundError={setBackgroundError /* context */}
-          showMessagesIcon={true}
-        />
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            width: '100%',
-            marginHorizontal: 5,
-            marginBottom: 2,
           }}
         >
-          <View style={{ width: 20 }} />
-
+          <View style={{ width: 28 }} />
+          <BoldText style={{ fontSize: 16 }}>
+            {translate('history.title') as string}
+          </BoldText>
           <Pressable
             onPress={() => {
               setShowFilters(true);
               bottomSheetRef.current?.present();
             }}
+            hitSlop={8}
             style={{
-              marginTop: -35,
-              marginRight: 20,
               flexDirection: 'row',
-              alignSelf: 'flex-start',
-              paddingHorizontal: 1,
+              alignItems: 'center',
+              paddingHorizontal: 2,
               paddingVertical: 4,
             }}
           >
-            <FiltersIcon
-              style={{ marginLeft: 5, marginRight: 5 }}
-              color={colors.zingo}
-              size={20}
-            />
+            <FiltersIcon color={colors.zingo} size={20} />
             {(!!filterKind ||
               filterFailed ||
               filterMemos ||
@@ -546,153 +579,266 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   width: 7,
                   height: 7,
                   borderRadius: 7,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: -3,
-                  marginLeft: -5,
+                  marginLeft: -3,
+                  marginTop: -8,
                 }}
               />
             )}
           </Pressable>
         </View>
-        {loading ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.primary}
-            style={{ marginVertical: 20 }}
-          />
-        ) : (
-          <>
-            {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
-              <RecyclerListView
-                ref={scrollViewRef}
-                renderAheadOffset={500}
-                scrollViewProps={{
-                  refreshControl: (
-                    <RefreshControl
-                      refreshing={false}
-                      onRefresh={() => doRefresh(screenName)}
-                      tintColor={colors.text}
-                      title={translate('history.refreshing') as string}
-                    />
-                  ),
-                  style: {
-                    flexGrow: 1,
-                    marginTop: 10,
-                    width: '100%',
-                  },
-                }}
-                onScroll={handleScroll}
-                scrollThrottle={100}
-                layoutProvider={layoutProvider}
-                dataProvider={dataProvider}
-                rowRenderer={rowRenderer}
-                onEndReachedThreshold={0.75}
-                onEndReached={() => {
-                  setShowFooter(true);
-                }}
-                disableRecycling={true}
-                renderFooter={() => (
-                  <>
-                    {showFooter ? (
-                      <>
-                        {loadMoreButton ? (
-                          <View
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'flex-start',
-                              marginTop: 20,
-                              marginBottom: 60,
-                            }}
-                          >
-                            <Button
-                              type={ButtonTypeEnum.Secondary}
-                              title={translate('history.loadmore') as string}
-                              onPress={loadMoreClicked}
-                            />
-                          </View>
-                        ) : (
-                          <>
-                            {!!valueTransfersSliced &&
-                              !!valueTransfersSliced.length && (
-                                <View
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'flex-start',
-                                    marginTop: 20,
-                                    marginBottom: 60,
-                                  }}
-                                >
-                                  <FadeText style={{ color: colors.primary }}>
-                                    {translate('history.end') as string}
-                                  </FadeText>
-                                </View>
-                              )}
-                          </>
-                        )}
-                      </>
-                    ) : null}
-                  </>
-                )}
-              />
-            ) : (
-              <View
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: 30,
-                }}
-              >
-                <FadeText style={{ color: colors.primary }}>
-                  {translate('history.empty') as string}
-                </FadeText>
-              </View>
-            )}
-            {!isAtTop && (
-              <Pressable
-                onPress={handleScrollToTop}
-                disabled={isScrollingToTop}
-                style={({ pressed }) => ({
-                  position: 'absolute',
-                  bottom: 30,
-                  right: 10,
-                  paddingHorizontal: 5,
-                  paddingVertical: 10,
-                  backgroundColor: colors.sideMenuBackground,
-                  borderRadius: 50,
-                  transform: [{ scale: pressed ? 0.9 : 1 }],
-                  borderWidth: 1,
-                  borderColor: colors.zingo,
-                  opacity: isScrollingToTop ? 0.5 : 1,
-                })}
-              >
-                <FontAwesomeIcon
-                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={16}
-                  icon={faAngleUp}
-                  color={colors.zingo}
-                />
-              </Pressable>
-            )}
-          </>
-        )}
       </View>
+    ),
+    [colors, translate, filterKind, filterFailed, filterMemos, filterWithFunds],
+  );
+
+  const renderFiltersHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 8,
+          paddingBottom: 6,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <View style={{ width: 28 }} />
+          <BoldText style={{ fontSize: 16 }}>
+            {translate('history.filters') as string}
+          </BoldText>
+          <Pressable
+            onPress={() => bottomSheetRef.current?.dismiss()}
+            hitSlop={8}
+            style={{
+              paddingHorizontal: 2,
+              paddingVertical: 4,
+            }}
+          >
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+          </Pressable>
+        </View>
+      </View>
+    ),
+    [colors, translate],
+  );
+
+  const hide = useCallback(() => {
+    bottomSheetRef.current?.dismiss();
+    setShowFilters(false);
+    setHeightLayout(10);
+  }, []);
+
+  return (
+    <View
+      style={{ flex: 1 }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
+    >
+      <View
+        accessible={true}
+        accessibilityLabel={translate('history.title-acc') as string}
+        style={{
+          flex: 1,
+          display: 'flex',
+          justifyContent: 'flex-start',
+          width: '100%',
+        }}
+      >
+        <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
+          <Header
+            testID="valuetransfer text"
+            title={''}
+            toggleMenuDrawer={toggleMenuDrawer}
+            setPrivacyOption={setPrivacyOption}
+            addLastSnackbar={addLastSnackbar /* context */}
+            screenName={screenName}
+            setShieldingAmount={setShieldingAmount}
+            setScrollToTop={setScrollToTop}
+            setScrollToBottom={setScrollToBottom}
+            setBackgroundError={setBackgroundError /* context */}
+            showMessagesIcon={true}
+            onUsdRowLayout={setUsdRowH}
+          />
+        </View>
+      </View>
+      <BottomSheet
+        ref={historySheetRef}
+        snapPoints={historySnapPoints}
+        index={0}
+        enableDynamicSizing={false}
+        enablePanDownToClose={false}
+        enableContentPanningGesture={false}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        handleComponent={renderHistoryHandle}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: colors.bottomSheetBackground,
+          }}
+        >
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              style={{ marginVertical: 20 }}
+            />
+          ) : (
+            <View style={{ flex: 1, width: '100%' }}>
+              {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
+                <RecyclerListView
+                  ref={scrollViewRef}
+                  renderAheadOffset={500}
+                  scrollViewProps={{
+                    refreshControl: (
+                      <RefreshControl
+                        refreshing={false}
+                        onRefresh={() => doRefresh(screenName)}
+                        tintColor={colors.text}
+                        title={translate('history.refreshing') as string}
+                      />
+                    ),
+                    style: {
+                      flexGrow: 1,
+                      width: '100%',
+                    },
+                  }}
+                  onScroll={handleScroll}
+                  scrollThrottle={100}
+                  layoutProvider={layoutProvider}
+                  dataProvider={dataProvider}
+                  rowRenderer={rowRenderer}
+                  onEndReachedThreshold={0.75}
+                  onEndReached={() => {
+                    setShowFooter(true);
+                  }}
+                  disableRecycling={true}
+                  renderFooter={() => (
+                    <>
+                      {showFooter ? (
+                        <>
+                          {loadMoreButton ? (
+                            <View
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                marginTop: 20,
+                                marginBottom: 60,
+                              }}
+                            >
+                              <Button
+                                type={ButtonTypeEnum.Secondary}
+                                title={translate('history.loadmore') as string}
+                                onPress={loadMoreClicked}
+                              />
+                            </View>
+                          ) : (
+                            <>
+                              {!!valueTransfersSliced &&
+                                !!valueTransfersSliced.length && (
+                                  <View
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'flex-start',
+                                      marginTop: 20,
+                                      marginBottom: 60,
+                                    }}
+                                  >
+                                    <FadeText style={{ color: colors.primary }}>
+                                      {translate('history.end') as string}
+                                    </FadeText>
+                                  </View>
+                                )}
+                            </>
+                          )}
+                        </>
+                      ) : null}
+                    </>
+                  )}
+                />
+              ) : (
+                <View
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 30,
+                  }}
+                >
+                  <FadeText style={{ color: colors.primary }}>
+                    {translate('history.empty') as string}
+                  </FadeText>
+                </View>
+              )}
+              {!isAtTop && (
+                <Pressable
+                  onPress={handleScrollToTop}
+                  disabled={isScrollingToTop}
+                  style={({ pressed }) => ({
+                    position: 'absolute',
+                    bottom: 30,
+                    right: 10,
+                    paddingHorizontal: 5,
+                    paddingVertical: 10,
+                    backgroundColor: colors.sideMenuBackground,
+                    borderRadius: 50,
+                    transform: [{ scale: pressed ? 0.9 : 1 }],
+                    borderWidth: 1,
+                    borderColor: colors.zingo,
+                    opacity: isScrollingToTop ? 0.5 : 1,
+                  })}
+                >
+                  <FontAwesomeIcon
+                    style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                    size={16}
+                    icon={faAngleUp}
+                    color={colors.zingo}
+                  />
+                </Pressable>
+              )}
+            </View>
+          )}
+        </View>
+      </BottomSheet>
       <BottomSheetModal
         ref={bottomSheetRef}
         snapPoints={snapPoints}
         enableDynamicSizing={false}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
-        handleStyle={{ display: 'none' }}
-        backgroundStyle={{ backgroundColor: colors.background }}
+        handleComponent={renderFiltersHandle}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
         onDismiss={() => setShowFilters(false)}
         backdropComponent={renderBackdrop}
       >
         <BottomSheetView
-          style={{ backgroundColor: colors.background, height: '100%' }}
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            height: '100%',
+          }}
         >
           {showFilters && (
             <Filters
