@@ -387,6 +387,8 @@
     "security-all": "Tümü",
     "security-some": "Bazıları",
     "security-none": "Hiçbiri",
+    "security-not-available": "Kullanılamıyor",
+    "security-device-locked-hint": "Uygulama güvenliğini etkinleştirmek için cihaz şifresini veya biyometriği yapılandırın.",
     "security-startapp": "Uygulama başladığında",
     "security-foregroundapp": "Uygulama ön plana geçtiğinde",
     "security-sendconfirm": "İşlemi Onayla",
