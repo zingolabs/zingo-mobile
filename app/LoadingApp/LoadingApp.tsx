@@ -50,17 +50,17 @@ import {
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import RPC from '../rpc';
+import { fetchWallet } from '../walletBackend';
 import { ThemeType } from '../types';
 import { ContextAppLoadingProvider } from '../context';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
+import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../rpc/types/RPCSeedType';
+import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
@@ -75,10 +75,10 @@ import {
 // no lazy load because slowing down screens.
 import ImportUfvk from './components/ImportUfvk';
 import { sendEmail } from '../sendEmail';
-import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
+import { RPCWalletKindEnum } from '../walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
-import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
+import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
 
@@ -672,7 +672,7 @@ export class LoadingAppClass extends Component<
               transparentPool = walletKindJSON.transparent;
               // if the seed & birthday are not stored in Keychain/Keystore, do it now.
               if (this.state.recoveryWalletInfoOnDevice) {
-                const wallet = await RPC.rpcFetchWallet(readOnly);
+                const wallet = await fetchWallet(readOnly);
                 if (wallet) {
                   await createUpdateRecoveryWalletInfo(wallet);
                 }
@@ -1506,7 +1506,7 @@ export class LoadingAppClass extends Component<
             transparentPool = walletKindJSON.transparent;
             // if the seed & birthday are not stored in Keychain/Keystore, do it now.
             if (this.state.recoveryWalletInfoOnDevice) {
-              const wallet = await RPC.rpcFetchWallet(readOnly);
+              const wallet = await fetchWallet(readOnly);
               if (wallet) {
                 await createUpdateRecoveryWalletInfo(wallet);
               }

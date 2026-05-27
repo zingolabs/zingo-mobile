@@ -27,7 +27,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import RPC from '../rpc';
+import WalletBackend, { fetchWallet } from '../walletBackend';
 import RPCModule from '../RPCModule';
 import {
   AppStateLoaded,
@@ -80,7 +80,7 @@ import { createAlert } from '../createAlert';
 import { sendEmail } from '../sendEmail';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../rpc/types/RPCSeedType';
+import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
@@ -100,10 +100,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import Drawer from '../../components/Drawer';
 import MessageList from '../../components/Messages/components/MessageList';
-import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
-import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
-import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
+import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
+import { RPCCheckAddressType } from '../walletBackend/types/RPCCheckAddressType';
+import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
@@ -653,7 +653,7 @@ export class LoadedAppClass extends Component<
   LoadedAppClassProps,
   LoadedAppClassState
 > {
-  rpc: RPC;
+  rpc: WalletBackend;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
@@ -736,22 +736,22 @@ export class LoadedAppClass extends Component<
       isSeedViewModalOpen: false,
     };
 
-    this.rpc = new RPC(
-      this.setTotalBalance,
-      this.setValueTransfersList,
-      this.setMessagesList,
-      this.setAllAddresses,
-      this.setInfo,
-      this.setSyncingStatus,
-      props.translate,
-      this.keepAwake,
-      this.setZingolibVersion,
-      this.setBirthday,
-      this.setLastError,
-      props.readOnly,
-      props.server,
-      props.performanceLevel,
-    );
+    this.rpc = new WalletBackend({
+      onBalanceChanged: this.setTotalBalance,
+      onValueTransfersChanged: this.setValueTransfersList,
+      onMessagesChanged: this.setMessagesList,
+      onAddressesChanged: this.setAllAddresses,
+      onInfoChanged: this.setInfo,
+      onSyncStatusChanged: this.setSyncingStatus,
+      translate: props.translate,
+      keepAwake: this.keepAwake,
+      onZingolibVersionChanged: this.setZingolibVersion,
+      onBirthdayChanged: this.setBirthday,
+      onError: this.setLastError,
+      readOnly: props.readOnly,
+      server: props.server,
+      performanceLevel: props.performanceLevel,
+    });
 
     this.appstate = {} as NativeEventSubscription;
     this.linking = {} as EmitterSubscription;
@@ -1709,7 +1709,7 @@ export class LoadedAppClass extends Component<
     if (!value) {
       await removeRecoveryWalletInfo();
     } else {
-      const wallet = await RPC.rpcFetchWallet(this.state.readOnly);
+      const wallet = await fetchWallet(this.state.readOnly);
       if (wallet) {
         await createUpdateRecoveryWalletInfo(wallet);
       }

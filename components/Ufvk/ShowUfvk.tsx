@@ -45,7 +45,7 @@ import ExpandedAddress from '../Receive/components/ExpandedAddress';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import WalletType from '../../app/AppState/types/WalletType';
-import RPC from '../../app/rpc/RPC';
+import { fetchWallet } from '../../app/walletBackend';
 
 type TextsType = {
   new: string[];
@@ -99,7 +99,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
         const info = await getRecoveryWalletInfo();
         setFetchedWallet(info);
       } else {
-        const info = await RPC.rpcFetchWallet(true);
+        const info = await fetchWallet(true);
         setFetchedWallet(info ?? ({} as WalletType));
       }
       setLoadingUfvk(false);
