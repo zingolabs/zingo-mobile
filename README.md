@@ -32,6 +32,10 @@ yarn release:prod:prep <version> <build>
 yarn release:beta:prep <version> <build>
 ```
 
+Pushing a `zingo-<version>-<build>` or `zingo-beta-<version>-<build>` tag
+triggers a CI workflow that builds the 4 ABI APKs + a universal APK from
+source on the tagged commit and publishes them to a fresh GitHub Release.
+
 Full step-by-step for both stores, signing setup, and the underlying iOS/Android
 flavor architecture: see [docs/release_quickstart.md](./docs/release_quickstart.md).
 

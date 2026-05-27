@@ -42,6 +42,41 @@ What each subcommand touches:
 Prod and beta versionCodes/build numbers evolve independently. Same versionName
 is fine across channels.
 
+After the bump, `release-prep` prints the suggested commit / push / tag
+commands to copy-paste. Pushing the tag triggers the Android Release CI
+workflow described below.
+
+## Tag-triggered Android APKs
+
+Pushing a release tag publishes a set of Android APKs as a GitHub Release.
+This is independent from the store uploads — it exists for sideloading,
+internal QA distribution, and reproducible per-commit archives.
+
+| Channel | Tag format | GitHub Release |
+|---|---|---|
+| prod | `zingo-<version>-<build>` | latest release, `prerelease=false` |
+| beta | `zingo-beta-<version>-<build>` | new release, `prerelease=true` |
+
+The `.github/workflows/android-release.yaml` workflow:
+
+1. Builds the rust native libs (4 ABIs in parallel) and the uniffi kotlin
+   bindings from source on the tagged commit. **No `actions/cache` is read
+   or written for these outputs** — all cross-job hand-off is via
+   `upload-artifact`, which is run-scoped. The maven dependency cache is
+   used in read-only mode (artifacts are content-addressed and signed).
+2. Assembles `assembleProdRelease` or `assembleBetaRelease` with
+   `-PsplitApk=true -PincludeUniversalApk=true`.
+3. Publishes 5 APKs to the release:
+   - `<prefix>-armeabi-v7a-<version>-<build>.apk` (32-bit ARM)
+   - `<prefix>-arm64-v8a-<version>-<build>.apk` (64-bit ARM, most modern phones)
+   - `<prefix>-x86-<version>-<build>.apk` (32-bit x86, emulators)
+   - `<prefix>-x86_64-<version>-<build>.apk` (64-bit x86, emulators)
+   - `<prefix>-universal-<version>-<build>.apk` (single APK with all 4 ABIs)
+
+   where `<prefix>` is `zingo` or `zingo-beta`.
+
+These APKs are signed with `debug.keystore`.
+
 ## Shipping Production
 
 ### iOS
