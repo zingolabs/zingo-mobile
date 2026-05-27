@@ -57,7 +57,7 @@ import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
+import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';

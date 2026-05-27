@@ -520,9 +520,7 @@ export class DataService {
         );
       }
       if (walletSaveRequiredStr) {
-        if (
-          walletSaveRequiredStr.toLowerCase().startsWith(GlobalConst.error)
-        ) {
+        if (walletSaveRequiredStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet save required ${walletSaveRequiredStr}`);
           this.config.onError(
             `Error wallet save required: ${walletSaveRequiredStr}`,

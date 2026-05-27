@@ -33,7 +33,11 @@ describe('transformValueTransfer — kind mapping', () => {
   ];
 
   test.each(cases)('maps %s → %s', (rpcKind, appKind) => {
-    const result = transformValueTransfer(makeVt({ kind: rpcKind }), 1100, 1100);
+    const result = transformValueTransfer(
+      makeVt({ kind: rpcKind }),
+      1100,
+      1100,
+    );
     expect(result.kind).toBe(appKind);
   });
 });
@@ -47,7 +51,11 @@ describe('transformValueTransfer — confirmations', () => {
       RPCValueTransfersStatusEnum.failed,
     ];
     for (const status of pendingStatuses) {
-      const result = transformValueTransfer(makeVt({ status, blockheight: 1000 }), 2000, 2000);
+      const result = transformValueTransfer(
+        makeVt({ status, blockheight: 1000 }),
+        2000,
+        2000,
+      );
       expect(result.confirmations).toBe(0);
     }
   });
@@ -85,7 +93,11 @@ describe('transformValueTransfer — confirmations', () => {
 
 describe('transformValueTransfer — amount and fee conversion', () => {
   test('converts value from zats to ZEC', () => {
-    const result = transformValueTransfer(makeVt({ value: 100_000_000 }), 1100, 1100);
+    const result = transformValueTransfer(
+      makeVt({ value: 100_000_000 }),
+      1100,
+      1100,
+    );
     expect(result.amount).toBeCloseTo(1.0);
   });
 
@@ -125,7 +137,11 @@ describe('transformValueTransfer — optional fields', () => {
   });
 
   test('zecPrice is preserved when present', () => {
-    const result = transformValueTransfer(makeVt({ zec_price: 42.5 }), 1100, 1100);
+    const result = transformValueTransfer(
+      makeVt({ zec_price: 42.5 }),
+      1100,
+      1100,
+    );
     expect(result.zecPrice).toBe(42.5);
   });
 
@@ -154,7 +170,11 @@ describe('transformValueTransfer — optional fields', () => {
   });
 
   test('memos is undefined when all memos are empty strings', () => {
-    const result = transformValueTransfer(makeVt({ memos: ['', ''] }), 1100, 1100);
+    const result = transformValueTransfer(
+      makeVt({ memos: ['', ''] }),
+      1100,
+      1100,
+    );
     expect(result.memos).toBeUndefined();
   });
 

@@ -31,9 +31,7 @@ export class TransactionService {
     return this.inSend;
   }
 
-  async sendTransaction(
-    sendJson: Array<SendJsonToTypeType>,
-  ): Promise<string> {
+  async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
     const sendTxPromise = new Promise<string>(async (resolve, reject) => {
       await this.syncCoordinator.clearTimers();
       this.setInSend(true);

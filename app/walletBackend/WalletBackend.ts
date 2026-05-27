@@ -38,14 +38,26 @@ export default class WalletBackend {
       await this.syncCoordinator.clearTimers();
       await this.syncCoordinator.configure();
     };
-    this.transactionService = new TransactionService(config, this.syncCoordinator);
-    this.walletLifecycle = new WalletLifecycleService(config, this.syncCoordinator);
+    this.transactionService = new TransactionService(
+      config,
+      this.syncCoordinator,
+    );
+    this.walletLifecycle = new WalletLifecycleService(
+      config,
+      this.syncCoordinator,
+    );
   }
 
   // Sync lifecycle
-  async configure() { return this.syncCoordinator.configure(); }
-  async clearTimers() { return this.syncCoordinator.clearTimers(); }
-  async pauseSyncProcess() { return this.syncCoordinator.pauseSyncProcess(); }
+  async configure() {
+    return this.syncCoordinator.configure();
+  }
+  async clearTimers() {
+    return this.syncCoordinator.clearTimers();
+  }
+  async pauseSyncProcess() {
+    return this.syncCoordinator.pauseSyncProcess();
+  }
   async refreshSync(fullRescan?: boolean) {
     return this.syncCoordinator.refreshSync(fullRescan);
   }
@@ -67,20 +79,36 @@ export default class WalletBackend {
   }
 
   // Wallet lifecycle
-  async changeWallet() { return this.walletLifecycle.changeWallet(); }
-  async changeWalletNoBackup() { return this.walletLifecycle.changeWalletNoBackup(); }
-  async restoreBackup() { return this.walletLifecycle.restoreBackup(); }
+  async changeWallet() {
+    return this.walletLifecycle.changeWallet();
+  }
+  async changeWalletNoBackup() {
+    return this.walletLifecycle.changeWalletNoBackup();
+  }
+  async restoreBackup() {
+    return this.walletLifecycle.restoreBackup();
+  }
 
   // Wallet version (used by LoadedApp on mount)
-  async getWalletVersion() { return this.dataService.getWalletVersion(); }
+  async getWalletVersion() {
+    return this.dataService.getWalletVersion();
+  }
 
   // Transaction in-flight flag
-  setInSend(value: boolean) { this.transactionService.setInSend(value); }
-  getInSend() { return this.transactionService.getInSend(); }
+  setInSend(value: boolean) {
+    this.transactionService.setInSend(value);
+  }
+  getInSend() {
+    return this.transactionService.getInSend();
+  }
 
   // Read-only mode
-  setReadOnly(value: boolean) { this.config.readOnly = value; }
-  getReadOnly() { return this.config.readOnly; }
+  setReadOnly(value: boolean) {
+    this.config.readOnly = value;
+  }
+  getReadOnly() {
+    return this.config.readOnly;
+  }
 
   // Backward-compatible static delegates (bodies live in walletUtils.ts)
   static rpcGetZecPrice = getZecPrice;
