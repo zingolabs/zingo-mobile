@@ -67,7 +67,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail {...props_1} />
       </ContextAppLoadedProvider>,
     );
-    const num = screen.getAllByText('0.0');
+    const num = screen.getAllByText('0');
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
     screen.getByText('orchard memo\nsapling memo');
@@ -80,7 +80,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail {...props_2} />
       </ContextAppLoadedProvider>,
     );
-    const num = screen.getAllByText('0.0');
+    const num = screen.getAllByText('0');
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
   });
