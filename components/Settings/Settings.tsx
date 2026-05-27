@@ -917,7 +917,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               justifyContent: 'space-between',
               marginLeft: 25,
               marginRight: 25,
-              marginVertical: 15,
+              marginTop: 25,
+              marginBottom: 15,
             }}
           >
             <BoldText>

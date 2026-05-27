@@ -286,9 +286,10 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
+              "marginBottom": 15,
               "marginLeft": 25,
               "marginRight": 25,
-              "marginVertical": 15,
+              "marginTop": 25,
             }
           }
         >
