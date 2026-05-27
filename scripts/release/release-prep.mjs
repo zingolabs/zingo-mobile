@@ -114,4 +114,23 @@ if (channel === 'beta') {
   );
 }
 
+const tag =
+  channel === 'beta'
+    ? `zingo-beta-${version}-${build}`
+    : `zingo-${version}-${build}`;
+const label = channel === 'beta' ? 'zingo beta' : 'zingo';
+
+console.log('');
+console.log('Ready. Suggested next steps:');
+console.log('  git diff');
+console.log('  git add -A');
+console.log(`  git commit -m "release: ${label} ${version} (${build})"`);
+console.log('  git push');
+console.log(`  git tag -m "release ${label} ${version} (${build})" ${tag}`);
+console.log(`  git push origin ${tag}`);
+console.log('');
+console.log(`Pushing the tag triggers .github/workflows/android-release.yaml,`);
+console.log(`which builds the 4 ABI APKs + the universal APK and attaches`);
+console.log(`them to a new GitHub Release (signed with debug.keystore).`);
+console.log('');
 console.log('done.');
