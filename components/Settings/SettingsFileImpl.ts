@@ -14,7 +14,7 @@ import {
 } from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
-import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export default class SettingsFileImpl {
   static async getFileName() {

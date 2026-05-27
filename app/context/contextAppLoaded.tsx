@@ -19,8 +19,8 @@ import {
   BlockExplorerEnum,
 } from '../AppState';
 
-import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
+import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
