@@ -387,6 +387,8 @@
     "security-all": "Todos",
     "security-some": "Alguns",
     "security-none": "Nenhum",
+    "security-not-available": "Não disponível",
+    "security-device-locked-hint": "Configure o código ou a biometria do dispositivo para habilitar a segurança do App.",
     "security-startapp": "Quando o App inicia",
     "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano",
     "security-sendconfirm": "Confirmar Transação",
