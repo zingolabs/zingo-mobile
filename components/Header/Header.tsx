@@ -2,7 +2,6 @@
 import {
   faBars,
   faChevronLeft,
-  faGear,
   faSnowflake,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -32,6 +31,8 @@ import { useSyncStatus } from '../../app/hooks/useSyncStatus';
 import BoldText from '../Components/BoldText';
 import SyncStatusBar from './components/SyncStatusBar';
 import BalanceRow from './components/BalanceRow';
+import { MessagesIcon } from '../Components/Icons/MessagesIcon';
+import { MessagesIcon as BoltIcon } from '../Components/Icons/BoltIcon';
 
 type HeaderProps = {
   // general
@@ -65,6 +66,8 @@ type HeaderProps = {
   setBackgroundError?: (title: string, error: string) => void;
   // first funds received legend for the Seed screen
   receivedLegend?: boolean;
+  // show messages icon next to settings
+  showMessagesIcon?: boolean;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -89,6 +92,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setScrollToBottom,
   closeScreen,
   noUfvkIcon,
+  showMessagesIcon,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -166,9 +170,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            paddingBottom: 0,
             backgroundColor: colors.card,
             paddingTop: 10,
+            paddingBottom: 10,
             minHeight: !noDrawMenu ? 60 : 25,
           }}
         >
@@ -221,11 +225,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             padding: 11.5,
             position: 'absolute',
             left: 0,
+            top: 10,
           }}
         >
-          <View
-            style={{ alignItems: 'center', flexDirection: 'row', height: 40 }}
-          >
+          <View style={{ alignItems: 'center', flexDirection: 'row' }}>
             {!noDrawMenu && (
               <TouchableOpacity
                 style={{ marginRight: 5 }}
@@ -279,10 +282,21 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             padding: 13,
             position: 'absolute',
             right: 0,
+            top: 10,
           }}
         >
           {!noDrawMenu && screenName !== ScreenEnum.Settings ? (
-            <>
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}
+            >
+              {showMessagesIcon && (
+                <TouchableOpacity
+                  testID="header.messages"
+                  onPress={() => navigation.navigate(RouteEnum.Messages)}
+                >
+                  <MessagesIcon size={26} color={colors.border} />
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 style={{ marginRight: 5 }}
                 testID="header.settings"
@@ -297,13 +311,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   }
                 }}
               >
-                <FontAwesomeIcon
-                  icon={faGear}
-                  size={28}
-                  color={colors.border}
-                />
+                <BoltIcon size={28} color={colors.border} />
               </TouchableOpacity>
-            </>
+            </View>
           ) : (
             <Image
               source={getZingoLogo()}

@@ -35,9 +35,10 @@ import {
   RouteEnum,
 } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/walletBackend/enums/RPCAddressScopeEnum';
-import BottomSheet, {
+import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
+  BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
@@ -81,7 +82,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [uAddrIndex, setUAddrIndex] = useState<number | null>(null);
   const [tAddrIndex, setTAddrIndex] = useState<number | null>(null);
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [heightLayout, setHeightLayout] = useState<number>(10);
@@ -100,15 +101,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
     setSheetType(_sheetType);
-    bottomSheetRef.current?.snapToIndex(0);
+    bottomSheetRef.current?.present();
     setIndexBottomSheet(0);
   }, []);
 
   const hide = useCallback(() => {
     setSheetType(null);
     Keyboard.dismiss();
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
+    bottomSheetRef.current?.dismiss();
     setIndexBottomSheet(-1);
     setHeightLayout(10);
   }, []);
@@ -316,12 +316,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         onIndexChange={setIndex}
         swipeEnabled={false}
       />
-      <BottomSheet
+      <BottomSheetModal
         ref={bottomSheetRef}
-        index={-1}
         snapPoints={snapPoints}
         enableDynamicSizing={false}
         onChange={handleSheetChanges}
+        onDismiss={() => setIndexBottomSheet(-1)}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
         handleStyle={{ display: 'none' }}
@@ -388,7 +388,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             />
           )}
         </BottomSheetView>
-      </BottomSheet>
+      </BottomSheetModal>
     </>
   );
 

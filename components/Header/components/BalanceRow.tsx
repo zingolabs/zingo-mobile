@@ -92,7 +92,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              margin: 0,
+              marginTop: 10,
             }}
           >
             {mode !== ModeEnum.basic &&
@@ -109,7 +109,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             <ZecAmount
               currencyName={info.currencyName}
               color={colors.text}
-              size={28}
+              size={36}
               amtZec={
                 totalBalance
                   ? totalBalance.totalOrchardBalance +

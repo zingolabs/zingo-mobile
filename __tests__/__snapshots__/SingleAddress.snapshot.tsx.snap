@@ -13,7 +13,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
     contentContainerStyle={
       {
         "alignItems": "center",
-        "paddingBottom": 20,
+        "paddingBottom": 100,
       }
     }
     style={
@@ -479,7 +479,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
     contentContainerStyle={
       {
         "alignItems": "center",
-        "paddingBottom": 20,
+        "paddingBottom": 100,
       }
     }
     style={
