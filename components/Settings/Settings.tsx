@@ -54,6 +54,7 @@ import {
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import ReactNativeBiometrics from 'react-native-biometrics';
 import RNPickerSelect from 'react-native-picker-select';
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -263,6 +264,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
   const [openInfoSection, setOpenInfoSection] = useState<string | null>(null);
+  const [deviceHasSecurity, setDeviceHasSecurity] = useState<boolean>(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const rnBiometrics = new ReactNativeBiometrics({
+          allowDeviceCredentials: true,
+        });
+        const { available } = await rnBiometrics.isSensorAvailable();
+        setDeviceHasSecurity(available);
+      } catch {
+        setDeviceHasSecurity(false);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -901,7 +917,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               justifyContent: 'space-between',
               marginLeft: 25,
               marginRight: 25,
-              marginVertical: 15,
+              marginTop: 25,
+              marginBottom: 15,
             }}
           >
             <BoldText>
@@ -1310,37 +1327,56 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           {mode !== ModeEnum.basic && (
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
                 marginLeft: 25,
                 marginRight: 25,
                 marginVertical: 15,
               }}
             >
-              <BoldText testID="settings.securitytitle">
-                {translate('settings.security-title') as string}
-              </BoldText>
-              <TouchableOpacity
-                onPress={() => securityBottomSheetRef.current?.snapToIndex(0)}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <RegText
-                    style={{
-                      marginRight: 5,
-                      fontWeight: '400',
-                      color: colors.zingo,
-                    }}
-                  >
-                    {securityLabel}
-                  </RegText>
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    size={12}
-                    color={colors.zingo}
-                  />
-                </View>
-              </TouchableOpacity>
+                <BoldText testID="settings.securitytitle">
+                  {translate('settings.security-title') as string}
+                </BoldText>
+                <TouchableOpacity
+                  disabled={!deviceHasSecurity}
+                  onPress={() => securityBottomSheetRef.current?.snapToIndex(0)}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <RegText
+                      style={{
+                        marginRight: 5,
+                        fontWeight: '400',
+                        color: deviceHasSecurity
+                          ? colors.zingo
+                          : colors.primaryDisabled,
+                      }}
+                    >
+                      {deviceHasSecurity
+                        ? securityLabel
+                        : (translate(
+                            'settings.security-not-available',
+                          ) as string)}
+                    </RegText>
+                    {deviceHasSecurity && (
+                      <FontAwesomeIcon
+                        icon={faChevronRight}
+                        size={12}
+                        color={colors.zingo}
+                      />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              </View>
+              {!deviceHasSecurity && (
+                <FadeText style={{ marginTop: 6 }}>
+                  {translate('settings.security-device-locked-hint') as string}
+                </FadeText>
+              )}
             </View>
           )}
 
