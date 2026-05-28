@@ -10,23 +10,17 @@ import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
 type TransparentWarningProps = {
   onSuccess: () => void;
   closeSheet: () => void;
-  setHeightLayout: (h: number) => void;
 };
 
 const TransparentWarning = ({
   onSuccess,
   closeSheet,
-  setHeightLayout,
 }: TransparentWarningProps) => {
   const { colors } = useTheme() as ThemeType;
   const { translate } = useContext(ContextAppLoaded);
 
   return (
     <View
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        setHeightLayout(height + 70);
-      }}
       style={{
         backgroundColor: colors.bottomSheetBackground,
       }}

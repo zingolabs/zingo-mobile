@@ -2,7 +2,6 @@
 
 exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
 <View
-  onLayout={[Function]}
   style={
     {
       "backgroundColor": "#031124",
@@ -575,7 +574,6 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
 
 exports[`Filters - snapshots Filters with no active filters 1`] = `
 <View
-  onLayout={[Function]}
   style={
     {
       "backgroundColor": "#031124",

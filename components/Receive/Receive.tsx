@@ -7,7 +7,7 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import { Dimensions, Keyboard, Pressable, View } from 'react-native';
+import { Keyboard, Pressable, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -49,6 +49,7 @@ import NewAddressTag from './components/NewAddressTag';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from './components/ExpandedAddress';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 
 type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
   toggleMenuDrawer: () => void;
@@ -90,8 +91,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const receiveSheetRef = useRef<BottomSheet>(null);
-  const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
-  const [heightLayout, setHeightLayout] = useState<number>(10);
+  const keyboardHeight = useKeyboardHeight();
 
   // Receive sheet snap points — identical computation to History so both
   // screens feel the same when dragging.
@@ -133,62 +133,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     [receiveSnapPoints],
   );
 
-  const snapPoints = useMemo(() => {
-    let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
-    if (snap1 < 1) {
-      snap1 = 1;
-    }
-    let snap2: number = 80;
-    if (snap1 < 80) {
-      snap2 = snap1 + 20;
-    }
-    return [`${snap1}%`, `${snap2}%`];
-  }, [heightLayout]);
-
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
     setSheetType(_sheetType);
     bottomSheetRef.current?.present();
-    setIndexBottomSheet(0);
   }, []);
 
   const hide = useCallback(() => {
     setSheetType(null);
     Keyboard.dismiss();
     bottomSheetRef.current?.dismiss();
-    setIndexBottomSheet(-1);
-    setHeightLayout(10);
   }, []);
-
-  const handleSheetChanges = useCallback((ind: number) => {
-    //console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& handleSheetChanges', ind);
-    setIndexBottomSheet(ind);
-  }, []);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        if (indexBottomSheet > -1) {
-          bottomSheetRef.current?.snapToIndex(1);
-          setIndexBottomSheet(1);
-        }
-      },
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        if (indexBottomSheet > -1) {
-          bottomSheetRef.current?.snapToIndex(0);
-          setIndexBottomSheet(0);
-        }
-      },
-    );
-
-    return () => {
-      !!keyboardDidShowListener && keyboardDidShowListener.remove();
-      !!keyboardDidHideListener && keyboardDidHideListener.remove();
-    };
-  }, [indexBottomSheet]);
 
   useEffect(() => {
     if (addresses && addresses.length > 0) {
@@ -272,11 +226,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           }}
         >
           <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16 }}>{modalTitle}</BoldText>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {modalTitle}
+          </BoldText>
           <Pressable
             onPress={hide}
             hitSlop={8}
-            style={{ paddingHorizontal: 2, paddingVertical: 4 }}
+            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
           >
             <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
           </Pressable>
@@ -440,7 +396,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                       color={colors.zingo}
                       style={{ marginRight: 8 }}
                     />
-                    <BoldText style={{ fontSize: 16 }}>
+                    <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
                       {
                         (index === 0
                           ? translate('receive.scope-shielded')
@@ -458,7 +414,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     paddingVertical: 4,
                   }}
                 >
-                  <BoldText style={{ fontSize: 16 }}>
+                  <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
                     {
                       (index === 0
                         ? translate('receive.scope-shielded')
@@ -471,7 +427,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 onPress={() => show('NA')}
                 hitSlop={8}
                 style={{
-                  paddingHorizontal: 2,
+                  paddingHorizontal: 14,
                   paddingVertical: 4,
                 }}
               >
@@ -493,12 +449,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       </BottomSheet>
       <BottomSheetModal
         ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        enableDynamicSizing={false}
-        onChange={handleSheetChanges}
-        onDismiss={() => setIndexBottomSheet(-1)}
+        enableDynamicSizing={true}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         handleComponent={renderModalHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
@@ -510,7 +465,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         <BottomSheetView
           style={{
             backgroundColor: colors.bottomSheetBackground,
-            height: '100%',
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
           }}
         >
           {sheetType === 'NA' && (
@@ -519,7 +474,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               closeSheet={hide}
               setAddressBook={setAddressBook}
               screenName={screenName}
-              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'NAT' && (
@@ -533,15 +487,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               }
               closeSheet={hide}
               setAddressBook={setAddressBook}
-              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'VA' && (
-            <VerifyAddress
-              closeSheet={hide}
-              screenName={screenName}
-              setHeightLayout={setHeightLayout}
-            />
+            <VerifyAddress closeSheet={hide} screenName={screenName} />
           )}
           {sheetType === 'TW' && (
             <TransparentWarning
@@ -549,7 +498,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               onSuccess={() => {
                 setIndex(1);
               }}
-              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'EA' && (
@@ -565,7 +513,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     ? tAddr[tAddrIndex].address
                     : ''
               }
-              setHeightLayout={setHeightLayout}
             />
           )}
         </BottomSheetView>

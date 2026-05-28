@@ -700,7 +700,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
           onStartShouldSetResponder={[Function]}
           style={
             {
-              "paddingHorizontal": 2,
+              "paddingHorizontal": 14,
               "paddingVertical": 4,
             }
           }

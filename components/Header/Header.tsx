@@ -176,7 +176,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             backgroundColor: colors.card,
             paddingTop: 10,
             paddingBottom: 10,
-            minHeight: !noDrawMenu ? 60 : 25,
+            minHeight: 60,
           }}
         >
           <SyncStatusBar

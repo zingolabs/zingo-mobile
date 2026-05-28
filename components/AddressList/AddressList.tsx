@@ -14,6 +14,7 @@ import {
   NativeSyntheticEvent,
   ActivityIndicator,
   Pressable,
+  TouchableOpacity,
 } from 'react-native';
 
 import { useTheme, useScrollToTop } from '@react-navigation/native';
@@ -27,14 +28,17 @@ import {
 } from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
+import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import BottomSheet from '@gorhom/bottom-sheet';
 import { RPCAddressScopeEnum } from '../../app/walletBackend/enums/RPCAddressScopeEnum';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 
 type AddressListProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -70,10 +74,77 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       ? route.params.addressKind
       : AddressKindEnum.u,
   );
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
+  const addressListSheetRef = useRef<BottomSheet>(null);
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
+
+  const closeScreen = useCallback(() => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  }, [navigation]);
+
+  const addressListSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  const handleTitle = useMemo(
+    () =>
+      `${translate('addresslist.title')} - ${
+        addressKind === AddressKindEnum.u
+          ? translate('addresslist.unified')
+          : translate('addresslist.transparent')
+      }`,
+    [addressKind, translate],
+  );
+
+  const renderAddressListHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 12,
+          paddingBottom: 8,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <TouchableOpacity
+            onPress={closeScreen}
+            hitSlop={8}
+            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronLeft}
+              size={20}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {handleTitle}
+          </BoldText>
+          <View style={{ width: 28 }} />
+        </View>
+      </View>
+    ),
+    [colors, closeScreen, handleTitle],
+  );
 
   useEffect(() => {
     const _addressKind =
@@ -168,118 +239,132 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
         flex: 1,
         backgroundColor: colors.background,
       }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
-      <Header
-        title={`${translate('addresslist.title')} - ${
-          addressKind === AddressKindEnum.u
-            ? translate('addresslist.unified')
-            : translate('addresslist.transparent')
-        }`}
-        screenName={screenName}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        noUfvkIcon={true}
-        closeScreen={() => {
-          if (navigation.canGoBack()) {
-            navigation.goBack();
-          }
+      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
+        <Header
+          title={''}
+          screenName={screenName}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          noUfvkIcon={true}
+        />
+      </View>
+      <BottomSheet
+        ref={addressListSheetRef}
+        snapPoints={addressListSnapPoints}
+        index={0}
+        enableDynamicSizing={false}
+        enablePanDownToClose={false}
+        enableContentPanningGesture={false}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
         }}
-      />
-      <ScrollView
-        ref={scrollViewRef}
-        onScroll={handleScroll}
-        scrollEventThrottle={100}
-        testID="addressbook.scroll-view"
-        keyboardShouldPersistTaps="handled"
-        style={{ height: '80%', maxHeight: '80%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-        }}
+        handleComponent={renderAddressListHandle}
       >
-        {addressesSliced.length === 0 && !loading && (
-          <View
-            style={{
-              height: 150,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              marginTop: 30,
-            }}
-          >
-            <FadeText style={{ color: colors.primary }}>
-              {translate('addressbook.empty') as string}
-            </FadeText>
-          </View>
-        )}
-        {loading ? (
-          <ActivityIndicator
-            style={{ marginTop: 7, marginRight: 7 }}
-            size={20}
-            color={colors.primaryDisabled}
-          />
-        ) : (
-          <>
-            {addressesSliced.map((alItem, index) => {
-              return (
-                <View key={`container-${index}-${alItem.address}`}>
-                  <AlSummaryLine
-                    key={`line-${index}-${alItem.address}`}
-                    index={index}
-                    setIndex={setIndex}
-                    item={alItem}
-                    closeScreen={() => {
-                      if (navigation.canGoBack()) {
-                        navigation.goBack();
-                      }
-                    }}
-                  />
-                </View>
-              );
-            })}
-          </>
-        )}
-        {loadMoreButton ? (
-          <View
-            style={{
-              height: 150,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              marginTop: 5,
-              marginBottom: 30,
-            }}
-          >
-            <Button
-              type={ButtonTypeEnum.Secondary}
-              title={translate('addressbook.loadmore') as string}
-              onPress={loadMoreClicked}
+        <ScrollView
+          ref={scrollViewRef}
+          onScroll={handleScroll}
+          scrollEventThrottle={100}
+          testID="addressbook.scroll-view"
+          keyboardShouldPersistTaps="handled"
+          bounces={false}
+          alwaysBounceVertical={false}
+          style={{
+            flex: 1,
+            backgroundColor: colors.bottomSheetBackground,
+          }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+          }}
+        >
+          {addressesSliced.length === 0 && !loading && (
+            <View
+              style={{
+                height: 150,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                marginTop: 30,
+              }}
+            >
+              <FadeText style={{ color: colors.primary }}>
+                {translate('addressbook.empty') as string}
+              </FadeText>
+            </View>
+          )}
+          {loading ? (
+            <ActivityIndicator
+              style={{ marginTop: 7, marginRight: 7 }}
+              size={20}
+              color={colors.primaryDisabled}
             />
-          </View>
-        ) : (
-          <>
-            {!!addressesSliced && !!addressesSliced.length && !loading && (
-              <View
-                style={{
-                  height: 150,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  marginTop: 5,
-                  marginBottom: 30,
-                }}
-              >
-                <FadeText style={{ color: colors.primary }}>
-                  {translate('addressbook.end') as string}
-                </FadeText>
-              </View>
-            )}
-          </>
-        )}
-      </ScrollView>
+          ) : (
+            <>
+              {addressesSliced.map((alItem, index) => {
+                return (
+                  <View key={`container-${index}-${alItem.address}`}>
+                    <AlSummaryLine
+                      key={`line-${index}-${alItem.address}`}
+                      index={index}
+                      setIndex={setIndex}
+                      item={alItem}
+                      closeScreen={() => {
+                        if (navigation.canGoBack()) {
+                          navigation.goBack();
+                        }
+                      }}
+                    />
+                  </View>
+                );
+              })}
+            </>
+          )}
+          {loadMoreButton ? (
+            <View
+              style={{
+                height: 150,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                marginTop: 5,
+                marginBottom: 30,
+              }}
+            >
+              <Button
+                type={ButtonTypeEnum.Secondary}
+                title={translate('addressbook.loadmore') as string}
+                onPress={loadMoreClicked}
+              />
+            </View>
+          ) : (
+            <>
+              {!!addressesSliced && !!addressesSliced.length && !loading && (
+                <View
+                  style={{
+                    height: 150,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    marginTop: 5,
+                    marginBottom: 30,
+                  }}
+                >
+                  <FadeText style={{ color: colors.primary }}>
+                    {translate('addressbook.end') as string}
+                  </FadeText>
+                </View>
+              )}
+            </>
+          )}
+        </ScrollView>
+      </BottomSheet>
       {!isAtTop && (
         <Pressable
           onPress={handleScrollToTop}

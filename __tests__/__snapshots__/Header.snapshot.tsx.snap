@@ -629,7 +629,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
           "alignItems": "center",
           "backgroundColor": "#011401",
           "display": "flex",
-          "minHeight": 25,
+          "minHeight": 60,
           "paddingBottom": 10,
           "paddingTop": 10,
         }

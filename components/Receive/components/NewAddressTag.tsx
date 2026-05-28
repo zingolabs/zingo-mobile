@@ -15,13 +15,11 @@ type NewAddressTagProps = {
   address: string;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
-  setHeightLayout: (h: number) => void;
 };
 const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   address,
   closeSheet,
   setAddressBook,
-  setHeightLayout,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
@@ -57,10 +55,6 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
 
   return (
     <View
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        setHeightLayout(height + 70);
-      }}
       style={{
         backgroundColor: colors.bottomSheetBackground,
       }}

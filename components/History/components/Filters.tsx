@@ -11,7 +11,6 @@ import FadeText from '../../Components/FadeText';
 
 type FiltersProps = {
   closeSheet: () => void;
-  setHeightLayout: (h: number) => void;
   filterKind: FilterEnum | null;
   setFilterKind: (f: FilterEnum | null) => void;
   filterFailed: boolean;
@@ -23,7 +22,6 @@ type FiltersProps = {
 };
 const Filters: React.FunctionComponent<FiltersProps> = ({
   closeSheet,
-  setHeightLayout,
   filterKind,
   setFilterKind,
   filterFailed,
@@ -58,11 +56,6 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
 
   return (
     <View
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        // +80 to leave room for the custom sheet handle (title + close icon)
-        setHeightLayout(height + 80);
-      }}
       style={{
         backgroundColor: colors.bottomSheetBackground,
       }}

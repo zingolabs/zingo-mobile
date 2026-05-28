@@ -2,7 +2,6 @@
 
 exports[`ExpandedAddress - snapshots ExpandedAddress with title and button 1`] = `
 <View
-  onLayout={[Function]}
   style={
     {
       "backgroundColor": "#031124",
@@ -97,7 +96,6 @@ exports[`ExpandedAddress - snapshots ExpandedAddress with title and button 1`] =
 
 exports[`ExpandedAddress - snapshots ExpandedAddress without optional props 1`] = `
 <View
-  onLayout={[Function]}
   style={
     {
       "backgroundColor": "#031124",

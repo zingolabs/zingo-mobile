@@ -68,6 +68,8 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
+import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
+import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { createAlert } from '../../app/createAlert';
@@ -276,7 +278,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // uses a single snap at the maximum height (just below the screen Header).
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
-  const SNAP_GAP = 4;
 
   // Label for the Server selector row — shows what the user currently has
   // configured (or "Offline"). The actual selection lives in a separate
@@ -307,12 +308,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     [selectServer, customServerUri, customServerChainName],
   );
 
-  const settingsSnapPoints = useMemo(() => {
-    if (containerH <= 0 || headerH <= 0) {
-      return ['95%'];
-    }
-    return [Math.max(containerH - headerH - SNAP_GAP, 200)];
-  }, [containerH, headerH]);
+  const settingsSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   useEffect(() => {
     (async () => {
@@ -787,6 +783,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const securityBottomSheetRef = useRef<BottomSheetModal>(null);
   const serverBottomSheetRef = useRef<BottomSheetModal>(null);
   const settingsSheetRef = useRef<BottomSheet>(null);
+  const keyboardHeight = useKeyboardHeight();
 
   const renderSettingsHandle = useCallback(
     () => (
@@ -828,7 +825,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               color={colors.primary}
             />
           </TouchableOpacity>
-          <BoldText style={{ fontSize: 16 }}>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
             {translate('settings.title') as string}
           </BoldText>
           <View style={{ width: 28 }} />
@@ -895,13 +892,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           }}
         >
           <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16 }}>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
             {translate('settings.security-title') as string}
           </BoldText>
           <Pressable
             onPress={() => securityBottomSheetRef.current?.close()}
             hitSlop={8}
-            style={{ paddingHorizontal: 2, paddingVertical: 4 }}
+            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
           >
             <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
           </Pressable>
@@ -937,13 +934,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           }}
         >
           <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16 }}>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
             {translate('settings.server-title') as string}
           </BoldText>
           <Pressable
             onPress={() => serverBottomSheetRef.current?.close()}
             hitSlop={8}
-            style={{ paddingHorizontal: 2, paddingVertical: 4 }}
+            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
           >
             <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
           </Pressable>
@@ -1805,6 +1802,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         ref={securityBottomSheetRef}
         enableDynamicSizing={true}
         enablePanDownToClose
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         handleComponent={renderSecurityHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
@@ -1816,7 +1816,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <BottomSheetView
           style={{
             backgroundColor: colors.bottomSheetBackground,
-            paddingBottom: 10,
+            paddingBottom: 30,
           }}
         >
           {securityCheckBox(
@@ -1883,6 +1883,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         ref={serverBottomSheetRef}
         enableDynamicSizing={true}
         enablePanDownToClose
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         handleComponent={renderServerHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
@@ -1898,7 +1901,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           contentContainerStyle={{
             paddingHorizontal: 16,
             paddingTop: 12,
-            paddingBottom: 30,
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
           }}
         >
           <View>

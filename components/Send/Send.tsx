@@ -267,7 +267,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}
         >
           <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16 }}>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
             {translate('send.title') as string}
           </BoldText>
           <View style={{ width: 28 }} />
@@ -1058,6 +1058,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         confirmSend: confirmSend,
         sendAllAmount:
           mode !== ModeEnum.basic &&
+          maxAmount > 0 &&
           Utils.parseStringLocaleToNumberFloat(amountText) ===
             Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
         calculateFeeWithPropose: calculateFeeWithPropose,
@@ -1652,7 +1653,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                         />
                       )}
                       <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                        <PriceFetcher setZecPrice={setZecPrice} />
+                        <PriceFetcher
+                          setZecPrice={setZecPrice}
+                          backgroundColor={colors.bottomSheetBackground}
+                        />
                       </View>
                     </>
                   )}
@@ -1660,6 +1664,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
                 <View style={{ display: 'flex', flexDirection: 'column' }}>
                   <TouchableOpacity
+                    style={{ alignSelf: 'flex-start' }}
                     onPress={() => {
                       if (
                         spendableBalanceLastError &&
@@ -1745,9 +1750,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                           display: 'flex',
                           flexDirection: 'row',
                           marginTop: 0,
-                          backgroundColor: colors.card,
+                          backgroundColor: colors.bottomSheetBackground,
                           padding: 5,
                           borderRadius: 10,
+                          alignSelf: 'flex-start',
                         }}
                       >
                         <FontAwesomeIcon
@@ -1769,53 +1775,54 @@ const Send: React.FunctionComponent<SendProps> = ({
                   {validAddress !== 0 &&
                     validAmount !== 0 &&
                     (fee > 0 || !!proposeSendLastError) && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          marginTop: 0,
-                          backgroundColor: colors.card,
-                          padding: 5,
-                          borderRadius: 10,
+                      <TouchableOpacity
+                        style={{ alignSelf: 'flex-start' }}
+                        onPress={() => {
+                          if (
+                            proposeSendLastError &&
+                            mode === ModeEnum.advanced
+                          ) {
+                            Alert.alert(
+                              translate('send.fee') as string,
+                              proposeSendLastError,
+                              [
+                                {
+                                  text: translate('support') as string,
+                                  onPress: async () =>
+                                    sendEmail(
+                                      translate,
+                                      zingolibVersion,
+                                      translate('send.fee') as string,
+                                      proposeSendLastError,
+                                    ),
+                                },
+                                {
+                                  text: translate('cancel') as string,
+                                  style: 'cancel',
+                                },
+                              ],
+                              { cancelable: false },
+                            );
+                          }
                         }}
                       >
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          size={16}
-                          color={colors.primary}
-                          style={{ marginRight: 5 }}
-                        />
-                        <FadeText>{'( '}</FadeText>
-                        <TouchableOpacity
-                          onPress={() => {
-                            if (
-                              proposeSendLastError &&
-                              mode === ModeEnum.advanced
-                            ) {
-                              Alert.alert(
-                                translate('send.fee') as string,
-                                proposeSendLastError,
-                                [
-                                  {
-                                    text: translate('support') as string,
-                                    onPress: async () =>
-                                      sendEmail(
-                                        translate,
-                                        zingolibVersion,
-                                        translate('send.fee') as string,
-                                        proposeSendLastError,
-                                      ),
-                                  },
-                                  {
-                                    text: translate('cancel') as string,
-                                    style: 'cancel',
-                                  },
-                                ],
-                                { cancelable: false },
-                              );
-                            }
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            marginTop: 0,
+                            backgroundColor: colors.bottomSheetBackground,
+                            padding: 5,
+                            borderRadius: 10,
                           }}
                         >
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            size={16}
+                            color={colors.primary}
+                            style={{ marginRight: 5 }}
+                          />
+                          <FadeText>{'( '}</FadeText>
                           <FadeText
                             style={{
                               color:
@@ -1823,6 +1830,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 mode === ModeEnum.advanced
                                   ? 'red'
                                   : colors.money,
+                              opacity:
+                                proposeSendLastError &&
+                                mode === ModeEnum.advanced
+                                  ? 1
+                                  : 0.65,
                             }}
                           >
                             {(translate('send.fee') as string) +
@@ -1830,12 +1842,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                               Utils.parseNumberFloatToStringLocale(fee, 8) +
                               ' '}
                           </FadeText>
-                        </TouchableOpacity>
-                        <FadeText>{')'}</FadeText>
-                      </View>
+                          <FadeText>{')'}</FadeText>
+                        </View>
+                      </TouchableOpacity>
                     )}
                   {stillConfirming && (
                     <TouchableOpacity
+                      style={{ alignSelf: 'flex-start' }}
                       onPress={() => {
                         navigation.navigate(RouteEnum.Pools);
                       }}
@@ -1845,7 +1858,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           display: 'flex',
                           flexDirection: 'row',
                           marginTop: 0,
-                          backgroundColor: colors.card,
+                          backgroundColor: colors.bottomSheetBackground,
                           padding: 5,
                           borderRadius: 10,
                         }}
@@ -1864,6 +1877,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   )}
                   {showShieldInfo && mode === ModeEnum.advanced && (
                     <TouchableOpacity
+                      style={{ alignSelf: 'flex-start' }}
                       onPress={() => {
                         navigation.navigate(RouteEnum.Pools);
                       }}
@@ -1873,7 +1887,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           display: 'flex',
                           flexDirection: 'row',
                           marginTop: 0,
-                          backgroundColor: colors.card,
+                          backgroundColor: colors.bottomSheetBackground,
                           padding: 5,
                           borderRadius: 10,
                         }}
@@ -2130,6 +2144,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     validAmount === 1 &&
                     amountText &&
                     mode !== ModeEnum.basic &&
+                    maxAmount > 0 &&
                     Utils.parseStringLocaleToNumberFloat(amountText) ===
                       Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
                       ? (translate('send.button-all') as string)

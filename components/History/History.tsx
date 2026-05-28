@@ -139,7 +139,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [filterMemos, setFilterMemos] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [showFooter, setShowFooter] = useState<boolean>(false);
-  const [heightLayout, setHeightLayout] = useState<number>(10);
   // measured dynamically to compute history sheet snap points
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -243,18 +242,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   );
 
   const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
-
-  const snapPoints = useMemo(() => {
-    let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
-    if (snap1 < 1) {
-      snap1 = 1;
-    }
-    let snap2: number = 80;
-    if (snap1 < 80) {
-      snap2 = snap1 + 20;
-    }
-    return [`${snap1}%`, `${snap2}%`];
-  }, [heightLayout]);
 
   // Bottom-sheet that hosts the history list itself. Snap points are ordered
   // from smallest sheet height (most balance area visible above) to largest
@@ -552,7 +539,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           }}
         >
           <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16 }}>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
             {translate('history.title') as string}
           </BoldText>
           <Pressable
@@ -564,7 +551,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              paddingHorizontal: 2,
+              paddingHorizontal: 14,
               paddingVertical: 4,
             }}
           >
@@ -617,14 +604,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
           }}
         >
           <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16 }}>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
             {translate('history.filters') as string}
           </BoldText>
           <Pressable
             onPress={() => bottomSheetRef.current?.dismiss()}
             hitSlop={8}
             style={{
-              paddingHorizontal: 2,
+              paddingHorizontal: 14,
               paddingVertical: 4,
             }}
           >
@@ -639,7 +626,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const hide = useCallback(() => {
     bottomSheetRef.current?.dismiss();
     setShowFilters(false);
-    setHeightLayout(10);
   }, []);
 
   return (
@@ -821,10 +807,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
       </BottomSheet>
       <BottomSheetModal
         ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        enableDynamicSizing={false}
+        enableDynamicSizing={true}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         handleComponent={renderFiltersHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
@@ -837,13 +824,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
         <BottomSheetView
           style={{
             backgroundColor: colors.bottomSheetBackground,
-            height: '100%',
+            paddingBottom: 30,
           }}
         >
           {showFilters && (
             <Filters
               closeSheet={hide}
-              setHeightLayout={setHeightLayout}
               filterKind={filterKind}
               setFilterKind={setFilterKind}
               filterFailed={filterFailed}

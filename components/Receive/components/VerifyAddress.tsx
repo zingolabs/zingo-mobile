@@ -23,12 +23,10 @@ import { VerifyXIcon } from '../../Components/Icons/VerifyXIcon';
 type VerifyAddressProps = {
   closeSheet: () => void;
   screenName: ScreenEnum;
-  setHeightLayout: (h: number) => void;
 };
 const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   closeSheet,
   screenName,
-  setHeightLayout,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, server } = context;
@@ -98,10 +96,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
 
   return (
     <View
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        setHeightLayout(height + 70);
-      }}
       style={{
         backgroundColor: colors.bottomSheetBackground,
       }}

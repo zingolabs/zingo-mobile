@@ -2,7 +2,6 @@
 
 exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] = `
 <View
-  onLayout={[Function]}
   style={
     {
       "backgroundColor": "#031124",

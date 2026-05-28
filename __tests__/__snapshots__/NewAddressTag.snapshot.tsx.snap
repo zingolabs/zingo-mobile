@@ -2,7 +2,6 @@
 
 exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
 <View
-  onLayout={[Function]}
   style={
     {
       "backgroundColor": "#031124",

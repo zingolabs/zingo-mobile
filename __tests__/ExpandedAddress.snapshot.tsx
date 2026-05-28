@@ -20,7 +20,6 @@ describe('ExpandedAddress - snapshots', () => {
           onCopy={onFn}
           title="My Address"
           button="Copy"
-          setHeightLayout={onFn}
         />,
       ).toJSON(),
     ).toMatchSnapshot();
@@ -32,7 +31,6 @@ describe('ExpandedAddress - snapshots', () => {
         <ExpandedAddress
           address="u1abc123def456abc123def456abc123def456abc123"
           closeSheet={onFn}
-          setHeightLayout={onFn}
         />,
       ).toJSON(),
     ).toMatchSnapshot();

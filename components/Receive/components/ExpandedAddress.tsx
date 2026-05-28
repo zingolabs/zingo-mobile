@@ -10,7 +10,6 @@ type ExpandedAddressProps = {
   onCopy?: () => void;
   title?: string;
   button?: string;
-  setHeightLayout: (h: number) => void;
 };
 
 const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
@@ -19,16 +18,11 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
   onCopy,
   title: _title,
   button,
-  setHeightLayout,
 }) => {
   const { colors } = useTheme() as ThemeType;
 
   return (
     <View
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        setHeightLayout(height + 70);
-      }}
       style={{
         backgroundColor: colors.bottomSheetBackground,
       }}

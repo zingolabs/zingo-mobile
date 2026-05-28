@@ -16,7 +16,7 @@ exports[`ScannerAddress - snapshots ScannerAddress active 1`] = `
           "alignItems": "center",
           "backgroundColor": "#011401",
           "display": "flex",
-          "minHeight": 25,
+          "minHeight": 60,
           "paddingBottom": 10,
           "paddingTop": 10,
         }
@@ -206,7 +206,7 @@ exports[`ScannerAddress - snapshots ScannerAddress inactive 1`] = `
           "alignItems": "center",
           "backgroundColor": "#011401",
           "display": "flex",
-          "minHeight": 25,
+          "minHeight": 60,
           "paddingBottom": 10,
           "paddingTop": 10,
         }

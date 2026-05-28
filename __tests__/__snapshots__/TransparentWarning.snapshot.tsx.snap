@@ -2,7 +2,6 @@
 
 exports[`TransparentWarning - snapshot TransparentWarning renders correctly 1`] = `
 <View
-  onLayout={[Function]}
   style={
     {
       "backgroundColor": "#031124",

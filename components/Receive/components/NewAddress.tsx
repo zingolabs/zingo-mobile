@@ -39,13 +39,11 @@ type NewAddressProps = {
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   screenName: ScreenEnum;
-  setHeightLayout: (h: number) => void;
 };
 const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   addressKind,
   closeSheet,
   setAddressBook,
-  setHeightLayout,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar } = context;
@@ -130,10 +128,6 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
 
   return (
     <View
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        setHeightLayout(height + 80);
-      }}
       style={{
         backgroundColor: colors.bottomSheetBackground,
       }}

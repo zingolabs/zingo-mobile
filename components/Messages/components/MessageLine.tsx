@@ -125,7 +125,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             borderTopWidth: 1,
             borderBottomWidth: 1,
             borderColor: colors.card,
-            backgroundColor: colors.background,
+            backgroundColor: colors.bottomSheetBackground,
           }}
         >
           <FadeText>{month}</FadeText>

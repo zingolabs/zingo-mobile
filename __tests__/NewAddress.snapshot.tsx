@@ -31,7 +31,6 @@ describe('NewAddress - snapshots', () => {
             closeSheet={onFn}
             setAddressBook={onFn}
             screenName={ScreenEnum.Receive}
-            setHeightLayout={onFn}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),
@@ -47,7 +46,6 @@ describe('NewAddress - snapshots', () => {
             closeSheet={onFn}
             setAddressBook={onFn}
             screenName={ScreenEnum.Receive}
-            setHeightLayout={onFn}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),
