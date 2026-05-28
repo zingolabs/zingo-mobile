@@ -377,12 +377,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }}
         handleComponent={null}
       >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: colors.bottomSheetBackground,
-          }}
-        >
+        <View style={{ flex: 1 }}>
           {/* Sheet header / "handle" visual — rendered as content (not via
               handleComponent) so re-renders triggered by index change don't
               remount the inner RNPickerSelect modal. */}

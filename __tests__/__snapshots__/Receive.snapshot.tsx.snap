@@ -628,7 +628,6 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
   <View
     style={
       {
-        "backgroundColor": "#031124",
         "flex": 1,
       }
     }
