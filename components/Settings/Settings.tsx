@@ -1094,6 +1094,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           <BottomSheetScrollView
             keyboardShouldPersistTaps="handled"
             testID="settings.scroll-view"
+            bounces={false}
+            alwaysBounceVertical={false}
             style={{
               flex: 1,
               backgroundColor: colors.bottomSheetBackground,
@@ -1890,6 +1892,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         backdropComponent={renderBackdropSecurity}
       >
         <BottomSheetScrollView
+          bounces={false}
+          alwaysBounceVertical={false}
           style={{ backgroundColor: colors.bottomSheetBackground }}
           contentContainerStyle={{
             paddingHorizontal: 16,

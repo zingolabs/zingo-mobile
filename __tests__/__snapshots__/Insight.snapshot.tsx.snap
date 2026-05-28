@@ -153,10 +153,10 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 8,
-            "height": 38,
+            "borderRadius": 6,
+            "height": 30,
             "resizeMode": "contain",
-            "width": 38,
+            "width": 30,
           }
         }
       />

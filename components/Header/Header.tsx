@@ -322,10 +322,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             <Image
               source={getZingoLogo()}
               style={{
-                width: 38,
-                height: 38,
+                width: 30,
+                height: 30,
                 resizeMode: 'contain',
-                borderRadius: 8,
+                borderRadius: 6,
               }}
             />
           )}

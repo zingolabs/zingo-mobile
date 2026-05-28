@@ -153,10 +153,10 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         }
         style={
           {
-            "borderRadius": 8,
-            "height": 38,
+            "borderRadius": 6,
+            "height": 30,
             "resizeMode": "contain",
-            "width": 38,
+            "width": 30,
           }
         }
       />
@@ -1030,10 +1030,10 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         }
         style={
           {
-            "borderRadius": 8,
-            "height": 38,
+            "borderRadius": 6,
+            "height": 30,
             "resizeMode": "contain",
-            "width": 38,
+            "width": 30,
           }
         }
       />

@@ -101,6 +101,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     <View style={{ flexDirection: 'column', width: '100%' }}>
       <ScrollView
         ref={scrollViewRef}
+        bounces={false}
+        alwaysBounceVertical={false}
         style={{ width: '100%' }}
         contentContainerStyle={{
           alignItems: 'center',

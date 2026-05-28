@@ -150,7 +150,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
                   "color": "#c3c3c3",
                   "fontSize": 14,
                   "fontWeight": "600",
-                  "marginLeft": 5,
+                  "padding": 10,
                 }
               }
               testID="send.addressplaceholder"
@@ -550,7 +550,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
                   "color": "#c3c3c3",
                   "fontSize": 14,
                   "fontWeight": "600",
-                  "marginLeft": 5,
+                  "padding": 10,
                 }
               }
               testID="send.addressplaceholder"
@@ -951,7 +951,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
                   "color": "#c3c3c3",
                   "fontSize": 14,
                   "fontWeight": "600",
-                  "marginLeft": 5,
+                  "padding": 10,
                 }
               }
               testID="send.addressplaceholder"

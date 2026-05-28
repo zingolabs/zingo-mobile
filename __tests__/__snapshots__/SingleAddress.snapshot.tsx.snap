@@ -10,6 +10,8 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
   }
 >
   <RCTScrollView
+    alwaysBounceVertical={false}
+    bounces={false}
     contentContainerStyle={
       {
         "alignItems": "center",
@@ -390,6 +392,8 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
   }
 >
   <RCTScrollView
+    alwaysBounceVertical={false}
+    bounces={false}
     contentContainerStyle={
       {
         "alignItems": "center",

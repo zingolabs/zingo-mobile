@@ -153,10 +153,10 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 8,
-            "height": 38,
+            "borderRadius": 6,
+            "height": 30,
             "resizeMode": "contain",
-            "width": 38,
+            "width": 30,
           }
         }
       />
@@ -422,10 +422,10 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 8,
-            "height": 38,
+            "borderRadius": 6,
+            "height": 30,
             "resizeMode": "contain",
-            "width": 38,
+            "width": 30,
           }
         }
       />
@@ -684,10 +684,10 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 8,
-            "height": 38,
+            "borderRadius": 6,
+            "height": 30,
             "resizeMode": "contain",
-            "width": 38,
+            "width": 30,
           }
         }
       />
@@ -1260,10 +1260,10 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 8,
-            "height": 38,
+            "borderRadius": 6,
+            "height": 30,
             "resizeMode": "contain",
-            "width": 38,
+            "width": 30,
           }
         }
       />
@@ -1529,10 +1529,10 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
         style={
           {
-            "borderRadius": 8,
-            "height": 38,
+            "borderRadius": 6,
+            "height": 30,
             "resizeMode": "contain",
-            "width": 38,
+            "width": 30,
           }
         }
       />

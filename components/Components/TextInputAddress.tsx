@@ -139,7 +139,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                   color: colors.text,
                   fontWeight: '600',
                   fontSize: 14,
-                  marginLeft: 5,
+                  padding: 10,
                   backgroundColor: 'transparent',
                 }}
                 value={address}
