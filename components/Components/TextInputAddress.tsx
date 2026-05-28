@@ -78,6 +78,11 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
         },
       );
     } else if (screenName === ScreenEnum.Receive) {
+      // ScannerAddress lives at the root Stack (above the LoadedApp screen),
+      // registered with presentation: 'modal'. From inside Receive bubble-up
+      // through Tab → Drawer → root Stack finds it; the modal presentation
+      // makes the camera render above LoadedApp (and above any open
+      // BottomSheetModal portal).
       navigation.navigate(RouteEnum.ScannerAddress, {
         setAddress: (a: string) => setAddress(a),
         active: true,

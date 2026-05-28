@@ -3,9 +3,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import RegText from '../../Components/RegText';
 
 type ExpandedAddressProps = {
   address: string;
@@ -20,7 +17,7 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
   address,
   closeSheet,
   onCopy,
-  title,
+  title: _title,
   button,
   setHeightLayout,
 }) => {
@@ -30,36 +27,18 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
     <View
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
-        //console.log('LAYOUTTT', height);
         setHeightLayout(height + 70);
       }}
       style={{
-        backgroundColor: colors.background,
+        backgroundColor: colors.bottomSheetBackground,
       }}
     >
-      <TouchableOpacity
-        onPress={() => {
-          closeSheet();
-        }}
-      >
-        <FontAwesomeIcon
-          size={24}
-          icon={faXmark}
-          color={colors.text}
-          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
-        />
-      </TouchableOpacity>
-      <RegText
-        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
-      >
-        {title ? title : ''}
-      </RegText>
       <View
         style={{
           width: '90%',
           padding: 16,
           borderRadius: 8,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bottomSheetBackground,
           alignSelf: 'center',
         }}
       >

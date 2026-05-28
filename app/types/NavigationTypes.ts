@@ -19,6 +19,9 @@ export type AppStackParamList = {
   // Stack
   [RouteEnum.LoadingApp]: LoadingAppNavigationState | undefined;
   [RouteEnum.LoadedApp]: LoadedAppNavigationState | undefined;
+  // ScannerAddress is presented as a modal at the root Stack level so it
+  // overlays LoadedApp (and any open BottomSheet modals).
+  [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
 };
 
 /**

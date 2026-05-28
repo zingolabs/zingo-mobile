@@ -1,12 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import {
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Text,
-  Pressable,
-} from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {
   NavigationProp,
@@ -19,7 +13,6 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
   AddressKindEnum,
-  ButtonTypeEnum,
   ModeEnum,
   RouteEnum,
   SnackbarDurationEnum,
@@ -29,15 +22,7 @@ import {
 import RegText from './RegText';
 import FadeText from './FadeText';
 import Clipboard from '@react-native-clipboard/clipboard';
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
-import Button from './Button';
 import { CopyIcon } from './Icons/CopyIcon';
-import { ChevronDown, ChevronUp } from './Icons/Chevron';
 import { EyeIcon } from './Icons/EyeIcon';
 import { TriangleAlert } from './Icons/TriangleAlert';
 import { ShieldIcon } from './Icons/ShieldIcon';
@@ -54,10 +39,7 @@ type SingleAddressProps = {
   setIndex: (i: number) => void;
   total: number;
   show: (s: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => void;
-  changeIndex?: (index: number) => void;
   hasTransparent?: boolean;
-  showMoreOptions?: boolean;
-  setShowMoreOptions?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
@@ -67,10 +49,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   total,
   index,
   setIndex,
-  changeIndex,
-  hasTransparent,
-  showMoreOptions,
-  setShowMoreOptions,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -78,45 +56,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const { colors } = useTheme() as ThemeType;
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
-  const contentHeight = useRef(0);
-
-  const animatedHeight = useSharedValue(0);
-  const animatedOpacity = useSharedValue(0);
-
   const scrollViewRef = useRef<ScrollView>(null);
 
   const isBasic = ModeEnum.basic === mode;
   const isUnified = address?.addressKind === AddressKindEnum.u;
-
-  const toggle = () => {
-    if (!setShowMoreOptions) return;
-    const next = !showMoreOptions;
-
-    animatedHeight.value = withTiming(next ? contentHeight.current : 0, {
-      duration: 300,
-      easing: Easing.out(Easing.cubic),
-    });
-
-    animatedOpacity.value = withTiming(next ? 1 : 0, {
-      duration: 300,
-      easing: Easing.out(Easing.cubic),
-    });
-
-    if (next) {
-      setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 200);
-    }
-
-    setShowMoreOptions(next);
-  };
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: animatedHeight.value,
-    opacity: animatedOpacity.value,
-    transform: [{ translateY: showMoreOptions ? 0 : -5 }],
-    overflow: 'hidden',
-  }));
 
   useEffect(() => {
     if (privacy) {
@@ -131,13 +74,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
       setExpandQRAddress(true);
     }
   }, [expandQRAddress, privacy]);
-
-  useEffect(() => {
-    return () => {
-      setShowMoreOptions && setShowMoreOptions(false);
-      animatedStyle.height = 0;
-    };
-  }, [animatedStyle, setShowMoreOptions]);
 
   function contactFromAddress() {
     const contact = addressBook.find(c => c.address === address?.address);
@@ -178,80 +114,34 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             {address && !isBasic && !isUnified && (
               <View
                 style={{
-                  width: '95%',
+                  alignSelf: 'center',
                   display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  backgroundColor: colors.warning.background,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  backgroundColor: colors.background,
                   borderRadius: 10,
-                  borderColor: colors.warning.border,
+                  borderColor: colors.bottomSheetBorder,
                   borderWidth: 1,
-                  padding: 10,
+                  paddingHorizontal: 19,
+                  paddingVertical: 13,
                   marginTop: 10,
                 }}
               >
-                <View
+                <TriangleAlert
+                  color="#F79700"
+                  size={20}
+                  style={{ marginRight: 10 }}
+                />
+                <Text
                   style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginBottom: 5,
+                    color: '#F79700',
+                    fontSize: 14,
+                    flexShrink: 1,
                   }}
                 >
-                  <TriangleAlert
-                    color={colors.warning.primary}
-                    size={20}
-                    style={{ marginRight: 10 }}
-                  />
-                  <Text
-                    style={{
-                      color: colors.warning.title,
-                      fontWeight: 'bold',
-                      fontSize: 16,
-                    }}
-                  >
-                    {translate('receive.transparent.warning.title') as string}
-                  </Text>
-                </View>
-                <Text style={{ color: colors.warning.text }}>
-                  {
-                    translate(
-                      'receive.transparent.warning.description',
-                    ) as string
-                  }
+                  {translate('receive.transparent-expose-warning') as string}
                 </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    changeIndex && changeIndex(0);
-                  }}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: '100%',
-                    backgroundColor: colors.primary,
-                    padding: 10,
-                    borderRadius: 5,
-                    marginTop: 10,
-                  }}
-                >
-                  <ShieldIcon
-                    color={colors.background}
-                    size={20}
-                    style={{ marginRight: 5 }}
-                  />
-                  <Text
-                    style={{
-                      color: colors.background,
-                      fontWeight: 'bold',
-                      fontSize: 14,
-                    }}
-                  >
-                    {translate('receive.transparent.warning.button') as string}
-                  </Text>
-                </TouchableOpacity>
               </View>
             )}
             <View
@@ -565,129 +455,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 />
               </View>
             )}
-            <View
-              style={{
-                flexDirection: 'column',
-                width: '100%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 10,
-              }}
-            >
-              {!isBasic && address && (
-                <>
-                  {isUnified ? (
-                    <Button
-                      onPress={() => show('NA')}
-                      title={translate('receive.newu-option') as string}
-                      type={ButtonTypeEnum.Primary}
-                    />
-                  ) : (
-                    <Button
-                      onPress={() => show('NA')}
-                      title={
-                        translate('receive.transparent.newt-option') as string
-                      }
-                      type={ButtonTypeEnum.Tertiary}
-                    />
-                  )}
-
-                  {isUnified && hasTransparent && (
-                    <>
-                      <Pressable
-                        onPress={toggle}
-                        style={{
-                          width: '70%',
-                          marginVertical: 26,
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <TriangleAlert
-                          size={20}
-                          color={
-                            showMoreOptions
-                              ? colors.warning.primary
-                              : colors.zingo
-                          }
-                          style={{ marginRight: 16 }}
-                        />
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            color: showMoreOptions
-                              ? colors.warning.primary
-                              : colors.zingo,
-                          }}
-                        >
-                          {translate('receive.danger-zone') as string}{' '}
-                        </Text>
-                        {showMoreOptions ? (
-                          <ChevronUp
-                            size={16}
-                            color={colors.warning.primary}
-                            style={{ marginLeft: 16 }}
-                          />
-                        ) : (
-                          <ChevronDown
-                            size={16}
-                            color={colors.zingo}
-                            style={{ marginLeft: 16 }}
-                          />
-                        )}
-                      </Pressable>
-
-                      <Animated.View style={[animatedStyle]}>
-                        <View
-                          style={{
-                            width: '100%',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <TouchableOpacity
-                            onLayout={e => {
-                              contentHeight.current =
-                                e.nativeEvent.layout.height;
-                            }}
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: 10,
-                              backgroundColor: colors.secondary,
-                              borderColor: colors.secondaryBorder,
-                              borderWidth: 1,
-                              padding: 0,
-                              paddingLeft: 20,
-                              paddingRight: 20,
-                              borderRadius: 10,
-                              maxWidth: '90%',
-                              minWidth: '30%',
-                              minHeight: 48,
-                              width: '80%',
-                            }}
-                            onPress={() => {
-                              show('TW');
-                              setShowMoreOptions && setShowMoreOptions(false);
-                              animatedHeight.value = 0;
-                            }}
-                          >
-                            <Text style={{ color: colors.text }}>
-                              {translate('receive.go-to-transparent') as string}
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      </Animated.View>
-                    </>
-                  )}
-                </>
-              )}
-            </View>
           </>
         ) : (
           <View

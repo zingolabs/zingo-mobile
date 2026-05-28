@@ -5,94 +5,10 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
   onLayout={[Function]}
   style={
     {
-      "backgroundColor": "#011401",
+      "backgroundColor": "#031124",
     }
   }
 >
-  <View
-    accessibilityState={
-      {
-        "busy": undefined,
-        "checked": undefined,
-        "disabled": undefined,
-        "expanded": undefined,
-        "selected": undefined,
-      }
-    }
-    accessibilityValue={
-      {
-        "max": undefined,
-        "min": undefined,
-        "now": undefined,
-        "text": undefined,
-      }
-    }
-    accessible={true}
-    collapsable={false}
-    focusable={true}
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      {
-        "opacity": 1,
-      }
-    }
-  >
-    <
-      color="#c3c3c3"
-      icon={
-        {
-          "icon": [
-            384,
-            512,
-            [
-              128473,
-              10005,
-              10006,
-              10060,
-              215,
-              "close",
-              "multiply",
-              "remove",
-              "times",
-            ],
-            "f00d",
-            "M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z",
-          ],
-          "iconName": "xmark",
-          "prefix": "fas",
-        }
-      }
-      size={24}
-      style={
-        {
-          "alignSelf": "flex-end",
-          "marginRight": 20,
-          "marginTop": 10,
-        }
-      }
-    />
-  </View>
-  <Text
-    style={
-      {
-        "alignSelf": "center",
-        "color": "#c3c3c3",
-        "fontSize": 15,
-        "fontWeight": "400",
-        "marginTop": 0,
-        "opacity": 1,
-        "paddingHorizontal": 10,
-      }
-    }
-  >
-    text translated
-  </Text>
   <View
     style={
       {

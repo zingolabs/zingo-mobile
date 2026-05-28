@@ -2470,10 +2470,6 @@ export class LoadedAppClass extends Component<
                   name={RouteEnum.AddressList}
                   component={AddressList}
                 />
-                <Drawer.Screen
-                  name={RouteEnum.ScannerAddress}
-                  component={ScannerAddress}
-                />
                 <Drawer.Screen name={RouteEnum.Messages}>
                   {props => (
                     <MessageList

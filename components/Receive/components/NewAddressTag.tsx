@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, TextInput, TouchableOpacity, Keyboard } from 'react-native';
+import { View, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { AddressBookFileClass, ButtonTypeEnum } from '../../../app/AppState';
@@ -8,8 +8,6 @@ import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../../app/utils';
 import { AddressBookFileImpl } from '../../AddressBook';
 
@@ -61,34 +59,12 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
     <View
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
-        //console.log('LAYOUTTT', height);
         setHeightLayout(height + 70);
       }}
       style={{
-        backgroundColor: colors.background,
+        backgroundColor: colors.bottomSheetBackground,
       }}
     >
-      <TouchableOpacity
-        onPress={() => {
-          setLabel('');
-          Keyboard.dismiss();
-          setTimeout(() => {
-            closeSheet();
-          }, 100);
-        }}
-      >
-        <FontAwesomeIcon
-          size={24}
-          icon={faXmark}
-          color={colors.text}
-          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
-        />
-      </TouchableOpacity>
-      <RegText
-        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
-      >
-        {translate('receive.add-tag') as string}
-      </RegText>
       <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
         <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
           {'Tag'}

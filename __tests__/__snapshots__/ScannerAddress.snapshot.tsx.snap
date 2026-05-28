@@ -183,6 +183,7 @@ exports[`ScannerAddress - snapshots ScannerAddress active 1`] = `
     style={
       {
         "backgroundColor": "#011401",
+        "flex": 1,
       }
     }
   />
@@ -372,6 +373,7 @@ exports[`ScannerAddress - snapshots ScannerAddress inactive 1`] = `
     style={
       {
         "backgroundColor": "#011401",
+        "flex": 1,
       }
     }
   />

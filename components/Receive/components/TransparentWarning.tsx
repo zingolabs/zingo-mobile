@@ -6,9 +6,6 @@ import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import RegText from '../../Components/RegText';
 
 type TransparentWarningProps = {
   onSuccess: () => void;
@@ -28,36 +25,18 @@ const TransparentWarning = ({
     <View
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
-        //console.log('LAYOUTTT', height);
         setHeightLayout(height + 70);
       }}
       style={{
-        backgroundColor: colors.background,
+        backgroundColor: colors.bottomSheetBackground,
       }}
     >
-      <TouchableOpacity
-        onPress={() => {
-          closeSheet();
-        }}
-      >
-        <FontAwesomeIcon
-          size={24}
-          icon={faXmark}
-          color={colors.text}
-          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
-        />
-      </TouchableOpacity>
-      <RegText
-        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
-      >
-        {translate('receive.modal-transparent.title') as string}
-      </RegText>
       <View
         style={{
           width: '90%',
           padding: 16,
           borderRadius: 8,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bottomSheetBackground,
           alignSelf: 'center',
         }}
       >
