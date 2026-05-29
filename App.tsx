@@ -10,6 +10,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
+import ScannerAddress from './components/Send/components/ScannerAddress';
 import { ThemeType, AppStackParamList } from './app/types';
 import { ModeEnum, RouteEnum } from './app/AppState';
 
@@ -171,6 +172,21 @@ const App: React.FunctionComponent = () => {
               <Stack.Screen name={RouteEnum.LoadedApp}>
                 {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
               </Stack.Screen>
+              {/* ScannerAddress lives at the root Stack (above LoadedApp,
+                  therefore above the BottomSheetModalProvider portal). Without
+                  this, any open BottomSheetModal renders ON TOP of the camera,
+                  hiding the preview.
+                  presentation: 'transparentModal' avoids the iOS UIKit modal
+                  freeze on the underlying view — with 'modal' or default
+                  'card' the BottomSheetModal backdrop below stays
+                  unresponsive for several seconds after the camera is
+                  dismissed because iOS pauses the underlying scene during
+                  the native modal presentation. */}
+              <Stack.Screen
+                name={RouteEnum.ScannerAddress}
+                component={ScannerAddress}
+                options={{ presentation: 'transparentModal' }}
+              />
             </Stack.Navigator>
           </SafeAreaView>
         </NavigationContainer>

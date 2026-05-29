@@ -102,6 +102,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={8}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}

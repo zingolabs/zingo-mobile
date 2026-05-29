@@ -109,13 +109,11 @@ import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
 import { RPCCheckAddressType } from '../walletBackend/types/RPCCheckAddressType';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
-import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
 import { MessagesAddress, MessagesAll } from '../../components/Messages';
 import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -136,7 +134,6 @@ const ru = require('../translations/ru.json');
 const tr = require('../translations/tr.json');
 
 const Tab = createBottomTabNavigator<AppDrawerParamList>();
-const Stack = createNativeStackNavigator<AppDrawerParamList>();
 
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -1498,10 +1495,7 @@ export class LoadedAppClass extends Component<
         { cancelable: false },
       );
     } else if (item === MenuItemEnum.AddressBook) {
-      this.drawerNav?.navigate(RouteEnum.AddressBookStack, {
-        screen: RouteEnum.AddressBook,
-        params: {},
-      });
+      this.drawerNav?.navigate(RouteEnum.AddressBook);
       return;
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
@@ -2371,31 +2365,13 @@ export class LoadedAppClass extends Component<
                   component={SyncReport}
                 />
                 <Drawer.Screen name={RouteEnum.Pools} component={Pools} />
-                <Drawer.Screen name={RouteEnum.AddressBookStack}>
-                  {() => {
-                    return (
-                      <Stack.Navigator
-                        initialRouteName={RouteEnum.AddressBook}
-                        screenOptions={{
-                          headerShown: false,
-                          animation: 'none',
-                        }}
-                      >
-                        <Stack.Screen name={RouteEnum.AddressBook}>
-                          {props => (
-                            <AddressBook
-                              {...props}
-                              setAddressBook={this.setAddressBook}
-                            />
-                          )}
-                        </Stack.Screen>
-                        <Stack.Screen
-                          name={RouteEnum.ScannerAddress}
-                          component={ScannerAddress}
-                        />
-                      </Stack.Navigator>
-                    );
-                  }}
+                <Drawer.Screen name={RouteEnum.AddressBook}>
+                  {props => (
+                    <AddressBook
+                      {...props}
+                      setAddressBook={this.setAddressBook}
+                    />
+                  )}
                 </Drawer.Screen>
                 <Drawer.Screen
                   name={RouteEnum.ValueTransferDetail}
@@ -2427,10 +2403,6 @@ export class LoadedAppClass extends Component<
                   component={MessagesAll}
                 />
                 <Drawer.Screen name={RouteEnum.Confirm} component={Confirm} />
-                <Drawer.Screen
-                  name={RouteEnum.ScannerAddress}
-                  component={ScannerAddress}
-                />
                 <Drawer.Screen
                   name={RouteEnum.Computing}
                   component={ComputingTxContent}

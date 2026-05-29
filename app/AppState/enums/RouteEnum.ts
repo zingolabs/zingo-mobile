@@ -15,7 +15,6 @@ export enum RouteEnum {
   Send = 'Send',
   Receive = 'Receive',
   Messages = 'Messages',
-  AddressBookStack = 'AddressBookStack',
   Settings = 'Settings',
   About = 'About',
   Rescan = 'Rescan',

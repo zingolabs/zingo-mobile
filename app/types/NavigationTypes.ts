@@ -58,7 +58,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Messages]: undefined;
-  [RouteEnum.AddressBookStack]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.Rescan]: undefined;
@@ -72,7 +71,6 @@ export type AppDrawerParamList = {
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
   [RouteEnum.AddressList]: AddressListNavigationState | undefined;
-  [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
   [RouteEnum.ValueTransferDetail]:
     | ValueTransferDetailNavigationState
     | undefined;

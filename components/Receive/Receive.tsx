@@ -61,6 +61,7 @@ type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
 const Receive: React.FunctionComponent<ReceiveProps> = ({
   // side menu
   toggleMenuDrawer,
+  navigation,
   // balance
   // privacy
   // shielding
@@ -492,7 +493,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             />
           )}
           {sheetType === 'VA' && (
-            <VerifyAddress closeSheet={hide} screenName={screenName} />
+            <VerifyAddress
+              closeSheet={hide}
+              screenName={screenName}
+              navigation={navigation}
+            />
           )}
           {sheetType === 'TW' && (
             <TransparentWarning
