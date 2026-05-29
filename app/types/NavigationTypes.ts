@@ -59,9 +59,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Messages]: undefined;
   [RouteEnum.AddressBookStack]: undefined;
-  [RouteEnum.ValueTransferDetailStack]: undefined;
-  [RouteEnum.ConfirmStack]: undefined;
-  [RouteEnum.InsightStack]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.Rescan]: undefined;

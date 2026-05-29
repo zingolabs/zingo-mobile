@@ -1107,29 +1107,26 @@ const Send: React.FunctionComponent<SendProps> = ({
   const setConfirmModalShow = async (
     parseAddressInfoJSON: RPCParseAddressType,
   ) => {
-    navigation.navigate(RouteEnum.ConfirmStack, {
-      screen: RouteEnum.Confirm,
-      params: {
-        calculatedFee: fee,
-        parseAddressInfoJSON: parseAddressInfoJSON,
-        donationAmount:
-          donation &&
-          server.chainName === ChainNameEnum.mainChainName &&
-          !donationAddress
-            ? Utils.parseStringLocaleToNumberFloat(
-                Utils.getZenniesDonationAmount(),
-              )
-            : 0,
-        confirmSend: confirmSend,
-        sendAllAmount:
-          mode !== ModeEnum.basic &&
-          maxAmount > 0 &&
-          Utils.parseStringLocaleToNumberFloat(amountText) ===
-            Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
-        calculateFeeWithPropose: calculateFeeWithPropose,
-        sendPageState: buildSendState(),
-        nym: nym,
-      },
+    navigation.navigate(RouteEnum.Confirm, {
+      calculatedFee: fee,
+      parseAddressInfoJSON: parseAddressInfoJSON,
+      donationAmount:
+        donation &&
+        server.chainName === ChainNameEnum.mainChainName &&
+        !donationAddress
+          ? Utils.parseStringLocaleToNumberFloat(
+              Utils.getZenniesDonationAmount(),
+            )
+          : 0,
+      confirmSend: confirmSend,
+      sendAllAmount:
+        mode !== ModeEnum.basic &&
+        maxAmount > 0 &&
+        Utils.parseStringLocaleToNumberFloat(amountText) ===
+          Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
+      calculateFeeWithPropose: calculateFeeWithPropose,
+      sendPageState: buildSendState(),
+      nym: nym,
     });
   };
 

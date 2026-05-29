@@ -54,7 +54,7 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Modify}
           doAction={onAction}
           screenName={ScreenEnum.AddressBook}
-          routeStack={RouteEnum.ConfirmStack}
+          routeStack={RouteEnum.AddressBookStack}
         />
       </ContextAppLoadedProvider>,
     );
@@ -70,7 +70,7 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Delete}
           doAction={onAction}
           screenName={ScreenEnum.AddressBook}
-          routeStack={RouteEnum.ValueTransferDetailStack}
+          routeStack={RouteEnum.AddressBookStack}
         />
       </ContextAppLoadedProvider>,
     );

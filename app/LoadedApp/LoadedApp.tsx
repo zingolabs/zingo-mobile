@@ -1426,9 +1426,7 @@ export class LoadedAppClass extends Component<
       this.drawerNav?.navigate(RouteEnum.Pools);
       return;
     } else if (item === MenuItemEnum.Insight) {
-      this.drawerNav?.navigate(RouteEnum.InsightStack, {
-        screen: RouteEnum.Insight,
-      });
+      this.drawerNav?.navigate(RouteEnum.Insight);
       return;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
@@ -2257,28 +2255,7 @@ export class LoadedAppClass extends Component<
                   {props => <Rescan {...props} doRescan={this.doRescan} />}
                 </Drawer.Screen>
                 <Drawer.Screen name={RouteEnum.Info} component={Info} />
-                <Drawer.Screen name={RouteEnum.InsightStack}>
-                  {() => {
-                    return (
-                      <Stack.Navigator
-                        initialRouteName={RouteEnum.Insight}
-                        screenOptions={{
-                          headerShown: false,
-                          animation: 'none',
-                        }}
-                      >
-                        <Stack.Screen
-                          name={RouteEnum.Insight}
-                          component={Insight}
-                        />
-                        <Stack.Screen
-                          name={RouteEnum.ScannerAddress}
-                          component={ScannerAddress}
-                        />
-                      </Stack.Navigator>
-                    );
-                  }}
-                </Drawer.Screen>
+                <Drawer.Screen name={RouteEnum.Insight} component={Insight} />
                 <Drawer.Screen name={RouteEnum.Ufvk}>
                   {props => {
                     const action =
@@ -2420,28 +2397,10 @@ export class LoadedAppClass extends Component<
                     );
                   }}
                 </Drawer.Screen>
-                <Drawer.Screen name={RouteEnum.ValueTransferDetailStack}>
-                  {() => {
-                    return (
-                      <Stack.Navigator
-                        initialRouteName={RouteEnum.ValueTransferDetail}
-                        screenOptions={{
-                          headerShown: false,
-                          animation: 'none',
-                        }}
-                      >
-                        <Stack.Screen
-                          name={RouteEnum.ValueTransferDetail}
-                          component={ValueTransferDetail}
-                        />
-                        <Stack.Screen
-                          name={RouteEnum.ScannerAddress}
-                          component={ScannerAddress}
-                        />
-                      </Stack.Navigator>
-                    );
-                  }}
-                </Drawer.Screen>
+                <Drawer.Screen
+                  name={RouteEnum.ValueTransferDetail}
+                  component={ValueTransferDetail}
+                />
                 <Drawer.Screen
                   name={RouteEnum.AddressList}
                   component={AddressList}
@@ -2467,28 +2426,11 @@ export class LoadedAppClass extends Component<
                   name={RouteEnum.MessagesAll}
                   component={MessagesAll}
                 />
-                <Drawer.Screen name={RouteEnum.ConfirmStack}>
-                  {() => {
-                    return (
-                      <Stack.Navigator
-                        initialRouteName={RouteEnum.Confirm}
-                        screenOptions={{
-                          headerShown: false,
-                          animation: 'none',
-                        }}
-                      >
-                        <Stack.Screen
-                          name={RouteEnum.Confirm}
-                          component={Confirm}
-                        />
-                        <Stack.Screen
-                          name={RouteEnum.ScannerAddress}
-                          component={ScannerAddress}
-                        />
-                      </Stack.Navigator>
-                    );
-                  }}
-                </Drawer.Screen>
+                <Drawer.Screen name={RouteEnum.Confirm} component={Confirm} />
+                <Drawer.Screen
+                  name={RouteEnum.ScannerAddress}
+                  component={ScannerAddress}
+                />
                 <Drawer.Screen
                   name={RouteEnum.Computing}
                   component={ComputingTxContent}

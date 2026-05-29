@@ -10,7 +10,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
-import ScannerAddress from './components/Send/components/ScannerAddress';
 import { ThemeType, AppStackParamList } from './app/types';
 import { ModeEnum, RouteEnum } from './app/AppState';
 
@@ -172,16 +171,6 @@ const App: React.FunctionComponent = () => {
               <Stack.Screen name={RouteEnum.LoadedApp}>
                 {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
               </Stack.Screen>
-              {/* ScannerAddress lives at the root Stack (above LoadedApp,
-                  therefore above the BottomSheetModalProvider portal). The
-                  default 'card' presentation pushes it as a regular stack
-                  screen — the camera respects normal flex layout. Any open
-                  BottomSheet modal stays alive underneath LoadedApp and
-                  reappears when the camera is dismissed. */}
-              <Stack.Screen
-                name={RouteEnum.ScannerAddress}
-                component={ScannerAddress}
-              />
             </Stack.Navigator>
           </SafeAreaView>
         </NavigationContainer>
