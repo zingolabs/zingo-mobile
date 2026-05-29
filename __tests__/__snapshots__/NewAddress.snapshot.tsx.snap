@@ -83,7 +83,7 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
           "flexDirection": "row",
           "flexGrow": 1,
           "justifyContent": "center",
-          "marginTop": 30,
+          "marginTop": 15,
           "marginVertical": 5,
         }
       }
@@ -414,7 +414,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
           "flexDirection": "row",
           "flexGrow": 1,
           "justifyContent": "center",
-          "marginTop": 30,
+          "marginTop": 15,
           "marginVertical": 5,
         }
       }

@@ -1314,6 +1314,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                               modalViewBottom: {
                                 minHeight: 300,
                               },
+                              // RNPickerSelect's default viewContainer uses
+                              // `alignSelf: 'stretch'` which overrides the
+                              // parent row's `alignItems: 'center'` on iOS,
+                              // making the contacts icon vertically offset
+                              // from the QR icon next to it. Force center.
+                              viewContainer: { alignSelf: 'center' },
                             }}
                             pickerProps={{
                               mode: 'dialog',
@@ -1430,16 +1436,16 @@ const Send: React.FunctionComponent<SendProps> = ({
                             }}
                           >
                             <FontAwesomeIcon
-                              style={{ marginRight: 7 }}
-                              size={32}
+                              style={{ marginRight: 5 }}
+                              size={28}
                               icon={faAddressCard}
                               color={colors.primary}
                             />
                           </RNPickerSelect>
                         ) : (
                           <FontAwesomeIcon
-                            style={{ marginRight: 7 }}
-                            size={32}
+                            style={{ marginRight: 5 }}
+                            size={28}
                             icon={faAddressCard}
                             color={colors.primaryDisabled}
                           />

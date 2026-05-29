@@ -2071,10 +2071,7 @@ export class LoadedAppClass extends Component<
                 initialRouteName={RouteEnum.HomeStack}
                 screenName={this.screenName}
               >
-                <Drawer.Screen
-                  name={RouteEnum.HomeStack}
-                  options={{ sceneStyle: { paddingBottom: 0 } }}
-                >
+                <Drawer.Screen name={RouteEnum.HomeStack}>
                   {props => {
                     useEffect(() => {
                       this.setNavigationHome(props.navigation);

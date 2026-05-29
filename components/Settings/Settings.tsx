@@ -840,11 +840,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingTop: 10,
+            paddingBottom: 14,
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            paddingVertical: 8,
-            backgroundColor: colors.bottomSheetBackground,
           }}
         >
           <Button
