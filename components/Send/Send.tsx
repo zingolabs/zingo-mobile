@@ -2076,6 +2076,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                         }}
                         maxLength={GlobalConst.memoMaxLength}
                         onFocus={() => {
+                          // Expand the Send sheet to its top snap so the memo
+                          // field (and the rest of the form) is fully visible
+                          // above the keyboard.
+                          sendSheetRef.current?.snapToIndex(
+                            sendSnapPoints.length - 1,
+                          );
                           // I need to wait for the keyboard is totally open
                           // otherwise the scroll to end never happened.
                           if (keyboardVisible) {

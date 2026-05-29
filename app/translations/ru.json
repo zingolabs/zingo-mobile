@@ -77,7 +77,12 @@
     "likely": "Возможно: ",
     "thiswalletaddress": "Адрес этого кошелька",
     "addto": "Добавить к ",
-    "filter-wallet": "Кошелек"
+    "filter-wallet": "Кошелек",
+    "add-tag": "Добавить тег",
+    "add-contact": "Добавить контакт",
+    "tag": "Тег",
+    "contact": "Контакт",
+    "address": "Адрес"
   },
   "change-privacy-legend": ".\nНажмите, чтобы раскрыть скрытые значения.",
   "txtcopied": "Текст скопирован в буфер обмена",

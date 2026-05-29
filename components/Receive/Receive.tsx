@@ -190,7 +190,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       case 'VA':
         return translate('receive.verify') as string;
       case 'NAT':
-        return translate('receive.add-tag') as string;
+        // Receive only deals with this wallet's own addresses.
+        return translate('addressbook.add-tag') as string;
       case 'TW':
         return translate('receive.modal-transparent.title') as string;
       case 'EA':
@@ -485,6 +486,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     ? tAddr[tAddrIndex].address
                     : ''
               }
+              own={true}
               closeSheet={hide}
               setAddressBook={setAddressBook}
             />

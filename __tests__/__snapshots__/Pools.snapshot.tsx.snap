@@ -828,7 +828,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "#011401",
+          "backgroundColor": "#031124",
           "borderRadius": 10,
           "display": "flex",
           "flexDirection": "row",

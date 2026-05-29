@@ -77,7 +77,12 @@
     "likely": "Likely: ",
     "thiswalletaddress": "This Wallet's Address",
     "addto": "Add to ",
-    "filter-wallet": "Wallet"
+    "filter-wallet": "Wallet",
+    "add-tag": "Add Tag",
+    "add-contact": "Add Contact",
+    "tag": "Tag",
+    "contact": "Contact",
+    "address": "Address"
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",

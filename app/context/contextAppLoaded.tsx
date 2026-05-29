@@ -67,7 +67,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   restartApp: () => {},
   somePending: false,
   addressBook: [] as AddressBookFileClass[],
-  launchAddressBook: () => {},
+  launchAddTagModal: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,

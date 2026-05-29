@@ -77,7 +77,12 @@
     "likely": "Muhtemelen ",
     "thiswalletaddress": "Bu Cüzdanın Adresi",
     "addto": "Şuraya ekle ",
-    "filter-wallet": "Cüzdan"
+    "filter-wallet": "Cüzdan",
+    "add-tag": "Etiket ekle",
+    "add-contact": "Kişi ekle",
+    "tag": "Etiket",
+    "contact": "Kişi",
+    "address": "Adres"
   },
   "change-privacy-legend": ".\nGizli değerleri göstermek için dokunun.",
   "txtcopied": "Metin panoya kopyalandı",
