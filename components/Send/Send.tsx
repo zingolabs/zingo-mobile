@@ -16,6 +16,7 @@ import {
   Platform,
   Text,
   Alert,
+  Pressable,
   NativeSyntheticEvent,
   TextInputEndEditingEventData,
   TextInputContentSizeChangeEventData,
@@ -75,11 +76,18 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
-import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
 import { RPCSendProposeType } from '../../app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
+import Memo from './components/Memo';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
 import { RPCParseAddressType } from '../../app/walletBackend/types/RPCParseAddressType';
@@ -195,6 +203,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   );
   const [keyboardListenersDone, setKeyboardListenersDone] =
     useState<boolean>(false);
+  // Bumped when the memo sheet is presented so the child Memo component
+  // remounts with the latest memoText as its initial draft.
+  const [memoSheetKey, setMemoSheetKey] = useState<number>(0);
   // measured dynamically to compute send sheet snap points
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -202,8 +213,10 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const scrollViewRef = useRef<ScrollView>(null);
   const sendSheetRef = useRef<BottomSheet>(null);
+  const memoBottomSheetRef = useRef<BottomSheetModal>(null);
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
+  const keyboardHeight = useKeyboardHeight();
 
   // Top icons strip height is a code-side constant (~55 px) — same on any phone.
   const TOP_ICONS_H = 55;
@@ -1032,12 +1045,64 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const setMemoModalShow = () => {
-    navigation.navigate(RouteEnum.Memo, {
-      message: memoText,
-      includeUAMessage: includeUAMemoBoolean,
-      setMessage: setMemoText,
-    });
+    // Bump key so the child Memo remounts and re-reads memoText as initial.
+    setMemoSheetKey(k => k + 1);
+    memoBottomSheetRef.current?.present();
   };
+
+  const renderMemoBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  );
+
+  const renderMemoHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 8,
+          paddingBottom: 6,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <View style={{ width: 28 }} />
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {translate('send.memo') as string}
+          </BoldText>
+          <Pressable
+            onPress={() => memoBottomSheetRef.current?.dismiss()}
+            hitSlop={8}
+            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+          </Pressable>
+        </View>
+      </View>
+    ),
+    [colors, translate],
+  );
 
   const setConfirmModalShow = async (
     parseAddressInfoJSON: RPCParseAddressType,
@@ -2305,6 +2370,40 @@ const Send: React.FunctionComponent<SendProps> = ({
           </View>
         </ScrollView>
       </BottomSheet>
+      <BottomSheetModal
+        ref={memoBottomSheetRef}
+        enableDynamicSizing={true}
+        enablePanDownToClose
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
+        handleComponent={renderMemoHandle}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        backdropComponent={renderMemoBackdrop}
+      >
+        <BottomSheetView
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingHorizontal: 20,
+            paddingTop: 12,
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
+          }}
+        >
+          <Memo
+            key={memoSheetKey}
+            closeSheet={() => memoBottomSheetRef.current?.dismiss()}
+            initialMemo={memoText}
+            includeUAMemoBoolean={includeUAMemoBoolean}
+            defaultUnifiedAddress={defaultUnifiedAddress}
+            setMemoText={setMemoText}
+            translate={translate}
+          />
+        </BottomSheetView>
+      </BottomSheetModal>
     </View>
   );
 

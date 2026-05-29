@@ -36,7 +36,6 @@ export enum RouteEnum {
   ValueTransferDetail = 'ValueTransferDetail',
   MessagesAddress = 'MessagesAddress',
   MessagesAll = 'MessagesAll',
-  Memo = 'Memo',
   Confirm = 'Confirm',
   Ufvk = 'Ufvk',
   Seed = 'Seed',

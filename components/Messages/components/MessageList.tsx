@@ -565,13 +565,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     totalBalance?.totalSpendableBalance,
   ]);
 
-  const setMemoModalShow = () => {
-    navigation.navigate(RouteEnum.Memo, {
-      message: memo,
-      includeUAMessage: true,
-      setMessage: setMemo,
-    });
-  };
+  // Memo expand was previously a separate Drawer screen; MessageList is not in
+  // active use right now, so this is left as a no-op until the chat flow comes
+  // back. When restored, inline a BottomSheetModal similar to the one in Send.
+  const setMemoModalShow = () => {};
 
   const setValueTransferDetailModalShow = useCallback(
     async (index: number, vt: ValueTransferType) => {

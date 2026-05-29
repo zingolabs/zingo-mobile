@@ -81,7 +81,6 @@ export type AppDrawerParamList = {
     | undefined;
   [RouteEnum.MessagesAddress]: MessagesAddressNavigationState | undefined;
   [RouteEnum.MessagesAll]: MessagesAllNavigationState | undefined;
-  [RouteEnum.Memo]: MemoNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
   [RouteEnum.Seed]: SeedNavigationState | undefined;
@@ -108,12 +107,6 @@ export type ValueTransferDetailNavigationState = {
   valueTransfersSliced: ValueTransferType[];
   totalLength: number;
   from?: RouteEnum;
-};
-
-export type MemoNavigationState = {
-  message: string;
-  includeUAMessage: boolean;
-  setMessage: (m: string) => void;
 };
 
 export type ConfirmNavigationState = {
