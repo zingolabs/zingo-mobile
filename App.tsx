@@ -160,6 +160,12 @@ const App: React.FunctionComponent = () => {
             style={{
               flex: 1,
               backgroundColor: theme.colors.background,
+              // The system safe-area top inset includes a visual buffer
+              // beyond the status bar / notch. We reclaim 10px of that
+              // buffer so the Header (and everything below) sits closer
+              // to the system chrome without overlapping it. Verified
+              // safe on both iOS and Android.
+              marginTop: -10,
             }}
           >
             <Stack.Navigator
