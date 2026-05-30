@@ -99,6 +99,7 @@
     "memobytes-unit": " karakterler."
   },
   "loadingapp": {
+    "welcome": "Hoş geldiniz",
     "actualserver": "Mevcut sunucu:",
     "createnewwallet": "Yeni Cüzdan Oluştur",
     "opencurrentwallet": "Mevcut Cüzdanı Aç",

@@ -99,6 +99,7 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
+    "welcome": "Bem-vindo",
     "actualserver": "Servidor atual:",
     "createnewwallet": "Criar uma nova carteira",
     "opencurrentwallet": "Abrir Carteira Atual",

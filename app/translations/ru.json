@@ -99,6 +99,7 @@
     "memobytes-unit": " симв."
   },
   "loadingapp": {
+    "welcome": "Добро пожаловать",
     "actualserver": "Текущий сервер:",
     "createnewwallet": "Создать новый кошелёк",
     "opencurrentwallet": "Открыть текущий кошелёк",

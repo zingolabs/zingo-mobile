@@ -99,6 +99,7 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
+    "welcome": "Welcome",
     "actualserver": "Actual server:",
     "createnewwallet": "Create New Wallet",
     "opencurrentwallet": "Open Current Wallet",

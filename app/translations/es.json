@@ -99,6 +99,7 @@
     "memobytes-unit": " car."
   },
   "loadingapp": {
+    "welcome": "Bienvenido",
     "actualserver": "Servidor Activo:",
     "createnewwallet": "Crear Nuevo Monedero",
     "opencurrentwallet": "Abrir Monedero Activo",
