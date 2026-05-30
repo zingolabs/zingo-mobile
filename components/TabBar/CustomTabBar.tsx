@@ -5,12 +5,13 @@ import {
   BottomTabBarHeightCallbackContext,
   BottomTabBarProps,
 } from '@react-navigation/bottom-tabs';
-import { TabActions } from '@react-navigation/native';
+import { TabActions, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { ModeEnum, RouteEnum } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import TotalBalanceClass from '../../app/AppState/classes/TotalBalanceClass';
+import { ThemeType } from '../../app/types';
 import { HouseFilledIcon } from '../Components/Icons/HouseFilledIcon';
 import { HouseOutlineIcon } from '../Components/Icons/HouseOutlineIcon';
 import { SendFilledIcon } from '../Components/Icons/SendFilledIcon';
@@ -25,7 +26,6 @@ const TAB_H_PADDING = 30;
 const TAB_V_PADDING = 10;
 const PILL_BG = '#040C17';
 const PILL_BORDER = '#071A35';
-const BUBBLE_COLOR = '#149D05';
 
 function renderNavIcon(
   routeName: string,
@@ -77,6 +77,10 @@ const CustomTabBar = ({
 }: BottomTabBarProps): React.ReactElement => {
   const { mode, totalBalance, somePending } = useContext(ContextAppLoaded);
   const reportHeight = useContext(BottomTabBarHeightCallbackContext);
+  // The active-tab bubble used to be hardcoded to the advanced-theme green
+  // (#149D05), so basic mode showed an off-palette green. Pull from the
+  // active theme's primary so it follows the mode switch.
+  const { colors } = useTheme() as ThemeType;
 
   const bubbleAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
   if (!bubbleAnimsRef.current) {
@@ -97,13 +101,28 @@ const CustomTabBar = ({
   }
   const pressAnims = pressAnimsRef.current;
 
-  useEffect(() => {
-    state.routes.forEach(r => {
-      if (!bubbleAnims[r.key]) bubbleAnims[r.key] = new Animated.Value(0);
-      if (!pressAnims[r.key]) pressAnims[r.key] = new Animated.Value(1);
-    });
-  }, [state.routes.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Backfill animation slots SYNCHRONOUSLY for any newly added route.key.
+  // This used to live in a useEffect, but useEffect runs after the render —
+  // so the first render after a mode toggle (which can produce a different
+  // set of Tab.Screen routes with new keys) tried to read
+  // bubbleAnims[route.key] before the effect populated it, crashing inside
+  // Animated.View with "Cannot read property 'getValue' of undefined".
+  state.routes.forEach(r => {
+    if (!bubbleAnims[r.key]) {
+      bubbleAnims[r.key] = new Animated.Value(
+        r.key === state.routes[state.index]?.key ? 1 : 0,
+      );
+    }
+    if (!pressAnims[r.key]) pressAnims[r.key] = new Animated.Value(1);
+  });
 
+  // Track the currently-selected route by its KEY, not by index. When the
+  // tab list shrinks (e.g. mode toggle removes the Send tab while the
+  // active index stays 0), React Navigation reassigns index 0 to the next
+  // remaining route — but `state.index` stays equal to 0, so depending on
+  // it alone never re-fires the effect, leaving the new active tab with a
+  // bubble value of 0 and the removed-but-still-cached one at 1.
+  const selectedRouteKey = state.routes[state.index]?.key;
   useEffect(() => {
     Animated.parallel(
       state.routes.map((r, i) =>
@@ -115,7 +134,7 @@ const CustomTabBar = ({
         }),
       ),
     ).start();
-  }, [state.index]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedRouteKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePressIn = (key: string) => {
     Animated.timing(pressAnims[key], {
@@ -179,6 +198,7 @@ const CustomTabBar = ({
                 <Animated.View
                   style={[
                     styles.bubble,
+                    { backgroundColor: colors.primary },
                     { transform: [{ scale: bubbleAnims[route.key] }] },
                   ]}
                 />
@@ -235,7 +255,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: BUBBLE_COLOR,
     borderRadius: 999,
   },
 });

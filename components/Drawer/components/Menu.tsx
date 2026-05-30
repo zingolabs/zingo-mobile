@@ -289,11 +289,12 @@ const Menu: React.FunctionComponent<MenuProps> = ({
         }}
       >
         <TouchableOpacity
-          onPress={() =>
+          onPress={() => {
             setModeOption(
               mode === ModeEnum.basic ? ModeEnum.advanced : ModeEnum.basic,
-            )
-          }
+            );
+            toggleMenuDrawer();
+          }}
           style={{
             flexDirection: 'row',
             alignItems: 'center',
