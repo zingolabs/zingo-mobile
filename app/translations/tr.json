@@ -143,6 +143,7 @@
     "changeservernew-error": "Error Sunucuyu yenisiyle değiştirmeye çalışırken bir hata oluştu ",
     "readingwallet-error": "Error Yeni sunucuyla cüzdanı okuma girişiminde hata oluştu:",
     "differentchain-error": "Farklı bir zincire sahip bir sunucuya geçiyorsunuz, bu kurtarma ifadesi olmadan bu cüzdana artık erişiminiz olmayacak.",
+    "serverchain-mismatch": "Sunucu seçtiğinizden farklı bir zincir bildiriyor. Zincir seçiciyi kontrol edip tekrar deneyin.",
     "changingwallet-label": "Error Cüzdan değiştirilirken bir hata oluştu",
     "restoringwallet-label": "Error Cüzdan geri yüklenirken bir hata oluştu",
     "computingtx": "İşlem Hesaplanıyor",

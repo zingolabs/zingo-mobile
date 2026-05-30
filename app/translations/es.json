@@ -143,6 +143,7 @@
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
     "differentchain-error": "Estás cambiando a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin tu frase semilla.",
+    "serverchain-mismatch": "El servidor reporta una cadena diferente a la seleccionada. Revisa el selector de cadena e inténtalo de nuevo.",
     "changingwallet-label": "Error cambiando de Monedero",
     "restoringwallet-label": "Error restaurando el Monedero",
     "computingtx": "Procesando Transacción",
@@ -430,7 +431,7 @@
     "unknown": "Desconocido",
     "title": "Información del Servidor",
     "errorgemini": "Error extrayendo el precio de Internet.",
-    "errorrpcmodule": "Error Interno extrayendo el precio de Internet",
+    "errorrpcmodule": "Fallo interno al obtener el precio de Internet",
     "zingolib": "Versión de Zingolib"
   },
   "rescan": {
@@ -580,7 +581,7 @@
         "description": "Está viendo direcciones transparentes. Estas exponen los detalles de sus transacciones públicamente.",
         "button": "Cambiar a Direcciones Blindadas (Recomendado)"
       },
-      "new-error": "Error al generar la dirección transparente. La última dirección transparente no ha recibido fondos."
+      "new-error": "No se pudo generar la dirección transparente. La última dirección transparente no ha recibido fondos."
     },
     "verification-success": "Esta dirección te pertenece y es segura para recibir fondos.",
     "verification-failure": "Esta dirección no te pertenece.",

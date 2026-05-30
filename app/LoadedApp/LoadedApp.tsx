@@ -561,6 +561,9 @@ export default function LoadedApp(props: LoadedAppProps) {
         navigationApp={props.navigation}
         theme={theme}
         translate={translate}
+        setI18nLocale={(locale: string) => {
+          i18n.locale = locale;
+        }}
         language={language}
         currency={currency}
         server={server}
@@ -617,6 +620,11 @@ type LoadedAppClassProps = {
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
+  // Mutates the i18n instance's active locale. Needed so language changes
+  // applied without remounting LoadedApp (reset=false in setLanguageOption)
+  // still take effect immediately for snackbars and any RPC error text
+  // produced after the change.
+  setI18nLocale: (locale: string) => void;
   theme: ThemeType;
   language: LanguageEnum;
   currency: CurrencyEnum;
@@ -1551,6 +1559,10 @@ export class LoadedAppClass extends Component<
               server: value,
               selectServer: selectServer,
             });
+            // Propagate the new server into the WalletBackend config too so
+            // sub-services (DataService etc.) stop using the URI captured at
+            // construction time.
+            this.rpc.setServer(value);
             // the server is changed, the App needs to restart the timeout tasks from the beginning
             await this.rpc.clearTimers();
             await this.rpc.configure();
@@ -1638,6 +1650,12 @@ export class LoadedAppClass extends Component<
     this.setState({
       language: value as LanguageEnum,
     });
+    // Apply the new locale to the shared i18n instance immediately. Without
+    // this, when `reset === false` (language changes alongside a server
+    // change) LoadedApp doesn't remount, so the i18n instance keeps its
+    // original locale and any snackbar/RPC error rendered until the next
+    // remount appears in the old language.
+    this.props.setI18nLocale(value);
     if (reset) {
       this.navigateToLoadingApp({ startingApp: false });
     }
@@ -1725,10 +1743,17 @@ export class LoadedAppClass extends Component<
     this.setState({
       performanceLevel: value as RPCPerformanceLevelEnum,
     });
+    // Propagate the new performance level into the shared WalletBackend
+    // config so SyncCoordinator's runTaskPromises doesn't see a diff
+    // between zingolib (which we set below) and the stale config and
+    // silently revert the user's choice on the next poll.
+    this.rpc.setPerformanceLevel(value);
 
-    // change it in zingolib as well.
+    // change it in zingolib as well. Use `value` directly — `setState`
+    // above is async, so `this.state.performanceLevel` here is still the
+    // OLD value at this point in the same event handler.
     const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
-      this.state.performanceLevel,
+      value,
       GlobalConst.minConfirmations.toString(),
     );
     console.log(
@@ -1830,7 +1855,10 @@ export class LoadedAppClass extends Component<
     if (this.state.newServer && this.state.newSelectServer) {
       const beforeServer = this.state.server;
 
-      const resultStrServerPromise = await RPCModule.changeServerProcess(
+      // No `await` here so Promise.race can actually enforce the 15s cap.
+      // With `await` the RPC call resolves before the race starts and the
+      // timer becomes a no-op (a failing server then blocks ~minutes).
+      const resultStrServerPromise = RPCModule.changeServerProcess(
         this.state.newServer.uri,
       );
       const timeoutServerPromise = new Promise((_, reject) => {
@@ -1869,6 +1897,9 @@ export class LoadedAppClass extends Component<
         newServer: {} as ServerType,
         newSelectServer: null,
       });
+      // Propagate to WalletBackend's shared config so sub-services pick up
+      // the new URI without needing the instance to be recreated.
+      this.rpc.setServer(this.state.newServer);
 
       await this.rpc.fetchInfoAndServerHeight();
 
