@@ -641,6 +641,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         setDisabled(false);
         return;
       } else {
+        // The chain the server actually reports must match what the user
+        // selected in the chain toggle. If they don't match, abort the
+        // save — continuing would persist the user's (wrong) chain
+        // alongside the server URI and `loadExistingWallet` would then
+        // open the wallet with the wrong chainName, killing the sync.
+        if (newChainName && newChainName !== chainNameParsed) {
+          addLastSnackbar(
+            translate('loadedapp.serverchain-mismatch') as string,
+          );
+          setServerOption(
+            serverContext,
+            selectServerContext,
+            false,
+            sameServerChainName,
+          );
+          setDisabled(false);
+          return;
+        }
         if (newChainName && newChainName !== chainName) {
           sameServerChainName = false;
           addLastSnackbar(

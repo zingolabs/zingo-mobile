@@ -15,7 +15,12 @@ const checkServerURI = async (
   let newChainName: ChainNameEnum | undefined;
 
   try {
-    const resultStrServerPromise = await RPCModule.changeServerProcess(uri);
+    // The variable must hold the Promise itself (no `await` here) so that
+    // Promise.race can actually race it against the timeout. With `await`
+    // the call resolves before the race starts and the 15s timer is moot —
+    // a failing RPC then blocks for as long as the native side decides
+    // (observed ~4 min in the wild instead of the intended 15s cap).
+    const resultStrServerPromise = RPCModule.changeServerProcess(uri);
     const timeoutServerPromise = new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error('Promise changeserver Timeout 15 seconds'));
@@ -41,7 +46,8 @@ const checkServerURI = async (
       // the server is changed
       if (uri) {
         // the new server is not Offline mode.
-        const infoStrPromise = await RPCModule.infoServerInfo();
+        // No `await` here so Promise.race can enforce the 15s cap.
+        const infoStrPromise = RPCModule.infoServerInfo();
         const timeoutInfoPromise = new Promise((resolve, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 15 seconds'));
@@ -74,7 +80,8 @@ const checkServerURI = async (
         }
       } else {
         // the new server is empty -> means Offline mode.
-        const balanceStrPromise = await RPCModule.getBalanceInfo();
+        // No `await` here so Promise.race can enforce the 15s cap.
+        const balanceStrPromise = RPCModule.getBalanceInfo();
         const timeoutInfoPromise = new Promise((resolve, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 15 seconds'));

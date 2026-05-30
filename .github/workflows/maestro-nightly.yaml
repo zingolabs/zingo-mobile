@@ -209,6 +209,12 @@ jobs:
             ios/build/DerivedData/Build/Products/Release-iphonesimulator/Zingo.app
 
       - name: Run Maestro tests
+        # GitHub macOS runners can boot XCTest slowly; the default 60s
+        # driver-startup timeout has fired twice in a row on this job.
+        # Maestro itself suggests bumping MAESTRO_DRIVER_STARTUP_TIMEOUT
+        # when it hits this — 180000ms (3 min) leaves slack for cold runners.
+        env:
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
         run: maestro test .maestro/
 
       - name: Upload Maestro report on failure

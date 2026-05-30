@@ -53,7 +53,7 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
 } from '../AppState';
-import { parseServerURI, serverUris } from '../uris';
+import { checkServerURI, parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { fetchWallet } from '../walletBackend';
 import { ThemeType } from '../types';
@@ -1199,38 +1199,53 @@ export class LoadingAppClass extends Component<
         this.state.translate('loadedapp.tryingnewserver') as string,
       );
 
-      const cs = {
-        uri: uri,
-        chainName: chainName,
-        region: '',
-        default: false,
-        latency: null,
-        obsolete: false,
-      } as ServerUrisType;
-      const serverChecked = await selectingServer([cs]);
-      if (serverChecked && serverChecked.latency) {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, {
-          uri,
-          chainName,
-        });
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.selectServer,
-          SelectServerEnum.custom,
-        );
-        this.setState({
-          selectServer: SelectServerEnum.custom,
-          server: { uri, chainName },
-          customServerUri: '',
-          customServerChainName: this.state.server.chainName,
-          customServerOffline: false,
-        });
-        this.customServerModalRef.current?.dismiss();
-      } else {
-        this.addLastSnackbar(
-          (this.state.translate('loadedapp.changeservernew-error') as string) +
-            uri,
-        );
+      // Use checkServerURI instead of selectingServer so we can also
+      // validate that the server is actually on the chain the user
+      // selected — selectingServer only measures latency and would let a
+      // wrong-chain config through, crashing the sync later when
+      // loadExistingWallet opens the wallet with the wrong chainName.
+      const { result, timeout, newChainName } = await checkServerURI(
+        uri,
+        this.state.server.uri,
+      );
+      if (!result) {
+        if (timeout) {
+          this.addLastSnackbar(
+            this.state.translate('loadedapp.tryingnewserver-error') as string,
+          );
+        } else {
+          this.addLastSnackbar(
+            (this.state.translate(
+              'loadedapp.changeservernew-error',
+            ) as string) + uri,
+          );
+        }
+        this.setState({ actionButtonsDisabled: false });
+        return;
       }
+      if (newChainName && newChainName !== chainName) {
+        this.addLastSnackbar(
+          this.state.translate('loadedapp.serverchain-mismatch') as string,
+        );
+        this.setState({ actionButtonsDisabled: false });
+        return;
+      }
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, {
+        uri,
+        chainName,
+      });
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.selectServer,
+        SelectServerEnum.custom,
+      );
+      this.setState({
+        selectServer: SelectServerEnum.custom,
+        server: { uri, chainName },
+        customServerUri: '',
+        customServerChainName: this.state.server.chainName,
+        customServerOffline: false,
+      });
+      this.customServerModalRef.current?.dismiss();
     }
     this.setState({ actionButtonsDisabled: false });
   };

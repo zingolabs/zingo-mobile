@@ -14,8 +14,9 @@
  * RPCModule is the React Native native module that bridges to zingolib (Rust).
  * This class never calls RPCModule directly.
  */
-import { SendJsonToTypeType } from '../AppState';
+import { SendJsonToTypeType, ServerType } from '../AppState';
 import { WalletBackendConfig } from './config/WalletBackendConfig';
+import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';
 import { SyncCoordinator } from './modules/SyncCoordinator';
 import { TransactionService } from './modules/TransactionService';
@@ -108,6 +109,24 @@ export default class WalletBackend {
   }
   getReadOnly() {
     return this.config.readOnly;
+  }
+
+  // Active server. Mutates the shared config reference so all sub-services
+  // (DataService etc.) pick up the new URI on their next call without having
+  // to recreate the WalletBackend instance. Without this, switching server
+  // without changing wallets left DataService.getLatestBlockServerInfo
+  // talking to the stale URI captured at construction time.
+  setServer(server: ServerType) {
+    this.config.server = server;
+  }
+
+  // Active performance level. Same shared-reference pattern as setServer.
+  // Without this, SyncCoordinator's runTaskPromises sees the stale config
+  // value, diffs it against the wallet-current (already-changed) value,
+  // and pushes the OLD level back to zingolib — silently reverting the
+  // user's setting.
+  setPerformanceLevel(performanceLevel: RPCPerformanceLevelEnum) {
+    this.config.performanceLevel = performanceLevel;
   }
 
   // Backward-compatible static delegates (bodies live in walletUtils.ts)
