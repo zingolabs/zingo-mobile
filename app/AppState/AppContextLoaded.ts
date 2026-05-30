@@ -95,8 +95,10 @@ export default interface AppContextLoaded {
   // List of our contacts - Address book
   addressBook: AddressBookFileClass[];
 
-  // helpers to open the address book modal from different places in the App
-  launchAddressBook: (add: string, s: ScreenEnum) => void;
+  // Opens the shared "Add Tag / Add Contact" BottomSheet modal in-place,
+  // pre-filled with the given address. Used from any screen that displays an
+  // address (AddressItem's + icon).
+  launchAddTagModal: (address: string) => void;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;

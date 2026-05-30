@@ -34,9 +34,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "alignItems": "center",
               "backgroundColor": "#011401",
               "display": "flex",
-              "minHeight": 60,
+              "minHeight": 50,
               "paddingBottom": 10,
-              "paddingTop": 10,
+              "paddingTop": 0,
             }
           }
           testID="header"
@@ -62,7 +62,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "left": 0,
               "padding": 11.5,
               "position": "absolute",
-              "top": 10,
+              "top": 0,
             }
           }
         >
@@ -139,7 +139,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "padding": 13,
               "position": "absolute",
               "right": 0,
-              "top": 10,
+              "top": 0,
             }
           }
         >
@@ -959,20 +959,40 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             }
           }
         >
-          <Text
+          <View
             style={
               {
-                "color": "#888888",
-                "fontSize": 15,
-                "fontWeight": "400",
-                "marginRight": 5,
-                "maxWidth": 180,
-                "opacity": 1,
+                "alignItems": "flex-end",
+                "marginRight": 8,
               }
             }
           >
-            https://zec.rocks:443
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 11,
+                  "lineHeight": 13,
+                  "opacity": 0.65,
+                }
+              }
+            >
+              text translated
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 15,
+                  "fontWeight": "400",
+                  "maxWidth": 180,
+                  "opacity": 1,
+                }
+              }
+            >
+              https://zec.rocks:443
+            </Text>
+          </View>
           <
             color="#888888"
             icon={
@@ -990,7 +1010,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={12}
+            size={16}
           />
         </View>
       </View>

@@ -11,6 +11,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
 import ScannerAddress from './components/Send/components/ScannerAddress';
+import ScannerUfvk from './app/LoadingApp/components/ScannerUfvk';
 import { ThemeType, AppStackParamList } from './app/types';
 import { ModeEnum, RouteEnum } from './app/AppState';
 
@@ -160,6 +161,12 @@ const App: React.FunctionComponent = () => {
             style={{
               flex: 1,
               backgroundColor: theme.colors.background,
+              // The system safe-area top inset includes a visual buffer
+              // beyond the status bar / notch. We reclaim 10px of that
+              // buffer so the Header (and everything below) sits closer
+              // to the system chrome without overlapping it. Verified
+              // safe on both iOS and Android.
+              marginTop: -10,
             }}
           >
             <Stack.Navigator
@@ -173,14 +180,24 @@ const App: React.FunctionComponent = () => {
                 {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
               </Stack.Screen>
               {/* ScannerAddress lives at the root Stack (above LoadedApp,
-                  therefore above the BottomSheetModalProvider portal). The
-                  default 'card' presentation pushes it as a regular stack
-                  screen — the camera respects normal flex layout. Any open
-                  BottomSheet modal stays alive underneath LoadedApp and
-                  reappears when the camera is dismissed. */}
+                  therefore above the BottomSheetModalProvider portal). Without
+                  this, any open BottomSheetModal renders ON TOP of the camera,
+                  hiding the preview.
+                  presentation: 'transparentModal' avoids the iOS UIKit modal
+                  freeze on the underlying view — with 'modal' or default
+                  'card' the BottomSheetModal backdrop below stays
+                  unresponsive for several seconds after the camera is
+                  dismissed because iOS pauses the underlying scene during
+                  the native modal presentation. */}
               <Stack.Screen
                 name={RouteEnum.ScannerAddress}
                 component={ScannerAddress}
+                options={{ presentation: 'transparentModal' }}
+              />
+              <Stack.Screen
+                name={RouteEnum.ScannerUfvk}
+                component={ScannerUfvk}
+                options={{ presentation: 'transparentModal' }}
               />
             </Stack.Navigator>
           </SafeAreaView>

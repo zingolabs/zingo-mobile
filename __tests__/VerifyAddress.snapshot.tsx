@@ -25,7 +25,11 @@ describe('VerifyAddress - snapshot', () => {
     expect(
       render(
         <ContextAppLoadedProvider value={state}>
-          <VerifyAddress closeSheet={onFn} screenName={ScreenEnum.Receive} />
+          <VerifyAddress
+            closeSheet={onFn}
+            screenName={ScreenEnum.Receive}
+            navigation={{ navigate: onFn } as never}
+          />
         </ContextAppLoadedProvider>,
       ).toJSON(),
     ).toMatchSnapshot();

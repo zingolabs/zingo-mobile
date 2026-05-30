@@ -3,7 +3,6 @@ import {
   DrawerContentComponentProps,
 } from '@react-navigation/drawer';
 import React from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Menu from './components/Menu';
 import { MenuItemEnum, ScreenEnum } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
@@ -40,7 +39,6 @@ function Drawer({
   initialRouteName,
   children,
 }: DrawerProps) {
-  const insets = useSafeAreaInsets();
   const menu = (props: DrawerContentComponentProps) => (
     <Menu
       onItemSelected={onMenuItemSelected}
@@ -56,7 +54,11 @@ function Drawer({
       screenOptions={{
         headerShown: false,
         drawerType: 'slide',
-        sceneStyle: { paddingBottom: insets.bottom },
+        // Each screen extends its content (BottomSheet) edge-to-edge of the
+        // device. Any padding here would create a dark strip around the
+        // sheet — top inset is already applied once by the root SafeAreaView
+        // in App.tsx, and the sheet handles its own bottom safe area inset.
+        sceneStyle: { paddingTop: 0, paddingBottom: 0 },
       }}
     >
       {children}

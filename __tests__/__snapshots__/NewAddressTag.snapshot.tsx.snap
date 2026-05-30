@@ -29,7 +29,42 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
         }
       }
     >
-      Tag
+      text translated
+    </Text>
+    <View
+      style={
+        {
+          "marginTop": 6,
+          "paddingHorizontal": 10,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
+            "opacity": 1,
+          }
+        }
+      >
+        u1abc123de...f456abc123
+      </Text>
+    </View>
+    <Text
+      style={
+        {
+          "color": "#c3c3c3",
+          "fontSize": 15,
+          "fontWeight": "400",
+          "marginTop": 18,
+          "opacity": 1,
+          "paddingHorizontal": 10,
+        }
+      }
+    >
+      text translated
     </Text>
     <View
       style={
@@ -67,9 +102,9 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
               "color": "#c3c3c3",
               "fontSize": 14,
               "fontWeight": "600",
-              "marginLeft": 5,
               "minHeight": 48,
               "minWidth": 48,
+              "padding": 10,
             }
           }
           value=""
@@ -83,7 +118,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
           "flexDirection": "row",
           "flexGrow": 1,
           "justifyContent": "center",
-          "marginTop": 30,
+          "marginTop": 15,
           "marginVertical": 5,
         }
       }
@@ -119,7 +154,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#011401",
+            "backgroundColor": "#031124",
             "borderColor": "#18bd18",
             "borderRadius": 24,
             "borderWidth": 2,

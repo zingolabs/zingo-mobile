@@ -34,8 +34,7 @@ import { ContextAppLoaded } from '../../../app/context';
 type AbSummaryLineProps = {
   index: number;
   item: AddressBookFileClass;
-  setCurrentItem: (b: number) => void;
-  setAction: (action: AddressBookActionEnum) => void;
+  openAbDetail: (index: number, action: AddressBookActionEnum) => void;
   handleScrollToTop: () => void;
   doAction: (
     action: AddressBookActionEnum,
@@ -48,8 +47,7 @@ type AbSummaryLineProps = {
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   index,
   item,
-  setCurrentItem,
-  setAction,
+  openAbDetail,
   handleScrollToTop,
   doAction,
   addressProtected,
@@ -124,8 +122,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           <TouchableOpacity
             onPress={() => {
               if (!addressProtected) {
-                setCurrentItem(index);
-                setAction(AddressBookActionEnum.Modify);
+                openAbDetail(index, AddressBookActionEnum.Modify);
                 handleScrollToTop();
               }
             }}
@@ -186,8 +183,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             <TouchableOpacity
               style={{ zIndex: 999, padding: 10 }}
               onPress={() => {
-                setCurrentItem(index);
-                setAction(AddressBookActionEnum.Modify);
+                openAbDetail(index, AddressBookActionEnum.Modify);
                 handleScrollToTop();
               }}
             >

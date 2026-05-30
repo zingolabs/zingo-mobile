@@ -77,7 +77,12 @@
     "likely": "Probablemente: ",
     "thiswalletaddress": "La Dirección de este Monedero",
     "addto": "Añadir a ",
-    "filter-wallet": "Monedero"
+    "filter-wallet": "Monedero",
+    "add-tag": "Añadir etiqueta",
+    "add-contact": "Añadir contacto",
+    "tag": "Etiqueta",
+    "contact": "Contacto",
+    "address": "Dirección"
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
@@ -94,6 +99,7 @@
     "memobytes-unit": " car."
   },
   "loadingapp": {
+    "welcome": "Bienvenido",
     "actualserver": "Servidor Activo:",
     "createnewwallet": "Crear Nuevo Monedero",
     "opencurrentwallet": "Abrir Monedero Activo",

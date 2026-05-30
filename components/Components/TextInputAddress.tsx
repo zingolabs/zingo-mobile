@@ -25,6 +25,10 @@ type TextInputAddressProps = {
   showLabel: boolean;
   screenName: ScreenEnum;
   routeStack?: RouteEnum;
+  // When rendered inside a BottomSheetModal (or any portaled context where
+  // useNavigation's context is lost), pass the navigation prop from the host
+  // screen so the QR button can navigate to ScannerAddress reliably.
+  navigation?: NavigationProp<ParamListBase>;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -32,10 +36,13 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   setError,
   disabled,
   showLabel,
-  screenName,
-  routeStack,
+  // screenName + routeStack are kept in the prop type for backward compat
+  // with all callers but are no longer consumed here — ScannerAddress lives
+  // at a single Drawer-level route so a direct navigate works everywhere.
+  navigation: navigationProp,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const hookNavigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = navigationProp ?? hookNavigation;
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
   const { colors } = useTheme() as ThemeType;
@@ -66,28 +73,13 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   }, [address, server.chainName, setError, translate]);
 
   const setQrcodeModalShow = () => {
-    if (screenName === ScreenEnum.AddressBook && routeStack) {
-      (navigation.navigate as (name: string, params?: object) => void)(
-        routeStack,
-        {
-          screen: RouteEnum.ScannerAddress,
-          params: {
-            setAddress: (a: string) => setAddress(a),
-            active: true,
-          },
-        },
-      );
-    } else if (screenName === ScreenEnum.Receive) {
-      // ScannerAddress lives at the root Stack (above the LoadedApp screen),
-      // registered with presentation: 'modal'. From inside Receive bubble-up
-      // through Tab → Drawer → root Stack finds it; the modal presentation
-      // makes the camera render above LoadedApp (and above any open
-      // BottomSheetModal portal).
-      navigation.navigate(RouteEnum.ScannerAddress, {
-        setAddress: (a: string) => setAddress(a),
-        active: true,
-      });
-    }
+    // ScannerAddress is now a top-level Drawer screen, so a direct navigate
+    // works from any caller (Receive, AddressBook, etc.) regardless of which
+    // stack they live in.
+    navigation.navigate(RouteEnum.ScannerAddress, {
+      setAddress: (a: string) => setAddress(a),
+      active: true,
+    });
   };
 
   //console.log('render input text address');
@@ -174,6 +166,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 disabled={disabled}
                 accessible={true}
                 accessibilityLabel={translate('send.scan-acc') as string}
+                hitSlop={8}
                 onPress={() => {
                   setQrcodeModalShow();
                 }}

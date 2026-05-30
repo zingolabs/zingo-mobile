@@ -24,6 +24,7 @@ describe('NewAddressTag - snapshot', () => {
         <ContextAppLoadedProvider value={state}>
           <NewAddressTag
             address="u1abc123def456abc123def456abc123def456abc123"
+            own={true}
             closeSheet={onFn}
             setAddressBook={onFn}
           />

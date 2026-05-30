@@ -30,9 +30,9 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               "alignItems": "center",
               "backgroundColor": "#011401",
               "display": "flex",
-              "minHeight": 60,
+              "minHeight": 50,
               "paddingBottom": 10,
-              "paddingTop": 10,
+              "paddingTop": 0,
             }
           }
           testID="header"
@@ -526,7 +526,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               "left": 0,
               "padding": 11.5,
               "position": "absolute",
-              "top": 10,
+              "top": 0,
             }
           }
         >
@@ -603,7 +603,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               "padding": 13,
               "position": "absolute",
               "right": 0,
-              "top": 10,
+              "top": 0,
             }
           }
         >
@@ -1919,9 +1919,9 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               "alignItems": "center",
               "backgroundColor": "#011401",
               "display": "flex",
-              "minHeight": 60,
+              "minHeight": 50,
               "paddingBottom": 10,
-              "paddingTop": 10,
+              "paddingTop": 0,
             }
           }
           testID="header"
@@ -2085,7 +2085,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               "left": 0,
               "padding": 11.5,
               "position": "absolute",
-              "top": 10,
+              "top": 0,
             }
           }
         >
@@ -2162,7 +2162,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               "padding": 13,
               "position": "absolute",
               "right": 0,
-              "top": 10,
+              "top": 0,
             }
           }
         >

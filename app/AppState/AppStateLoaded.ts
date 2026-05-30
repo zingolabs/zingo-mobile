@@ -18,4 +18,8 @@ export default interface AppStateLoaded {
 
   // to know if the modal is open or not
   isSeedViewModalOpen: boolean;
+
+  // Address+ownership pair for the shared "Add Tag/Contact" BottomSheetModal
+  // hosted at LoadedApp level. `null` while hidden.
+  addTagModalTarget: { address: string; own: boolean } | null;
 }

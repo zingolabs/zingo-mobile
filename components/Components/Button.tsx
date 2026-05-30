@@ -45,7 +45,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         ? {
             backgroundColor: disabled
               ? colors.secondaryDisabled
-              : colors.background,
+              : colors.bottomSheetBackground,
             borderColor: disabled ? colors.primaryDisabled : colors.primary,
             borderWidth: 2,
             width: twoButtons ? '40%' : '80%',

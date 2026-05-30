@@ -572,15 +572,12 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
 
   const setValueTransferDetailModalShow = useCallback(
     async (index: number, vt: ValueTransferType) => {
-      navigation.navigate(RouteEnum.ValueTransferDetailStack, {
-        screen: RouteEnum.ValueTransferDetail,
-        params: {
-          index: index,
-          vt: vt,
-          valueTransfersSliced: messagesSliced,
-          totalLength: messagesFiltered ? messagesFiltered.length : 0,
-          from: RouteEnum.Messages,
-        },
+      navigation.navigate(RouteEnum.ValueTransferDetail, {
+        index: index,
+        vt: vt,
+        valueTransfersSliced: messagesSliced,
+        totalLength: messagesFiltered ? messagesFiltered.length : 0,
+        from: RouteEnum.Messages,
       });
     },
     [navigation, messagesSliced, messagesFiltered],

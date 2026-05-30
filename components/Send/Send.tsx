@@ -1107,29 +1107,26 @@ const Send: React.FunctionComponent<SendProps> = ({
   const setConfirmModalShow = async (
     parseAddressInfoJSON: RPCParseAddressType,
   ) => {
-    navigation.navigate(RouteEnum.ConfirmStack, {
-      screen: RouteEnum.Confirm,
-      params: {
-        calculatedFee: fee,
-        parseAddressInfoJSON: parseAddressInfoJSON,
-        donationAmount:
-          donation &&
-          server.chainName === ChainNameEnum.mainChainName &&
-          !donationAddress
-            ? Utils.parseStringLocaleToNumberFloat(
-                Utils.getZenniesDonationAmount(),
-              )
-            : 0,
-        confirmSend: confirmSend,
-        sendAllAmount:
-          mode !== ModeEnum.basic &&
-          maxAmount > 0 &&
-          Utils.parseStringLocaleToNumberFloat(amountText) ===
-            Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
-        calculateFeeWithPropose: calculateFeeWithPropose,
-        sendPageState: buildSendState(),
-        nym: nym,
-      },
+    navigation.navigate(RouteEnum.Confirm, {
+      calculatedFee: fee,
+      parseAddressInfoJSON: parseAddressInfoJSON,
+      donationAmount:
+        donation &&
+        server.chainName === ChainNameEnum.mainChainName &&
+        !donationAddress
+          ? Utils.parseStringLocaleToNumberFloat(
+              Utils.getZenniesDonationAmount(),
+            )
+          : 0,
+      confirmSend: confirmSend,
+      sendAllAmount:
+        mode !== ModeEnum.basic &&
+        maxAmount > 0 &&
+        Utils.parseStringLocaleToNumberFloat(amountText) ===
+          Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
+      calculateFeeWithPropose: calculateFeeWithPropose,
+      sendPageState: buildSendState(),
+      nym: nym,
     });
   };
 
@@ -1317,6 +1314,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                               modalViewBottom: {
                                 minHeight: 300,
                               },
+                              // RNPickerSelect's default viewContainer uses
+                              // `alignSelf: 'stretch'` which overrides the
+                              // parent row's `alignItems: 'center'` on iOS,
+                              // making the contacts icon vertically offset
+                              // from the QR icon next to it. Force center.
+                              viewContainer: { alignSelf: 'center' },
                             }}
                             pickerProps={{
                               mode: 'dialog',
@@ -1433,16 +1436,16 @@ const Send: React.FunctionComponent<SendProps> = ({
                             }}
                           >
                             <FontAwesomeIcon
-                              style={{ marginRight: 7 }}
-                              size={32}
+                              style={{ marginRight: 5 }}
+                              size={28}
                               icon={faAddressCard}
                               color={colors.primary}
                             />
                           </RNPickerSelect>
                         ) : (
                           <FontAwesomeIcon
-                            style={{ marginRight: 7 }}
-                            size={32}
+                            style={{ marginRight: 5 }}
+                            size={28}
                             icon={faAddressCard}
                             color={colors.primaryDisabled}
                           />
@@ -2076,6 +2079,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                         }}
                         maxLength={GlobalConst.memoMaxLength}
                         onFocus={() => {
+                          // Expand the Send sheet to its top snap so the memo
+                          // field (and the rest of the form) is fully visible
+                          // above the keyboard.
+                          sendSheetRef.current?.snapToIndex(
+                            sendSnapPoints.length - 1,
+                          );
                           // I need to wait for the keyboard is totally open
                           // otherwise the scroll to end never happened.
                           if (keyboardVisible) {

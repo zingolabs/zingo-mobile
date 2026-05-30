@@ -4,75 +4,14 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
 <View
   style={
     {
-      "borderColor": "#18bd18",
-      "borderWidth": 1,
+      "backgroundColor": "#031124",
       "display": "flex",
       "flexDirection": "column",
-      "margin": 10,
+      "paddingBottom": 5,
     }
   }
   testID="addressbookdetail.0"
 >
-  <Text
-    style={
-      {
-        "color": "#c3c3c3",
-        "fontSize": 15,
-        "fontWeight": "400",
-        "marginTop": 10,
-        "opacity": 1,
-        "paddingHorizontal": 10,
-      }
-    }
-  >
-    text translated
-  </Text>
-  <View
-    style={
-      {
-        "display": "flex",
-        "flexDirection": "row",
-        "justifyContent": "flex-start",
-        "marginTop": 10,
-        "paddingHorizontal": 10,
-      }
-    }
-  >
-    <View
-      accessible={true}
-      style={
-        {
-          "borderColor": "#c3c3c3",
-          "borderRadius": 5,
-          "borderWidth": 1,
-          "flexGrow": 1,
-          "maxHeight": 150,
-          "minHeight": 48,
-          "minWidth": 48,
-        }
-      }
-    >
-      <TextInput
-        editable={true}
-        maxLength={50}
-        onChangeText={[Function]}
-        placeholder="text translated"
-        placeholderTextColor="#888888"
-        style={
-          {
-            "backgroundColor": "transparent",
-            "color": "#c3c3c3",
-            "fontSize": 14,
-            "fontWeight": "600",
-            "marginLeft": 5,
-            "minHeight": 48,
-            "minWidth": 48,
-          }
-        }
-        testID="addressbook.label-field"
-      />
-    </View>
-  </View>
   <View
     style={
       {
@@ -172,7 +111,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
                 {
                   "busy": undefined,
                   "checked": undefined,
-                  "disabled": undefined,
+                  "disabled": false,
                   "expanded": undefined,
                   "selected": undefined,
                 }
@@ -188,6 +127,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={8}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -230,6 +170,66 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       </View>
     </View>
   </View>
+  <Text
+    style={
+      {
+        "color": "#c3c3c3",
+        "fontSize": 15,
+        "fontWeight": "400",
+        "marginTop": 18,
+        "opacity": 1,
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    text translated
+  </Text>
+  <View
+    style={
+      {
+        "display": "flex",
+        "flexDirection": "row",
+        "justifyContent": "flex-start",
+        "marginTop": 10,
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      style={
+        {
+          "borderColor": "#c3c3c3",
+          "borderRadius": 5,
+          "borderWidth": 1,
+          "flexGrow": 1,
+          "maxHeight": 150,
+          "minHeight": 48,
+          "minWidth": 48,
+        }
+      }
+    >
+      <TextInput
+        editable={true}
+        maxLength={50}
+        onChangeText={[Function]}
+        placeholder="text translated"
+        placeholderTextColor="#888888"
+        style={
+          {
+            "backgroundColor": "transparent",
+            "color": "#c3c3c3",
+            "fontSize": 14,
+            "fontWeight": "600",
+            "marginLeft": 5,
+            "minHeight": 48,
+            "minWidth": 48,
+          }
+        }
+        testID="addressbook.label-field"
+      />
+    </View>
+  </View>
   <View
     style={
       {
@@ -237,6 +237,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
         "flexDirection": "row",
         "flexGrow": 1,
         "justifyContent": "center",
+        "marginTop": 15,
         "marginVertical": 5,
       }
     }
@@ -272,7 +273,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "#011401",
+          "backgroundColor": "#031124",
           "borderColor": "#18bd18",
           "borderRadius": 24,
           "borderWidth": 2,
@@ -403,22 +404,58 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
 <View
   style={
     {
-      "borderColor": "#18bd18",
-      "borderWidth": 1,
+      "backgroundColor": "#031124",
       "display": "flex",
       "flexDirection": "column",
-      "margin": 10,
+      "paddingBottom": 5,
     }
   }
   testID="addressbookdetail.2"
 >
+  <View>
+    <Text
+      style={
+        {
+          "color": "#c3c3c3",
+          "fontSize": 15,
+          "fontWeight": "400",
+          "marginTop": 10,
+          "opacity": 1,
+          "paddingHorizontal": 10,
+        }
+      }
+    >
+      text translated
+    </Text>
+    <View
+      style={
+        {
+          "marginTop": 6,
+          "paddingHorizontal": 10,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
+            "opacity": 1,
+          }
+        }
+      >
+        u098765432...__________
+      </Text>
+    </View>
+  </View>
   <Text
     style={
       {
         "color": "#c3c3c3",
         "fontSize": 15,
         "fontWeight": "400",
-        "marginTop": 10,
+        "marginTop": 18,
         "opacity": 1,
         "paddingHorizontal": 10,
       }
@@ -476,168 +513,11 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
   <View
     style={
       {
-        "display": "flex",
-        "flexDirection": "column",
-      }
-    }
-  >
-    <View
-      style={
-        {
-          "display": "flex",
-          "marginTop": 10,
-          "padding": 10,
-        }
-      }
-    >
-      <View
-        style={
-          {
-            "display": "flex",
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-          }
-        }
-      >
-        <Text
-          style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 15,
-              "fontWeight": "400",
-              "opacity": 1,
-            }
-          }
-        >
-          text translated
-        </Text>
-      </View>
-      <View
-        style={
-          {
-            "borderColor": "#c3c3c3",
-            "borderRadius": 5,
-            "borderWidth": 1,
-            "marginTop": 5,
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "flexDirection": "row",
-            }
-          }
-        >
-          <View
-            accessibilityLabel="text translated"
-            accessible={true}
-            style={
-              {
-                "flex": 1,
-                "justifyContent": "center",
-              }
-            }
-          >
-            <TextInput
-              editable={false}
-              onChangeText={[Function]}
-              placeholder="text translated"
-              placeholderTextColor="#888888"
-              style={
-                {
-                  "backgroundColor": "transparent",
-                  "color": "#c3c3c3",
-                  "fontSize": 14,
-                  "fontWeight": "600",
-                  "padding": 10,
-                }
-              }
-              testID="send.addressplaceholder"
-              value="u0987654321_____________"
-            />
-          </View>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "display": "flex",
-                "flexDirection": "row",
-                "justifyContent": "center",
-              }
-            }
-          >
-            <View
-              accessibilityLabel="text translated"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": true,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={false}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                {
-                  "opacity": 1,
-                }
-              }
-              testID="send.scan-button"
-            >
-              <
-                color="#ffffff"
-                icon={
-                  {
-                    "icon": [
-                      448,
-                      512,
-                      [],
-                      "f029",
-                      "M64 160l64 0 0-64-64 0 0 64zM0 80C0 53.5 21.5 32 48 32l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48L0 80zM64 416l64 0 0-64-64 0 0 64zM0 336c0-26.5 21.5-48 48-48l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48l0-96zM320 96l0 64 64 0 0-64-64 0zM304 32l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48l0-96c0-26.5 21.5-48 48-48zM288 352a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm0 64c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm96 32c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zm32-96a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm-32 32a32 32 0 1 1 -64 0 32 32 0 1 1 64 0z",
-                    ],
-                    "iconName": "qrcode",
-                    "prefix": "fas",
-                  }
-                }
-                size={28}
-                style={
-                  {
-                    "marginRight": 5,
-                  }
-                }
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-    </View>
-  </View>
-  <View
-    style={
-      {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
         "justifyContent": "center",
+        "marginTop": 15,
         "marginVertical": 5,
       }
     }
@@ -673,7 +553,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "#011401",
+          "backgroundColor": "#031124",
           "borderColor": "#18bd18",
           "borderRadius": 24,
           "borderWidth": 2,
@@ -804,22 +684,58 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
 <View
   style={
     {
-      "borderColor": "#18bd18",
-      "borderWidth": 1,
+      "backgroundColor": "#031124",
       "display": "flex",
       "flexDirection": "column",
-      "margin": 10,
+      "paddingBottom": 5,
     }
   }
   testID="addressbookdetail.1"
 >
+  <View>
+    <Text
+      style={
+        {
+          "color": "#c3c3c3",
+          "fontSize": 15,
+          "fontWeight": "400",
+          "marginTop": 10,
+          "opacity": 1,
+          "paddingHorizontal": 10,
+        }
+      }
+    >
+      text translated
+    </Text>
+    <View
+      style={
+        {
+          "marginTop": 6,
+          "paddingHorizontal": 10,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
+            "opacity": 1,
+          }
+        }
+      >
+        u123456789...__________
+      </Text>
+    </View>
+  </View>
   <Text
     style={
       {
         "color": "#c3c3c3",
         "fontSize": 15,
         "fontWeight": "400",
-        "marginTop": 10,
+        "marginTop": 18,
         "opacity": 1,
         "paddingHorizontal": 10,
       }
@@ -877,164 +793,6 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
   <View
     style={
       {
-        "display": "flex",
-        "flexDirection": "column",
-      }
-    }
-  >
-    <View
-      style={
-        {
-          "display": "flex",
-          "marginTop": 10,
-          "padding": 10,
-        }
-      }
-    >
-      <View
-        style={
-          {
-            "display": "flex",
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-          }
-        }
-      >
-        <Text
-          style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 15,
-              "fontWeight": "400",
-              "opacity": 1,
-            }
-          }
-        >
-          text translated
-        </Text>
-      </View>
-      <View
-        style={
-          {
-            "borderColor": "#c3c3c3",
-            "borderRadius": 5,
-            "borderWidth": 1,
-            "marginTop": 5,
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "flexDirection": "row",
-            }
-          }
-        >
-          <View
-            accessibilityLabel="text translated"
-            accessible={true}
-            style={
-              {
-                "flex": 1,
-                "justifyContent": "center",
-              }
-            }
-          >
-            <TextInput
-              editable={false}
-              onChangeText={[Function]}
-              placeholder="text translated"
-              placeholderTextColor="#888888"
-              style={
-                {
-                  "backgroundColor": "transparent",
-                  "color": "#c3c3c3",
-                  "fontSize": 14,
-                  "fontWeight": "600",
-                  "padding": 10,
-                }
-              }
-              testID="send.addressplaceholder"
-              value="u1234567890_____________"
-            />
-          </View>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "display": "flex",
-                "flexDirection": "row",
-                "justifyContent": "center",
-              }
-            }
-          >
-            <View
-              accessibilityLabel="text translated"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": true,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={false}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                {
-                  "opacity": 1,
-                }
-              }
-              testID="send.scan-button"
-            >
-              <
-                color="#ffffff"
-                icon={
-                  {
-                    "icon": [
-                      448,
-                      512,
-                      [],
-                      "f029",
-                      "M64 160l64 0 0-64-64 0 0 64zM0 80C0 53.5 21.5 32 48 32l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48L0 80zM64 416l64 0 0-64-64 0 0 64zM0 336c0-26.5 21.5-48 48-48l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48l0-96zM320 96l0 64 64 0 0-64-64 0zM304 32l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48l0-96c0-26.5 21.5-48 48-48zM288 352a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm0 64c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm96 32c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zm32-96a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm-32 32a32 32 0 1 1 -64 0 32 32 0 1 1 64 0z",
-                    ],
-                    "iconName": "qrcode",
-                    "prefix": "fas",
-                  }
-                }
-                size={28}
-                style={
-                  {
-                    "marginRight": 5,
-                  }
-                }
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-    </View>
-  </View>
-  <View
-    style={
-      {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -1061,6 +819,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
         "flexDirection": "row",
         "flexGrow": 1,
         "justifyContent": "center",
+        "marginTop": 15,
         "marginVertical": 5,
       }
     }
@@ -1096,7 +855,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "#011401",
+          "backgroundColor": "#031124",
           "borderColor": "#18bd18",
           "borderRadius": 24,
           "borderWidth": 2,

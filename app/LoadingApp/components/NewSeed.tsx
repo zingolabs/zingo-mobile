@@ -1,13 +1,26 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useContext, useRef } from 'react';
-import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useCallback,
+} from 'react';
+import { View, TouchableOpacity, Text } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import BottomSheet, {
+  BottomSheetFooter,
+  BottomSheetFooterProps,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 
 import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
+import BoldText from '../../../components/Components/BoldText';
 import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
@@ -20,6 +33,7 @@ import {
 } from '../../AppState';
 import Header from '../../../components/Header';
 import Utils from '../../utils';
+import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
 
 type TextsType = {
   new: string[];
@@ -55,6 +69,9 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
   const [expandSeed, setExpandSeed] = useState<boolean>(true);
   const [expandBirthday, setExpandBithday] = useState<boolean>(true);
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
+  const newSeedSheetRef = useRef<BottomSheet>(null);
 
   const seedPhrase = wallet.seed || '';
   const birthdayNumber = (wallet.birthday && wallet.birthday.toString()) || '';
@@ -133,160 +150,231 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
     onClickOK();
   };
 
-  //console.log('=================================');
-  //console.log(wallet.seed, wallet.birthday);
-  //console.log('render seed', privacy);
+  const newSeedSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  const seedTitle =
+    translate('seed.title') + ' (' + translate('seed.new') + ')';
+
+  const renderNewSeedHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 12,
+          paddingBottom: 8,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <TouchableOpacity
+            onPress={onClickOKHide}
+            hitSlop={8}
+            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronLeft}
+              size={20}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {seedTitle}
+          </BoldText>
+          <View style={{ width: 28 }} />
+        </View>
+      </View>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [colors, seedTitle],
+  );
+
+  const renderNewSeedFooter = useCallback(
+    (props: BottomSheetFooterProps) => (
+      <BottomSheetFooter {...props} bottomInset={0}>
+        <View
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingTop: 10,
+            paddingBottom: 14,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            type={
+              mode === ModeEnum.basic
+                ? ButtonTypeEnum.Secondary
+                : ButtonTypeEnum.Primary
+            }
+            title={
+              mode === ModeEnum.basic
+                ? (translate('cancel') as string)
+                : !!texts && !!texts.new
+                  ? texts.new[0]
+                  : ''
+            }
+            onPress={() => onClickOKHide()}
+          />
+        </View>
+      </BottomSheetFooter>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [colors, mode, texts, translate],
+  );
 
   return (
-    // SafeAreaView (instead of plain View) because this screen is rendered
-    // inside a transparent Modal in LoadingApp.tsx. iOS does not auto-apply
-    // safe-area insets to transparent Modals (Android does), so without this
-    // the Header collides with the status bar/notch.
-    <SafeAreaView
-      edges={['top']}
+    <View
       style={{
         flex: 1,
         backgroundColor: colors.background,
       }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
-      <Header
-        title={translate('seed.title') + ' (' + translate(`seed.new`) + ')'}
-        screenName={screenName}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noUfvkIcon={true}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar}
-        translate={translate}
-        netInfo={netInfo}
-        mode={mode}
-        privacy={privacy}
-        closeScreen={onClickOKHide}
-      />
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        style={{ height: '80%', maxHeight: '80%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-        }}
-      >
-        <RegText
-          style={{
-            marginTop: 0,
-            padding: 20,
-            textAlign: 'center',
-            fontWeight: '900',
-          }}
-        >
-          {translate('seed.text-readonly') as string}
-        </RegText>
-        <View
-          style={{
-            margin: 10,
-            padding: 10,
-            borderWidth: 1,
-            borderRadius: 10,
-            borderColor: colors.text,
-            maxHeight: '45%',
-          }}
-        >
-          <TouchableOpacity onPress={() => copySeedToClipboard(true)}>
-            <RegText
-              color={colors.text}
-              style={{
-                textAlign: 'center',
-              }}
-            >
-              {!expandSeed ? Utils.trimToSmall(seedPhrase, 5) : seedPhrase}
-            </RegText>
-          </TouchableOpacity>
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-          >
-            <View />
-            <TouchableOpacity onPress={() => copySeedToClipboard(false)}>
-              <Text
-                style={{
-                  color: colors.text,
-                  textDecorationLine: 'underline',
-                  padding: 10,
-                  marginTop: 0,
-                  textAlign: 'center',
-                  minHeight: 48,
-                }}
-              >
-                {translate('seed.tapcopy') as string}
-              </Text>
-            </TouchableOpacity>
-            <View />
-          </View>
-        </View>
-
-        <View style={{ marginTop: 10, alignItems: 'center' }}>
-          <FadeText style={{ textAlign: 'center' }}>
-            {translate('seed.birthday-readonly') as string}
-          </FadeText>
-          <TouchableOpacity
-            onPress={() => {
-              if (birthdayNumber) {
-                Clipboard.setString(birthdayNumber);
-                if (addLastSnackbar) {
-                  addLastSnackbar(
-                    translate('seed.tapcopy-birthday-message') as string,
-                    SnackbarDurationEnum.short,
-                  );
-                }
-                setExpandBithday(true);
-                if (privacy) {
-                  setTimeout(() => {
-                    setExpandBithday(false);
-                  }, 5 * 1000);
-                }
-              }
-            }}
-          >
-            <RegText color={colors.text} style={{ textAlign: 'center' }}>
-              {!expandBirthday
-                ? Utils.trimToSmall(birthdayNumber, 1)
-                : birthdayNumber}
-            </RegText>
-          </TouchableOpacity>
-        </View>
-        <View style={{ marginBottom: 30 }} />
-      </ScrollView>
-      <View
-        style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}
-      >
-        <Button
-          type={
-            mode === ModeEnum.basic
-              ? ButtonTypeEnum.Secondary
-              : ButtonTypeEnum.Primary
-          }
-          style={{
-            backgroundColor:
-              mode === ModeEnum.basic ? colors.background : colors.primary,
-          }}
-          title={
-            mode === ModeEnum.basic
-              ? (translate('cancel') as string)
-              : !!texts && !!texts.new
-                ? texts.new[0]
-                : ''
-          }
-          onPress={() => onClickOKHide()}
+      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
+        <Header
+          title={''}
+          screenName={screenName}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noUfvkIcon={true}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar}
+          translate={translate}
+          netInfo={netInfo}
+          mode={mode}
+          privacy={privacy}
         />
       </View>
-    </SafeAreaView>
+      <BottomSheet
+        ref={newSeedSheetRef}
+        snapPoints={newSeedSnapPoints}
+        index={0}
+        enableDynamicSizing={false}
+        enablePanDownToClose={false}
+        enableContentPanningGesture={false}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        handleComponent={renderNewSeedHandle}
+        footerComponent={renderNewSeedFooter}
+      >
+        <BottomSheetScrollView
+          keyboardShouldPersistTaps="handled"
+          bounces={false}
+          alwaysBounceVertical={false}
+          style={{
+            flex: 1,
+            backgroundColor: colors.bottomSheetBackground,
+          }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+            paddingBottom: 80,
+          }}
+        >
+          <RegText
+            style={{
+              marginTop: 0,
+              padding: 20,
+              textAlign: 'center',
+              fontWeight: '900',
+            }}
+          >
+            {translate('seed.text-readonly') as string}
+          </RegText>
+          <View
+            style={{
+              margin: 10,
+              padding: 10,
+              borderWidth: 1,
+              borderRadius: 10,
+              borderColor: colors.text,
+            }}
+          >
+            <TouchableOpacity onPress={() => copySeedToClipboard(true)}>
+              <RegText
+                color={colors.text}
+                style={{
+                  textAlign: 'center',
+                }}
+              >
+                {!expandSeed ? Utils.trimToSmall(seedPhrase, 5) : seedPhrase}
+              </RegText>
+            </TouchableOpacity>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+            >
+              <View />
+              <TouchableOpacity onPress={() => copySeedToClipboard(false)}>
+                <Text
+                  style={{
+                    color: colors.text,
+                    textDecorationLine: 'underline',
+                    padding: 10,
+                    marginTop: 0,
+                    textAlign: 'center',
+                    minHeight: 48,
+                  }}
+                >
+                  {translate('seed.tapcopy') as string}
+                </Text>
+              </TouchableOpacity>
+              <View />
+            </View>
+          </View>
+
+          <View style={{ marginTop: 10, alignItems: 'center' }}>
+            <FadeText style={{ textAlign: 'center' }}>
+              {translate('seed.birthday-readonly') as string}
+            </FadeText>
+            <TouchableOpacity
+              onPress={() => {
+                if (birthdayNumber) {
+                  Clipboard.setString(birthdayNumber);
+                  if (addLastSnackbar) {
+                    addLastSnackbar(
+                      translate('seed.tapcopy-birthday-message') as string,
+                      SnackbarDurationEnum.short,
+                    );
+                  }
+                  setExpandBithday(true);
+                  if (privacy) {
+                    setTimeout(() => {
+                      setExpandBithday(false);
+                    }, 5 * 1000);
+                  }
+                }
+              }}
+            >
+              <RegText color={colors.text} style={{ textAlign: 'center' }}>
+                {!expandBirthday
+                  ? Utils.trimToSmall(birthdayNumber, 1)
+                  : birthdayNumber}
+              </RegText>
+            </TouchableOpacity>
+          </View>
+        </BottomSheetScrollView>
+      </BottomSheet>
+    </View>
   );
 };
 

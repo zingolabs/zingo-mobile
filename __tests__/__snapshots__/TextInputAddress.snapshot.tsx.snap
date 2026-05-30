@@ -95,6 +95,7 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
             accessible={true}
             collapsable={false}
             focusable={false}
+            hitSlop={8}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -256,6 +257,7 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
             accessible={true}
             collapsable={false}
             focusable={true}
+            hitSlop={8}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}

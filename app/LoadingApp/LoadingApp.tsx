@@ -1,7 +1,6 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   Alert,
-  Modal,
   I18nManager,
   EmitterSubscription,
   AppState,
@@ -10,7 +9,6 @@ import {
 } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -19,6 +17,13 @@ import NetInfo, {
   NetInfoSubscription,
   NetInfoState,
 } from '@react-native-community/netinfo/src/index';
+
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
+import CustomServerModalHost from './components/CustomServerModalHost';
 
 import RPCModule from '../RPCModule';
 import {
@@ -456,6 +461,9 @@ export class LoadingAppClass extends Component<
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
   clipboardTimer: ReturnType<typeof setTimeout> | null = null;
+  customServerModalRef: React.RefObject<React.ComponentRef<
+    typeof BottomSheetModal
+  > | null>;
   screenName = ScreenEnum.LoadingApp;
 
   constructor(props: LoadingAppClassProps) {
@@ -502,7 +510,6 @@ export class LoadingAppClass extends Component<
       actionButtonsDisabled: false,
       walletExists: false,
       hasBackupWallet: false,
-      customServerShow: false,
       customServerUri: '',
       customServerChainName: ChainNameEnum.mainChainName,
       customServerOffline: false,
@@ -524,6 +531,7 @@ export class LoadingAppClass extends Component<
     this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
+    this.customServerModalRef = React.createRef();
   }
 
   componentDidMount = async () => {
@@ -866,9 +874,7 @@ export class LoadingAppClass extends Component<
           });
           if (isConnected !== state.isConnected) {
             if (!state.isConnected) {
-              this.setState({
-                customServerShow: false,
-              });
+              this.customServerModalRef.current?.dismiss();
             } else {
               // if it is offline & there is no wallet file
               // the screen is going to be empty
@@ -877,9 +883,7 @@ export class LoadingAppClass extends Component<
                 this.state.selectServer === SelectServerEnum.offline &&
                 !this.state.walletExists
               ) {
-                this.setState({
-                  customServerShow: true,
-                });
+                this.customServerModalRef.current?.present();
               }
               if (screen !== RouteEnum.Launching) {
                 this.setState({
@@ -903,9 +907,7 @@ export class LoadingAppClass extends Component<
       this.state.selectServer === SelectServerEnum.offline &&
       !this.state.walletExists
     ) {
-      this.setState({
-        customServerShow: true,
-      });
+      this.customServerModalRef.current?.present();
     }
   };
 
@@ -1159,12 +1161,6 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  setCustomServerShow = (customServerShow: boolean) => {
-    this.setState({
-      customServerShow,
-    });
-  };
-
   usingCustomServer = async () => {
     if (!this.state.customServerUri && !this.state.customServerOffline) {
       return;
@@ -1182,11 +1178,11 @@ export class LoadingAppClass extends Component<
       this.setState({
         selectServer: SelectServerEnum.offline,
         server: { uri: '', chainName: this.state.server.chainName },
-        customServerShow: false,
         customServerUri: '',
         customServerChainName: this.state.server.chainName,
         customServerOffline: false,
       });
+      this.customServerModalRef.current?.dismiss();
     } else {
       const uri: string = parseServerURI(
         this.state.customServerUri,
@@ -1245,11 +1241,11 @@ export class LoadingAppClass extends Component<
       this.setState({
         selectServer: SelectServerEnum.custom,
         server: { uri, chainName },
-        customServerShow: false,
         customServerUri: '',
         customServerChainName: this.state.server.chainName,
         customServerOffline: false,
       });
+      this.customServerModalRef.current?.dismiss();
     }
     this.setState({ actionButtonsDisabled: false });
   };
@@ -1597,7 +1593,7 @@ export class LoadingAppClass extends Component<
   };
 
   customServer = () => {
-    this.setState({ customServerShow: true });
+    this.customServerModalRef.current?.present();
   };
 
   onPressServerChainName = (chain: ChainNameEnum) => {
@@ -1757,7 +1753,6 @@ export class LoadingAppClass extends Component<
       actionButtonsDisabled,
       walletExists,
       hasBackupWallet,
-      customServerShow,
       customServerUri,
       customServerChainName,
       customServerOffline,
@@ -1806,64 +1801,48 @@ export class LoadingAppClass extends Component<
     return (
       <>
         <ContextAppLoadingProvider value={context}>
-          {screen === RouteEnum.Launching && (
-            <Launching
-              translate={translate}
-              firstLaunchingMessage={firstLaunchingMessage}
-              biometricsFailed={biometricsFailed}
-              tryAgain={() => {
-                this.setState({ biometricsFailed: false }, () =>
-                  this.componentDidMount(),
-                );
-              }}
-            />
-          )}
-          {screen === RouteEnum.StartMenu && (
-            <StartMenu
-              actionButtonsDisabled={actionButtonsDisabled}
-              hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
-              recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
-              changeMode={this.changeMode}
-              customServer={this.customServer}
-              customServerShow={customServerShow}
-              customServerOffline={customServerOffline}
-              onPressServerOffline={this.onPressServerOffline}
-              customServerChainName={customServerChainName}
-              onPressServerChainName={this.onPressServerChainName}
-              customServerUri={customServerUri}
-              setCustomServerUri={this.setCustomServerUri}
-              usingCustomServer={this.usingCustomServer}
-              setCustomServerShow={this.setCustomServerShow}
-              walletExists={walletExists}
-              hasBackupWallet={hasBackupWallet}
-              openCurrentWallet={this.openCurrentWallet}
-              createNewWallet={this.createNewWallet}
-              getwalletToRestore={this.getwalletToRestore}
-              restoreLastBackup={this.restoreLastBackup}
-            />
-          )}
-          {screen === RouteEnum.NewSeed && wallet && (
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={screen === RouteEnum.NewSeed}
-              onRequestClose={() =>
-                this.navigateToLoadedApp(
-                  readOnly,
-                  orchardPool,
-                  saplingPool,
-                  transparentPool,
-                  true,
-                  firstLaunchingMessage,
-                )
-              }
-            >
-              {/* iOS renders Modals in a separate UIWindow, outside the app's
-                  view tree. The app-level SafeAreaProvider in App.tsx is not
-                  reachable from here, so SafeAreaView inside <NewSeed/> reads
-                  zero insets. Wrapping the Modal content with its own
-                  SafeAreaProvider rehydrates the context. No-op on Android. */}
-              <SafeAreaProvider>
+          <GestureHandlerRootView>
+            <BottomSheetModalProvider>
+              {screen === RouteEnum.Launching && (
+                <Launching
+                  translate={translate}
+                  firstLaunchingMessage={firstLaunchingMessage}
+                  biometricsFailed={biometricsFailed}
+                  tryAgain={() => {
+                    this.setState({ biometricsFailed: false }, () =>
+                      this.componentDidMount(),
+                    );
+                  }}
+                />
+              )}
+              {screen === RouteEnum.StartMenu && (
+                <StartMenu
+                  actionButtonsDisabled={actionButtonsDisabled}
+                  hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
+                  recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
+                  changeMode={this.changeMode}
+                  customServer={this.customServer}
+                  walletExists={walletExists}
+                  hasBackupWallet={hasBackupWallet}
+                  openCurrentWallet={this.openCurrentWallet}
+                  createNewWallet={this.createNewWallet}
+                  getwalletToRestore={this.getwalletToRestore}
+                  restoreLastBackup={this.restoreLastBackup}
+                />
+              )}
+              <CustomServerModalHost
+                ref={this.customServerModalRef}
+                actionButtonsDisabled={actionButtonsDisabled}
+                customServerOffline={customServerOffline}
+                onPressServerOffline={this.onPressServerOffline}
+                customServerChainName={customServerChainName}
+                onPressServerChainName={this.onPressServerChainName}
+                customServerUri={customServerUri}
+                setCustomServerUri={this.setCustomServerUri}
+                usingCustomServer={this.usingCustomServer}
+                translate={translate}
+              />
+              {screen === RouteEnum.NewSeed && wallet && (
                 <NewSeed
                   wallet={this.state.wallet}
                   onClickOK={() =>
@@ -1877,28 +1856,17 @@ export class LoadingAppClass extends Component<
                     )
                   }
                 />
-              </SafeAreaProvider>
-            </Modal>
-          )}
-          {screen === RouteEnum.ImportUfvk && (
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={screen === RouteEnum.ImportUfvk}
-              onRequestClose={() =>
-                this.setState({ screen: RouteEnum.StartMenu })
-              }
-            >
-              <SafeAreaProvider>
+              )}
+              {screen === RouteEnum.ImportUfvk && (
                 <ImportUfvk
                   onClickOK={(s: string, b: number) => this.doRestore(s, b)}
                   onClickCancel={() =>
                     this.setState({ screen: RouteEnum.StartMenu })
                   }
                 />
-              </SafeAreaProvider>
-            </Modal>
-          )}
+              )}
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
         </ContextAppLoadingProvider>
         <Toast config={toastConfig} />
       </>
