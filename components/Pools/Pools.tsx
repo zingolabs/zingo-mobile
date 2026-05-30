@@ -322,7 +322,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         display: 'flex',
                         flexDirection: 'row',
                         marginTop: 5,
-                        backgroundColor: colors.card,
+                        backgroundColor: colors.bottomSheetBackground,
                         padding: 5,
                         borderRadius: 10,
                       }}
@@ -343,7 +343,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       display: 'flex',
                       flexDirection: 'row',
                       marginTop: 5,
-                      backgroundColor: colors.card,
+                      backgroundColor: colors.bottomSheetBackground,
                       padding: 5,
                       borderRadius: 10,
                     }}

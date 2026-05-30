@@ -299,6 +299,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
   }, [selectServer, autoServerUri, listServerUri, customServerUri, translate]);
 
+  // Selection mode (auto / list / custom / offline) shown on a small caption
+  // line above the URL so the user can tell at a glance which mode is active
+  // without opening the selector.
+  const currentServerKindLabel = useMemo(() => {
+    switch (selectServer) {
+      case SelectServerEnum.offline:
+        return translate('settings.server-offline') as string;
+      case SelectServerEnum.auto:
+        return translate('settings.server-auto') as string;
+      case SelectServerEnum.list:
+        return translate('settings.server-list') as string;
+      case SelectServerEnum.custom:
+        return translate('settings.server-custom') as string;
+      default:
+        return '';
+    }
+  }, [selectServer, translate]);
+
   // Custom server is the only selectable that requires user input — flag it
   // when either field is missing so the label can render red as a hint.
   const customServerIncomplete = useMemo(
@@ -840,11 +858,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingTop: 10,
+            paddingBottom: 14,
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            paddingVertical: 8,
-            backgroundColor: colors.bottomSheetBackground,
           }}
         >
           <Button
@@ -1514,21 +1533,35 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   onPress={() => serverBottomSheetRef.current?.present()}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <RegText
-                      style={{
-                        marginRight: 5,
-                        fontWeight: '400',
-                        color: customServerIncomplete
-                          ? colors.danger.primary
-                          : colors.zingo,
-                        maxWidth: 180,
-                      }}
-                    >
-                      {currentServerLabel}
-                    </RegText>
+                    <View style={{ alignItems: 'flex-end', marginRight: 8 }}>
+                      {selectServer !== SelectServerEnum.offline && (
+                        <FadeText
+                          style={{
+                            fontSize: 11,
+                            lineHeight: 13,
+                            color: customServerIncomplete
+                              ? colors.danger.primary
+                              : colors.zingo,
+                          }}
+                        >
+                          {currentServerKindLabel}
+                        </FadeText>
+                      )}
+                      <RegText
+                        style={{
+                          fontWeight: '400',
+                          color: customServerIncomplete
+                            ? colors.danger.primary
+                            : colors.zingo,
+                          maxWidth: 180,
+                        }}
+                      >
+                        {currentServerLabel}
+                      </RegText>
+                    </View>
                     <FontAwesomeIcon
                       icon={faChevronRight}
-                      size={12}
+                      size={16}
                       color={
                         customServerIncomplete
                           ? colors.danger.primary

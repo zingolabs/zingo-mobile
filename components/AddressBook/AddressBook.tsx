@@ -37,16 +37,25 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import AddressBookFileImpl from './AddressBookFileImpl';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAngleUp,
+  faChevronLeft,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
   BottomSheetFooter,
   BottomSheetFooterProps,
+  BottomSheetModal,
+  BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import Utils from '../../app/utils';
 import RPCModule from '../../app/RPCModule';
 import { RPCCheckAddressType } from '../../app/walletBackend/types/RPCCheckAddressType';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
+import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 
 type AddressBookProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -90,13 +99,15 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const [routeStack, setRouteStack] = useState<RouteEnum>(
     !!route.params && route.params.routeStack !== undefined
       ? route.params.routeStack
-      : RouteEnum.AddressBookStack,
+      : RouteEnum.AddressBook,
   );
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const addressBookSheetRef = useRef<BottomSheet>(null);
+  const abDetailSheetRef = useRef<BottomSheetModal>(null);
+  const keyboardHeight = useKeyboardHeight();
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
@@ -132,7 +143,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     const _routeStack =
       !!route.params && route.params.routeStack !== undefined
         ? route.params.routeStack
-        : RouteEnum.AddressBookStack;
+        : RouteEnum.AddressBook;
     setCurrentAddress(_currentAddress);
     setRouteStack(_routeStack);
   }, [route, route.params, route.params?.currentAddress]);
@@ -171,12 +182,28 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     setNumAb(numAb + 50);
   }, [numAb]);
 
-  const newAddressBookItem = () => {
-    setCurrentItem(-1);
-    setAction(AddressBookActionEnum.Add);
-  };
+  // Counter bumped on each open so the inner AbDetail remounts (form state
+  // resets) without us having to mutate currentItem/action during dismiss —
+  // mutating those during the close animation broke subsequent presents on
+  // Android. Same shape as the Send → Memo modal.
+  const [abDetailKey, setAbDetailKey] = useState<number>(0);
+
+  const openAbDetail = useCallback(
+    (newItem: number, newAction: AddressBookActionEnum) => {
+      setCurrentItem(newItem);
+      setAction(newAction);
+      setAbDetailKey(k => k + 1);
+      abDetailSheetRef.current?.present();
+    },
+    [],
+  );
+
+  const newAddressBookItem = useCallback(() => {
+    openAbDetail(-1, AddressBookActionEnum.Add);
+  }, [openAbDetail]);
 
   const cancel = () => {
+    abDetailSheetRef.current?.dismiss();
     setCurrentItem(null);
     setAction(null);
     if (currentAddress) {
@@ -333,8 +360,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     [colors, closeScreenAction, translate],
   );
 
-  const showNewButton = currentItem === null && !loading;
-
   const renderAddressBookFooter = useCallback(
     (props: BottomSheetFooterProps) => (
       <BottomSheetFooter {...props} bottomInset={0}>
@@ -357,8 +382,70 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         </View>
       </BottomSheetFooter>
     ),
+    [colors, translate, newAddressBookItem],
+  );
 
-    [colors, translate],
+  const abDetailTitle =
+    action === AddressBookActionEnum.Add
+      ? (translate('addressbook.add') as string)
+      : action === AddressBookActionEnum.Modify
+        ? (translate('addressbook.modify') as string)
+        : action === AddressBookActionEnum.Delete
+          ? (translate('addressbook.delete') as string)
+          : '';
+
+  const renderAbDetailBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  );
+
+  const renderAbDetailHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 8,
+          paddingBottom: 6,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <View style={{ width: 28 }} />
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {abDetailTitle}
+          </BoldText>
+          <Pressable
+            onPress={() => abDetailSheetRef.current?.dismiss()}
+            hitSlop={8}
+            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+          </Pressable>
+        </View>
+      </View>
+    ),
+    [colors, abDetailTitle],
   );
 
   return (
@@ -393,7 +480,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           borderTopRightRadius: 40,
         }}
         handleComponent={renderAddressBookHandle}
-        footerComponent={showNewButton ? renderAddressBookFooter : undefined}
+        footerComponent={renderAddressBookFooter}
       >
         <View
           style={{
@@ -545,49 +632,21 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             paddingBottom: 80,
           }}
         >
-          {currentItem === -1 && action !== null && (
-            <AbDetail
-              index={-1}
-              key={'detail-new'}
-              item={{} as AddressBookFileClass}
-              cancel={cancel}
-              action={action}
-              doAction={doAction}
-              currentAddress={currentAddress}
-              screenName={screenName}
-              routeStack={routeStack}
-            />
+          {!currentAddress && addressBookSliced.length === 0 && !loading && (
+            <View
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 30,
+                marginBottom: 30,
+              }}
+            >
+              <FadeText style={{ color: colors.primary }}>
+                {translate('addressbook.empty') as string}
+              </FadeText>
+            </View>
           )}
-          {currentItem !== null && currentItem > -1 && action !== null && (
-            <AbDetail
-              index={currentItem}
-              key={`detail-${currentItem}-${addressBookSliced[currentItem].label}`}
-              item={addressBookSliced[currentItem]}
-              cancel={cancel}
-              action={action}
-              doAction={doAction}
-              screenName={screenName}
-              routeStack={routeStack}
-            />
-          )}
-          {!currentAddress &&
-            addressBookSliced.length === 0 &&
-            currentItem !== -1 &&
-            !loading && (
-              <View
-                style={{
-                  height: 150,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  marginTop: 30,
-                }}
-              >
-                <FadeText style={{ color: colors.primary }}>
-                  {translate('addressbook.empty') as string}
-                </FadeText>
-              </View>
-            )}
           {loading ? (
             <ActivityIndicator
               style={{ marginTop: 7, marginRight: 7 }}
@@ -597,41 +656,18 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           ) : (
             <>
               {!currentAddress &&
-                addressBookSliced.map((aBItem, index) => {
-                  return (
-                    <View key={`container-${index}-${aBItem.label}`}>
-                      {currentItem === index && (
-                        <AbSummaryLine
-                          index={index}
-                          key={`line-${index}-${aBItem.label}`}
-                          item={aBItem}
-                          setCurrentItem={setCurrentItem}
-                          setAction={setAction}
-                          handleScrollToTop={handleScrollToTop}
-                          doAction={doAction}
-                        />
-                      )}
-                    </View>
-                  );
-                })}
-              {!currentAddress &&
-                addressBookSliced.map((aBItem, index) => {
-                  return (
-                    <View key={`container-${index}-${aBItem.label}`}>
-                      {currentItem !== index && (
-                        <AbSummaryLine
-                          index={index}
-                          key={`line-${index}-${aBItem.label}`}
-                          item={aBItem}
-                          setCurrentItem={setCurrentItem}
-                          setAction={setAction}
-                          handleScrollToTop={handleScrollToTop}
-                          doAction={doAction}
-                        />
-                      )}
-                    </View>
-                  );
-                })}
+                addressBookSliced.map((aBItem, index) => (
+                  <View key={`container-${index}-${aBItem.label}`}>
+                    <AbSummaryLine
+                      index={index}
+                      key={`line-${index}-${aBItem.label}`}
+                      item={aBItem}
+                      openAbDetail={openAbDetail}
+                      handleScrollToTop={handleScrollToTop}
+                      doAction={doAction}
+                    />
+                  </View>
+                ))}
               {!currentAddress &&
                 addressBookProtected.map((aBItem, index) => {
                   return (
@@ -640,8 +676,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                         index={index}
                         key={`line-${index}-${aBItem.label}`}
                         item={aBItem}
-                        setCurrentItem={setCurrentItem}
-                        setAction={setAction}
+                        openAbDetail={openAbDetail}
                         handleScrollToTop={handleScrollToTop}
                         doAction={doAction}
                         addressProtected={true}
@@ -719,6 +754,54 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           />
         </Pressable>
       )}
+      <BottomSheetModal
+        ref={abDetailSheetRef}
+        enableDynamicSizing={true}
+        enablePanDownToClose
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
+        handleComponent={renderAbDetailHandle}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        backdropComponent={renderAbDetailBackdrop}
+      >
+        <BottomSheetView
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
+          }}
+        >
+          <AbDetail
+            // AbDetail is always mounted so the BottomSheetView has measurable
+            // content from the first render — Android's dynamic sizing
+            // refused to animate up if the content was conditionally added
+            // only on the user gesture. The counter-based key forces a remount
+            // each time the modal opens so internal form state resets, and is
+            // independent of currentItem/action so dismissing doesn't bump it
+            // mid-animation.
+            key={`detail-${abDetailKey}`}
+            index={currentItem ?? -1}
+            item={
+              currentItem !== null &&
+              currentItem > -1 &&
+              addressBookSliced[currentItem]
+                ? addressBookSliced[currentItem]
+                : ({} as AddressBookFileClass)
+            }
+            cancel={cancel}
+            action={action ?? AddressBookActionEnum.Add}
+            doAction={doAction}
+            currentAddress={currentAddress}
+            screenName={screenName}
+            routeStack={routeStack}
+            navigation={navigation}
+          />
+        </BottomSheetView>
+      </BottomSheetModal>
     </View>
   );
 };

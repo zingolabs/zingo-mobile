@@ -174,9 +174,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             display: 'flex',
             alignItems: 'center',
             backgroundColor: colors.card,
-            paddingTop: 10,
+            paddingTop: 0,
             paddingBottom: 10,
-            minHeight: 60,
+            minHeight: 50,
           }}
         >
           <SyncStatusBar
@@ -229,7 +229,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             padding: 11.5,
             position: 'absolute',
             left: 0,
-            top: 10,
+            top: 0,
           }}
         >
           <View style={{ alignItems: 'center', flexDirection: 'row' }}>
@@ -286,7 +286,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             padding: 13,
             position: 'absolute',
             right: 0,
-            top: 10,
+            top: 0,
           }}
         >
           {!noDrawMenu && screenName !== ScreenEnum.Settings ? (

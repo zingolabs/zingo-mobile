@@ -102,6 +102,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={8}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -160,7 +161,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
           "flexDirection": "row",
           "flexGrow": 1,
           "justifyContent": "center",
-          "marginTop": 30,
+          "marginTop": 15,
           "marginVertical": 5,
         }
       }
@@ -196,7 +197,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#011401",
+            "backgroundColor": "#031124",
             "borderColor": "#18bd18",
             "borderRadius": 24,
             "borderWidth": 2,

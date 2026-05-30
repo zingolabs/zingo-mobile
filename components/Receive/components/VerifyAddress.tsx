@@ -1,7 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useTheme,
+} from '@react-navigation/native';
 
 import {
   ButtonTypeEnum,
@@ -23,10 +27,14 @@ import { VerifyXIcon } from '../../Components/Icons/VerifyXIcon';
 type VerifyAddressProps = {
   closeSheet: () => void;
   screenName: ScreenEnum;
+  // VerifyAddress lives inside a portaled BottomSheetModal; pass navigation
+  // from the host (Receive) so the QR button can navigate to ScannerAddress.
+  navigation: NavigationProp<ParamListBase>;
 };
 const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   closeSheet,
   screenName,
+  navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, server } = context;
@@ -107,6 +115,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         disabled={false}
         showLabel={false}
         screenName={screenName}
+        navigation={navigation}
       />
       {!!errorAddress && (
         <View
@@ -176,7 +185,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-            marginTop: 30,
+            marginTop: 15,
           }}
         >
           <Button

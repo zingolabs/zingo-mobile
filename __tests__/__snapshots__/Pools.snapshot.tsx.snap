@@ -20,9 +20,9 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             "alignItems": "center",
             "backgroundColor": "#011401",
             "display": "flex",
-            "minHeight": 60,
+            "minHeight": 50,
             "paddingBottom": 10,
-            "paddingTop": 10,
+            "paddingTop": 0,
           }
         }
         testID="header"
@@ -126,7 +126,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             "left": 0,
             "padding": 11.5,
             "position": "absolute",
-            "top": 10,
+            "top": 0,
           }
         }
       >
@@ -145,7 +145,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             "padding": 13,
             "position": "absolute",
             "right": 0,
-            "top": 10,
+            "top": 0,
           }
         }
       >
@@ -828,7 +828,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "#011401",
+          "backgroundColor": "#031124",
           "borderRadius": 10,
           "display": "flex",
           "flexDirection": "row",

@@ -275,7 +275,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-            marginTop: 30,
+            marginTop: 15,
           }}
         >
           <Button

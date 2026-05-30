@@ -77,7 +77,12 @@
     "likely": "Provavelmente: ",
     "thiswalletaddress": "Endereço desta Carteira",
     "addto": "Adicionar à ",
-    "filter-wallet": "Carteira"
+    "filter-wallet": "Carteira",
+    "add-tag": "Adicionar etiqueta",
+    "add-contact": "Adicionar contato",
+    "tag": "Etiqueta",
+    "contact": "Contato",
+    "address": "Endereço"
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
@@ -94,6 +99,7 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
+    "welcome": "Bem-vindo",
     "actualserver": "Servidor atual:",
     "createnewwallet": "Criar uma nova carteira",
     "opencurrentwallet": "Abrir Carteira Atual",

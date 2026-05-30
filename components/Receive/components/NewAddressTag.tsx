@@ -13,11 +13,13 @@ import { AddressBookFileImpl } from '../../AddressBook';
 
 type NewAddressTagProps = {
   address: string;
+  own: boolean;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   address,
+  own,
   closeSheet,
   setAddressBook,
 }) => {
@@ -32,15 +34,13 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
       if (!label) {
         return;
       }
-      //console.log(label, address);
       const randomColors = Utils.generateColorList(1);
       const ab = await AddressBookFileImpl.writeAddressBookItem(
         label,
         address,
         randomColors[0],
-        true,
+        own,
       );
-      //console.log(ab);
       setAddressBook(ab);
     } catch (error) {
       console.log(`Critical Error new address ${error}`);
@@ -61,7 +61,23 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
     >
       <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
         <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
-          {'Tag'}
+          {translate('addressbook.address') as string}
+        </RegText>
+        <View
+          style={{
+            paddingHorizontal: 10,
+            marginTop: 6,
+          }}
+        >
+          <RegText>{Utils.trimToSmall(address, 10)}</RegText>
+        </View>
+
+        <RegText style={{ marginTop: 18, paddingHorizontal: 10 }}>
+          {
+            (own
+              ? translate('addressbook.tag')
+              : translate('addressbook.contact')) as string
+          }
         </RegText>
         <View
           style={{
@@ -91,7 +107,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
                 fontSize: 14,
                 minWidth: 48,
                 minHeight: 48,
-                marginLeft: 5,
+                padding: 10,
                 backgroundColor: 'transparent',
               }}
               placeholder={translate('addressbook.label-placeholder') as string}
@@ -110,7 +126,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-            marginTop: 30,
+            marginTop: 15,
           }}
         >
           <Button

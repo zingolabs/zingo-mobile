@@ -121,7 +121,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'flex-start',
-                  backgroundColor: colors.background,
+                  backgroundColor: colors.bottomSheetBackground,
                   borderRadius: 10,
                   borderColor: colors.bottomSheetBorder,
                   borderWidth: 1,

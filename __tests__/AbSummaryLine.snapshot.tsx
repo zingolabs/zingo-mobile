@@ -32,8 +32,7 @@ describe('AbSummaryLine - snapshots', () => {
           <AbSummaryLine
             index={0}
             item={mockAddressBook[0]}
-            setCurrentItem={onFn}
-            setAction={onFn}
+            openAbDetail={onFn}
             handleScrollToTop={onFn}
             doAction={
               onFn as (
@@ -56,8 +55,7 @@ describe('AbSummaryLine - snapshots', () => {
           <AbSummaryLine
             index={1}
             item={mockAddressBook[1]}
-            setCurrentItem={onFn}
-            setAction={onFn}
+            openAbDetail={onFn}
             handleScrollToTop={onFn}
             doAction={
               onFn as (
@@ -82,8 +80,7 @@ describe('AbSummaryLine - snapshots', () => {
           <AbSummaryLine
             index={0}
             item={mockAddressBook[0]}
-            setCurrentItem={onFn}
-            setAction={onFn}
+            openAbDetail={onFn}
             handleScrollToTop={onFn}
             doAction={
               onFn as (

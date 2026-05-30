@@ -31,9 +31,9 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               "alignItems": "center",
               "backgroundColor": "#011401",
               "display": "flex",
-              "minHeight": 60,
+              "minHeight": 50,
               "paddingBottom": 10,
-              "paddingTop": 10,
+              "paddingTop": 0,
             }
           }
           testID="header"
@@ -527,7 +527,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               "left": 0,
               "padding": 11.5,
               "position": "absolute",
-              "top": 10,
+              "top": 0,
             }
           }
         >
@@ -604,7 +604,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               "padding": 13,
               "position": "absolute",
               "right": 0,
-              "top": 10,
+              "top": 0,
             }
           }
         >
@@ -745,9 +745,9 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               "alignItems": "center",
               "backgroundColor": "#011401",
               "display": "flex",
-              "minHeight": 60,
+              "minHeight": 50,
               "paddingBottom": 10,
-              "paddingTop": 10,
+              "paddingTop": 0,
             }
           }
           testID="header"
@@ -911,7 +911,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               "left": 0,
               "padding": 11.5,
               "position": "absolute",
-              "top": 10,
+              "top": 0,
             }
           }
         >
@@ -988,7 +988,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               "padding": 13,
               "position": "absolute",
               "right": 0,
-              "top": 10,
+              "top": 0,
             }
           }
         >

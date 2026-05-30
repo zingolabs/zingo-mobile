@@ -97,7 +97,11 @@ import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
 import CustomTabBar from '../../components/TabBar/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
+import AddTagModalHost from '../../components/AddressBook/components/AddTagModalHost';
 import Drawer from '../../components/Drawer';
 import MessageList from '../../components/Messages/components/MessageList';
 import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
@@ -105,13 +109,11 @@ import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
 import { RPCCheckAddressType } from '../walletBackend/types/RPCCheckAddressType';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
-import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
 import { MessagesAddress, MessagesAll } from '../../components/Messages';
 import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -132,7 +134,6 @@ const ru = require('../translations/ru.json');
 const tr = require('../translations/tr.json');
 
 const Tab = createBottomTabNavigator<AppDrawerParamList>();
-const Stack = createNativeStackNavigator<AppDrawerParamList>();
 
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -656,6 +657,9 @@ export class LoadedAppClass extends Component<
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
+  addTagModalRef: React.RefObject<React.ComponentRef<
+    typeof BottomSheetModal
+  > | null>;
   screenName = ScreenEnum.LoadedApp;
   private drawerNav: DrawerContentComponentProps['navigation'] | null = null;
 
@@ -696,7 +700,7 @@ export class LoadedAppClass extends Component<
       restartApp: this.navigateToLoadingApp,
       somePending: false,
       addressBook: props.addressBook,
-      launchAddressBook: this.launchAddressBook,
+      launchAddTagModal: this.launchAddTagModal,
       shieldingAmount: 0,
       showSwipeableIcons: true,
       doRefresh: this.doRefresh,
@@ -733,6 +737,7 @@ export class LoadedAppClass extends Component<
       scrollToTop: false,
       scrollToBottom: false,
       isSeedViewModalOpen: false,
+      addTagModalTarget: null,
     };
 
     this.rpc = new WalletBackend({
@@ -755,6 +760,7 @@ export class LoadedAppClass extends Component<
     this.appstate = {} as NativeEventSubscription;
     this.linking = {} as EmitterSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
+    this.addTagModalRef = React.createRef();
   }
 
   componentDidMount = async () => {
@@ -1417,9 +1423,7 @@ export class LoadedAppClass extends Component<
       this.drawerNav?.navigate(RouteEnum.Pools);
       return;
     } else if (item === MenuItemEnum.Insight) {
-      this.drawerNav?.navigate(RouteEnum.InsightStack, {
-        screen: RouteEnum.Insight,
-      });
+      this.drawerNav?.navigate(RouteEnum.Insight);
       return;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
@@ -1491,7 +1495,7 @@ export class LoadedAppClass extends Component<
         { cancelable: false },
       );
     } else if (item === MenuItemEnum.AddressBook) {
-      this.launchAddressBook('', this.screenName);
+      this.drawerNav?.navigate(RouteEnum.AddressBook);
       return;
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
@@ -1945,42 +1949,23 @@ export class LoadedAppClass extends Component<
     this.setState({ lastError: error });
   };
 
-  // close modal make sense because this is called
-  // in a component which can live in differents screens
-  launchAddressBook = (address: string, screenName: ScreenEnum) => {
-    if (screenName === ScreenEnum.LoadedApp || screenName === ScreenEnum.Send) {
-      this.drawerNav?.navigate(RouteEnum.AddressBookStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.AddressBookStack,
-        },
-      });
-    } else if (screenName === ScreenEnum.ValueTransferDetail) {
-      this.drawerNav?.navigate(RouteEnum.ValueTransferDetailStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.ValueTransferDetailStack,
-        },
-      });
-    } else if (screenName === ScreenEnum.Confirm) {
-      this.drawerNav?.navigate(RouteEnum.ConfirmStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.ConfirmStack,
-        },
-      });
-    } else if (screenName === ScreenEnum.Insight) {
-      this.drawerNav?.navigate(RouteEnum.InsightStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.InsightStack,
-        },
-      });
+  // Determines `own` via RPC, then opens the shared modal so the user can
+  // attach a label without leaving their current screen. Used from AddressItem
+  // anywhere an address is displayed with a tappable "+ contact" icon.
+  launchAddTagModal = async (address: string) => {
+    let own = false;
+    try {
+      const checkStr = await RPCModule.checkMyAddressInfo(address);
+      if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+        const checkJSON = JSON.parse(checkStr);
+        own = !!checkJSON.is_wallet_address;
+      }
+    } catch (e) {
+      console.log('Error checking address ownership for add-tag modal', e);
     }
+    this.setState({ addTagModalTarget: { address, own } }, () => {
+      this.addTagModalRef.current?.present();
+    });
   };
 
   setScrollToTop = (value: boolean) => {
@@ -2046,7 +2031,7 @@ export class LoadedAppClass extends Component<
       transparentPool: this.state.transparentPool,
       addLastSnackbar: this.addLastSnackbar,
       addressBook: this.state.addressBook,
-      launchAddressBook: this.state.launchAddressBook,
+      launchAddTagModal: this.state.launchAddTagModal,
       shieldingAmount: this.state.shieldingAmount,
       restartApp: this.state.restartApp,
       somePending: this.state.somePending,
@@ -2086,10 +2071,7 @@ export class LoadedAppClass extends Component<
                 initialRouteName={RouteEnum.HomeStack}
                 screenName={this.screenName}
               >
-                <Drawer.Screen
-                  name={RouteEnum.HomeStack}
-                  options={{ sceneStyle: { paddingBottom: 0 } }}
-                >
+                <Drawer.Screen name={RouteEnum.HomeStack}>
                   {props => {
                     useEffect(() => {
                       this.setNavigationHome(props.navigation);
@@ -2264,36 +2246,7 @@ export class LoadedAppClass extends Component<
                   {props => <Rescan {...props} doRescan={this.doRescan} />}
                 </Drawer.Screen>
                 <Drawer.Screen name={RouteEnum.Info} component={Info} />
-                <Drawer.Screen name={RouteEnum.InsightStack}>
-                  {() => {
-                    return (
-                      <Stack.Navigator
-                        initialRouteName={RouteEnum.Insight}
-                        screenOptions={{
-                          headerShown: false,
-                          animation: 'none',
-                        }}
-                      >
-                        <Stack.Screen
-                          name={RouteEnum.Insight}
-                          component={Insight}
-                        />
-                        <Stack.Screen name={RouteEnum.AddressBook}>
-                          {props => (
-                            <AddressBook
-                              {...props}
-                              setAddressBook={this.setAddressBook}
-                            />
-                          )}
-                        </Stack.Screen>
-                        <Stack.Screen
-                          name={RouteEnum.ScannerAddress}
-                          component={ScannerAddress}
-                        />
-                      </Stack.Navigator>
-                    );
-                  }}
-                </Drawer.Screen>
+                <Drawer.Screen name={RouteEnum.Insight} component={Insight} />
                 <Drawer.Screen name={RouteEnum.Ufvk}>
                   {props => {
                     const action =
@@ -2409,62 +2362,18 @@ export class LoadedAppClass extends Component<
                   component={SyncReport}
                 />
                 <Drawer.Screen name={RouteEnum.Pools} component={Pools} />
-                <Drawer.Screen name={RouteEnum.AddressBookStack}>
-                  {() => {
-                    return (
-                      <Stack.Navigator
-                        initialRouteName={RouteEnum.AddressBook}
-                        screenOptions={{
-                          headerShown: false,
-                          animation: 'none',
-                        }}
-                      >
-                        <Stack.Screen name={RouteEnum.AddressBook}>
-                          {props => (
-                            <AddressBook
-                              {...props}
-                              setAddressBook={this.setAddressBook}
-                            />
-                          )}
-                        </Stack.Screen>
-                        <Stack.Screen
-                          name={RouteEnum.ScannerAddress}
-                          component={ScannerAddress}
-                        />
-                      </Stack.Navigator>
-                    );
-                  }}
+                <Drawer.Screen name={RouteEnum.AddressBook}>
+                  {props => (
+                    <AddressBook
+                      {...props}
+                      setAddressBook={this.setAddressBook}
+                    />
+                  )}
                 </Drawer.Screen>
-                <Drawer.Screen name={RouteEnum.ValueTransferDetailStack}>
-                  {() => {
-                    return (
-                      <Stack.Navigator
-                        initialRouteName={RouteEnum.ValueTransferDetail}
-                        screenOptions={{
-                          headerShown: false,
-                          animation: 'none',
-                        }}
-                      >
-                        <Stack.Screen
-                          name={RouteEnum.ValueTransferDetail}
-                          component={ValueTransferDetail}
-                        />
-                        <Stack.Screen name={RouteEnum.AddressBook}>
-                          {props => (
-                            <AddressBook
-                              {...props}
-                              setAddressBook={this.setAddressBook}
-                            />
-                          )}
-                        </Stack.Screen>
-                        <Stack.Screen
-                          name={RouteEnum.ScannerAddress}
-                          component={ScannerAddress}
-                        />
-                      </Stack.Navigator>
-                    );
-                  }}
-                </Drawer.Screen>
+                <Drawer.Screen
+                  name={RouteEnum.ValueTransferDetail}
+                  component={ValueTransferDetail}
+                />
                 <Drawer.Screen
                   name={RouteEnum.AddressList}
                   component={AddressList}
@@ -2490,41 +2399,18 @@ export class LoadedAppClass extends Component<
                   name={RouteEnum.MessagesAll}
                   component={MessagesAll}
                 />
-                <Drawer.Screen name={RouteEnum.ConfirmStack}>
-                  {() => {
-                    return (
-                      <Stack.Navigator
-                        initialRouteName={RouteEnum.Confirm}
-                        screenOptions={{
-                          headerShown: false,
-                          animation: 'none',
-                        }}
-                      >
-                        <Stack.Screen
-                          name={RouteEnum.Confirm}
-                          component={Confirm}
-                        />
-                        <Stack.Screen name={RouteEnum.AddressBook}>
-                          {props => (
-                            <AddressBook
-                              {...props}
-                              setAddressBook={this.setAddressBook}
-                            />
-                          )}
-                        </Stack.Screen>
-                        <Stack.Screen
-                          name={RouteEnum.ScannerAddress}
-                          component={ScannerAddress}
-                        />
-                      </Stack.Navigator>
-                    );
-                  }}
-                </Drawer.Screen>
+                <Drawer.Screen name={RouteEnum.Confirm} component={Confirm} />
                 <Drawer.Screen
                   name={RouteEnum.Computing}
                   component={ComputingTxContent}
                 />
               </Drawer>
+              <AddTagModalHost
+                ref={this.addTagModalRef}
+                target={this.state.addTagModalTarget}
+                setAddressBook={this.setAddressBook}
+                translate={this.state.translate}
+              />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
         </ContextAppLoadedProvider>

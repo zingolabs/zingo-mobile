@@ -1,18 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-
-import { ContextAppLoaded } from '../../../app/context';
-import Scanner from '../../Scanner';
-import { GlobalConst, RouteEnum, ScreenEnum } from '../../../app/AppState';
-import Header from '../../Header';
+import React, { useEffect, useState } from 'react';
+import { Pressable, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { AppDrawerParamList, ThemeType } from '../../../app/types';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
-import { View } from 'react-native';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import Scanner from '../../Scanner';
+import { GlobalConst, RouteEnum } from '../../../app/AppState';
+import { AppStackParamList, ThemeType } from '../../../app/types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type ScannerAddressProps = DrawerScreenProps<
-  AppDrawerParamList,
+type ScannerAddressProps = NativeStackScreenProps<
+  AppStackParamList,
   RouteEnum.ScannerAddress
 >;
 
@@ -24,10 +23,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
     !!route.params && route.params.setAddress !== undefined
       ? route.params.setAddress
       : () => {};
-  const context = useContext(ContextAppLoaded);
-  const { translate } = context;
   const { colors } = useTheme() as ThemeType;
-  const screenName = ScreenEnum.ScannerAddress;
 
   const [active, setActive] = useState<boolean>(
     !!route.params && route.params.active !== undefined
@@ -45,15 +41,11 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
 
   const validateAddress = (scannedAddress: string) => {
     if (scannedAddress.toLowerCase().startsWith(GlobalConst.zcash)) {
-      //console.log('valid QR URI');
+      setAddress(scannedAddress);
+    } else if (scannedAddress.toLowerCase().includes(':')) {
       setAddress(scannedAddress);
     } else {
-      //console.log('not valid QR URI, adding prefix zcash:');
-      if (scannedAddress.toLowerCase().includes(':')) {
-        setAddress(scannedAddress);
-      } else {
-        setAddress(GlobalConst.zcash + scannedAddress);
-      }
+      setAddress(GlobalConst.zcash + scannedAddress);
     }
   };
 
@@ -78,21 +70,26 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
         backgroundColor: colors.background,
       }}
     >
-      <Header
-        title={translate('scanner.scanaddress') as string}
-        screenName={screenName}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        noUfvkIcon={true}
-        closeScreen={() => onCloseScreen()}
-      />
-      <Scanner
-        active={active}
-        onRead={onRead}
-        onClose={() => onCloseScreen()}
-      />
+      <Scanner active={active} onRead={onRead} onClose={onCloseScreen} />
+      <Pressable
+        onPress={onCloseScreen}
+        hitSlop={12}
+        style={{
+          position: 'absolute',
+          top: 32,
+          right: 32,
+          width: 44,
+          height: 44,
+          borderRadius: 22,
+          backgroundColor: 'rgba(0,0,0,0.55)',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        accessibilityLabel="Close scanner"
+        accessibilityRole="button"
+      >
+        <FontAwesomeIcon icon={faXmark} size={22} color={'#FFFFFF'} />
+      </Pressable>
     </View>
   );
 };

@@ -12,7 +12,6 @@ export default interface AppStateLoading {
   actionButtonsDisabled: boolean;
   walletExists: boolean;
   hasBackupWallet: boolean;
-  customServerShow: boolean;
   customServerUri: string;
   customServerChainName: ChainNameEnum;
   customServerOffline: boolean;

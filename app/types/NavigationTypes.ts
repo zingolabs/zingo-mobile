@@ -19,9 +19,11 @@ export type AppStackParamList = {
   // Stack
   [RouteEnum.LoadingApp]: LoadingAppNavigationState | undefined;
   [RouteEnum.LoadedApp]: LoadedAppNavigationState | undefined;
-  // ScannerAddress is presented as a modal at the root Stack level so it
-  // overlays LoadedApp (and any open BottomSheet modals).
+  // ScannerAddress / ScannerUfvk are presented as transparent modals at the
+  // root Stack so they overlay everything (LoadedApp, LoadingApp, and any
+  // open BottomSheet portals).
   [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
+  [RouteEnum.ScannerUfvk]: ScannerUfvkNavigationState | undefined;
 };
 
 /**
@@ -58,10 +60,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Messages]: undefined;
-  [RouteEnum.AddressBookStack]: undefined;
-  [RouteEnum.ValueTransferDetailStack]: undefined;
-  [RouteEnum.ConfirmStack]: undefined;
-  [RouteEnum.InsightStack]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.Rescan]: undefined;
@@ -75,7 +73,6 @@ export type AppDrawerParamList = {
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
   [RouteEnum.AddressList]: AddressListNavigationState | undefined;
-  [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
   [RouteEnum.ValueTransferDetail]:
     | ValueTransferDetailNavigationState
     | undefined;
@@ -98,6 +95,11 @@ export type AddressListNavigationState = {
 
 export type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
+  active: boolean;
+};
+
+export type ScannerUfvkNavigationState = {
+  setUfvkText: (k: string) => void;
   active: boolean;
 };
 
