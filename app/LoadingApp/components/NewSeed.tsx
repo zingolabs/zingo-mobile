@@ -221,10 +221,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
                 ? ButtonTypeEnum.Secondary
                 : ButtonTypeEnum.Primary
             }
-            style={{
-              backgroundColor:
-                mode === ModeEnum.basic ? colors.background : colors.primary,
-            }}
             title={
               mode === ModeEnum.basic
                 ? (translate('cancel') as string)

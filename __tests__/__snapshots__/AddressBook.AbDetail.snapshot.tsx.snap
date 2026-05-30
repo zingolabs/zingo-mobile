@@ -273,7 +273,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "#011401",
+          "backgroundColor": "#031124",
           "borderColor": "#18bd18",
           "borderRadius": 24,
           "borderWidth": 2,
@@ -553,7 +553,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "#011401",
+          "backgroundColor": "#031124",
           "borderColor": "#18bd18",
           "borderRadius": 24,
           "borderWidth": 2,
@@ -855,7 +855,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "#011401",
+          "backgroundColor": "#031124",
           "borderColor": "#18bd18",
           "borderRadius": 24,
           "borderWidth": 2,

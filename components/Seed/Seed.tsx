@@ -377,10 +377,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 ? ButtonTypeEnum.Secondary
                 : ButtonTypeEnum.Primary
             }
-            style={{
-              backgroundColor:
-                mode === ModeEnum.basic ? colors.background : colors.primary,
-            }}
             title={
               mode === ModeEnum.basic
                 ? !basicFirstViewSeed

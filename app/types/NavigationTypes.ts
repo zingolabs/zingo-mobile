@@ -19,9 +19,11 @@ export type AppStackParamList = {
   // Stack
   [RouteEnum.LoadingApp]: LoadingAppNavigationState | undefined;
   [RouteEnum.LoadedApp]: LoadedAppNavigationState | undefined;
-  // ScannerAddress is presented as a modal at the root Stack level so it
-  // overlays LoadedApp (and any open BottomSheet modals).
+  // ScannerAddress / ScannerUfvk are presented as transparent modals at the
+  // root Stack so they overlay everything (LoadedApp, LoadingApp, and any
+  // open BottomSheet portals).
   [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
+  [RouteEnum.ScannerUfvk]: ScannerUfvkNavigationState | undefined;
 };
 
 /**
@@ -93,6 +95,11 @@ export type AddressListNavigationState = {
 
 export type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
+  active: boolean;
+};
+
+export type ScannerUfvkNavigationState = {
+  setUfvkText: (k: string) => void;
   active: boolean;
 };
 

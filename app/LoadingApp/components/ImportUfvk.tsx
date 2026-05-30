@@ -6,15 +6,14 @@ import React, {
   useState,
   useRef,
 } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  Keyboard,
-} from 'react-native';
+import { View, TouchableOpacity, TextInput, Keyboard } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import {
   faChevronLeft,
   faQrcode,
@@ -31,7 +30,6 @@ import FadeText from '../../../components/Components/FadeText';
 import RegText from '../../../components/Components/RegText';
 import BoldText from '../../../components/Components/BoldText';
 import Button from '../../../components/Components/Button';
-import ScannerUfvk from './ScannerUfvk';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
 import Header from '../../../components/Header';
@@ -39,6 +37,7 @@ import RPCModule from '../../RPCModule';
 import {
   ButtonTypeEnum,
   GlobalConst,
+  RouteEnum,
   ScreenEnum,
   SelectServerEnum,
 } from '../../AppState';
@@ -59,6 +58,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   onClickCancel,
   onClickOK,
 }) => {
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, mode, addLastSnackbar, selectServer } =
     context;
@@ -67,7 +67,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
-  const [qrcodeModalVisible, setQrcodeModalVisible] = useState<boolean>(false);
   const [latestBlock, setLatestBlock] = useState<number>(0);
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -144,7 +143,10 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   };
 
   const showQrcodeModalVisible = () => {
-    setQrcodeModalVisible(true);
+    navigation.navigate(RouteEnum.ScannerUfvk, {
+      setUfvkText: (k: string) => setSeedufvkText(k),
+      active: true,
+    });
   };
 
   const importUfvkSnapPoints = useFullSheetSnapPoints(containerH, headerH);
@@ -231,17 +233,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={qrcodeModalVisible}
-        onRequestClose={() => setQrcodeModalVisible(false)}
-      >
-        <ScannerUfvk
-          setUfvkText={setSeedufvkText}
-          closeModal={() => setQrcodeModalVisible(false)}
-        />
-      </Modal>
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}

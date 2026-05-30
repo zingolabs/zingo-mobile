@@ -197,7 +197,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#011401",
+            "backgroundColor": "#031124",
             "borderColor": "#18bd18",
             "borderRadius": 24,
             "borderWidth": 2,

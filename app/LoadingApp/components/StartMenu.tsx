@@ -88,6 +88,21 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        {/* StartMenu-only quirk: the parent header section has no opaque
+            background (unlike the standard <Header/> used elsewhere), and
+            on Android the straight middle of the top border between the
+            two corner arcs is dropped. Paint it explicitly between the
+            corner radii. */}
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 40,
+            right: 40,
+            height: 1,
+            backgroundColor: colors.bottomSheetBorder,
+          }}
+        />
         <View
           style={{
             flexDirection: 'row',
@@ -120,7 +135,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             position: 'absolute',
             top: 0,
             right: 0,
-            zIndex: 999,
           }}
         >
           {netInfo.isConnected && !actionButtonsDisabled && (

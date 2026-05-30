@@ -604,7 +604,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#011401",
+            "backgroundColor": "#031124",
             "borderColor": "#18bd18",
             "borderRadius": 24,
             "borderWidth": 2,

@@ -49,13 +49,13 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: colors.bottomSheetBackground,
-        paddingHorizontal: 10,
-        paddingTop: 10,
-        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingTop: 12,
       }}
     >
       <View
         style={{
+          alignSelf: 'center',
           alignItems: 'center',
           justifyContent: 'center',
           margin: 0,
@@ -86,22 +86,15 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
       </View>
       {!customServerOffline && (
         <>
-          <ChainTypeToggle
-            customServerChainName={customServerChainName}
-            onPress={onPressServerChainName}
-            translate={translate}
-            disabled={actionButtonsDisabled}
-          />
           <View
             style={{
               borderColor: colors.border,
               borderWidth: 1,
-              marginBottom: 10,
-              width: '100%',
-              maxWidth: '100%',
+              marginLeft: 5,
+              width: 'auto',
+              maxWidth: '90%',
               minWidth: '50%',
               minHeight: 48,
-              alignItems: 'center',
             }}
           >
             <TextInput
@@ -111,7 +104,8 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
                 color: colors.text,
                 fontWeight: '600',
                 fontSize: 18,
-                minWidth: '90%',
+                minWidth: '50%',
+                maxWidth: '90%',
                 minHeight: 48,
                 marginLeft: 5,
                 backgroundColor: 'transparent',
@@ -121,6 +115,33 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
               editable={!actionButtonsDisabled}
               maxLength={100}
             />
+          </View>
+          <View
+            style={{
+              marginLeft: 5,
+              width: 'auto',
+              maxWidth: '90%',
+              minWidth: '50%',
+              minHeight: 48,
+            }}
+          >
+            <View
+              style={{
+                paddingTop: 10,
+                paddingLeft: 10,
+                paddingRight: 10,
+                marginBottom: 5,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <ChainTypeToggle
+                customServerChainName={customServerChainName}
+                onPress={onPressServerChainName}
+                translate={translate}
+                disabled={actionButtonsDisabled}
+              />
+            </View>
           </View>
         </>
       )}

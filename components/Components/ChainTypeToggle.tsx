@@ -1,12 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCashRegister } from '@fortawesome/free-solid-svg-icons';
 import { ChainNameEnum, TranslateType } from '../../app/AppState';
+import RegText from './RegText';
 
 type ChainTypeToggleProps = {
   customServerChainName: string;
@@ -14,6 +13,12 @@ type ChainTypeToggleProps = {
   translate: (key: string) => TranslateType;
   disabled?: boolean;
 };
+
+const CHAINS: { value: ChainNameEnum; key: 'main' | 'test' | 'regtest' }[] = [
+  { value: ChainNameEnum.mainChainName, key: 'main' },
+  { value: ChainNameEnum.testChainName, key: 'test' },
+  { value: ChainNameEnum.regtestChainName, key: 'regtest' },
+];
 
 const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
   customServerChainName,
@@ -27,156 +32,42 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
     <View
       style={{
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.primary,
+        borderRadius: 8,
+        marginBottom: 10,
       }}
     >
-      <TouchableOpacity
-        disabled={disabled}
-        testID="settings.custom-server-chain.mainnet"
-        style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.mainChainName)}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 10,
-          }}
-        >
-          <View
+      {CHAINS.map(c => {
+        const selected = customServerChainName === c.value;
+        return (
+          <TouchableOpacity
+            key={c.value}
+            testID={`settings.custom-server-chain.${c.key}net`}
+            disabled={disabled}
+            onPress={() => onPress(c.value)}
             style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
+              flex: 1,
+              paddingVertical: 8,
               alignItems: 'center',
-              borderWidth:
-                customServerChainName === ChainNameEnum.mainChainName ? 2 : 1,
-              borderColor:
-                customServerChainName === ChainNameEnum.mainChainName
-                  ? colors.primary
-                  : colors.primaryDisabled,
-              borderRadius: 5,
-              paddingHorizontal: 5,
+              backgroundColor: selected ? colors.primary : 'transparent',
+              borderRadius: 8,
+              borderWidth: selected ? 1 : 0,
+              borderColor: colors.primary,
             }}
           >
-            <Text
+            <RegText
               style={{
-                fontSize: 13,
-                color: colors.border,
-                marginRight: 5,
+                color: selected ? colors.background : colors.primary,
+                fontSize: 12,
               }}
             >
-              {translate('settings.value-chainname-main') as string}
-            </Text>
-            {customServerChainName === ChainNameEnum.mainChainName && (
-              <FontAwesomeIcon
-                icon={faCashRegister}
-                size={12}
-                color={colors.primary}
-              />
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity
-        disabled={disabled}
-        testID="settings.custom-server-chain.testnet"
-        style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.testChainName)}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 10,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderWidth:
-                customServerChainName === ChainNameEnum.testChainName ? 2 : 1,
-              borderColor:
-                customServerChainName === ChainNameEnum.testChainName
-                  ? colors.primary
-                  : colors.primaryDisabled,
-              borderRadius: 5,
-              paddingHorizontal: 5,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 13,
-                color: colors.border,
-                marginRight: 5,
-              }}
-            >
-              {translate('settings.value-chainname-test') as string}
-            </Text>
-            {customServerChainName === ChainNameEnum.testChainName && (
-              <FontAwesomeIcon
-                icon={faCashRegister}
-                size={12}
-                color={colors.primary}
-              />
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity
-        disabled={disabled}
-        testID="settings.custom-server-chain.regtest"
-        style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.regtestChainName)}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 10,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderWidth:
-                customServerChainName === ChainNameEnum.regtestChainName
-                  ? 2
-                  : 1,
-              borderColor:
-                customServerChainName === ChainNameEnum.regtestChainName
-                  ? colors.primary
-                  : colors.primaryDisabled,
-              borderRadius: 5,
-              paddingHorizontal: 5,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 13,
-                color: colors.border,
-                marginRight: 5,
-              }}
-            >
-              {translate('settings.value-chainname-regtest') as string}
-            </Text>
-            {customServerChainName === ChainNameEnum.regtestChainName && (
-              <FontAwesomeIcon
-                icon={faCashRegister}
-                size={12}
-                color={colors.primary}
-              />
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
+              {translate(`settings.value-chainname-${c.key}`) as string}
+            </RegText>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };

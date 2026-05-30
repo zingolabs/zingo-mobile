@@ -29,6 +29,7 @@ export enum RouteEnum {
   AddressBook = 'AddressBook',
   AddressList = 'AddressList',
   ScannerAddress = 'ScannerAddress',
+  ScannerUfvk = 'ScannerUfvk',
   ValueTransferDetail = 'ValueTransferDetail',
   MessagesAddress = 'MessagesAddress',
   MessagesAll = 'MessagesAll',
