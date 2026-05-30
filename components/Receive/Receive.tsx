@@ -301,6 +301,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     <View
       style={{ flex: 1 }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
+      testID="receive.title"
     >
       <View
         accessible={true}
@@ -314,7 +315,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       >
         <Header
           title={''}
-          testID="receive.title"
           screenName={screenName}
           toggleMenuDrawer={toggleMenuDrawer}
           showMessagesIcon={true}
