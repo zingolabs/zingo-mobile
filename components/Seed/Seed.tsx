@@ -1,8 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useCallback,
+  useMemo,
+} from 'react';
 import {
   View,
-  ScrollView,
   TouchableOpacity,
   Text,
   Alert,
@@ -16,10 +22,19 @@ import {
   useTheme,
 } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import BottomSheet, {
+  BottomSheetFooter,
+  BottomSheetFooterProps,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
+import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
+import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
@@ -96,6 +111,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     {} as WalletType,
   );
   const [loadingSeed, setLoadingSeed] = useState<boolean>(true);
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
+  const seedSheetRef = useRef<BottomSheet>(null);
 
   useEffect(() => {
     (async () => {
@@ -285,206 +303,307 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     }
   };
 
+  const seedSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  const seedTitle = useMemo(
+    () => translate('seed.title') + ' (' + translate(`seed.${action}`) + ')',
+    [action, translate],
+  );
+
+  const renderSeedHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 12,
+          paddingBottom: 8,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <TouchableOpacity
+            onPress={onClickCancelHide}
+            hitSlop={8}
+            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronLeft}
+              size={20}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {seedTitle}
+          </BoldText>
+          <View style={{ width: 28 }} />
+        </View>
+      </View>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [colors, seedTitle],
+  );
+
+  const renderSeedFooter = useCallback(
+    (props: BottomSheetFooterProps) => (
+      <BottomSheetFooter {...props} bottomInset={0}>
+        <View
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingTop: 10,
+            paddingBottom: 14,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            testID="seed.button.ok"
+            type={
+              mode === ModeEnum.basic
+                ? ButtonTypeEnum.Secondary
+                : ButtonTypeEnum.Primary
+            }
+            style={{
+              backgroundColor:
+                mode === ModeEnum.basic ? colors.background : colors.primary,
+            }}
+            title={
+              mode === ModeEnum.basic
+                ? !basicFirstViewSeed
+                  ? (translate('seed.showtransactions') as string)
+                  : (translate('cancel') as string)
+                : !!texts && !!texts[action]
+                  ? texts[action][times]
+                  : ''
+            }
+            onPress={async () => {
+              if (!seedPhrase) {
+                return;
+              }
+              if (times === 0) {
+                onClickOKHide(seedPhrase, Number(birthdayNumber));
+              } else if (times === 1) {
+                onPressOK();
+              }
+            }}
+          />
+        </View>
+      </BottomSheetFooter>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      colors,
+      mode,
+      basicFirstViewSeed,
+      texts,
+      action,
+      times,
+      seedPhrase,
+      birthdayNumber,
+      translate,
+    ],
+  );
+
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: colors.background,
       }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
-      <Header
-        title={
-          translate('seed.title') + ' (' + translate(`seed.${action}`) + ')'
-        }
-        screenName={screenName}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noUfvkIcon={true}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar}
-        translate={translate}
-        netInfo={netInfo}
-        mode={mode}
-        privacy={privacy}
-        receivedLegend={
-          action === SeedActionEnum.view ? !basicFirstViewSeed : false
-        }
-        closeScreen={onClickCancelHide}
-      />
-      {loadingSeed ? (
-        <ActivityIndicator
-          size="large"
-          color={colors.primary}
-          style={{ marginVertical: 20 }}
+      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
+        <Header
+          title={''}
+          screenName={screenName}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noUfvkIcon={true}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar}
+          translate={translate}
+          netInfo={netInfo}
+          mode={mode}
+          privacy={privacy}
+          receivedLegend={
+            action === SeedActionEnum.view ? !basicFirstViewSeed : false
+          }
         />
-      ) : (
-        <>
-          <ScrollView
-            keyboardShouldPersistTaps="handled"
-            style={{ height: '80%', maxHeight: '80%' }}
-            contentContainerStyle={{
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              justifyContent: 'flex-start',
-            }}
-          >
-            <RegText
+      </View>
+      <BottomSheet
+        ref={seedSheetRef}
+        snapPoints={seedSnapPoints}
+        index={0}
+        enableDynamicSizing={false}
+        enablePanDownToClose={false}
+        enableContentPanningGesture={false}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        handleComponent={renderSeedHandle}
+        footerComponent={loadingSeed ? undefined : renderSeedFooter}
+      >
+        {loadingSeed ? (
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            style={{ marginVertical: 20 }}
+          />
+        ) : (
+          <>
+            <BottomSheetScrollView
+              keyboardShouldPersistTaps="handled"
+              bounces={false}
+              alwaysBounceVertical={false}
               style={{
-                marginTop: 0,
-                padding: 20,
-                textAlign: 'center',
-                fontWeight: '900',
+                flex: 1,
+                backgroundColor: colors.bottomSheetBackground,
+              }}
+              contentContainerStyle={{
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                justifyContent: 'flex-start',
+                paddingBottom: 80,
               }}
             >
-              {action === SeedActionEnum.backup ||
-              action === SeedActionEnum.change ||
-              action === SeedActionEnum.server
-                ? (translate(`seed.text-readonly-${action}`) as string)
-                : (translate('seed.text-readonly') as string)}
-            </RegText>
-            <View
-              style={{
-                margin: 10,
-                padding: 10,
-                borderWidth: 1,
-                borderRadius: 10,
-                borderColor: colors.text,
-                maxHeight: '45%',
-              }}
-            >
-              <TouchableOpacity onPress={() => copySeedToClipboard(true)}>
-                <RegText
-                  color={colors.text}
-                  style={{
-                    textAlign: 'center',
-                  }}
-                >
-                  {!expandSeed ? Utils.trimToSmall(seedPhrase, 5) : seedPhrase}
-                </RegText>
-              </TouchableOpacity>
+              <RegText
+                style={{
+                  marginTop: 0,
+                  padding: 20,
+                  textAlign: 'center',
+                  fontWeight: '900',
+                }}
+              >
+                {action === SeedActionEnum.backup ||
+                action === SeedActionEnum.change ||
+                action === SeedActionEnum.server
+                  ? (translate(`seed.text-readonly-${action}`) as string)
+                  : (translate('seed.text-readonly') as string)}
+              </RegText>
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  margin: 10,
+                  padding: 10,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  borderColor: colors.text,
+                  maxHeight: '45%',
                 }}
               >
-                <View />
-                <TouchableOpacity onPress={() => copySeedToClipboard(false)}>
-                  <Text
+                <TouchableOpacity onPress={() => copySeedToClipboard(true)}>
+                  <RegText
+                    color={colors.text}
                     style={{
-                      color: colors.text,
-                      textDecorationLine: 'underline',
-                      padding: 10,
-                      marginTop: 0,
                       textAlign: 'center',
-                      minHeight: 48,
                     }}
                   >
-                    {translate('seed.tapcopy') as string}
-                  </Text>
+                    {!expandSeed
+                      ? Utils.trimToSmall(seedPhrase, 5)
+                      : seedPhrase}
+                  </RegText>
                 </TouchableOpacity>
-                <View />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <View />
+                  <TouchableOpacity onPress={() => copySeedToClipboard(false)}>
+                    <Text
+                      style={{
+                        color: colors.text,
+                        textDecorationLine: 'underline',
+                        padding: 10,
+                        marginTop: 0,
+                        textAlign: 'center',
+                        minHeight: 48,
+                      }}
+                    >
+                      {translate('seed.tapcopy') as string}
+                    </Text>
+                  </TouchableOpacity>
+                  <View />
+                </View>
               </View>
-            </View>
 
-            <View style={{ marginTop: 10, alignItems: 'center' }}>
-              <FadeText style={{ textAlign: 'center' }}>
-                {translate('seed.birthday-readonly') as string}
-              </FadeText>
-              <TouchableOpacity
-                onPress={() => {
-                  if (birthdayNumber) {
-                    Clipboard.setString(birthdayNumber);
-                    if (addLastSnackbar) {
-                      addLastSnackbar(
-                        translate('seed.tapcopy-birthday-message') as string,
-                        SnackbarDurationEnum.short,
-                      );
-                    }
-                    setExpandBithday(true);
-                    if (privacy) {
-                      setTimeout(() => {
-                        setExpandBithday(false);
-                      }, 5 * 1000);
-                    }
-                  }
-                }}
-              >
-                <RegText color={colors.text} style={{ textAlign: 'center' }}>
-                  {!expandBirthday
-                    ? Utils.trimToSmall(birthdayNumber, 1)
-                    : birthdayNumber}
-                </RegText>
-              </TouchableOpacity>
-            </View>
-            {!!ufvk && (
               <View style={{ marginTop: 10, alignItems: 'center' }}>
                 <FadeText style={{ textAlign: 'center' }}>
-                  {translate('ufvk.viewkey') as string}
+                  {translate('seed.birthday-readonly') as string}
                 </FadeText>
                 <TouchableOpacity
                   onPress={() => {
-                    Clipboard.setString(ufvk);
-                    if (addLastSnackbar) {
-                      addLastSnackbar(
-                        translate('ufvk.tapcopy-message') as string,
-                        SnackbarDurationEnum.short,
-                      );
+                    if (birthdayNumber) {
+                      Clipboard.setString(birthdayNumber);
+                      if (addLastSnackbar) {
+                        addLastSnackbar(
+                          translate('seed.tapcopy-birthday-message') as string,
+                          SnackbarDurationEnum.short,
+                        );
+                      }
+                      setExpandBithday(true);
+                      if (privacy) {
+                        setTimeout(() => {
+                          setExpandBithday(false);
+                        }, 5 * 1000);
+                      }
                     }
                   }}
                 >
                   <RegText color={colors.text} style={{ textAlign: 'center' }}>
-                    {Utils.trimToSmall(ufvk, 8)}
+                    {!expandBirthday
+                      ? Utils.trimToSmall(birthdayNumber, 1)
+                      : birthdayNumber}
                   </RegText>
                 </TouchableOpacity>
               </View>
-            )}
-            <View style={{ marginBottom: 30 }} />
-          </ScrollView>
-          <View
-            style={{
-              flexGrow: 1,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginVertical: 5,
-            }}
-          >
-            <Button
-              testID="seed.button.ok"
-              type={
-                mode === ModeEnum.basic
-                  ? ButtonTypeEnum.Secondary
-                  : ButtonTypeEnum.Primary
-              }
-              style={{
-                backgroundColor:
-                  mode === ModeEnum.basic ? colors.background : colors.primary,
-              }}
-              title={
-                mode === ModeEnum.basic
-                  ? !basicFirstViewSeed
-                    ? (translate('seed.showtransactions') as string)
-                    : (translate('cancel') as string)
-                  : !!texts && !!texts[action]
-                    ? texts[action][times]
-                    : ''
-              }
-              onPress={async () => {
-                if (!seedPhrase) {
-                  return;
-                }
-                if (times === 0) {
-                  onClickOKHide(seedPhrase, Number(birthdayNumber));
-                } else if (times === 1) {
-                  onPressOK();
-                }
-              }}
-            />
-          </View>
-        </>
-      )}
+              {!!ufvk && (
+                <View style={{ marginTop: 10, alignItems: 'center' }}>
+                  <FadeText style={{ textAlign: 'center' }}>
+                    {translate('ufvk.viewkey') as string}
+                  </FadeText>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Clipboard.setString(ufvk);
+                      if (addLastSnackbar) {
+                        addLastSnackbar(
+                          translate('ufvk.tapcopy-message') as string,
+                          SnackbarDurationEnum.short,
+                        );
+                      }
+                    }}
+                  >
+                    <RegText
+                      color={colors.text}
+                      style={{ textAlign: 'center' }}
+                    >
+                      {Utils.trimToSmall(ufvk, 8)}
+                    </RegText>
+                  </TouchableOpacity>
+                </View>
+              )}
+              <View style={{ marginBottom: 30 }} />
+            </BottomSheetScrollView>
+          </>
+        )}
+      </BottomSheet>
     </View>
   );
 };

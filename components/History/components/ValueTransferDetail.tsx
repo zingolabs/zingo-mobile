@@ -1,13 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-  Text,
-  Alert,
-} from 'react-native';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { View, TouchableOpacity, Linking, Text, Alert } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -46,10 +45,13 @@ import AddressItem from '../../Components/AddressItem';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
 import {
+  faChevronLeft,
   faTriangleExclamation,
   faChevronDown,
   faChevronUp,
 } from '@fortawesome/free-solid-svg-icons';
+import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { useFullSheetSnapPoints } from '../../../app/hooks/useFullSheetSnapPoints';
 import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import Button from '../../Components/Button';
 import RPCModule from '../../../app/RPCModule';
@@ -112,7 +114,69 @@ const ValueTransferDetail: React.FunctionComponent<
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
   const [addressProtected, setAddressProtected] = useState<boolean>(true);
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
   const isTheFirstMount = useRef(true);
+  const vtdSheetRef = useRef<BottomSheet>(null);
+
+  const closeScreen = useCallback(() => {
+    const fromRoute = route.params?.from;
+    if (fromRoute) {
+      navigation.navigate(fromRoute as never);
+      return;
+    }
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  }, [navigation, route.params?.from]);
+
+  const vtdSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  const renderVtdHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 12,
+          paddingBottom: 8,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <TouchableOpacity
+            onPress={closeScreen}
+            hitSlop={8}
+            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronLeft}
+              size={20}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {translate('history.details') as string}
+          </BoldText>
+          <View style={{ width: 28 }} />
+        </View>
+      </View>
+    ),
+    [colors, closeScreen, translate],
+  );
 
   const { memo, memoUA } = Utils.splitMemo(valueTransfer.memos);
 
@@ -316,358 +380,327 @@ const ValueTransferDetail: React.FunctionComponent<
         flex: 1,
         backgroundColor: colors.background,
       }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
-      <Header
-        title={translate('history.details') as string}
-        screenName={screenName}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noUfvkIcon={true}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar}
-        closeScreen={() => {
-          if (navigation.canGoBack()) {
-            navigation.goBack();
-          }
+      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
+        <Header
+          title={''}
+          screenName={screenName}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noUfvkIcon={true}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar}
+        />
+      </View>
+      <BottomSheet
+        ref={vtdSheetRef}
+        snapPoints={vtdSnapPoints}
+        index={0}
+        enableDynamicSizing={false}
+        enablePanDownToClose={false}
+        enableContentPanningGesture={false}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
         }}
-      />
-      {showNavigator && (
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            marginRight: 30,
-            marginTop: 5,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => moveValueTransferDetail(valueTransferIndex, -1)}
-            style={{ marginRight: 25 }}
-            disabled={valueTransferIndex === 0}
-          >
-            <FontAwesomeIcon
-              icon={faChevronUp}
-              color={
-                valueTransferIndex === 0
-                  ? colors.primaryDisabled
-                  : colors.primary
-              }
-              size={24}
-            />
-          </TouchableOpacity>
-          <FadeText>{(valueTransferIndex + 1).toString()}</FadeText>
-          <TouchableOpacity
-            onPress={() => moveValueTransferDetail(valueTransferIndex, 1)}
-            style={{ marginLeft: 25 }}
-            disabled={valueTransferIndex === valueTransfersSliced.length - 1}
-          >
-            <FontAwesomeIcon
-              icon={faChevronDown}
-              color={
-                valueTransferIndex === valueTransfersSliced.length - 1
-                  ? colors.primaryDisabled
-                  : colors.primary
-              }
-              size={24}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
-      <ScrollView
-        showsVerticalScrollIndicator={true}
-        persistentScrollbar={true}
-        indicatorStyle={'white'}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-        }}
+        handleComponent={renderVtdHandle}
       >
-        <View
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            margin: 25,
-            marginTop: showNavigator ? 5 : 25,
-            padding: 10,
-            borderWidth: 1,
-            borderRadius: 10,
-            borderColor:
-              valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                ? 'coral'
-                : colors.border,
-          }}
-        >
-          <BoldText
+        {showNavigator && (
+          <View
             style={{
-              textAlign: 'center',
-              textTransform: 'capitalize',
-              color: spendColor,
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              marginRight: 30,
+              marginTop: 5,
+              backgroundColor: colors.bottomSheetBackground,
             }}
           >
-            {valueTransfer.status === RPCValueTransfersStatusEnum.failed &&
-            valueTransfer.kind === ValueTransferKindEnum.Sent
-              ? (translate('history.sent-failed') as string)
-              : valueTransfer.status === RPCValueTransfersStatusEnum.failed &&
-                  valueTransfer.kind === ValueTransferKindEnum.Shield
-                ? (translate('history.shield-failed') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Sent &&
-                    valueTransfer.confirmations === 0
-                  ? (translate('history.sending') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.Sent &&
-                      valueTransfer.confirmations !== 0
-                    ? (translate('history.sent') as string)
-                    : valueTransfer.kind === ValueTransferKindEnum.Received &&
-                        valueTransfer.confirmations === 0
-                      ? (translate('history.receiving') as string)
-                      : valueTransfer.kind === ValueTransferKindEnum.Received &&
-                          valueTransfer.confirmations !== 0
-                        ? (translate('history.received') as string)
-                        : valueTransfer.kind ===
-                              ValueTransferKindEnum.MemoToSelf &&
-                            valueTransfer.confirmations === 0
-                          ? (translate('history.sendingtoself') as string)
-                          : valueTransfer.kind ===
-                                ValueTransferKindEnum.MemoToSelf &&
-                              valueTransfer.confirmations !== 0
-                            ? (translate('history.memotoself') as string)
-                            : valueTransfer.kind ===
-                                  ValueTransferKindEnum.SendToSelf &&
-                                valueTransfer.confirmations === 0
-                              ? (translate('history.sendingtoself') as string)
-                              : valueTransfer.kind ===
-                                    ValueTransferKindEnum.SendToSelf &&
-                                  valueTransfer.confirmations !== 0
-                                ? (translate('history.sendtoself') as string)
-                                : valueTransfer.kind ===
-                                      ValueTransferKindEnum.Shield &&
-                                    valueTransfer.confirmations === 0
-                                  ? (translate('history.shielding') as string)
-                                  : valueTransfer.kind ===
-                                        ValueTransferKindEnum.Shield &&
-                                      valueTransfer.confirmations !== 0
-                                    ? (translate('history.shield') as string)
-                                    : valueTransfer.kind ===
-                                          ValueTransferKindEnum.Rejection &&
-                                        valueTransfer.confirmations === 0
-                                      ? (translate('history.sending') as string)
-                                      : valueTransfer.kind ===
-                                            ValueTransferKindEnum.Rejection &&
-                                          valueTransfer.confirmations !== 0
-                                        ? (translate(
-                                            'history.rejection',
-                                          ) as string)
-                                        : ''}
-          </BoldText>
-          <ZecAmount
-            style={{
-              opacity:
-                valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                  ? 0.5
-                  : 1,
-            }}
-            currencyName={info.currencyName}
-            size={28}
-            amtZec={valueTransfer.amount}
-            privacy={privacy}
-            smallPrefix={true}
-          />
-          {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
-            <CurrencyAmount
-              price={valueTransfer.zecPrice}
-              amtZec={valueTransfer.amount}
-              currency={currency}
-              privacy={privacy}
-            />
-          )}
-        </View>
-
-        {valueTransfer.confirmations ===
-          0 /* not min confirmations applied */ && (
-          <>
-            {valueTransfer.status === RPCValueTransfersStatusEnum.failed && (
-              <>
-                <View
-                  style={{
-                    flexGrow: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginBottom: 10,
-                  }}
-                >
-                  <Button
-                    type={ButtonTypeEnum.Primary}
-                    title={translate('history.remove') as string}
-                    onPress={() => {
-                      actionOnPress(TransactionActionEnum.remove);
-                    }}
-                  />
-                </View>
-              </>
-            )}
-          </>
+            <TouchableOpacity
+              onPress={() => moveValueTransferDetail(valueTransferIndex, -1)}
+              style={{ marginRight: 25 }}
+              disabled={valueTransferIndex === 0}
+            >
+              <FontAwesomeIcon
+                icon={faChevronUp}
+                color={
+                  valueTransferIndex === 0
+                    ? colors.primaryDisabled
+                    : colors.primary
+                }
+                size={24}
+              />
+            </TouchableOpacity>
+            <FadeText>{(valueTransferIndex + 1).toString()}</FadeText>
+            <TouchableOpacity
+              onPress={() => moveValueTransferDetail(valueTransferIndex, 1)}
+              style={{ marginLeft: 25 }}
+              disabled={valueTransferIndex === valueTransfersSliced.length - 1}
+            >
+              <FontAwesomeIcon
+                icon={faChevronDown}
+                color={
+                  valueTransferIndex === valueTransfersSliced.length - 1
+                    ? colors.primaryDisabled
+                    : colors.primary
+                }
+                size={24}
+              />
+            </TouchableOpacity>
+          </View>
         )}
-
-        {valueTransfer.confirmations >= 0 &&
-          valueTransfer.confirmations < GlobalConst.minConfirmations && (
-            <View
+        <BottomSheetScrollView
+          showsVerticalScrollIndicator={true}
+          persistentScrollbar={true}
+          indicatorStyle={'white'}
+          bounces={false}
+          alwaysBounceVertical={false}
+          style={{
+            flex: 1,
+            backgroundColor: colors.bottomSheetBackground,
+          }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+          }}
+        >
+          <View
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              margin: 25,
+              marginTop: showNavigator ? 5 : 25,
+              padding: 10,
+              borderWidth: 1,
+              borderRadius: 10,
+              borderColor:
+                valueTransfer.status === RPCValueTransfersStatusEnum.failed
+                  ? 'coral'
+                  : colors.border,
+            }}
+          >
+            <BoldText
               style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
+                textAlign: 'center',
+                textTransform: 'capitalize',
+                color: spendColor,
               }}
             >
-              {(valueTransfer.status ===
-                RPCValueTransfersStatusEnum.transmitted ||
-                valueTransfer.status ===
-                  RPCValueTransfersStatusEnum.calculated) && (
-                <FontAwesomeIcon
-                  style={{ marginRight: 5 }}
-                  icon={faTriangleExclamation}
-                  color={colors.syncing}
-                  size={12}
-                />
+              {valueTransfer.status === RPCValueTransfersStatusEnum.failed &&
+              valueTransfer.kind === ValueTransferKindEnum.Sent
+                ? (translate('history.sent-failed') as string)
+                : valueTransfer.status === RPCValueTransfersStatusEnum.failed &&
+                    valueTransfer.kind === ValueTransferKindEnum.Shield
+                  ? (translate('history.shield-failed') as string)
+                  : valueTransfer.kind === ValueTransferKindEnum.Sent &&
+                      valueTransfer.confirmations === 0
+                    ? (translate('history.sending') as string)
+                    : valueTransfer.kind === ValueTransferKindEnum.Sent &&
+                        valueTransfer.confirmations !== 0
+                      ? (translate('history.sent') as string)
+                      : valueTransfer.kind === ValueTransferKindEnum.Received &&
+                          valueTransfer.confirmations === 0
+                        ? (translate('history.receiving') as string)
+                        : valueTransfer.kind ===
+                              ValueTransferKindEnum.Received &&
+                            valueTransfer.confirmations !== 0
+                          ? (translate('history.received') as string)
+                          : valueTransfer.kind ===
+                                ValueTransferKindEnum.MemoToSelf &&
+                              valueTransfer.confirmations === 0
+                            ? (translate('history.sendingtoself') as string)
+                            : valueTransfer.kind ===
+                                  ValueTransferKindEnum.MemoToSelf &&
+                                valueTransfer.confirmations !== 0
+                              ? (translate('history.memotoself') as string)
+                              : valueTransfer.kind ===
+                                    ValueTransferKindEnum.SendToSelf &&
+                                  valueTransfer.confirmations === 0
+                                ? (translate('history.sendingtoself') as string)
+                                : valueTransfer.kind ===
+                                      ValueTransferKindEnum.SendToSelf &&
+                                    valueTransfer.confirmations !== 0
+                                  ? (translate('history.sendtoself') as string)
+                                  : valueTransfer.kind ===
+                                        ValueTransferKindEnum.Shield &&
+                                      valueTransfer.confirmations === 0
+                                    ? (translate('history.shielding') as string)
+                                    : valueTransfer.kind ===
+                                          ValueTransferKindEnum.Shield &&
+                                        valueTransfer.confirmations !== 0
+                                      ? (translate('history.shield') as string)
+                                      : valueTransfer.kind ===
+                                            ValueTransferKindEnum.Rejection &&
+                                          valueTransfer.confirmations === 0
+                                        ? (translate(
+                                            'history.sending',
+                                          ) as string)
+                                        : valueTransfer.kind ===
+                                              ValueTransferKindEnum.Rejection &&
+                                            valueTransfer.confirmations !== 0
+                                          ? (translate(
+                                              'history.rejection',
+                                            ) as string)
+                                          : ''}
+            </BoldText>
+            <ZecAmount
+              style={{
+                opacity:
+                  valueTransfer.status === RPCValueTransfersStatusEnum.failed
+                    ? 0.5
+                    : 1,
+              }}
+              currencyName={info.currencyName}
+              size={28}
+              amtZec={valueTransfer.amount}
+              privacy={privacy}
+              smallPrefix={true}
+            />
+            {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
+              <CurrencyAmount
+                price={valueTransfer.zecPrice}
+                amtZec={valueTransfer.amount}
+                currency={currency}
+                privacy={privacy}
+              />
+            )}
+          </View>
+
+          {valueTransfer.confirmations ===
+            0 /* not min confirmations applied */ && (
+            <>
+              {valueTransfer.status === RPCValueTransfersStatusEnum.failed && (
+                <>
+                  <View
+                    style={{
+                      flexGrow: 1,
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 10,
+                    }}
+                  >
+                    <Button
+                      type={ButtonTypeEnum.Primary}
+                      title={translate('history.remove') as string}
+                      onPress={() => {
+                        actionOnPress(TransactionActionEnum.remove);
+                      }}
+                    />
+                  </View>
+                </>
               )}
-              {(valueTransfer.status ===
-                RPCValueTransfersStatusEnum.transmitted ||
-                valueTransfer.status ===
-                  RPCValueTransfersStatusEnum.calculated ||
-                valueTransfer.status === RPCValueTransfersStatusEnum.mempool ||
-                valueTransfer.status ===
-                  RPCValueTransfersStatusEnum.failed) && (
-                <FadeText
-                  style={{
-                    color:
-                      valueTransfer.status ===
-                      RPCValueTransfersStatusEnum.failed
-                        ? 'coral'
-                        : valueTransfer.status ===
-                              RPCValueTransfersStatusEnum.transmitted ||
-                            valueTransfer.status ===
-                              RPCValueTransfersStatusEnum.calculated
-                          ? colors.primary
-                          : colors.primaryDisabled,
-                    fontSize: 12,
-                    opacity: 1,
-                    fontWeight: '700',
-                    textAlign:
-                      valueTransfer.status ===
-                        RPCValueTransfersStatusEnum.transmitted ||
-                      valueTransfer.status ===
-                        RPCValueTransfersStatusEnum.calculated
-                        ? 'center'
-                        : 'left',
-                    textDecorationLine:
-                      valueTransfer.status ===
-                        RPCValueTransfersStatusEnum.transmitted ||
-                      valueTransfer.status ===
-                        RPCValueTransfersStatusEnum.calculated
-                        ? 'underline'
-                        : 'none',
-                  }}
-                >
-                  {(translate(`history.${valueTransfer.status}`) as string) +
-                    ' - ' +
-                    (translate('history.not-confirmed') as string)}
-                </FadeText>
-              )}
-              {valueTransfer.status === RPCValueTransfersStatusEnum.confirmed &&
-                valueTransfer.confirmations >= 0 &&
-                valueTransfer.confirmations < GlobalConst.minConfirmations && (
+            </>
+          )}
+
+          {valueTransfer.confirmations >= 0 &&
+            valueTransfer.confirmations < GlobalConst.minConfirmations && (
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {(valueTransfer.status ===
+                  RPCValueTransfersStatusEnum.transmitted ||
+                  valueTransfer.status ===
+                    RPCValueTransfersStatusEnum.calculated) && (
+                  <FontAwesomeIcon
+                    style={{ marginRight: 5 }}
+                    icon={faTriangleExclamation}
+                    color={colors.syncing}
+                    size={12}
+                  />
+                )}
+                {(valueTransfer.status ===
+                  RPCValueTransfersStatusEnum.transmitted ||
+                  valueTransfer.status ===
+                    RPCValueTransfersStatusEnum.calculated ||
+                  valueTransfer.status ===
+                    RPCValueTransfersStatusEnum.mempool ||
+                  valueTransfer.status ===
+                    RPCValueTransfersStatusEnum.failed) && (
                   <FadeText
                     style={{
-                      color: colors.primaryDisabled,
+                      color:
+                        valueTransfer.status ===
+                        RPCValueTransfersStatusEnum.failed
+                          ? 'coral'
+                          : valueTransfer.status ===
+                                RPCValueTransfersStatusEnum.transmitted ||
+                              valueTransfer.status ===
+                                RPCValueTransfersStatusEnum.calculated
+                            ? colors.primary
+                            : colors.primaryDisabled,
                       fontSize: 12,
                       opacity: 1,
                       fontWeight: '700',
-                      textAlign: 'left',
-                      textDecorationLine: 'none',
+                      textAlign:
+                        valueTransfer.status ===
+                          RPCValueTransfersStatusEnum.transmitted ||
+                        valueTransfer.status ===
+                          RPCValueTransfersStatusEnum.calculated
+                          ? 'center'
+                          : 'left',
+                      textDecorationLine:
+                        valueTransfer.status ===
+                          RPCValueTransfersStatusEnum.transmitted ||
+                        valueTransfer.status ===
+                          RPCValueTransfersStatusEnum.calculated
+                          ? 'underline'
+                          : 'none',
                     }}
                   >
                     {(translate(`history.${valueTransfer.status}`) as string) +
                       ' - ' +
-                      (translate('history.waiting') as string) +
-                      ' (' +
-                      GlobalConst.minConfirmations.toString() +
-                      ')'}
+                      (translate('history.not-confirmed') as string)}
                   </FadeText>
                 )}
-            </View>
-          )}
+                {valueTransfer.status ===
+                  RPCValueTransfersStatusEnum.confirmed &&
+                  valueTransfer.confirmations >= 0 &&
+                  valueTransfer.confirmations <
+                    GlobalConst.minConfirmations && (
+                    <FadeText
+                      style={{
+                        color: colors.primaryDisabled,
+                        fontSize: 12,
+                        opacity: 1,
+                        fontWeight: '700',
+                        textAlign: 'left',
+                        textDecorationLine: 'none',
+                      }}
+                    >
+                      {(translate(
+                        `history.${valueTransfer.status}`,
+                      ) as string) +
+                        ' - ' +
+                        (translate('history.waiting') as string) +
+                        ' (' +
+                        GlobalConst.minConfirmations.toString() +
+                        ')'}
+                    </FadeText>
+                  )}
+              </View>
+            )}
 
-        <View style={{ margin: 10 }}>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: 10,
-            }}
-          >
-            <View style={{ display: 'flex' }}>
-              <FadeText>{translate('history.time') as string}</FadeText>
-              <RegText
-                style={{
-                  opacity:
-                    valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                      ? 0.5
-                      : 1,
-                }}
-              >
-                {valueTransfer.time
-                  ? Utils.formatDate(
-                      (valueTransfer.time || 0) * 1000,
-                      'yyyy MMM d h:mm aaa',
-                      language,
-                    )
-                  : '--'}
-              </RegText>
-            </View>
-            <View style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <FadeText>
-                {translate('history.confirmations') as string}
-              </FadeText>
-              <RegText
-                style={{
-                  opacity:
-                    valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                      ? 0.5
-                      : 1,
-                }}
-              >
-                {valueTransfer.confirmations >= 0
-                  ? valueTransfer.confirmations.toString()
-                  : '-'}
-              </RegText>
-            </View>
-          </View>
-
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              marginTop: 10,
-            }}
-          >
-            <FadeText>{translate('history.txid') as string}</FadeText>
-            <TouchableOpacity
-              onPress={() => {
-                if (valueTransfer.txid) {
-                  Clipboard.setString(valueTransfer.txid);
-                  addLastSnackbar(
-                    translate('history.txcopied') as string,
-                    SnackbarDurationEnum.short,
-                  );
-                  setExpandTxid(true);
-                }
+          <View style={{ margin: 10 }}>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: 10,
               }}
             >
-              {!valueTransfer.txid && (
+              <View style={{ display: 'flex' }}>
+                <FadeText>{translate('history.time') as string}</FadeText>
                 <RegText
                   style={{
                     opacity:
@@ -677,10 +710,19 @@ const ValueTransferDetail: React.FunctionComponent<
                         : 1,
                   }}
                 >
-                  {'Unknown'}
+                  {valueTransfer.time
+                    ? Utils.formatDate(
+                        (valueTransfer.time || 0) * 1000,
+                        'yyyy MMM d h:mm aaa',
+                        language,
+                      )
+                    : '--'}
                 </RegText>
-              )}
-              {!expandTxid && !!valueTransfer.txid && (
+              </View>
+              <View style={{ display: 'flex', alignItems: 'flex-end' }}>
+                <FadeText>
+                  {translate('history.confirmations') as string}
+                </FadeText>
                 <RegText
                   style={{
                     opacity:
@@ -690,11 +732,35 @@ const ValueTransferDetail: React.FunctionComponent<
                         : 1,
                   }}
                 >
-                  {Utils.trimToSmall(valueTransfer.txid, 10)}
+                  {valueTransfer.confirmations >= 0
+                    ? valueTransfer.confirmations.toString()
+                    : '-'}
                 </RegText>
-              )}
-              {expandTxid && !!valueTransfer.txid && (
-                <>
+              </View>
+            </View>
+
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                marginTop: 10,
+              }}
+            >
+              <FadeText>{translate('history.txid') as string}</FadeText>
+              <TouchableOpacity
+                onPress={() => {
+                  if (valueTransfer.txid) {
+                    Clipboard.setString(valueTransfer.txid);
+                    addLastSnackbar(
+                      translate('history.txcopied') as string,
+                      SnackbarDurationEnum.short,
+                    );
+                    setExpandTxid(true);
+                  }
+                }}
+              >
+                {!valueTransfer.txid && (
                   <RegText
                     style={{
                       opacity:
@@ -704,33 +770,130 @@ const ValueTransferDetail: React.FunctionComponent<
                           : 1,
                     }}
                   >
-                    {valueTransfer.txid}
+                    {'Unknown'}
                   </RegText>
-                  {server.chainName !== ChainNameEnum.regtestChainName &&
-                    valueTransfer.status !==
-                      RPCValueTransfersStatusEnum.failed && (
-                      <TouchableOpacity
-                        onPress={() => handleTxIDClick(valueTransfer.txid)}
-                      >
-                        <Text
-                          style={{
-                            color: colors.text,
-                            textDecorationLine: 'underline',
-                            margin: 15,
-                          }}
+                )}
+                {!expandTxid && !!valueTransfer.txid && (
+                  <RegText
+                    style={{
+                      opacity:
+                        valueTransfer.status ===
+                        RPCValueTransfersStatusEnum.failed
+                          ? 0.5
+                          : 1,
+                    }}
+                  >
+                    {Utils.trimToSmall(valueTransfer.txid, 10)}
+                  </RegText>
+                )}
+                {expandTxid && !!valueTransfer.txid && (
+                  <>
+                    <RegText
+                      style={{
+                        opacity:
+                          valueTransfer.status ===
+                          RPCValueTransfersStatusEnum.failed
+                            ? 0.5
+                            : 1,
+                      }}
+                    >
+                      {valueTransfer.txid}
+                    </RegText>
+                    {server.chainName !== ChainNameEnum.regtestChainName &&
+                      valueTransfer.status !==
+                        RPCValueTransfersStatusEnum.failed && (
+                        <TouchableOpacity
+                          onPress={() => handleTxIDClick(valueTransfer.txid)}
                         >
-                          {translate('history.viewexplorer') as string}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
+                          <Text
+                            style={{
+                              color: colors.text,
+                              textDecorationLine: 'underline',
+                              margin: 15,
+                            }}
+                          >
+                            {translate('history.viewexplorer') as string}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
 
-          {!!valueTransfer.fee && valueTransfer.fee > 0 && (
-            <View style={{ display: 'flex', marginTop: 10 }}>
-              <FadeText>{translate('history.txfee') as string}</FadeText>
+            {!!valueTransfer.fee && valueTransfer.fee > 0 && (
+              <View style={{ display: 'flex', marginTop: 10 }}>
+                <FadeText>{translate('history.txfee') as string}</FadeText>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <ZecAmount
+                    style={{
+                      opacity:
+                        valueTransfer.status ===
+                        RPCValueTransfersStatusEnum.failed
+                          ? 0.5
+                          : 1,
+                    }}
+                    amtZec={valueTransfer.fee}
+                    size={14}
+                    currencyName={info.currencyName}
+                    privacy={privacy}
+                  />
+                </View>
+              </View>
+            )}
+
+            {!!valueTransfer.address && (
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  marginTop: 10,
+                }}
+              >
+                <FadeText>{translate('history.address') as string}</FadeText>
+                <AddressItem
+                  address={valueTransfer.address}
+                  screenName={screenName}
+                  withIcon={true}
+                  withSendIcon={true}
+                  addressProtected={addressProtected}
+                />
+              </View>
+            )}
+
+            {!!valueTransfer.poolType && (
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  marginTop: 10,
+                }}
+              >
+                <FadeText>{translate('history.pool') as string}</FadeText>
+                <RegText
+                  style={{
+                    opacity:
+                      valueTransfer.status ===
+                      RPCValueTransfersStatusEnum.failed
+                        ? 0.5
+                        : 1,
+                  }}
+                >
+                  {valueTransfer.poolType}
+                </RegText>
+              </View>
+            )}
+
+            <View style={{ marginTop: 10 }}>
+              <FadeText>{translate('history.amount') as string}</FadeText>
               <View
                 style={{
                   display: 'flex',
@@ -746,162 +909,95 @@ const ValueTransferDetail: React.FunctionComponent<
                         ? 0.5
                         : 1,
                   }}
-                  amtZec={valueTransfer.fee}
+                  amtZec={valueTransfer.amount}
                   size={14}
                   currencyName={info.currencyName}
                   privacy={privacy}
                 />
+                {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
+                  <CurrencyAmount
+                    price={valueTransfer.zecPrice}
+                    amtZec={valueTransfer.amount}
+                    currency={currency}
+                    privacy={privacy}
+                  />
+                )}
               </View>
             </View>
-          )}
 
-          {!!valueTransfer.address && (
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                marginTop: 10,
-              }}
-            >
-              <FadeText>{translate('history.address') as string}</FadeText>
-              <AddressItem
-                address={valueTransfer.address}
-                screenName={screenName}
-                withIcon={true}
-                withSendIcon={true}
-                addressProtected={addressProtected}
-              />
-            </View>
-          )}
-
-          {!!valueTransfer.poolType && (
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                marginTop: 10,
-              }}
-            >
-              <FadeText>{translate('history.pool') as string}</FadeText>
-              <RegText
-                style={{
-                  opacity:
-                    valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                      ? 0.5
-                      : 1,
-                }}
-              >
-                {valueTransfer.poolType}
-              </RegText>
-            </View>
-          )}
-
-          <View style={{ marginTop: 10 }}>
-            <FadeText>{translate('history.amount') as string}</FadeText>
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
-            >
-              <ZecAmount
-                style={{
-                  opacity:
-                    valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                      ? 0.5
-                      : 1,
-                }}
-                amtZec={valueTransfer.amount}
-                size={14}
-                currencyName={info.currencyName}
-                privacy={privacy}
-              />
-              {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
-                <CurrencyAmount
-                  price={valueTransfer.zecPrice}
-                  amtZec={valueTransfer.amount}
-                  currency={currency}
-                  privacy={privacy}
-                />
-              )}
-            </View>
-          </View>
-
-          {(!!memo || !!memoUA) && (
-            <View style={{ marginTop: 10 }}>
-              <FadeText>{translate('history.memo') as string}</FadeText>
-              {!!memo && (
-                <TouchableOpacity
-                  onPress={() => {
-                    Clipboard.setString(memo);
-                    addLastSnackbar(
-                      translate('history.memocopied') as string,
-                      SnackbarDurationEnum.short,
-                    );
-                  }}
-                >
-                  <RegText selectable={true}>{memo}</RegText>
-                </TouchableOpacity>
-              )}
-              {!!memoUA && (
-                <TouchableOpacity
-                  onPress={() => {
-                    Clipboard.setString(memoUA);
-                    if (!thisWalletAddress(memoUA)) {
+            {(!!memo || !!memoUA) && (
+              <View style={{ marginTop: 10 }}>
+                <FadeText>{translate('history.memo') as string}</FadeText>
+                {!!memo && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      Clipboard.setString(memo);
                       addLastSnackbar(
-                        translate('history.address-http') as string,
-                        SnackbarDurationEnum.long,
+                        translate('history.memocopied') as string,
+                        SnackbarDurationEnum.short,
                       );
-                    }
-                    addLastSnackbar(
-                      translate('history.addresscopied') as string,
-                      SnackbarDurationEnum.short,
-                    );
-                  }}
-                >
-                  <RegText>{GlobalConst.replyTo}</RegText>
-                  {!thisWalletAddress(memoUA) && (
-                    <FontAwesomeIcon
-                      icon={faTriangleExclamation}
-                      color={'red'}
-                      size={14}
-                    />
-                  )}
-                  <RegText
-                    style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}
+                    }}
                   >
-                    {memoUA}
-                  </RegText>
-                  {contactFound(memoUA) && (
-                    <View style={{ flexDirection: 'row' }}>
-                      {!thisWalletAddress(memoUA) && (
-                        <RegText style={{ opacity: 0.6 }}>
-                          {translate('addressbook.likely') as string}
-                        </RegText>
-                      )}
-                      <AddressItem
-                        address={memoUA}
-                        screenName={screenName}
-                        onlyContact={true}
+                    <RegText selectable={true}>{memo}</RegText>
+                  </TouchableOpacity>
+                )}
+                {!!memoUA && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      Clipboard.setString(memoUA);
+                      if (!thisWalletAddress(memoUA)) {
+                        addLastSnackbar(
+                          translate('history.address-http') as string,
+                          SnackbarDurationEnum.long,
+                        );
+                      }
+                      addLastSnackbar(
+                        translate('history.addresscopied') as string,
+                        SnackbarDurationEnum.short,
+                      );
+                    }}
+                  >
+                    <RegText>{GlobalConst.replyTo}</RegText>
+                    {!thisWalletAddress(memoUA) && (
+                      <FontAwesomeIcon
+                        icon={faTriangleExclamation}
+                        color={'red'}
+                        size={14}
                       />
-                    </View>
-                  )}
-                  {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
-                    <View style={{ flexDirection: 'row' }}>
-                      <RegText color={colors.primaryDisabled}>
-                        {translate('addressbook.thiswalletaddress') as string}
-                      </RegText>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
-        </View>
-      </ScrollView>
+                    )}
+                    <RegText
+                      style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}
+                    >
+                      {memoUA}
+                    </RegText>
+                    {contactFound(memoUA) && (
+                      <View style={{ flexDirection: 'row' }}>
+                        {!thisWalletAddress(memoUA) && (
+                          <RegText style={{ opacity: 0.6 }}>
+                            {translate('addressbook.likely') as string}
+                          </RegText>
+                        )}
+                        <AddressItem
+                          address={memoUA}
+                          screenName={screenName}
+                          onlyContact={true}
+                        />
+                      </View>
+                    )}
+                    {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
+                      <View style={{ flexDirection: 'row' }}>
+                        <RegText color={colors.primaryDisabled}>
+                          {translate('addressbook.thiswalletaddress') as string}
+                        </RegText>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+          </View>
+        </BottomSheetScrollView>
+      </BottomSheet>
     </View>
   );
 };

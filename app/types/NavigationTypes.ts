@@ -19,6 +19,9 @@ export type AppStackParamList = {
   // Stack
   [RouteEnum.LoadingApp]: LoadingAppNavigationState | undefined;
   [RouteEnum.LoadedApp]: LoadedAppNavigationState | undefined;
+  // ScannerAddress is presented as a modal at the root Stack level so it
+  // overlays LoadedApp (and any open BottomSheet modals).
+  [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
 };
 
 /**
@@ -78,7 +81,6 @@ export type AppDrawerParamList = {
     | undefined;
   [RouteEnum.MessagesAddress]: MessagesAddressNavigationState | undefined;
   [RouteEnum.MessagesAll]: MessagesAllNavigationState | undefined;
-  [RouteEnum.Memo]: MemoNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
   [RouteEnum.Seed]: SeedNavigationState | undefined;
@@ -104,12 +106,7 @@ export type ValueTransferDetailNavigationState = {
   vt: ValueTransferType;
   valueTransfersSliced: ValueTransferType[];
   totalLength: number;
-};
-
-export type MemoNavigationState = {
-  message: string;
-  includeUAMessage: boolean;
-  setMessage: (m: string) => void;
+  from?: RouteEnum;
 };
 
 export type ConfirmNavigationState = {

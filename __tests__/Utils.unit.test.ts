@@ -144,7 +144,7 @@ describe('Utils.splitZecAmountIntoBigSmall', () => {
 
   test('handles zero', () => {
     const result = Utils.splitZecAmountIntoBigSmall(0);
-    expect(result.bigPart).toBe('0.0');
+    expect(result.bigPart).toBe('0');
     expect(result.smallPart).toBe('0000');
   });
 });

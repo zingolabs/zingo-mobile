@@ -22,11 +22,7 @@ describe('TransparentWarning - snapshot', () => {
     expect(
       render(
         <ContextAppLoadedProvider value={state}>
-          <TransparentWarning
-            onSuccess={onFn}
-            closeSheet={onFn}
-            setHeightLayout={onFn}
-          />
+          <TransparentWarning onSuccess={onFn} closeSheet={onFn} />
         </ContextAppLoadedProvider>,
       ).toJSON(),
     ).toMatchSnapshot();

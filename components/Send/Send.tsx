@@ -5,6 +5,7 @@ import React, {
   useContext,
   useCallback,
   useRef,
+  useMemo,
 } from 'react';
 import {
   View,
@@ -15,6 +16,7 @@ import {
   Platform,
   Text,
   Alert,
+  Pressable,
   NativeSyntheticEvent,
   TextInputEndEditingEventData,
   TextInputContentSizeChangeEventData,
@@ -74,10 +76,18 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
 import { RPCSendProposeType } from '../../app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
+import Memo from './components/Memo';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
 import { RPCParseAddressType } from '../../app/walletBackend/types/RPCParseAddressType';
@@ -193,10 +203,92 @@ const Send: React.FunctionComponent<SendProps> = ({
   );
   const [keyboardListenersDone, setKeyboardListenersDone] =
     useState<boolean>(false);
+  // Bumped when the memo sheet is presented so the child Memo component
+  // remounts with the latest memoText as its initial draft.
+  const [memoSheetKey, setMemoSheetKey] = useState<number>(0);
+  // measured dynamically to compute send sheet snap points
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
+  const [usdRowH, setUsdRowH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
+  const sendSheetRef = useRef<BottomSheet>(null);
+  const memoBottomSheetRef = useRef<BottomSheetModal>(null);
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
+  const keyboardHeight = useKeyboardHeight();
+
+  // Top icons strip height is a code-side constant (~55 px) — same on any phone.
+  const TOP_ICONS_H = 55;
+  const SNAP_GAP = 4;
+  // Bump applied to the snaps that sit just below a balance row (low + mid);
+  // the max snap (just below the top icons strip) doesn't need it.
+  const BALANCE_SNAP_BUMP = 10;
+
+  useEffect(() => {
+    const withUsd =
+      currency === CurrencyEnum.USDCurrency ||
+      currency === CurrencyEnum.USDTORCurrency;
+    if (!withUsd) {
+      setUsdRowH(0);
+    }
+  }, [currency]);
+
+  const sendSnapPoints = useMemo(() => {
+    const withUsd =
+      currency === CurrencyEnum.USDCurrency ||
+      currency === CurrencyEnum.USDTORCurrency;
+    if (containerH <= 0 || headerH <= 0) {
+      return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
+    }
+    const snapBase = containerH - headerH - SNAP_GAP;
+    const snapLow = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
+    const snapMid = Math.min(
+      Math.max(snapBase + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
+      containerH - TOP_ICONS_H - SNAP_GAP,
+    );
+    const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
+    if (withUsd && usdRowH > 0) {
+      return [snapLow, snapMid, snapMax];
+    }
+    return [snapLow, snapMax];
+  }, [currency, containerH, headerH, usdRowH]);
+
+  const renderSendHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 8,
+          paddingBottom: 6,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <View style={{ width: 28 }} />
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {translate('send.title') as string}
+          </BoldText>
+          <View style={{ width: 28 }} />
+        </View>
+      </View>
+    ),
+    [colors, translate],
+  );
 
   const runSendPropose = async (proposeJSON: string): Promise<string> => {
     try {
@@ -953,12 +1045,64 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const setMemoModalShow = () => {
-    navigation.navigate(RouteEnum.Memo, {
-      message: memoText,
-      includeUAMessage: includeUAMemoBoolean,
-      setMessage: setMemoText,
-    });
+    // Bump key so the child Memo remounts and re-reads memoText as initial.
+    setMemoSheetKey(k => k + 1);
+    memoBottomSheetRef.current?.present();
   };
+
+  const renderMemoBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  );
+
+  const renderMemoHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 8,
+          paddingBottom: 6,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <View style={{ width: 28 }} />
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {translate('send.memo') as string}
+          </BoldText>
+          <Pressable
+            onPress={() => memoBottomSheetRef.current?.dismiss()}
+            hitSlop={8}
+            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+          </Pressable>
+        </View>
+      </View>
+    ),
+    [colors, translate],
+  );
 
   const setConfirmModalShow = async (
     parseAddressInfoJSON: RPCParseAddressType,
@@ -979,6 +1123,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         confirmSend: confirmSend,
         sendAllAmount:
           mode !== ModeEnum.basic &&
+          maxAmount > 0 &&
           Utils.parseStringLocaleToNumberFloat(amountText) ===
             Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
         calculateFeeWithPropose: calculateFeeWithPropose,
@@ -999,7 +1144,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   //);
 
   const returnPage = (
-    <View>
+    <View
+      style={{ flex: 1 }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
+    >
       <View
         accessible={true}
         accessibilityLabel={translate('send.title-acc') as string}
@@ -1007,18 +1155,17 @@ const Send: React.FunctionComponent<SendProps> = ({
           display: 'flex',
           justifyContent: 'flex-start',
           width: '100%',
-          height: '100%',
-          marginBottom: 200,
         }}
       >
         <View
           onLayout={e => {
             const { height } = e.nativeEvent.layout;
+            setHeaderH(height);
             keyboardListeners(height);
           }}
         >
           <Header
-            title={translate('send.title') as string}
+            title={''}
             screenName={screenName}
             toggleMenuDrawer={toggleMenuDrawer}
             setPrivacyOption={setPrivacyOption}
@@ -1027,14 +1174,33 @@ const Send: React.FunctionComponent<SendProps> = ({
             setScrollToTop={setScrollToTop}
             setScrollToBottom={setScrollToBottom}
             setBackgroundError={setBackgroundError /* context */}
+            showMessagesIcon={true}
+            onUsdRowLayout={setUsdRowH}
           />
         </View>
+      </View>
+      <BottomSheet
+        ref={sendSheetRef}
+        snapPoints={sendSnapPoints}
+        index={0}
+        enableDynamicSizing={false}
+        enablePanDownToClose={false}
+        enableContentPanningGesture={false}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        handleComponent={renderSendHandle}
+      >
         <ScrollView
           ref={scrollViewRef}
           onContentSizeChange={(_, height) => setContentHeight(height)}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{}}
           testID="send.scroll-view"
+          bounces={false}
+          alwaysBounceVertical={false}
         >
           <View
             style={{
@@ -1110,7 +1276,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         color: colors.text,
                         fontWeight: '600',
                         fontSize: 14,
-                        marginLeft: 5,
+                        padding: 10,
                         backgroundColor: 'transparent',
                       }}
                       value={addressText}
@@ -1552,7 +1718,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                         />
                       )}
                       <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                        <PriceFetcher setZecPrice={setZecPrice} />
+                        <PriceFetcher
+                          setZecPrice={setZecPrice}
+                          backgroundColor={colors.bottomSheetBackground}
+                        />
                       </View>
                     </>
                   )}
@@ -1560,6 +1729,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
                 <View style={{ display: 'flex', flexDirection: 'column' }}>
                   <TouchableOpacity
+                    style={{ alignSelf: 'flex-start' }}
                     onPress={() => {
                       if (
                         spendableBalanceLastError &&
@@ -1645,9 +1815,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                           display: 'flex',
                           flexDirection: 'row',
                           marginTop: 0,
-                          backgroundColor: colors.card,
+                          backgroundColor: colors.bottomSheetBackground,
                           padding: 5,
                           borderRadius: 10,
+                          alignSelf: 'flex-start',
                         }}
                       >
                         <FontAwesomeIcon
@@ -1669,53 +1840,54 @@ const Send: React.FunctionComponent<SendProps> = ({
                   {validAddress !== 0 &&
                     validAmount !== 0 &&
                     (fee > 0 || !!proposeSendLastError) && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          marginTop: 0,
-                          backgroundColor: colors.card,
-                          padding: 5,
-                          borderRadius: 10,
+                      <TouchableOpacity
+                        style={{ alignSelf: 'flex-start' }}
+                        onPress={() => {
+                          if (
+                            proposeSendLastError &&
+                            mode === ModeEnum.advanced
+                          ) {
+                            Alert.alert(
+                              translate('send.fee') as string,
+                              proposeSendLastError,
+                              [
+                                {
+                                  text: translate('support') as string,
+                                  onPress: async () =>
+                                    sendEmail(
+                                      translate,
+                                      zingolibVersion,
+                                      translate('send.fee') as string,
+                                      proposeSendLastError,
+                                    ),
+                                },
+                                {
+                                  text: translate('cancel') as string,
+                                  style: 'cancel',
+                                },
+                              ],
+                              { cancelable: false },
+                            );
+                          }
                         }}
                       >
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          size={16}
-                          color={colors.primary}
-                          style={{ marginRight: 5 }}
-                        />
-                        <FadeText>{'( '}</FadeText>
-                        <TouchableOpacity
-                          onPress={() => {
-                            if (
-                              proposeSendLastError &&
-                              mode === ModeEnum.advanced
-                            ) {
-                              Alert.alert(
-                                translate('send.fee') as string,
-                                proposeSendLastError,
-                                [
-                                  {
-                                    text: translate('support') as string,
-                                    onPress: async () =>
-                                      sendEmail(
-                                        translate,
-                                        zingolibVersion,
-                                        translate('send.fee') as string,
-                                        proposeSendLastError,
-                                      ),
-                                  },
-                                  {
-                                    text: translate('cancel') as string,
-                                    style: 'cancel',
-                                  },
-                                ],
-                                { cancelable: false },
-                              );
-                            }
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            marginTop: 0,
+                            backgroundColor: colors.bottomSheetBackground,
+                            padding: 5,
+                            borderRadius: 10,
                           }}
                         >
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            size={16}
+                            color={colors.primary}
+                            style={{ marginRight: 5 }}
+                          />
+                          <FadeText>{'( '}</FadeText>
                           <FadeText
                             style={{
                               color:
@@ -1723,6 +1895,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 mode === ModeEnum.advanced
                                   ? 'red'
                                   : colors.money,
+                              opacity:
+                                proposeSendLastError &&
+                                mode === ModeEnum.advanced
+                                  ? 1
+                                  : 0.65,
                             }}
                           >
                             {(translate('send.fee') as string) +
@@ -1730,12 +1907,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                               Utils.parseNumberFloatToStringLocale(fee, 8) +
                               ' '}
                           </FadeText>
-                        </TouchableOpacity>
-                        <FadeText>{')'}</FadeText>
-                      </View>
+                          <FadeText>{')'}</FadeText>
+                        </View>
+                      </TouchableOpacity>
                     )}
                   {stillConfirming && (
                     <TouchableOpacity
+                      style={{ alignSelf: 'flex-start' }}
                       onPress={() => {
                         navigation.navigate(RouteEnum.Pools);
                       }}
@@ -1745,7 +1923,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           display: 'flex',
                           flexDirection: 'row',
                           marginTop: 0,
-                          backgroundColor: colors.card,
+                          backgroundColor: colors.bottomSheetBackground,
                           padding: 5,
                           borderRadius: 10,
                         }}
@@ -1764,6 +1942,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   )}
                   {showShieldInfo && mode === ModeEnum.advanced && (
                     <TouchableOpacity
+                      style={{ alignSelf: 'flex-start' }}
                       onPress={() => {
                         navigation.navigate(RouteEnum.Pools);
                       }}
@@ -1773,7 +1952,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           display: 'flex',
                           flexDirection: 'row',
                           marginTop: 0,
-                          backgroundColor: colors.card,
+                          backgroundColor: colors.bottomSheetBackground,
                           padding: 5,
                           borderRadius: 10,
                         }}
@@ -2030,6 +2209,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     validAmount === 1 &&
                     amountText &&
                     mode !== ModeEnum.basic &&
+                    maxAmount > 0 &&
                     Utils.parseStringLocaleToNumberFloat(amountText) ===
                       Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
                       ? (translate('send.button-all') as string)
@@ -2189,7 +2369,41 @@ const Send: React.FunctionComponent<SendProps> = ({
             </View>
           </View>
         </ScrollView>
-      </View>
+      </BottomSheet>
+      <BottomSheetModal
+        ref={memoBottomSheetRef}
+        enableDynamicSizing={true}
+        enablePanDownToClose
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
+        handleComponent={renderMemoHandle}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        backdropComponent={renderMemoBackdrop}
+      >
+        <BottomSheetView
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingHorizontal: 20,
+            paddingTop: 12,
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
+          }}
+        >
+          <Memo
+            key={memoSheetKey}
+            closeSheet={() => memoBottomSheetRef.current?.dismiss()}
+            initialMemo={memoText}
+            includeUAMemoBoolean={includeUAMemoBoolean}
+            defaultUnifiedAddress={defaultUnifiedAddress}
+            setMemoText={setMemoText}
+            translate={translate}
+          />
+        </BottomSheetView>
+      </BottomSheetModal>
     </View>
   );
 

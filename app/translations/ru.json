@@ -551,6 +551,10 @@
   "receive": {
     "u-title": "Защищёный",
     "t-title": "Публичный",
+    "scope-shielded": "Защищённый адрес",
+    "scope-transparent": "Прозрачный адрес",
+    "select-scope-placeholder": "Выберите тип адреса",
+    "transparent-expose-warning": "Прозрачные адреса раскрывают ваши данные.",
     "noaddress": "Адрес не указан",
     "title-address": "Мои адреса",
     "title-basic-alone": "Мой адрес получения",

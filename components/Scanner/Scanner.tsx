@@ -47,6 +47,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({
   return (
     <View
       style={{
+        flex: 1,
         backgroundColor: colors.background,
       }}
     >
@@ -56,10 +57,17 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({
         </View>
       ) : (
         <Camera
-          style={{ width: '100%', height: '100%' }}
+          style={{ flex: 1 }}
           device={device}
           isActive={active}
           codeScanner={codeScanner}
+          // Force Android to use TextureView instead of the default
+          // SurfaceView. SurfaceView renders in its own hardware compositor
+          // layer that ignores React Native's view hierarchy/z-order, which
+          // makes the preview cover surrounding views (like the Header).
+          // TextureView renders inside the regular RN view tree and respects
+          // the parent flex bounds.
+          androidPreviewViewType="texture-view"
         />
       )}
     </View>

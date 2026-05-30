@@ -551,6 +551,10 @@
   "receive": {
     "u-title": "Shielded",
     "t-title": "Exposed transparent",
+    "scope-shielded": "Shielded Address",
+    "scope-transparent": "Transparent Address",
+    "select-scope-placeholder": "Select address kind",
+    "transparent-expose-warning": "Transparent addresses expose your details.",
     "noaddress": "No Address",
     "title-address": "My Address",
     "title-basic-alone": "My Receiving Address",

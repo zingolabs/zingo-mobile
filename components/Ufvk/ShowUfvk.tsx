@@ -9,16 +9,16 @@ import React, {
 } from 'react';
 import {
   View,
-  ScrollView,
   Alert,
   ActivityIndicator,
-  Dimensions,
   Text,
   TouchableOpacity,
 } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
@@ -26,6 +26,7 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
 import RegText from '../Components/RegText';
+import BoldText from '../Components/BoldText';
 import {
   ButtonTypeEnum,
   ChainNameEnum,
@@ -35,12 +36,16 @@ import {
   SnackbarDurationEnum,
   UfvkActionEnum,
 } from '../../app/AppState';
-import {
+import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
+  BottomSheetFooter,
+  BottomSheetFooterProps,
   BottomSheetModal,
+  BottomSheetScrollView,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
+import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import ExpandedAddress from '../Receive/components/ExpandedAddress';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
@@ -86,11 +91,13 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       ? route.params.action
       : UfvkActionEnum.view,
   );
-  const [heightLayout, setHeightLayout] = useState<number>(10);
   const [fetchedWallet, setFetchedWallet] = useState<WalletType>(
     {} as WalletType,
   );
   const [loadingUfvk, setLoadingUfvk] = useState<boolean>(true);
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
+  const ufvkSheetRef = useRef<BottomSheet>(null);
 
   useEffect(() => {
     (async () => {
@@ -108,18 +115,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-
-  const snapPoints = useMemo(() => {
-    let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
-    if (snap1 < 1) {
-      snap1 = 1;
-    }
-    let snap2: number = 80;
-    if (snap1 < 80) {
-      snap2 = snap1 + 20;
-    }
-    return [`${snap1}%`, `${snap2}%`];
-  }, [heightLayout]);
 
   const show = useCallback((_sheetType: 'EA') => {
     setSheetType(_sheetType);
@@ -238,6 +233,108 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     }, 60 * 1000);
   };
 
+  const ufvkSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  const ufvkTitle = useMemo(
+    () => translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')',
+    [action, translate],
+  );
+
+  const renderUfvkHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 12,
+          paddingBottom: 8,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <TouchableOpacity
+            onPress={onClickCancelHide}
+            hitSlop={8}
+            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronLeft}
+              size={20}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {ufvkTitle}
+          </BoldText>
+          <View style={{ width: 28 }} />
+        </View>
+      </View>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [colors, ufvkTitle],
+  );
+
+  const renderUfvkFooter = useCallback(
+    (props: BottomSheetFooterProps) => (
+      <BottomSheetFooter {...props} bottomInset={0}>
+        <View
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingTop: 10,
+            paddingBottom: 14,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            type={
+              mode === ModeEnum.basic
+                ? ButtonTypeEnum.Secondary
+                : ButtonTypeEnum.Primary
+            }
+            style={{
+              backgroundColor:
+                mode === ModeEnum.basic ? colors.background : colors.primary,
+            }}
+            title={
+              mode === ModeEnum.basic
+                ? (translate('cancel') as string)
+                : !!texts && !!texts[action]
+                  ? texts[action][times]
+                  : ''
+            }
+            onPress={() => {
+              if (!fetchedWallet.ufvk) {
+                return;
+              }
+              if (times === 0) {
+                onClickOKHide();
+              } else if (times === 1) {
+                onPressOK();
+              }
+            }}
+          />
+        </View>
+      </BottomSheetFooter>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [colors, mode, texts, action, times, fetchedWallet.ufvk, translate],
+  );
+
   return (
     <View>
       <View
@@ -245,141 +342,132 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           flex: 1,
           backgroundColor: colors.background,
         }}
+        onLayout={e => setContainerH(e.nativeEvent.layout.height)}
       >
-        <Header
-          title={
-            translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'
-          }
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noUfvkIcon={true}
-          setPrivacyOption={setPrivacyOption}
-          addLastSnackbar={addLastSnackbar}
-          closeScreen={onClickCancelHide}
-        />
-        {loadingUfvk ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.primary}
-            style={{ marginVertical: 20 }}
+        <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
+          <Header
+            title={''}
+            screenName={screenName}
+            noBalance={true}
+            noSyncingStatus={true}
+            noDrawMenu={true}
+            noUfvkIcon={true}
+            setPrivacyOption={setPrivacyOption}
+            addLastSnackbar={addLastSnackbar}
           />
-        ) : (
-          <>
-            <ScrollView
-              style={{ height: '80%', maxHeight: '80%' }}
-              contentContainerStyle={{
-                flexDirection: 'column',
-                alignItems: 'stretch',
-                justifyContent: 'flex-start',
-              }}
-            >
-              <RegText
+        </View>
+        <BottomSheet
+          ref={ufvkSheetRef}
+          snapPoints={ufvkSnapPoints}
+          index={0}
+          enableDynamicSizing={false}
+          enablePanDownToClose={false}
+          enableContentPanningGesture={false}
+          backgroundStyle={{
+            backgroundColor: colors.bottomSheetBackground,
+            borderTopLeftRadius: 40,
+            borderTopRightRadius: 40,
+          }}
+          handleComponent={renderUfvkHandle}
+          footerComponent={loadingUfvk ? undefined : renderUfvkFooter}
+        >
+          {loadingUfvk ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              style={{ marginVertical: 20 }}
+            />
+          ) : (
+            <>
+              <BottomSheetScrollView
+                bounces={false}
+                alwaysBounceVertical={false}
                 style={{
-                  marginTop: 0,
-                  padding: 20,
-                  textAlign: 'center',
-                  fontWeight: '900',
+                  flex: 1,
+                  backgroundColor: colors.bottomSheetBackground,
                 }}
-              >
-                {action === UfvkActionEnum.backup ||
-                action === UfvkActionEnum.change ||
-                action === UfvkActionEnum.server
-                  ? (translate(`ufvk.text-readonly-${action}`) as string)
-                  : (translate('ufvk.text-readonly') as string)}
-              </RegText>
-
-              <View
-                style={{
-                  display: 'flex',
+                contentContainerStyle={{
                   flexDirection: 'column',
-                  marginTop: 0,
-                  alignItems: 'center',
+                  alignItems: 'stretch',
+                  justifyContent: 'flex-start',
+                  paddingBottom: 80,
                 }}
               >
-                {!!fetchedWallet.ufvk && (
-                  <>
-                    <SingleAddress
-                      ufvk={fetchedWallet.ufvk}
-                      index={0}
-                      setIndex={() => {}}
-                      total={1}
-                      show={() => show('EA')}
-                    />
-                    <TouchableOpacity onPress={doCopy}>
-                      <Text
-                        style={{
-                          color: colors.text,
-                          textDecorationLine: 'underline',
-                          padding: 10,
-                          textAlign: 'center',
-                          minHeight: 48,
-                        }}
-                      >
-                        {translate('seed.tapcopy') as string}
-                      </Text>
-                    </TouchableOpacity>
-                  </>
-                )}
-              </View>
+                <RegText
+                  style={{
+                    marginTop: 0,
+                    padding: 20,
+                    textAlign: 'center',
+                    fontWeight: '900',
+                  }}
+                >
+                  {action === UfvkActionEnum.backup ||
+                  action === UfvkActionEnum.change ||
+                  action === UfvkActionEnum.server
+                    ? (translate(`ufvk.text-readonly-${action}`) as string)
+                    : (translate('ufvk.text-readonly') as string)}
+                </RegText>
 
-              <View style={{ marginBottom: 30 }} />
-            </ScrollView>
-            <View
-              style={{
-                flexGrow: 1,
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginVertical: 5,
-              }}
-            >
-              <Button
-                type={
-                  mode === ModeEnum.basic
-                    ? ButtonTypeEnum.Secondary
-                    : ButtonTypeEnum.Primary
-                }
-                style={{
-                  backgroundColor:
-                    mode === ModeEnum.basic
-                      ? colors.background
-                      : colors.primary,
-                }}
-                title={
-                  mode === ModeEnum.basic
-                    ? (translate('cancel') as string)
-                    : !!texts && !!texts[action]
-                      ? texts[action][times]
-                      : ''
-                }
-                onPress={() => {
-                  if (!fetchedWallet.ufvk) {
-                    return;
-                  }
-                  if (times === 0) {
-                    onClickOKHide();
-                  } else if (times === 1) {
-                    onPressOK();
-                  }
-                }}
-              />
-            </View>
-          </>
-        )}
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginTop: 0,
+                    alignItems: 'center',
+                  }}
+                >
+                  {!!fetchedWallet.ufvk && (
+                    <>
+                      <SingleAddress
+                        ufvk={fetchedWallet.ufvk}
+                        index={0}
+                        setIndex={() => {}}
+                        total={1}
+                        show={() => show('EA')}
+                      />
+                      <TouchableOpacity onPress={doCopy}>
+                        <Text
+                          style={{
+                            color: colors.text,
+                            textDecorationLine: 'underline',
+                            padding: 10,
+                            textAlign: 'center',
+                            minHeight: 48,
+                          }}
+                        >
+                          {translate('seed.tapcopy') as string}
+                        </Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </View>
+
+                <View style={{ marginBottom: 30 }} />
+              </BottomSheetScrollView>
+            </>
+          )}
+        </BottomSheet>
       </View>
       <BottomSheetModal
         ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        enableDynamicSizing={false}
+        enableDynamicSizing={true}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         handleStyle={{ display: 'none' }}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
         backdropComponent={renderBackdrop}
       >
         <BottomSheetView
-          style={{ backgroundColor: colors.background, height: '100%' }}
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingBottom: 30,
+          }}
         >
           {sheetType === 'EA' && (
             <ExpandedAddress
@@ -388,7 +476,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
               title={translate('receive.title-address') as string}
               button={translate('receive.copy-address-button') as string}
               address={fetchedWallet.ufvk ? fetchedWallet.ufvk : ''}
-              setHeightLayout={setHeightLayout}
             />
           )}
         </BottomSheetView>

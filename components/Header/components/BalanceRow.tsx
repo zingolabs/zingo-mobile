@@ -55,6 +55,7 @@ type BalanceRowProps = {
   calculateDisableButtonToShield: () => boolean;
   onPressShieldFunds: () => void;
   receivedLegend: boolean | undefined;
+  onUsdRowLayout?: (height: number) => void;
 };
 
 const BalanceRow: React.FC<BalanceRowProps> = React.memo(
@@ -80,6 +81,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     calculateDisableButtonToShield,
     onPressShieldFunds,
     receivedLegend,
+    onUsdRowLayout,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme() as ThemeType;
@@ -190,7 +192,10 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           currency === CurrencyEnum.USDTORCurrency) &&
           !noBalance &&
           selectServer !== SelectServerEnum.offline && (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View
+              onLayout={e => onUsdRowLayout?.(e.nativeEvent.layout.height)}
+              style={{ flexDirection: 'row', alignItems: 'center' }}
+            >
               <CurrencyAmount
                 style={{ marginTop: 0, marginBottom: 0 }}
                 price={zecPrice.zecPrice}

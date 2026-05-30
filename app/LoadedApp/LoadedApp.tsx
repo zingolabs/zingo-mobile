@@ -108,7 +108,6 @@ import { AddressList } from '../../components/AddressList';
 import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
 import { MessagesAddress, MessagesAll } from '../../components/Messages';
-import Memo from '../../components/Memo';
 import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
@@ -2470,10 +2469,6 @@ export class LoadedAppClass extends Component<
                   name={RouteEnum.AddressList}
                   component={AddressList}
                 />
-                <Drawer.Screen
-                  name={RouteEnum.ScannerAddress}
-                  component={ScannerAddress}
-                />
                 <Drawer.Screen name={RouteEnum.Messages}>
                   {props => (
                     <MessageList
@@ -2495,7 +2490,6 @@ export class LoadedAppClass extends Component<
                   name={RouteEnum.MessagesAll}
                   component={MessagesAll}
                 />
-                <Drawer.Screen name={RouteEnum.Memo} component={Memo} />
                 <Drawer.Screen name={RouteEnum.ConfirmStack}>
                   {() => {
                     return (

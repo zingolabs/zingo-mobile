@@ -551,6 +551,10 @@
   "receive": {
     "u-title": "Blindadas",
     "t-title": "Transparente expuesta",
+    "scope-shielded": "Dirección Blindada",
+    "scope-transparent": "Dirección Transparente",
+    "select-scope-placeholder": "Selecciona el tipo de dirección",
+    "transparent-expose-warning": "Las direcciones transparentes exponen tus datos.",
     "noaddress": "Sin Direcciones",
     "title-address": "Mi Dirección",
     "title-basic-alone": "Mi Dirección de Recepción",

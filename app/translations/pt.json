@@ -551,6 +551,10 @@
   "receive": {
     "u-title": "Blindadas",
     "t-title": "Transparente exposto",
+    "scope-shielded": "Endereço Blindado",
+    "scope-transparent": "Endereço Transparente",
+    "select-scope-placeholder": "Selecione o tipo de endereço",
+    "transparent-expose-warning": "Endereços transparentes expõem seus dados.",
     "noaddress": "Sem Endereço",
     "title-address": "Meu Endereço",
     "title-basic-alone": "Meu Endereço de Recebimento",

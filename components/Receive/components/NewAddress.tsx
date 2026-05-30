@@ -4,7 +4,6 @@ import {
   View,
   TextInput,
   NativeSyntheticEvent,
-  TouchableOpacity,
   Keyboard,
   Platform,
 } from 'react-native';
@@ -25,7 +24,7 @@ import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
 import { AddressUnifiedTypeEnum } from '../../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import ContextMenu, {
   ContextMenuOnPressNativeEvent,
 } from 'react-native-context-menu-view';
@@ -40,13 +39,11 @@ type NewAddressProps = {
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   screenName: ScreenEnum;
-  setHeightLayout: (h: number) => void;
 };
 const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   addressKind,
   closeSheet,
   setAddressBook,
-  setHeightLayout,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar } = context;
@@ -131,40 +128,10 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
 
   return (
     <View
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        //console.log('LAYOUTTT', height);
-        setHeightLayout(height + 80);
-      }}
       style={{
-        backgroundColor: colors.background,
+        backgroundColor: colors.bottomSheetBackground,
       }}
     >
-      <TouchableOpacity
-        onPress={() => {
-          setLabel('');
-          Keyboard.dismiss();
-          setTimeout(() => {
-            closeSheet();
-          }, 100);
-        }}
-      >
-        <FontAwesomeIcon
-          size={24}
-          icon={faXmark}
-          color={colors.text}
-          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
-        />
-      </TouchableOpacity>
-      <RegText
-        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
-      >
-        {
-          (addressKind === AddressKindEnum.u
-            ? translate('receive.newu-option')
-            : translate('receive.transparent.newt-option')) as string
-        }
-      </RegText>
       <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
         <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
           {'Tag (Optional)'}

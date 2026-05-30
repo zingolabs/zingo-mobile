@@ -25,7 +25,6 @@ describe('Filters - snapshots', () => {
         <ContextAppLoadedProvider value={state}>
           <Filters
             closeSheet={onFn}
-            setHeightLayout={onFn}
             filterKind={null}
             setFilterKind={onFn}
             filterFailed={false}
@@ -46,7 +45,6 @@ describe('Filters - snapshots', () => {
         <ContextAppLoadedProvider value={state}>
           <Filters
             closeSheet={onFn}
-            setHeightLayout={onFn}
             filterKind={FilterEnum.sent}
             setFilterKind={onFn}
             filterFailed={true}

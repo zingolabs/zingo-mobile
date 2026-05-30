@@ -85,6 +85,11 @@ export default class Utils {
       decimalPart = decimalPart.replace(/0+$/, '') || '0';
     }
 
+    // Drop the "0." suffix entirely when the value is exactly zero — show plain "0".
+    if (intPart === 0 && smallPart === '0000' && decimalPart === '0') {
+      return { bigPart: '0', smallPart };
+    }
+
     return { bigPart: intPart + decimalSeparator + decimalPart, smallPart };
   }
 

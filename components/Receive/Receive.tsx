@@ -2,29 +2,31 @@
 import React, {
   useContext,
   useState,
-  ReactNode,
   useEffect,
   useRef,
   useMemo,
   useCallback,
 } from 'react';
-import { Dimensions, Keyboard, View } from 'react-native';
-import {
-  TabView,
-  SceneRendererProps,
-  Route,
-  NavigationState,
-} from 'react-native-tab-view';
+import { Keyboard, Pressable, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import {
+  faChevronDown,
+  faPlus,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
+import RNPickerSelect from 'react-native-picker-select';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '../Components/SingleAddress';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import BoldText from '../Components/BoldText';
 
 import {
   AddressKindEnum,
+  CurrencyEnum,
   ModeEnum,
   SecurityType,
   UnifiedAddressClass,
@@ -35,7 +37,7 @@ import {
   RouteEnum,
 } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/walletBackend/enums/RPCAddressScopeEnum';
-import {
+import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetModal,
@@ -47,6 +49,7 @@ import NewAddressTag from './components/NewAddressTag';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from './components/ExpandedAddress';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 
 type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
   toggleMenuDrawer: () => void;
@@ -62,7 +65,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   // privacy
   // shielding
   // for receive
-  alone,
+  alone: _alone,
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -72,10 +75,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const screenName = ScreenEnum.Receive;
 
   const [index, setIndex] = useState<number>(0);
-  const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
   const [sheetType, setSheetType] = useState<
     'NA' | 'VA' | 'NAT' | 'TW' | 'EA' | null
   >(null);
+
+  // measured dynamically to compute receive sheet snap points
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
+  const [usdRowH, setUsdRowH] = useState<number>(0);
 
   const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
   const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
@@ -83,66 +90,59 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [tAddrIndex, setTAddrIndex] = useState<number | null>(null);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [heightLayout, setHeightLayout] = useState<number>(10);
+  const receiveSheetRef = useRef<BottomSheet>(null);
+  const keyboardHeight = useKeyboardHeight();
 
-  const snapPoints = useMemo(() => {
-    let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
-    if (snap1 < 1) {
-      snap1 = 1;
+  // Receive sheet snap points — identical computation to History so both
+  // screens feel the same when dragging.
+  const TOP_ICONS_H = 55;
+  const SNAP_GAP = 4;
+  const BALANCE_SNAP_BUMP = 10;
+
+  useEffect(() => {
+    const withUsd =
+      context.currency === CurrencyEnum.USDCurrency ||
+      context.currency === CurrencyEnum.USDTORCurrency;
+    if (!withUsd) {
+      setUsdRowH(0);
     }
-    let snap2: number = 80;
-    if (snap1 < 80) {
-      snap2 = snap1 + 20;
+  }, [context.currency]);
+
+  const receiveSnapPoints = useMemo(() => {
+    const withUsd =
+      context.currency === CurrencyEnum.USDCurrency ||
+      context.currency === CurrencyEnum.USDTORCurrency;
+    if (containerH <= 0 || headerH <= 0) {
+      return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
-    return [`${snap1}%`, `${snap2}%`];
-  }, [heightLayout]);
+    const snapBase = containerH - headerH - SNAP_GAP;
+    const snapLow = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
+    const snapMid = Math.min(
+      Math.max(snapBase + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
+      containerH - TOP_ICONS_H - SNAP_GAP,
+    );
+    const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
+    if (withUsd && usdRowH > 0) {
+      return [snapLow, snapMid, snapMax];
+    }
+    return [snapLow, snapMax];
+  }, [context.currency, containerH, headerH, usdRowH]);
+
+  const initialReceiveSnapIndex = useMemo(
+    () => receiveSnapPoints.length - 1,
+    [receiveSnapPoints],
+  );
 
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
     setSheetType(_sheetType);
     bottomSheetRef.current?.present();
-    setIndexBottomSheet(0);
   }, []);
 
   const hide = useCallback(() => {
     setSheetType(null);
     Keyboard.dismiss();
     bottomSheetRef.current?.dismiss();
-    setIndexBottomSheet(-1);
-    setHeightLayout(10);
   }, []);
-
-  const handleSheetChanges = useCallback((ind: number) => {
-    //console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& handleSheetChanges', ind);
-    setIndexBottomSheet(ind);
-  }, []);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        if (indexBottomSheet > -1) {
-          bottomSheetRef.current?.snapToIndex(1);
-          setIndexBottomSheet(1);
-        }
-      },
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        if (indexBottomSheet > -1) {
-          bottomSheetRef.current?.snapToIndex(0);
-          setIndexBottomSheet(0);
-        }
-      },
-    );
-
-    return () => {
-      !!keyboardDidShowListener && keyboardDidShowListener.remove();
-      !!keyboardDidHideListener && keyboardDidHideListener.remove();
-    };
-  }, [indexBottomSheet]);
 
   useEffect(() => {
     if (addresses && addresses.length > 0) {
@@ -168,121 +168,79 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     }
   }, [addresses]);
 
-  useEffect(() => {
-    const basicModeRoutes = [
-      { key: 'uaddr', title: translate('receive.u-title') as string },
-    ];
-    const advancedModeRoutes = [
-      { key: 'uaddr', title: translate('receive.u-title') as string },
-      { key: 'taddr', title: translate('receive.t-title') as string },
-    ];
-    setRoutes(mode === ModeEnum.basic ? basicModeRoutes : advancedModeRoutes);
-  }, [mode, translate]);
+  const isAdvanced = mode !== ModeEnum.basic;
+  const canPickScope = isAdvanced && tAddr && tAddr.length > 0;
 
-  const renderScene: (
-    props: SceneRendererProps & {
-      route: Route;
-    },
-  ) => ReactNode = ({ route }) => {
-    let component: React.ReactNode;
-    switch (route.key) {
-      case 'uaddr': {
-        let uAddress = new UnifiedAddressClass(
-          0,
-          translate('receive.noaddress') as string,
-          AddressKindEnum.u,
-          false,
-          false,
-          false,
-        );
-        if (uAddrIndex !== null && uAddr.length > 0) {
-          uAddress = uAddr[uAddrIndex];
-        }
+  const scopeItems = useMemo(
+    () => [
+      { label: translate('receive.scope-shielded') as string, value: 'u' },
+      { label: translate('receive.scope-transparent') as string, value: 't' },
+    ],
+    [translate],
+  );
 
-        component = (
-          <>
-            {!!addresses && !!defaultUnifiedAddress && (
-              <>
-                <SingleAddress
-                  address={uAddress}
-                  index={uAddrIndex ? uAddrIndex : 0}
-                  setIndex={setUAddrIndex}
-                  total={uAddr.length}
-                  show={show}
-                  changeIndex={setIndex}
-                  hasTransparent={tAddr && tAddr.length > 0}
-                  showMoreOptions={showMoreOptions}
-                  setShowMoreOptions={setShowMoreOptions}
-                />
-              </>
-            )}
-          </>
-        );
-        break;
-      }
-      case 'taddr': {
-        let tAddress = new TransparentAddressClass(
-          0,
-          translate('receive.noaddress') as string,
-          AddressKindEnum.t,
-          RPCAddressScopeEnum.external,
-        );
-        if (tAddrIndex !== null && tAddr.length > 0) {
-          tAddress = tAddr[tAddrIndex];
-        }
-
-        component = (
-          <>
-            {!!addresses && !!defaultUnifiedAddress && (
-              <>
-                <SingleAddress
-                  address={tAddress}
-                  index={tAddrIndex ? tAddrIndex : 0}
-                  setIndex={setTAddrIndex}
-                  total={tAddr.length}
-                  show={show}
-                  changeIndex={setIndex}
-                />
-              </>
-            )}
-          </>
-        );
-        break;
-      }
+  const modalTitle = useMemo(() => {
+    switch (sheetType) {
+      case 'NA':
+        return (
+          index === 0
+            ? translate('receive.newu-option')
+            : translate('receive.transparent.newt-option')
+        ) as string;
+      case 'VA':
+        return translate('receive.verify') as string;
+      case 'NAT':
+        return translate('receive.add-tag') as string;
+      case 'TW':
+        return translate('receive.modal-transparent.title') as string;
+      case 'EA':
+        return translate('receive.title-address') as string;
+      default:
+        return '';
     }
-    return <>{component}</>;
-  };
+  }, [sheetType, index, translate]);
 
-  const renderTabBarPage: (
-    props: SceneRendererProps & {
-      navigationState: NavigationState<Route>;
-    },
-  ) => ReactNode = () => {
-    return (
+  const renderModalHandle = useCallback(
+    () => (
       <View
-        accessible={true}
-        accessibilityLabel={translate('receive.title-acc') as string}
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          width: '100%',
+          paddingTop: 8,
+          paddingBottom: 6,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
         }}
       >
-        <Header
-          title={
-            alone
-              ? (translate('receive.title-basic-alone') as string)
-              : (translate('receive.title-address') as string)
-          }
-          testID="receive.title"
-          screenName={screenName}
-          toggleMenuDrawer={toggleMenuDrawer}
-          noBalance={true}
-          noPrivacy={true}
-        />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <View style={{ width: 28 }} />
+          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+            {modalTitle}
+          </BoldText>
+          <Pressable
+            onPress={hide}
+            hitSlop={8}
+            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+          </Pressable>
+        </View>
       </View>
-    );
-  };
+    ),
+    [colors, modalTitle, hide],
+  );
 
   const renderBackdrop = (props: BottomSheetBackdropProps) => (
     <BottomSheetBackdrop
@@ -307,29 +265,208 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     );
   };
 
+  // Resolve the address currently shown based on the scope index.
+  const currentAddress = useMemo(() => {
+    if (index === 0) {
+      if (uAddrIndex !== null && uAddr.length > 0) {
+        return uAddr[uAddrIndex];
+      }
+      return new UnifiedAddressClass(
+        0,
+        translate('receive.noaddress') as string,
+        AddressKindEnum.u,
+        false,
+        false,
+        false,
+      );
+    }
+    if (tAddrIndex !== null && tAddr.length > 0) {
+      return tAddr[tAddrIndex];
+    }
+    return new TransparentAddressClass(
+      0,
+      translate('receive.noaddress') as string,
+      AddressKindEnum.t,
+      RPCAddressScopeEnum.external,
+    );
+  }, [index, uAddrIndex, tAddrIndex, uAddr, tAddr, translate]);
+
+  const setCurrentAddrIndex = index === 0 ? setUAddrIndex : setTAddrIndex;
+  const currentTotal = index === 0 ? uAddr.length : tAddr.length;
+  const currentAddrIndex = index === 0 ? (uAddrIndex ?? 0) : (tAddrIndex ?? 0);
+
   const returnPage = (
-    <>
-      <TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        renderTabBar={renderTabBarPage}
-        onIndexChange={setIndex}
-        swipeEnabled={false}
-      />
+    <View
+      style={{ flex: 1 }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
+    >
+      <View
+        accessible={true}
+        accessibilityLabel={translate('receive.title-acc') as string}
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          width: '100%',
+        }}
+        onLayout={e => setHeaderH(e.nativeEvent.layout.height)}
+      >
+        <Header
+          title={''}
+          testID="receive.title"
+          screenName={screenName}
+          toggleMenuDrawer={toggleMenuDrawer}
+          showMessagesIcon={true}
+          onUsdRowLayout={setUsdRowH}
+        />
+      </View>
+      <BottomSheet
+        ref={receiveSheetRef}
+        snapPoints={receiveSnapPoints}
+        index={initialReceiveSnapIndex}
+        enableDynamicSizing={false}
+        enablePanDownToClose={false}
+        enableContentPanningGesture={true}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        handleComponent={null}
+      >
+        <View style={{ flex: 1 }}>
+          {/* Sheet header / "handle" visual — rendered as content (not via
+              handleComponent) so re-renders triggered by index change don't
+              remount the inner RNPickerSelect modal. */}
+          <View
+            style={{
+              paddingTop: 8,
+              paddingBottom: 6,
+              paddingHorizontal: 16,
+              backgroundColor: colors.bottomSheetBackground,
+              borderTopLeftRadius: 40,
+              borderTopRightRadius: 40,
+              borderTopWidth: 1,
+              borderLeftWidth: 1,
+              borderRightWidth: 1,
+              borderTopColor: colors.bottomSheetBorder,
+              borderLeftColor: colors.bottomSheetBorder,
+              borderRightColor: colors.bottomSheetBorder,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <View style={{ width: 28 }} />
+              {canPickScope ? (
+                <RNPickerSelect
+                  value={index === 0 ? 'u' : 't'}
+                  items={scopeItems}
+                  placeholder={{
+                    label: translate(
+                      'receive.select-scope-placeholder',
+                    ) as string,
+                    value: null,
+                    color: colors.primary,
+                  }}
+                  useNativeAndroidPickerStyle={false}
+                  fixAndroidTouchableBug={true}
+                  onValueChange={(v: string) => {
+                    if (v === 'u') {
+                      setIndex(0);
+                    } else if (v === 't') {
+                      setIndex(1);
+                    }
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingHorizontal: 2,
+                      paddingVertical: 4,
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faChevronDown}
+                      size={14}
+                      color={colors.zingo}
+                      style={{ marginRight: 8 }}
+                    />
+                    <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+                      {
+                        (index === 0
+                          ? translate('receive.scope-shielded')
+                          : translate('receive.scope-transparent')) as string
+                      }
+                    </BoldText>
+                  </View>
+                </RNPickerSelect>
+              ) : (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingHorizontal: 2,
+                    paddingVertical: 4,
+                  }}
+                >
+                  <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+                    {
+                      (index === 0
+                        ? translate('receive.scope-shielded')
+                        : translate('receive.scope-transparent')) as string
+                    }
+                  </BoldText>
+                </View>
+              )}
+              <Pressable
+                onPress={() => show('NA')}
+                hitSlop={8}
+                style={{
+                  paddingHorizontal: 14,
+                  paddingVertical: 4,
+                }}
+              >
+                <FontAwesomeIcon icon={faPlus} size={18} color={colors.zingo} />
+              </Pressable>
+            </View>
+          </View>
+          {!!addresses && !!defaultUnifiedAddress && (
+            <SingleAddress
+              address={currentAddress}
+              index={currentAddrIndex}
+              setIndex={setCurrentAddrIndex}
+              total={currentTotal}
+              show={show}
+              hasTransparent={index === 0 && tAddr && tAddr.length > 0}
+            />
+          )}
+        </View>
+      </BottomSheet>
       <BottomSheetModal
         ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        enableDynamicSizing={false}
-        onChange={handleSheetChanges}
-        onDismiss={() => setIndexBottomSheet(-1)}
+        enableDynamicSizing={true}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
-        handleStyle={{ display: 'none' }}
-        backgroundStyle={{ backgroundColor: colors.background }}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
+        handleComponent={renderModalHandle}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
         backdropComponent={renderBackdrop}
       >
         <BottomSheetView
-          style={{ backgroundColor: colors.background, height: '100%' }}
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
+          }}
         >
           {sheetType === 'NA' && (
             <NewAddress
@@ -337,7 +474,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               closeSheet={hide}
               setAddressBook={setAddressBook}
               screenName={screenName}
-              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'NAT' && (
@@ -351,24 +487,17 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               }
               closeSheet={hide}
               setAddressBook={setAddressBook}
-              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'VA' && (
-            <VerifyAddress
-              closeSheet={hide}
-              screenName={screenName}
-              setHeightLayout={setHeightLayout}
-            />
+            <VerifyAddress closeSheet={hide} screenName={screenName} />
           )}
           {sheetType === 'TW' && (
             <TransparentWarning
               closeSheet={hide}
               onSuccess={() => {
-                setShowMoreOptions(false);
                 setIndex(1);
               }}
-              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'EA' && (
@@ -384,12 +513,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     ? tAddr[tAddrIndex].address
                     : ''
               }
-              setHeightLayout={setHeightLayout}
             />
           )}
         </BottomSheetView>
       </BottomSheetModal>
-    </>
+    </View>
   );
 
   //console.log('render Receive - 4', uAddr, uAddrIndex, tAddr, tAddrIndex, defaultUnifiedAddress);

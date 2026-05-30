@@ -10,6 +10,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
+import ScannerAddress from './components/Send/components/ScannerAddress';
 import { ThemeType, AppStackParamList } from './app/types';
 import { ModeEnum, RouteEnum } from './app/AppState';
 
@@ -21,7 +22,7 @@ LogBox.ignoreLogs([
 ]);
 
 const advancePalette: string[] = [
-  '#06172d',
+  '#010A17',
   '#dadfe1',
   '#43a637',
   '#23692f',
@@ -35,7 +36,7 @@ const advancePalette: string[] = [
 ];
 
 const basicPalette: string[] = [
-  '#07182e',
+  '#010A17',
   '#dadfe1',
   '#15576f',
   '#4fa254',
@@ -68,6 +69,8 @@ export const advancedTheme: ThemeType = {
     syncing: '#ebff5a', // yellow
     notification: '',
     sideMenuBackground: advancePalette[10],
+    bottomSheetBackground: '#031124',
+    bottomSheetBorder: '#05234C',
     warning: {
       background: '#262527',
       border: '#65491C',
@@ -103,6 +106,8 @@ export const basicTheme: ThemeType = {
     syncing: '#ebff5a', // yellow
     notification: '',
     sideMenuBackground: basicPalette[10],
+    bottomSheetBackground: '#031124',
+    bottomSheetBorder: '#05234C',
     warning: {
       background: '#262527',
       border: '#65491C',
@@ -167,6 +172,16 @@ const App: React.FunctionComponent = () => {
               <Stack.Screen name={RouteEnum.LoadedApp}>
                 {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
               </Stack.Screen>
+              {/* ScannerAddress lives at the root Stack (above LoadedApp,
+                  therefore above the BottomSheetModalProvider portal). The
+                  default 'card' presentation pushes it as a regular stack
+                  screen — the camera respects normal flex layout. Any open
+                  BottomSheet modal stays alive underneath LoadedApp and
+                  reappears when the camera is dismissed. */}
+              <Stack.Screen
+                name={RouteEnum.ScannerAddress}
+                component={ScannerAddress}
+              />
             </Stack.Navigator>
           </SafeAreaView>
         </NavigationContainer>

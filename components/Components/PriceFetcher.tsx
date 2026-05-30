@@ -21,15 +21,18 @@ import Utils from '../../app/utils';
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
   textBefore?: string;
+  backgroundColor?: string;
 };
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   setZecPrice,
   textBefore,
+  backgroundColor,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, zecPrice, addLastSnackbar, mode, currency } = context;
   const { colors } = useTheme() as ThemeType;
+  const bg = backgroundColor ?? colors.card;
 
   const [refreshMinutes, setRefreshMinutes] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -140,7 +143,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.card,
+            backgroundColor: bg,
             margin: 0,
             marginTop: 10,
             padding: 5,
@@ -169,7 +172,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
               flexWrap: 'wrap',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.card,
+              backgroundColor: bg,
               margin: 0,
               marginTop: 10,
               padding: 5,

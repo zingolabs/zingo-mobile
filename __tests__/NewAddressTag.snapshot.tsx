@@ -26,7 +26,6 @@ describe('NewAddressTag - snapshot', () => {
             address="u1abc123def456abc123def456abc123def456abc123"
             closeSheet={onFn}
             setAddressBook={onFn}
-            setHeightLayout={onFn}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),

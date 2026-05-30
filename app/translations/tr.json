@@ -551,6 +551,10 @@
   "receive": {
     "u-title": "Korumalı",
     "t-title": "gizliliği kaldırılmış açık",
+    "scope-shielded": "Korumalı Adres",
+    "scope-transparent": "Şeffaf Adres",
+    "select-scope-placeholder": "Adres türünü seçin",
+    "transparent-expose-warning": "Şeffaf adresler verilerinizi açığa çıkarır.",
     "noaddress": "Adres Yok",
     "title-address": "Adresim",
     "title-basic-alone": "Alıcı Adresim",

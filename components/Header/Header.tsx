@@ -68,6 +68,8 @@ type HeaderProps = {
   receivedLegend?: boolean;
   // show messages icon next to settings
   showMessagesIcon?: boolean;
+  // optional layout reporting (used by History for bottom-sheet snap points)
+  onUsdRowLayout?: (height: number) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -93,6 +95,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   closeScreen,
   noUfvkIcon,
   showMessagesIcon,
+  onUsdRowLayout,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -173,7 +176,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             backgroundColor: colors.card,
             paddingTop: 10,
             paddingBottom: 10,
-            minHeight: !noDrawMenu ? 60 : 25,
+            minHeight: 60,
           }}
         >
           <SyncStatusBar
@@ -217,6 +220,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             calculateDisableButtonToShield={calculateDisableButtonToShield}
             onPressShieldFunds={onPressShieldFunds}
             receivedLegend={receivedLegend}
+            onUsdRowLayout={onUsdRowLayout}
           />
         </View>
 
@@ -318,17 +322,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             <Image
               source={getZingoLogo()}
               style={{
-                width: 38,
-                height: 38,
+                width: 30,
+                height: 30,
                 resizeMode: 'contain',
-                borderRadius: 8,
+                borderRadius: 6,
               }}
             />
           )}
         </View>
       </View>
 
-      <View>
+      {!!title && (
         <View
           style={{
             display: 'flex',
@@ -380,11 +384,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             </>
           )}
         </View>
-
-        <View
-          style={{ width: '100%', height: 1, backgroundColor: colors.primary }}
-        />
-      </View>
+      )}
     </>
   );
 };
