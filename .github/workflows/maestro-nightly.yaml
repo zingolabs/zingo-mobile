@@ -198,6 +198,22 @@ jobs:
             -derivedDataPath "build/DerivedData" \
             -quiet
 
+      - name: Debug — Xcode + simulator inventory
+        # Started failing on May 27, 2026 with the same IOSDriverTimeout
+        # across Maestro 2.5.1 and 2.6.0 — strongly points to a GitHub
+        # macos-15 runner image change (Xcode/simulator catalog) that
+        # leaves us booting something other than what we built for. Dump
+        # the actual state so we can see what changed.
+        run: |
+          echo "--- Xcode version ---"
+          xcodebuild -version
+          echo "--- Available iOS runtimes ---"
+          xcrun simctl list runtimes | grep -i ios || true
+          echo "--- iPhone 16 devices ---"
+          xcrun simctl list devices "iPhone 16" || true
+          echo "--- Devicetypes containing 'iPhone' ---"
+          xcrun simctl list devicetypes | grep -i iphone | head -20 || true
+
       - name: Boot iOS simulator
         run: |
           # Match the simulator the app was built for (line above: iPhone 16, iOS 18.5).
