@@ -1570,7 +1570,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
                   marginLeft: 25,
                   marginRight: 25,
                   marginVertical: 15,
@@ -1582,11 +1581,25 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <TouchableOpacity
                   disabled={disabled}
                   onPress={() => serverBottomSheetRef.current?.present()}
+                  style={{ flex: 1, marginLeft: 12 }}
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={{ alignItems: 'flex-end', marginRight: 8 }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <View
+                      style={{
+                        flex: 1,
+                        alignItems: 'flex-end',
+                        marginRight: 8,
+                      }}
+                    >
                       {selectServer !== SelectServerEnum.offline && (
                         <FadeText
+                          numberOfLines={1}
                           style={{
                             fontSize: 11,
                             lineHeight: 13,
@@ -1599,12 +1612,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         </FadeText>
                       )}
                       <RegText
+                        numberOfLines={1}
+                        ellipsizeMode="middle"
                         style={{
                           fontWeight: '400',
                           color: customServerIncomplete
                             ? colors.danger.primary
                             : colors.zingo,
-                          maxWidth: 180,
                         }}
                       >
                         {currentServerLabel}

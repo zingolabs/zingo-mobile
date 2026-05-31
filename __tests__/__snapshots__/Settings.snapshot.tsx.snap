@@ -898,7 +898,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         {
           "alignItems": "center",
           "flexDirection": "row",
-          "justifyContent": "space-between",
           "marginLeft": 25,
           "marginRight": 25,
           "marginVertical": 15,
@@ -947,6 +946,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         onStartShouldSetResponder={[Function]}
         style={
           {
+            "flex": 1,
+            "marginLeft": 12,
             "opacity": 1,
           }
         }
@@ -956,6 +957,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "justifyContent": "flex-end",
             }
           }
         >
@@ -963,11 +965,13 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             style={
               {
                 "alignItems": "flex-end",
+                "flex": 1,
                 "marginRight": 8,
               }
             }
           >
             <Text
+              numberOfLines={1}
               style={
                 {
                   "color": "#888888",
@@ -980,12 +984,13 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               text translated
             </Text>
             <Text
+              ellipsizeMode="middle"
+              numberOfLines={1}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 15,
                   "fontWeight": "400",
-                  "maxWidth": 180,
                   "opacity": 1,
                 }
               }
