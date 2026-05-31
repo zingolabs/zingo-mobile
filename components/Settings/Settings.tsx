@@ -892,19 +892,18 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             alignItems: 'center',
           }}
         >
-          <View testID="settings.button.save">
-            <Button
-              disabled={disabled || disabledButton}
-              type={ButtonTypeEnum.Primary}
-              title={translate('settings.save') as string}
-              onPress={() => {
-                setTimeout(async () => {
-                  await saveSettings();
-                  Keyboard.dismiss();
-                }, 100);
-              }}
-            />
-          </View>
+          <Button
+            testID="settings.button.save"
+            disabled={disabled || disabledButton}
+            type={ButtonTypeEnum.Primary}
+            title={translate('settings.save') as string}
+            onPress={() => {
+              setTimeout(async () => {
+                await saveSettings();
+                Keyboard.dismiss();
+              }, 100);
+            }}
+          />
         </View>
       </BottomSheetFooter>
     ),
@@ -1145,6 +1144,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
         <BottomSheet
           ref={settingsSheetRef}
+          accessible={false}
           snapPoints={settingsSnapPoints}
           index={0}
           enableDynamicSizing={false}

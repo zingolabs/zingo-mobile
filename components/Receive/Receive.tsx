@@ -333,6 +333,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       </View>
       <BottomSheet
         ref={receiveSheetRef}
+        accessible={false}
         snapPoints={receiveSnapPoints}
         index={initialReceiveSnapIndex}
         enableDynamicSizing={false}

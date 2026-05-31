@@ -2120,6 +2120,7 @@ export class LoadedAppClass extends Component<
                           <Tab.Navigator
                             detachInactiveScreens={true}
                             initialRouteName={RouteEnum.History}
+                            backBehavior="initialRoute"
                             tabBar={renderTabBar}
                             screenOptions={{
                               headerShown: false,

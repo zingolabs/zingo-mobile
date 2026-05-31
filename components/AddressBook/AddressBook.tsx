@@ -381,13 +381,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             alignItems: 'center',
           }}
         >
-          <View testID="addressbook.button.new">
-            <Button
-              type={ButtonTypeEnum.Primary}
-              title={translate('addressbook.new') as string}
-              onPress={() => newAddressBookItem()}
-            />
-          </View>
+          <Button
+            testID="addressbook.button.new"
+            type={ButtonTypeEnum.Primary}
+            title={translate('addressbook.new') as string}
+            onPress={() => newAddressBookItem()}
+          />
         </View>
       </BottomSheetFooter>
     ),
@@ -488,6 +487,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       </View>
       <BottomSheet
         ref={addressBookSheetRef}
+        accessible={false}
         snapPoints={addressBookSnapPoints}
         index={0}
         enableDynamicSizing={false}
