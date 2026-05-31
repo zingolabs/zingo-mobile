@@ -78,6 +78,12 @@ jobs:
         run: ./gradlew assembleProdRelease -PsplitApk=true
 
       - name: Install Maestro CLI
+        # Pin to 2.5.1 — Maestro 2.6.0 (released the week between our last
+        # green nightly on May 26 and the first red on May 27) broke the
+        # iOS driver startup; pinning here on Android too so both jobs
+        # always run on the same known-good CLI release.
+        env:
+          MAESTRO_VERSION: '2.5.1'
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
@@ -199,6 +205,9 @@ jobs:
           xcrun simctl bootstatus "iPhone 16" -b
 
       - name: Install Maestro CLI
+        # Pinned — see comment in maestro-android job. 2.6.0 broke iOS.
+        env:
+          MAESTRO_VERSION: '2.5.1'
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
