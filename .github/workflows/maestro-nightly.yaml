@@ -219,10 +219,10 @@ jobs:
           # macos-15 now ships 5 iPhone 16 devices (one per iOS runtime:
           # 18.5, 18.6, 26.0, 26.1, 26.2). `simctl boot "iPhone 16"`
           # selects the highest-iOS match (iOS 26.2), which mismatches the
-          # iOS 18.5 build target above — the app installs but XCTest
-          # can't host it, so Maestro's driver hangs until timeout. Pick
-          # the iPhone 16 from iOS 18.5 explicitly by UDID and export it
-          # for the subsequent install/test steps.
+          # iOS 18.5 build target above. Pick the iPhone 16 from iOS 18.5
+          # explicitly by UDID. Also shutdown anything else booted on the
+          # runner first so Maestro can't accidentally pick a stale device.
+          xcrun simctl shutdown all || true
           UDID=$(xcrun simctl list devices "iPhone 16" --json | \
             jq -r '.devices["com.apple.CoreSimulator.SimRuntime.iOS-18-5"][] | select(.name=="iPhone 16") | .udid')
           if [ -z "$UDID" ]; then
@@ -233,6 +233,8 @@ jobs:
           echo "SIM_UDID=$UDID" >> $GITHUB_ENV
           xcrun simctl boot "$UDID" || true
           xcrun simctl bootstatus "$UDID" -b
+          echo "--- Booted devices after our boot ---"
+          xcrun simctl list devices booted
 
       - name: Install Maestro CLI
         # Pinned — see comment in maestro-android job. 2.6.0 broke iOS.
@@ -253,12 +255,16 @@ jobs:
 
       - name: Run Maestro tests
         # GitHub macOS runners can boot XCTest slowly; the default 60s
-        # driver-startup timeout has fired twice in a row on this job.
-        # Maestro itself suggests bumping MAESTRO_DRIVER_STARTUP_TIMEOUT
-        # when it hits this — 180000ms (3 min) leaves slack for cold runners.
+        # driver-startup timeout has fired multiple times on this job.
+        # Bumping to 3 min leaves slack for cold runners.
+        # Pass --device explicitly so Maestro never auto-picks the wrong
+        # simulator when the runner has any other booted device.
         env:
           MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
-        run: maestro test .maestro/
+        run: |
+          echo "--- Devices booted right before maestro test ---"
+          xcrun simctl list devices booted
+          maestro --device "$SIM_UDID" test .maestro/
 
       - name: Upload Maestro report on failure
         if: failure()
