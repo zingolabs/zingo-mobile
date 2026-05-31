@@ -8,6 +8,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
       "flex": 1,
     }
   }
+  testID="receive.title"
 >
   <View
     accessibilityLabel="text translated"

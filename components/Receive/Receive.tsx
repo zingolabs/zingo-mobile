@@ -227,8 +227,18 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             justifyContent: 'space-between',
           }}
         >
-          <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          {/* Left spacer matches the X Pressable width (14×2 + 20 = 48)
+              so the title is geometrically centered in the row. */}
+          <View style={{ width: 48 }} />
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {modalTitle}
           </BoldText>
           <Pressable
@@ -398,7 +408,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                       color={colors.zingo}
                       style={{ marginRight: 8 }}
                     />
-                    <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+                    <BoldText
+                      numberOfLines={1}
+                      style={{
+                        flex: 1,
+                        fontSize: 16,
+                        lineHeight: 28,
+                        textAlign: 'center',
+                      }}
+                    >
                       {
                         (index === 0
                           ? translate('receive.scope-shielded')
@@ -416,7 +434,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     paddingVertical: 4,
                   }}
                 >
-                  <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+                  <BoldText
+                    numberOfLines={1}
+                    style={{
+                      flex: 1,
+                      fontSize: 16,
+                      lineHeight: 28,
+                      textAlign: 'center',
+                    }}
+                  >
                     {
                       (index === 0
                         ? translate('receive.scope-shielded')

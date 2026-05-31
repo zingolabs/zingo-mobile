@@ -535,8 +535,20 @@ const History: React.FunctionComponent<HistoryProps> = ({
             justifyContent: 'space-between',
           }}
         >
-          <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          {/* Left spacer matches the filter Pressable width
+              (paddingHorizontal: 14 × 2 + icon 20 = 48) so the title
+              stays perfectly centered. flex/textAlign/numberOfLines on
+              the BoldText keep a long translation from being clipped. */}
+          <View style={{ width: 48 }} />
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {translate('history.title') as string}
           </BoldText>
           <Pressable
@@ -600,8 +612,19 @@ const History: React.FunctionComponent<HistoryProps> = ({
             justifyContent: 'space-between',
           }}
         >
-          <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          {/* Left spacer matches the X Pressable width
+              (paddingHorizontal: 14 × 2 + icon 20 = 48) so the title
+              stays perfectly centered. */}
+          <View style={{ width: 48 }} />
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {translate('history.filters') as string}
           </BoldText>
           <Pressable

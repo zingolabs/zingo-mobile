@@ -8,6 +8,7 @@ type BoldTextProps = {
   children: string | string[];
   testID?: string;
   selectable?: boolean;
+  numberOfLines?: number;
 };
 
 const BoldText: React.FunctionComponent<BoldTextProps> = ({
@@ -15,6 +16,7 @@ const BoldText: React.FunctionComponent<BoldTextProps> = ({
   children,
   testID,
   selectable,
+  numberOfLines,
 }) => {
   const { colors } = useTheme() as ThemeType;
   const totalStyle: TextStyle = {
@@ -26,7 +28,12 @@ const BoldText: React.FunctionComponent<BoldTextProps> = ({
   };
 
   return (
-    <Text testID={testID} style={totalStyle} selectable={selectable}>
+    <Text
+      testID={testID}
+      style={totalStyle}
+      selectable={selectable}
+      numberOfLines={numberOfLines}
+    >
       {children}
     </Text>
   );

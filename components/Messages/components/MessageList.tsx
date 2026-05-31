@@ -195,7 +195,15 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           ) : (
             <View style={{ width: 28 }} />
           )}
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {translate('messages.title') as string}
           </BoldText>
           <View style={{ width: 28 }} />

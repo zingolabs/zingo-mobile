@@ -57,7 +57,15 @@ const ComputingTxContent: React.FunctionComponent<
             justifyContent: 'center',
           }}
         >
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {translate('send.sending-title') as string}
           </BoldText>
         </View>

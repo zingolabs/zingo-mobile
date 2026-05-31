@@ -861,7 +861,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               color={colors.primary}
             />
           </TouchableOpacity>
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {translate('settings.title') as string}
           </BoldText>
           <View style={{ width: 28 }} />
@@ -928,8 +936,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             justifyContent: 'space-between',
           }}
         >
-          <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          {/* Left spacer matches the X Pressable's width (14×2 + 20 = 48)
+              so the title stays perfectly centered. The BoldText
+              flex-fills the middle space so a long localized title can
+              still ellipsize cleanly instead of being clipped. */}
+          <View style={{ width: 48 }} />
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {translate('settings.security-title') as string}
           </BoldText>
           <Pressable
@@ -970,8 +990,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             justifyContent: 'space-between',
           }}
         >
-          <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          {/* Left spacer matches the X Pressable's width (14×2 + 20 = 48)
+              so the title stays perfectly centered. The BoldText
+              flex-fills the middle space so a long localized title can
+              still ellipsize cleanly instead of being clipped. */}
+          <View style={{ width: 48 }} />
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {translate('settings.server-title') as string}
           </BoldText>
           <Pressable

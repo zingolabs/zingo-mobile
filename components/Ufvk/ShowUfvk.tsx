@@ -276,7 +276,15 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
               color={colors.primary}
             />
           </TouchableOpacity>
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {ufvkTitle}
           </BoldText>
           <View style={{ width: 28 }} />

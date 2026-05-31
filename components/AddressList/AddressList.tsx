@@ -136,7 +136,15 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
               color={colors.primary}
             />
           </TouchableOpacity>
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {handleTitle}
           </BoldText>
           <View style={{ width: 28 }} />

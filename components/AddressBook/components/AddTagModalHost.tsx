@@ -76,8 +76,21 @@ const AddTagModalHost = forwardRef<
             justifyContent: 'space-between',
           }}
         >
-          <View style={{ width: 28 }} />
-          <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+          {/* Left spacer width matches the X Pressable's measured width
+              (paddingHorizontal: 14 × 2 + icon size 20 = 48) so the title
+              stays perfectly centered. The BoldText flex-fills the middle
+              space so a long localized title ellipsizes instead of being
+              clipped. */}
+          <View style={{ width: 48 }} />
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
             {
               (target?.own
                 ? translate('addressbook.add-tag')
