@@ -185,6 +185,10 @@ jobs:
       # matching the react-native version in package.json, so pod install's
       # post_install hook downloads the matching dSYMs.
       - name: Build app
+        # No -destination needed for a simulator build — the binary is the same
+        # for every iPhone simulator at the given SDK. Pinning a specific device
+        # broke when the GH macos-15 image started shipping iOS 18.5/18.6/26.x
+        # runtimes that aren't paired with Xcode 16.4 as destinations.
         working-directory: ios
         run: |
           set -euxo pipefail
@@ -194,7 +198,6 @@ jobs:
             -scheme Zingo \
             -sdk iphonesimulator \
             -configuration Release \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
             -derivedDataPath "build/DerivedData" \
             -quiet
 
