@@ -409,15 +409,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                       color={colors.zingo}
                       style={{ marginRight: 8 }}
                     />
-                    <BoldText
-                      numberOfLines={1}
-                      style={{
-                        flex: 1,
-                        fontSize: 16,
-                        lineHeight: 28,
-                        textAlign: 'center',
-                      }}
-                    >
+                    <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
                       {
                         (index === 0
                           ? translate('receive.scope-shielded')
@@ -435,15 +427,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     paddingVertical: 4,
                   }}
                 >
-                  <BoldText
-                    numberOfLines={1}
-                    style={{
-                      flex: 1,
-                      fontSize: 16,
-                      lineHeight: 28,
-                      textAlign: 'center',
-                    }}
-                  >
+                  <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
                     {
                       (index === 0
                         ? translate('receive.scope-shielded')

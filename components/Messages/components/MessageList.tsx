@@ -41,7 +41,7 @@ import {
   faPaperPlane,
   faAngleDown,
 } from '@fortawesome/free-solid-svg-icons';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import {
   AddressBookFileClass,
@@ -639,9 +639,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           }}
           handleComponent={renderMessagesHandle}
         >
-          <BottomSheetView
-            accessible={true}
-            accessibilityLabel={translate('history.title-acc') as string}
+          <View
             style={{
               flex: 1,
               backgroundColor: colors.bottomSheetBackground,
@@ -736,8 +734,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   style={{ marginVertical: 20 }}
                 />
               )}
-              <ScrollView
-                ref={scrollViewRef}
+              <BottomSheetScrollView
+                ref={scrollViewRef as unknown as React.RefObject<ScrollView>}
                 bounces={false}
                 alwaysBounceVertical={false}
                 onScroll={handleScroll}
@@ -750,7 +748,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   //console.log('content HEIGHT >>>>>>>>>>>>>', h);
                   setContentScrollViewHeight(h);
                 }}
-                scrollEventThrottle={100}
                 accessible={true}
                 accessibilityLabel={translate('history.list-acc') as string}
                 refreshControl={
@@ -849,7 +846,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                     </View>
                   )}
                 <View style={{ marginBottom: 10 }} />
-              </ScrollView>
+              </BottomSheetScrollView>
               {!isAtBottom &&
                 scrollable &&
                 !loading &&
@@ -1086,7 +1083,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   )}
                 </View>
               )}
-          </BottomSheetView>
+          </View>
         </BottomSheet>
       </View>
     </KeyboardAvoidingView>
