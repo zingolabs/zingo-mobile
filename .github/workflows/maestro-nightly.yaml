@@ -254,13 +254,14 @@ jobs:
             ios/build/DerivedData/Build/Products/Release-iphonesimulator/Zingo.app
 
       - name: Run Maestro tests
-        # GitHub macOS runners can boot XCTest slowly; the default 60s
-        # driver-startup timeout has fired multiple times on this job.
-        # Bumping to 3 min leaves slack for cold runners.
+        # GitHub macOS-15 runners now ship many extra iOS runtimes; first-time
+        # boot of the iOS 18.5 sim runs data migration plugins (~55s) and the
+        # XCTest driver install often eats the rest of the 3 min budget.
+        # Bumping to 5 min absorbs the worst-case cold-runner timing.
         # Pass --device explicitly so Maestro never auto-picks the wrong
         # simulator when the runner has any other booted device.
         env:
-          MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: '300000'
         run: |
           echo "--- Devices booted right before maestro test ---"
           xcrun simctl list devices booted
