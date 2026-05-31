@@ -216,9 +216,23 @@ jobs:
 
       - name: Boot iOS simulator
         run: |
-          # Match the simulator the app was built for (line above: iPhone 16, iOS 18.5).
-          xcrun simctl boot "iPhone 16" || true
-          xcrun simctl bootstatus "iPhone 16" -b
+          # macos-15 now ships 5 iPhone 16 devices (one per iOS runtime:
+          # 18.5, 18.6, 26.0, 26.1, 26.2). `simctl boot "iPhone 16"`
+          # selects the highest-iOS match (iOS 26.2), which mismatches the
+          # iOS 18.5 build target above — the app installs but XCTest
+          # can't host it, so Maestro's driver hangs until timeout. Pick
+          # the iPhone 16 from iOS 18.5 explicitly by UDID and export it
+          # for the subsequent install/test steps.
+          UDID=$(xcrun simctl list devices "iPhone 16" --json | \
+            jq -r '.devices["com.apple.CoreSimulator.SimRuntime.iOS-18-5"][] | select(.name=="iPhone 16") | .udid')
+          if [ -z "$UDID" ]; then
+            echo "::error::No iPhone 16 device found for iOS 18.5 runtime"
+            exit 1
+          fi
+          echo "Booting iPhone 16 (iOS 18.5) — UDID=$UDID"
+          echo "SIM_UDID=$UDID" >> $GITHUB_ENV
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
 
       - name: Install Maestro CLI
         # Pinned — see comment in maestro-android job. 2.6.0 broke iOS.
@@ -230,7 +244,11 @@ jobs:
 
       - name: Install app on simulator
         run: |
-          xcrun simctl install booted \
+          # Use the explicit UDID exported above instead of "booted" —
+          # there may be other iPhone 16 devices on the runner (across
+          # different iOS runtimes) and we want this app on exactly the
+          # iOS 18.5 one it was built for.
+          xcrun simctl install "$SIM_UDID" \
             ios/build/DerivedData/Build/Products/Release-iphonesimulator/Zingo.app
 
       - name: Run Maestro tests
