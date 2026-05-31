@@ -370,63 +370,57 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'space-between',
               }}
             >
-              <View style={{ width: 28 }} />
-              {canPickScope ? (
-                <RNPickerSelect
-                  value={index === 0 ? 'u' : 't'}
-                  items={scopeItems}
-                  placeholder={{
-                    label: translate(
-                      'receive.select-scope-placeholder',
-                    ) as string,
-                    value: null,
-                    color: colors.primary,
-                  }}
-                  useNativeAndroidPickerStyle={false}
-                  fixAndroidTouchableBug={true}
-                  onValueChange={(v: string) => {
-                    if (v === 'u') {
-                      setIndex(0);
-                    } else if (v === 't') {
-                      setIndex(1);
-                    }
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      paddingHorizontal: 2,
-                      paddingVertical: 4,
+              <View style={{ width: 46 }} />
+              <View
+                style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+              >
+                {canPickScope ? (
+                  <RNPickerSelect
+                    value={index === 0 ? 'u' : 't'}
+                    items={scopeItems}
+                    placeholder={{
+                      label: translate(
+                        'receive.select-scope-placeholder',
+                      ) as string,
+                      value: null,
+                      color: colors.primary,
+                    }}
+                    useNativeAndroidPickerStyle={false}
+                    fixAndroidTouchableBug={true}
+                    onValueChange={(v: string) => {
+                      if (v === 'u') {
+                        setIndex(0);
+                      } else if (v === 't') {
+                        setIndex(1);
+                      }
                     }}
                   >
-                    <FontAwesomeIcon
-                      icon={faChevronDown}
-                      size={14}
-                      color={colors.zingo}
-                      style={{ marginRight: 8 }}
-                    />
-                    <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
-                      {
-                        (index === 0
-                          ? translate('receive.scope-shielded')
-                          : translate('receive.scope-transparent')) as string
-                      }
-                    </BoldText>
-                  </View>
-                </RNPickerSelect>
-              ) : (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingHorizontal: 2,
-                    paddingVertical: 4,
-                  }}
-                >
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingHorizontal: 2,
+                        paddingVertical: 4,
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faChevronDown}
+                        size={14}
+                        color={colors.zingo}
+                        style={{ marginRight: 8 }}
+                      />
+                      <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+                        {
+                          (index === 0
+                            ? translate('receive.scope-shielded')
+                            : translate('receive.scope-transparent')) as string
+                        }
+                      </BoldText>
+                    </View>
+                  </RNPickerSelect>
+                ) : (
                   <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
                     {
                       (index === 0
@@ -434,18 +428,26 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                         : translate('receive.scope-transparent')) as string
                     }
                   </BoldText>
-                </View>
+                )}
+              </View>
+              {isAdvanced ? (
+                <Pressable
+                  onPress={() => show('NA')}
+                  hitSlop={8}
+                  style={{
+                    paddingHorizontal: 14,
+                    paddingVertical: 4,
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faPlus}
+                    size={18}
+                    color={colors.zingo}
+                  />
+                </Pressable>
+              ) : (
+                <View style={{ width: 46 }} />
               )}
-              <Pressable
-                onPress={() => show('NA')}
-                hitSlop={8}
-                style={{
-                  paddingHorizontal: 14,
-                  paddingVertical: 4,
-                }}
-              >
-                <FontAwesomeIcon icon={faPlus} size={18} color={colors.zingo} />
-              </Pressable>
             </View>
           </View>
           {!!addresses && !!defaultUnifiedAddress && (
