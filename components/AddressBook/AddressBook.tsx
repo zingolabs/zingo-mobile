@@ -381,12 +381,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             alignItems: 'center',
           }}
         >
-          <Button
-            testID="addressbook.button.new"
-            type={ButtonTypeEnum.Primary}
-            title={translate('addressbook.new') as string}
-            onPress={() => newAddressBookItem()}
-          />
+          <View testID="addressbook.button.new">
+            <Button
+              type={ButtonTypeEnum.Primary}
+              title={translate('addressbook.new') as string}
+              onPress={() => newAddressBookItem()}
+            />
+          </View>
         </View>
       </BottomSheetFooter>
     ),

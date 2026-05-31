@@ -892,18 +892,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             alignItems: 'center',
           }}
         >
-          <Button
-            testID="settings.button.save"
-            disabled={disabled || disabledButton}
-            type={ButtonTypeEnum.Primary}
-            title={translate('settings.save') as string}
-            onPress={() => {
-              setTimeout(async () => {
-                await saveSettings();
-                Keyboard.dismiss();
-              }, 100);
-            }}
-          />
+          <View testID="settings.button.save">
+            <Button
+              disabled={disabled || disabledButton}
+              type={ButtonTypeEnum.Primary}
+              title={translate('settings.save') as string}
+              onPress={() => {
+                setTimeout(async () => {
+                  await saveSettings();
+                  Keyboard.dismiss();
+                }, 100);
+              }}
+            />
+          </View>
         </View>
       </BottomSheetFooter>
     ),

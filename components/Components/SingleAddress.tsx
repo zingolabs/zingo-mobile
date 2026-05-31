@@ -445,16 +445,20 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     </Text>
                   </TouchableOpacity>
                 )}
-                <Address
-                  address={address.address}
-                  style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
-                  onPress={() => show('EA')}
+                {/* testID on a plain View — Maestro's iOS driver misses testIDs on TouchableOpacity. */}
+                <View
                   testID={
                     address.addressKind === AddressKindEnum.u
                       ? 'receive.unified-address'
                       : undefined
                   }
-                />
+                >
+                  <Address
+                    address={address.address}
+                    style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+                    onPress={() => show('EA')}
+                  />
+                </View>
               </View>
             )}
           </>
