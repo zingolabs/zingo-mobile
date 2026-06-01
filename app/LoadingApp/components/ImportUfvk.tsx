@@ -315,6 +315,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               <TextInput
                 testID="import.seedufvkinput"
                 multiline
+                autoCorrect={false}
+                autoComplete="off"
+                spellCheck={false}
+                textContentType="none"
+                keyboardType="visible-password"
                 style={{
                   color: colors.text,
                   fontWeight: '600',
