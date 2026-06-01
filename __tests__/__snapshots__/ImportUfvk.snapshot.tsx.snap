@@ -129,8 +129,12 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       }
     >
       <TextInput
+        autoComplete="off"
+        autoCorrect={false}
+        keyboardType="visible-password"
         multiline={true}
         onChangeText={[Function]}
+        spellCheck={false}
         style={
           {
             "backgroundColor": "transparent",
@@ -143,6 +147,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           }
         }
         testID="import.seedufvkinput"
+        textContentType="none"
         value=""
       />
     </View>
