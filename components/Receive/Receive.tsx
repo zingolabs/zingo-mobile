@@ -15,7 +15,7 @@ import {
   faPlus,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
-import RNPickerSelect from 'react-native-picker-select';
+import SelectBottomSheet from '../Components/SelectBottomSheet';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '../Components/SingleAddress';
@@ -91,6 +91,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [tAddrIndex, setTAddrIndex] = useState<number | null>(null);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const scopeSelectRef = useRef<BottomSheetModal>(null);
   const receiveSheetRef = useRef<BottomSheet>(null);
   const keyboardHeight = useKeyboardHeight();
 
@@ -347,9 +348,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         handleComponent={null}
       >
         <View style={{ flex: 1 }}>
-          {/* Sheet header / "handle" visual — rendered as content (not via
-              handleComponent) so re-renders triggered by index change don't
-              remount the inner RNPickerSelect modal. */}
+          {/* Sheet header rendered as content (not via handleComponent) so
+              index-change re-renders don't remount the inner select trigger. */}
           <View
             style={{
               paddingTop: 8,
@@ -381,49 +381,29 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 }}
               >
                 {canPickScope ? (
-                  <RNPickerSelect
-                    value={index === 0 ? 'u' : 't'}
-                    items={scopeItems}
-                    placeholder={{
-                      label: translate(
-                        'receive.select-scope-placeholder',
-                      ) as string,
-                      value: null,
-                      color: colors.primary,
-                    }}
-                    useNativeAndroidPickerStyle={false}
-                    fixAndroidTouchableBug={true}
-                    onValueChange={(v: string) => {
-                      if (v === 'u') {
-                        setIndex(0);
-                      } else if (v === 't') {
-                        setIndex(1);
-                      }
+                  <Pressable
+                    onPress={() => scopeSelectRef.current?.present()}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingHorizontal: 2,
+                      paddingVertical: 4,
                     }}
                   >
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        paddingHorizontal: 2,
-                        paddingVertical: 4,
-                      }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faChevronDown}
-                        size={14}
-                        color={colors.zingo}
-                        style={{ marginRight: 8 }}
-                      />
-                      <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
-                        {
-                          (index === 0
-                            ? translate('receive.scope-shielded')
-                            : translate('receive.scope-transparent')) as string
-                        }
-                      </BoldText>
-                    </View>
-                  </RNPickerSelect>
+                    <FontAwesomeIcon
+                      icon={faChevronDown}
+                      size={14}
+                      color={colors.zingo}
+                      style={{ marginRight: 8 }}
+                    />
+                    <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+                      {
+                        (index === 0
+                          ? translate('receive.scope-shielded')
+                          : translate('receive.scope-transparent')) as string
+                      }
+                    </BoldText>
+                  </Pressable>
                 ) : (
                   <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
                     {
@@ -470,6 +450,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         ref={bottomSheetRef}
         enableDynamicSizing={true}
         enablePanDownToClose
+        stackBehavior="push"
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
@@ -541,6 +522,19 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           )}
         </BottomSheetView>
       </BottomSheetModal>
+      <SelectBottomSheet
+        ref={scopeSelectRef}
+        title={translate('receive.select-scope-placeholder') as string}
+        items={scopeItems}
+        value={index === 0 ? 'u' : 't'}
+        onChange={v => {
+          if (v === 'u') {
+            setIndex(0);
+          } else if (v === 't') {
+            setIndex(1);
+          }
+        }}
+      />
     </View>
   );
 

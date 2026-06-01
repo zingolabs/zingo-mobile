@@ -38,7 +38,7 @@ import {
   useTheme,
 } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
-import RNPickerSelect from 'react-native-picker-select';
+import SelectBottomSheet from '../Components/SelectBottomSheet';
 
 import { SvgXml } from 'react-native-svg';
 import FadeText from '../Components/FadeText';
@@ -186,8 +186,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     useState<string>('');
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [contentHeight, setContentHeight] = useState<number>(0);
-  const [pickerTempSelectedAddress, setPickerTempSelectedAddress] =
-    useState<string>('');
   const [addressText, setAddressText] = useState<string>(
     sendPageState.toaddr.to,
   );
@@ -214,6 +212,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const scrollViewRef = useRef<ScrollView>(null);
   const sendSheetRef = useRef<BottomSheet>(null);
   const memoBottomSheetRef = useRef<BottomSheetModal>(null);
+  const addressBookSelectRef = useRef<BottomSheetModal>(null);
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
@@ -1326,132 +1325,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {itemsPicker.length > 0 && (
                       <>
                         {!updatingToField ? (
-                          <RNPickerSelect
-                            key={itemsPicker.length}
-                            style={{
-                              modalViewBottom: {
-                                minHeight: 300,
-                              },
-                              // RNPickerSelect's default viewContainer uses
-                              // `alignSelf: 'stretch'` which overrides the
-                              // parent row's `alignItems: 'center'` on iOS,
-                              // making the contacts icon vertically offset
-                              // from the QR icon next to it. Force center.
-                              viewContainer: { alignSelf: 'center' },
-                            }}
-                            pickerProps={{
-                              mode: 'dialog',
-                              itemStyle: {
-                                color: colors.background,
-                              },
-                            }}
-                            fixAndroidTouchableBug={true}
-                            value={
-                              pickerTempSelectedAddress &&
-                              Platform.OS === GlobalConst.platformOSios
-                                ? (pickerTempSelectedAddress ?? ' ')
-                                : (addressText ?? ' ')
+                          <TouchableOpacity
+                            onPress={() =>
+                              addressBookSelectRef.current?.present()
                             }
-                            items={itemsPicker}
-                            placeholder={{
-                              label: translate(
-                                'addressbook.select-placeholder',
-                              ) as string,
-                              value: null,
-                              color: colors.primary,
-                            }}
-                            useNativeAndroidPickerStyle={false}
-                            onDonePress={async () => {
-                              // only for IOS
-                              if (
-                                validAddress === 1 &&
-                                addressText &&
-                                pickerTempSelectedAddress &&
-                                addressText !== pickerTempSelectedAddress
-                              ) {
-                                setUpdatingToField(true);
-                                await ShowAddressAlertAsync(translate)
-                                  .then(() => {
-                                    updateToField(
-                                      pickerTempSelectedAddress,
-                                      null,
-                                      null,
-                                      null,
-                                      null,
-                                    );
-                                  })
-                                  .catch(() => {
-                                    updateToField(
-                                      addressText,
-                                      null,
-                                      null,
-                                      null,
-                                      null,
-                                    );
-                                  });
-                                setTimeout(() => {
-                                  setUpdatingToField(false);
-                                }, 500);
-                              } else if (
-                                addressText !== pickerTempSelectedAddress
-                              ) {
-                                updateToField(
-                                  pickerTempSelectedAddress,
-                                  null,
-                                  null,
-                                  null,
-                                  null,
-                                );
-                              }
-                              setPickerTempSelectedAddress('');
-                            }}
-                            onValueChange={async (itemValue: string) => {
-                              // only for Android
-                              if (
-                                Platform.OS === GlobalConst.platformOSandroid
-                              ) {
-                                if (
-                                  validAddress === 1 &&
-                                  addressText &&
-                                  itemValue &&
-                                  addressText !== itemValue
-                                ) {
-                                  setUpdatingToField(true);
-                                  await ShowAddressAlertAsync(translate)
-                                    .then(() => {
-                                      updateToField(
-                                        itemValue,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                      );
-                                    })
-                                    .catch(() => {
-                                      updateToField(
-                                        addressText,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                      );
-                                    });
-                                  setTimeout(() => {
-                                    setUpdatingToField(false);
-                                  }, 500);
-                                } else if (addressText !== itemValue) {
-                                  updateToField(
-                                    itemValue,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                  );
-                                }
-                              } else {
-                                setPickerTempSelectedAddress(itemValue);
-                              }
-                            }}
                           >
                             <FontAwesomeIcon
                               style={{ marginRight: 5 }}
@@ -1459,7 +1336,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               icon={faAddressCard}
                               color={colors.primary}
                             />
-                          </RNPickerSelect>
+                          </TouchableOpacity>
                         ) : (
                           <FontAwesomeIcon
                             style={{ marginRight: 5 }}
@@ -2401,6 +2278,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         ref={memoBottomSheetRef}
         enableDynamicSizing={true}
         enablePanDownToClose
+        stackBehavior="push"
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
@@ -2431,6 +2309,34 @@ const Send: React.FunctionComponent<SendProps> = ({
           />
         </BottomSheetView>
       </BottomSheetModal>
+      <SelectBottomSheet
+        ref={addressBookSelectRef}
+        title={translate('addressbook.select-placeholder') as string}
+        items={itemsPicker}
+        value={addressText ?? ''}
+        onChange={async itemValue => {
+          if (
+            validAddress === 1 &&
+            addressText &&
+            itemValue &&
+            addressText !== itemValue
+          ) {
+            setUpdatingToField(true);
+            await ShowAddressAlertAsync(translate)
+              .then(() => {
+                updateToField(itemValue, null, null, null, null);
+              })
+              .catch(() => {
+                updateToField(addressText, null, null, null, null);
+              });
+            setTimeout(() => {
+              setUpdatingToField(false);
+            }, 500);
+          } else if (addressText !== itemValue) {
+            updateToField(itemValue, null, null, null, null);
+          }
+        }}
+      />
     </View>
   );
 

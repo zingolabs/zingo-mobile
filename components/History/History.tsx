@@ -829,6 +829,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         ref={bottomSheetRef}
         enableDynamicSizing={true}
         enablePanDownToClose
+        stackBehavior="push"
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}

@@ -456,6 +456,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
         ref={bottomSheetRef}
         enableDynamicSizing={true}
         enablePanDownToClose
+        stackBehavior="push"
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}

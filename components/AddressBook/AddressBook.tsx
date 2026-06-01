@@ -777,6 +777,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         ref={abDetailSheetRef}
         enableDynamicSizing={true}
         enablePanDownToClose
+        stackBehavior="push"
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}

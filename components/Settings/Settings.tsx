@@ -57,7 +57,7 @@ import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import ReactNativeBiometrics from 'react-native-biometrics';
-import RNPickerSelect from 'react-native-picker-select';
+import SelectBottomSheet from '../Components/SelectBottomSheet';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -818,6 +818,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const securityBottomSheetRef = useRef<BottomSheetModal>(null);
   const serverBottomSheetRef = useRef<BottomSheetModal>(null);
+  const languageSelectRef = useRef<BottomSheetModal>(null);
+  const blockExplorerSelectRef = useRef<BottomSheetModal>(null);
+  const listServerSelectRef = useRef<BottomSheetModal>(null);
   const settingsSheetRef = useRef<BottomSheet>(null);
   const keyboardHeight = useKeyboardHeight();
 
@@ -1225,29 +1228,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               <BoldText>
                 {translate('settings.language-title') as string}
               </BoldText>
-              <RNPickerSelect
-                value={language}
-                items={LANGUAGES.map(l => ({
-                  label: translate(
-                    `settings.value-language-${l.value}`,
-                  ) as string,
-                  value: l.value,
-                }))}
-                onValueChange={(value: string) => {
-                  if (value) {
-                    setLanguage(value as LanguageEnum);
-                  }
-                }}
-                placeholder={{
-                  label: translate(
-                    'settings.select-language-placeholder',
-                  ) as string,
-                  value: null,
-                  color: colors.primary,
-                }}
-                useNativeAndroidPickerStyle={false}
-                fixAndroidTouchableBug={true}
+              <TouchableOpacity
                 disabled={disabled}
+                onPress={() => languageSelectRef.current?.present()}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <RegText
@@ -1265,7 +1248,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     color={colors.zingo}
                   />
                 </View>
-              </RNPickerSelect>
+              </TouchableOpacity>
             </View>
 
             {mode !== ModeEnum.basic && (
@@ -1652,29 +1635,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <BoldText>
                   {translate('settings.blockexplorer-title') as string}
                 </BoldText>
-                <RNPickerSelect
-                  value={blockExplorer}
-                  items={BLOCKEXPLORERMENU.map(b => ({
-                    label: translate(
-                      `settings.value-blockexplorer-${b.value}`,
-                    ) as string,
-                    value: b.value,
-                  }))}
-                  onValueChange={(value: string) => {
-                    if (value) {
-                      setBlockExplorer(value as BlockExplorerEnum);
-                    }
-                  }}
-                  placeholder={{
-                    label: translate(
-                      'settings.select-blockexplorer-placeholder',
-                    ) as string,
-                    value: null,
-                    color: colors.primary,
-                  }}
-                  useNativeAndroidPickerStyle={false}
-                  fixAndroidTouchableBug={true}
+                <TouchableOpacity
                   disabled={disabled}
+                  onPress={() => blockExplorerSelectRef.current?.present()}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <RegText
@@ -1696,7 +1659,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       color={colors.zingo}
                     />
                   </View>
-                </RNPickerSelect>
+                </TouchableOpacity>
               </View>
             )}
 
@@ -1900,6 +1863,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         ref={securityBottomSheetRef}
         enableDynamicSizing={true}
         enablePanDownToClose
+        stackBehavior="push"
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
@@ -1981,6 +1945,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         ref={serverBottomSheetRef}
         enableDynamicSizing={true}
         enablePanDownToClose
+        stackBehavior="push"
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
@@ -2102,46 +2067,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
           <View>
             {!disabled && itemsPicker.length > 0 ? (
-              <RNPickerSelect
-                style={{
-                  modalViewBottom: {
-                    minHeight: 300,
-                  },
-                }}
-                pickerProps={{
-                  mode: 'dialog',
-                  itemStyle: {
-                    color: colors.background,
-                  },
-                }}
-                fixAndroidTouchableBug={true}
-                value={listServerUri ?? ' '}
-                items={itemsPicker}
-                placeholder={{
-                  label: translate('settings.select-placeholder') as string,
-                  value: null,
-                  color: colors.primary,
-                }}
-                useNativeAndroidPickerStyle={false}
-                onValueChange={(itemValue: string) => {
-                  if (itemValue) {
-                    setOfflineIcon(farCircle);
-                    setAutoIcon(farCircle);
-                    setListIcon(faDotCircle);
-                    setCustomIcon(farCircle);
-                    setSelectServer(SelectServerEnum.list);
-                    setListServerUri(itemValue);
-                    setAutoServerUri(itemValue);
-                    const cnItem = serverUris(translate).find(
-                      (s: ServerUrisType) => s.uri === itemValue && !s.obsolete,
-                    );
-                    if (cnItem) {
-                      setListServerChainName(cnItem.chainName);
-                    } else {
-                      console.log('chain name not found');
-                    }
-                  }
-                }}
+              <TouchableOpacity
+                onPress={() => listServerSelectRef.current?.present()}
               >
                 <View
                   style={{
@@ -2173,7 +2100,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     </FadeText>
                   )}
                 </View>
-              </RNPickerSelect>
+              </TouchableOpacity>
             ) : (
               <View
                 style={{
@@ -2328,6 +2255,51 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           </View>
         </BottomSheetScrollView>
       </BottomSheetModal>
+      <SelectBottomSheet
+        ref={languageSelectRef}
+        title={translate('settings.select-language-placeholder') as string}
+        items={LANGUAGES.map(l => ({
+          label: translate(`settings.value-language-${l.value}`) as string,
+          value: l.value,
+        }))}
+        value={language}
+        onChange={v => setLanguage(v as LanguageEnum)}
+      />
+      <SelectBottomSheet
+        ref={blockExplorerSelectRef}
+        title={translate('settings.select-blockexplorer-placeholder') as string}
+        items={BLOCKEXPLORERMENU.map(b => ({
+          label: translate(`settings.value-blockexplorer-${b.value}`) as string,
+          value: b.value,
+        }))}
+        value={blockExplorer}
+        onChange={v => setBlockExplorer(v as BlockExplorerEnum)}
+      />
+      <SelectBottomSheet
+        ref={listServerSelectRef}
+        title={translate('settings.select-placeholder') as string}
+        items={itemsPicker}
+        value={listServerUri ?? ''}
+        onChange={itemValue => {
+          if (itemValue) {
+            setOfflineIcon(farCircle);
+            setAutoIcon(farCircle);
+            setListIcon(faDotCircle);
+            setCustomIcon(farCircle);
+            setSelectServer(SelectServerEnum.list);
+            setListServerUri(itemValue);
+            setAutoServerUri(itemValue);
+            const cnItem = serverUris(translate).find(
+              (s: ServerUrisType) => s.uri === itemValue && !s.obsolete,
+            );
+            if (cnItem) {
+              setListServerChainName(cnItem.chainName);
+            } else {
+              console.log('chain name not found');
+            }
+          }
+        }}
+      />
     </KeyboardAvoidingView>
   );
 };

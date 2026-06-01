@@ -115,6 +115,7 @@ const AddTagModalHost = forwardRef<
       ref={ref}
       enableDynamicSizing={true}
       enablePanDownToClose
+      stackBehavior="push"
       keyboardBehavior={'interactive'}
       keyboardBlurBehavior={'restore'}
       android_keyboardInputMode={'adjustResize'}
