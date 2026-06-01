@@ -243,6 +243,188 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
       </View>
     </View>
   </View>
+  <View
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "opacity": 1,
+        "paddingHorizontal": 24,
+        "paddingVertical": 14,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#18bd18",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "opacity": 1,
+        }
+      }
+    >
+      text translated
+    </Text>
+    <
+      color="#18bd18"
+      icon={
+        {
+          "icon": [
+            448,
+            512,
+            [
+              10003,
+              10004,
+            ],
+            "f00c",
+            "M434.8 70.1c14.3 10.4 17.5 30.4 7.1 44.7l-256 352c-5.5 7.6-14 12.3-23.4 13.1s-18.5-2.7-25.1-9.3l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l101.5 101.5 234-321.7c10.4-14.3 30.4-17.5 44.7-7.1z",
+          ],
+          "iconName": "check",
+          "prefix": "fas",
+        }
+      }
+      size={16}
+    />
+  </View>
+  <View
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "opacity": 1,
+        "paddingHorizontal": 24,
+        "paddingVertical": 14,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#c3c3c3",
+          "fontSize": 16,
+          "fontWeight": "400",
+          "opacity": 1,
+        }
+      }
+    >
+      text translated
+    </Text>
+  </View>
+  <View
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "opacity": 1,
+        "paddingHorizontal": 24,
+        "paddingVertical": 14,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#c3c3c3",
+          "fontSize": 16,
+          "fontWeight": "400",
+          "opacity": 1,
+        }
+      }
+    >
+      text translated
+    </Text>
+  </View>
 </View>
 `;
 
@@ -349,62 +531,95 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
       }
     >
       <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           {
-            "alignItems": "center",
-            "backgroundColor": "#303d4f",
-            "borderColor": "#c3c3c3",
-            "borderRadius": 5,
-            "borderWidth": 1,
-            "flexDirection": "row",
             "flexGrow": 1,
-            "justifyContent": "space-between",
-            "maxHeight": 48,
-            "minHeight": 48,
-            "minWidth": 48,
           }
         }
       >
-        <Text
+        <View
           style={
             {
-              "backgroundColor": "transparent",
-              "color": "#c3c3c3",
-              "fontSize": 15,
-              "fontWeight": "600",
-              "marginLeft": 20,
-              "marginTop": 25,
+              "alignItems": "center",
+              "backgroundColor": "#303d4f",
+              "borderColor": "#c3c3c3",
+              "borderRadius": 5,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "flexGrow": 1,
+              "justifyContent": "space-between",
               "maxHeight": 48,
               "minHeight": 48,
               "minWidth": 48,
-              "opacity": 1,
             }
           }
         >
-          text translated
-        </Text>
-        <
-          color="#c3c3c3"
-          icon={
-            {
-              "icon": [
-                448,
-                512,
-                [],
-                "f078",
-                "M201.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 338.7 54.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z",
-              ],
-              "iconName": "chevron-down",
-              "prefix": "fas",
+          <Text
+            style={
+              {
+                "backgroundColor": "transparent",
+                "color": "#c3c3c3",
+                "fontSize": 15,
+                "fontWeight": "600",
+                "marginLeft": 20,
+                "opacity": 1,
+              }
             }
-          }
-          size={12}
-          style={
-            {
-              "marginRight": 20,
+          >
+            text translated
+          </Text>
+          <
+            color="#c3c3c3"
+            icon={
+              {
+                "icon": [
+                  448,
+                  512,
+                  [],
+                  "f078",
+                  "M201.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 338.7 54.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z",
+                ],
+                "iconName": "chevron-down",
+                "prefix": "fas",
+              }
             }
-          }
-        />
+            size={12}
+            style={
+              {
+                "marginRight": 20,
+              }
+            }
+          />
+        </View>
       </View>
     </View>
     <View
@@ -573,6 +788,188 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
         </View>
       </View>
     </View>
+  </View>
+  <View
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "opacity": 1,
+        "paddingHorizontal": 24,
+        "paddingVertical": 14,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#18bd18",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "opacity": 1,
+        }
+      }
+    >
+      text translated
+    </Text>
+    <
+      color="#18bd18"
+      icon={
+        {
+          "icon": [
+            448,
+            512,
+            [
+              10003,
+              10004,
+            ],
+            "f00c",
+            "M434.8 70.1c14.3 10.4 17.5 30.4 7.1 44.7l-256 352c-5.5 7.6-14 12.3-23.4 13.1s-18.5-2.7-25.1-9.3l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l101.5 101.5 234-321.7c10.4-14.3 30.4-17.5 44.7-7.1z",
+          ],
+          "iconName": "check",
+          "prefix": "fas",
+        }
+      }
+      size={16}
+    />
+  </View>
+  <View
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "opacity": 1,
+        "paddingHorizontal": 24,
+        "paddingVertical": 14,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#c3c3c3",
+          "fontSize": 16,
+          "fontWeight": "400",
+          "opacity": 1,
+        }
+      }
+    >
+      text translated
+    </Text>
+  </View>
+  <View
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "opacity": 1,
+        "paddingHorizontal": 24,
+        "paddingVertical": 14,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#c3c3c3",
+          "fontSize": 16,
+          "fontWeight": "400",
+          "opacity": 1,
+        }
+      }
+    >
+      text translated
+    </Text>
   </View>
 </View>
 `;

@@ -1,12 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
-import {
-  View,
-  TextInput,
-  NativeSyntheticEvent,
-  Keyboard,
-  Platform,
-} from 'react-native';
+import React, { useContext, useMemo, useRef, useState } from 'react';
+import { View, TextInput, Keyboard, Pressable } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import {
@@ -25,9 +19,8 @@ import Button from '../../Components/Button';
 import { AddressUnifiedTypeEnum } from '../../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import ContextMenu, {
-  ContextMenuOnPressNativeEvent,
-} from 'react-native-context-menu-view';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import SelectBottomSheet from '../../Components/SelectBottomSheet';
 import RPCModule from '../../../app/RPCModule';
 import { RPCUnifiedAddressType } from '../../../app/walletBackend/types/RPCUnifiedAddressType';
 import { RPCTransparentAddressType } from '../../../app/walletBackend/types/RPCTransparentAddressType';
@@ -52,6 +45,25 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   const [label, setLabel] = useState<string>('');
   const [type, setType] = useState<AddressUnifiedTypeEnum>(
     AddressUnifiedTypeEnum.orchard,
+  );
+  const uTypeSelectRef = useRef<BottomSheetModal>(null);
+
+  const uTypeItems = useMemo(
+    () => [
+      {
+        label: translate('receive.shielded-orchard') as string,
+        value: AddressUnifiedTypeEnum.orchard,
+      },
+      {
+        label: translate('receive.shielded-orchard-sapling') as string,
+        value: AddressUnifiedTypeEnum.orchardAndSapling,
+      },
+      {
+        label: translate('receive.shielded-sapling') as string,
+        value: AddressUnifiedTypeEnum.sapling,
+      },
+    ],
+    [translate],
   );
 
   const createAddress = async () => {
@@ -191,32 +203,9 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 marginTop: 10,
               }}
             >
-              <ContextMenu
-                title={translate('loadedapp.options') as string}
-                dropdownMenuMode={true}
-                style={{
-                  flexGrow: 1,
-                }}
-                actions={[
-                  { title: translate('receive.shielded-orchard') as string },
-                  {
-                    title: translate(
-                      'receive.shielded-orchard-sapling',
-                    ) as string,
-                  },
-                  { title: translate('receive.shielded-sapling') as string },
-                ]}
-                onPress={(
-                  e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>,
-                ) => {
-                  if (e.nativeEvent.index === 0) {
-                    setType(AddressUnifiedTypeEnum.orchard);
-                  } else if (e.nativeEvent.index === 1) {
-                    setType(AddressUnifiedTypeEnum.orchardAndSapling);
-                  } else if (e.nativeEvent.index === 2) {
-                    setType(AddressUnifiedTypeEnum.sapling);
-                  }
-                }}
+              <Pressable
+                onPress={() => uTypeSelectRef.current?.present()}
+                style={{ flexGrow: 1 }}
               >
                 <View
                   style={{
@@ -237,12 +226,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                     style={{
                       color: colors.text,
                       fontWeight: '600',
-                      minWidth: 48,
-                      minHeight: 48,
-                      maxHeight: 48,
                       marginLeft: 20,
-                      marginTop:
-                        Platform.OS === GlobalConst.platformOSandroid ? 17 : 25,
                       backgroundColor: 'transparent',
                     }}
                   >
@@ -263,7 +247,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                     style={{ marginRight: 20 }}
                   />
                 </View>
-              </ContextMenu>
+              </Pressable>
             </View>
           </>
         )}
@@ -301,6 +285,13 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           />
         </View>
       </View>
+      <SelectBottomSheet
+        ref={uTypeSelectRef}
+        title={translate('loadedapp.options') as string}
+        items={uTypeItems}
+        value={type}
+        onChange={v => setType(v as AddressUnifiedTypeEnum)}
+      />
     </View>
   );
 };

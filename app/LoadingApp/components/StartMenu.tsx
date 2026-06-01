@@ -1,25 +1,33 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Text,
   View,
   ActivityIndicator,
   Image,
   Alert,
-  NativeSyntheticEvent,
+  Pressable,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-
-import ContextMenu, {
-  ContextMenuOnPressNativeEvent,
-} from 'react-native-context-menu-view';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
-import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
+import ActionMenuBottomSheet, {
+  ActionMenuBottomSheetAction,
+} from '../../../components/Components/ActionMenuBottomSheet';
 
 import { ThemeType } from '../../types';
 import { ButtonTypeEnum, ModeEnum, SelectServerEnum } from '../../AppState';
@@ -67,8 +75,68 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const startMenuSheetRef = useRef<BottomSheet>(null);
+  const optionsMenuRef = useRef<BottomSheetModal>(null);
 
   const startMenuSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  // Consolidates the three legacy ContextMenu kebabs into one action list
+  // gated by network + mode + saved-state. Order: recoverkeys → primary
+  // action (advanced vs custom server) → restore backup.
+  const optionsActions = useMemo<ActionMenuBottomSheetAction[]>(() => {
+    if (actionButtonsDisabled) {
+      return [];
+    }
+    const list: ActionMenuBottomSheetAction[] = [];
+    if (hasRecoveryWalletInfoSaved) {
+      list.push({
+        label: translate('loadingapp.recoverkeys') as string,
+        onPress: () => recoverRecoveryWalletInfo(true),
+      });
+    }
+    if (netInfo.isConnected) {
+      if (mode === ModeEnum.basic) {
+        list.push({
+          label: translate('loadingapp.advancedmode') as string,
+          onPress: () => changeMode(ModeEnum.advanced),
+        });
+      } else {
+        list.push({
+          label: translate('loadingapp.custom') as string,
+          onPress: () => customServer(),
+        });
+        if (hasBackupWallet) {
+          list.push({
+            label: translate('loadedapp.restorebackupwallet') as string,
+            onPress: () =>
+              Alert.alert(
+                translate('loadedapp.restorebackupwallet') as string,
+                translate('loadedapp.alert-restorebackupwallet-body') as string,
+                [
+                  {
+                    text: translate('confirm') as string,
+                    onPress: () => restoreLastBackup(),
+                  },
+                  { text: translate('cancel') as string, style: 'cancel' },
+                ],
+                { cancelable: false },
+              ),
+          });
+        }
+      }
+    }
+    return list;
+  }, [
+    actionButtonsDisabled,
+    hasRecoveryWalletInfoSaved,
+    netInfo.isConnected,
+    mode,
+    hasBackupWallet,
+    translate,
+    recoverRecoveryWalletInfo,
+    changeMode,
+    customServer,
+    restoreLastBackup,
+  ]);
 
   const renderStartMenuHandle = useCallback(
     () => (
@@ -145,164 +213,15 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             right: 0,
           }}
         >
-          {netInfo.isConnected && !actionButtonsDisabled && (
-            <>
-              {mode === ModeEnum.basic ? (
-                <ContextMenu
-                  title={translate('loadedapp.options') as string}
-                  dropdownMenuMode={true}
-                  actions={
-                    hasRecoveryWalletInfoSaved
-                      ? [
-                          {
-                            title: translate(
-                              'loadingapp.recoverkeys',
-                            ) as string,
-                          },
-                          {
-                            title: translate(
-                              'loadingapp.advancedmode',
-                            ) as string,
-                          },
-                        ]
-                      : [
-                          {
-                            title: translate(
-                              'loadingapp.advancedmode',
-                            ) as string,
-                          },
-                        ]
-                  }
-                  onPress={(
-                    e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>,
-                  ) => {
-                    if (
-                      hasRecoveryWalletInfoSaved &&
-                      e.nativeEvent.index === 0
-                    ) {
-                      recoverRecoveryWalletInfo(true);
-                    } else if (
-                      hasRecoveryWalletInfoSaved &&
-                      e.nativeEvent.index === 1
-                    ) {
-                      changeMode(ModeEnum.advanced);
-                    } else if (
-                      !hasRecoveryWalletInfoSaved &&
-                      e.nativeEvent.index === 0
-                    ) {
-                      changeMode(ModeEnum.advanced);
-                    }
-                  }}
-                >
-                  <FontAwesomeIcon
-                    style={{ width: 40, padding: 10 }}
-                    icon={faEllipsisV}
-                    color={'#ffffff'}
-                    size={32}
-                  />
-                </ContextMenu>
-              ) : (
-                <ContextMenu
-                  title={translate('loadedapp.options') as string}
-                  dropdownMenuMode={true}
-                  actions={
-                    hasRecoveryWalletInfoSaved
-                      ? [
-                          {
-                            title: translate(
-                              'loadingapp.recoverkeys',
-                            ) as string,
-                          },
-                          { title: translate('loadingapp.custom') as string },
-                          ...(hasBackupWallet
-                            ? [
-                                {
-                                  title: translate(
-                                    'loadedapp.restorebackupwallet',
-                                  ) as string,
-                                },
-                              ]
-                            : []),
-                        ]
-                      : [
-                          { title: translate('loadingapp.custom') as string },
-                          ...(hasBackupWallet
-                            ? [
-                                {
-                                  title: translate(
-                                    'loadedapp.restorebackupwallet',
-                                  ) as string,
-                                },
-                              ]
-                            : []),
-                        ]
-                  }
-                  onPress={(
-                    e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>,
-                  ) => {
-                    const idx = e.nativeEvent.index;
-                    const customIdx = hasRecoveryWalletInfoSaved ? 1 : 0;
-                    const backupIdx = customIdx + 1;
-                    if (hasRecoveryWalletInfoSaved && idx === 0) {
-                      recoverRecoveryWalletInfo(true);
-                    } else if (idx === customIdx) {
-                      customServer();
-                    } else if (hasBackupWallet && idx === backupIdx) {
-                      Alert.alert(
-                        translate('loadedapp.restorebackupwallet') as string,
-                        translate(
-                          'loadedapp.alert-restorebackupwallet-body',
-                        ) as string,
-                        [
-                          {
-                            text: translate('confirm') as string,
-                            onPress: () => restoreLastBackup(),
-                          },
-                          {
-                            text: translate('cancel') as string,
-                            style: 'cancel',
-                          },
-                        ],
-                        { cancelable: false },
-                      );
-                    }
-                  }}
-                >
-                  <FontAwesomeIcon
-                    style={{ width: 40, padding: 10 }}
-                    icon={faEllipsisV}
-                    color={'#ffffff'}
-                    size={32}
-                  />
-                </ContextMenu>
-              )}
-            </>
+          {optionsActions.length > 0 && (
+            <Pressable
+              onPress={() => optionsMenuRef.current?.present()}
+              style={{ width: 40, padding: 10 }}
+              hitSlop={8}
+            >
+              <FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={32} />
+            </Pressable>
           )}
-          {!netInfo.isConnected &&
-            hasRecoveryWalletInfoSaved &&
-            !actionButtonsDisabled && (
-              <ContextMenu
-                title={translate('loadedapp.options') as string}
-                dropdownMenuMode={true}
-                actions={[
-                  { title: translate('loadingapp.recoverkeys') as string },
-                ]}
-                onPress={(
-                  e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>,
-                ) => {
-                  if (e.nativeEvent.index === 0) {
-                    recoverRecoveryWalletInfo(true);
-                  }
-                }}
-              >
-                <FontAwesomeIcon
-                  style={{ width: 40, padding: 10 }}
-                  icon={faEllipsisV}
-                  color={'#ffffff'}
-                  size={32}
-                />
-              </ContextMenu>
-            )}
         </View>
         <View
           style={{
@@ -585,6 +504,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           )}
         </BottomSheetScrollView>
       </BottomSheet>
+      <ActionMenuBottomSheet
+        ref={optionsMenuRef}
+        title={translate('loadedapp.options') as string}
+        actions={optionsActions}
+      />
     </View>
   );
 };
