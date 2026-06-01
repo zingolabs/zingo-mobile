@@ -25,6 +25,8 @@ import {
 } from '@gorhom/bottom-sheet';
 import CustomServerModalHost from './components/CustomServerModalHost';
 import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
+import ConfirmBottomSheet from '../../components/Components/ConfirmBottomSheet';
+import { showConfirm } from '../showConfirm';
 
 import RPCModule from '../RPCModule';
 import {
@@ -924,10 +926,14 @@ export class LoadingAppClass extends Component<
 
   showDonationAlertAsync = (): Promise<void> => {
     return new Promise((resolve, reject) => {
-      Alert.alert(
-        this.state.translate('loadingapp.alert-donation-title') as string,
-        this.state.translate('loadingapp.alert-donation-body') as string,
-        [
+      showConfirm({
+        title: this.state.translate(
+          'loadingapp.alert-donation-title',
+        ) as string,
+        message: this.state.translate(
+          'loadingapp.alert-donation-body',
+        ) as string,
+        buttons: [
           {
             text: this.state.translate('confirm') as string,
             onPress: () => resolve(),
@@ -938,8 +944,7 @@ export class LoadingAppClass extends Component<
             onPress: () => reject(),
           },
         ],
-        { cancelable: false },
-      );
+      });
     });
   };
 
@@ -1646,13 +1651,14 @@ export class LoadingAppClass extends Component<
         : `${(wallet.ufvk || '').slice(0, 5)} ... ${(wallet.ufvk || '').slice(-5)}`;
       setTimeout(
         () => {
-          Alert.alert(
-            this.props.translate('loadedapp.walletseed-basic') as string,
-            (security
-              ? ''
-              : ((this.props.translate('loadingapp.recoverkeysinstall') +
-                  '\n\n') as string)) + preview,
-            [
+          showConfirm({
+            title: this.props.translate('loadedapp.walletseed-basic') as string,
+            message:
+              (security
+                ? ''
+                : ((this.props.translate('loadingapp.recoverkeysinstall') +
+                    '\n\n') as string)) + preview,
+            buttons: [
               {
                 text: this.props.translate('copy') as string,
                 onPress: () => {
@@ -1683,8 +1689,7 @@ export class LoadingAppClass extends Component<
                 style: 'cancel',
               },
             ],
-            { cancelable: false },
-          );
+          });
           // IOS needs time to close the biometric screen.
           // but Android I don't think so, a little bit Just in case.
         },
@@ -1805,6 +1810,7 @@ export class LoadingAppClass extends Component<
           <GestureHandlerRootView>
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />
+              <ConfirmBottomSheet />
               {screen === RouteEnum.Launching && (
                 <Launching
                   translate={translate}

@@ -7,13 +7,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  View,
-  Alert,
-  ActivityIndicator,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
+import { View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import { showConfirm } from '../../app/showConfirm';
 
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -162,20 +157,21 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   }, []);
 
   const onPressOK = () => {
-    Alert.alert(
-      !!texts && !!texts[action] ? texts[action][3] : '',
-      (action === UfvkActionEnum.change
-        ? (translate('ufvk.change-warning') as string)
-        : action === UfvkActionEnum.backup
-          ? (translate('ufvk.backup-warning') as string)
-          : action === UfvkActionEnum.server
-            ? (translate('ufvk.server-warning') as string)
-            : '') +
+    showConfirm({
+      title: !!texts && !!texts[action] ? texts[action][3] : '',
+      message:
+        (action === UfvkActionEnum.change
+          ? (translate('ufvk.change-warning') as string)
+          : action === UfvkActionEnum.backup
+            ? (translate('ufvk.backup-warning') as string)
+            : action === UfvkActionEnum.server
+              ? (translate('ufvk.server-warning') as string)
+              : '') +
         (server.chainName !== ChainNameEnum.mainChainName &&
         (action === UfvkActionEnum.change || action === UfvkActionEnum.server)
           ? '\n' + (translate('ufvk.mainnet-warning') as string)
           : ''),
-      [
+      buttons: [
         {
           text: translate('confirm') as string,
           onPress: () => onClickOKHide(),
@@ -186,8 +182,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           style: 'cancel',
         },
       ],
-      { cancelable: false },
-    );
+    });
   };
 
   const onClickCancelHide = () => {

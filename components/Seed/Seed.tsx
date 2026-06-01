@@ -7,13 +7,8 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { showConfirm } from '../../app/showConfirm';
 
 import {
   NavigationProp,
@@ -237,20 +232,21 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   }, [action, translate]);
 
   const onPressOK = () => {
-    Alert.alert(
-      !!texts && !!texts[action] ? texts[action][3] : '',
-      (action === SeedActionEnum.change
-        ? (translate('seed.change-warning') as string)
-        : action === SeedActionEnum.backup
-          ? (translate('seed.backup-warning') as string)
-          : action === SeedActionEnum.server
-            ? (translate('seed.server-warning') as string)
-            : '') +
+    showConfirm({
+      title: !!texts && !!texts[action] ? texts[action][3] : '',
+      message:
+        (action === SeedActionEnum.change
+          ? (translate('seed.change-warning') as string)
+          : action === SeedActionEnum.backup
+            ? (translate('seed.backup-warning') as string)
+            : action === SeedActionEnum.server
+              ? (translate('seed.server-warning') as string)
+              : '') +
         (server.chainName !== ChainNameEnum.mainChainName &&
         (action === SeedActionEnum.change || action === SeedActionEnum.server)
           ? '\n' + (translate('seed.mainnet-warning') as string)
           : ''),
-      [
+      buttons: [
         {
           text: translate('confirm') as string,
           onPress: () => {
@@ -263,8 +259,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           style: 'cancel',
         },
       ],
-      { cancelable: false },
-    );
+    });
   };
 
   const onClickCancelHide = () => {

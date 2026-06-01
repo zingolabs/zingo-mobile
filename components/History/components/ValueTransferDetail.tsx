@@ -6,7 +6,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { View, TouchableOpacity, Linking, Text, Alert } from 'react-native';
+import { View, TouchableOpacity, Linking, Text } from 'react-native';
+import { showConfirm } from '../../../app/showConfirm';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -368,18 +369,17 @@ const ValueTransferDetail: React.FunctionComponent<
   };
 
   const actionOnPress = (action: TransactionActionEnum) => {
-    Alert.alert(
-      translate(`history.${action}-title`) as string,
-      translate(`history.${action}-alert`) as string,
-      [
+    showConfirm({
+      title: translate(`history.${action}-title`) as string,
+      message: translate(`history.${action}-alert`) as string,
+      buttons: [
         {
           text: translate('confirm') as string,
           onPress: () => runAction(action),
         },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: false },
-    );
+    });
   };
 
   return (

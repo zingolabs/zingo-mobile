@@ -62,7 +62,28 @@ const Menu: React.FunctionComponent<MenuProps> = ({
     rescanMenu,
     selectServer,
     netInfo,
+    totalBalance,
+    somePending,
   } = context;
+
+  // Same gating as the Send tab in LoadedApp: only show Tip if a real send
+  // is actually possible (online, not read-only, and either confirmed funds
+  // or pending funds that will become spendable). Tip without an available
+  // Send screen would dead-end the user.
+  const canSendInBasic =
+    mode === ModeEnum.basic &&
+    !readOnly &&
+    selectServer !== SelectServerEnum.offline &&
+    ((!!totalBalance &&
+      totalBalance.confirmedOrchardBalance +
+        totalBalance.confirmedSaplingBalance >
+        0) ||
+      (!!totalBalance &&
+        ((totalBalance.totalOrchardBalance > 0 &&
+          totalBalance.confirmedOrchardBalance === 0) ||
+          (totalBalance.totalSaplingBalance > 0 &&
+            totalBalance.confirmedSaplingBalance === 0)) &&
+        somePending));
   const { colors } = useTheme() as ThemeType;
 
   const dimensions = {
@@ -261,17 +282,15 @@ const Menu: React.FunctionComponent<MenuProps> = ({
                 {translate('loadedapp.loadwalletfromseed-basic') as string}
               </RegText>
             )}
-          {mode === ModeEnum.basic &&
-            !readOnly &&
-            selectServer !== SelectServerEnum.offline && (
-              <RegText
-                testID="menu.tipzingolabs"
-                onPress={() => onItemSelectedWrapper(MenuItemEnum.TipZingoLabs)}
-                style={item}
-              >
-                {translate('loadedapp.tipzingolabs-basic') as string}
-              </RegText>
-            )}
+          {canSendInBasic && (
+            <RegText
+              testID="menu.tipzingolabs"
+              onPress={() => onItemSelectedWrapper(MenuItemEnum.TipZingoLabs)}
+              style={item}
+            >
+              {translate('loadedapp.tipzingolabs-basic') as string}
+            </RegText>
+          )}
           <RegText
             onPress={() => onItemSelectedWrapper(MenuItemEnum.Support)}
             style={item}

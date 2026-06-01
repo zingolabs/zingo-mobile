@@ -1,5 +1,5 @@
-import { Alert } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { showConfirm } from '../showConfirm';
 import {
   NavigationProp,
   ParamListBase,
@@ -265,15 +265,14 @@ export function useShieldFunds({
 
   const onPressShieldFunds = useCallback(() => {
     const pools = calculatePoolsToShield();
-    Alert.alert(
-      translate(`history.shield-title-${pools}`) as string,
-      translate(`history.shield-alert-${pools}`) as string,
-      [
+    showConfirm({
+      title: translate(`history.shield-title-${pools}`) as string,
+      message: translate(`history.shield-alert-${pools}`) as string,
+      buttons: [
         { text: translate('confirm') as string, onPress: shieldFunds },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: false },
-    );
+    });
   }, [translate, calculatePoolsToShield, shieldFunds]);
 
   return {

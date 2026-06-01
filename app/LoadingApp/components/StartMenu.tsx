@@ -6,14 +6,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  Text,
-  View,
-  ActivityIndicator,
-  Image,
-  Alert,
-  Pressable,
-} from 'react-native';
+import { Text, View, ActivityIndicator, Image, Pressable } from 'react-native';
+import { showConfirm } from '../../showConfirm';
 import { useTheme } from '@react-navigation/native';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -108,18 +102,19 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           list.push({
             label: translate('loadedapp.restorebackupwallet') as string,
             onPress: () =>
-              Alert.alert(
-                translate('loadedapp.restorebackupwallet') as string,
-                translate('loadedapp.alert-restorebackupwallet-body') as string,
-                [
+              showConfirm({
+                title: translate('loadedapp.restorebackupwallet') as string,
+                message: translate(
+                  'loadedapp.alert-restorebackupwallet-body',
+                ) as string,
+                buttons: [
                   {
                     text: translate('confirm') as string,
                     onPress: () => restoreLastBackup(),
                   },
                   { text: translate('cancel') as string, style: 'cancel' },
                 ],
-                { cancelable: false },
-              ),
+              }),
           });
         }
       }
@@ -397,18 +392,21 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               disabled={actionButtonsDisabled}
               onPress={() => {
                 if (walletExists) {
-                  Alert.alert(
-                    translate('loadingapp.alert-newwallet-title') as string,
-                    translate('loadingapp.alert-newwallet-body') as string,
-                    [
+                  showConfirm({
+                    title: translate(
+                      'loadingapp.alert-newwallet-title',
+                    ) as string,
+                    message: translate(
+                      'loadingapp.alert-newwallet-body',
+                    ) as string,
+                    buttons: [
                       {
                         text: translate('confirm') as string,
                         onPress: () => createNewWallet(),
                       },
                       { text: translate('cancel') as string, style: 'cancel' },
                     ],
-                    { cancelable: false },
-                  );
+                  });
                 } else {
                   createNewWallet();
                 }

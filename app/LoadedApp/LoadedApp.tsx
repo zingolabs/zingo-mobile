@@ -103,6 +103,8 @@ import {
 } from '@gorhom/bottom-sheet';
 import AddTagModalHost from '../../components/AddressBook/components/AddTagModalHost';
 import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
+import ConfirmBottomSheet from '../../components/Components/ConfirmBottomSheet';
+import { showConfirm } from '../showConfirm';
 import Drawer from '../../components/Drawer';
 import MessageList from '../../components/Messages/components/MessageList';
 import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
@@ -1469,10 +1471,10 @@ export class LoadedAppClass extends Component<
       return;
     } else if (item === MenuItemEnum.LoadWalletFromSeed) {
       const { translate } = this.state;
-      Alert.alert(
-        translate('loadedapp.restorewallet-title') as string,
-        translate('loadedapp.restorewallet-alert') as string,
-        [
+      showConfirm({
+        title: translate('loadedapp.restorewallet-title') as string,
+        message: translate('loadedapp.restorewallet-alert') as string,
+        buttons: [
           {
             text: translate('confirm') as string,
             onPress: async () =>
@@ -1483,14 +1485,13 @@ export class LoadedAppClass extends Component<
           },
           { text: translate('cancel') as string, style: 'cancel' },
         ],
-        { cancelable: false },
-      );
+      });
     } else if (item === MenuItemEnum.TipZingoLabs) {
       const { translate } = this.state;
-      Alert.alert(
-        translate('loadingapp.alert-donation-title') as string,
-        translate('loadingapp.alert-donation-body') as string,
-        [
+      showConfirm({
+        title: translate('loadingapp.alert-donation-title') as string,
+        message: translate('loadingapp.alert-donation-body') as string,
+        buttons: [
           {
             text: translate('confirm') as string,
             onPress: async () => await this.setDonationOption(true),
@@ -1501,8 +1502,7 @@ export class LoadedAppClass extends Component<
             style: 'cancel',
           },
         ],
-        { cancelable: false },
-      );
+      });
     } else if (item === MenuItemEnum.AddressBook) {
       this.drawerNav?.navigate(RouteEnum.AddressBook);
       return;
@@ -2099,6 +2099,7 @@ export class LoadedAppClass extends Component<
           <GestureHandlerRootView>
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />
+              <ConfirmBottomSheet />
               <Drawer
                 onMenuItemSelected={this.onMenuItemSelected}
                 initialRouteName={RouteEnum.HomeStack}

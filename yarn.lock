@@ -1552,11 +1552,6 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-12.0.1.tgz#fec75f4093c27778479d8927b4f51f133b8a13a4"
   integrity sha512-P/3caXIvfYSJG8AWJVefukg+ZGRPs+M4Lp3pNJtgcTYoJxCjWrKQGNnCkj/Cz//zWa/avGed0i/wzm0T8vV2IQ==
 
-"@react-native-picker/picker@2.11.4":
-  version "2.11.4"
-  resolved "https://registry.yarnpkg.com/@react-native-picker/picker/-/picker-2.11.4.tgz#7fb09506ee00a82989125cc03e8495204c8afc01"
-  integrity sha512-Kf8h1AMnBo54b1fdiVylP2P/iFcZqzpMYcglC28EEFB1DEnOjsNr6Ucqc+3R9e91vHxEDnhZFbYDmAe79P2gjA==
-
 "@react-native/assets-registry@0.81.6":
   version "0.81.6"
   resolved "https://registry.yarnpkg.com/@react-native/assets-registry/-/assets-registry-0.81.6.tgz#4a9edfa209e4ef43adb372cbf481a7c4ff2e7342"

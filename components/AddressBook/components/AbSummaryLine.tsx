@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, TouchableOpacity, Alert } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import { showConfirm } from '../../../app/showConfirm';
 import {
   NavigationProp,
   ParamListBase,
@@ -74,10 +75,10 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
     : (translate('info.unknown') as string);
 
   const onPressDelete = () => {
-    Alert.alert(
-      translate('addressbook.delete-title') as string,
-      translate('addressbook.delete-alert') as string,
-      [
+    showConfirm({
+      title: translate('addressbook.delete-title') as string,
+      message: translate('addressbook.delete-alert') as string,
+      buttons: [
         {
           text: translate('confirm') as string,
           onPress: () =>
@@ -90,8 +91,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
         },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: false },
-    );
+    });
   };
 
   //console.log('render Ab SummaryLine - 5', index);
