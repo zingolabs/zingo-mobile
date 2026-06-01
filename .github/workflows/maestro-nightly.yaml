@@ -185,10 +185,10 @@ jobs:
       # matching the react-native version in package.json, so pod install's
       # post_install hook downloads the matching dSYMs.
       - name: Build app
-        # No -destination needed for a simulator build — the binary is the same
-        # for every iPhone simulator at the given SDK. Pinning a specific device
-        # broke when the GH macos-15 image started shipping iOS 18.5/18.6/26.x
-        # runtimes that aren't paired with Xcode 16.4 as destinations.
+        # OS=latest lets xcodebuild pick whatever iOS runtime is paired with
+        # the active Xcode — pinning OS=18.5 broke when macos-15 started
+        # shipping multiple runtimes (18.5/18.6/26.x) that aren't all
+        # registered as xcodebuild destinations.
         working-directory: ios
         run: |
           set -euxo pipefail
@@ -198,6 +198,7 @@ jobs:
             -scheme Zingo \
             -sdk iphonesimulator \
             -configuration Release \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -derivedDataPath "build/DerivedData" \
             -quiet
 
@@ -253,8 +254,26 @@ jobs:
           # there may be other iPhone 16 devices on the runner (across
           # different iOS runtimes) and we want this app on exactly the
           # iOS 18.5 one it was built for.
-          xcrun simctl install "$SIM_UDID" \
-            ios/build/DerivedData/Build/Products/Release-iphonesimulator/Zingo.app
+          APP=ios/build/DerivedData/Build/Products/Release-iphonesimulator/Zingo.app
+          xcrun simctl install "$SIM_UDID" "$APP"
+
+          # Verify FrontBoard has registered the bundle before handing off
+          # to Maestro. Without this, the first launch after install can
+          # race FrontBoard and fail with FBSOpenApplicationServiceErrorDomain
+          # ("unknown to FrontBoard"). Poll listapps until the bundle ID
+          # shows up, max ~30s.
+          BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
+          echo "Waiting for $BUNDLE_ID to register with FrontBoard…"
+          for i in $(seq 1 30); do
+            if xcrun simctl listapps "$SIM_UDID" | grep -q "\"$BUNDLE_ID\""; then
+              echo "App registered (after ${i}s)."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::App $BUNDLE_ID never registered with FrontBoard"
+          xcrun simctl listapps "$SIM_UDID" | head -40
+          exit 1
 
       - name: Run Maestro tests
         # GitHub macOS-15 runners now ship many extra iOS runtimes; first-time

@@ -1,7 +1,6 @@
 appId: org.ZingoLabs.Zingo
 ---
-- launchApp:
-    clearState: true
+- launchApp
 
 - extendedWaitUntil:
     visible:
