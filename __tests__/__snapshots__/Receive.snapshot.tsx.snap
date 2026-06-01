@@ -638,9 +638,9 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
         {
           "backgroundColor": "#031124",
           "borderLeftColor": "#05234C",
-          "borderLeftWidth": 1,
+          "borderLeftWidth": 0.5,
           "borderRightColor": "#05234C",
-          "borderRightWidth": 1,
+          "borderRightWidth": 0.5,
           "borderTopColor": "#05234C",
           "borderTopLeftRadius": 40,
           "borderTopRightRadius": 40,
@@ -656,18 +656,27 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "justifyContent": "space-between",
           }
         }
       >
         <View
           style={
             {
-              "width": 28,
+              "width": 46,
             }
           }
         />
-        RNPickerSelect
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            }
+          }
+        >
+          RNPickerSelect
+        </View>
         <View
           accessibilityState={
             {

@@ -213,8 +213,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
-          borderLeftWidth: 1,
-          borderRightWidth: 1,
+          borderLeftWidth: 0.5,
+          borderRightWidth: 0.5,
           borderTopColor: colors.bottomSheetBorder,
           borderLeftColor: colors.bottomSheetBorder,
           borderRightColor: colors.bottomSheetBorder,
@@ -359,8 +359,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               borderTopLeftRadius: 40,
               borderTopRightRadius: 40,
               borderTopWidth: 1,
-              borderLeftWidth: 1,
-              borderRightWidth: 1,
+              borderLeftWidth: 0.5,
+              borderRightWidth: 0.5,
               borderTopColor: colors.bottomSheetBorder,
               borderLeftColor: colors.bottomSheetBorder,
               borderRightColor: colors.bottomSheetBorder,
@@ -374,7 +374,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             >
               <View style={{ width: 46 }} />
               <View
-                style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 {canPickScope ? (
                   <RNPickerSelect
