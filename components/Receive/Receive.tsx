@@ -50,6 +50,7 @@ import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from './components/ExpandedAddress';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
+import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 
 type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
   toggleMenuDrawer: () => void;
@@ -94,6 +95,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const scopeSelectRef = useRef<BottomSheetModal>(null);
   const receiveSheetRef = useRef<BottomSheet>(null);
   const keyboardHeight = useKeyboardHeight();
+  useDismissSheetsOnBlur();
 
   // Receive sheet snap points — identical computation to History so both
   // screens feel the same when dragging.

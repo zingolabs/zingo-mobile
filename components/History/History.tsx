@@ -43,6 +43,7 @@ import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
+import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import Header from '../Header';
 import Utils from '../../app/utils';
 import {
@@ -146,6 +147,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const historySheetRef = useRef<BottomSheet>(null);
+  useDismissSheetsOnBlur();
   const scrollViewRef =
     useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(
       null,

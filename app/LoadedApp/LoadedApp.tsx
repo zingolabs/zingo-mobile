@@ -102,6 +102,7 @@ import {
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 import AddTagModalHost from '../../components/AddressBook/components/AddTagModalHost';
+import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
 import Drawer from '../../components/Drawer';
 import MessageList from '../../components/Messages/components/MessageList';
 import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
@@ -2097,6 +2098,7 @@ export class LoadedAppClass extends Component<
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
             <BottomSheetModalProvider>
+              <BottomSheetBackHandler />
               <Drawer
                 onMenuItemSelected={this.onMenuItemSelected}
                 initialRouteName={RouteEnum.HomeStack}

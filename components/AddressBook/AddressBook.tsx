@@ -56,6 +56,7 @@ import { RPCCheckAddressType } from '../../app/walletBackend/types/RPCCheckAddre
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
+import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 
 type AddressBookProps = DrawerScreenProps<
   AppDrawerParamList,
@@ -108,6 +109,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const addressBookSheetRef = useRef<BottomSheet>(null);
   const abDetailSheetRef = useRef<BottomSheetModal>(null);
   const keyboardHeight = useKeyboardHeight();
+  useDismissSheetsOnBlur();
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 

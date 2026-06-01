@@ -70,6 +70,7 @@ import BottomSheet, {
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
+import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { createAlert } from '../../app/createAlert';
@@ -823,6 +824,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const listServerSelectRef = useRef<BottomSheetModal>(null);
   const settingsSheetRef = useRef<BottomSheet>(null);
   const keyboardHeight = useKeyboardHeight();
+  useDismissSheetsOnBlur();
 
   const renderSettingsHandle = useCallback(
     () => (

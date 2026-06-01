@@ -83,6 +83,7 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
+import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
 import { RPCSendProposeType } from '../../app/walletBackend/types/RPCSendProposeType';
@@ -216,6 +217,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
+  useDismissSheetsOnBlur();
 
   // Top icons strip height is a code-side constant (~55 px) — same on any phone.
   const TOP_ICONS_H = 55;

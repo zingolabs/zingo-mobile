@@ -46,6 +46,7 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
+import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import ExpandedAddress from '../Receive/components/ExpandedAddress';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
@@ -115,6 +116,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  useDismissSheetsOnBlur();
 
   const show = useCallback((_sheetType: 'EA') => {
     setSheetType(_sheetType);

@@ -24,6 +24,7 @@ import {
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 import CustomServerModalHost from './components/CustomServerModalHost';
+import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
 
 import RPCModule from '../RPCModule';
 import {
@@ -1803,6 +1804,7 @@ export class LoadingAppClass extends Component<
         <ContextAppLoadingProvider value={context}>
           <GestureHandlerRootView>
             <BottomSheetModalProvider>
+              <BottomSheetBackHandler />
               {screen === RouteEnum.Launching && (
                 <Launching
                   translate={translate}
