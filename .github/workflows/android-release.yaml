@@ -314,7 +314,7 @@ jobs:
           result-encoding: string
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: ${{ steps.channel.outputs.label }} ${{ github.ref_name }}
           body: |
