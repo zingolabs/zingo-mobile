@@ -1,9 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import {
-  faBars,
-  faChevronLeft,
-  faSnowflake,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faSnowflake } from '@fortawesome/free-solid-svg-icons';
+import BurgerIcon from '../../assets/img/options/burger.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   NavigationProp,
@@ -251,7 +248,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
         <View
           style={{
-            padding: 11.5,
+            paddingLeft: 20,
+            paddingTop: 16,
+            paddingRight: 11.5,
+            paddingBottom: 11.5,
             position: 'absolute',
             left: 0,
             top: 0,
@@ -266,11 +266,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 accessibilityLabel={translate('menudrawer-acc') as string}
                 onPress={toggleMenuDrawer}
               >
-                <FontAwesomeIcon
-                  icon={faBars}
-                  size={32}
-                  color={colors.border}
-                />
+                <BurgerIcon width={19} height={17} />
               </TouchableOpacity>
             )}
             {readOnly && !noUfvkIcon && (

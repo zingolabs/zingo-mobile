@@ -86,6 +86,7 @@
   },
   "change-privacy-legend": ".\nGizli değerleri göstermek için dokunun.",
   "txtcopied": "Metin panoya kopyalandı",
+  "linkcopied": "Bağlantı panoya kopyalandı",
   "insight": {
     "title": "Finansal İçgörü",
     "no-data": "Seçilen grafikle uyumlu veriler cüzdanınızda bulunmamaktadır.",

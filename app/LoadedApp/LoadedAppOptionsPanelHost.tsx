@@ -76,10 +76,12 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   }, [isOpen]);
 
   // Runs biometrics for protected items, then forwards to the LoadedApp
-  // class-level dispatcher that knows which screen to navigate to.
+  // class-level dispatcher that knows which screen to navigate to. The
+  // panel is only closed after biometrics succeeds (or upfront for items
+  // that don't need it) — closing before would strand the user on the
+  // previous screen if they cancel the OS auth prompt.
   const dispatch = useMemo(
     () => async (item: MenuItemEnum) => {
-      closeOptionsPanel();
       const needsBio =
         (item === MenuItemEnum.WalletSeedUfvk && security.seedUfvkScreen) ||
         (item === MenuItemEnum.Rescan && security.rescanScreen) ||
@@ -93,6 +95,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
           return;
         }
       }
+      closeOptionsPanel();
       onMenuItemSelected(item);
     },
     [security, translate, addLastSnackbar, onMenuItemSelected],
@@ -278,6 +281,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       title={translate('loadedapp.options') as string}
       actions={actions}
       socials={socials}
+      onLinkCopied={() => addLastSnackbar(translate('linkcopied') as string)}
       mode={modePill}
       onClose={closeOptionsPanel}
     >

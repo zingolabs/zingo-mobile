@@ -86,6 +86,7 @@
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
+  "linkcopied": "Link copied to Clipboard",
   "insight": {
     "title": "Financial Insight",
     "no-data": "There is no data in your Wallet that fits the graph selected.",

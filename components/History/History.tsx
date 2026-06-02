@@ -145,7 +145,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [filterFailed, setFilterFailed] = useState<boolean>(false);
   const [filterMemos, setFilterMemos] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [showFooter, setShowFooter] = useState<boolean>(false);
   // measured dynamically to compute history sheet snap points
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -455,8 +454,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
       // Always update isAtTop for manual scrolling
       setIsAtTop(isTop);
-
-      setShowFooter(offsetY > 0);
     },
     [isScrollingToTop],
   );
@@ -757,59 +754,41 @@ const History: React.FunctionComponent<HistoryProps> = ({
                     layoutProvider={layoutProvider}
                     dataProvider={dataProvider}
                     rowRenderer={rowRenderer}
-                    onEndReachedThreshold={0.75}
-                    onEndReached={() => {
-                      setShowFooter(true);
-                    }}
                     disableRecycling={true}
-                    renderFooter={() => (
-                      <>
-                        {showFooter ? (
-                          <>
-                            {loadMoreButton ? (
-                              <View
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'flex-start',
-                                  marginTop: 20,
-                                  marginBottom: 60,
-                                }}
-                              >
-                                <Button
-                                  type={ButtonTypeEnum.Secondary}
-                                  title={
-                                    translate('history.loadmore') as string
-                                  }
-                                  onPress={loadMoreClicked}
-                                />
-                              </View>
-                            ) : (
-                              <>
-                                {!!valueTransfersSliced &&
-                                  !!valueTransfersSliced.length && (
-                                    <View
-                                      style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'flex-start',
-                                        marginTop: 20,
-                                        marginBottom: 60,
-                                      }}
-                                    >
-                                      <FadeText
-                                        style={{ color: colors.primary }}
-                                      >
-                                        {translate('history.end') as string}
-                                      </FadeText>
-                                    </View>
-                                  )}
-                              </>
-                            )}
-                          </>
-                        ) : null}
-                      </>
-                    )}
+                    renderFooter={() =>
+                      loadMoreButton ? (
+                        <View
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            marginTop: 20,
+                            marginBottom: 60,
+                          }}
+                        >
+                          <Button
+                            type={ButtonTypeEnum.Secondary}
+                            title={translate('history.loadmore') as string}
+                            onPress={loadMoreClicked}
+                          />
+                        </View>
+                      ) : !!valueTransfersSliced &&
+                        !!valueTransfersSliced.length ? (
+                        <View
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            marginTop: 20,
+                            marginBottom: 60,
+                          }}
+                        >
+                          <FadeText style={{ color: colors.primary }}>
+                            {translate('history.end') as string}
+                          </FadeText>
+                        </View>
+                      ) : null
+                    }
                   />
                 ) : (
                   <View

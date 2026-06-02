@@ -50,6 +50,9 @@ export type OptionsPanelProps = {
   title: string;
   actions: OptionsPanelAction[];
   socials?: OptionsPanelSocial[];
+  /** Fired after a social URL (x/github) is placed on the clipboard, so
+   *  the host can show a snackbar. Not fired for `mail` (no copy). */
+  onLinkCopied?: (url: string) => void;
   /**
    * Mode pill at the bottom. Shows the wallet brand + the mode that will
    * become active when tapped (so the user reads the destination, mirroring
@@ -76,6 +79,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   title,
   actions,
   socials,
+  onLinkCopied,
   mode,
   onClose,
 }) => {
@@ -85,15 +89,19 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   // Cleared when a different social with no URL is tapped (e.g. mail).
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
-  const handleSocialPress = useCallback((social: OptionsPanelSocial) => {
-    if (social.id === 'mail') {
-      setCopiedUrl(null);
-      social.onPress();
-      return;
-    }
-    Clipboard.setString(social.url);
-    setCopiedUrl(social.url);
-  }, []);
+  const handleSocialPress = useCallback(
+    (social: OptionsPanelSocial) => {
+      if (social.id === 'mail') {
+        setCopiedUrl(null);
+        social.onPress();
+        return;
+      }
+      Clipboard.setString(social.url);
+      setCopiedUrl(social.url);
+      onLinkCopied?.(social.url);
+    },
+    [onLinkCopied],
+  );
 
   // Triple chevron stacked vertically; tap area is the whole column.
   const tripleChevron = useMemo(

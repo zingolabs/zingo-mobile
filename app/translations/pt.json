@@ -86,6 +86,7 @@
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
+  "linkcopied": "Link copiado para a Área de Transferência",
   "insight": {
     "title": "Visão Financeira",
     "no-data": "Não há dados em sua Carteira que correspondam ao gráfico selecionado.",

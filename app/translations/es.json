@@ -86,6 +86,7 @@
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
+  "linkcopied": "Enlace copiado al Portapapeles",
   "insight": {
     "title": "Visión Financiera",
     "no-data": "No hay datos en tu Monedero que concuerden con el gráfico seleccionado.",
