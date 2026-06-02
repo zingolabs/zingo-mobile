@@ -3611,10 +3611,10 @@ detect-newline@^3.1.0:
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-3.1.0.tgz#576f5dfc63ae1a192ff192d8ad3af6308991b651"
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
 
-detox@^20.51.1:
-  version "20.51.1"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-20.51.1.tgz#50e5b9cb4407bff51d67876325a98d7a3ae36633"
-  integrity sha512-SKHM445qJDSaCO0vQHZnzfStpU1nQtBgWPjMZh/R+1q/ra9F2WyvtNSQcDTb2SPC/jN4FNWaj9ZUcJTkaLEB/g==
+detox@^20.51.3:
+  version "20.51.3"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-20.51.3.tgz#74bf905e76e8d63e57141f182e511f1511ad490a"
+  integrity sha512-wrR1Xr+mojmM+UsycyLalLmednc2ZMHasdzGZgdmqfcVXN5OcSyVzA/JGoTmmz3Q/Xqv4bvT3jg/HdfQwiQMiw==
   dependencies:
     "@wix-pilot/core" "^3.4.2"
     "@wix-pilot/detox" "^1.0.13"
