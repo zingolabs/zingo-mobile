@@ -752,10 +752,13 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                     ) : null
                   }
                   style={{
-                    flexGrow: 1,
-                    marginTop: 10,
+                    flex: 1,
                     width: '100%',
                     opacity: loading ? 0 : 1,
+                  }}
+                  contentContainerStyle={{
+                    flexGrow: 1,
+                    paddingTop: 10,
                   }}
                 />
                 {!isAtBottom && !loading && (

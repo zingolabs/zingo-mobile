@@ -212,8 +212,12 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 hitSlop={8}
                 style={{ padding: 4 }}
               >
-                {social.id === 'x' && <XSocial width={26} height={26} />}
-                {social.id === 'github' && <Github width={26} height={26} />}
+                {/* Sizes are proportional to each SVG's viewBox
+                    (X 30 / Github 37 / Mail 35) so the glyphs render at
+                    a comparable visual weight instead of all collapsing
+                    to the same pixel box. */}
+                {social.id === 'x' && <XSocial width={22} height={22} />}
+                {social.id === 'github' && <Github width={27} height={27} />}
                 {social.id === 'mail' && <Mail width={26} height={26} />}
               </Pressable>
             ))}
