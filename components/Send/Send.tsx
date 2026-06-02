@@ -215,6 +215,10 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const scrollViewRef = useRef<ScrollView>(null);
   const sendSheetRef = useRef<BottomSheet>(null);
+  // Track internal snap index; when snapPoints shrinks (e.g., USD currency
+  // disabled, 3 → 2 snaps), clamp the index in an effect so the sheet
+  // doesn't throw "out of range" against the stale internal position.
+  const internalSnapIndexRef = useRef<number>(0);
   const memoBottomSheetRef = useRef<BottomSheetModal>(null);
   const addressBookSelectRef = useRef<BottomSheetModal>(null);
   const feeCalculationGenRef = useRef<number>(0);
@@ -258,6 +262,12 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
     return [snapLow, snapMax];
   }, [currency, containerH, headerH, usdRowH]);
+
+  useEffect(() => {
+    if (internalSnapIndexRef.current >= sendSnapPoints.length) {
+      sendSheetRef.current?.snapToIndex(sendSnapPoints.length - 1);
+    }
+  }, [sendSnapPoints]);
 
   const renderSendHandle = useCallback(
     () => (
@@ -1207,6 +1217,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           ref={sendSheetRef}
           snapPoints={sendSnapPoints}
           index={0}
+          onChange={i => {
+            internalSnapIndexRef.current = i;
+          }}
           enableDynamicSizing={false}
           enablePanDownToClose={false}
           enableContentPanningGesture={false}

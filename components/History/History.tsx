@@ -153,6 +153,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const historySheetRef = useRef<BottomSheet>(null);
+  // Track internal snap index; when snapPoints shrinks (e.g., USD currency
+  // disabled, 3 → 2 snaps), clamp the index in an effect so the sheet
+  // doesn't throw "out of range" against the stale internal position.
+  const internalSnapIndexRef = useRef<number>(0);
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
   const scrollViewRef =
@@ -295,6 +299,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
     }
     return [snapLow, snapMax];
   }, [currency, containerH, headerH, usdRowH]);
+
+  useEffect(() => {
+    if (internalSnapIndexRef.current >= historySnapPoints.length) {
+      historySheetRef.current?.snapToIndex(historySnapPoints.length - 1);
+    }
+  }, [historySnapPoints]);
 
   const fetchValueTransfersFiltered = useMemo(() => {
     if (!valueTransfers) {
@@ -697,6 +707,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
           ref={historySheetRef}
           snapPoints={historySnapPoints}
           index={0}
+          onChange={i => {
+            internalSnapIndexRef.current = i;
+          }}
           enableDynamicSizing={false}
           enablePanDownToClose={false}
           enableContentPanningGesture={false}

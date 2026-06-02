@@ -2,7 +2,6 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   View,
-  Alert,
   I18nManager,
   EmitterSubscription,
   AppState,
@@ -727,6 +726,7 @@ export class LoadedAppClass extends Component<
       setPrivacyOption: this.setPrivacyOption,
       setNymOption: this.setNymOption,
       setModeOption: this.setModeOption,
+      setCurrencyOption: this.setCurrencyOption,
 
       // context settings
       server: props.server,
@@ -796,10 +796,11 @@ export class LoadedAppClass extends Component<
       // migration from Z1 to Z2. Wallet version 32 (first of Z2).
       const version = await this.rpc.getWalletVersion();
       if (version && version < 32) {
-        Alert.alert(
-          `${this.state.translate('loadedapp.migration-title')} v:${version}`,
-          this.state.translate('loadedapp.migration-body') as string,
-        );
+        showConfirm({
+          title: `${this.state.translate('loadedapp.migration-title')} v:${version}`,
+          message: this.state.translate('loadedapp.migration-body') as string,
+          buttons: [{ text: this.state.translate('close') as string }],
+        });
       }
     }
 
@@ -880,10 +881,11 @@ export class LoadedAppClass extends Component<
               (this.state.backgroundError.title ||
                 this.state.backgroundError.error)
             ) {
-              Alert.alert(
-                this.state.backgroundError.title,
-                this.state.backgroundError.error,
-              );
+              showConfirm({
+                title: this.state.backgroundError.title,
+                message: this.state.backgroundError.error,
+                buttons: [{ text: this.state.translate('close') as string }],
+              });
               this.setBackgroundError('', '');
             }
           }
@@ -2087,6 +2089,7 @@ export class LoadedAppClass extends Component<
       setPrivacyOption: this.setPrivacyOption,
       setNymOption: this.setNymOption,
       setModeOption: this.setModeOption,
+      setCurrencyOption: this.setCurrencyOption,
 
       // context settings
       server: this.state.server,

@@ -138,10 +138,24 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     return [snapLow, snapMax];
   }, [context.currency, containerH, headerH, usdRowH]);
 
-  const initialReceiveSnapIndex = useMemo(
+  // Stable initial index — the `index` prop is controlled, so recomputing
+  // it reactively when snapPoints grows (2 → 3 with USD currency) forces a
+  // snapToIndex that races snapPoints propagation and throws "out of
+  // range". Set once on mount and let user/effect changes go through the
+  // ref instead.
+  const [initialReceiveSnapIndex] = useState<number>(
     () => receiveSnapPoints.length - 1,
-    [receiveSnapPoints],
   );
+  // Track the sheet's internal snap index (updated via onChange). When
+  // snapPoints shrinks (3 → 2) and that index is now out of range, clamp
+  // it via the ref from an effect (post-commit, after BottomSheet has
+  // processed the new snapPoints prop).
+  const internalSnapIndexRef = useRef<number>(initialReceiveSnapIndex);
+  useEffect(() => {
+    if (internalSnapIndexRef.current >= receiveSnapPoints.length) {
+      receiveSheetRef.current?.snapToIndex(receiveSnapPoints.length - 1);
+    }
+  }, [receiveSnapPoints]);
 
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
     setSheetType(_sheetType);
@@ -349,6 +363,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           accessible={false}
           snapPoints={receiveSnapPoints}
           index={initialReceiveSnapIndex}
+          onChange={i => {
+            internalSnapIndexRef.current = i;
+          }}
           enableDynamicSizing={false}
           enablePanDownToClose={false}
           enableContentPanningGesture={true}

@@ -138,4 +138,5 @@ export default interface AppContextLoaded {
   nym: boolean;
   setNymOption: (value: boolean) => Promise<void>;
   setModeOption: (value: string) => Promise<void>;
+  setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
 }

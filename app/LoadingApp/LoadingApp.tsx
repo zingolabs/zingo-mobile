@@ -1,6 +1,5 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
-  Alert,
   I18nManager,
   EmitterSubscription,
   AppState,
@@ -832,10 +831,11 @@ export class LoadingAppClass extends Component<
             (this.state.backgroundError.title ||
               this.state.backgroundError.error)
           ) {
-            Alert.alert(
-              this.state.backgroundError.title,
-              this.state.backgroundError.error,
-            );
+            showConfirm({
+              title: this.state.backgroundError.title,
+              message: this.state.backgroundError.error,
+              buttons: [{ text: this.state.translate('close') as string }],
+            });
             this.setBackgroundError('', '');
           }
         }
