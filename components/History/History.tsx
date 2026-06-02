@@ -14,7 +14,9 @@ import {
   Dimensions,
   Platform,
   Pressable,
+  StyleSheet,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import {
   NavigationProp,
   ParamListBase,
@@ -44,6 +46,7 @@ import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
+import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import Header from '../Header';
 import Utils from '../../app/utils';
 import {
@@ -151,6 +154,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const historySheetRef = useRef<BottomSheet>(null);
   useDismissSheetsOnBlur();
+  const sheetSlideStyle = useOptionsPanelSheetSlide();
   const scrollViewRef =
     useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(
       null,
@@ -685,151 +689,160 @@ const History: React.FunctionComponent<HistoryProps> = ({
           />
         </View>
       </View>
-      <BottomSheet
-        ref={historySheetRef}
-        snapPoints={historySnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderHistoryHandle}
+      <Animated.View
+        pointerEvents="box-none"
+        style={[StyleSheet.absoluteFill, sheetSlideStyle]}
       >
-        <View
-          style={{
-            flex: 1,
+        <BottomSheet
+          ref={historySheetRef}
+          snapPoints={historySnapPoints}
+          index={0}
+          enableDynamicSizing={false}
+          enablePanDownToClose={false}
+          enableContentPanningGesture={false}
+          backgroundStyle={{
             backgroundColor: colors.bottomSheetBackground,
+            borderTopLeftRadius: 40,
+            borderTopRightRadius: 40,
           }}
+          handleComponent={renderHistoryHandle}
         >
-          {loading ? (
-            <ActivityIndicator
-              size="large"
-              color={colors.primary}
-              style={{ marginVertical: 20 }}
-            />
-          ) : (
-            <View style={{ flex: 1, width: '100%' }}>
-              {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
-                <RecyclerListView
-                  ref={scrollViewRef}
-                  renderAheadOffset={500}
-                  scrollViewProps={{
-                    refreshControl: (
-                      <RefreshControl
-                        refreshing={false}
-                        onRefresh={() => doRefresh(screenName)}
-                        tintColor={colors.text}
-                        title={translate('history.refreshing') as string}
-                      />
-                    ),
-                    style: {
-                      flexGrow: 1,
-                      width: '100%',
-                    },
-                  }}
-                  onScroll={handleScroll}
-                  scrollThrottle={100}
-                  layoutProvider={layoutProvider}
-                  dataProvider={dataProvider}
-                  rowRenderer={rowRenderer}
-                  onEndReachedThreshold={0.75}
-                  onEndReached={() => {
-                    setShowFooter(true);
-                  }}
-                  disableRecycling={true}
-                  renderFooter={() => (
-                    <>
-                      {showFooter ? (
-                        <>
-                          {loadMoreButton ? (
-                            <View
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                                marginTop: 20,
-                                marginBottom: 60,
-                              }}
-                            >
-                              <Button
-                                type={ButtonTypeEnum.Secondary}
-                                title={translate('history.loadmore') as string}
-                                onPress={loadMoreClicked}
-                              />
-                            </View>
-                          ) : (
-                            <>
-                              {!!valueTransfersSliced &&
-                                !!valueTransfersSliced.length && (
-                                  <View
-                                    style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'flex-start',
-                                      marginTop: 20,
-                                      marginBottom: 60,
-                                    }}
-                                  >
-                                    <FadeText style={{ color: colors.primary }}>
-                                      {translate('history.end') as string}
-                                    </FadeText>
-                                  </View>
-                                )}
-                            </>
-                          )}
-                        </>
-                      ) : null}
-                    </>
-                  )}
-                />
-              ) : (
-                <View
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 30,
-                  }}
-                >
-                  <FadeText style={{ color: colors.primary }}>
-                    {translate('history.empty') as string}
-                  </FadeText>
-                </View>
-              )}
-              {!isAtTop && (
-                <Pressable
-                  onPress={handleScrollToTop}
-                  disabled={isScrollingToTop}
-                  style={({ pressed }) => ({
-                    position: 'absolute',
-                    bottom: 30,
-                    right: 10,
-                    paddingHorizontal: 5,
-                    paddingVertical: 10,
-                    backgroundColor: colors.sideMenuBackground,
-                    borderRadius: 50,
-                    transform: [{ scale: pressed ? 0.9 : 1 }],
-                    borderWidth: 1,
-                    borderColor: colors.zingo,
-                    opacity: isScrollingToTop ? 0.5 : 1,
-                  })}
-                >
-                  <FontAwesomeIcon
-                    style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                    size={16}
-                    icon={faAngleUp}
-                    color={colors.zingo}
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: colors.bottomSheetBackground,
+            }}
+          >
+            {loading ? (
+              <ActivityIndicator
+                size="large"
+                color={colors.primary}
+                style={{ marginVertical: 20 }}
+              />
+            ) : (
+              <View style={{ flex: 1, width: '100%' }}>
+                {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
+                  <RecyclerListView
+                    ref={scrollViewRef}
+                    renderAheadOffset={500}
+                    scrollViewProps={{
+                      refreshControl: (
+                        <RefreshControl
+                          refreshing={false}
+                          onRefresh={() => doRefresh(screenName)}
+                          tintColor={colors.text}
+                          title={translate('history.refreshing') as string}
+                        />
+                      ),
+                      style: {
+                        flexGrow: 1,
+                        width: '100%',
+                      },
+                    }}
+                    onScroll={handleScroll}
+                    scrollThrottle={100}
+                    layoutProvider={layoutProvider}
+                    dataProvider={dataProvider}
+                    rowRenderer={rowRenderer}
+                    onEndReachedThreshold={0.75}
+                    onEndReached={() => {
+                      setShowFooter(true);
+                    }}
+                    disableRecycling={true}
+                    renderFooter={() => (
+                      <>
+                        {showFooter ? (
+                          <>
+                            {loadMoreButton ? (
+                              <View
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'flex-start',
+                                  marginTop: 20,
+                                  marginBottom: 60,
+                                }}
+                              >
+                                <Button
+                                  type={ButtonTypeEnum.Secondary}
+                                  title={
+                                    translate('history.loadmore') as string
+                                  }
+                                  onPress={loadMoreClicked}
+                                />
+                              </View>
+                            ) : (
+                              <>
+                                {!!valueTransfersSliced &&
+                                  !!valueTransfersSliced.length && (
+                                    <View
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'flex-start',
+                                        marginTop: 20,
+                                        marginBottom: 60,
+                                      }}
+                                    >
+                                      <FadeText
+                                        style={{ color: colors.primary }}
+                                      >
+                                        {translate('history.end') as string}
+                                      </FadeText>
+                                    </View>
+                                  )}
+                              </>
+                            )}
+                          </>
+                        ) : null}
+                      </>
+                    )}
                   />
-                </Pressable>
-              )}
-            </View>
-          )}
-        </View>
-      </BottomSheet>
+                ) : (
+                  <View
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 30,
+                    }}
+                  >
+                    <FadeText style={{ color: colors.primary }}>
+                      {translate('history.empty') as string}
+                    </FadeText>
+                  </View>
+                )}
+                {!isAtTop && (
+                  <Pressable
+                    onPress={handleScrollToTop}
+                    disabled={isScrollingToTop}
+                    style={({ pressed }) => ({
+                      position: 'absolute',
+                      bottom: 30,
+                      right: 10,
+                      paddingHorizontal: 5,
+                      paddingVertical: 10,
+                      backgroundColor: colors.sideMenuBackground,
+                      borderRadius: 50,
+                      transform: [{ scale: pressed ? 0.9 : 1 }],
+                      borderWidth: 1,
+                      borderColor: colors.zingo,
+                      opacity: isScrollingToTop ? 0.5 : 1,
+                    })}
+                  >
+                    <FontAwesomeIcon
+                      style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                      size={16}
+                      icon={faAngleUp}
+                      color={colors.zingo}
+                    />
+                  </Pressable>
+                )}
+              </View>
+            )}
+          </View>
+        </BottomSheet>
+      </Animated.View>
       <BottomSheetModal
         ref={bottomSheetRef}
         enableDynamicSizing={true}

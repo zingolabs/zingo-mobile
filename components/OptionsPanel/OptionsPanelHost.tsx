@@ -1,16 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef } from 'react';
-import {
-  BackHandler,
-  Dimensions,
-  Platform,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { BackHandler, Platform, StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
@@ -18,18 +13,28 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import OptionsPanel, { OptionsPanelProps } from './OptionsPanel';
 import { useOptionsPanel } from '../../app/context/optionsPanel';
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
-const SLIDE_DURATION_MS = 500;
+const FADE_DURATION_MS = 320;
+// Open sequence (total ≈ 700ms = slide duration):
+//   1) 0–350ms:  only the sheet slides down — panel stays at opacity 0
+//   2) 350–670ms: panel fades 0 → 1 while the sheet is still sliding,
+//      producing the "morphing" overlap between the two surfaces
+//   3) end:       panel at full opacity, sheet fully off-screen
+// Close path is untouched: panel just fades 1 → 0 immediately.
+const OPEN_FADE_DELAY_MS = 350;
 
 type OptionsPanelHostProps = OptionsPanelProps & {
-  /** Active app surface (navigator, tabs…). Slides down when isOpen=true. */
+  /** Active app surface (navigator). Stays fixed; only the sheet inside
+   *  each screen slides — see per-screen wiring. The header crossfades
+   *  via the shared `useOptionsPanel` state read by Header.tsx. */
   children: React.ReactNode;
 };
 
 /**
- * Renders the Options panel as a static background layer and the active
- * app surface on top, sliding it down off-screen when the panel opens.
- * Reads isOpen from <OptionsPanelProvider/> (must wrap this component).
+ * Mounts the OptionsPanel as a screen-filling overlay that fades in/out
+ * with the panel state. The active app surface stays in place underneath
+ * (the per-screen BottomSheet handles its own slide-down). When the panel
+ * is closed the overlay is fully transparent and unmounted from the touch
+ * tree via `pointerEvents`.
  */
 const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
   children,
@@ -37,19 +42,18 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
 }) => {
   const { isOpen, close } = useOptionsPanel();
   const { dismissAll } = useBottomSheetModal();
-  const translateY = useSharedValue(0);
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
-    translateY.value = withTiming(isOpen ? SCREEN_HEIGHT : 0, {
-      duration: SLIDE_DURATION_MS,
+    const tween = withTiming(isOpen ? 1 : 0, {
+      duration: FADE_DURATION_MS,
       easing: Easing.out(Easing.cubic),
     });
-  }, [isOpen, translateY]);
+    opacity.value = isOpen ? withDelay(OPEN_FADE_DELAY_MS, tween) : tween;
+  }, [isOpen, opacity]);
 
-  // When the panel opens, close any BottomSheetModal that was open in the
-  // screen behind. Without this the modal stays mounted (it's portaled
-  // under the provider) and would re-appear on top of the next screen the
-  // user navigates to from Options.
+  // Close any open BottomSheetModal in the screen behind when the panel
+  // opens — defensive cleanup (kept from step 5).
   const prevIsOpen = useRef(false);
   useEffect(() => {
     if (isOpen && !prevIsOpen.current) {
@@ -59,10 +63,7 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
   }, [isOpen, dismissAll]);
 
   // Android hardware/gesture back: while the panel is open, the back
-  // action just closes it (does NOT pop the underlying screen). This
-  // listener is registered last so it runs FIRST in BackHandler's stack;
-  // if the panel is closed we return false and the next listener (the
-  // existing BottomSheetBackHandler) handles the press normally.
+  // action just closes it (does NOT pop the underlying screen).
   useEffect(() => {
     if (Platform.OS !== 'android') {
       return;
@@ -77,21 +78,22 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
     return () => sub.remove();
   }, [isOpen, close]);
 
-  const frontStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
+  const overlayStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
   }));
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Background layer — always mounted so it's already laid out when
-          the front layer slides off; no flash of empty content. */}
-      <View style={StyleSheet.absoluteFill}>
-        <OptionsPanel {...panelProps} />
-      </View>
+      {/* Active app surface — stays fixed. */}
+      <View style={StyleSheet.absoluteFill}>{children}</View>
 
-      {/* Front layer = current app surface. */}
-      <Animated.View style={[StyleSheet.absoluteFill, frontStyle]}>
-        {children}
+      {/* Options panel — fades in over everything, ignores touches when
+          closed so the screen behind stays interactive. */}
+      <Animated.View
+        pointerEvents={isOpen ? 'auto' : 'none'}
+        style={[StyleSheet.absoluteFill, overlayStyle]}
+      >
+        <OptionsPanel {...panelProps} />
       </Animated.View>
     </View>
   );

@@ -11,8 +11,19 @@ import {
   useNavigation,
   useTheme,
 } from '@react-navigation/native';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { useOptionsPanel } from '../../app/context/optionsPanel';
+
+// Mirror the panel host's fade duration so the header dissolves in lockstep
+// with the panel that's appearing over it.
+const HEADER_FADE_MS = 320;
 import {
   ModeEnum,
   NetInfoType,
@@ -123,6 +134,20 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const { colors } = useTheme() as ThemeType;
 
+  // Fade the entire screen header out when the Options panel is open so
+  // its content doesn't shine through the (fading-in) panel overlay.
+  const { isOpen: optionsPanelOpen } = useOptionsPanel();
+  const headerOpacity = useSharedValue(1);
+  useEffect(() => {
+    headerOpacity.value = withTiming(optionsPanelOpen ? 0 : 1, {
+      duration: HEADER_FADE_MS,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [optionsPanelOpen, headerOpacity]);
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: headerOpacity.value,
+  }));
+
   const {
     percentageOutputsScanned,
     syncInProgress,
@@ -167,7 +192,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   return (
     <>
-      <View>
+      <Animated.View style={headerAnimatedStyle}>
         <View
           testID="header"
           style={{
@@ -330,7 +355,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             />
           )}
         </View>
-      </View>
+      </Animated.View>
 
       {!!title && (
         <View
