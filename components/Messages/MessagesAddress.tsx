@@ -3,10 +3,10 @@ import React from 'react';
 import { RouteEnum } from '../../app/AppState';
 //import MessageList from './components/MessageList';
 
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../../app/types';
 
-type MessagesAddressProps = DrawerScreenProps<
+type MessagesAddressProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.MessagesAddress
 >;

@@ -57,11 +57,11 @@ import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RP
 import Button from '../../Components/Button';
 import RPCModule from '../../../app/RPCModule';
 import { createAlert } from '../../../app/createAlert';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
-type ValueTransferDetailProps = DrawerScreenProps<
+type ValueTransferDetailProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.ValueTransferDetail
 >;

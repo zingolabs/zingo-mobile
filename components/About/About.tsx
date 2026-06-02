@@ -15,10 +15,10 @@ import Header from '../Header';
 import DetailLine from '../Components/DetailLine';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';
 import { getZingoName, getZingoVersion } from '../../app/utils/ZingoAppData';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 
-type AboutProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.About>;
+type AboutProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.About>;
 
 const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);

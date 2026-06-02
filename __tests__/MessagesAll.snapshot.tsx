@@ -7,11 +7,11 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import MessagesAll from '../components/Messages/MessagesAll';
 import { RouteEnum } from '../app/AppState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeProps(): DrawerScreenProps<
+function makeProps(): NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.MessagesAll
 > {

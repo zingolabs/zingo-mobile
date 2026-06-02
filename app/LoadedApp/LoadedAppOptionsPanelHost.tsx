@@ -1,0 +1,289 @@
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+
+import { OptionsPanelHost } from '../../components/OptionsPanel';
+import type {
+  OptionsPanelAction,
+  OptionsPanelSocial,
+} from '../../components/OptionsPanel';
+import { closeOptionsPanel, useOptionsPanel } from '../context/optionsPanel';
+import { ContextAppLoaded } from '../context';
+import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../AppState';
+import simpleBiometrics from '../simpleBiometrics';
+import { sendEmail } from '../sendEmail';
+import RPCModule from '../RPCModule';
+import { GlobalConst } from '../AppState';
+import { getZingoLogo, getZingoName } from '../utils/ZingoAppData';
+import { advancedTheme, basicTheme } from '../../App';
+
+import AddressBookIcon from '../../assets/img/options/address-book.svg';
+import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
+import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.svg';
+import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
+import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
+import RestoreBackupIcon from '../../assets/img/options/restore-backup.svg';
+import SwitchWalletIcon from '../../assets/img/options/switch-wallet.svg';
+// TODO: replace with bespoke icons once the SVGs are provided.
+import TipZingoLabsIcon from '../../assets/img/options/refresh.svg';
+import LoadWalletFromSeedIcon from '../../assets/img/options/refresh.svg';
+
+const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
+const SOCIAL_GITHUB_URL = 'https://github.com/zingolabs/zingo-mobile';
+
+type LoadedAppOptionsPanelHostProps = {
+  onMenuItemSelected: (item: MenuItemEnum) => void;
+  setModeOption: (mode: ModeEnum) => Promise<void>;
+  zingolibVersion: string;
+  children: React.ReactNode;
+};
+
+/**
+ * Wires the global OptionsPanel content for the LoadedApp tree: builds the
+ * actions grid from MenuItemEnum, the 3 socials (X / GitHub copy-URL, mail
+ * launches the device composer) and the mode-toggle pill at the bottom.
+ * Stays in a functional component so it can consume ContextAppLoaded and the
+ * OptionsPanel context naturally (LoadedApp itself is a class).
+ */
+const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
+  onMenuItemSelected,
+  setModeOption,
+  zingolibVersion,
+  children,
+}) => {
+  const context = useContext(ContextAppLoaded);
+  const {
+    translate,
+    mode,
+    security,
+    addLastSnackbar,
+    readOnly,
+    selectServer,
+    netInfo,
+    valueTransfersTotal,
+    totalBalance,
+    somePending,
+  } = context;
+  const { isOpen } = useOptionsPanel();
+
+  // Re-check the backup file each time the panel opens — same trigger as the
+  // legacy drawer's `useDrawerStatus` effect.
+  const [hasBackupWallet, setHasBackupWallet] = useState(false);
+  useEffect(() => {
+    if (!isOpen) return;
+    (async () => {
+      const exists = await RPCModule.walletBackupExists();
+      setHasBackupWallet(!!exists && exists !== GlobalConst.false);
+    })();
+  }, [isOpen]);
+
+  // Runs biometrics for protected items, then forwards to the LoadedApp
+  // class-level dispatcher that knows which screen to navigate to.
+  const dispatch = useMemo(
+    () => async (item: MenuItemEnum) => {
+      closeOptionsPanel();
+      const needsBio =
+        (item === MenuItemEnum.WalletSeedUfvk && security.seedUfvkScreen) ||
+        (item === MenuItemEnum.Rescan && security.rescanScreen) ||
+        (item === MenuItemEnum.ChangeWallet && security.changeWalletScreen) ||
+        (item === MenuItemEnum.RestoreWalletBackup &&
+          security.restoreWalletBackupScreen);
+      if (needsBio) {
+        const ok = await simpleBiometrics({ translate });
+        if (ok === false) {
+          addLastSnackbar(translate('biometrics-error') as string);
+          return;
+        }
+      }
+      onMenuItemSelected(item);
+    },
+    [security, translate, addLastSnackbar, onMenuItemSelected],
+  );
+
+  // Visibility rules mirror the legacy Menu.tsx so the grid behaves the
+  // same: most "wallet-changing" items only make sense online + advanced,
+  // and basic-mode with an empty wallet hides the seed/insight cells.
+  const actions = useMemo<OptionsPanelAction[]>(() => {
+    const isBasic = mode === ModeEnum.basic;
+    const isOffline = selectServer === SelectServerEnum.offline;
+    const isEmptyBasic =
+      isBasic && valueTransfersTotal !== null && valueTransfersTotal === 0;
+
+    const showSeedUfvk = !isEmptyBasic;
+    const showSyncReport = !isBasic && !isOffline;
+    const showFundPools = !isBasic;
+    const showInsight = !isEmptyBasic;
+    const showRestoreBackup = !isBasic && hasBackupWallet;
+    const showChangeWallet = !isBasic && netInfo.isConnected && !isOffline;
+    // basic-only entries replicated from the legacy Menu.tsx.
+    const showLoadWalletFromSeed =
+      isBasic &&
+      valueTransfersTotal !== null &&
+      valueTransfersTotal === 0 &&
+      netInfo.isConnected &&
+      !isOffline;
+    // Same `canSendInBasic` predicate already used in Settings — Tip only
+    // makes sense when an actual Send is possible.
+    const canSendInBasic =
+      isBasic &&
+      !readOnly &&
+      !isOffline &&
+      ((!!totalBalance &&
+        totalBalance.confirmedOrchardBalance +
+          totalBalance.confirmedSaplingBalance >
+          0) ||
+        (!!totalBalance &&
+          ((totalBalance.totalOrchardBalance > 0 &&
+            totalBalance.confirmedOrchardBalance === 0) ||
+            (totalBalance.totalSaplingBalance > 0 &&
+              totalBalance.confirmedSaplingBalance === 0)) &&
+          somePending));
+
+    const list: OptionsPanelAction[] = [];
+
+    // AddressBook — always visible.
+    list.push({
+      id: MenuItemEnum.AddressBook,
+      label: translate('loadedapp.addressbook') as string,
+      icon: <AddressBookIcon width={28} height={28} />,
+      onPress: () => dispatch(MenuItemEnum.AddressBook),
+    });
+
+    if (showSeedUfvk) {
+      // Same label-rules as Menu.tsx: 'seed' vs 'ufvk' depending on
+      // readOnly, and 'basic' suffix when the user is in basic mode.
+      const label = readOnly
+        ? isBasic
+          ? (translate('loadedapp.walletufvk-basic') as string)
+          : (translate('loadedapp.walletufvk') as string)
+        : isBasic
+          ? (translate('loadedapp.walletseed-basic') as string)
+          : (translate('loadedapp.walletseed') as string);
+      list.push({
+        id: MenuItemEnum.WalletSeedUfvk,
+        label,
+        icon: <WalletSeedIcon width={28} height={28} />,
+        onPress: () => dispatch(MenuItemEnum.WalletSeedUfvk),
+      });
+    }
+
+    if (showSyncReport) {
+      list.push({
+        id: MenuItemEnum.SyncReport,
+        label: translate('loadedapp.report') as string,
+        icon: <SyncRescanReportIcon width={30} height={30} />,
+        onPress: () => dispatch(MenuItemEnum.SyncReport),
+      });
+    }
+
+    if (showFundPools) {
+      list.push({
+        id: MenuItemEnum.FundPools,
+        label: translate('loadedapp.fundpools') as string,
+        icon: <FundsPoolsIcon width={30} height={30} />,
+        onPress: () => dispatch(MenuItemEnum.FundPools),
+      });
+    }
+
+    if (showInsight) {
+      list.push({
+        id: MenuItemEnum.Insight,
+        label: translate('loadedapp.insight') as string,
+        icon: <FinancialInsightIcon width={30} height={30} />,
+        onPress: () => dispatch(MenuItemEnum.Insight),
+      });
+    }
+
+    if (showRestoreBackup) {
+      list.push({
+        id: MenuItemEnum.RestoreWalletBackup,
+        label: translate('loadedapp.restorebackupwallet') as string,
+        icon: <RestoreBackupIcon width={28} height={28} />,
+        onPress: () => dispatch(MenuItemEnum.RestoreWalletBackup),
+      });
+    }
+
+    if (showChangeWallet) {
+      list.push({
+        id: MenuItemEnum.ChangeWallet,
+        label: translate('loadedapp.changewallet') as string,
+        icon: <SwitchWalletIcon width={30} height={30} />,
+        onPress: () => dispatch(MenuItemEnum.ChangeWallet),
+      });
+    }
+
+    if (showLoadWalletFromSeed) {
+      list.push({
+        id: MenuItemEnum.LoadWalletFromSeed,
+        label: translate('loadedapp.loadwalletfromseed-basic') as string,
+        icon: <LoadWalletFromSeedIcon width={28} height={28} />,
+        onPress: () => dispatch(MenuItemEnum.LoadWalletFromSeed),
+      });
+    }
+
+    if (canSendInBasic) {
+      list.push({
+        id: MenuItemEnum.TipZingoLabs,
+        label: translate('loadedapp.tipzingolabs-basic') as string,
+        icon: <TipZingoLabsIcon width={28} height={28} />,
+        onPress: () => dispatch(MenuItemEnum.TipZingoLabs),
+      });
+    }
+
+    return list;
+  }, [
+    translate,
+    dispatch,
+    mode,
+    readOnly,
+    selectServer,
+    netInfo.isConnected,
+    valueTransfersTotal,
+    hasBackupWallet,
+    totalBalance,
+    somePending,
+  ]);
+
+  const socials = useMemo<OptionsPanelSocial[]>(
+    () => [
+      { id: 'x', url: SOCIAL_X_URL },
+      { id: 'github', url: SOCIAL_GITHUB_URL },
+      {
+        id: 'mail',
+        onPress: () => {
+          closeOptionsPanel();
+          sendEmail(translate, zingolibVersion);
+        },
+      },
+    ],
+    [translate, zingolibVersion],
+  );
+
+  const modePill = useMemo(() => {
+    const isBasic = mode === ModeEnum.basic;
+    const target = isBasic ? ModeEnum.advanced : ModeEnum.basic;
+    return {
+      walletName: getZingoName(),
+      targetModeLabel: translate(`settings.value-mode-${target}`) as string,
+      targetModeColor: isBasic
+        ? advancedTheme.colors.primary
+        : basicTheme.colors.primary,
+      logoSource: getZingoLogo(),
+      // Intentionally NOT closing the panel — staying open lets the user
+      // see the action grid change as it re-filters by the new mode.
+      onToggle: () => setModeOption(target),
+    };
+  }, [mode, translate, setModeOption]);
+
+  return (
+    <OptionsPanelHost
+      title={translate('loadedapp.options') as string}
+      actions={actions}
+      socials={socials}
+      mode={modePill}
+      onClose={closeOptionsPanel}
+    >
+      {children}
+    </OptionsPanelHost>
+  );
+};
+
+export default LoadedAppOptionsPanelHost;

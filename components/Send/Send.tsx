@@ -93,9 +93,9 @@ import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
 import { RPCParseAddressType } from '../../app/walletBackend/types/RPCParseAddressType';
 import { RPCSpendablebalanceType } from '../../app/walletBackend/types/RPCSpendablebalanceType';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
+type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
   toggleMenuDrawer: () => void;
   // privacy

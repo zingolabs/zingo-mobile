@@ -19,7 +19,7 @@ import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { RPCParseAddressStatusEnum } from '../app/walletBackend/enums/RPCParseAddressStatusEnum';
@@ -27,7 +27,10 @@ import { RPCAddressKindEnum } from '../app/walletBackend/enums/RPCAddressKindEnu
 import { RPCReceiversEnum } from '../app/walletBackend/enums/RPCReceiversEnum';
 import { ChainNameEnum } from '../app/AppState';
 
-function makeProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Confirm> {
+function makeProps(): NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Confirm
+> {
   return {
     navigation: mockNavigation,
     route: {

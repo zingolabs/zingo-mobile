@@ -53,12 +53,12 @@ import BottomSheet, {
 import Utils from '../../app/utils';
 import RPCModule from '../../app/RPCModule';
 import { RPCCheckAddressType } from '../../app/walletBackend/types/RPCCheckAddressType';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 
-type AddressBookProps = DrawerScreenProps<
+type AddressBookProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.AddressBook
 > & {

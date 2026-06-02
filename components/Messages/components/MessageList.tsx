@@ -70,9 +70,9 @@ import { createAlert } from '../../../app/createAlert';
 import selectingServer from '../../../app/selectingServer';
 import { serverUris } from '../../../app/uris';
 import Utils from '../../../app/utils';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type MessageListProps = DrawerScreenProps<
+type MessageListProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Messages
 > & {

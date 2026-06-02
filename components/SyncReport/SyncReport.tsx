@@ -29,7 +29,7 @@ import { RPCSyncStatusType } from '../../app/walletBackend/types/RPCSyncStatusTy
 import { RPCSyncScanRangeStatusType } from '../../app/walletBackend/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '../../app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
 import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Button from '../Components/Button';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
@@ -37,7 +37,7 @@ import Utils from '../../app/utils';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 //import { ModeEnum } from '../../app/AppState';
 
-type SyncReportProps = DrawerScreenProps<
+type SyncReportProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.SyncReport
 >;

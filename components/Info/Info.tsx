@@ -21,11 +21,11 @@ import {
   RouteEnum,
   ScreenEnum,
 } from '../../app/AppState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getZingoName, getZingoVersion } from '../../app/utils/ZingoAppData';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 
-type InfoProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Info>;
+type InfoProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Info>;
 
 const Info: React.FunctionComponent<InfoProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);

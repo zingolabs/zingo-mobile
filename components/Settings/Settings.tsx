@@ -72,7 +72,7 @@ import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
 import NymOn from '../../assets/img/nym-on.svg';
@@ -81,7 +81,7 @@ import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
 
-type SettingsProps = DrawerScreenProps<
+type SettingsProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Settings
 > & {
@@ -1307,7 +1307,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               </View>
             )}
 
-            {mode !== ModeEnum.basic && !readOnly && (
+            {!readOnly && (
               <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View

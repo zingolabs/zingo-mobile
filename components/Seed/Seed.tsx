@@ -45,7 +45,7 @@ import {
 import Header from '../Header';
 import Utils from '../../app/utils';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import WalletType from '../../app/AppState/types/WalletType';
 import { fetchWallet } from '../../app/walletBackend';
@@ -59,7 +59,7 @@ type TextsType = {
   backup: string[];
 };
 
-type SeedProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
+type SeedProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   keepAwake?: (v: boolean) => void;

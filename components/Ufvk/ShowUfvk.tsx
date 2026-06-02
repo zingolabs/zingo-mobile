@@ -43,7 +43,7 @@ import BottomSheet, {
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import ExpandedAddress from '../Receive/components/ExpandedAddress';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import WalletType from '../../app/AppState/types/WalletType';
 import { fetchWallet } from '../../app/walletBackend';
@@ -57,7 +57,10 @@ type TextsType = {
   backup: string[];
 };
 
-type ShowUfvkProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Ufvk> & {
+type ShowUfvkProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Ufvk
+> & {
   onClickOK: () => void;
   onClickCancel: () => void;
 };

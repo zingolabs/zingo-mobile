@@ -48,11 +48,14 @@ import VerifyAddress from './components/VerifyAddress';
 import NewAddressTag from './components/NewAddressTag';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from './components/ExpandedAddress';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 
-type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
+type ReceiveProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Receive
+> & {
   toggleMenuDrawer: () => void;
   alone: boolean;
   setSecurityOption: (s: SecurityType) => Promise<void>;

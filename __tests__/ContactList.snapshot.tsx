@@ -23,11 +23,11 @@ import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeProps(): DrawerScreenProps<
+function makeProps(): NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.ContactList
 > {

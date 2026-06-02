@@ -47,9 +47,9 @@ import Header from '../../Header';
 import Utils from '../../../app/utils';
 import ContactLine from './ContactLine';
 import RegText from '../../Components/RegText';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type ContactListProps = DrawerScreenProps<
+type ContactListProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.ContactList
 > & {

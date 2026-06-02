@@ -16,13 +16,13 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(
   a: UfvkActionEnum,
-): DrawerScreenProps<AppDrawerParamList, RouteEnum.Ufvk> {
+): NativeStackScreenProps<AppDrawerParamList, RouteEnum.Ufvk> {
   return {
     navigation: mockNavigation,
     route: {

@@ -24,10 +24,13 @@ import {
   SelectServerEnum,
   SnackbarDurationEnum,
 } from '../../app/AppState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 
-type RescanProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Rescan> & {
+type RescanProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Rescan
+> & {
   doRescan: () => Promise<void>;
 };
 
