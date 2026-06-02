@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import {
   View,
-  ScrollView,
   RefreshControl,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -44,11 +43,13 @@ import {
   faPaperPlane,
   faAngleDown,
 } from '@fortawesome/free-solid-svg-icons';
-import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetFlatList,
+  BottomSheetFlatListMethods,
+} from '@gorhom/bottom-sheet';
 
 import {
   AddressBookFileClass,
-  ButtonTypeEnum,
   GlobalConst,
   RouteEnum,
   ScreenEnum,
@@ -62,7 +63,6 @@ import {
 import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import FadeText from '../../Components/FadeText';
 import BoldText from '../../Components/BoldText';
-import Button from '../../Components/Button';
 import MessageLine from './MessageLine';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
@@ -125,23 +125,14 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.MessagesList;
 
-  const [numVt, setNumVt] = useState<number>(50);
-  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
-  const [messagesSliced, setMessagesSliced] = useState<ValueTransferType[]>([]);
   const [messagesFiltered, setMessagesFiltered] = useState<ValueTransferType[]>(
     [],
   );
+  // With BottomSheetFlatList + `inverted`, the visual bottom (newest
+  // messages) corresponds to contentOffset.y ≈ 0. We surface a jump-to-
+  // bottom button when the user has scrolled "up" (i.e. y > threshold).
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
-  const [isScrollingToBottom, setIsScrollingToBottom] =
-    useState<boolean>(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [firstScrollToBottomDone, setFirstScrollToBottomDone] =
-    useState<boolean>(false);
-  const [scrollViewHeight, setScrollViewHeight] = useState<number>(0);
-  const [contentScrollViewHeight, setContentScrollViewHeight] =
-    useState<number>(0);
-  const [scrollable, setScrollable] = useState<boolean>(false);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [disableSend, setDisableSend] = useState<boolean>(false);
@@ -153,7 +144,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
 
-  const scrollViewRef = useRef<ScrollView>(null);
+  const flatListRef = useRef<BottomSheetFlatListMethods>(null);
   const messagesSheetRef = useRef<BottomSheet>(null);
   const sheetSlideStyle = useOptionsPanelSheetSlide();
 
@@ -216,8 +207,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     ),
     [closeScreen, colors, translate],
   );
-
-  var lastMonth = '';
 
   const dimensions = {
     width: Dimensions.get('window').width,
@@ -282,84 +271,57 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
 
   useEffect(() => {
     if (messages !== null) {
-      const vtf = fetchMessagesFiltered;
-      setLoadMoreButton(numVt < vtf.length);
-      setMessagesFiltered(vtf);
-      setMessagesSliced(vtf.slice(-numVt));
+      setMessagesFiltered(fetchMessagesFiltered);
       if (loading) {
         setTimeout(() => {
           setLoading(false);
         }, 500);
       }
     }
-    // if change numVt don't need to apply the filter
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addressFilter, loading, messages, fetchMessagesFiltered]);
+  }, [loading, messages, fetchMessagesFiltered]);
 
-  useEffect(() => {
-    setLoadMoreButton(numVt < messagesFiltered.length);
-    setMessagesSliced(messagesFiltered.slice(-numVt));
-  }, [numVt, messagesFiltered]);
+  // Reverse the filtered list once so the newest message is at index 0,
+  // matching what BottomSheetFlatList expects with `inverted`. Memo on
+  // the array identity — `messagesFiltered` is only replaced when the
+  // upstream data or filter changes.
+  const messagesData = useMemo(
+    () => messagesFiltered.slice().reverse(),
+    [messagesFiltered],
+  );
+
+  // Precompute the month label per index. A label is shown above an item
+  // when its month differs from the item rendered visually ABOVE it. In
+  // inverted FlatList, "above" corresponds to index+1 in the data array.
+  // The last item (length-1) is the topmost visible, so it always gets
+  // its label.
+  const monthLabels = useMemo(() => {
+    return messagesData.map((vt, i) => {
+      const myMonth = vt.time
+        ? Utils.formatDate(vt.time * 1000, 'MMM yyyy', language)
+        : '--- ----';
+      if (i === messagesData.length - 1) {
+        return myMonth;
+      }
+      const next = messagesData[i + 1];
+      const nextMonth = next.time
+        ? Utils.formatDate(next.time * 1000, 'MMM yyyy', language)
+        : '--- ----';
+      return myMonth !== nextMonth ? myMonth : '';
+    });
+  }, [messagesData, language]);
 
   const handleScrollToBottom = useCallback(() => {
-    if (scrollViewRef.current && !isScrollingToBottom) {
-      setIsScrollingToBottom(true);
-
-      // Clear any existing timeout
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-
-      // Force set to bottom immediately for UI feedback
-      setIsAtBottom(true);
-
-      // Scroll to bottom
-      scrollViewRef.current.scrollToEnd({ animated: true });
-
-      // Set timeout to reset scrolling state
-      scrollTimeoutRef.current = setTimeout(() => {
-        setIsScrollingToBottom(false);
-        setScrollToBottom(false);
-        // Double-check position after scroll animation
-        if (scrollViewRef.current) {
-          setIsAtBottom(true); // For ScrollView, assume success
-        }
-      }, 800);
-    }
-  }, [isScrollingToBottom, setScrollToBottom]);
+    // With `inverted`, the visual bottom is offset 0.
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+    setIsAtBottom(true);
+  }, []);
 
   useEffect(() => {
-    if (scrollToBottom && !isScrollingToBottom) {
+    if (scrollToBottom) {
       handleScrollToBottom();
+      setScrollToBottom(false);
     }
-  }, [scrollToBottom, isScrollingToBottom, handleScrollToBottom]);
-
-  useEffect(() => {
-    if (!loading) {
-      if (!messagesSliced || !messagesSliced.length) {
-        setFirstScrollToBottomDone(true);
-      } else {
-        //console.log('scroll bottom');
-        handleScrollToBottom();
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
-
-  useEffect(() => {
-    //console.log(scrollViewHeight, contentScrollViewHeight);
-    if (contentScrollViewHeight > 0 && scrollViewHeight > 0) {
-      //setIsAtBottom(false);
-      if (contentScrollViewHeight >= scrollViewHeight) {
-        //console.log('SCROLLABLE >>>>>>>>>>>>>');
-        setScrollable(true);
-      } else {
-        setScrollable(false);
-      }
-      //console.log('first scroll bottom done');
-      setFirstScrollToBottomDone(true);
-    }
-  }, [contentScrollViewHeight, scrollViewHeight]);
+  }, [scrollToBottom, handleScrollToBottom, setScrollToBottom]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -395,36 +357,15 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     }
   }, [memo, defaultUnifiedAddress]);
 
-  const loadMoreClicked = useCallback(() => {
-    setNumVt(numVt + 50);
-  }, [numVt]);
-
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { contentOffset, contentSize, layoutMeasurement } =
-        event.nativeEvent;
-      const isBottom =
-        Math.round(contentOffset.y) >=
-          Math.round(contentSize.height - layoutMeasurement.height - 100) &&
-        scrollable;
-
-      // If we're scrolling to bottom and we've reached the bottom, stop the scrolling state
-      if (isScrollingToBottom && isBottom) {
-        setIsScrollingToBottom(false);
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current);
-          scrollTimeoutRef.current = null;
-        }
-      }
-
-      // Always update isAtBottom for manual scrolling
-      setIsAtBottom(isBottom);
-
-      if (isBottom && !firstScrollToBottomDone) {
-        setFirstScrollToBottomDone(true);
-      }
+      // BottomSheetFlatList runs inverted, so the visual bottom (newest)
+      // is offset 0. Anything beyond a small threshold means the user has
+      // scrolled "up" into older messages — show the jump-to-bottom pill.
+      const y = Math.round(event.nativeEvent.contentOffset.y);
+      setIsAtBottom(y < 100);
     },
-    [isScrollingToBottom, scrollable, firstScrollToBottomDone],
+    [],
   );
 
   const buildSendState = (memoPar: string) => {
@@ -587,12 +528,12 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       navigation.navigate(RouteEnum.ValueTransferDetail, {
         index: index,
         vt: vt,
-        valueTransfersSliced: messagesSliced,
+        valueTransfersSliced: messagesFiltered,
         totalLength: messagesFiltered ? messagesFiltered.length : 0,
         from: RouteEnum.Messages,
       });
     },
-    [navigation, messagesSliced, messagesFiltered],
+    [navigation, messagesFiltered],
   );
 
   //if (address) {
@@ -735,27 +676,34 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                     </View>
                   </>
                 )}
-                {(loading || !firstScrollToBottomDone) && (
+                {loading && (
                   <ActivityIndicator
                     size="large"
                     color={colors.primary}
                     style={{ marginVertical: 20 }}
                   />
                 )}
-                <BottomSheetScrollView
-                  ref={scrollViewRef as unknown as React.RefObject<ScrollView>}
-                  bounces={false}
-                  alwaysBounceVertical={false}
-                  onScroll={handleScroll}
-                  onLayout={e => {
-                    const { height } = e.nativeEvent.layout;
-                    //console.log('layout HEIGHT >>>>>>>>>>>>>', height);
-                    setScrollViewHeight(height);
-                  }}
-                  onContentSizeChange={(_w: number, h: number) => {
-                    //console.log('content HEIGHT >>>>>>>>>>>>>', h);
-                    setContentScrollViewHeight(h);
-                  }}
+                <BottomSheetFlatList
+                  ref={flatListRef}
+                  data={messagesData}
+                  inverted
+                  keyExtractor={(item, idx) =>
+                    `${idx}-${item.txid}-${item.kind}`
+                  }
+                  renderItem={({ item, index }) => (
+                    <MessageLine
+                      index={messagesData.length - 1 - index}
+                      vt={item}
+                      month={monthLabels[index] ?? ''}
+                      setValueTransferDetailModalShow={
+                        setValueTransferDetailModalShow
+                      }
+                      messageAddress={address}
+                      screenName={screenName}
+                    />
+                  )}
+                  onScrollEndDrag={handleScroll}
+                  onMomentumScrollEnd={handleScroll}
                   accessible={true}
                   accessibilityLabel={translate('history.list-acc') as string}
                   refreshControl={
@@ -766,34 +714,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                       title={translate('history.refreshing') as string}
                     />
                   }
-                  style={{
-                    flexGrow: 1,
-                    marginTop: 10,
-                    width: '100%',
-                    opacity: loading || !firstScrollToBottomDone ? 0 : 1,
-                  }}
-                >
-                  {loadMoreButton && (
-                    <View
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        marginTop: 10,
-                        marginBottom: 10,
-                      }}
-                    >
-                      <Button
-                        type={ButtonTypeEnum.Secondary}
-                        title={translate('history.loadmore') as string}
-                        onPress={loadMoreClicked}
-                      />
-                    </View>
-                  )}
-
-                  {!loadMoreButton &&
-                    !!messagesSliced &&
-                    !messagesSliced.length && (
+                  ListEmptyComponent={
+                    !loading ? (
                       <View
                         style={{
                           display: 'flex',
@@ -801,44 +723,19 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                           justifyContent: 'flex-start',
                           marginTop: 10,
                           marginBottom: 10,
+                          // Inverted flips children; un-flip the empty
+                          // message so it reads upright.
+                          transform: [{ scaleY: -1 }],
                         }}
                       >
                         <FadeText style={{ color: colors.primary }}>
                           {translate('messages.empty') as string}
                         </FadeText>
                       </View>
-                    )}
-
-                  {messagesSliced &&
-                    messagesSliced.length > 0 &&
-                    messagesSliced.map((vt, index) => {
-                      let txmonth = vt.time
-                        ? Utils.formatDate(vt.time * 1000, 'MMM yyyy', language)
-                        : '--- ----';
-
-                      var month = '';
-                      if (txmonth !== lastMonth) {
-                        month = txmonth;
-                        lastMonth = txmonth;
-                      }
-
-                      return (
-                        <MessageLine
-                          key={`${index}-${vt.txid}-${vt.kind}`}
-                          index={index}
-                          vt={vt}
-                          month={month}
-                          setValueTransferDetailModalShow={
-                            setValueTransferDetailModalShow
-                          }
-                          messageAddress={address}
-                          screenName={screenName}
-                        />
-                      );
-                    })}
-                  {!loadMoreButton &&
-                    !!messagesSliced &&
-                    !!messagesSliced.length && (
+                    ) : null
+                  }
+                  ListFooterComponent={
+                    messagesData.length > 0 ? (
                       <View
                         style={{
                           display: 'flex',
@@ -852,41 +749,41 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                           {translate('history.end') as string}
                         </FadeText>
                       </View>
-                    )}
-                  <View style={{ marginBottom: 10 }} />
-                </BottomSheetScrollView>
-                {!isAtBottom &&
-                  scrollable &&
-                  !loading &&
-                  firstScrollToBottomDone && (
-                    <Pressable
-                      onPress={handleScrollToBottom}
-                      disabled={isScrollingToBottom}
-                      style={({ pressed }) => ({
-                        position: 'absolute',
-                        bottom: 30,
-                        right: 10,
-                        paddingHorizontal: 5,
-                        paddingVertical: 10,
-                        backgroundColor: colors.sideMenuBackground,
-                        borderRadius: 50,
-                        transform: [{ scale: pressed ? 0.9 : 1 }],
-                        borderWidth: 1,
-                        borderColor: colors.zingo,
-                        opacity: isScrollingToBottom ? 0.5 : 1,
-                      })}
-                    >
-                      <FontAwesomeIcon
-                        style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                        size={16}
-                        icon={faAngleDown}
-                        color={colors.zingo}
-                      />
-                    </Pressable>
-                  )}
+                    ) : null
+                  }
+                  style={{
+                    flexGrow: 1,
+                    marginTop: 10,
+                    width: '100%',
+                    opacity: loading ? 0 : 1,
+                  }}
+                />
+                {!isAtBottom && !loading && (
+                  <Pressable
+                    onPress={handleScrollToBottom}
+                    style={({ pressed }) => ({
+                      position: 'absolute',
+                      bottom: 30,
+                      right: 10,
+                      paddingHorizontal: 5,
+                      paddingVertical: 10,
+                      backgroundColor: colors.sideMenuBackground,
+                      borderRadius: 50,
+                      transform: [{ scale: pressed ? 0.9 : 1 }],
+                      borderWidth: 1,
+                      borderColor: colors.zingo,
+                    })}
+                  >
+                    <FontAwesomeIcon
+                      style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                      size={16}
+                      icon={faAngleDown}
+                      color={colors.zingo}
+                    />
+                  </Pressable>
+                )}
               </View>
               {!loading &&
-                firstScrollToBottomDone &&
                 address &&
                 selectServer !== SelectServerEnum.offline && (
                   <View

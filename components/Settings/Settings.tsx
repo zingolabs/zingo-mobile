@@ -767,7 +767,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setBlockExplorer(blockExplorerContext);
       setNym(nymContext);
     }
-    navigation.navigate(RouteEnum.HomeStack);
+    // `goBack()` pops Settings off the stack — using `navigate(HomeStack)`
+    // would push HomeStack on top while leaving the already-authenticated
+    // Settings instance alive in the stack, allowing a back gesture to
+    // bypass the biometric gate.
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate(RouteEnum.HomeStack);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

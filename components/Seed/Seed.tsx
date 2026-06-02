@@ -287,9 +287,17 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       );
       setBasicFirstViewSeed(true);
       keepAwake && keepAwake(false);
-      // redirect to history screen
-      navigation.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.History,
+      // Redirect to history screen — `reset` wipes the stack so the
+      // (already-authenticated) Seed instance can't be reached via a back
+      // gesture after onboarding.
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: RouteEnum.HomeStack,
+            params: { screen: RouteEnum.History },
+          },
+        ],
       });
     } else {
       if (navigation.canGoBack()) {

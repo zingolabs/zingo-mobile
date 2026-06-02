@@ -212,9 +212,9 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 hitSlop={8}
                 style={{ padding: 4 }}
               >
-                {social.id === 'x' && <XSocial width={34} height={34} />}
-                {social.id === 'github' && <Github width={38} height={38} />}
-                {social.id === 'mail' && <Mail width={40} height={40} />}
+                {social.id === 'x' && <XSocial width={26} height={26} />}
+                {social.id === 'github' && <Github width={26} height={26} />}
+                {social.id === 'mail' && <Mail width={26} height={26} />}
               </Pressable>
             ))}
           </View>

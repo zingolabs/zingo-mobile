@@ -27,7 +27,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
-  ButtonTypeEnum,
   CurrencyEnum,
   FilterEnum,
   GlobalConst,
@@ -42,7 +41,6 @@ import {
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
@@ -128,8 +126,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.History;
 
-  const [numVt, setNumVt] = useState<number>(50);
-  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
+  const PAGE_SIZE = 50;
+  const [numVt, setNumVt] = useState<number>(PAGE_SIZE);
   const [valueTransfersSliced, setValueTransfersSliced] = useState<
     ValueTransferType[]
   >([]);
@@ -368,7 +366,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     if (valueTransfers !== null) {
       const vtf = fetchValueTransfersFiltered;
       setValueTransfersFiltered(vtf);
-      setLoadMoreButton(numVt < vtf.length);
       const vtfs = vtf.slice(0, numVt);
       setValueTransfersSliced(vtfs);
       setDataProvider(data => data.cloneWithRows(vtfs));
@@ -379,11 +376,21 @@ const History: React.FunctionComponent<HistoryProps> = ({
   }, [fetchValueTransfersFiltered, numVt, valueTransfers, server.chainName]);
 
   useEffect(() => {
-    setLoadMoreButton(numVt < valueTransfersFiltered.length);
     const vtfs = valueTransfersFiltered.slice(0, numVt);
     setValueTransfersSliced(vtfs);
     setDataProvider(data => data.cloneWithRows(vtfs));
   }, [numVt, valueTransfersFiltered]);
+
+  const hasMore = numVt < valueTransfersFiltered.length;
+
+  // Auto-pagination: RecyclerListView fires onEndReached when the user
+  // approaches the bottom of the list — bump `numVt` so the next page
+  // appears without any user action.
+  const onEndReached = useCallback(() => {
+    if (hasMore) {
+      setNumVt(prev => prev + PAGE_SIZE);
+    }
+  }, [hasMore]);
 
   const handleScrollToTop = useCallback(() => {
     if (scrollViewRef.current && !isScrollingToTop) {
@@ -434,10 +441,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
       setScrollToTop(false);
     }
   }, [scrollToTop, handleScrollToTop, setScrollToTop]);
-
-  const loadMoreClicked = useCallback(() => {
-    setNumVt(numVt + 50);
-  }, [numVt]);
 
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
@@ -755,8 +758,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
                     dataProvider={dataProvider}
                     rowRenderer={rowRenderer}
                     disableRecycling={true}
+                    onEndReached={onEndReached}
+                    onEndReachedThreshold={0.5}
                     renderFooter={() =>
-                      loadMoreButton ? (
+                      hasMore ? (
                         <View
                           style={{
                             display: 'flex',
@@ -766,10 +771,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             marginBottom: 60,
                           }}
                         >
-                          <Button
-                            type={ButtonTypeEnum.Secondary}
-                            title={translate('history.loadmore') as string}
-                            onPress={loadMoreClicked}
+                          <ActivityIndicator
+                            size="small"
+                            color={colors.primary}
                           />
                         </View>
                       ) : !!valueTransfersSliced &&

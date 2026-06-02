@@ -319,7 +319,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   testID="header.messages"
                   onPress={() => navigation.navigate(RouteEnum.Messages)}
                 >
-                  <MessagesIcon size={26} color={colors.border} />
+                  <MessagesIcon size={26} color="#B1BBC5" />
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -336,7 +336,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   }
                 }}
               >
-                <BoltIcon size={28} color={colors.border} />
+                <BoltIcon size={28} color="#B1BBC5" />
               </TouchableOpacity>
             </View>
           ) : (

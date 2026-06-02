@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Animated, Platform, View, TouchableOpacity } from 'react-native';
+import { Animated, View, TouchableOpacity } from 'react-native';
 import {
   NavigationProp,
   ParamListBase,
@@ -343,19 +343,12 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   : 'flex-start',
               marginTop: 10,
               paddingBottom: 10,
-              borderBottomWidth: nextLineWithSameTxid
-                ? Platform.OS === GlobalConst.platformOSandroid
-                  ? 1
-                  : 0.5
-                : 1.5,
-              borderBottomColor: nextLineWithSameTxid
-                ? colors.primaryDisabled
-                : colors.border,
-              borderStyle: nextLineWithSameTxid
-                ? Platform.OS === GlobalConst.platformOSandroid
-                  ? 'dotted'
-                  : 'solid'
-                : 'solid',
+              // Lines that belong to the same TXID render flush against
+              // each other — no separator. The separator only marks the
+              // boundary between distinct transactions.
+              borderBottomWidth: nextLineWithSameTxid ? 0 : 1.5,
+              borderBottomColor: '#122033',
+              borderStyle: 'solid',
             }}
           >
             <View
