@@ -16,15 +16,17 @@ import { getZingoLogo, getZingoName } from '../utils/ZingoAppData';
 import { advancedTheme, basicTheme } from '../../App';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';
+import AddressBookBasicIcon from '../../assets/img/options/address-book-basic.svg';
 import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
+import WalletSeedBasicIcon from '../../assets/img/options/wallet-seed-basic.svg';
 import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.svg';
 import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
 import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
+import FinancialInsightBasicIcon from '../../assets/img/options/financial-insight-basic.svg';
 import RestoreBackupIcon from '../../assets/img/options/restore-backup.svg';
 import SwitchWalletIcon from '../../assets/img/options/switch-wallet.svg';
-// TODO: replace with bespoke icons once the SVGs are provided.
-import TipZingoLabsIcon from '../../assets/img/options/refresh.svg';
-import LoadWalletFromSeedIcon from '../../assets/img/options/refresh.svg';
+import LoadWalletFromSeedBasicIcon from '../../assets/img/options/switch-wallet-basic.svg';
+import TipZingoLabsBasicIcon from '../../assets/img/options/tip-zingolabs-basic.svg';
 
 const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
 const SOCIAL_GITHUB_URL = 'https://github.com/zingolabs/zingo-mobile';
@@ -146,7 +148,11 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     list.push({
       id: MenuItemEnum.AddressBook,
       label: translate('loadedapp.addressbook') as string,
-      icon: <AddressBookIcon width={28} height={28} />,
+      icon: isBasic ? (
+        <AddressBookBasicIcon width={28} height={28} />
+      ) : (
+        <AddressBookIcon width={28} height={28} />
+      ),
       onPress: () => dispatch(MenuItemEnum.AddressBook),
     });
 
@@ -163,7 +169,11 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       list.push({
         id: MenuItemEnum.WalletSeedUfvk,
         label,
-        icon: <WalletSeedIcon width={28} height={28} />,
+        icon: isBasic ? (
+          <WalletSeedBasicIcon width={28} height={28} />
+        ) : (
+          <WalletSeedIcon width={28} height={28} />
+        ),
         onPress: () => dispatch(MenuItemEnum.WalletSeedUfvk),
       });
     }
@@ -190,7 +200,11 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       list.push({
         id: MenuItemEnum.Insight,
         label: translate('loadedapp.insight') as string,
-        icon: <FinancialInsightIcon width={30} height={30} />,
+        icon: isBasic ? (
+          <FinancialInsightBasicIcon width={30} height={30} />
+        ) : (
+          <FinancialInsightIcon width={30} height={30} />
+        ),
         onPress: () => dispatch(MenuItemEnum.Insight),
       });
     }
@@ -217,7 +231,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       list.push({
         id: MenuItemEnum.LoadWalletFromSeed,
         label: translate('loadedapp.loadwalletfromseed-basic') as string,
-        icon: <LoadWalletFromSeedIcon width={28} height={28} />,
+        icon: <LoadWalletFromSeedBasicIcon width={30} height={30} />,
         onPress: () => dispatch(MenuItemEnum.LoadWalletFromSeed),
       });
     }
@@ -226,7 +240,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       list.push({
         id: MenuItemEnum.TipZingoLabs,
         label: translate('loadedapp.tipzingolabs-basic') as string,
-        icon: <TipZingoLabsIcon width={28} height={28} />,
+        icon: <TipZingoLabsBasicIcon width={30} height={30} />,
         onPress: () => dispatch(MenuItemEnum.TipZingoLabs),
       });
     }

@@ -218,7 +218,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                     to the same pixel box. */}
                 {social.id === 'x' && <XSocial width={22} height={22} />}
                 {social.id === 'github' && <Github width={27} height={27} />}
-                {social.id === 'mail' && <Mail width={26} height={26} />}
+                {social.id === 'mail' && <Mail width={29} height={29} />}
               </Pressable>
             ))}
           </View>
