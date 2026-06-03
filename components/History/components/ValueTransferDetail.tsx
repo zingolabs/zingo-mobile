@@ -121,15 +121,13 @@ const ValueTransferDetail: React.FunctionComponent<
   const vtdSheetRef = useRef<BottomSheet>(null);
 
   const closeScreen = useCallback(() => {
-    const fromRoute = route.params?.from;
-    if (fromRoute) {
-      navigation.navigate(fromRoute as never);
-      return;
-    }
+    // Pop the current screen instead of pushing a new instance of the
+    // previous route — `navigate` would leave Detail alive in the stack
+    // and the iOS edge-swipe (or back gesture) could land back on it.
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
-  }, [navigation, route.params?.from]);
+  }, [navigation]);
 
   const vtdSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 

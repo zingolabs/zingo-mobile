@@ -103,7 +103,6 @@ export type ValueTransferDetailNavigationState = {
   vt: ValueTransferType;
   valueTransfersSliced: ValueTransferType[];
   totalLength: number;
-  from?: RouteEnum;
 };
 
 export type ConfirmNavigationState = {

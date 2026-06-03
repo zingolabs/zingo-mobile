@@ -796,36 +796,42 @@ const History: React.FunctionComponent<HistoryProps> = ({
                     </FadeText>
                   </View>
                 )}
-                {!isAtTop && (
-                  <Pressable
-                    onPress={handleScrollToTop}
-                    disabled={isScrollingToTop}
-                    style={({ pressed }) => ({
-                      position: 'absolute',
-                      bottom: 30,
-                      right: 10,
-                      paddingHorizontal: 5,
-                      paddingVertical: 10,
-                      backgroundColor: colors.sideMenuBackground,
-                      borderRadius: 50,
-                      transform: [{ scale: pressed ? 0.9 : 1 }],
-                      borderWidth: 1,
-                      borderColor: colors.zingo,
-                      opacity: isScrollingToTop ? 0.5 : 1,
-                    })}
-                  >
-                    <FontAwesomeIcon
-                      style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                      size={16}
-                      icon={faAngleUp}
-                      color={colors.zingo}
-                    />
-                  </Pressable>
-                )}
               </View>
             )}
           </View>
         </BottomSheet>
+        {/* Floating "back to top" anchored to the Animated.View (full
+            screen) instead of the BottomSheet content. On Android, the
+            inner container ends above the system nav bar; anchoring there
+            pushed the button visibly higher than on iOS. Pinning it to
+            the outer wrapper keeps it at the same visual offset across
+            platforms. */}
+        {!isAtTop && (
+          <Pressable
+            onPress={handleScrollToTop}
+            disabled={isScrollingToTop}
+            style={({ pressed }) => ({
+              position: 'absolute',
+              bottom: 30,
+              right: 10,
+              paddingHorizontal: 5,
+              paddingVertical: 10,
+              backgroundColor: colors.sideMenuBackground,
+              borderRadius: 50,
+              transform: [{ scale: pressed ? 0.9 : 1 }],
+              borderWidth: 1,
+              borderColor: colors.zingo,
+              opacity: isScrollingToTop ? 0.5 : 1,
+            })}
+          >
+            <FontAwesomeIcon
+              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+              size={16}
+              icon={faAngleUp}
+              color={colors.zingo}
+            />
+          </Pressable>
+        )}
       </Animated.View>
       <BottomSheetModal
         ref={bottomSheetRef}

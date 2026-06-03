@@ -1,3 +1,3 @@
-import MessageList from './components/MessageList';
+import MessageList from './MessageList';
 
 export { MessageList };
