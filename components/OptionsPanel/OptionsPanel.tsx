@@ -16,7 +16,7 @@ import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
 import { ThemeType } from '../../app/types';
 
-import ChevronUp from '../../assets/img/options/chevron-up.svg';
+import ChevronsUp from '../../assets/img/options/chevrons-up.svg';
 import XSocial from '../../assets/img/options/x.svg';
 import Github from '../../assets/img/options/github.svg';
 import Mail from '../../assets/img/options/mail.svg';
@@ -103,14 +103,22 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
     [onLinkCopied],
   );
 
-  // Triple chevron stacked vertically; tap area is the whole column.
+  // Triple chevron centered inside a 25×25 box — same footprint as the
+  // burger icon in the Header, so when the user toggles the panel both
+  // glyphs appear at exactly the same screen position (their boxes
+  // overlap), giving a clean morph from one to the other.
   const tripleChevron = useMemo(
     () => (
       <Pressable onPress={onClose} hitSlop={12} style={{ padding: 4 }}>
-        <View style={{ alignItems: 'center' }}>
-          <ChevronUp width={19} height={9} />
-          <ChevronUp width={19} height={9} style={{ marginTop: -2 }} />
-          <ChevronUp width={19} height={9} style={{ marginTop: -2 }} />
+        <View
+          style={{
+            width: 25,
+            height: 25,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <ChevronsUp width={17.474} height={22.079} />
         </View>
       </Pressable>
     ),

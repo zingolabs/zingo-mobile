@@ -230,9 +230,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             paddingLeft: 15,
             paddingTop: 10,
             paddingBottom: 0,
-            borderTopWidth: 1,
-            borderBottomWidth: 1,
-            borderColor: colors.card,
             backgroundColor: colors.bottomSheetBackground,
           }}
         >

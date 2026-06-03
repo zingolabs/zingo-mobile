@@ -1512,9 +1512,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
     style={
       {
         "backgroundColor": "#031124",
-        "borderBottomWidth": 1,
-        "borderColor": "#011401",
-        "borderTopWidth": 1,
         "paddingBottom": 0,
         "paddingLeft": 15,
         "paddingTop": 10,

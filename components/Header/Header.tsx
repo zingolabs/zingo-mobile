@@ -266,7 +266,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 accessibilityLabel={translate('menudrawer-acc') as string}
                 onPress={toggleMenuDrawer}
               >
-                <BurgerIcon width={19} height={17} />
+                <BurgerIcon width={25} height={25} />
               </TouchableOpacity>
             )}
             {readOnly && !noUfvkIcon && (
@@ -319,7 +319,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   testID="header.messages"
                   onPress={() => navigation.navigate(RouteEnum.Messages)}
                 >
-                  <MessagesIcon size={26} color="#B1BBC5" />
+                  <MessagesIcon size={24} color="#B1BBC5" />
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -336,7 +336,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   }
                 }}
               >
-                <BoltIcon size={28} color="#B1BBC5" />
+                <BoltIcon size={25} color="#B1BBC5" />
               </TouchableOpacity>
             </View>
           ) : (
