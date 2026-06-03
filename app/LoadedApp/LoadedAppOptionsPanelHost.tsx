@@ -210,15 +210,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       });
     }
 
-    if (showRestoreBackup) {
-      list.push({
-        id: MenuItemEnum.RestoreWalletBackup,
-        label: translate('loadedapp.restorebackupwallet') as string,
-        icon: <RestoreBackupIcon width={28} height={28} />,
-        onPress: () => dispatch(MenuItemEnum.RestoreWalletBackup),
-      });
-    }
-
     if (showChangeWallet) {
       list.push({
         id: MenuItemEnum.ChangeWallet,
@@ -234,6 +225,15 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
         label: translate('loadedapp.loadwalletfromseed-basic') as string,
         icon: <LoadWalletFromSeedBasicIcon width={30} height={30} />,
         onPress: () => dispatch(MenuItemEnum.LoadWalletFromSeed),
+      });
+    }
+
+    if (showRestoreBackup) {
+      list.push({
+        id: MenuItemEnum.RestoreWalletBackup,
+        label: translate('loadedapp.restorebackupwallet') as string,
+        icon: <RestoreBackupIcon width={28} height={28} />,
+        onPress: () => dispatch(MenuItemEnum.RestoreWalletBackup),
       });
     }
 
