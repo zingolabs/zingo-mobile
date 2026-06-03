@@ -72,10 +72,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const importUfvkSheetRef = useRef<BottomSheet>(null);
-  // Drives the BottomSheetFooter's `bottomInset` so the action button
-  // slides above the on-screen keyboard instead of being hidden behind
-  // it. `keyboardBehavior` + `android_keyboardInputMode` on the sheet
-  // handle the rest (sheet resize, blur restore).
   const keyboardHeight = useKeyboardHeight();
 
   useEffect(() => {

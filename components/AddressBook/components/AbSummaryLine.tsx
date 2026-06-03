@@ -107,9 +107,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           flexDirection: 'row',
           marginTop: 15,
           paddingBottom: 15,
-          borderBottomWidth: addressProtected ? 3 : 1,
-          borderBottomColor: addressProtected ? colors.zingo : colors.border,
-          opacity: addressProtected ? 0.5 : 1,
+          borderBottomWidth: 1.5,
+          borderBottomColor: '#122033',
         }}
       >
         <View

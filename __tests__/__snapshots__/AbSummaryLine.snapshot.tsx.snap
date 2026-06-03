@@ -13,12 +13,11 @@ exports[`AbSummaryLine - snapshots AbSummaryLine normal contact 1`] = `
   <View
     style={
       {
-        "borderBottomColor": "#ffffff",
-        "borderBottomWidth": 1,
+        "borderBottomColor": "#122033",
+        "borderBottomWidth": 1.5,
         "display": "flex",
         "flexDirection": "row",
         "marginTop": 15,
-        "opacity": 1,
         "paddingBottom": 15,
       }
     }
@@ -383,12 +382,11 @@ exports[`AbSummaryLine - snapshots AbSummaryLine protected address 1`] = `
   <View
     style={
       {
-        "borderBottomColor": "#888888",
-        "borderBottomWidth": 3,
+        "borderBottomColor": "#122033",
+        "borderBottomWidth": 1.5,
         "display": "flex",
         "flexDirection": "row",
         "marginTop": 15,
-        "opacity": 0.5,
         "paddingBottom": 15,
       }
     }
@@ -546,12 +544,11 @@ exports[`AbSummaryLine - snapshots AbSummaryLine readOnly mode 1`] = `
   <View
     style={
       {
-        "borderBottomColor": "#ffffff",
-        "borderBottomWidth": 1,
+        "borderBottomColor": "#122033",
+        "borderBottomWidth": 1.5,
         "display": "flex",
         "flexDirection": "row",
         "marginTop": 15,
-        "opacity": 1,
         "paddingBottom": 15,
       }
     }
