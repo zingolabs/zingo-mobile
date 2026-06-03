@@ -80,14 +80,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   } = context;
   const { colors } = useTheme() as ThemeType;
 
-  //const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
-
-  //const dimensions = {
-  //  width: Dimensions.get('window').width,
-  //  height: Dimensions.get('window').height,
-  //};
-  //const maxWidthHit = useRef<boolean>(false);
-
   const amountColor =
     vt.status === RPCValueTransfersStatusEnum.failed
       ? colors.zingo
@@ -109,75 +101,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
         : faArrowUp;
 
   const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
-
-  //useEffect(() => {
-  //  setMessagesAddress(Utils.isMessagesAddress(vt));
-  //}, [vt]);
-
-  /*
-  const handleRenderRightActions = (
-    progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>,
-    swipeable: Swipeable,
-  ) => {
-    const width = dimensions.width * 0.7;
-    const trans = progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [width, 0],
-      extrapolate: 'extend',
-    });
-
-    dragX.addListener(({ value }) => {
-      if (-value >= dimensions.width * (1 / 2) && messagesAddress) {
-        if (!maxWidthHit.current) {
-          //console.log(value);
-          setValueTransferDetail(vt);
-          setValueTransferDetailIndex(index);
-          setMessagesAddressModalShow(true);
-          swipeable.reset();
-        }
-        maxWidthHit.current = true;
-      } else {
-        maxWidthHit.current = false;
-      }
-    });
-
-    return (
-      <>
-        {showSwipeableIcons && (
-          <Animated.View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              transform: [{ translateX: trans }],
-              backgroundColor: colors.sideMenuBackground,
-            }}>
-            {messagesAddress && (
-              <View
-                style={{
-                  width: width,
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                }}>
-                <TouchableOpacity
-                  style={{ zIndex: 999, padding: 20, alignSelf: 'flex-start' }}
-                  onPress={() => {
-                    setValueTransferDetail(vt);
-                    setValueTransferDetailIndex(index);
-                    setMessagesAddressModalShow(true);
-                    swipeable.reset();
-                  }}>
-                  <FontAwesomeIcon style={{ opacity: 0.8 }} size={24} icon={faComments} color={colors.money} />
-                </TouchableOpacity>
-              </View>
-            )}
-          </Animated.View>
-        )}
-      </>
-    );
-  };
-  */
 
   const handleRenderLeftActions = (
     progress: Animated.AnimatedInterpolation<number>,

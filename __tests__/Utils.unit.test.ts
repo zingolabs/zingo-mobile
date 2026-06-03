@@ -14,7 +14,6 @@ import Utils from '../app/utils/Utils';
 import {
   BlockExplorerEnum,
   ChainNameEnum,
-  ContactType,
   GlobalConst,
   LanguageEnum,
 } from '../app/AppState';
@@ -352,33 +351,5 @@ describe('Utils.countMemoBytes', () => {
 
   test('returns 0 for empty memo without UA', () => {
     expect(Utils.countMemoBytes(undefined, false, '')).toBe(0);
-  });
-});
-
-const minimalContact = (address: string, memos: string[]): ContactType => ({
-  address,
-  memos,
-  label: '',
-  color: '',
-  time: 0,
-  confirmations: 0,
-});
-
-describe('Utils.isMessagesAddress', () => {
-  test('returns true for non-transparent address', () => {
-    expect(Utils.isMessagesAddress(minimalContact('u1abc123', []))).toBe(true);
-  });
-
-  test('returns false for transparent address', () => {
-    expect(Utils.isMessagesAddress(minimalContact('t1abc123', []))).toBe(false);
-  });
-
-  test('returns true when address is empty but memoUA exists', () => {
-    const memos = [`hello${GlobalConst.replyTo}u1abc`];
-    expect(Utils.isMessagesAddress(minimalContact('', memos))).toBe(true);
-  });
-
-  test('returns false when no address and no memoUA', () => {
-    expect(Utils.isMessagesAddress(minimalContact('', ['hello']))).toBe(false);
   });
 });

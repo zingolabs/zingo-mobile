@@ -1,4 +1,3 @@
-import MessagesAddress from './MessagesAddress';
-import MessagesAll from './MessagesAll';
+import MessageList from './components/MessageList';
 
-export { MessagesAddress, MessagesAll };
+export { MessageList };

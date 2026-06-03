@@ -12,14 +12,12 @@ import {
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
-  ContactType,
   GlobalConst,
   LanguageEnum,
   SendJsonToTypeType,
   SendPageStateClass,
   ServerType,
   TranslateType,
-  ValueTransferType,
   BlockExplorerEnum,
 } from '../AppState';
 
@@ -428,36 +426,6 @@ export default class Utils {
       resultJSON.chain_name === serverChainName
     );
   }
-
-  static isMessagesAddress(vt: ValueTransferType | ContactType): boolean {
-    // we can't check here in this VT if the memo is empty
-    // because this address/contact could have memos in another
-    // VT in the list.
-    // only for orchard or sapling
-    if (vt.address) {
-      // the performance in the list is really bad if here I asked properly
-      // to zingolib (parse_address command) about the type of the address.
-      return !vt.address.startsWith('t');
-    } else {
-      const { memoUA } = Utils.splitMemo(vt.memos);
-      return !!memoUA;
-    }
-  }
-
-  static messagesAddress = (vt: ValueTransferType | ContactType): string => {
-    // we can't check here in this VT if the memo is empty
-    // because this address/contact could have memos in another
-    // VT in the list.
-    // only for orchard or sapling
-    if (vt.address) {
-      // the performance in the list is really bad if here I asked properly
-      // to zingolib (parse_address command) about the type of the address.
-      return !vt.address.startsWith('t') ? vt.address : '';
-    } else {
-      const { memoUA } = Utils.splitMemo(vt.memos);
-      return memoUA ? memoUA : '';
-    }
-  };
 
   static splitMemo = (
     memos: string[] | undefined,

@@ -110,14 +110,13 @@ import {
   toggleOptionsPanel,
 } from '../context/optionsPanel';
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
-import MessageList from '../../components/Messages/components/MessageList';
+import { MessageList } from '../../components/Messages';
 import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
 import { RPCCheckAddressType } from '../walletBackend/types/RPCCheckAddressType';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
-import { MessagesAddress, MessagesAll } from '../../components/Messages';
 import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -1407,7 +1406,7 @@ export class LoadedAppClass extends Component<
   };
 
   doRefresh = (screen: ScreenEnum) => {
-    if (screen === ScreenEnum.History || screen === ScreenEnum.ContactList) {
+    if (screen === ScreenEnum.History) {
       // Value Transfers
       this.rpc.fetchTandZandOValueTransfers();
     } else {
@@ -2458,19 +2457,9 @@ export class LoadedAppClass extends Component<
                           closeScreen={() => props.navigation.goBack()}
                           setScrollToBottom={this.setScrollToBottom}
                           scrollToBottom={scrollToBottom}
-                          sendTransaction={this.sendTransaction}
-                          setServerOption={this.setServerOption}
                         />
                       )}
                     </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.MessagesAddress}
-                      component={MessagesAddress}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MessagesAll}
-                      component={MessagesAll}
-                    />
                     <RootNavigator.Screen
                       name={RouteEnum.Confirm}
                       component={Confirm}

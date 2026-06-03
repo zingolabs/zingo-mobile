@@ -474,18 +474,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     [navigation, valueTransfersSliced, valueTransfersFiltered],
   );
 
-  /*
-  const setMessagesAddressModalShow = (vt: ValueTransferType) => {
-    navigation.navigate(RouteEnum.MessagesAddress, {
-      setScrollToBottom: setScrollToBottom,
-      scrollToBottom: scrollToBottom,
-      address: Utils.messagesAddress(vt),
-      sendTransaction: sendTransaction,
-      setServerOption: setServerOption,
-    });
-  };
-  */
-
   const rowRenderer = (
     type: string | number,
     data: ValueTransferType,

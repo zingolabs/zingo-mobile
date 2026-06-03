@@ -23,7 +23,6 @@ export enum RouteEnum {
   Computing = 'Computing',
   SyncReport = 'SyncReport',
   Pools = 'Pools',
-  ContactList = 'ContactList',
 
   // Drawer with params
   AddressBook = 'AddressBook',
@@ -31,8 +30,6 @@ export enum RouteEnum {
   ScannerAddress = 'ScannerAddress',
   ScannerUfvk = 'ScannerUfvk',
   ValueTransferDetail = 'ValueTransferDetail',
-  MessagesAddress = 'MessagesAddress',
-  MessagesAll = 'MessagesAll',
   Confirm = 'Confirm',
   Ufvk = 'Ufvk',
   Seed = 'Seed',

@@ -26,6 +26,7 @@ import FinancialInsightBasicIcon from '../../assets/img/options/financial-insigh
 import RestoreBackupIcon from '../../assets/img/options/restore-backup.svg';
 import SwitchWalletIcon from '../../assets/img/options/switch-wallet.svg';
 import LoadWalletFromSeedBasicIcon from '../../assets/img/options/switch-wallet-basic.svg';
+import TipZingoLabsIcon from '../../assets/img/options/tip-zingolabs.svg';
 import TipZingoLabsBasicIcon from '../../assets/img/options/tip-zingolabs-basic.svg';
 
 const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
@@ -125,10 +126,10 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       valueTransfersTotal === 0 &&
       netInfo.isConnected &&
       !isOffline;
-    // Same `canSendInBasic` predicate already used in Settings — Tip only
-    // makes sense when an actual Send is possible.
-    const canSendInBasic =
-      isBasic &&
+    // Tip ZingoLabs is available in both basic and advanced modes — it
+    // only requires an actual Send to be possible (online, not read-only,
+    // confirmed funds or pending-incoming funds).
+    const canTipZingoLabs =
       !readOnly &&
       !isOffline &&
       ((!!totalBalance &&
@@ -236,11 +237,15 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       });
     }
 
-    if (canSendInBasic) {
+    if (canTipZingoLabs) {
       list.push({
         id: MenuItemEnum.TipZingoLabs,
         label: translate('loadedapp.tipzingolabs-basic') as string,
-        icon: <TipZingoLabsBasicIcon width={30} height={30} />,
+        icon: isBasic ? (
+          <TipZingoLabsBasicIcon width={30} height={30} />
+        ) : (
+          <TipZingoLabsIcon width={30} height={30} />
+        ),
         onPress: () => dispatch(MenuItemEnum.TipZingoLabs),
       });
     }
