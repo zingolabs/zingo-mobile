@@ -152,10 +152,15 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
 
   useEffect(() => {
     return () => {
+      // Only wipe the clipboard if WE have a pending auto-clear timer —
+      // i.e. the user copied something from this screen and the 60s
+      // expiry hasn't fired yet. Otherwise we'd be wiping clipboard
+      // content the user copied from somewhere else.
       if (clipboardTimer.current) {
         clearTimeout(clipboardTimer.current);
+        Clipboard.setString('');
+        clipboardTimer.current = null;
       }
-      Clipboard.setString('');
     };
   }, []);
 
