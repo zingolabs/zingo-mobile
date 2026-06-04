@@ -65,4 +65,5 @@ module.exports = {
 // Keep React import referenced so bundlers don't strip it in environments
 // that need it for createElement (the passthroughs above are React
 // children, not elements, so this is belt-and-suspenders).
-void React;
+
+React;

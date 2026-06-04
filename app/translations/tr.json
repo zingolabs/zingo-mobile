@@ -327,6 +327,7 @@
       }
     ],
     "nochanges": "Herhangi bir değişiklik kaydedilmedi.",
+    "save-error": "Ayarlar kaydedilemedi",
     "ismemo": "Kaydetmek için notları indirme seçeneğini seçmeniz gerekiyor.",
     "isthreshold": "Kaydetmek için işlem filtre eşiği seçeneğini seçmeniz gerekiyor.",
     "isserver": "Listeden bir sunucu seçmeniz ya da geçerli bir Sunucu URI’si girmeniz gerekiyor.",

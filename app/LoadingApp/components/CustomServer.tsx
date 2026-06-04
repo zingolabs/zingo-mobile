@@ -114,6 +114,11 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
               onChangeText={setCustomServerUri}
               editable={!actionButtonsDisabled}
               maxLength={100}
+              keyboardType="url"
+              autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
+              textContentType="URL"
             />
           </View>
           <View

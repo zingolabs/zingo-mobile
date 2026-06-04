@@ -327,6 +327,7 @@
       }
     ],
     "nochanges": "No changes registered.",
+    "save-error": "Couldn't save settings",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
     "isserver": "You need to choose one Server of the list or fill out a valid Server URI.",

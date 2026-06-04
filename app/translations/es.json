@@ -327,6 +327,7 @@
       }
     ],
     "nochanges": "No se han registrado cambios.",
+    "save-error": "No se pudieron guardar los ajustes",
     "ismemo": "Necesitas escoger una opción de Memos para poder guardar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder guardar.",
     "isserver": "Necesitas escoger un Servidor Activo de la lista o rellenar una URI válida para poder guardar.",

@@ -18,6 +18,7 @@ import ServerType from './types/ServerType';
 import ZecPriceType from './types/ZecPriceType';
 import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
+import { SetServerResult } from './types/SetServerResult';
 import ValueTransferType from './types/ValueTransferType';
 import TransactionType from './types/TransactionType';
 import TxDetailType from './types/TxDetailType';
@@ -86,6 +87,7 @@ export {
   ServerType,
   SecurityType,
   ServerUrisType,
+  SetServerResult,
   ValueTransferType,
   TransactionType,
   TxDetailType,

@@ -6,6 +6,12 @@ type checkServerURIReturn = {
   result: boolean;
   timeout: boolean;
   newChainName?: ChainNameEnum;
+  // Raw native/JS error string from whichever step failed. Surfaced so the
+  // caller can append it to the user-facing snackbar — the existing
+  // `changeservernew-error` translation only says "trying to change the
+  // server" and gives no clue about *why* (TLS handshake, gRPC unavailable,
+  // wallet-chain mismatch, etc.). Undefined on success.
+  errorDetail?: string;
 };
 
 const checkServerURI = async (
@@ -41,7 +47,12 @@ const checkServerURI = async (
       //console.log('changeserver', resultStrServer);
       await RPCModule.changeServerProcess(oldUri);
       // error, no timeout
-      return { result: false, timeout: false, newChainName };
+      return {
+        result: false,
+        timeout: false,
+        newChainName,
+        errorDetail: `changeServer: ${resultStrServer}`,
+      };
     } else {
       // the server is changed
       if (uri) {
@@ -65,7 +76,12 @@ const checkServerURI = async (
           // I have to restore the old server again.
           await RPCModule.changeServerProcess(oldUri);
           // error, no timeout
-          return { result: false, timeout: false, newChainName };
+          return {
+            result: false,
+            timeout: false,
+            newChainName,
+            errorDetail: `infoServerInfo: ${infoStr}`,
+          };
         } else {
           try {
             const infoJSON: RPCInfoType = await JSON.parse(infoStr);
@@ -75,7 +91,14 @@ const checkServerURI = async (
             // I have to restore the old server again.
             await RPCModule.changeServerProcess(oldUri);
             // error, no timeout
-            return { result: false, timeout: false, newChainName };
+            return {
+              result: false,
+              timeout: false,
+              newChainName,
+              errorDetail: `infoServerInfo parse: ${
+                e instanceof Error ? e.message : String(e)
+              } | raw: ${infoStr}`,
+            };
           }
         }
       } else {
@@ -102,7 +125,12 @@ const checkServerURI = async (
           // I have to restore the old server again.
           await RPCModule.changeServerProcess(oldUri);
           // error, no timeout
-          return { result: false, timeout: false, newChainName };
+          return {
+            result: false,
+            timeout: false,
+            newChainName,
+            errorDetail: `getBalanceInfo: ${balanceStr}`,
+          };
         } else {
           newChainName = undefined;
         }
@@ -113,7 +141,12 @@ const checkServerURI = async (
     // I have to restore the old server again. Just in case.
     await RPCModule.changeServerProcess(oldUri);
     // error, YES timeout
-    return { result: false, timeout: true, newChainName };
+    return {
+      result: false,
+      timeout: true,
+      newChainName,
+      errorDetail: error instanceof Error ? error.message : String(error),
+    };
   }
 
   // NO error, no timeout

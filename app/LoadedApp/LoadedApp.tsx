@@ -38,6 +38,7 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
+  SetServerResult,
   AddressBookFileClass,
   SecurityType,
   MenuItemEnum,
@@ -213,8 +214,22 @@ export default function LoadedApp(props: LoadedAppProps) {
   );
   const i18n = useMemo(() => new I18n(file), [file]);
 
-  const translate: (key: string) => TranslateType = (key: string) =>
-    substituteZingoName(i18n.t(key) as TranslateType);
+  // `translate` carries `language` in its memo deps so its identity changes
+  // when the user switches language. Memoized children that include
+  // `translate` in their useMemo/useCallback deps then re-evaluate with
+  // the new locale — without this, `i18n.locale` mutates but cached
+  // translated strings (panel labels, screen titles set at mount, etc.)
+  // stay in the old language until the next remount.
+
+  // `language` is intentionally in the deps even though the body doesn't
+  // reference it: i18n-js mutates `i18n.locale` in place, so `i18n`'s
+  // identity is stable across language switches. The state bump on
+  // `language` is what forces this memo to rebuild and gives `translate` a
+  // fresh identity that downstream useMemo/useCallback deps can observe.
+  const translate: (key: string) => TranslateType = useMemo(
+    () => (key: string) => substituteZingoName(i18n.t(key) as TranslateType),
+    [i18n, language], // eslint-disable-line react-hooks/exhaustive-deps
+  );
   const readOnly =
     !!props.route.params && props.route.params.readOnly !== undefined
       ? props.route.params.readOnly
@@ -569,7 +584,12 @@ export default function LoadedApp(props: LoadedAppProps) {
         theme={theme}
         translate={translate}
         setI18nLocale={(locale: string) => {
+          // Mutate the shared i18n instance AND lift `language` to the
+          // outer state so `translate` (memoized on language) is rebuilt
+          // — this is what makes the in-place language switch propagate
+          // without a `navigateToLoadingApp` reset.
           i18n.locale = locale;
+          setLanguage(locale as LanguageEnum);
         }}
         language={language}
         currency={currency}
@@ -1531,112 +1551,112 @@ export class LoadedAppClass extends Component<
     selectServer: SelectServerEnum,
     toast: boolean,
     sameServerChainName: boolean,
-  ): Promise<void> => {
-    // here I know the server was changed, clean all the tasks before anything.
+  ): Promise<SetServerResult> => {
+    // The server is changing — stop the ongoing sync tasks before touching
+    // anything else.
     await this.rpc.clearTimers();
     this.setSyncingStatus({} as RPCSyncStatusType);
     this.keepAwake(false);
-    // First we need to check the `chainName` between servers, if this is different
-    // we cannot try to open the current wallet, because make not sense.
-    let error = false;
+
+    // Caller pre-detected a chain change (`sameServerChainName === false`).
+    // We can't open the existing wallet against a different chain; stash
+    // the desired server in state so the recovery screen can pick it up,
+    // restore the previous server, and signal `chain-changed` so the
+    // caller navigates to Seed/Ufvk recovery. We deliberately do NOT
+    // navigate from here — navigation policy lives in the caller now.
     if (!sameServerChainName) {
-      error = true;
-    } else {
-      // when I try to open the wallet in the new server:
-      // - the seed doesn't exists (the type of sever is different `main` / `test` / `regtest` ...).
-      //   The App have to go to the initial screen
-      // - the seed exists and the App can open the wallet in the new server.
-      //   But I have to restart the sync if needed.
-      let result: string = await RPCModule.loadExistingWallet(
-        value.uri,
-        value.chainName,
-        this.state.performanceLevel,
-        GlobalConst.minConfirmations.toString(),
-      );
-      if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
-        try {
-          // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType & RPCUfvkType =
-            await JSON.parse(result);
-          if (!resultJson.error) {
-            // Load the wallet and navigate to the ValueTransfers screen
-            if (toast && selectServer !== SelectServerEnum.offline) {
-              this.addLastSnackbar(
-                `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
-              );
-            }
-            await SettingsFileImpl.writeSettings(
-              SettingsNameEnum.server,
-              value,
-            );
-            await SettingsFileImpl.writeSettings(
-              SettingsNameEnum.selectServer,
-              selectServer,
-            );
-            this.setState({
-              server: value,
-              selectServer: selectServer,
-            });
-            // Propagate the new server into the WalletBackend config too so
-            // sub-services (DataService etc.) stop using the URI captured at
-            // construction time.
-            this.rpc.setServer(value);
-            // the server is changed, the App needs to restart the timeout tasks from the beginning
-            await this.rpc.clearTimers();
-            await this.rpc.configure();
-            // creating tor cliente if needed
-            // we have two buttons to fetch -> we need tor client Just in case.
-            if (
-              this.state.currency === CurrencyEnum.USDTORCurrency ||
-              this.state.currency === CurrencyEnum.USDCurrency
-            ) {
-              const resp: string = await RPCModule.createTorClientProcess();
-              if (resp && resp.toLowerCase().startsWith(GlobalConst.error)) {
-                this.setLastError(`Create tor client error: ${resp}`);
-              }
-            }
-            return;
-          } else {
-            error = true;
-          }
-        } catch (e) {
-          error = true;
-        }
-      } else {
-        error = true;
-      }
-    }
-
-    // if the chainName is different between server or we cannot open the wallet...
-    if (error) {
-      // I need to open the modal ASAP, and keep going with the toast.
-      if (this.state.readOnly) {
-        this.drawerNav?.navigate(RouteEnum.Ufvk, {
-          action: UfvkActionEnum.server,
-        });
-      } else {
-        this.drawerNav?.navigate(RouteEnum.Seed, {
-          action: SeedActionEnum.server,
-        });
-      }
-      if (toast) {
-        this.addLastSnackbar(
-          `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
-        );
-      }
-
-      // we need to restore the old server because the new one doesn't have the seed of the current wallet.
       const oldSettings = await SettingsFileImpl.readSettings();
       await RPCModule.changeServerProcess(oldSettings.server.uri);
-
-      // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.setState({
         newServer: value as ServerType,
         newSelectServer: selectServer,
         server: oldSettings.server,
         selectServer: oldSettings.selectServer,
       });
+      if (toast) {
+        this.addLastSnackbar(
+          `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+        );
+      }
+      return { kind: 'chain-changed' };
     }
+
+    // Same chain — try to open the wallet on the new server.
+    const result: string = await RPCModule.loadExistingWallet(
+      value.uri,
+      value.chainName,
+      this.state.performanceLevel,
+      GlobalConst.minConfirmations.toString(),
+    );
+
+    let openError: string | null = null;
+    if (!result || result.toLowerCase().startsWith(GlobalConst.error)) {
+      openError = result || 'loadExistingWallet returned empty';
+    } else {
+      try {
+        // `resultJson` may carry an `error` field for watch-only wallets,
+        // which is actually fine — we treat it as success.
+        const resultJson: RPCSeedType & RPCUfvkType = JSON.parse(result);
+        if (resultJson.error) {
+          openError = String(resultJson.error);
+        }
+      } catch (e) {
+        openError = (e as Error).message ?? 'JSON parse error';
+      }
+    }
+
+    if (openError === null) {
+      // Success path.
+      if (toast && selectServer !== SelectServerEnum.offline) {
+        this.addLastSnackbar(
+          `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
+        );
+      }
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, value);
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.selectServer,
+        selectServer,
+      );
+      this.setState({
+        server: value,
+        selectServer: selectServer,
+      });
+      // Propagate the new server into WalletBackend so sub-services
+      // (DataService etc.) stop using the URI captured at construction.
+      this.rpc.setServer(value);
+      await this.rpc.clearTimers();
+      await this.rpc.configure();
+      // If the user has USD currency selected, the Tor client is needed
+      // for price fetching — recreate it on the new server.
+      if (
+        this.state.currency === CurrencyEnum.USDTORCurrency ||
+        this.state.currency === CurrencyEnum.USDCurrency
+      ) {
+        const resp: string = await RPCModule.createTorClientProcess();
+        if (resp && resp.toLowerCase().startsWith(GlobalConst.error)) {
+          this.setLastError(`Create tor client error: ${resp}`);
+        }
+      }
+      return { kind: 'ok' };
+    }
+
+    // Same chain but wallet open failed (RPC blip, network, JSON parse).
+    // Restore the previous server and surface the error to the caller via
+    // the result. NO navigation — the previous heavy-handed jump to
+    // Seed/Ufvk on any RPC blip was the root cause of the "Settings save
+    // sometimes doesn't apply" reports.
+    const oldSettings = await SettingsFileImpl.readSettings();
+    await RPCModule.changeServerProcess(oldSettings.server.uri);
+    this.setState({
+      server: oldSettings.server,
+      selectServer: oldSettings.selectServer,
+    });
+    if (toast) {
+      this.addLastSnackbar(
+        `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+      );
+    }
+    return { kind: 'error', message: openError };
   };
 
   setCurrencyOption = async (value: CurrencyEnum): Promise<void> => {
@@ -1663,20 +1683,17 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  setLanguageOption = async (value: string, reset: boolean): Promise<void> => {
+  setLanguageOption = async (value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.language, value);
     this.setState({
       language: value as LanguageEnum,
     });
-    // Apply the new locale to the shared i18n instance immediately. Without
-    // this, when `reset === false` (language changes alongside a server
-    // change) LoadedApp doesn't remount, so the i18n instance keeps its
-    // original locale and any snackbar/RPC error rendered until the next
-    // remount appears in the old language.
+    // The shared i18n instance is mutated AND the outer LoadedApp's
+    // `language` state is bumped (see setI18nLocale wiring), which
+    // rebuilds the memoized `translate`. Memoized children with
+    // `translate` in their deps then re-evaluate with the new locale —
+    // no full remount needed.
     this.props.setI18nLocale(value);
-    if (reset) {
-      this.navigateToLoadingApp({ startingApp: false });
-    }
   };
 
   setSendAllOption = async (value: boolean): Promise<void> => {

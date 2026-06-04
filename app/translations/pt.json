@@ -327,6 +327,7 @@
       }
     ],
     "nochanges": "Nenhuma alteração registrada.",
+    "save-error": "Não foi possível salvar as configurações",
     "ismemo": "Você precisa escolher a opção MEMO para salvar.",
     "isthreshold": "Você precisa escolher a opção Limite para salvar.",
     "isserver": "Você precisa escolher um Servidor Ativo da lista ou preencher um URI válido para poder salvar.",

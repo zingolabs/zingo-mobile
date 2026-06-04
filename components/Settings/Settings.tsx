@@ -44,8 +44,11 @@ import Header from '../Header';
 import {
   LanguageEnum,
   SecurityType,
+  SeedActionEnum,
   ServerType,
   ServerUrisType,
+  SetServerResult,
+  UfvkActionEnum,
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
@@ -93,9 +96,9 @@ type SettingsProps = NativeStackScreenProps<
     selectServer: SelectServerEnum,
     toast: boolean,
     sameServerChainName: boolean,
-  ) => Promise<void>;
+  ) => Promise<SetServerResult>;
   setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
-  setLanguageOption: (value: LanguageEnum, reset: boolean) => Promise<void>;
+  setLanguageOption: (value: LanguageEnum) => Promise<void>;
   setSendAllOption: (value: boolean) => Promise<void>;
   setDonationOption: (value: boolean) => Promise<void>;
   setSecurityOption: (value: SecurityType) => Promise<void>;
@@ -512,7 +515,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     securityObject,
   ]);
 
+  // Ref that always points to the latest `saveSettings`. The footer's
+  // `useCallback` only rebuilds when its declared deps change — which left
+  // its captured `saveSettings` (and the local state inside it) stuck on
+  // the first render that flipped `disabledButton`. Subsequent toggles
+  // didn't refresh the closure, so only the change that flipped
+  // disabledButton actually persisted on save. Reading through a ref makes
+  // the footer's onPress always invoke the current closure.
+  const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
+
   const saveSettings = async () => {
+    // ───────────────────────────────────────────────────────────────
+    // Phase 1: Resolve the target server URI/chain from the picker mode
+    // and validate up-front (no I/O yet — purely synchronous guards).
+    // ───────────────────────────────────────────────────────────────
     let serverUriParsed = '';
     let chainNameParsed = '';
     if (selectServer === SelectServerEnum.auto) {
@@ -528,8 +544,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       serverUriParsed = '';
       chainNameParsed = ChainNameEnum.mainChainName;
     }
-    let sameServerChainName = true;
     const chainName = serverContext.chainName;
+
     if (
       serverContext.uri === serverUriParsed &&
       serverContext.chainName === chainNameParsed &&
@@ -561,6 +577,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
+    // ───────────────────────────────────────────────────────────────
+    // Phase 2: If the URI changed, parse/canonicalize it. `parseServerURI`
+    // also catches malformed strings (`http:/host` without the double
+    // slash etc.) that url-parse silently accepts.
+    // ───────────────────────────────────────────────────────────────
     if (
       serverContext.uri !== serverUriParsed &&
       selectServer !== SelectServerEnum.offline
@@ -569,25 +590,18 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (resultUri && resultUri.toLowerCase().startsWith(GlobalConst.error)) {
         addLastSnackbar(translate('settings.isuri') as string);
         return;
-      } else {
-        // url-parse sometimes is too wise, and if you put:
-        // server: `http:/zec-server.com:9067` the parser understand this. Good.
-        // but this value will be store in the settings and the value is wrong.
-        // so, this function if everything is OK return the URI well formatted.
-        // and I save it in the state ASAP.
-        if (serverUriParsed !== resultUri) {
-          serverUriParsed = resultUri;
-          if (selectServer === SelectServerEnum.auto) {
-            setAutoServerUri(serverUriParsed);
-          } else if (selectServer === SelectServerEnum.list) {
-            setListServerUri(serverUriParsed);
-          } else if (selectServer === SelectServerEnum.custom) {
-            setCustomServerUri(serverUriParsed);
-          }
+      }
+      if (serverUriParsed !== resultUri) {
+        serverUriParsed = resultUri;
+        if (selectServer === SelectServerEnum.auto) {
+          setAutoServerUri(serverUriParsed);
+        } else if (selectServer === SelectServerEnum.list) {
+          setListServerUri(serverUriParsed);
+        } else if (selectServer === SelectServerEnum.custom) {
+          setCustomServerUri(serverUriParsed);
         }
       }
     }
-
     if (
       (serverContext.uri !== serverUriParsed ||
         selectServerContext !== selectServer) &&
@@ -598,12 +612,22 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (
+    // ───────────────────────────────────────────────────────────────
+    // Phase 3: If the server is changing, probe it via `checkServerURI`
+    // first. We detect two distinct chain conditions:
+    //   • newChainName ≠ chainNameParsed → user's toggle is lying about
+    //     the chain. Abort the save, restore the previous server.
+    //   • newChainName ≠ current chainName → the new server is on a
+    //     different chain than the open wallet. We set
+    //     `sameServerChainName = false`, which makes `setServerOption`
+    //     return `chain-changed` so we can navigate to recovery.
+    // ───────────────────────────────────────────────────────────────
+    const serverChanged =
       serverContext.uri !== serverUriParsed ||
-      serverContext.chainName !== chainNameParsed
-    ) {
-      // if the user is changing -> to Offline mode.
-      // doesn't matter is the device have or not internet connection.
+      serverContext.chainName !== chainNameParsed;
+    let sameServerChainName = true;
+
+    if (serverChanged) {
       if (
         !netInfo.isConnected &&
         !(
@@ -618,12 +642,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (serverUriParsed) {
         addLastSnackbar(translate('loadedapp.tryingnewserver') as string);
       }
-      const { result, timeout, newChainName } = await checkServerURI(
-        serverUriParsed,
-        serverContext.uri,
-      );
+      const { result, timeout, newChainName, errorDetail } =
+        await checkServerURI(serverUriParsed, serverContext.uri);
       if (!result) {
-        // if the server checking takes more then 15 seconds.
+        // Native/JS error string kept out of the user snackbar but logged so
+        // it surfaces in `adb logcat` / Xcode console for diagnosis.
+        console.log('checkServerURI failed:', errorDetail);
         if (timeout === true) {
           addLastSnackbar(
             translate('loadedapp.tryingnewserver-error') as string,
@@ -634,114 +658,148 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               serverUriParsed,
           );
         }
-        // in this point the sync process is blocked, who knows why.
-        // if I save the actual server before the customization... is going to work.
-        setServerOption(
-          serverContext,
-          selectServerContext,
-          false,
+        // Restore the previous server so the sync state stays consistent.
+        await setServerOption(serverContext, selectServerContext, false, true);
+        setDisabled(false);
+        return;
+      }
+      if (newChainName && newChainName !== chainNameParsed) {
+        addLastSnackbar(translate('loadedapp.serverchain-mismatch') as string);
+        await setServerOption(serverContext, selectServerContext, false, true);
+        setDisabled(false);
+        return;
+      }
+      if (newChainName && newChainName !== chainName) {
+        sameServerChainName = false;
+        addLastSnackbar(translate('loadedapp.differentchain-error') as string);
+      }
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Phase 4: Persist the "light" settings (AsyncStorage only, no
+    // backend coordination). Wrapped in try/catch so a single failing
+    // setter doesn't silently drop the rest.
+    // ───────────────────────────────────────────────────────────────
+    try {
+      if (currencyContext !== currency) {
+        await setCurrencyOption(currency);
+      }
+      if (sendAllContext !== sendAll) {
+        await setSendAllOption(sendAll);
+      }
+      if (donationContext !== donation) {
+        await setDonationOption(donation);
+      }
+      if (privacyContext !== privacy) {
+        await setPrivacyOption(privacy);
+      }
+      if (!isEqual(securityContext, securityObject())) {
+        await setSecurityOption(securityObject());
+      }
+      if (rescanMenuContext !== rescanMenu) {
+        await setRescanMenuOption(rescanMenu);
+      }
+      if (recoveryWalletInfoOnDeviceContext !== recoveryWalletInfoOnDevice) {
+        await setRecoveryWalletInfoOnDeviceOption(recoveryWalletInfoOnDevice);
+        const saved = await hasRecoveryWalletInfo();
+        setHasRecoveryWalletInfoSaved(saved);
+        if (saved) {
+          setStorageRecoveryWalletInfo(
+            Platform.OS === GlobalConst.platformOSios
+              ? GlobalConst.keyChain
+              : GlobalConst.keyStore,
+          );
+        }
+      }
+      if (performanceLevelContext !== performanceLevel) {
+        await setPerformanceLevelOption(performanceLevel);
+      }
+      if (blockExplorerContext !== blockExplorer) {
+        await setBlockExplorerOption(blockExplorer);
+      }
+      if (nymContext !== nym) {
+        await setNymOption(nym);
+      }
+      // Language: applied in place. Belongs with the light settings now
+      // that the i18n update propagates without an app reset. Apply it
+      // before phase 5 so any snackbar that surfaces during the server
+      // switch already reads in the new locale.
+      if (languageContext !== language) {
+        await setLanguageOption(language);
+      }
+    } catch (e) {
+      addLastSnackbar(
+        `${translate('settings.save-error') as string}: ${(e as Error).message}`,
+      );
+      setDisabled(false);
+      return;
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Phase 5: Apply server / selectServer.
+    //
+    // If the server URI changed, `setServerOption` does the heavy lifting
+    // (loadExistingWallet → writeSettings → state). It returns a tagged
+    // result so we know whether to:
+    //   • `ok`         → navigate back as usual.
+    //   • `chain-changed` → navigate to Seed/Ufvk recovery. The library
+    //     already restored the previous server and stashed the desired
+    //     one in `newServer`/`newSelectServer` for the recovery screen.
+    //   • `error`      → stay on Settings, snackbar already shown.
+    // ───────────────────────────────────────────────────────────────
+    try {
+      if (serverChanged) {
+        const result = await setServerOption(
+          { uri: serverUriParsed, chainName: chainNameParsed } as ServerType,
+          selectServer,
+          true,
           sameServerChainName,
         );
         setDisabled(false);
-        return;
-      } else {
-        // The chain the server actually reports must match what the user
-        // selected in the chain toggle. If they don't match, abort the
-        // save — continuing would persist the user's (wrong) chain
-        // alongside the server URI and `loadExistingWallet` would then
-        // open the wallet with the wrong chainName, killing the sync.
-        if (newChainName && newChainName !== chainNameParsed) {
-          addLastSnackbar(
-            translate('loadedapp.serverchain-mismatch') as string,
-          );
-          setServerOption(
-            serverContext,
-            selectServerContext,
-            false,
-            sameServerChainName,
-          );
-          setDisabled(false);
+        if (result.kind === 'error') {
+          // Old server restored, snackbar already shown by setServerOption.
           return;
         }
-        if (newChainName && newChainName !== chainName) {
-          sameServerChainName = false;
-          addLastSnackbar(
-            translate('loadedapp.differentchain-error') as string,
-          );
+        if (result.kind === 'chain-changed') {
+          // The open wallet can't be used against the new chain — send the
+          // user to Seed/Ufvk recovery so they can switch wallets or
+          // cancel.
+          if (readOnly) {
+            navigation.navigate(RouteEnum.Ufvk, {
+              action: UfvkActionEnum.server,
+            });
+          } else {
+            navigation.navigate(RouteEnum.Seed, {
+              action: SeedActionEnum.server,
+            });
+          }
+          return;
         }
+        // result.kind === 'ok' — fall through to the final goBack().
+      } else {
+        if (selectServerContext !== selectServer) {
+          await setSelectServerOption(selectServer);
+        }
+        setDisabled(false);
       }
-    }
-
-    if (currencyContext !== currency) {
-      await setCurrencyOption(currency);
-    }
-    if (sendAllContext !== sendAll) {
-      await setSendAllOption(sendAll);
-    }
-    if (donationContext !== donation) {
-      await setDonationOption(donation);
-    }
-    if (privacyContext !== privacy) {
-      await setPrivacyOption(privacy);
-    }
-    if (!isEqual(securityContext, securityObject())) {
-      await setSecurityOption(securityObject());
-    }
-    if (rescanMenuContext !== rescanMenu) {
-      await setRescanMenuOption(rescanMenu);
-    }
-    if (recoveryWalletInfoOnDeviceContext !== recoveryWalletInfoOnDevice) {
-      await setRecoveryWalletInfoOnDeviceOption(recoveryWalletInfoOnDevice);
-      const saved = await hasRecoveryWalletInfo();
-      setHasRecoveryWalletInfoSaved(saved);
-      if (saved) {
-        setStorageRecoveryWalletInfo(
-          Platform.OS === GlobalConst.platformOSios
-            ? GlobalConst.keyChain
-            : GlobalConst.keyStore,
-        );
-      }
-    }
-    if (performanceLevelContext !== performanceLevel) {
-      await setPerformanceLevelOption(performanceLevel);
-    }
-    if (blockExplorerContext !== blockExplorer) {
-      await setBlockExplorerOption(blockExplorer);
-    }
-    if (nymContext !== nym) {
-      await setNymOption(nym);
-    }
-
-    // I need a little time in this modal because maybe the wallet cannot be open with the new server
-    let ms = 100;
-    if (
-      serverContext.uri !== serverUriParsed ||
-      serverContext.chainName !== chainNameParsed
-    ) {
-      if (languageContext !== language) {
-        await setLanguageOption(language, false);
-      }
-      setServerOption(
-        { uri: serverUriParsed, chainName: chainNameParsed } as ServerType,
-        selectServer,
-        true,
-        sameServerChainName,
+    } catch (e) {
+      addLastSnackbar(
+        `${translate('settings.save-error') as string}: ${(e as Error).message}`,
       );
-      ms = 1500;
-    } else {
-      if (selectServerContext !== selectServer) {
-        await setSelectServerOption(selectServer);
-      }
-      if (languageContext !== language) {
-        await setLanguageOption(language, true);
-      }
+      setDisabled(false);
+      return;
     }
 
-    setDisabled(false);
-    setTimeout(() => {
-      navigateToHome(false);
-    }, ms);
+    // ───────────────────────────────────────────────────────────────
+    // Phase 6: Done — pop back to the previous screen.
+    // ───────────────────────────────────────────────────────────────
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate(RouteEnum.HomeStack);
+    }
   };
+  saveSettingsRef.current = saveSettings;
 
   const navigateToHome = useCallback((reset: boolean) => {
     if (reset) {
@@ -916,7 +974,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             title={translate('settings.save') as string}
             onPress={() => {
               setTimeout(async () => {
-                await saveSettings();
+                await saveSettingsRef.current();
                 Keyboard.dismiss();
               }, 100);
             }}
@@ -924,7 +982,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
       </BottomSheetFooter>
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [colors, disabled, disabledButton, translate],
   );
 
@@ -2254,6 +2312,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     onChangeText={(text: string) => setCustomServerUri(text)}
                     editable={!disabled}
                     maxLength={100}
+                    keyboardType="url"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    spellCheck={false}
+                    textContentType="URL"
                   />
                 </View>
                 <View

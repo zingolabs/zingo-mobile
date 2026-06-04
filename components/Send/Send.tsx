@@ -66,6 +66,7 @@ import {
   GlobalConst,
   ServerUrisType,
   ServerType,
+  SetServerResult,
   SelectServerEnum,
   RouteEnum,
   SecurityType,
@@ -113,7 +114,7 @@ type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
     selectServer: SelectServerEnum,
     toast: boolean,
     sameServerChainName: boolean,
-  ) => Promise<void>;
+  ) => Promise<SetServerResult>;
   clearToAddr: () => void;
   setSecurityOption: (s: SecurityType) => Promise<void>;
 };
