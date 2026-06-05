@@ -235,6 +235,10 @@ const Send: React.FunctionComponent<SendProps> = ({
         defaultValueFee();
         return;
       }
+      if (Utils.parseStringLocaleToNumberFloat(amountPar) === 0 && !memoEnabled) {
+        defaultValueFee();
+        return;
+      }
       if (validMemo === -1) {
         defaultValueFee();
         return;
