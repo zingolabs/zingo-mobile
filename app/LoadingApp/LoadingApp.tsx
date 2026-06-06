@@ -64,7 +64,7 @@ import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import { humanizeChainTokens } from '../utils/humanizeChainTokens';
+import Utils from '../utils';
 import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
@@ -746,7 +746,7 @@ export class LoadingAppClass extends Component<
       }
       if (error) {
         await this.walletErrorHandle(
-          humanizeChainTokens(errorText, this.state.translate),
+          Utils.humanizeChainTokens(errorText, this.state.translate),
           this.state.translate('loadingapp.readingwallet-label') as string,
           RouteEnum.StartMenu,
           true,

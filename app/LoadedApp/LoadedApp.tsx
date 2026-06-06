@@ -70,7 +70,6 @@ import {
 } from '../AppState';
 import Utils from '../utils';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import { humanizeChainTokens } from '../utils/humanizeChainTokens';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
@@ -1659,7 +1658,7 @@ export class LoadedAppClass extends Component<
     }
     return {
       kind: 'error',
-      message: humanizeChainTokens(openError, this.state.translate),
+      message: Utils.humanizeChainTokens(openError, this.state.translate),
     };
   };
 
