@@ -625,6 +625,7 @@
     "sent": "Enviado ",
     "sent-failed": "Envio ",
     "received": "Recibido ",
+    "received-failed": "Recibo ",
     "memotoself": "Memo-Auto-Enviado ",
     "sendtoself": "Auto-Enviado ",
     "shield": "Blindado ",

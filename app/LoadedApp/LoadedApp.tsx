@@ -121,6 +121,7 @@ import ValueTransferDetail from '../../components/History/components/ValueTransf
 import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RPCValueTransfersStatusEnum } from '../walletBackend/enums/RPCValueTransfersStatusEnum';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -1166,11 +1167,16 @@ export class LoadedAppClass extends Component<
       // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
         valueTransfersTotal > 0
-          ? valueTransfers.filter(
-              (vt: ValueTransferType) =>
-                vt.confirmations >= 0 &&
-                vt.confirmations < GlobalConst.minConfirmations,
-            ).length
+          ? valueTransfers
+              .filter(
+                (vt: ValueTransferType) =>
+                  vt.status !== RPCValueTransfersStatusEnum.failed,
+              )
+              .filter(
+                (vt: ValueTransferType) =>
+                  vt.confirmations >= 0 &&
+                  vt.confirmations < GlobalConst.minConfirmations,
+              ).length
           : 0;
       // if a ValueTransfer go from 3 confirmations to > 3 -> Show a message about a ValueTransfer is confirmed
       this.state.valueTransfers &&

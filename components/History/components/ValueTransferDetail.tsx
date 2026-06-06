@@ -502,56 +502,69 @@ const ValueTransferDetail: React.FunctionComponent<
                 : valueTransfer.status === RPCValueTransfersStatusEnum.failed &&
                     valueTransfer.kind === ValueTransferKindEnum.Shield
                   ? (translate('history.shield-failed') as string)
-                  : valueTransfer.kind === ValueTransferKindEnum.Sent &&
-                      valueTransfer.confirmations === 0
-                    ? (translate('history.sending') as string)
+                  : valueTransfer.status ===
+                        RPCValueTransfersStatusEnum.failed &&
+                      valueTransfer.kind === ValueTransferKindEnum.Received
+                    ? (translate('history.received-failed') as string)
                     : valueTransfer.kind === ValueTransferKindEnum.Sent &&
-                        valueTransfer.confirmations !== 0
-                      ? (translate('history.sent') as string)
-                      : valueTransfer.kind === ValueTransferKindEnum.Received &&
-                          valueTransfer.confirmations === 0
-                        ? (translate('history.receiving') as string)
+                        valueTransfer.confirmations === 0
+                      ? (translate('history.sending') as string)
+                      : valueTransfer.kind === ValueTransferKindEnum.Sent &&
+                          valueTransfer.confirmations !== 0
+                        ? (translate('history.sent') as string)
                         : valueTransfer.kind ===
                               ValueTransferKindEnum.Received &&
-                            valueTransfer.confirmations !== 0
-                          ? (translate('history.received') as string)
+                            valueTransfer.confirmations === 0
+                          ? (translate('history.receiving') as string)
                           : valueTransfer.kind ===
-                                ValueTransferKindEnum.MemoToSelf &&
-                              valueTransfer.confirmations === 0
-                            ? (translate('history.sendingtoself') as string)
+                                ValueTransferKindEnum.Received &&
+                              valueTransfer.confirmations !== 0
+                            ? (translate('history.received') as string)
                             : valueTransfer.kind ===
                                   ValueTransferKindEnum.MemoToSelf &&
-                                valueTransfer.confirmations !== 0
-                              ? (translate('history.memotoself') as string)
+                                valueTransfer.confirmations === 0
+                              ? (translate('history.sendingtoself') as string)
                               : valueTransfer.kind ===
-                                    ValueTransferKindEnum.SendToSelf &&
-                                  valueTransfer.confirmations === 0
-                                ? (translate('history.sendingtoself') as string)
+                                    ValueTransferKindEnum.MemoToSelf &&
+                                  valueTransfer.confirmations !== 0
+                                ? (translate('history.memotoself') as string)
                                 : valueTransfer.kind ===
                                       ValueTransferKindEnum.SendToSelf &&
-                                    valueTransfer.confirmations !== 0
-                                  ? (translate('history.sendtoself') as string)
+                                    valueTransfer.confirmations === 0
+                                  ? (translate(
+                                      'history.sendingtoself',
+                                    ) as string)
                                   : valueTransfer.kind ===
-                                        ValueTransferKindEnum.Shield &&
-                                      valueTransfer.confirmations === 0
-                                    ? (translate('history.shielding') as string)
+                                        ValueTransferKindEnum.SendToSelf &&
+                                      valueTransfer.confirmations !== 0
+                                    ? (translate(
+                                        'history.sendtoself',
+                                      ) as string)
                                     : valueTransfer.kind ===
                                           ValueTransferKindEnum.Shield &&
-                                        valueTransfer.confirmations !== 0
-                                      ? (translate('history.shield') as string)
+                                        valueTransfer.confirmations === 0
+                                      ? (translate(
+                                          'history.shielding',
+                                        ) as string)
                                       : valueTransfer.kind ===
-                                            ValueTransferKindEnum.Rejection &&
-                                          valueTransfer.confirmations === 0
+                                            ValueTransferKindEnum.Shield &&
+                                          valueTransfer.confirmations !== 0
                                         ? (translate(
-                                            'history.sending',
+                                            'history.shield',
                                           ) as string)
                                         : valueTransfer.kind ===
                                               ValueTransferKindEnum.Rejection &&
-                                            valueTransfer.confirmations !== 0
+                                            valueTransfer.confirmations === 0
                                           ? (translate(
-                                              'history.rejection',
+                                              'history.sending',
                                             ) as string)
-                                          : ''}
+                                          : valueTransfer.kind ===
+                                                ValueTransferKindEnum.Rejection &&
+                                              valueTransfer.confirmations !== 0
+                                            ? (translate(
+                                                'history.rejection',
+                                              ) as string)
+                                            : ''}
             </BoldText>
             <ZecAmount
               style={{

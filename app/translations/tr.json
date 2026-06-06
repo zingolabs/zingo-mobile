@@ -625,6 +625,7 @@
     "sent": "Gönderildi ",
     "sent-failed": "Göndermek ",
     "received": "Alındı ",
+    "received-failed": "Almak ",
     "memotoself": "Kendime not ",
     "sendtoself": "Kendime Gönder ",
     "shield": "Korumalı ",
