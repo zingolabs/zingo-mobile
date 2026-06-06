@@ -1292,6 +1292,55 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 </View>
               )}
 
+              {/* About + Server Info — entry points migrated from the
+                  legacy drawer Menu. The bottom sheet stays mounted in
+                  the stack underneath while the user is on those screens
+                  (useDismissSheetsOnBlur in those screens handles their
+                  own children). */}
+              <TouchableOpacity
+                testID="settings.about"
+                disabled={disabled}
+                onPress={() => navigation.navigate(RouteEnum.About)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginLeft: 25,
+                  marginRight: 25,
+                  marginTop: 25,
+                  marginBottom: 15,
+                }}
+              >
+                <BoldText>{translate('loadedapp.about') as string}</BoldText>
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  size={12}
+                  color={colors.zingo}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                testID="settings.serverinfo"
+                disabled={disabled}
+                onPress={() => navigation.navigate(RouteEnum.Info)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginLeft: 25,
+                  marginRight: 25,
+                  marginTop: 15,
+                  marginBottom: 15,
+                }}
+              >
+                <BoldText>{translate('loadedapp.info') as string}</BoldText>
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  size={12}
+                  color={colors.zingo}
+                />
+              </TouchableOpacity>
+
               <View
                 style={{
                   flexDirection: 'row',

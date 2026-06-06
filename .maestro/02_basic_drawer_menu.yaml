@@ -7,24 +7,34 @@ appId: org.ZingoLabs.Zingo
       id: "receive.title"
     timeout: 120000
 
-# Open drawer and verify basic-mode items are present
+# Open options panel and verify basic-mode items are present
 - tapOn:
     id: "header.drawmenu"
-- assertVisible:
-    id: "menu.about"
 - assertVisible:
     id: "menu.addressbook"
 - assertVisible:
     id: "menu.loadwalletfromseed"
+- back
+
+# About + Server Info live as the first two rows in Settings now.
+- tapOn:
+    id: "header.settings"
+- extendedWaitUntil:
+    visible:
+      id: "settings.scroll-view"
+    timeout: 10000
 - assertVisible:
-    id: "menu.tipzingolabs"
+    id: "settings.about"
+- assertVisible:
+    id: "settings.serverinfo"
 
 # Navigate to About and verify it loads
 - tapOn:
-    id: "menu.about"
+    id: "settings.about"
 - extendedWaitUntil:
     visible:
       id: "about.scroll-view"
     timeout: 10000
 
+- back
 - back

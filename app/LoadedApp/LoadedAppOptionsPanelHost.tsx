@@ -32,6 +32,23 @@ import TipZingoLabsBasicIcon from '../../assets/img/options/tip-zingolabs-basic.
 const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
 const SOCIAL_GITHUB_URL = 'https://github.com/zingolabs/zingo-mobile';
 
+// Legacy `menu.*` testID slugs, kept stable across the drawer→OptionsPanel
+// migration so existing Maestro flows (.maestro/*.yaml) and the detox
+// helper (e2e/e2e-utils/loadTestWallet.js) continue to resolve their
+// selectors. Add a new entry here when a new MenuItemEnum surfaces in
+// the grid.
+const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
+  [MenuItemEnum.AddressBook]: 'menu.addressbook',
+  [MenuItemEnum.WalletSeedUfvk]: 'menu.walletseedufvk',
+  [MenuItemEnum.SyncReport]: 'menu.syncreport',
+  [MenuItemEnum.FundPools]: 'menu.fundpools',
+  [MenuItemEnum.Insight]: 'menu.insight',
+  [MenuItemEnum.ChangeWallet]: 'menu.changewallet',
+  [MenuItemEnum.LoadWalletFromSeed]: 'menu.loadwalletfromseed',
+  [MenuItemEnum.RestoreWalletBackup]: 'menu.restorebackupwallet',
+  [MenuItemEnum.TipZingoLabs]: 'menu.tipzingolabs',
+};
+
 type LoadedAppOptionsPanelHostProps = {
   onMenuItemSelected: (item: MenuItemEnum) => void;
   setModeOption: (mode: ModeEnum) => Promise<void>;
@@ -148,6 +165,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     // AddressBook — always visible.
     list.push({
       id: MenuItemEnum.AddressBook,
+      testID: MENU_TEST_IDS[MenuItemEnum.AddressBook],
       label: translate('loadedapp.addressbook') as string,
       icon: isBasic ? (
         <AddressBookBasicIcon width={28} height={28} />
@@ -169,6 +187,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
           : (translate('loadedapp.walletseed') as string);
       list.push({
         id: MenuItemEnum.WalletSeedUfvk,
+        testID: MENU_TEST_IDS[MenuItemEnum.WalletSeedUfvk],
         label,
         icon: isBasic ? (
           <WalletSeedBasicIcon width={28} height={28} />
@@ -182,6 +201,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     if (showSyncReport) {
       list.push({
         id: MenuItemEnum.SyncReport,
+        testID: MENU_TEST_IDS[MenuItemEnum.SyncReport],
         label: translate('loadedapp.report') as string,
         icon: <SyncRescanReportIcon width={30} height={30} />,
         onPress: () => dispatch(MenuItemEnum.SyncReport),
@@ -191,6 +211,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     if (showFundPools) {
       list.push({
         id: MenuItemEnum.FundPools,
+        testID: MENU_TEST_IDS[MenuItemEnum.FundPools],
         label: translate('loadedapp.fundpools') as string,
         icon: <FundsPoolsIcon width={30} height={30} />,
         onPress: () => dispatch(MenuItemEnum.FundPools),
@@ -200,6 +221,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     if (showInsight) {
       list.push({
         id: MenuItemEnum.Insight,
+        testID: MENU_TEST_IDS[MenuItemEnum.Insight],
         label: translate('loadedapp.insight') as string,
         icon: isBasic ? (
           <FinancialInsightBasicIcon width={30} height={30} />
@@ -213,6 +235,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     if (showChangeWallet) {
       list.push({
         id: MenuItemEnum.ChangeWallet,
+        testID: MENU_TEST_IDS[MenuItemEnum.ChangeWallet],
         label: translate('loadedapp.changewallet') as string,
         icon: <SwitchWalletIcon width={30} height={30} />,
         onPress: () => dispatch(MenuItemEnum.ChangeWallet),
@@ -222,6 +245,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     if (showLoadWalletFromSeed) {
       list.push({
         id: MenuItemEnum.LoadWalletFromSeed,
+        testID: MENU_TEST_IDS[MenuItemEnum.LoadWalletFromSeed],
         label: translate('loadedapp.loadwalletfromseed-basic') as string,
         icon: <LoadWalletFromSeedBasicIcon width={30} height={30} />,
         onPress: () => dispatch(MenuItemEnum.LoadWalletFromSeed),
@@ -231,6 +255,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     if (showRestoreBackup) {
       list.push({
         id: MenuItemEnum.RestoreWalletBackup,
+        testID: MENU_TEST_IDS[MenuItemEnum.RestoreWalletBackup],
         label: translate('loadedapp.restorebackupwallet') as string,
         icon: <RestoreBackupIcon width={28} height={28} />,
         onPress: () => dispatch(MenuItemEnum.RestoreWalletBackup),
@@ -240,6 +265,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     if (canTipZingoLabs) {
       list.push({
         id: MenuItemEnum.TipZingoLabs,
+        testID: MENU_TEST_IDS[MenuItemEnum.TipZingoLabs],
         label: translate('loadedapp.tipzingolabs-basic') as string,
         icon: isBasic ? (
           <TipZingoLabsBasicIcon width={30} height={30} />

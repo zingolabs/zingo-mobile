@@ -32,6 +32,9 @@ export type OptionsPanelAction = {
   onPress: () => void;
   /** Greys out the cell and disables onPress. */
   disabled?: boolean;
+  /** testID for the action cell. Matches the legacy `menu.*` slugs used by
+   *  Maestro flows and detox helpers. */
+  testID?: string;
 };
 
 /**
@@ -164,6 +167,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
           {actions.map(action => (
             <Pressable
               key={action.id}
+              testID={action.testID}
               onPress={action.disabled ? undefined : action.onPress}
               style={({ pressed }) => ({
                 width: '25%',
