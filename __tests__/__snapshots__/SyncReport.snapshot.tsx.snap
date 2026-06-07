@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
 <View
@@ -102,74 +102,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     <View
       style={
         {
-          "display": "flex",
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "marginTop": 10,
-          "width": "100%",
-        }
-      }
-    >
-      <Text
-        style={
-          {
-            "color": "#18bd18",
-          }
-        }
-      >
-        0
-      </Text>
-      <Text
-        style={
-          {
-            "color": "#18bd18",
-          }
-        }
-      >
-        500K
-      </Text>
-      <Text
-        style={
-          {
-            "color": "#18bd18",
-          }
-        }
-      >
-        1M
-      </Text>
-      <Text
-        style={
-          {
-            "color": "#18bd18",
-          }
-        }
-      >
-        1.5M
-      </Text>
-      <Text
-        style={
-          {
-            "color": "#18bd18",
-          }
-        }
-      >
-        2M
-      </Text>
-      <Text
-        style={
-          {
-            "color": "#18bd18",
-          }
-        }
-      >
-        2.5M
-      </Text>
-    </View>
-    <View
-      style={
-        {
-          "display": "flex",
-          "flexDirection": "row",
+          "marginTop": 0,
           "width": "100%",
         }
       }
@@ -177,114 +110,317 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
       <View
         style={
           {
-            "borderLeftColor": "#18bd18",
-            "borderLeftWidth": 1,
-            "borderRightColor": "#18bd18",
-            "borderRightWidth": 1,
-            "height": 10,
-            "width": "20%",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "marginTop": 10,
+            "width": "100%",
           }
         }
-      />
+      >
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 0,
+            }
+          }
+        >
+          0
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 0,
+            }
+          }
+        >
+          0.5M
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 6.050000000000001,
+            }
+          }
+        >
+          1M
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 0,
+            }
+          }
+        >
+          1.5M
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 6.050000000000001,
+            }
+          }
+        >
+          2M
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 0,
+            }
+          }
+        >
+          2.5M
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 6.050000000000001,
+            }
+          }
+        >
+          3M
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 0,
+            }
+          }
+        >
+          3.5M
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 6.050000000000001,
+            }
+          }
+        >
+          4M
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 0,
+            }
+          }
+        >
+          4.5M
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 11,
+              "marginLeft": 6.050000000000001,
+            }
+          }
+        >
+          5M
+        </Text>
+      </View>
       <View
         style={
           {
-            "borderLeftColor": "#18bd18",
-            "borderLeftWidth": 1,
-            "borderRightColor": "#18bd18",
-            "borderRightWidth": 1,
-            "height": 10,
-            "width": "20%",
+            "display": "flex",
+            "flexDirection": "row",
+            "width": "100%",
           }
         }
-      />
+      >
+        <View
+          style={
+            {
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "10%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "10%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "10%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "10%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "10%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "10%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "10%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "10%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "10%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "10%",
+            }
+          }
+        />
+      </View>
       <View
         style={
           {
-            "borderLeftColor": "#18bd18",
-            "borderLeftWidth": 1,
-            "borderRightColor": "#18bd18",
-            "borderRightWidth": 1,
-            "height": 10,
-            "width": "20%",
+            "borderBottomColor": "#18bd18",
+            "borderBottomWidth": 2,
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "flex-start",
+            "marginBottom": 0,
+            "width": "100%",
           }
         }
-      />
-      <View
-        style={
-          {
-            "borderLeftColor": "#18bd18",
-            "borderLeftWidth": 1,
-            "borderRightColor": "#18bd18",
-            "borderRightWidth": 1,
-            "height": 10,
-            "width": "20%",
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "blue",
+              "borderLeftColor": "#18bd18",
+              "borderLeftWidth": 1,
+              "borderRightColor": "blue",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "38.002%",
+            }
           }
-        }
-      />
-      <View
-        style={
-          {
-            "borderLeftColor": "#18bd18",
-            "borderLeftWidth": 1,
-            "borderRightColor": "#18bd18",
-            "borderRightWidth": 1,
-            "height": 10,
-            "width": "20%",
+        />
+        <View
+          style={
+            {
+              "backgroundColor": "yellow",
+              "borderBottomColor": "blue",
+              "borderBottomWidth": 5,
+              "borderRightColor": "yellow",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "1.998%",
+            }
           }
-        }
-      />
-    </View>
-    <View
-      style={
-        {
-          "borderBottomColor": "#18bd18",
-          "borderBottomWidth": 2,
-          "display": "flex",
-          "flexDirection": "row",
-          "justifyContent": "flex-start",
-          "marginBottom": 0,
-          "width": "100%",
-        }
-      }
-    >
-      <View
-        style={
-          {
-            "backgroundColor": "blue",
-            "borderLeftColor": "#18bd18",
-            "borderLeftWidth": 1,
-            "borderRightColor": "blue",
-            "borderRightWidth": 1,
-            "height": 10,
-            "width": "76.004%",
+        />
+        <View
+          style={
+            {
+              "backgroundColor": "#333333",
+              "borderRightColor": "#18bd18",
+              "borderRightWidth": 1,
+              "height": 10,
+              "width": "60%",
+            }
           }
-        }
-      />
-      <View
-        style={
-          {
-            "backgroundColor": "yellow",
-            "borderBottomColor": "blue",
-            "borderBottomWidth": 5,
-            "borderRightColor": "yellow",
-            "borderRightWidth": 1,
-            "height": 10,
-            "width": "3.996%",
-          }
-        }
-      />
-      <View
-        style={
-          {
-            "backgroundColor": "#333333",
-            "borderRightColor": "#18bd18",
-            "borderRightWidth": 1,
-            "height": 10,
-            "width": "20%",
-          }
-        }
-      />
+        />
+      </View>
     </View>
     <View
       style={

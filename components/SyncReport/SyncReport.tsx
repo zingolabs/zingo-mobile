@@ -2,7 +2,8 @@
 import React, {
   useCallback,
   useContext,
-  useEffect, useMemo,
+  useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -182,9 +183,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     // row inside `rows` below, so this effect only feeds the labels.
     setServerServer(info.latestBlock || 0);
     setServerWallet(
-      info.latestBlock && wallet.birthday ? info.latestBlock - wallet.birthday : 0,
+      info.latestBlock && birthday ? info.latestBlock - birthday : 0,
     );
-  }, [info.latestBlock, wallet.birthday]);
+  }, [info.latestBlock, birthday]);
 
   // Break the 0…maxBlocks range into one or more 5M-wide rows so the
   // label/tick line never overflows horizontally. Each row carries its
@@ -197,7 +198,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     const STEP = 500_000;
     const formatLabel = (n: number): string =>
       n === 0 ? '0' : `${n / 1_000_000}M`;
-    const birthday = wallet.birthday || 0;
+    const birthdayTemp = birthday || 0;
     const latest = info.latestBlock || 0;
     const rowCount = Math.max(1, Math.ceil(maxBlocks / ROW_SPAN));
     return Array.from({ length: rowCount }, (_, r) => {
@@ -213,7 +214,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       rowLabels.push(formatLabel(rowEnd));
       const clamp = (v: number): number =>
         Math.max(rowStart, Math.min(rowEnd, v));
-      const s1Right = clamp(birthday);
+      const s1Right = clamp(birthdayTemp);
       const s2Right = clamp(latest);
       const pct = (left: number, right: number): number =>
         ((right - left) * 100) / rowSize;
@@ -232,7 +233,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         serv3Percent: pct(s2Right, rowEnd),
       };
     });
-  }, [maxBlocks, info.latestBlock, wallet.birthday]);
+  }, [maxBlocks, info.latestBlock, birthday]);
 
   const reportError = (error: string) => {
     createAlert(
@@ -381,7 +382,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                       const fontSize = 11;
                       const shift = fontSize * 0.55;
                       return (
-                        <View key={rIdx} style={{ width: `${row.rowWidthPct}%`, marginTop: rIdx === 0 ? 0 : 12 }}>
+                        <View
+                          key={rIdx}
+                          style={{
+                            width: `${row.rowWidthPct}%`,
+                            marginTop: rIdx === 0 ? 0 : 12,
+                          }}
+                        >
                           <View
                             style={{
                               display: 'flex',
@@ -389,29 +396,41 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               width: '100%',
                               justifyContent: 'space-between',
                               marginTop: 10,
-                            }}>
-                            {row.rowLabels.map((label: string, lIdx: number) => {
-                              // The first label of every row sits flush at
-                              // the row's left edge (just like "0" in row 1)
-                              // so it has to skip the shift too — otherwise
-                              // "5M", "10M", … would float right of their
-                              // tick.
-                              const needsShift =
-                                lIdx > 0 && label !== '0' && !label.includes('.');
-                              return (
-                                <Text
-                                  key={label}
-                                  style={{
-                                    color: colors.primary,
-                                    fontSize,
-                                    marginLeft: needsShift ? shift : 0,
-                                  }}>
-                                  {label}
-                                </Text>
-                              );
-                            })}
+                            }}
+                          >
+                            {row.rowLabels.map(
+                              (label: string, lIdx: number) => {
+                                // The first label of every row sits flush at
+                                // the row's left edge (just like "0" in row 1)
+                                // so it has to skip the shift too — otherwise
+                                // "5M", "10M", … would float right of their
+                                // tick.
+                                const needsShift =
+                                  lIdx > 0 &&
+                                  label !== '0' &&
+                                  !label.includes('.');
+                                return (
+                                  <Text
+                                    key={label}
+                                    style={{
+                                      color: colors.primary,
+                                      fontSize,
+                                      marginLeft: needsShift ? shift : 0,
+                                    }}
+                                  >
+                                    {label}
+                                  </Text>
+                                );
+                              },
+                            )}
                           </View>
-                          <View style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              width: '100%',
+                            }}
+                          >
                             {row.rowPoints.map((point: number) => (
                               <View
                                 key={point}
@@ -435,7 +454,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               borderBottomColor: colors.primary,
                               borderBottomWidth: 2,
                               marginBottom: 0,
-                            }}>
+                            }}
+                          >
                             {row.serv1Percent > 0 && (
                               <View
                                 style={{
