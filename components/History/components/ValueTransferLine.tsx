@@ -367,6 +367,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       ? (translate('history.sent-failed') as string)
                       : vt.status === RPCValueTransfersStatusEnum.failed && vt.kind === ValueTransferKindEnum.Shield
                       ? (translate('history.shield-failed') as string)
+                      : vt.status === RPCValueTransfersStatusEnum.failed && vt.kind === ValueTransferKindEnum.Received
+                      ? (translate('history.received-failed') as string)
                       : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
                       ? (translate('history.sending') as string)
                       : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations !== 0
