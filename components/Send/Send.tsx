@@ -970,7 +970,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     let error = '';
     let customError: string | undefined;
     try {
-      const txid = await sendTransaction(sendPageStatePar);
+      await sendTransaction(sendPageStatePar);
 
       // Clear the fields
       clearState();
@@ -979,19 +979,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       setScrollToTop(true);
       setScrollToBottom(true);
 
-      createAlert(
-        setBackgroundError,
-        addLastSnackbar,
-        translate('send.confirm-title') as string,
-        `${translate('send.Broadcast')} ${txid}`,
-        true,
-        translate,
-      );
       // the app send successfully on the first attemp.
-
-      navigation.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.History,
-      });
+      navigation.navigate(RouteEnum.Computing, { phase: 'created' });
       return;
     } catch (err1) {
       error = err1 as string;
@@ -1027,7 +1016,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
 
         try {
-          const txid = await sendTransaction(sendPageStatePar);
+          await sendTransaction(sendPageStatePar);
 
           // Clear the fields
           clearState();
@@ -1036,19 +1025,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           setScrollToTop(true);
           setScrollToBottom(true);
 
-          createAlert(
-            setBackgroundError,
-            addLastSnackbar,
-            translate('send.confirm-title') as string,
-            `${translate('send.Broadcast')} ${txid}`,
-            true,
-            translate,
-          );
           // the app send successfully on the second attemp.
-
-          navigation.navigate(RouteEnum.HomeStack, {
-            screen: RouteEnum.History,
-          });
+          navigation.navigate(RouteEnum.Computing, { phase: 'created' });
           return;
         } catch (err2) {
           error = err2 as string;
@@ -1753,7 +1731,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                         >
                           {translate('send.spendable') as string}
                         </RegText>
-                        {inputZec ? (
+                        {inputZec ||
+                        server.chainName !== ChainNameEnum.mainChainName ? (
                           <ZecAmount
                             style={{ marginLeft: 0 }}
                             currencyName={info.currencyName}

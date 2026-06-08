@@ -62,7 +62,7 @@ export type AppDrawerParamList = {
   [RouteEnum.About]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Insight]: undefined;
-  [RouteEnum.Computing]: undefined;
+  [RouteEnum.Computing]: { phase?: 'created' } | undefined;
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
 

@@ -182,6 +182,7 @@ export function useShieldFunds({
     const shieldStr = await executeShieldFunds();
 
     if (shieldStr) {
+      let success = false;
       if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
         createAlert(
           setBackgroundError,
@@ -204,33 +205,26 @@ export function useShieldFunds({
               translate,
             );
           } else if (shieldJSON.txids) {
-            createAlert(
-              setBackgroundError,
-              addLastSnackbar,
-              translate(`history.shield-title-${pools}`) as string,
-              `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txids.join(', ')}`,
-              true,
-              translate,
-            );
+            success = true;
           }
         } catch (e) {
-          createAlert(
-            setBackgroundError,
-            addLastSnackbar,
-            translate(`history.shield-title-${pools}`) as string,
-            `${translate(`history.shield-message-${pools}`)} ${shieldStr}`,
-            true,
-            translate,
-          );
+          // Unparseable response that didn't start with `error` is most
+          // likely a quirky success payload — treat it as success and let
+          // the user land on the "created" confirmation.
+          success = true;
         }
       }
       setScrollToTop?.(true);
       setScrollToBottom?.(true);
       setShieldingFee(0);
       setShieldingAmount?.(0);
-      navigation.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.History,
-      });
+      if (success) {
+        navigation.navigate(RouteEnum.Computing, { phase: 'created' });
+      } else {
+        navigation.navigate(RouteEnum.HomeStack, {
+          screen: RouteEnum.History,
+        });
+      }
     }
   }, [
     setBackgroundError,
