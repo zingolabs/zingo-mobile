@@ -1768,10 +1768,10 @@
     react-native-drawer-layout "^4.2.4"
     use-latest-callback "^0.2.4"
 
-"@react-navigation/elements@^2.9.18":
-  version "2.9.18"
-  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.18.tgz#6197631c44dde42c63b623df4f4d3276611aa1b2"
-  integrity sha512-mKEvDr6CkCVYZSb8W9WubNseihL+1c8M7ktZJCTCbMk8rQgdQfkdRNwpSUQKspdGpUHCb9cyzvaiuzl1NtjVgw==
+"@react-navigation/elements@^2.9.18", "@react-navigation/elements@^2.9.19":
+  version "2.9.20"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.20.tgz#573b8ce307456e0fc304a0c177b0a3a526a3b103"
+  integrity sha512-/GLwbTyM8Sw68RAd6FJSEx3HZ8zDfKlH85h3p+hMhNX9v7C7/airKAcPNqisxF+9Oyk5qGUtiKqSsmeVP/OowA==
   dependencies:
     color "^4.2.3"
     use-latest-callback "^0.2.4"
@@ -1805,12 +1805,12 @@
   dependencies:
     nanoid "^3.3.11"
 
-"@react-navigation/stack@^7.9.2":
-  version "7.9.2"
-  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-7.9.2.tgz#d04bfce909d937a665e8265def986f3af4dd7d95"
-  integrity sha512-zrUpd1TMUa8X2WqEmrBo2tW7EYmPD/vUXchXF2SSM7pnKQILPbhaB6+724ANnBIyMKBgskxaAly7oX+I16X7ww==
+"@react-navigation/stack@^7.9.3":
+  version "7.9.3"
+  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-7.9.3.tgz#f744d528e9d2e01c665d7bda27a6caf3ea850152"
+  integrity sha512-ZFMiyhx48HglkMGASfrEgU8ihvm38PP/Pjne76s9iOGmpJSmxnJtc1mS2O1zD3F2R5vqwE7D4077X7pzA5xqKA==
   dependencies:
-    "@react-navigation/elements" "^2.9.18"
+    "@react-navigation/elements" "^2.9.19"
     color "^4.2.3"
     use-latest-callback "^0.2.4"
 
