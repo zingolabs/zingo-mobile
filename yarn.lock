@@ -1735,12 +1735,12 @@
     invariant "^2.2.4"
     nullthrows "^1.1.1"
 
-"@react-navigation/bottom-tabs@^7.16.1":
-  version "7.16.1"
-  resolved "https://registry.yarnpkg.com/@react-navigation/bottom-tabs/-/bottom-tabs-7.16.1.tgz#b57729ae28077489a1c5c49ddc151c3810f6e0f5"
-  integrity sha512-wjFATJmbq0K8B96Ax0JcK2+Eu7syfYvQ5qUd/tgcv8JuCYLwKKqojJMAl31qdjpKqFG09pQ6TSdEDHOek60CAA==
+"@react-navigation/bottom-tabs@^7.16.2":
+  version "7.16.2"
+  resolved "https://registry.yarnpkg.com/@react-navigation/bottom-tabs/-/bottom-tabs-7.16.2.tgz#9c721e76351627fcdb261e1a7d0d10e648b07040"
+  integrity sha512-Lbp++BGMc7SQXnyKuO/JrQJIhFH0zyB5v4kIEbnzDJLJfgubd5hoSe+QfCqy4YHfLA4phC4Xf/6Q2Ic8x7datQ==
   dependencies:
-    "@react-navigation/elements" "^2.9.18"
+    "@react-navigation/elements" "^2.9.19"
     color "^4.2.3"
     sf-symbols-typescript "^2.1.0"
 
