@@ -27,6 +27,7 @@ import BoldText from '../Components/BoldText';
 
 import {
   AddressKindEnum,
+  ChainNameEnum,
   CurrencyEnum,
   ModeEnum,
   SecurityType,
@@ -112,18 +113,24 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const BALANCE_SNAP_BUMP = 10;
 
   useEffect(() => {
+    const isMainChain =
+      context.server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      context.currency === CurrencyEnum.USDCurrency ||
-      context.currency === CurrencyEnum.USDTORCurrency;
+      isMainChain &&
+      (context.currency === CurrencyEnum.USDCurrency ||
+        context.currency === CurrencyEnum.USDTORCurrency);
     if (!withUsd) {
       setUsdRowH(0);
     }
-  }, [context.currency]);
+  }, [context.currency, context.server.chainName]);
 
   const receiveSnapPoints = useMemo(() => {
+    const isMainChain =
+      context.server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      context.currency === CurrencyEnum.USDCurrency ||
-      context.currency === CurrencyEnum.USDTORCurrency;
+      isMainChain &&
+      (context.currency === CurrencyEnum.USDCurrency ||
+        context.currency === CurrencyEnum.USDTORCurrency);
     if (containerH <= 0 || headerH <= 0) {
       return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
@@ -145,7 +152,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     }
     points.push(snapMax);
     return points;
-  }, [context.currency, containerH, headerH, usdRowH, priceRowH]);
+  }, [
+    context.currency,
+    context.server.chainName,
+    containerH,
+    headerH,
+    usdRowH,
+    priceRowH,
+  ]);
 
   // Stable initial index — the `index` prop is controlled, so recomputing
   // it reactively when snapPoints grows (2 → 3 with USD currency) forces a

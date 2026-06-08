@@ -184,6 +184,11 @@
     "backupwallet-error": "Error: Couldn't save the wallet backup."
   },
   "settings": {
+    "section-preferences": "Preferences",
+    "section-privacysecurity": "Privacy & Security",
+    "section-networkadvanced": "Network & Advanced",
+    "section-other": "Other",
+    "section-developer": "Developer",
     "memos": [
       {
         "value": "none",

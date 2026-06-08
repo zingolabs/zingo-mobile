@@ -184,6 +184,11 @@
     "backupwallet-error": "Error: Cüzdan yedeği kaydedilemedi."
   },
   "settings": {
+    "section-preferences": "Tercihler",
+    "section-privacysecurity": "Gizlilik ve Güvenlik",
+    "section-networkadvanced": "Ağ ve Gelişmiş",
+    "section-other": "Diğer",
+    "section-developer": "Geliştirici",
     "memos": [
       {
         "value": "none",

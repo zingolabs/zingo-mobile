@@ -184,6 +184,11 @@
     "backupwallet-error": "Error: não foi possível salvar o backup da carteira."
   },
   "settings": {
+    "section-preferences": "Preferências",
+    "section-privacysecurity": "Privacidade e Segurança",
+    "section-networkadvanced": "Rede e Avançado",
+    "section-other": "Outros",
+    "section-developer": "Desenvolvedor",
     "memos": [
       {
         "value": "none",

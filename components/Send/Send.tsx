@@ -249,18 +249,22 @@ const Send: React.FunctionComponent<SendProps> = ({
   const BALANCE_SNAP_BUMP = 10;
 
   useEffect(() => {
+    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      currency === CurrencyEnum.USDCurrency ||
-      currency === CurrencyEnum.USDTORCurrency;
+      isMainChain &&
+      (currency === CurrencyEnum.USDCurrency ||
+        currency === CurrencyEnum.USDTORCurrency);
     if (!withUsd) {
       setUsdRowH(0);
     }
-  }, [currency]);
+  }, [currency, server.chainName]);
 
   const sendSnapPoints = useMemo(() => {
+    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      currency === CurrencyEnum.USDCurrency ||
-      currency === CurrencyEnum.USDTORCurrency;
+      isMainChain &&
+      (currency === CurrencyEnum.USDCurrency ||
+        currency === CurrencyEnum.USDTORCurrency);
     if (containerH <= 0 || headerH <= 0) {
       return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
@@ -282,7 +286,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
     points.push(snapMax);
     return points;
-  }, [currency, containerH, headerH, usdRowH, priceRowH]);
+  }, [currency, server.chainName, containerH, headerH, usdRowH, priceRowH]);
 
   const priceSnapIndex = priceRowH > 0 ? 0 : null;
   const onPriceSnapChange = usePriceSnapAutoClose(

@@ -184,6 +184,11 @@
     "backupwallet-error": "Error: Не удалось сохранить резервную копию кошелька."
   },
   "settings": {
+    "section-preferences": "Настройки",
+    "section-privacysecurity": "Конфиденциальность и безопасность",
+    "section-networkadvanced": "Сеть и расширенные",
+    "section-other": "Прочее",
+    "section-developer": "Разработчик",
     "memos": [
       {
         "value": "none",
