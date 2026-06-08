@@ -61,7 +61,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.Rescan]: undefined;
-  [RouteEnum.Info]: undefined;
   [RouteEnum.Insight]: undefined;
   [RouteEnum.Computing]: undefined;
   [RouteEnum.SyncReport]: undefined;

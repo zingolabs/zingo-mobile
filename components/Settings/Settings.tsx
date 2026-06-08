@@ -135,6 +135,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     translate,
+    info,
     server: serverContext,
     currency: currencyContext,
     language: languageContext,
@@ -1319,28 +1320,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 />
               </TouchableOpacity>
 
-              <TouchableOpacity
-                testID="settings.serverinfo"
-                disabled={disabled}
-                onPress={() => navigation.navigate(RouteEnum.Info)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginLeft: 25,
-                  marginRight: 25,
-                  marginTop: 15,
-                  marginBottom: 15,
-                }}
-              >
-                <BoldText>{translate('loadedapp.info') as string}</BoldText>
-                <FontAwesomeIcon
-                  icon={faChevronRight}
-                  size={12}
-                  color={colors.zingo}
-                />
-              </TouchableOpacity>
-
               <View
                 style={{
                   flexDirection: 'row',
@@ -2111,6 +2090,68 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
           }}
         >
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: colors.primary,
+              borderRadius: 10,
+              backgroundColor: '#031124',
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              marginBottom: 16,
+            }}
+          >
+            {[
+              {
+                label: translate('info.serverversion') as string,
+                value: info.version ? info.version : '-',
+              },
+              {
+                label: translate('info.zainod') as string,
+                value: info.serverUri ? info.serverUri : '-',
+              },
+              {
+                label: translate('info.network') as string,
+                value: !info.chainName
+                  ? '-'
+                  : info.chainName === ChainNameEnum.mainChainName
+                    ? 'Mainnet'
+                    : info.chainName === ChainNameEnum.testChainName
+                      ? 'Testnet'
+                      : info.chainName === ChainNameEnum.regtestChainName
+                        ? 'Regtest'
+                        : (translate('info.unknown') as string) +
+                          ' (' +
+                          info.chainName +
+                          ')',
+              },
+              {
+                label: translate('info.serverblock') as string,
+                value: info.latestBlock ? info.latestBlock.toString() : '-',
+              },
+            ].map(row => (
+              <View
+                key={row.label}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingVertical: 6,
+                  gap: 12,
+                }}
+              >
+                <FadeText>{row.label}</FadeText>
+                <RegText
+                  numberOfLines={1}
+                  ellipsizeMode="middle"
+                  style={{ flexShrink: 1, textAlign: 'right' }}
+                >
+                  {row.value}
+                </RegText>
+              </View>
+            ))}
+          </View>
+
           <View>
             <TouchableOpacity
               testID="settings.offline-server"

@@ -252,6 +252,172 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       text translated
     </Text>
   </View>
+  <View
+    style={
+      {
+        "backgroundColor": "#031124",
+        "borderColor": "#18bd18",
+        "borderRadius": 10,
+        "borderWidth": 1,
+        "marginBottom": 16,
+        "paddingHorizontal": 12,
+        "paddingVertical": 6,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "gap": 12,
+          "justifyContent": "space-between",
+          "paddingVertical": 6,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#c3c3c3",
+            "opacity": 0.65,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <Text
+        ellipsizeMode="middle"
+        numberOfLines={1}
+        style={
+          {
+            "color": "#c3c3c3",
+            "flexShrink": 1,
+            "fontSize": 15,
+            "fontWeight": "400",
+            "opacity": 1,
+            "textAlign": "right",
+          }
+        }
+      >
+        server_version
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "gap": 12,
+          "justifyContent": "space-between",
+          "paddingVertical": 6,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#c3c3c3",
+            "opacity": 0.65,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <Text
+        ellipsizeMode="middle"
+        numberOfLines={1}
+        style={
+          {
+            "color": "#c3c3c3",
+            "flexShrink": 1,
+            "fontSize": 15,
+            "fontWeight": "400",
+            "opacity": 1,
+            "textAlign": "right",
+          }
+        }
+      >
+        https://zec.rocks:443
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "gap": 12,
+          "justifyContent": "space-between",
+          "paddingVertical": 6,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#c3c3c3",
+            "opacity": 0.65,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <Text
+        ellipsizeMode="middle"
+        numberOfLines={1}
+        style={
+          {
+            "color": "#c3c3c3",
+            "flexShrink": 1,
+            "fontSize": 15,
+            "fontWeight": "400",
+            "opacity": 1,
+            "textAlign": "right",
+          }
+        }
+      >
+        Mainnet
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "gap": 12,
+          "justifyContent": "space-between",
+          "paddingVertical": 6,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#c3c3c3",
+            "opacity": 0.65,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <Text
+        ellipsizeMode="middle"
+        numberOfLines={1}
+        style={
+          {
+            "color": "#c3c3c3",
+            "flexShrink": 1,
+            "fontSize": 15,
+            "fontWeight": "400",
+            "opacity": 1,
+            "textAlign": "right",
+          }
+        }
+      >
+        2000000
+      </Text>
+    </View>
+  </View>
   <View>
     <View
       accessibilityState={

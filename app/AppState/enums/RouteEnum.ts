@@ -18,7 +18,6 @@ export enum RouteEnum {
   Settings = 'Settings',
   About = 'About',
   Rescan = 'Rescan',
-  Info = 'Info',
   Insight = 'Insight',
   Computing = 'Computing',
   SyncReport = 'SyncReport',

@@ -125,7 +125,6 @@ import { RPCValueTransfersStatusEnum } from '../walletBackend/enums/RPCValueTran
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
-const Info = React.lazy(() => import('../../components/Info'));
 const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
 const Pools = React.lazy(() => import('../../components/Pools'));
@@ -1463,9 +1462,6 @@ export class LoadedAppClass extends Component<
     } else if (item === MenuItemEnum.Rescan) {
       this.drawerNav?.navigate(RouteEnum.Rescan);
       return;
-    } else if (item === MenuItemEnum.Info) {
-      this.drawerNav?.navigate(RouteEnum.Info);
-      return;
     } else if (item === MenuItemEnum.SyncReport) {
       this.drawerNav?.navigate(RouteEnum.SyncReport);
       return;
@@ -2331,10 +2327,6 @@ export class LoadedAppClass extends Component<
                     <RootNavigator.Screen name={RouteEnum.Rescan}>
                       {props => <Rescan {...props} doRescan={this.doRescan} />}
                     </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.Info}
-                      component={Info}
-                    />
                     <RootNavigator.Screen
                       name={RouteEnum.Insight}
                       component={Insight}

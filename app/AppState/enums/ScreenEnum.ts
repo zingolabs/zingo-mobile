@@ -21,7 +21,6 @@ export enum ScreenEnum {
   Settings = 'Settings',
   // Drawer
   About = 'About',
-  Info = 'Info',
   Pools = 'Pools',
   SyncReport = 'SyncReport',
   Seed = 'Seed',
