@@ -10,17 +10,9 @@ import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import DetailLine from '../Components/DetailLine';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
-import CurrencyAmount from '../Components/CurrencyAmount';
-import RegText from '../Components/RegText';
 import BoldText from '../Components/BoldText';
-import {
-  ChainNameEnum,
-  CurrencyEnum,
-  RouteEnum,
-  ScreenEnum,
-} from '../../app/AppState';
+import { ChainNameEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getZingoName, getZingoVersion } from '../../app/utils/ZingoAppData';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
@@ -29,7 +21,7 @@ type InfoProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Info>;
 
 const Info: React.FunctionComponent<InfoProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, currency, zecPrice, setZecPrice } = context;
+  const { info, translate } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Info;
 
@@ -179,41 +171,6 @@ const Info: React.FunctionComponent<InfoProps> = ({ navigation }) => {
               label={translate('info.serverblock') as string}
               value={info.latestBlock ? info.latestBlock.toString() : '-'}
             />
-            {(currency === CurrencyEnum.USDCurrency ||
-              currency === CurrencyEnum.USDTORCurrency) && (
-              <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                <DetailLine
-                  label={
-                    (currency === CurrencyEnum.USDTORCurrency
-                      ? translate('info.zecpricetor')
-                      : translate('info.zecprice')) as string
-                  }
-                >
-                  {zecPrice.zecPrice === -1 && (
-                    <RegText color={colors.text}>
-                      {translate('info.errorgemini') as string}
-                    </RegText>
-                  )}
-                  {zecPrice.zecPrice === -2 && (
-                    <RegText color={colors.text}>
-                      {translate('info.errorrpcmodule') as string}
-                    </RegText>
-                  )}
-                  <CurrencyAmount
-                    price={zecPrice.zecPrice}
-                    amtZec={1}
-                    currency={currency}
-                    privacy={false}
-                  />
-                </DetailLine>
-                <View style={{ marginLeft: 5 }}>
-                  <PriceFetcher
-                    setZecPrice={setZecPrice}
-                    backgroundColor={colors.bottomSheetBackground}
-                  />
-                </View>
-              </View>
-            )}
           </View>
         </BottomSheetScrollView>
       </BottomSheet>

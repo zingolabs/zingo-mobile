@@ -428,6 +428,9 @@
     "nym-network": "Сеть NYM",
     "nym-enhanced-privacy": "Повышенная конфиденциальность"
   },
+  "header": {
+    "lastupdate": "Последнее обновление:"
+  },
   "info": {
     "version": "Версия",
     "serverversion": "Версия сервера",

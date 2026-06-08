@@ -428,6 +428,9 @@
     "nym-network": "Red NYM",
     "nym-enhanced-privacy": "Privacidad Mejorada"
   },
+  "header": {
+    "lastupdate": "Última actualización:"
+  },
   "info": {
     "version": "Versión",
     "serverversion": "Versión del Servidor",

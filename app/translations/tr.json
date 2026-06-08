@@ -428,6 +428,9 @@
     "nym-network": "NYM Ağı",
     "nym-enhanced-privacy": "Gelişmiş Gizlilik"
   },
+  "header": {
+    "lastupdate": "Son güncelleme:"
+  },
   "info": {
     "version": "Versiyon",
     "serverversion": "Sunucu versiyonu",

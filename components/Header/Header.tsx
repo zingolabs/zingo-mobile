@@ -39,6 +39,7 @@ import { useSyncStatus } from '../../app/hooks/useSyncStatus';
 import BoldText from '../Components/BoldText';
 import SyncStatusBar from './components/SyncStatusBar';
 import BalanceRow from './components/BalanceRow';
+import PriceRow from './components/PriceRow';
 import { MessagesIcon } from '../Components/Icons/MessagesIcon';
 import { MessagesIcon as BoltIcon } from '../Components/Icons/BoltIcon';
 
@@ -78,6 +79,8 @@ type HeaderProps = {
   showMessagesIcon?: boolean;
   // optional layout reporting (used by History for bottom-sheet snap points)
   onUsdRowLayout?: (height: number) => void;
+  // optional layout reporting for the pull-down PriceRow snap point
+  onPriceRowLayout?: (height: number) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -104,6 +107,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noUfvkIcon,
   showMessagesIcon,
   onUsdRowLayout,
+  onPriceRowLayout,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -244,6 +248,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             receivedLegend={receivedLegend}
             onUsdRowLayout={onUsdRowLayout}
           />
+
+          {!noBalance && (
+            <PriceRow
+              translate={translate}
+              currency={currency}
+              zecPrice={zecPrice}
+              info={info}
+              selectServer={selectServer}
+              onLayout={onPriceRowLayout}
+            />
+          )}
         </View>
 
         <View

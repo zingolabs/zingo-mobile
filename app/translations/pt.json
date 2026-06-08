@@ -428,6 +428,9 @@
     "nym-network": "Rede NYM",
     "nym-enhanced-privacy": "Privacidade Aprimorada"
   },
+  "header": {
+    "lastupdate": "Última atualização:"
+  },
   "info": {
     "version": "Versão",
     "serverversion": "Versão do Servidor",

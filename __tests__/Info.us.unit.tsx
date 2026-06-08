@@ -33,8 +33,9 @@ function makeDrawerProps(): NativeStackScreenProps<
 }
 // test suite
 describe('Component Info - test', () => {
-  //unit test
-  test('Info - price with us (.) decimal point', () => {
+  // regression: the ZEC price block was removed from Server Info — it must
+  // not render anywhere on this screen, regardless of currency settings.
+  test('Info - no ZEC price shown (us locale)', () => {
     const state = { ...defaultAppContextLoaded };
     state.info = mockInfo;
     state.zecPrice = mockZecPrice;
@@ -45,6 +46,6 @@ describe('Component Info - test', () => {
         <Info {...props} />
       </ContextAppLoadedProvider>,
     );
-    screen.getByText('$ 33.33');
+    expect(screen.queryByText('$ 33.33')).toBeNull();
   });
 });
