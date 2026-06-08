@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import {
   NavigationProp,
   ParamListBase,
@@ -18,8 +18,13 @@ import BottomSheet, {
   BottomSheetFooterProps,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
+import TransactionCreatedIcon from '../../../assets/img/transaction-created.svg';
+import TransactionFailedIcon from '../../../assets/img/transaction-failed.svg';
+
+// Ring colors come from the SVG stroke palette so the outer border
+// matches the icon inside.
+const RING_GREEN = '#149D05';
+const RING_RED = '#822929';
 
 import RegText from '../../../components/Components/RegText';
 import BoldText from '../../../components/Components/BoldText';
@@ -54,22 +59,26 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const [timerPhase, setTimerPhase] = useState<0 | 1>(0);
+  const [showErrorDetails, setShowErrorDetails] = useState<boolean>(false);
   const computingSheetRef = useRef<BottomSheet>(null);
 
   const computingSnapPoints = useFullSheetSnapPoints(containerH, headerH);
   const phase = route.params?.phase ?? 'computing';
+  const errorMessage = route.params?.errorMessage;
   const isCreated = phase === 'created';
+  const isFailed = phase === 'failed';
+  const isTerminal = isCreated || isFailed;
 
   // Swap the copy after PHASE1_DURATION_MS — only while still in the
-  // computing phase. If `phase === 'created'` arrives before the timer
+  // computing phase. If a terminal `phase` arrives before the timer
   // fires, we drop the timer altogether.
   useEffect(() => {
-    if (isCreated) {
+    if (isTerminal) {
       return;
     }
     const t = setTimeout(() => setTimerPhase(1), PHASE1_DURATION_MS);
     return () => clearTimeout(t);
-  }, [isCreated]);
+  }, [isTerminal]);
 
   const onContinue = useCallback(() => {
     navigation.navigate(RouteEnum.HomeStack, {
@@ -117,7 +126,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
             alignItems: 'center',
           }}
         >
-          {isCreated && (
+          {isTerminal && (
             <Button
               type={ButtonTypeEnum.Primary}
               title={translate('loadedapp.continue') as string}
@@ -127,7 +136,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
         </View>
       </BottomSheetFooter>
     ),
-    [colors, isCreated, onContinue, translate],
+    [colors, isTerminal, onContinue, translate],
   );
 
   return (
@@ -170,37 +179,44 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
             backgroundColor: colors.bottomSheetBackground,
             paddingHorizontal: 24,
             // Footer floats absolutely on top of the sheet (it doesn't
-            // shrink the BottomSheetView), so we reserve its height as
-            // paddingBottom to keep the centered content above it.
-            paddingTop: 24,
+            // shrink the BottomSheetView), so we mirror its height on top
+            // too — keeping the centered content in the true visual middle
+            // of the area between handle and footer.
+            paddingTop: 106,
             paddingBottom: 106,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          {/* Both icons share an identical 120x120 bounding box so
-              `justifyContent: 'center'` lands them at the same Y. */}
+          {/* Both terminal states render the icon inside a colored ring;
+              the computing state uses the same 120x120 bounding box so
+              `justifyContent: 'center'` lands every variant at the same Y. */}
           <View
             style={{
-              width: 120,
-              height: 120,
+              width: 100,
+              height: 100,
+              borderRadius: 50,
+              borderWidth: isTerminal ? 3 : 0,
+              borderColor: isCreated
+                ? RING_GREEN
+                : isFailed
+                  ? RING_RED
+                  : 'transparent',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
             {isCreated ? (
-              <FontAwesomeIcon
-                icon={faCircleCheck}
-                size={120}
-                color={colors.primary}
-              />
+              <TransactionCreatedIcon width={30} height={30} />
+            ) : isFailed ? (
+              <TransactionFailedIcon width={30} height={30} />
             ) : (
-              // size="large" renders at ~36px; scale ≈ 3.3 brings the
-              // visible footprint up to ~120px to match the success icon.
+              // size="large" renders at ~36px; scale ≈ 2.8 brings the
+              // visible footprint up to ~100px to match the terminal ring.
               <ActivityIndicator
                 size="large"
                 color={colors.primary}
-                style={{ transform: [{ scale: 3.3 }] }}
+                style={{ transform: [{ scale: 2.8 }] }}
               />
             )}
           </View>
@@ -215,7 +231,9 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
               translate(
                 isCreated
                   ? 'loadedapp.transactioncreated-title'
-                  : 'send.sending-title',
+                  : isFailed
+                    ? 'loadedapp.transactionfailed-title'
+                    : 'send.sending-title',
               ) as string
             }
           </BoldText>
@@ -230,12 +248,43 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
               translate(
                 isCreated
                   ? 'loadedapp.transactioncreated-body'
-                  : timerPhase === 0
-                    ? 'loadedapp.computingtx'
-                    : 'loadedapp.computingtx-hangon',
+                  : isFailed
+                    ? 'loadedapp.transactionfailed-body'
+                    : timerPhase === 0
+                      ? 'loadedapp.computingtx'
+                      : 'loadedapp.computingtx-hangon',
               ) as string
             }
           </RegText>
+          {isFailed && !!errorMessage && (
+            <View style={{ marginTop: 16, alignItems: 'center' }}>
+              <TouchableOpacity
+                onPress={() => setShowErrorDetails(v => !v)}
+                hitSlop={8}
+              >
+                <RegText
+                  style={{
+                    color: RING_RED,
+                    textDecorationLine: 'underline',
+                  }}
+                >
+                  {translate('loadedapp.transactionfailed-details') as string}
+                </RegText>
+              </TouchableOpacity>
+              {showErrorDetails && (
+                <RegText
+                  style={{
+                    marginTop: 10,
+                    textAlign: 'center',
+                    color: colors.placeholder,
+                    fontSize: 12,
+                  }}
+                >
+                  {errorMessage}
+                </RegText>
+              )}
+            </View>
+          )}
         </BottomSheetView>
       </BottomSheet>
     </View>

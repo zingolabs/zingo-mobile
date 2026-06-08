@@ -89,7 +89,6 @@ import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
-import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
 import { RPCSendProposeType } from '../../app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
@@ -1036,23 +1035,9 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     }
 
-    setTimeout(() => {
-      // if the App is in background I need to store the error
-      // and when the App come back to foreground shows it to the user.
-      createAlert(
-        setBackgroundError,
-        addLastSnackbar,
-        translate('send.sending-error') as string,
-        `${customError ? customError : error}`,
-        false,
-        translate,
-        sendEmail,
-        zingolibVersion,
-      );
-    }, 1 * 1000);
-
-    navigation.navigate(RouteEnum.HomeStack, {
-      screen: RouteEnum.History,
+    navigation.navigate(RouteEnum.Computing, {
+      phase: 'failed',
+      errorMessage: customError ? customError : error,
     });
   };
 
