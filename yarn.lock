@@ -1758,20 +1758,20 @@
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
-"@react-navigation/drawer@^7.10.2":
-  version "7.10.2"
-  resolved "https://registry.yarnpkg.com/@react-navigation/drawer/-/drawer-7.10.2.tgz#8be71c12c75b3fecb687ef7df29c836b8f9e5ff2"
-  integrity sha512-/ccYFvBPJNzOYioiMQsqjAR4dcQ+7+yjzcuMDTKgsMahLD7Jn7FdOFNtGwMaIQWhfK8KFVMH2KOXAlH/uAGZXw==
+"@react-navigation/drawer@^7.11.0":
+  version "7.11.0"
+  resolved "https://registry.yarnpkg.com/@react-navigation/drawer/-/drawer-7.11.0.tgz#cb8c4d2328ac08ed6b054a2160495e2837fcefc4"
+  integrity sha512-3RiFMgEsx/shjjzQJVrqpSoHFfke2JmGIkYpuaJ/AGnLnj17xVdVXyILZXFN+3SPqpIDtaEBCEFqcrIHqAHcwA==
   dependencies:
-    "@react-navigation/elements" "^2.9.18"
+    "@react-navigation/elements" "^2.9.20"
     color "^4.2.3"
     react-native-drawer-layout "^4.2.4"
     use-latest-callback "^0.2.4"
 
-"@react-navigation/elements@^2.9.18", "@react-navigation/elements@^2.9.19":
-  version "2.9.20"
-  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.20.tgz#573b8ce307456e0fc304a0c177b0a3a526a3b103"
-  integrity sha512-/GLwbTyM8Sw68RAd6FJSEx3HZ8zDfKlH85h3p+hMhNX9v7C7/airKAcPNqisxF+9Oyk5qGUtiKqSsmeVP/OowA==
+"@react-navigation/elements@^2.9.18", "@react-navigation/elements@^2.9.19", "@react-navigation/elements@^2.9.20":
+  version "2.9.21"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.21.tgz#9a7a6eb1b7c6347fabb8baa0997065f1c745d257"
+  integrity sha512-O9sH1oMqWG/whbdkbJL68xNmeM5ShkVEhL0FFpyiA/bRUObFlMaLW4yzbiRcfAFNWFVDubhowlrnOg9hcWkc8w==
   dependencies:
     color "^4.2.3"
     use-latest-callback "^0.2.4"
