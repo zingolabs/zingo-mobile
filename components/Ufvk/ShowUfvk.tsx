@@ -43,7 +43,7 @@ import BottomSheet, {
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import ExpandedAddress from '../Receive/components/ExpandedAddress';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import WalletType from '../../app/AppState/types/WalletType';
 import { fetchWallet } from '../../app/walletBackend';
@@ -57,7 +57,10 @@ type TextsType = {
   backup: string[];
 };
 
-type ShowUfvkProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Ufvk> & {
+type ShowUfvkProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Ufvk
+> & {
   onClickOK: () => void;
   onClickCancel: () => void;
 };
@@ -149,10 +152,15 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
 
   useEffect(() => {
     return () => {
+      // Only wipe the clipboard if WE have a pending auto-clear timer —
+      // i.e. the user copied something from this screen and the 60s
+      // expiry hasn't fired yet. Otherwise we'd be wiping clipboard
+      // content the user copied from somewhere else.
       if (clipboardTimer.current) {
         clearTimeout(clipboardTimer.current);
+        Clipboard.setString('');
+        clipboardTimer.current = null;
       }
-      Clipboard.setString('');
     };
   }, []);
 

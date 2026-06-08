@@ -1,6 +1,5 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
-  Alert,
   I18nManager,
   EmitterSubscription,
   AppState,
@@ -56,7 +55,7 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
 } from '../AppState';
-import { checkServerURI, parseServerURI, serverUris } from '../uris';
+import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { fetchWallet } from '../walletBackend';
 import { ThemeType } from '../types';
@@ -65,6 +64,7 @@ import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
+import Utils from '../utils';
 import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
@@ -746,7 +746,7 @@ export class LoadingAppClass extends Component<
       }
       if (error) {
         await this.walletErrorHandle(
-          errorText,
+          Utils.humanizeChainTokens(errorText, this.state.translate),
           this.state.translate('loadingapp.readingwallet-label') as string,
           RouteEnum.StartMenu,
           true,
@@ -832,10 +832,11 @@ export class LoadingAppClass extends Component<
             (this.state.backgroundError.title ||
               this.state.backgroundError.error)
           ) {
-            Alert.alert(
-              this.state.backgroundError.title,
-              this.state.backgroundError.error,
-            );
+            showConfirm({
+              title: this.state.backgroundError.title,
+              message: this.state.backgroundError.error,
+              buttons: [{ text: this.state.translate('close') as string }],
+            });
             this.setBackgroundError('', '');
           }
         }
@@ -1205,33 +1206,27 @@ export class LoadingAppClass extends Component<
         this.state.translate('loadedapp.tryingnewserver') as string,
       );
 
-      // Use checkServerURI instead of selectingServer so we can also
-      // validate that the server is actually on the chain the user
-      // selected — selectingServer only measures latency and would let a
-      // wrong-chain config through, crashing the sync later when
-      // loadExistingWallet opens the wallet with the wrong chainName.
-      const { result, timeout, newChainName } = await checkServerURI(
+      // In LoadingApp there is no lightclient instance yet, so we can't
+      // use `checkServerURI` (which calls `changeServerProcess` /
+      // `infoServerInfo` — both require an open wallet). The right probe
+      // at this stage is a wallet-less latency check against the URI:
+      // `getLatestBlockServerInfo` only hits the gRPC endpoint to fetch
+      // the tip height, no client state needed. Chain selection is taken
+      // from the user's toggle on the modal — it's a config choice, not
+      // something we can introspect without a wallet.
+      const cs = {
         uri,
-        this.state.server.uri,
-      );
-      if (!result) {
-        if (timeout) {
-          this.addLastSnackbar(
-            this.state.translate('loadedapp.tryingnewserver-error') as string,
-          );
-        } else {
-          this.addLastSnackbar(
-            (this.state.translate(
-              'loadedapp.changeservernew-error',
-            ) as string) + uri,
-          );
-        }
-        this.setState({ actionButtonsDisabled: false });
-        return;
-      }
-      if (newChainName && newChainName !== chainName) {
+        chainName,
+        region: '',
+        default: false,
+        latency: null,
+        obsolete: false,
+      } as ServerUrisType;
+      const serverChecked = await selectingServer([cs]);
+      if (!serverChecked || !serverChecked.latency) {
         this.addLastSnackbar(
-          this.state.translate('loadedapp.serverchain-mismatch') as string,
+          (this.state.translate('loadedapp.changeservernew-error') as string) +
+            uri,
         );
         this.setState({ actionButtonsDisabled: false });
         return;

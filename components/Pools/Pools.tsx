@@ -15,11 +15,11 @@ import FadeText from '../Components/FadeText';
 import { faChevronLeft, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 
-type PoolsProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Pools>;
+type PoolsProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Pools>;
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);

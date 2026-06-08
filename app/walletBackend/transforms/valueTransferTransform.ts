@@ -58,6 +58,10 @@ export function transformValueTransfer(
 
   result.blockheight = vt.blockheight;
   result.status = vt.status;
+
+  if (vt.status === RPCValueTransfersStatusEnum.failed) {
+    console.log('[RPC] failed value transfer (raw):', vt);
+  }
   result.address = !vt.recipient_address ? undefined : vt.recipient_address;
   result.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
   result.memos =
@@ -65,6 +69,10 @@ export function transformValueTransfer(
       ? undefined
       : vt.memos;
   result.poolType = !vt.pool_received ? undefined : vt.pool_received;
+
+  if (result.status === RPCValueTransfersStatusEnum.failed) {
+    console.log('[RPC] failed value transfer (transformed):', result);
+  }
 
   return result;
 }

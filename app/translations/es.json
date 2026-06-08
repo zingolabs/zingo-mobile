@@ -86,6 +86,7 @@
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
+  "linkcopied": "Enlace copiado al Portapapeles",
   "insight": {
     "title": "Visión Financiera",
     "no-data": "No hay datos en tu Monedero que concuerden con el gráfico seleccionado.",
@@ -326,6 +327,7 @@
       }
     ],
     "nochanges": "No se han registrado cambios.",
+    "save-error": "No se pudieron guardar los ajustes",
     "ismemo": "Necesitas escoger una opción de Memos para poder guardar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder guardar.",
     "isserver": "Necesitas escoger un Servidor Activo de la lista o rellenar una URI válida para poder guardar.",
@@ -623,6 +625,7 @@
     "sent": "Enviado ",
     "sent-failed": "Envio ",
     "received": "Recibido ",
+    "received-failed": "Recibo ",
     "memotoself": "Memo-Auto-Enviado ",
     "sendtoself": "Auto-Enviado ",
     "shield": "Blindado ",

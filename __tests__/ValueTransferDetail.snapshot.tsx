@@ -21,7 +21,7 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockNetInfo } from '../__mocks__/dataMocks/mockNetInfo';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
@@ -35,7 +35,7 @@ const fixedValueTransfers = mockValueTransfers.map(vt => ({
 
 function makeProps(
   index: number,
-): DrawerScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail> {
+): NativeStackScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail> {
   return {
     navigation: mockNavigation,
     route: {

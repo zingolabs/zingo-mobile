@@ -17,7 +17,6 @@ export enum ScreenEnum {
   ScannerAddress = 'ScannerAddress',
   Receive = 'Receive',
   AddressList = 'AddressList',
-  ContactList = 'ContactList',
   MessagesList = 'MessagesList',
   Settings = 'Settings',
   // Drawer

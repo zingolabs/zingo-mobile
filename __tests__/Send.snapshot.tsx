@@ -19,11 +19,11 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<
+function makeDrawerProps(): NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Send
 > {

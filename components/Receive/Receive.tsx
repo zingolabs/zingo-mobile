@@ -7,7 +7,8 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import { Keyboard, Pressable, View } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -48,11 +49,15 @@ import VerifyAddress from './components/VerifyAddress';
 import NewAddressTag from './components/NewAddressTag';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from './components/ExpandedAddress';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
+import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 
-type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
+type ReceiveProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Receive
+> & {
   toggleMenuDrawer: () => void;
   alone: boolean;
   setSecurityOption: (s: SecurityType) => Promise<void>;
@@ -94,6 +99,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const scopeSelectRef = useRef<BottomSheetModal>(null);
   const receiveSheetRef = useRef<BottomSheet>(null);
+  const sheetSlideStyle = useOptionsPanelSheetSlide();
   const keyboardHeight = useKeyboardHeight();
   useDismissSheetsOnBlur();
 
@@ -132,10 +138,24 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     return [snapLow, snapMax];
   }, [context.currency, containerH, headerH, usdRowH]);
 
-  const initialReceiveSnapIndex = useMemo(
+  // Stable initial index — the `index` prop is controlled, so recomputing
+  // it reactively when snapPoints grows (2 → 3 with USD currency) forces a
+  // snapToIndex that races snapPoints propagation and throws "out of
+  // range". Set once on mount and let user/effect changes go through the
+  // ref instead.
+  const [initialReceiveSnapIndex] = useState<number>(
     () => receiveSnapPoints.length - 1,
-    [receiveSnapPoints],
   );
+  // Track the sheet's internal snap index (updated via onChange). When
+  // snapPoints shrinks (3 → 2) and that index is now out of range, clamp
+  // it via the ref from an effect (post-commit, after BottomSheet has
+  // processed the new snapPoints prop).
+  const internalSnapIndexRef = useRef<number>(initialReceiveSnapIndex);
+  useEffect(() => {
+    if (internalSnapIndexRef.current >= receiveSnapPoints.length) {
+      receiveSheetRef.current?.snapToIndex(receiveSnapPoints.length - 1);
+    }
+  }, [receiveSnapPoints]);
 
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
     setSheetType(_sheetType);
@@ -334,70 +354,86 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           onUsdRowLayout={setUsdRowH}
         />
       </View>
-      <BottomSheet
-        ref={receiveSheetRef}
-        accessible={false}
-        snapPoints={receiveSnapPoints}
-        index={initialReceiveSnapIndex}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={true}
-        backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={null}
+      <Animated.View
+        pointerEvents="box-none"
+        style={[StyleSheet.absoluteFill, sheetSlideStyle]}
       >
-        <View style={{ flex: 1 }}>
-          {/* Sheet header rendered as content (not via handleComponent) so
+        <BottomSheet
+          ref={receiveSheetRef}
+          accessible={false}
+          snapPoints={receiveSnapPoints}
+          index={initialReceiveSnapIndex}
+          onChange={i => {
+            internalSnapIndexRef.current = i;
+          }}
+          enableDynamicSizing={false}
+          enablePanDownToClose={false}
+          enableContentPanningGesture={true}
+          backgroundStyle={{
+            backgroundColor: colors.bottomSheetBackground,
+            borderTopLeftRadius: 40,
+            borderTopRightRadius: 40,
+          }}
+          handleComponent={null}
+        >
+          <View style={{ flex: 1 }}>
+            {/* Sheet header rendered as content (not via handleComponent) so
               index-change re-renders don't remount the inner select trigger. */}
-          <View
-            style={{
-              paddingTop: 8,
-              paddingBottom: 6,
-              paddingHorizontal: 16,
-              backgroundColor: colors.bottomSheetBackground,
-              borderTopLeftRadius: 40,
-              borderTopRightRadius: 40,
-              borderTopWidth: 1,
-              borderLeftWidth: 0.5,
-              borderRightWidth: 0.5,
-              borderTopColor: colors.bottomSheetBorder,
-              borderLeftColor: colors.bottomSheetBorder,
-              borderRightColor: colors.bottomSheetBorder,
-            }}
-          >
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
+                paddingTop: 8,
+                paddingBottom: 6,
+                paddingHorizontal: 16,
+                backgroundColor: colors.bottomSheetBackground,
+                borderTopLeftRadius: 40,
+                borderTopRightRadius: 40,
+                borderTopWidth: 1,
+                borderLeftWidth: 0.5,
+                borderRightWidth: 0.5,
+                borderTopColor: colors.bottomSheetBorder,
+                borderLeftColor: colors.bottomSheetBorder,
+                borderRightColor: colors.bottomSheetBorder,
               }}
             >
-              <View style={{ width: 46 }} />
               <View
                 style={{
-                  flex: 1,
+                  flexDirection: 'row',
                   alignItems: 'center',
-                  justifyContent: 'center',
                 }}
               >
-                {canPickScope ? (
-                  <Pressable
-                    onPress={() => scopeSelectRef.current?.present()}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      paddingHorizontal: 2,
-                      paddingVertical: 4,
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faChevronDown}
-                      size={14}
-                      color={colors.zingo}
-                      style={{ marginRight: 8 }}
-                    />
+                <View style={{ width: 46 }} />
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {canPickScope ? (
+                    <Pressable
+                      onPress={() => scopeSelectRef.current?.present()}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingHorizontal: 2,
+                        paddingVertical: 4,
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faChevronDown}
+                        size={14}
+                        color={colors.zingo}
+                        style={{ marginRight: 8 }}
+                      />
+                      <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+                        {
+                          (index === 0
+                            ? translate('receive.scope-shielded')
+                            : translate('receive.scope-transparent')) as string
+                        }
+                      </BoldText>
+                    </Pressable>
+                  ) : (
                     <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
                       {
                         (index === 0
@@ -405,49 +441,41 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                           : translate('receive.scope-transparent')) as string
                       }
                     </BoldText>
+                  )}
+                </View>
+                {isAdvanced ? (
+                  <Pressable
+                    onPress={() => show('NA')}
+                    hitSlop={8}
+                    style={{
+                      paddingHorizontal: 14,
+                      paddingVertical: 4,
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      size={18}
+                      color={colors.zingo}
+                    />
                   </Pressable>
                 ) : (
-                  <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
-                    {
-                      (index === 0
-                        ? translate('receive.scope-shielded')
-                        : translate('receive.scope-transparent')) as string
-                    }
-                  </BoldText>
+                  <View style={{ width: 46 }} />
                 )}
               </View>
-              {isAdvanced ? (
-                <Pressable
-                  onPress={() => show('NA')}
-                  hitSlop={8}
-                  style={{
-                    paddingHorizontal: 14,
-                    paddingVertical: 4,
-                  }}
-                >
-                  <FontAwesomeIcon
-                    icon={faPlus}
-                    size={18}
-                    color={colors.zingo}
-                  />
-                </Pressable>
-              ) : (
-                <View style={{ width: 46 }} />
-              )}
             </View>
+            {!!addresses && !!defaultUnifiedAddress && (
+              <SingleAddress
+                address={currentAddress}
+                index={currentAddrIndex}
+                setIndex={setCurrentAddrIndex}
+                total={currentTotal}
+                show={show}
+                hasTransparent={index === 0 && tAddr && tAddr.length > 0}
+              />
+            )}
           </View>
-          {!!addresses && !!defaultUnifiedAddress && (
-            <SingleAddress
-              address={currentAddress}
-              index={currentAddrIndex}
-              setIndex={setCurrentAddrIndex}
-              total={currentTotal}
-              show={show}
-              hasTransparent={index === 0 && tAddr && tAddr.length > 0}
-            />
-          )}
-        </View>
-      </BottomSheet>
+        </BottomSheet>
+      </Animated.View>
       <BottomSheetModal
         ref={bottomSheetRef}
         enableDynamicSizing={true}

@@ -42,6 +42,7 @@ import {
   SelectServerEnum,
 } from '../../AppState';
 import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
+import { useKeyboardHeight } from '../../hooks/useKeyboardHeight';
 
 const activationHeight = {
   main: 419200,
@@ -71,6 +72,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const importUfvkSheetRef = useRef<BottomSheet>(null);
+  const keyboardHeight = useKeyboardHeight();
 
   useEffect(() => {
     if (!netInfo.isConnected || selectServer !== SelectServerEnum.offline) {
@@ -207,7 +209,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 
   const renderImportUfvkFooter = useCallback(
     (props: BottomSheetFooterProps) => (
-      <BottomSheetFooter {...props} bottomInset={0}>
+      <BottomSheetFooter {...props} bottomInset={keyboardHeight}>
         <View
           style={{
             backgroundColor: colors.bottomSheetBackground,
@@ -230,7 +232,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, translate, seedufvkText, birthday],
+    [colors, translate, seedufvkText, birthday, keyboardHeight],
   );
 
   return (
@@ -262,6 +264,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         enableContentPanningGesture={false}
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
           borderTopLeftRadius: 40,

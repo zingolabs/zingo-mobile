@@ -15,7 +15,10 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   Pressable,
+  StyleSheet,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -41,8 +44,11 @@ import Header from '../Header';
 import {
   LanguageEnum,
   SecurityType,
+  SeedActionEnum,
   ServerType,
   ServerUrisType,
+  SetServerResult,
+  UfvkActionEnum,
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
@@ -72,7 +78,7 @@ import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
 import NymOn from '../../assets/img/nym-on.svg';
@@ -81,7 +87,7 @@ import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
 
-type SettingsProps = DrawerScreenProps<
+type SettingsProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Settings
 > & {
@@ -90,9 +96,9 @@ type SettingsProps = DrawerScreenProps<
     selectServer: SelectServerEnum,
     toast: boolean,
     sameServerChainName: boolean,
-  ) => Promise<void>;
+  ) => Promise<SetServerResult>;
   setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
-  setLanguageOption: (value: LanguageEnum, reset: boolean) => Promise<void>;
+  setLanguageOption: (value: LanguageEnum) => Promise<void>;
   setSendAllOption: (value: boolean) => Promise<void>;
   setDonationOption: (value: boolean) => Promise<void>;
   setSecurityOption: (value: SecurityType) => Promise<void>;
@@ -509,7 +515,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     securityObject,
   ]);
 
+  // Ref that always points to the latest `saveSettings`. The footer's
+  // `useCallback` only rebuilds when its declared deps change — which left
+  // its captured `saveSettings` (and the local state inside it) stuck on
+  // the first render that flipped `disabledButton`. Subsequent toggles
+  // didn't refresh the closure, so only the change that flipped
+  // disabledButton actually persisted on save. Reading through a ref makes
+  // the footer's onPress always invoke the current closure.
+  const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
+
   const saveSettings = async () => {
+    // ───────────────────────────────────────────────────────────────
+    // Phase 1: Resolve the target server URI/chain from the picker mode
+    // and validate up-front (no I/O yet — purely synchronous guards).
+    // ───────────────────────────────────────────────────────────────
     let serverUriParsed = '';
     let chainNameParsed = '';
     if (selectServer === SelectServerEnum.auto) {
@@ -525,8 +544,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       serverUriParsed = '';
       chainNameParsed = ChainNameEnum.mainChainName;
     }
-    let sameServerChainName = true;
     const chainName = serverContext.chainName;
+
     if (
       serverContext.uri === serverUriParsed &&
       serverContext.chainName === chainNameParsed &&
@@ -558,6 +577,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
+    // ───────────────────────────────────────────────────────────────
+    // Phase 2: If the URI changed, parse/canonicalize it. `parseServerURI`
+    // also catches malformed strings (`http:/host` without the double
+    // slash etc.) that url-parse silently accepts.
+    // ───────────────────────────────────────────────────────────────
     if (
       serverContext.uri !== serverUriParsed &&
       selectServer !== SelectServerEnum.offline
@@ -566,25 +590,18 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (resultUri && resultUri.toLowerCase().startsWith(GlobalConst.error)) {
         addLastSnackbar(translate('settings.isuri') as string);
         return;
-      } else {
-        // url-parse sometimes is too wise, and if you put:
-        // server: `http:/zec-server.com:9067` the parser understand this. Good.
-        // but this value will be store in the settings and the value is wrong.
-        // so, this function if everything is OK return the URI well formatted.
-        // and I save it in the state ASAP.
-        if (serverUriParsed !== resultUri) {
-          serverUriParsed = resultUri;
-          if (selectServer === SelectServerEnum.auto) {
-            setAutoServerUri(serverUriParsed);
-          } else if (selectServer === SelectServerEnum.list) {
-            setListServerUri(serverUriParsed);
-          } else if (selectServer === SelectServerEnum.custom) {
-            setCustomServerUri(serverUriParsed);
-          }
+      }
+      if (serverUriParsed !== resultUri) {
+        serverUriParsed = resultUri;
+        if (selectServer === SelectServerEnum.auto) {
+          setAutoServerUri(serverUriParsed);
+        } else if (selectServer === SelectServerEnum.list) {
+          setListServerUri(serverUriParsed);
+        } else if (selectServer === SelectServerEnum.custom) {
+          setCustomServerUri(serverUriParsed);
         }
       }
     }
-
     if (
       (serverContext.uri !== serverUriParsed ||
         selectServerContext !== selectServer) &&
@@ -595,12 +612,22 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (
+    // ───────────────────────────────────────────────────────────────
+    // Phase 3: If the server is changing, probe it via `checkServerURI`
+    // first. We detect two distinct chain conditions:
+    //   • newChainName ≠ chainNameParsed → user's toggle is lying about
+    //     the chain. Abort the save, restore the previous server.
+    //   • newChainName ≠ current chainName → the new server is on a
+    //     different chain than the open wallet. We set
+    //     `sameServerChainName = false`, which makes `setServerOption`
+    //     return `chain-changed` so we can navigate to recovery.
+    // ───────────────────────────────────────────────────────────────
+    const serverChanged =
       serverContext.uri !== serverUriParsed ||
-      serverContext.chainName !== chainNameParsed
-    ) {
-      // if the user is changing -> to Offline mode.
-      // doesn't matter is the device have or not internet connection.
+      serverContext.chainName !== chainNameParsed;
+    let sameServerChainName = true;
+
+    if (serverChanged) {
       if (
         !netInfo.isConnected &&
         !(
@@ -615,12 +642,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (serverUriParsed) {
         addLastSnackbar(translate('loadedapp.tryingnewserver') as string);
       }
-      const { result, timeout, newChainName } = await checkServerURI(
-        serverUriParsed,
-        serverContext.uri,
-      );
+      const { result, timeout, newChainName, errorDetail } =
+        await checkServerURI(serverUriParsed, serverContext.uri);
       if (!result) {
-        // if the server checking takes more then 15 seconds.
+        // Native/JS error string kept out of the user snackbar but logged so
+        // it surfaces in `adb logcat` / Xcode console for diagnosis.
+        console.log('checkServerURI failed:', errorDetail);
         if (timeout === true) {
           addLastSnackbar(
             translate('loadedapp.tryingnewserver-error') as string,
@@ -631,114 +658,148 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               serverUriParsed,
           );
         }
-        // in this point the sync process is blocked, who knows why.
-        // if I save the actual server before the customization... is going to work.
-        setServerOption(
-          serverContext,
-          selectServerContext,
-          false,
+        // Restore the previous server so the sync state stays consistent.
+        await setServerOption(serverContext, selectServerContext, false, true);
+        setDisabled(false);
+        return;
+      }
+      if (newChainName && newChainName !== chainNameParsed) {
+        addLastSnackbar(translate('loadedapp.serverchain-mismatch') as string);
+        await setServerOption(serverContext, selectServerContext, false, true);
+        setDisabled(false);
+        return;
+      }
+      if (newChainName && newChainName !== chainName) {
+        sameServerChainName = false;
+        addLastSnackbar(translate('loadedapp.differentchain-error') as string);
+      }
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Phase 4: Persist the "light" settings (AsyncStorage only, no
+    // backend coordination). Wrapped in try/catch so a single failing
+    // setter doesn't silently drop the rest.
+    // ───────────────────────────────────────────────────────────────
+    try {
+      if (currencyContext !== currency) {
+        await setCurrencyOption(currency);
+      }
+      if (sendAllContext !== sendAll) {
+        await setSendAllOption(sendAll);
+      }
+      if (donationContext !== donation) {
+        await setDonationOption(donation);
+      }
+      if (privacyContext !== privacy) {
+        await setPrivacyOption(privacy);
+      }
+      if (!isEqual(securityContext, securityObject())) {
+        await setSecurityOption(securityObject());
+      }
+      if (rescanMenuContext !== rescanMenu) {
+        await setRescanMenuOption(rescanMenu);
+      }
+      if (recoveryWalletInfoOnDeviceContext !== recoveryWalletInfoOnDevice) {
+        await setRecoveryWalletInfoOnDeviceOption(recoveryWalletInfoOnDevice);
+        const saved = await hasRecoveryWalletInfo();
+        setHasRecoveryWalletInfoSaved(saved);
+        if (saved) {
+          setStorageRecoveryWalletInfo(
+            Platform.OS === GlobalConst.platformOSios
+              ? GlobalConst.keyChain
+              : GlobalConst.keyStore,
+          );
+        }
+      }
+      if (performanceLevelContext !== performanceLevel) {
+        await setPerformanceLevelOption(performanceLevel);
+      }
+      if (blockExplorerContext !== blockExplorer) {
+        await setBlockExplorerOption(blockExplorer);
+      }
+      if (nymContext !== nym) {
+        await setNymOption(nym);
+      }
+      // Language: applied in place. Belongs with the light settings now
+      // that the i18n update propagates without an app reset. Apply it
+      // before phase 5 so any snackbar that surfaces during the server
+      // switch already reads in the new locale.
+      if (languageContext !== language) {
+        await setLanguageOption(language);
+      }
+    } catch (e) {
+      addLastSnackbar(
+        `${translate('settings.save-error') as string}: ${(e as Error).message}`,
+      );
+      setDisabled(false);
+      return;
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Phase 5: Apply server / selectServer.
+    //
+    // If the server URI changed, `setServerOption` does the heavy lifting
+    // (loadExistingWallet → writeSettings → state). It returns a tagged
+    // result so we know whether to:
+    //   • `ok`         → navigate back as usual.
+    //   • `chain-changed` → navigate to Seed/Ufvk recovery. The library
+    //     already restored the previous server and stashed the desired
+    //     one in `newServer`/`newSelectServer` for the recovery screen.
+    //   • `error`      → stay on Settings, snackbar already shown.
+    // ───────────────────────────────────────────────────────────────
+    try {
+      if (serverChanged) {
+        const result = await setServerOption(
+          { uri: serverUriParsed, chainName: chainNameParsed } as ServerType,
+          selectServer,
+          true,
           sameServerChainName,
         );
         setDisabled(false);
-        return;
-      } else {
-        // The chain the server actually reports must match what the user
-        // selected in the chain toggle. If they don't match, abort the
-        // save — continuing would persist the user's (wrong) chain
-        // alongside the server URI and `loadExistingWallet` would then
-        // open the wallet with the wrong chainName, killing the sync.
-        if (newChainName && newChainName !== chainNameParsed) {
-          addLastSnackbar(
-            translate('loadedapp.serverchain-mismatch') as string,
-          );
-          setServerOption(
-            serverContext,
-            selectServerContext,
-            false,
-            sameServerChainName,
-          );
-          setDisabled(false);
+        if (result.kind === 'error') {
+          // Old server restored, snackbar already shown by setServerOption.
           return;
         }
-        if (newChainName && newChainName !== chainName) {
-          sameServerChainName = false;
-          addLastSnackbar(
-            translate('loadedapp.differentchain-error') as string,
-          );
+        if (result.kind === 'chain-changed') {
+          // The open wallet can't be used against the new chain — send the
+          // user to Seed/Ufvk recovery so they can switch wallets or
+          // cancel.
+          if (readOnly) {
+            navigation.navigate(RouteEnum.Ufvk, {
+              action: UfvkActionEnum.server,
+            });
+          } else {
+            navigation.navigate(RouteEnum.Seed, {
+              action: SeedActionEnum.server,
+            });
+          }
+          return;
         }
+        // result.kind === 'ok' — fall through to the final goBack().
+      } else {
+        if (selectServerContext !== selectServer) {
+          await setSelectServerOption(selectServer);
+        }
+        setDisabled(false);
       }
-    }
-
-    if (currencyContext !== currency) {
-      await setCurrencyOption(currency);
-    }
-    if (sendAllContext !== sendAll) {
-      await setSendAllOption(sendAll);
-    }
-    if (donationContext !== donation) {
-      await setDonationOption(donation);
-    }
-    if (privacyContext !== privacy) {
-      await setPrivacyOption(privacy);
-    }
-    if (!isEqual(securityContext, securityObject())) {
-      await setSecurityOption(securityObject());
-    }
-    if (rescanMenuContext !== rescanMenu) {
-      await setRescanMenuOption(rescanMenu);
-    }
-    if (recoveryWalletInfoOnDeviceContext !== recoveryWalletInfoOnDevice) {
-      await setRecoveryWalletInfoOnDeviceOption(recoveryWalletInfoOnDevice);
-      const saved = await hasRecoveryWalletInfo();
-      setHasRecoveryWalletInfoSaved(saved);
-      if (saved) {
-        setStorageRecoveryWalletInfo(
-          Platform.OS === GlobalConst.platformOSios
-            ? GlobalConst.keyChain
-            : GlobalConst.keyStore,
-        );
-      }
-    }
-    if (performanceLevelContext !== performanceLevel) {
-      await setPerformanceLevelOption(performanceLevel);
-    }
-    if (blockExplorerContext !== blockExplorer) {
-      await setBlockExplorerOption(blockExplorer);
-    }
-    if (nymContext !== nym) {
-      await setNymOption(nym);
-    }
-
-    // I need a little time in this modal because maybe the wallet cannot be open with the new server
-    let ms = 100;
-    if (
-      serverContext.uri !== serverUriParsed ||
-      serverContext.chainName !== chainNameParsed
-    ) {
-      if (languageContext !== language) {
-        await setLanguageOption(language, false);
-      }
-      setServerOption(
-        { uri: serverUriParsed, chainName: chainNameParsed } as ServerType,
-        selectServer,
-        true,
-        sameServerChainName,
+    } catch (e) {
+      addLastSnackbar(
+        `${translate('settings.save-error') as string}: ${(e as Error).message}`,
       );
-      ms = 1500;
-    } else {
-      if (selectServerContext !== selectServer) {
-        await setSelectServerOption(selectServer);
-      }
-      if (languageContext !== language) {
-        await setLanguageOption(language, true);
-      }
+      setDisabled(false);
+      return;
     }
 
-    setDisabled(false);
-    setTimeout(() => {
-      navigateToHome(false);
-    }, ms);
+    // ───────────────────────────────────────────────────────────────
+    // Phase 6: Done — pop back to the previous screen.
+    // ───────────────────────────────────────────────────────────────
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate(RouteEnum.HomeStack);
+    }
   };
+  saveSettingsRef.current = saveSettings;
 
   const navigateToHome = useCallback((reset: boolean) => {
     if (reset) {
@@ -764,7 +825,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setBlockExplorer(blockExplorerContext);
       setNym(nymContext);
     }
-    navigation.navigate(RouteEnum.HomeStack);
+    // `goBack()` pops Settings off the stack — using `navigate(HomeStack)`
+    // would push HomeStack on top while leaving the already-authenticated
+    // Settings instance alive in the stack, allowing a back gesture to
+    // bypass the biometric gate.
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate(RouteEnum.HomeStack);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -823,6 +892,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const blockExplorerSelectRef = useRef<BottomSheetModal>(null);
   const listServerSelectRef = useRef<BottomSheetModal>(null);
   const settingsSheetRef = useRef<BottomSheet>(null);
+  const sheetSlideStyle = useOptionsPanelSheetSlide();
   const keyboardHeight = useKeyboardHeight();
   useDismissSheetsOnBlur();
 
@@ -904,7 +974,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             title={translate('settings.save') as string}
             onPress={() => {
               setTimeout(async () => {
-                await saveSettings();
+                await saveSettingsRef.current();
                 Keyboard.dismiss();
               }, 100);
             }}
@@ -912,7 +982,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
       </BottomSheetFooter>
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [colors, disabled, disabledButton, translate],
   );
 
@@ -1147,483 +1217,130 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             noPrivacy={true}
           />
         </View>
-        <BottomSheet
-          ref={settingsSheetRef}
-          accessible={false}
-          snapPoints={settingsSnapPoints}
-          index={0}
-          enableDynamicSizing={false}
-          enablePanDownToClose={false}
-          enableContentPanningGesture={false}
-          backgroundStyle={{
-            backgroundColor: colors.bottomSheetBackground,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-          }}
-          handleComponent={renderSettingsHandle}
-          footerComponent={renderSettingsFooter}
+        <Animated.View
+          pointerEvents="box-none"
+          style={[StyleSheet.absoluteFill, sheetSlideStyle]}
         >
-          <BottomSheetScrollView
-            keyboardShouldPersistTaps="handled"
-            testID="settings.scroll-view"
-            bounces={false}
-            alwaysBounceVertical={false}
-            style={{
-              flex: 1,
+          <BottomSheet
+            ref={settingsSheetRef}
+            accessible={false}
+            snapPoints={settingsSnapPoints}
+            index={0}
+            enableDynamicSizing={false}
+            enablePanDownToClose={false}
+            enableContentPanningGesture={false}
+            backgroundStyle={{
               backgroundColor: colors.bottomSheetBackground,
+              borderTopLeftRadius: 40,
+              borderTopRightRadius: 40,
             }}
-            contentContainerStyle={{
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              justifyContent: 'flex-start',
-              paddingBottom: 100,
-            }}
+            handleComponent={renderSettingsHandle}
+            footerComponent={renderSettingsFooter}
           >
-            {/* NYM feature hidden for now — will be enabled in the future */}
-            {false && (
-              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                <BoldText>
-                  {translate('settings.nym-privacy-network') as string}
-                </BoldText>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginTop: 5,
-                  }}
-                >
-                  {nym ? (
-                    <NymOn width={22} height={22} />
-                  ) : (
-                    <NymOff width={22} height={22} />
-                  )}
-                  <View style={{ flex: 1, marginLeft: 10 }}>
-                    <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
-                      {translate('settings.nym-network') as string}
-                    </BoldText>
-                    <FadeText>
-                      {translate('settings.nym-enhanced-privacy') as string}
-                    </FadeText>
-                  </View>
-                  <TouchableOpacity onPress={() => setNym(!nym)}>
-                    {nym ? (
-                      <NymSwitchOn width={40} height={19} />
-                    ) : (
-                      <SwitchOff width={40} height={19} />
-                    )}
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-
-            <View
+            <BottomSheetScrollView
+              keyboardShouldPersistTaps="handled"
+              testID="settings.scroll-view"
+              bounces={false}
+              alwaysBounceVertical={false}
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginLeft: 25,
-                marginRight: 25,
-                marginTop: 25,
-                marginBottom: 15,
+                flex: 1,
+                backgroundColor: colors.bottomSheetBackground,
+              }}
+              contentContainerStyle={{
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                justifyContent: 'flex-start',
+                paddingBottom: 100,
               }}
             >
-              <BoldText>
-                {translate('settings.language-title') as string}
-              </BoldText>
-              <TouchableOpacity
-                disabled={disabled}
-                onPress={() => languageSelectRef.current?.present()}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <RegText
-                    style={{
-                      marginRight: 5,
-                      fontWeight: '400',
-                      color: colors.zingo,
-                    }}
-                  >
-                    {translate(`settings.value-language-${language}`) as string}
-                  </RegText>
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    size={12}
-                    color={colors.zingo}
-                  />
-                </View>
-              </TouchableOpacity>
-            </View>
-
-            {mode !== ModeEnum.basic && (
-              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              {/* NYM feature hidden for now — will be enabled in the future */}
+              {false && (
+                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                  <BoldText>
+                    {translate('settings.nym-privacy-network') as string}
+                  </BoldText>
                   <View
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
-                      flex: 1,
+                      marginTop: 5,
                     }}
                   >
-                    <BoldText>
-                      {translate('settings.privacy-title') as string}
-                    </BoldText>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setOpenInfoSection(
-                          openInfoSection === 'privacy' ? null : 'privacy',
-                        )
-                      }
-                      style={{ marginLeft: 6 }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        size={14}
-                        color={colors.text}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <TouchableOpacity onPress={() => setPrivacy(!privacy)}>
-                    {privacy ? (
-                      <SettingSwitchOn width={40} height={19} />
+                    {nym ? (
+                      <NymOn width={22} height={22} />
                     ) : (
-                      <SwitchOff width={40} height={19} />
+                      <NymOff width={22} height={22} />
                     )}
-                  </TouchableOpacity>
-                </View>
-                {openInfoSection === 'privacy' && (
-                  <View
-                    style={{
-                      backgroundColor: '#040E1D',
-                      borderRadius: 8,
-                      padding: 10,
-                      marginTop: 8,
-                    }}
-                  >
-                    <FadeText style={{ textAlign: 'center' }}>
-                      {PRIVACYS.find(d => String(d.value) === 'true')?.text ??
-                        ''}
-                    </FadeText>
-                  </View>
-                )}
-              </View>
-            )}
-
-            {mode !== ModeEnum.basic && !readOnly && (
-              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      flex: 1,
-                    }}
-                  >
-                    <BoldText>
-                      {translate('settings.donation-title') as string}
-                    </BoldText>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setOpenInfoSection(
-                          openInfoSection === 'donation' ? null : 'donation',
-                        )
-                      }
-                      style={{ marginLeft: 6 }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        size={14}
-                        color={colors.text}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <TouchableOpacity onPress={() => setDonation(!donation)}>
-                    {donation ? (
-                      <SettingSwitchOn width={40} height={19} />
-                    ) : (
-                      <SwitchOff width={40} height={19} />
-                    )}
-                  </TouchableOpacity>
-                </View>
-                {openInfoSection === 'donation' && (
-                  <View
-                    style={{
-                      backgroundColor: '#040E1D',
-                      borderRadius: 8,
-                      padding: 10,
-                      marginTop: 8,
-                    }}
-                  >
-                    <FadeText style={{ textAlign: 'center' }}>
-                      {DONATIONS.find(d => String(d.value) === 'true')?.text ??
-                        ''}
-                    </FadeText>
-                  </View>
-                )}
-              </View>
-            )}
-
-            {mode !== ModeEnum.basic && !readOnly && (
-              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      flex: 1,
-                    }}
-                  >
-                    <BoldText>
-                      {translate('settings.sendall-title') as string}
-                    </BoldText>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setOpenInfoSection(
-                          openInfoSection === 'sendall' ? null : 'sendall',
-                        )
-                      }
-                      style={{ marginLeft: 6 }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        size={14}
-                        color={colors.text}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <TouchableOpacity onPress={() => setSendAll(!sendAll)}>
-                    {sendAll ? (
-                      <SettingSwitchOn width={40} height={19} />
-                    ) : (
-                      <SwitchOff width={40} height={19} />
-                    )}
-                  </TouchableOpacity>
-                </View>
-                {openInfoSection === 'sendall' && (
-                  <View
-                    style={{
-                      backgroundColor: '#040E1D',
-                      borderRadius: 8,
-                      padding: 10,
-                      marginTop: 8,
-                    }}
-                  >
-                    <FadeText style={{ textAlign: 'center' }}>
-                      {SENDALLS.find(d => String(d.value) === 'true')?.text ??
-                        ''}
-                    </FadeText>
-                  </View>
-                )}
-              </View>
-            )}
-
-            {mode !== ModeEnum.basic && (
-              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      flex: 1,
-                    }}
-                  >
-                    <BoldText>
-                      {translate('settings.rescanmenu-title') as string}
-                    </BoldText>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setOpenInfoSection(
-                          openInfoSection === 'rescan' ? null : 'rescan',
-                        )
-                      }
-                      style={{ marginLeft: 6 }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        size={14}
-                        color={colors.text}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <TouchableOpacity onPress={() => setRescanMenu(!rescanMenu)}>
-                    {rescanMenu ? (
-                      <SettingSwitchOn width={40} height={19} />
-                    ) : (
-                      <SwitchOff width={40} height={19} />
-                    )}
-                  </TouchableOpacity>
-                </View>
-                {openInfoSection === 'rescan' && (
-                  <View
-                    style={{
-                      backgroundColor: '#040E1D',
-                      borderRadius: 8,
-                      padding: 10,
-                      marginTop: 8,
-                    }}
-                  >
-                    <FadeText style={{ textAlign: 'center' }}>
-                      {RESCANMENU.find(d => String(d.value) === 'true')?.text ??
-                        ''}
-                    </FadeText>
-                  </View>
-                )}
-              </View>
-            )}
-
-            {mode !== ModeEnum.basic && (
-              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      flex: 1,
-                    }}
-                  >
-                    <TouchableOpacity
-                      onLongPress={() => setShowDeveloperOptions(true)}
-                    >
-                      <BoldText>
-                        {
-                          translate(
-                            'settings.recoverywalletinfoondevice-title',
-                          ) as string
-                        }
-                      </BoldText>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setOpenInfoSection(
-                          openInfoSection === 'recovery' ? null : 'recovery',
-                        )
-                      }
-                      style={{ marginLeft: 6 }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        size={14}
-                        color={colors.text}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <TouchableOpacity
-                    onPress={() =>
-                      setRecoveryWalletInfoOnDevice(!recoveryWalletInfoOnDevice)
-                    }
-                  >
-                    {recoveryWalletInfoOnDevice ? (
-                      <SettingSwitchOn width={40} height={19} />
-                    ) : (
-                      <SwitchOff width={40} height={19} />
-                    )}
-                  </TouchableOpacity>
-                </View>
-                {openInfoSection === 'recovery' && (
-                  <View
-                    style={{
-                      backgroundColor: '#040E1D',
-                      borderRadius: 8,
-                      padding: 10,
-                      marginTop: 8,
-                    }}
-                  >
-                    <FadeText style={{ textAlign: 'center' }}>
-                      {RECOVERYWALLETINFOONDEVICE.find(
-                        d => String(d.value) === 'true',
-                      )?.text ?? ''}
-                    </FadeText>
-                    {hasRecoveryWalletInfoSaved && (
-                      <FadeText
-                        style={{
-                          color: colors.primary,
-                          textAlign: 'center',
-                          marginTop: 6,
-                        }}
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <BoldText
+                        style={{ color: nym ? '#07FF94' : colors.text }}
                       >
-                        {(translate('settings.walletkeyssaved') as string) +
-                          (storageRecoveryWalletInfo
-                            ? ' [' + storageRecoveryWalletInfo + ']'
-                            : '')}
+                        {translate('settings.nym-network') as string}
+                      </BoldText>
+                      <FadeText>
+                        {translate('settings.nym-enhanced-privacy') as string}
                       </FadeText>
-                    )}
+                    </View>
+                    <TouchableOpacity onPress={() => setNym(!nym)}>
+                      {nym ? (
+                        <NymSwitchOn width={40} height={19} />
+                      ) : (
+                        <SwitchOff width={40} height={19} />
+                      )}
+                    </TouchableOpacity>
                   </View>
-                )}
-              </View>
-            )}
+                </View>
+              )}
 
-            {mode !== ModeEnum.basic && (
-              <View
+              {/* About + Server Info — entry points migrated from the
+                  legacy drawer Menu. The bottom sheet stays mounted in
+                  the stack underneath while the user is on those screens
+                  (useDismissSheetsOnBlur in those screens handles their
+                  own children). */}
+              <TouchableOpacity
+                testID="settings.about"
+                disabled={disabled}
+                onPress={() => navigation.navigate(RouteEnum.About)}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
+                  justifyContent: 'space-between',
                   marginLeft: 25,
                   marginRight: 25,
-                  marginVertical: 15,
+                  marginTop: 25,
+                  marginBottom: 15,
                 }}
               >
-                <BoldText>
-                  {translate('settings.server-title') as string}
-                </BoldText>
-                <TouchableOpacity
-                  disabled={disabled}
-                  onPress={() => serverBottomSheetRef.current?.present()}
-                  style={{ flex: 1, marginLeft: 12 }}
-                >
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                    }}
-                  >
-                    <View
-                      style={{
-                        flex: 1,
-                        alignItems: 'flex-end',
-                        marginRight: 8,
-                      }}
-                    >
-                      {selectServer !== SelectServerEnum.offline && (
-                        <FadeText
-                          numberOfLines={1}
-                          style={{
-                            fontSize: 11,
-                            lineHeight: 13,
-                            color: customServerIncomplete
-                              ? colors.danger.primary
-                              : colors.zingo,
-                          }}
-                        >
-                          {currentServerKindLabel}
-                        </FadeText>
-                      )}
-                      <RegText
-                        numberOfLines={1}
-                        ellipsizeMode="middle"
-                        style={{
-                          fontWeight: '400',
-                          color: customServerIncomplete
-                            ? colors.danger.primary
-                            : colors.zingo,
-                        }}
-                      >
-                        {currentServerLabel}
-                      </RegText>
-                    </View>
-                    <FontAwesomeIcon
-                      icon={faChevronRight}
-                      size={16}
-                      color={
-                        customServerIncomplete
-                          ? colors.danger.primary
-                          : colors.zingo
-                      }
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            )}
+                <BoldText>{translate('loadedapp.about') as string}</BoldText>
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  size={12}
+                  color={colors.zingo}
+                />
+              </TouchableOpacity>
 
-            {mode !== ModeEnum.basic && (
+              <TouchableOpacity
+                testID="settings.serverinfo"
+                disabled={disabled}
+                onPress={() => navigation.navigate(RouteEnum.Info)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginLeft: 25,
+                  marginRight: 25,
+                  marginTop: 15,
+                  marginBottom: 15,
+                }}
+              >
+                <BoldText>{translate('loadedapp.info') as string}</BoldText>
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  size={12}
+                  color={colors.zingo}
+                />
+              </TouchableOpacity>
+
               <View
                 style={{
                   flexDirection: 'row',
@@ -1631,15 +1348,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   justifyContent: 'space-between',
                   marginLeft: 25,
                   marginRight: 25,
-                  marginVertical: 15,
+                  marginTop: 25,
+                  marginBottom: 15,
                 }}
               >
                 <BoldText>
-                  {translate('settings.blockexplorer-title') as string}
+                  {translate('settings.language-title') as string}
                 </BoldText>
                 <TouchableOpacity
                   disabled={disabled}
-                  onPress={() => blockExplorerSelectRef.current?.present()}
+                  onPress={() => languageSelectRef.current?.present()}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <RegText
@@ -1651,7 +1369,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     >
                       {
                         translate(
-                          `settings.value-blockexplorer-${blockExplorer}`,
+                          `settings.value-language-${language}`,
                         ) as string
                       }
                     </RegText>
@@ -1663,29 +1381,398 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   </View>
                 </TouchableOpacity>
               </View>
-            )}
 
-            {mode !== ModeEnum.basic && (
-              <View
-                style={{
-                  marginLeft: 25,
-                  marginRight: 25,
-                  marginVertical: 15,
-                }}
-              >
+              {mode !== ModeEnum.basic && (
+                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        flex: 1,
+                      }}
+                    >
+                      <BoldText>
+                        {translate('settings.privacy-title') as string}
+                      </BoldText>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenInfoSection(
+                            openInfoSection === 'privacy' ? null : 'privacy',
+                          )
+                        }
+                        style={{ marginLeft: 6 }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={14}
+                          color={colors.text}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity onPress={() => setPrivacy(!privacy)}>
+                      {privacy ? (
+                        <SettingSwitchOn width={40} height={19} />
+                      ) : (
+                        <SwitchOff width={40} height={19} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                  {openInfoSection === 'privacy' && (
+                    <View
+                      style={{
+                        backgroundColor: '#040E1D',
+                        borderRadius: 8,
+                        padding: 10,
+                        marginTop: 8,
+                      }}
+                    >
+                      <FadeText style={{ textAlign: 'center' }}>
+                        {PRIVACYS.find(d => String(d.value) === 'true')?.text ??
+                          ''}
+                      </FadeText>
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {!readOnly && (
+                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        flex: 1,
+                      }}
+                    >
+                      <BoldText>
+                        {translate('settings.donation-title') as string}
+                      </BoldText>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenInfoSection(
+                            openInfoSection === 'donation' ? null : 'donation',
+                          )
+                        }
+                        style={{ marginLeft: 6 }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={14}
+                          color={colors.text}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity onPress={() => setDonation(!donation)}>
+                      {donation ? (
+                        <SettingSwitchOn width={40} height={19} />
+                      ) : (
+                        <SwitchOff width={40} height={19} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                  {openInfoSection === 'donation' && (
+                    <View
+                      style={{
+                        backgroundColor: '#040E1D',
+                        borderRadius: 8,
+                        padding: 10,
+                        marginTop: 8,
+                      }}
+                    >
+                      <FadeText style={{ textAlign: 'center' }}>
+                        {DONATIONS.find(d => String(d.value) === 'true')
+                          ?.text ?? ''}
+                      </FadeText>
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {mode !== ModeEnum.basic && !readOnly && (
+                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        flex: 1,
+                      }}
+                    >
+                      <BoldText>
+                        {translate('settings.sendall-title') as string}
+                      </BoldText>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenInfoSection(
+                            openInfoSection === 'sendall' ? null : 'sendall',
+                          )
+                        }
+                        style={{ marginLeft: 6 }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={14}
+                          color={colors.text}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity onPress={() => setSendAll(!sendAll)}>
+                      {sendAll ? (
+                        <SettingSwitchOn width={40} height={19} />
+                      ) : (
+                        <SwitchOff width={40} height={19} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                  {openInfoSection === 'sendall' && (
+                    <View
+                      style={{
+                        backgroundColor: '#040E1D',
+                        borderRadius: 8,
+                        padding: 10,
+                        marginTop: 8,
+                      }}
+                    >
+                      <FadeText style={{ textAlign: 'center' }}>
+                        {SENDALLS.find(d => String(d.value) === 'true')?.text ??
+                          ''}
+                      </FadeText>
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {mode !== ModeEnum.basic && (
+                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        flex: 1,
+                      }}
+                    >
+                      <BoldText>
+                        {translate('settings.rescanmenu-title') as string}
+                      </BoldText>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenInfoSection(
+                            openInfoSection === 'rescan' ? null : 'rescan',
+                          )
+                        }
+                        style={{ marginLeft: 6 }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={14}
+                          color={colors.text}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => setRescanMenu(!rescanMenu)}
+                    >
+                      {rescanMenu ? (
+                        <SettingSwitchOn width={40} height={19} />
+                      ) : (
+                        <SwitchOff width={40} height={19} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                  {openInfoSection === 'rescan' && (
+                    <View
+                      style={{
+                        backgroundColor: '#040E1D',
+                        borderRadius: 8,
+                        padding: 10,
+                        marginTop: 8,
+                      }}
+                    >
+                      <FadeText style={{ textAlign: 'center' }}>
+                        {RESCANMENU.find(d => String(d.value) === 'true')
+                          ?.text ?? ''}
+                      </FadeText>
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {mode !== ModeEnum.basic && (
+                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        flex: 1,
+                      }}
+                    >
+                      <TouchableOpacity
+                        onLongPress={() => setShowDeveloperOptions(true)}
+                      >
+                        <BoldText>
+                          {
+                            translate(
+                              'settings.recoverywalletinfoondevice-title',
+                            ) as string
+                          }
+                        </BoldText>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenInfoSection(
+                            openInfoSection === 'recovery' ? null : 'recovery',
+                          )
+                        }
+                        style={{ marginLeft: 6 }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={14}
+                          color={colors.text}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() =>
+                        setRecoveryWalletInfoOnDevice(
+                          !recoveryWalletInfoOnDevice,
+                        )
+                      }
+                    >
+                      {recoveryWalletInfoOnDevice ? (
+                        <SettingSwitchOn width={40} height={19} />
+                      ) : (
+                        <SwitchOff width={40} height={19} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                  {openInfoSection === 'recovery' && (
+                    <View
+                      style={{
+                        backgroundColor: '#040E1D',
+                        borderRadius: 8,
+                        padding: 10,
+                        marginTop: 8,
+                      }}
+                    >
+                      <FadeText style={{ textAlign: 'center' }}>
+                        {RECOVERYWALLETINFOONDEVICE.find(
+                          d => String(d.value) === 'true',
+                        )?.text ?? ''}
+                      </FadeText>
+                      {hasRecoveryWalletInfoSaved && (
+                        <FadeText
+                          style={{
+                            color: colors.primary,
+                            textAlign: 'center',
+                            marginTop: 6,
+                          }}
+                        >
+                          {(translate('settings.walletkeyssaved') as string) +
+                            (storageRecoveryWalletInfo
+                              ? ' [' + storageRecoveryWalletInfo + ']'
+                              : '')}
+                        </FadeText>
+                      )}
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {mode !== ModeEnum.basic && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginLeft: 25,
+                    marginRight: 25,
+                    marginVertical: 15,
+                  }}
+                >
+                  <BoldText>
+                    {translate('settings.server-title') as string}
+                  </BoldText>
+                  <TouchableOpacity
+                    disabled={disabled}
+                    onPress={() => serverBottomSheetRef.current?.present()}
+                    style={{ flex: 1, marginLeft: 12 }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                      }}
+                    >
+                      <View
+                        style={{
+                          flex: 1,
+                          alignItems: 'flex-end',
+                          marginRight: 8,
+                        }}
+                      >
+                        {selectServer !== SelectServerEnum.offline && (
+                          <FadeText
+                            numberOfLines={1}
+                            style={{
+                              fontSize: 11,
+                              lineHeight: 13,
+                              color: customServerIncomplete
+                                ? colors.danger.primary
+                                : colors.zingo,
+                            }}
+                          >
+                            {currentServerKindLabel}
+                          </FadeText>
+                        )}
+                        <RegText
+                          numberOfLines={1}
+                          ellipsizeMode="middle"
+                          style={{
+                            fontWeight: '400',
+                            color: customServerIncomplete
+                              ? colors.danger.primary
+                              : colors.zingo,
+                          }}
+                        >
+                          {currentServerLabel}
+                        </RegText>
+                      </View>
+                      <FontAwesomeIcon
+                        icon={faChevronRight}
+                        size={16}
+                        color={
+                          customServerIncomplete
+                            ? colors.danger.primary
+                            : colors.zingo
+                        }
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {mode !== ModeEnum.basic && (
                 <View
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
+                    marginLeft: 25,
+                    marginRight: 25,
+                    marginVertical: 15,
                   }}
                 >
-                  <BoldText testID="settings.securitytitle">
-                    {translate('settings.security-title') as string}
+                  <BoldText>
+                    {translate('settings.blockexplorer-title') as string}
                   </BoldText>
                   <TouchableOpacity
-                    disabled={!deviceHasSecurity}
-                    onPress={() => securityBottomSheetRef.current?.present()}
+                    disabled={disabled}
+                    onPress={() => blockExplorerSelectRef.current?.present()}
                   >
                     <View
                       style={{ flexDirection: 'row', alignItems: 'center' }}
@@ -1694,172 +1781,227 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         style={{
                           marginRight: 5,
                           fontWeight: '400',
-                          color: deviceHasSecurity
-                            ? colors.zingo
-                            : colors.primaryDisabled,
-                        }}
-                      >
-                        {deviceHasSecurity
-                          ? securityLabel
-                          : (translate(
-                              'settings.security-not-available',
-                            ) as string)}
-                      </RegText>
-                      {deviceHasSecurity && (
-                        <FontAwesomeIcon
-                          icon={faChevronRight}
-                          size={12}
-                          color={colors.zingo}
-                        />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                {!deviceHasSecurity && (
-                  <FadeText style={{ marginTop: 6 }}>
-                    {
-                      translate(
-                        'settings.security-device-locked-hint',
-                      ) as string
-                    }
-                  </FadeText>
-                )}
-              </View>
-            )}
-
-            <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginBottom: 16,
-                }}
-              >
-                <BoldText>
-                  {translate('settings.currency-title') as string}
-                </BoldText>
-                <TouchableOpacity
-                  onPress={() =>
-                    setOpenInfoSection(
-                      openInfoSection === 'currency' ? null : 'currency',
-                    )
-                  }
-                  style={{ marginLeft: 6 }}
-                >
-                  <FontAwesomeIcon
-                    icon={faInfoCircle}
-                    size={14}
-                    color={colors.text}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  borderWidth: 1,
-                  borderColor: colors.primary,
-                  borderRadius: 8,
-                }}
-              >
-                {CURRENCIES.map(c => {
-                  const selected = String(currency) === String(c.value);
-                  return (
-                    <TouchableOpacity
-                      key={String(c.value)}
-                      onPress={() =>
-                        setCurrency(c.value as unknown as CurrencyEnum)
-                      }
-                      style={{
-                        flex: 1,
-                        paddingVertical: 8,
-                        alignItems: 'center',
-                        backgroundColor: selected
-                          ? colors.primary
-                          : 'transparent',
-                        borderRadius: 8,
-                        borderWidth: selected ? 1 : 0,
-                        borderColor: colors.primary,
-                      }}
-                    >
-                      <RegText
-                        style={{
-                          color: selected ? colors.background : colors.primary,
-                          fontSize: 12,
+                          color: colors.zingo,
                         }}
                       >
                         {
                           translate(
-                            `settings.value-currency-${c.value}`,
+                            `settings.value-blockexplorer-${blockExplorer}`,
                           ) as string
                         }
                       </RegText>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-              {openInfoSection === 'currency' && (
-                <View
-                  style={{
-                    backgroundColor: '#040E1D',
-                    borderRadius: 8,
-                    padding: 10,
-                    marginTop: 8,
-                  }}
-                >
-                  <FadeText style={{ textAlign: 'center' }}>
-                    {CURRENCIES.find(d => String(d.value) === 'USDTOR')?.text ??
-                      ''}
-                  </FadeText>
+                      <FontAwesomeIcon
+                        icon={faChevronRight}
+                        size={12}
+                        color={colors.zingo}
+                      />
+                    </View>
+                  </TouchableOpacity>
                 </View>
               )}
-            </View>
 
-            {mode !== ModeEnum.basic && (
-              <>
-                {showDeveloperOptions && (
-                  <View style={{ width: '100%', marginBottom: 20 }}>
-                    <View style={{ display: 'flex', margin: 10 }}>
-                      <BoldText>
-                        {translate('settings.performancelevel-title') as string}
-                      </BoldText>
-                    </View>
-
-                    <View style={{ display: 'flex', marginLeft: 25 }}>
-                      {optionsRadio(
-                        PERFORMANCELEVELMENU,
-                        setPerformanceLevel as React.Dispatch<
-                          React.SetStateAction<string | boolean>
-                        >,
-                        String,
-                        performanceLevel,
-                        'performancelevel',
-                      )}
-                    </View>
-                    {!!lastError && (
-                      <>
-                        <View style={{ display: 'flex', margin: 10 }}>
-                          <BoldText>{'LAST ERROR'}</BoldText>
-                        </View>
-
-                        <View style={{ display: 'flex', marginLeft: 25 }}>
-                          <Button
-                            type={ButtonTypeEnum.Primary}
-                            title={translate('view-error') as string}
-                            onPress={() => {
-                              reportError(lastError);
-                            }}
-                            twoButtons={true}
+              {mode !== ModeEnum.basic && (
+                <View
+                  style={{
+                    marginLeft: 25,
+                    marginRight: 25,
+                    marginVertical: 15,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <BoldText testID="settings.securitytitle">
+                      {translate('settings.security-title') as string}
+                    </BoldText>
+                    <TouchableOpacity
+                      disabled={!deviceHasSecurity}
+                      onPress={() => securityBottomSheetRef.current?.present()}
+                    >
+                      <View
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                      >
+                        <RegText
+                          style={{
+                            marginRight: 5,
+                            fontWeight: '400',
+                            color: deviceHasSecurity
+                              ? colors.zingo
+                              : colors.primaryDisabled,
+                          }}
+                        >
+                          {deviceHasSecurity
+                            ? securityLabel
+                            : (translate(
+                                'settings.security-not-available',
+                              ) as string)}
+                        </RegText>
+                        {deviceHasSecurity && (
+                          <FontAwesomeIcon
+                            icon={faChevronRight}
+                            size={12}
+                            color={colors.zingo}
                           />
-                        </View>
-                      </>
-                    )}
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                  {!deviceHasSecurity && (
+                    <FadeText style={{ marginTop: 6 }}>
+                      {
+                        translate(
+                          'settings.security-device-locked-hint',
+                        ) as string
+                      }
+                    </FadeText>
+                  )}
+                </View>
+              )}
+
+              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 16,
+                  }}
+                >
+                  <BoldText>
+                    {translate('settings.currency-title') as string}
+                  </BoldText>
+                  <TouchableOpacity
+                    onPress={() =>
+                      setOpenInfoSection(
+                        openInfoSection === 'currency' ? null : 'currency',
+                      )
+                    }
+                    style={{ marginLeft: 6 }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faInfoCircle}
+                      size={14}
+                      color={colors.text}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    borderWidth: 1,
+                    borderColor: colors.primary,
+                    borderRadius: 8,
+                  }}
+                >
+                  {CURRENCIES.map(c => {
+                    const selected = String(currency) === String(c.value);
+                    return (
+                      <TouchableOpacity
+                        key={String(c.value)}
+                        onPress={() =>
+                          setCurrency(c.value as unknown as CurrencyEnum)
+                        }
+                        style={{
+                          flex: 1,
+                          paddingVertical: 8,
+                          alignItems: 'center',
+                          backgroundColor: selected
+                            ? colors.primary
+                            : 'transparent',
+                          borderRadius: 8,
+                          borderWidth: selected ? 1 : 0,
+                          borderColor: colors.primary,
+                        }}
+                      >
+                        <RegText
+                          style={{
+                            color: selected
+                              ? colors.background
+                              : colors.primary,
+                            fontSize: 12,
+                          }}
+                        >
+                          {
+                            translate(
+                              `settings.value-currency-${c.value}`,
+                            ) as string
+                          }
+                        </RegText>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                {openInfoSection === 'currency' && (
+                  <View
+                    style={{
+                      backgroundColor: '#040E1D',
+                      borderRadius: 8,
+                      padding: 10,
+                      marginTop: 8,
+                    }}
+                  >
+                    <FadeText style={{ textAlign: 'center' }}>
+                      {CURRENCIES.find(d => String(d.value) === 'USDTOR')
+                        ?.text ?? ''}
+                    </FadeText>
                   </View>
                 )}
-              </>
-            )}
-          </BottomSheetScrollView>
-        </BottomSheet>
+              </View>
+
+              {mode !== ModeEnum.basic && (
+                <>
+                  {showDeveloperOptions && (
+                    <View style={{ width: '100%', marginBottom: 20 }}>
+                      <View style={{ display: 'flex', margin: 10 }}>
+                        <BoldText>
+                          {
+                            translate(
+                              'settings.performancelevel-title',
+                            ) as string
+                          }
+                        </BoldText>
+                      </View>
+
+                      <View style={{ display: 'flex', marginLeft: 25 }}>
+                        {optionsRadio(
+                          PERFORMANCELEVELMENU,
+                          setPerformanceLevel as React.Dispatch<
+                            React.SetStateAction<string | boolean>
+                          >,
+                          String,
+                          performanceLevel,
+                          'performancelevel',
+                        )}
+                      </View>
+                      {!!lastError && (
+                        <>
+                          <View style={{ display: 'flex', margin: 10 }}>
+                            <BoldText>{'LAST ERROR'}</BoldText>
+                          </View>
+
+                          <View style={{ display: 'flex', marginLeft: 25 }}>
+                            <Button
+                              type={ButtonTypeEnum.Primary}
+                              title={translate('view-error') as string}
+                              onPress={() => {
+                                reportError(lastError);
+                              }}
+                              twoButtons={true}
+                            />
+                          </View>
+                        </>
+                      )}
+                    </View>
+                  )}
+                </>
+              )}
+            </BottomSheetScrollView>
+          </BottomSheet>
+        </Animated.View>
       </View>
       <BottomSheetModal
         ref={securityBottomSheetRef}
@@ -2219,6 +2361,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     onChangeText={(text: string) => setCustomServerUri(text)}
                     editable={!disabled}
                     maxLength={100}
+                    keyboardType="url"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    spellCheck={false}
+                    textContentType="URL"
                   />
                 </View>
                 <View

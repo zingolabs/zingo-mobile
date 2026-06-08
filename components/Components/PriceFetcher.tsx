@@ -1,12 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-  Alert,
-  AlertButton,
-} from 'react-native';
+import { TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
@@ -17,6 +11,7 @@ import RegText from './RegText';
 import { ThemeType } from '../../app/types';
 import { CurrencyEnum, ModeEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
+import { showConfirm, ConfirmButton } from '../../app/showConfirm';
 
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
@@ -30,7 +25,14 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   backgroundColor,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode, currency } = context;
+  const {
+    translate,
+    zecPrice,
+    addLastSnackbar,
+    mode,
+    currency,
+    setCurrencyOption,
+  } = context;
   const { colors } = useTheme() as ThemeType;
   const bg = backgroundColor ?? colors.card;
 
@@ -106,32 +108,35 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   };
 
   const onPressFetchAlert = () => {
-    const buttons: AlertButton[] = [
-      ...[
-        currency === CurrencyEnum.USDCurrency
-          ? {
-              text: translate('send.fetch-button') as string,
-              onPress: () => onPressFetch(false),
-            }
-          : {},
-      ],
-      ...[
-        currency === CurrencyEnum.USDCurrency ||
-        currency === CurrencyEnum.USDTORCurrency
-          ? {
-              text: translate('send.fetchwithtor-button') as string,
-              onPress: () => onPressFetch(true),
-            }
-          : {},
-      ],
-      { text: translate('cancel') as string, style: 'cancel' },
-    ];
-    Alert.alert(
-      translate('send.fetchpricetitle') as string,
-      translate('send.fetchpricebody') as string,
-      buttons.filter((b: AlertButton) => !!b.text),
-      { cancelable: false },
-    );
+    const buttons: ConfirmButton[] = [];
+    if (currency === CurrencyEnum.USDCurrency) {
+      buttons.push({
+        text: translate('send.fetch-button') as string,
+        onPress: () => onPressFetch(false),
+      });
+    }
+    if (
+      currency === CurrencyEnum.USDCurrency ||
+      currency === CurrencyEnum.USDTORCurrency
+    ) {
+      buttons.push({
+        text: translate('send.fetchwithtor-button') as string,
+        onPress: async () => {
+          // If the user picked Tor while the preference was non-Tor USD,
+          // promote the preference so the next request only offers Tor.
+          if (currency === CurrencyEnum.USDCurrency) {
+            await setCurrencyOption(CurrencyEnum.USDTORCurrency);
+          }
+          onPressFetch(true);
+        },
+      });
+    }
+    buttons.push({ text: translate('cancel') as string, style: 'cancel' });
+    showConfirm({
+      title: translate('send.fetchpricetitle') as string,
+      message: translate('send.fetchpricebody') as string,
+      buttons,
+    });
   };
 
   return (

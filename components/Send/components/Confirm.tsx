@@ -47,10 +47,13 @@ import {
 import { RPCAddressKindEnum } from '../../../app/walletBackend/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/walletBackend/enums/RPCReceiversEnum';
 import { RPCParseAddressStatusEnum } from '../../../app/walletBackend/enums/RPCParseAddressStatusEnum';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCParseAddressType } from '../../../app/walletBackend/types/RPCParseAddressType';
 
-type ConfirmProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Confirm>;
+type ConfirmProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Confirm
+>;
 
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   navigation,

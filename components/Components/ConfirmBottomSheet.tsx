@@ -156,28 +156,59 @@ const ConfirmBottomSheet: React.FC = () => {
             {options.message}
           </RegText>
         )}
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 10,
-          }}
-        >
-          {options?.buttons.map((b, i) => (
-            <Button
-              key={`${i}-${b.text}`}
-              type={
-                b.style === 'cancel'
-                  ? ButtonTypeEnum.Secondary
-                  : ButtonTypeEnum.Primary
-              }
-              title={b.text}
-              onPress={() => handleButton(b)}
-              twoButtons={(options.buttons.length ?? 0) > 1}
-            />
-          ))}
-        </View>
+        {(() => {
+          const all = options?.buttons ?? [];
+          const cancel = all.find(b => b.style === 'cancel');
+          const actions = all.filter(b => b.style !== 'cancel');
+          // 3+ buttons would overflow horizontally (Button at 40% each):
+          // stack actions in one row and cancel below on its own.
+          const stacked = all.length > 2 && !!cancel;
+          const rowButtons = stacked ? actions : all;
+          const useTwoButtonsWidth = rowButtons.length > 1 || stacked;
+          return (
+            <>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                {rowButtons.map((b, i) => (
+                  <Button
+                    key={`${i}-${b.text}`}
+                    type={
+                      b.style === 'cancel'
+                        ? ButtonTypeEnum.Secondary
+                        : ButtonTypeEnum.Primary
+                    }
+                    title={b.text}
+                    onPress={() => handleButton(b)}
+                    twoButtons={useTwoButtonsWidth}
+                  />
+                ))}
+              </View>
+              {stacked && cancel && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: 10,
+                  }}
+                >
+                  <Button
+                    type={ButtonTypeEnum.Secondary}
+                    title={cancel.text}
+                    onPress={() => handleButton(cancel)}
+                    twoButtons={true}
+                  />
+                </View>
+              )}
+            </>
+          );
+        })()}
       </BottomSheetView>
     </BottomSheetModal>
   );

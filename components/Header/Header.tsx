@@ -1,9 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import {
-  faBars,
-  faChevronLeft,
-  faSnowflake,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faSnowflake } from '@fortawesome/free-solid-svg-icons';
+import BurgerIcon from '../../assets/img/options/burger.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   NavigationProp,
@@ -11,8 +8,19 @@ import {
   useNavigation,
   useTheme,
 } from '@react-navigation/native';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { useOptionsPanel } from '../../app/context/optionsPanel';
+
+// Mirror the panel host's fade duration so the header dissolves in lockstep
+// with the panel that's appearing over it.
+const HEADER_FADE_MS = 320;
 import {
   ModeEnum,
   NetInfoType,
@@ -123,6 +131,20 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const { colors } = useTheme() as ThemeType;
 
+  // Fade the entire screen header out when the Options panel is open so
+  // its content doesn't shine through the (fading-in) panel overlay.
+  const { isOpen: optionsPanelOpen } = useOptionsPanel();
+  const headerOpacity = useSharedValue(1);
+  useEffect(() => {
+    headerOpacity.value = withTiming(optionsPanelOpen ? 0 : 1, {
+      duration: HEADER_FADE_MS,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [optionsPanelOpen, headerOpacity]);
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: headerOpacity.value,
+  }));
+
   const {
     percentageOutputsScanned,
     syncInProgress,
@@ -167,7 +189,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   return (
     <>
-      <View>
+      <Animated.View style={headerAnimatedStyle}>
         <View
           testID="header"
           style={{
@@ -226,7 +248,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
         <View
           style={{
-            padding: 11.5,
+            paddingLeft: 20,
+            paddingTop: 16,
+            paddingRight: 11.5,
+            paddingBottom: 11.5,
             position: 'absolute',
             left: 0,
             top: 0,
@@ -241,11 +266,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 accessibilityLabel={translate('menudrawer-acc') as string}
                 onPress={toggleMenuDrawer}
               >
-                <FontAwesomeIcon
-                  icon={faBars}
-                  size={32}
-                  color={colors.border}
-                />
+                <BurgerIcon width={25} height={25} />
               </TouchableOpacity>
             )}
             {readOnly && !noUfvkIcon && (
@@ -298,7 +319,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   testID="header.messages"
                   onPress={() => navigation.navigate(RouteEnum.Messages)}
                 >
-                  <MessagesIcon size={26} color={colors.border} />
+                  <MessagesIcon size={24} color="#B1BBC5" />
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -315,7 +336,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   }
                 }}
               >
-                <BoltIcon size={28} color={colors.border} />
+                <BoltIcon size={25} color="#B1BBC5" />
               </TouchableOpacity>
             </View>
           ) : (
@@ -330,7 +351,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             />
           )}
         </View>
-      </View>
+      </Animated.View>
 
       {!!title && (
         <View

@@ -260,7 +260,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
           style={
             {
               "alignItems": "flex-start",
-              "borderBottomColor": "#ffffff",
+              "borderBottomColor": "#122033",
               "borderBottomWidth": 1.5,
               "borderStyle": "solid",
               "display": "flex",
@@ -825,7 +825,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
           style={
             {
               "alignItems": "flex-start",
-              "borderBottomColor": "#ffffff",
+              "borderBottomColor": "#122033",
               "borderBottomWidth": 1.5,
               "borderStyle": "solid",
               "display": "flex",
@@ -1273,8 +1273,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
           style={
             {
               "alignItems": "flex-start",
-              "borderBottomColor": "#5a8c5a",
-              "borderBottomWidth": 0.5,
+              "borderBottomColor": "#122033",
+              "borderBottomWidth": 0,
               "borderStyle": "solid",
               "display": "flex",
               "flexDirection": "column",
@@ -1512,9 +1512,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
     style={
       {
         "backgroundColor": "#031124",
-        "borderBottomWidth": 1,
-        "borderColor": "#011401",
-        "borderTopWidth": 1,
         "paddingBottom": 0,
         "paddingLeft": 15,
         "paddingTop": 10,
@@ -1782,7 +1779,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
           style={
             {
               "alignItems": "flex-start",
-              "borderBottomColor": "#ffffff",
+              "borderBottomColor": "#122033",
               "borderBottomWidth": 1.5,
               "borderStyle": "solid",
               "display": "flex",

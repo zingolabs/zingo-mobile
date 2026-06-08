@@ -86,6 +86,7 @@
   },
   "change-privacy-legend": ".\nGizli değerleri göstermek için dokunun.",
   "txtcopied": "Metin panoya kopyalandı",
+  "linkcopied": "Bağlantı panoya kopyalandı",
   "insight": {
     "title": "Finansal İçgörü",
     "no-data": "Seçilen grafikle uyumlu veriler cüzdanınızda bulunmamaktadır.",
@@ -326,6 +327,7 @@
       }
     ],
     "nochanges": "Herhangi bir değişiklik kaydedilmedi.",
+    "save-error": "Ayarlar kaydedilemedi",
     "ismemo": "Kaydetmek için notları indirme seçeneğini seçmeniz gerekiyor.",
     "isthreshold": "Kaydetmek için işlem filtre eşiği seçeneğini seçmeniz gerekiyor.",
     "isserver": "Listeden bir sunucu seçmeniz ya da geçerli bir Sunucu URI’si girmeniz gerekiyor.",
@@ -623,6 +625,7 @@
     "sent": "Gönderildi ",
     "sent-failed": "Göndermek ",
     "received": "Alındı ",
+    "received-failed": "Almak ",
     "memotoself": "Kendime not ",
     "sendtoself": "Kendime Gönder ",
     "shield": "Korumalı ",

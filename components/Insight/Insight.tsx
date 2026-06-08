@@ -36,7 +36,7 @@ import {
   ScreenEnum,
   SnackbarDurationEnum,
 } from '../../app/AppState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 
 type DataType = {
@@ -59,7 +59,10 @@ const getPercent = (percent: number) => {
   );
 };
 
-type InsightProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Insight>;
+type InsightProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Insight
+>;
 
 const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);

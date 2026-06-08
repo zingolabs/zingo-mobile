@@ -45,7 +45,7 @@ import {
 import Header from '../Header';
 import Utils from '../../app/utils';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import WalletType from '../../app/AppState/types/WalletType';
 import { fetchWallet } from '../../app/walletBackend';
@@ -59,7 +59,7 @@ type TextsType = {
   backup: string[];
 };
 
-type SeedProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
+type SeedProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   keepAwake?: (v: boolean) => void;
@@ -134,10 +134,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   useEffect(() => {
     return () => {
+      // Only wipe the clipboard if WE have a pending auto-clear timer —
+      // i.e. the user copied something from this screen and the 60s
+      // expiry hasn't fired yet. Otherwise we'd be wiping clipboard
+      // content the user copied from somewhere else (e.g. their seed
+      // from another app, ready to paste into restore-wallet).
       if (clipboardTimer.current) {
         clearTimeout(clipboardTimer.current);
+        Clipboard.setString('');
+        clipboardTimer.current = null;
       }
-      Clipboard.setString('');
     };
   }, []);
 
@@ -287,9 +293,17 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       );
       setBasicFirstViewSeed(true);
       keepAwake && keepAwake(false);
-      // redirect to history screen
-      navigation.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.History,
+      // Redirect to history screen — `reset` wipes the stack so the
+      // (already-authenticated) Seed instance can't be reached via a back
+      // gesture after onboarding.
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: RouteEnum.HomeStack,
+            params: { screen: RouteEnum.History },
+          },
+        ],
       });
     } else {
       if (navigation.canGoBack()) {

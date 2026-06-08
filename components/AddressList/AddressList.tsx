@@ -37,10 +37,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { RPCAddressScopeEnum } from '../../app/walletBackend/enums/RPCAddressScopeEnum';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 
-type AddressListProps = DrawerScreenProps<
+type AddressListProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.AddressList
 >;

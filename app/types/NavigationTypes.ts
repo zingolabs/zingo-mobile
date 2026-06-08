@@ -3,9 +3,7 @@ import {
   LaunchingModeEnum,
   RouteEnum,
   SeedActionEnum,
-  SelectServerEnum,
   SendPageStateClass,
-  ServerType,
   UfvkActionEnum,
   ValueTransferType,
 } from '../AppState';
@@ -68,7 +66,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Computing]: undefined;
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
-  [RouteEnum.ContactList]: undefined;
 
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
@@ -76,8 +73,6 @@ export type AppDrawerParamList = {
   [RouteEnum.ValueTransferDetail]:
     | ValueTransferDetailNavigationState
     | undefined;
-  [RouteEnum.MessagesAddress]: MessagesAddressNavigationState | undefined;
-  [RouteEnum.MessagesAll]: MessagesAllNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
   [RouteEnum.Seed]: SeedNavigationState | undefined;
@@ -108,7 +103,6 @@ export type ValueTransferDetailNavigationState = {
   vt: ValueTransferType;
   valueTransfersSliced: ValueTransferType[];
   totalLength: number;
-  from?: RouteEnum;
 };
 
 export type ConfirmNavigationState = {
@@ -125,24 +119,6 @@ export type ConfirmNavigationState = {
   ) => Promise<void>;
   sendPageState: SendPageStateClass;
   nym: boolean;
-};
-
-export type MessagesAddressNavigationState = {
-  setScrollToBottom: (value: boolean) => void;
-  scrollToBottom: boolean;
-  address: string;
-  sendTransaction: (s: SendPageStateClass) => Promise<String>;
-  setServerOption: (
-    value: ServerType,
-    selectServer: SelectServerEnum,
-    toast: boolean,
-    sameServerChainName: boolean,
-  ) => Promise<void>;
-};
-
-export type MessagesAllNavigationState = {
-  setScrollToBottom: (value: boolean) => void;
-  scrollToBottom: boolean;
 };
 
 export type UfvkNavigationState = {

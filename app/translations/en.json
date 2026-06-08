@@ -86,6 +86,7 @@
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
+  "linkcopied": "Link copied to Clipboard",
   "insight": {
     "title": "Financial Insight",
     "no-data": "There is no data in your Wallet that fits the graph selected.",
@@ -326,6 +327,7 @@
       }
     ],
     "nochanges": "No changes registered.",
+    "save-error": "Couldn't save settings",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
     "isserver": "You need to choose one Server of the list or fill out a valid Server URI.",
@@ -623,6 +625,7 @@
     "sent": "Sent ",
     "sent-failed": "Send ",
     "received": "Received ",
+    "received-failed": "Receive ",
     "memotoself": "Memo-to-Self ",
     "sendtoself": "Send-to-Self ",
     "shield": "Shielded ",

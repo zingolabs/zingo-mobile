@@ -364,12 +364,12 @@ jobs:
       #  run: podman pull zingodevops/regchest:013
 
       - name: Pull ci-build image
-        run: podman pull docker.io/zingodevops/ci-build:010
+        run: podman pull docker.io/zingodevops/ci-build:011
 
       - name: Extract binaries & params from image
         run: |
           set -euxo pipefail
-          cid=$(podman create docker.io/zingodevops/ci-build:010)
+          cid=$(podman create docker.io/zingodevops/ci-build:011)
           mkdir -p rust/test_binaries/bins
           podman cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
           podman cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/

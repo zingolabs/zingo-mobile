@@ -10,10 +10,10 @@ import { AppDrawerParamList, ThemeType } from '../../types';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';
 import { RouteEnum, ScreenEnum } from '../../AppState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
 
-type ComputingTxContentProps = DrawerScreenProps<
+type ComputingTxContentProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Computing
 >;

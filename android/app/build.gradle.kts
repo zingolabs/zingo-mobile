@@ -120,8 +120,8 @@ android {
         applicationId = "org.ZingoLabs.Zingo" // Real
         minSdk = rootProject.extra["minSdkVersion"] as Int
         targetSdk = rootProject.extra["targetSdkVersion"] as Int
-        versionCode = 307 // Real (prod baseline; beta flavor overrides below)
-        versionName = "2.0.19" // Real
+        versionCode = 309 // Real (prod baseline; beta flavor overrides below)
+        versionName = "2.0.20" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
@@ -302,7 +302,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    androidTestImplementation("com.wix:detox:20.51.0")
+    androidTestImplementation("com.wix:detox:20.51.3")
     implementation("androidx.appcompat:appcompat:1.7.0")
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
