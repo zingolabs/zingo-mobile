@@ -27,6 +27,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
+  ChainNameEnum,
   CurrencyEnum,
   FilterEnum,
   GlobalConst,
@@ -45,6 +46,7 @@ import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
+import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
 import Header from '../Header';
 import Utils from '../../app/utils';
 import {
@@ -147,6 +149,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const [usdRowH, setUsdRowH] = useState<number>(0);
+  const [priceRowH, setPriceRowH] = useState<number>(0);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const historySheetRef = useRef<BottomSheet>(null);
@@ -154,6 +157,17 @@ const History: React.FunctionComponent<HistoryProps> = ({
   // disabled, 3 → 2 snaps), clamp the index in an effect so the sheet
   // doesn't throw "out of range" against the stale internal position.
   const internalSnapIndexRef = useRef<number>(0);
+  // Bump the sheet up by one when the PriceRow first appears so the user
+  // stays at the same visual snap (balance still showing) instead of
+  // landing on the new price snap.
+  const prevHasPriceSnapRef = useRef<boolean>(false);
+  useEffect(() => {
+    const hasPriceSnap = priceRowH > 0;
+    if (!prevHasPriceSnapRef.current && hasPriceSnap) {
+      historySheetRef.current?.snapToIndex(internalSnapIndexRef.current + 1);
+    }
+    prevHasPriceSnapRef.current = hasPriceSnap;
+  }, [priceRowH]);
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
   const scrollViewRef =
@@ -267,35 +281,58 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const BALANCE_SNAP_BUMP = 10;
 
   useEffect(() => {
+    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      currency === CurrencyEnum.USDCurrency ||
-      currency === CurrencyEnum.USDTORCurrency;
+      isMainChain &&
+      (currency === CurrencyEnum.USDCurrency ||
+        currency === CurrencyEnum.USDTORCurrency);
     if (!withUsd) {
       setUsdRowH(0);
     }
-  }, [currency]);
+  }, [currency, server.chainName]);
 
   const historySnapPoints = useMemo(() => {
+    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      currency === CurrencyEnum.USDCurrency ||
-      currency === CurrencyEnum.USDTORCurrency;
+      isMainChain &&
+      (currency === CurrencyEnum.USDCurrency ||
+        currency === CurrencyEnum.USDTORCurrency);
     // Until the layout reports the actual container + header heights, fall
     // back to percentages.
     if (containerH <= 0 || headerH <= 0) {
       return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
     const snapBase = containerH - headerH - SNAP_GAP;
-    const snapLow = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
+    // Smallest sheet: full header visible, including the PriceRow at the
+    // bottom of the Header (only present when zecPrice > 0).
+    const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
+    // "Balance visible" snap covers the PriceRow but keeps balance + USD
+    // showing — when there's no PriceRow, this collapses back to the
+    // original snapLow value.
+    const snapLow = Math.max(snapBase + priceRowH + BALANCE_SNAP_BUMP, 100);
     const snapMid = Math.min(
-      Math.max(snapBase + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
+      Math.max(snapBase + priceRowH + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
       containerH - TOP_ICONS_H - SNAP_GAP,
     );
     const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
-    if (withUsd && usdRowH > 0) {
-      return [snapLow, snapMid, snapMax];
+    const points: number[] = [];
+    if (priceRowH > 0) {
+      points.push(snapPrice);
     }
-    return [snapLow, snapMax];
-  }, [currency, containerH, headerH, usdRowH]);
+    points.push(snapLow);
+    if (withUsd && usdRowH > 0) {
+      points.push(snapMid);
+    }
+    points.push(snapMax);
+    return points;
+  }, [currency, server.chainName, containerH, headerH, usdRowH, priceRowH]);
+
+  const priceSnapIndex = priceRowH > 0 ? 0 : null;
+  const onPriceSnapChange = usePriceSnapAutoClose(
+    historySheetRef,
+    priceSnapIndex,
+    1,
+  );
 
   useEffect(() => {
     if (internalSnapIndexRef.current >= historySnapPoints.length) {
@@ -684,6 +721,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             setBackgroundError={setBackgroundError /* context */}
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
+            onPriceRowLayout={setPriceRowH}
           />
         </View>
       </View>
@@ -697,6 +735,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           index={0}
           onChange={i => {
             internalSnapIndexRef.current = i;
+            onPriceSnapChange(i);
           }}
           enableDynamicSizing={false}
           enablePanDownToClose={false}

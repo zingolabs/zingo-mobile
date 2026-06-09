@@ -153,7 +153,14 @@
     "serverchain-mismatch": "Sunucu seçtiğinizden farklı bir zincir bildiriyor. Zincir seçiciyi kontrol edip tekrar deneyin.",
     "changingwallet-label": "Error Cüzdan değiştirilirken bir hata oluştu",
     "restoringwallet-label": "Error Cüzdan geri yüklenirken bir hata oluştu",
-    "computingtx": "İşlem Hesaplanıyor",
+    "computingtx": "İşlem Hesaplanıyor...",
+    "computingtx-hangon": "Sabırlı olun,\nbir an sürecek...",
+    "transactioncreated-title": "İşlem oluşturuldu",
+    "transactioncreated-body": "Tüm ayrıntıları işlem\ngeçmişinizde bulabilirsiniz.",
+    "transactionfailed-title": "İşlem başarısız",
+    "transactionfailed-body": "Endişelenmeyin, paranız güvende\nve hesabınızdan düşülmedi.",
+    "transactionfailed-details": "Hata ayrıntıları",
+    "continue": "Devam et",
     "of": "of",
     "history-menu": "Geçmiş",
     "send-menu": "Gönder",
@@ -184,6 +191,11 @@
     "backupwallet-error": "Error: Cüzdan yedeği kaydedilemedi."
   },
   "settings": {
+    "section-preferences": "Tercihler",
+    "section-privacysecurity": "Gizlilik ve Güvenlik",
+    "section-networkadvanced": "Ağ ve Gelişmiş",
+    "section-other": "Diğer",
+    "section-developer": "Geliştirici",
     "memos": [
       {
         "value": "none",
@@ -427,6 +439,9 @@
     "nym-privacy-network": "Gizlilik Ağı",
     "nym-network": "NYM Ağı",
     "nym-enhanced-privacy": "Gelişmiş Gizlilik"
+  },
+  "header": {
+    "lastupdate": "Son güncelleme:"
   },
   "info": {
     "version": "Versiyon",

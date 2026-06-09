@@ -153,7 +153,14 @@
     "serverchain-mismatch": "O servidor informa uma rede diferente da selecionada. Verifique o seletor de rede e tente novamente.",
     "changingwallet-label": "Error ao Alterar a Carteira",
     "restoringwallet-label": "Error ao Restaurar a Carteira",
-    "computingtx": "Avaliando a Transação",
+    "computingtx": "Processando Transação...",
+    "computingtx-hangon": "Aguarde um momento,\nisto vai demorar só um instante...",
+    "transactioncreated-title": "Transação criada",
+    "transactioncreated-body": "Você pode ver todos os detalhes em\nseu histórico de transações.",
+    "transactionfailed-title": "Transação falhou",
+    "transactionfailed-body": "Não se preocupe, seus fundos estão a salvo\ne não foram descontados.",
+    "transactionfailed-details": "Detalhes do erro",
+    "continue": "Continuar",
     "of": "de",
     "history-menu": "Historico",
     "send-menu": "Enviar",
@@ -184,6 +191,11 @@
     "backupwallet-error": "Error: não foi possível salvar o backup da carteira."
   },
   "settings": {
+    "section-preferences": "Preferências",
+    "section-privacysecurity": "Privacidade e Segurança",
+    "section-networkadvanced": "Rede e Avançado",
+    "section-other": "Outros",
+    "section-developer": "Desenvolvedor",
     "memos": [
       {
         "value": "none",
@@ -427,6 +439,9 @@
     "nym-privacy-network": "Rede de Privacidade",
     "nym-network": "Rede NYM",
     "nym-enhanced-privacy": "Privacidade Aprimorada"
+  },
+  "header": {
+    "lastupdate": "Última atualização:"
   },
   "info": {
     "version": "Versão",

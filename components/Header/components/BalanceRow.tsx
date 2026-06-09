@@ -11,6 +11,7 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   ButtonTypeEnum,
+  ChainNameEnum,
   CurrencyEnum,
   ModeEnum,
   RouteEnum,
@@ -191,7 +192,8 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
         {(currency === CurrencyEnum.USDCurrency ||
           currency === CurrencyEnum.USDTORCurrency) &&
           !noBalance &&
-          selectServer !== SelectServerEnum.offline && (
+          selectServer !== SelectServerEnum.offline &&
+          info.chainName === ChainNameEnum.mainChainName && (
             <View
               onLayout={e => onUsdRowLayout?.(e.nativeEvent.layout.height)}
               style={{ flexDirection: 'row', alignItems: 'center' }}

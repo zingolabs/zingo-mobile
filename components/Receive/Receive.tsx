@@ -27,6 +27,7 @@ import BoldText from '../Components/BoldText';
 
 import {
   AddressKindEnum,
+  ChainNameEnum,
   CurrencyEnum,
   ModeEnum,
   SecurityType,
@@ -53,6 +54,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
+import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
 
 type ReceiveProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -90,6 +92,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const [usdRowH, setUsdRowH] = useState<number>(0);
+  const [priceRowH, setPriceRowH] = useState<number>(0);
 
   const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
   const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
@@ -110,33 +113,53 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const BALANCE_SNAP_BUMP = 10;
 
   useEffect(() => {
+    const isMainChain =
+      context.server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      context.currency === CurrencyEnum.USDCurrency ||
-      context.currency === CurrencyEnum.USDTORCurrency;
+      isMainChain &&
+      (context.currency === CurrencyEnum.USDCurrency ||
+        context.currency === CurrencyEnum.USDTORCurrency);
     if (!withUsd) {
       setUsdRowH(0);
     }
-  }, [context.currency]);
+  }, [context.currency, context.server.chainName]);
 
   const receiveSnapPoints = useMemo(() => {
+    const isMainChain =
+      context.server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      context.currency === CurrencyEnum.USDCurrency ||
-      context.currency === CurrencyEnum.USDTORCurrency;
+      isMainChain &&
+      (context.currency === CurrencyEnum.USDCurrency ||
+        context.currency === CurrencyEnum.USDTORCurrency);
     if (containerH <= 0 || headerH <= 0) {
       return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
     const snapBase = containerH - headerH - SNAP_GAP;
-    const snapLow = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
+    const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
+    const snapLow = Math.max(snapBase + priceRowH + BALANCE_SNAP_BUMP, 100);
     const snapMid = Math.min(
-      Math.max(snapBase + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
+      Math.max(snapBase + priceRowH + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
       containerH - TOP_ICONS_H - SNAP_GAP,
     );
     const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
-    if (withUsd && usdRowH > 0) {
-      return [snapLow, snapMid, snapMax];
+    const points: number[] = [];
+    if (priceRowH > 0) {
+      points.push(snapPrice);
     }
-    return [snapLow, snapMax];
-  }, [context.currency, containerH, headerH, usdRowH]);
+    points.push(snapLow);
+    if (withUsd && usdRowH > 0) {
+      points.push(snapMid);
+    }
+    points.push(snapMax);
+    return points;
+  }, [
+    context.currency,
+    context.server.chainName,
+    containerH,
+    headerH,
+    usdRowH,
+    priceRowH,
+  ]);
 
   // Stable initial index — the `index` prop is controlled, so recomputing
   // it reactively when snapPoints grows (2 → 3 with USD currency) forces a
@@ -156,6 +179,23 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       receiveSheetRef.current?.snapToIndex(receiveSnapPoints.length - 1);
     }
   }, [receiveSnapPoints]);
+  // Bump the sheet up by one when the PriceRow first appears so the user
+  // stays at the same visual snap instead of landing on the new price snap.
+  const prevHasPriceSnapRef = useRef<boolean>(false);
+  useEffect(() => {
+    const hasPriceSnap = priceRowH > 0;
+    if (!prevHasPriceSnapRef.current && hasPriceSnap) {
+      receiveSheetRef.current?.snapToIndex(internalSnapIndexRef.current + 1);
+    }
+    prevHasPriceSnapRef.current = hasPriceSnap;
+  }, [priceRowH]);
+
+  const priceSnapIndex = priceRowH > 0 ? 0 : null;
+  const onPriceSnapChange = usePriceSnapAutoClose(
+    receiveSheetRef,
+    priceSnapIndex,
+    1,
+  );
 
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
     setSheetType(_sheetType);
@@ -352,6 +392,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           toggleMenuDrawer={toggleMenuDrawer}
           showMessagesIcon={true}
           onUsdRowLayout={setUsdRowH}
+          onPriceRowLayout={setPriceRowH}
         />
       </View>
       <Animated.View
@@ -365,6 +406,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           index={initialReceiveSnapIndex}
           onChange={i => {
             internalSnapIndexRef.current = i;
+            onPriceSnapChange(i);
           }}
           enableDynamicSizing={false}
           enablePanDownToClose={false}

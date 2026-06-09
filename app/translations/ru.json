@@ -153,7 +153,14 @@
     "serverchain-mismatch": "Сервер сообщает о другой сети, отличной от выбранной. Проверьте селектор сети и попробуйте снова.",
     "changingwallet-label": "Error при смене кошелька",
     "restoringwallet-label": "Error при восстановлении кошелька",
-    "computingtx": "Вычисление транзакции",
+    "computingtx": "Обработка транзакции...",
+    "computingtx-hangon": "Подождите немного,\nэто займёт всего минуту...",
+    "transactioncreated-title": "Транзакция создана",
+    "transactioncreated-body": "Все детали вы найдёте\nв истории транзакций.",
+    "transactionfailed-title": "Ошибка транзакции",
+    "transactionfailed-body": "Не волнуйтесь, ваши средства в безопасности\nи не были списаны.",
+    "transactionfailed-details": "Подробности ошибки",
+    "continue": "Продолжить",
     "of": "из",
     "history-menu": "История",
     "send-menu": "Отправлено",
@@ -184,6 +191,11 @@
     "backupwallet-error": "Error: Не удалось сохранить резервную копию кошелька."
   },
   "settings": {
+    "section-preferences": "Настройки",
+    "section-privacysecurity": "Конфиденциальность и безопасность",
+    "section-networkadvanced": "Сеть и расширенные",
+    "section-other": "Прочее",
+    "section-developer": "Разработчик",
     "memos": [
       {
         "value": "none",
@@ -427,6 +439,9 @@
     "nym-privacy-network": "Сеть конфиденциальности",
     "nym-network": "Сеть NYM",
     "nym-enhanced-privacy": "Повышенная конфиденциальность"
+  },
+  "header": {
+    "lastupdate": "Последнее обновление:"
   },
   "info": {
     "version": "Версия",

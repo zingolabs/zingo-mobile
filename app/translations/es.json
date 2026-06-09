@@ -153,7 +153,14 @@
     "serverchain-mismatch": "El servidor reporta una cadena diferente a la seleccionada. Revisa el selector de cadena e inténtalo de nuevo.",
     "changingwallet-label": "Error cambiando de Monedero",
     "restoringwallet-label": "Error restaurando el Monedero",
-    "computingtx": "Procesando Transacción",
+    "computingtx": "Procesando Transacción...",
+    "computingtx-hangon": "Aguanta un poco,\nesto solo tardará un momento...",
+    "transactioncreated-title": "Transacción creada",
+    "transactioncreated-body": "Puedes ver todos los detalles en\ntu historial de transacciones.",
+    "transactionfailed-title": "Transacción fallida",
+    "transactionfailed-body": "Tranquilo, tus fondos están a salvo\ny no se han descontado.",
+    "transactionfailed-details": "Detalles del error",
+    "continue": "Continuar",
     "of": "de",
     "history-menu": "Historico",
     "send-menu": "Enviar",
@@ -184,6 +191,11 @@
     "backupwallet-error": "Error: No se pudo guardar la copia de seguridad del monedero."
   },
   "settings": {
+    "section-preferences": "Preferencias",
+    "section-privacysecurity": "Privacidad y Seguridad",
+    "section-networkadvanced": "Red y Avanzado",
+    "section-other": "Otros",
+    "section-developer": "Desarrollador",
     "memos": [
       {
         "value": "none",
@@ -427,6 +439,9 @@
     "nym-privacy-network": "Red de Privacidad",
     "nym-network": "Red NYM",
     "nym-enhanced-privacy": "Privacidad Mejorada"
+  },
+  "header": {
+    "lastupdate": "Última actualización:"
   },
   "info": {
     "version": "Versión",

@@ -15,7 +15,6 @@ import {
 } from '../AppState';
 import TotalBalanceClass from '../AppState/classes/TotalBalanceClass';
 import NetInfoType from '../AppState/types/NetInfoType';
-import { createAlert } from '../createAlert';
 import { shieldFunds as executeShieldFunds } from '../walletBackend';
 import { RPCShieldProposeType } from '../walletBackend/types/RPCShieldProposeType';
 import { RPCShieldType } from '../walletBackend/types/RPCShieldType';
@@ -175,61 +174,37 @@ export function useShieldFunds({
       return;
     }
 
-    const pools: PoolToShieldEnum = PoolToShieldEnum.transparentPoolToShield;
-
     navigation.navigate(RouteEnum.Computing);
     await RPCModule.shieldProcess();
     const shieldStr = await executeShieldFunds();
 
     if (shieldStr) {
+      let success = false;
+      let errorMessage: string | undefined;
       if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          translate(`history.shield-title-${pools}`) as string,
-          `${translate(`history.shield-error-${pools}`)} ${shieldStr}`,
-          true,
-          translate,
-        );
+        errorMessage = shieldStr;
       } else {
         try {
           const shieldJSON: RPCShieldType = JSON.parse(shieldStr);
           if (shieldJSON.error) {
-            createAlert(
-              setBackgroundError,
-              addLastSnackbar,
-              translate(`history.shield-title-${pools}`) as string,
-              `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
-              true,
-              translate,
-            );
+            errorMessage = shieldJSON.error;
           } else if (shieldJSON.txids) {
-            createAlert(
-              setBackgroundError,
-              addLastSnackbar,
-              translate(`history.shield-title-${pools}`) as string,
-              `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txids.join(', ')}`,
-              true,
-              translate,
-            );
+            success = true;
           }
         } catch (e) {
-          createAlert(
-            setBackgroundError,
-            addLastSnackbar,
-            translate(`history.shield-title-${pools}`) as string,
-            `${translate(`history.shield-message-${pools}`)} ${shieldStr}`,
-            true,
-            translate,
-          );
+          // Unparseable response that didn't start with `error` is most
+          // likely a quirky success payload — treat it as success and let
+          // the user land on the "created" confirmation.
+          success = true;
         }
       }
       setScrollToTop?.(true);
       setScrollToBottom?.(true);
       setShieldingFee(0);
       setShieldingAmount?.(0);
-      navigation.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.History,
+      navigation.navigate(RouteEnum.Computing, {
+        phase: success ? 'created' : 'failed',
+        errorMessage: success ? undefined : errorMessage,
       });
     }
   }, [

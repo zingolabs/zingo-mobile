@@ -579,14 +579,16 @@ const ValueTransferDetail: React.FunctionComponent<
               privacy={privacy}
               smallPrefix={true}
             />
-            {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
-              <CurrencyAmount
-                price={valueTransfer.zecPrice}
-                amtZec={valueTransfer.amount}
-                currency={currency}
-                privacy={privacy}
-              />
-            )}
+            {!!valueTransfer.zecPrice &&
+              valueTransfer.zecPrice > 0 &&
+              server.chainName === ChainNameEnum.mainChainName && (
+                <CurrencyAmount
+                  price={valueTransfer.zecPrice}
+                  amtZec={valueTransfer.amount}
+                  currency={currency}
+                  privacy={privacy}
+                />
+              )}
           </View>
 
           {valueTransfer.confirmations ===
@@ -933,14 +935,16 @@ const ValueTransferDetail: React.FunctionComponent<
                   currencyName={info.currencyName}
                   privacy={privacy}
                 />
-                {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
-                  <CurrencyAmount
-                    price={valueTransfer.zecPrice}
-                    amtZec={valueTransfer.amount}
-                    currency={currency}
-                    privacy={privacy}
-                  />
-                )}
+                {!!valueTransfer.zecPrice &&
+                  valueTransfer.zecPrice > 0 &&
+                  server.chainName === ChainNameEnum.mainChainName && (
+                    <CurrencyAmount
+                      price={valueTransfer.zecPrice}
+                      amtZec={valueTransfer.amount}
+                      currency={currency}
+                      privacy={privacy}
+                    />
+                  )}
               </View>
             </View>
 

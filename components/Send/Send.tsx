@@ -88,7 +88,7 @@ import BottomSheet, {
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
-import { createAlert } from '../../app/createAlert';
+import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
 import AddressItem from '../Components/AddressItem';
 import { RPCSendProposeType } from '../../app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
@@ -213,6 +213,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const [usdRowH, setUsdRowH] = useState<number>(0);
+  const [priceRowH, setPriceRowH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const sendSheetRef = useRef<BottomSheet>(null);
@@ -220,6 +221,17 @@ const Send: React.FunctionComponent<SendProps> = ({
   // disabled, 3 → 2 snaps), clamp the index in an effect so the sheet
   // doesn't throw "out of range" against the stale internal position.
   const internalSnapIndexRef = useRef<number>(0);
+  // Bump the sheet up by one when the PriceRow first appears so the user
+  // stays at the same visual snap (balance still showing) instead of
+  // landing on the new price snap.
+  const prevHasPriceSnapRef = useRef<boolean>(false);
+  useEffect(() => {
+    const hasPriceSnap = priceRowH > 0;
+    if (!prevHasPriceSnapRef.current && hasPriceSnap) {
+      sendSheetRef.current?.snapToIndex(internalSnapIndexRef.current + 1);
+    }
+    prevHasPriceSnapRef.current = hasPriceSnap;
+  }, [priceRowH]);
   const memoBottomSheetRef = useRef<BottomSheetModal>(null);
   const addressBookSelectRef = useRef<BottomSheetModal>(null);
   const feeCalculationGenRef = useRef<number>(0);
@@ -236,33 +248,51 @@ const Send: React.FunctionComponent<SendProps> = ({
   const BALANCE_SNAP_BUMP = 10;
 
   useEffect(() => {
+    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      currency === CurrencyEnum.USDCurrency ||
-      currency === CurrencyEnum.USDTORCurrency;
+      isMainChain &&
+      (currency === CurrencyEnum.USDCurrency ||
+        currency === CurrencyEnum.USDTORCurrency);
     if (!withUsd) {
       setUsdRowH(0);
     }
-  }, [currency]);
+  }, [currency, server.chainName]);
 
   const sendSnapPoints = useMemo(() => {
+    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      currency === CurrencyEnum.USDCurrency ||
-      currency === CurrencyEnum.USDTORCurrency;
+      isMainChain &&
+      (currency === CurrencyEnum.USDCurrency ||
+        currency === CurrencyEnum.USDTORCurrency);
     if (containerH <= 0 || headerH <= 0) {
       return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
     const snapBase = containerH - headerH - SNAP_GAP;
-    const snapLow = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
+    const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
+    const snapLow = Math.max(snapBase + priceRowH + BALANCE_SNAP_BUMP, 100);
     const snapMid = Math.min(
-      Math.max(snapBase + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
+      Math.max(snapBase + priceRowH + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
       containerH - TOP_ICONS_H - SNAP_GAP,
     );
     const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
-    if (withUsd && usdRowH > 0) {
-      return [snapLow, snapMid, snapMax];
+    const points: number[] = [];
+    if (priceRowH > 0) {
+      points.push(snapPrice);
     }
-    return [snapLow, snapMax];
-  }, [currency, containerH, headerH, usdRowH]);
+    points.push(snapLow);
+    if (withUsd && usdRowH > 0) {
+      points.push(snapMid);
+    }
+    points.push(snapMax);
+    return points;
+  }, [currency, server.chainName, containerH, headerH, usdRowH, priceRowH]);
+
+  const priceSnapIndex = priceRowH > 0 ? 0 : null;
+  const onPriceSnapChange = usePriceSnapAutoClose(
+    sendSheetRef,
+    priceSnapIndex,
+    1,
+  );
 
   useEffect(() => {
     if (internalSnapIndexRef.current >= sendSnapPoints.length) {
@@ -939,7 +969,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     let error = '';
     let customError: string | undefined;
     try {
-      const txid = await sendTransaction(sendPageStatePar);
+      await sendTransaction(sendPageStatePar);
 
       // Clear the fields
       clearState();
@@ -948,19 +978,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       setScrollToTop(true);
       setScrollToBottom(true);
 
-      createAlert(
-        setBackgroundError,
-        addLastSnackbar,
-        translate('send.confirm-title') as string,
-        `${translate('send.Broadcast')} ${txid}`,
-        true,
-        translate,
-      );
       // the app send successfully on the first attemp.
-
-      navigation.navigate(RouteEnum.HomeStack, {
-        screen: RouteEnum.History,
-      });
+      navigation.navigate(RouteEnum.Computing, { phase: 'created' });
       return;
     } catch (err1) {
       error = err1 as string;
@@ -996,7 +1015,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
 
         try {
-          const txid = await sendTransaction(sendPageStatePar);
+          await sendTransaction(sendPageStatePar);
 
           // Clear the fields
           clearState();
@@ -1005,19 +1024,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           setScrollToTop(true);
           setScrollToBottom(true);
 
-          createAlert(
-            setBackgroundError,
-            addLastSnackbar,
-            translate('send.confirm-title') as string,
-            `${translate('send.Broadcast')} ${txid}`,
-            true,
-            translate,
-          );
           // the app send successfully on the second attemp.
-
-          navigation.navigate(RouteEnum.HomeStack, {
-            screen: RouteEnum.History,
-          });
+          navigation.navigate(RouteEnum.Computing, { phase: 'created' });
           return;
         } catch (err2) {
           error = err2 as string;
@@ -1027,23 +1035,9 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     }
 
-    setTimeout(() => {
-      // if the App is in background I need to store the error
-      // and when the App come back to foreground shows it to the user.
-      createAlert(
-        setBackgroundError,
-        addLastSnackbar,
-        translate('send.sending-error') as string,
-        `${customError ? customError : error}`,
-        false,
-        translate,
-        sendEmail,
-        zingolibVersion,
-      );
-    }, 1 * 1000);
-
-    navigation.navigate(RouteEnum.HomeStack, {
-      screen: RouteEnum.History,
+    navigation.navigate(RouteEnum.Computing, {
+      phase: 'failed',
+      errorMessage: customError ? customError : error,
     });
   };
 
@@ -1214,6 +1208,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             setBackgroundError={setBackgroundError /* context */}
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
+            onPriceRowLayout={setPriceRowH}
           />
         </View>
       </View>
@@ -1227,6 +1222,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           index={0}
           onChange={i => {
             internalSnapIndexRef.current = i;
+            onPriceSnapChange(i);
           }}
           enableDynamicSizing={false}
           enablePanDownToClose={false}
@@ -1590,80 +1586,81 @@ const Send: React.FunctionComponent<SendProps> = ({
                       ) : null}
                     </View>
                     {(currency === CurrencyEnum.USDCurrency ||
-                      currency === CurrencyEnum.USDTORCurrency) && (
-                      <>
-                        <TouchableOpacity
-                          onPress={() => {
-                            if (
-                              inputZec &&
-                              !amountCurrencyText &&
-                              amountText &&
-                              zecPrice.zecPrice > 0
-                            ) {
-                              const zecVal =
+                      currency === CurrencyEnum.USDTORCurrency) &&
+                      server.chainName === ChainNameEnum.mainChainName && (
+                        <>
+                          <TouchableOpacity
+                            onPress={() => {
+                              if (
+                                inputZec &&
+                                !amountCurrencyText &&
+                                amountText &&
+                                zecPrice.zecPrice > 0
+                              ) {
+                                const zecVal =
+                                  Utils.parseStringLocaleToNumberFloat(
+                                    amountText,
+                                  );
+                                if (!isNaN(zecVal)) {
+                                  setAmountCurrencyText(
+                                    Utils.parseNumberFloatToStringLocale(
+                                      zecVal * zecPrice.zecPrice,
+                                      2,
+                                    ),
+                                  );
+                                }
+                              }
+                              setInputZec(!inputZec);
+                            }}
+                            disabled={
+                              !zecPrice.zecPrice || zecPrice.zecPrice <= 0
+                            }
+                            style={{ marginHorizontal: 8 }}
+                          >
+                            <Swap
+                              width={28}
+                              height={28}
+                              color={
+                                !zecPrice.zecPrice || zecPrice.zecPrice <= 0
+                                  ? colors.primaryDisabled
+                                  : colors.primary
+                              }
+                            />
+                          </TouchableOpacity>
+                          {inputZec ? (
+                            <CurrencyAmount
+                              style={{ marginTop: 0, marginBottom: 0 }}
+                              price={zecPrice.zecPrice}
+                              amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
                                   amountText,
-                                );
-                              if (!isNaN(zecVal)) {
-                                setAmountCurrencyText(
-                                  Utils.parseNumberFloatToStringLocale(
-                                    zecVal * zecPrice.zecPrice,
-                                    2,
-                                  ),
-                                );
+                                ) || 0
                               }
-                            }
-                            setInputZec(!inputZec);
-                          }}
-                          disabled={
-                            !zecPrice.zecPrice || zecPrice.zecPrice <= 0
-                          }
-                          style={{ marginHorizontal: 8 }}
-                        >
-                          <Swap
-                            width={28}
-                            height={28}
-                            color={
-                              !zecPrice.zecPrice || zecPrice.zecPrice <= 0
-                                ? colors.primaryDisabled
-                                : colors.primary
-                            }
-                          />
-                        </TouchableOpacity>
-                        {inputZec ? (
-                          <CurrencyAmount
-                            style={{ marginTop: 0, marginBottom: 0 }}
-                            price={zecPrice.zecPrice}
-                            amtZec={
-                              Utils.parseStringLocaleToNumberFloat(
-                                amountText,
-                              ) || 0
-                            }
-                            currency={currency}
-                            privacy={privacy}
-                          />
-                        ) : (
-                          <ZecAmount
-                            style={{ marginLeft: 0 }}
-                            currencyName={info.currencyName}
-                            color={colors.text}
-                            size={16}
-                            amtZec={
-                              Utils.parseStringLocaleToNumberFloat(
-                                amountText,
-                              ) || 0
-                            }
-                            privacy={privacy}
-                          />
-                        )}
-                        <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                          <PriceFetcher
-                            setZecPrice={setZecPrice}
-                            backgroundColor={colors.bottomSheetBackground}
-                          />
-                        </View>
-                      </>
-                    )}
+                              currency={currency}
+                              privacy={privacy}
+                            />
+                          ) : (
+                            <ZecAmount
+                              style={{ marginLeft: 0 }}
+                              currencyName={info.currencyName}
+                              color={colors.text}
+                              size={16}
+                              amtZec={
+                                Utils.parseStringLocaleToNumberFloat(
+                                  amountText,
+                                ) || 0
+                              }
+                              privacy={privacy}
+                            />
+                          )}
+                          <View style={{ marginLeft: inputZec ? 5 : 2 }}>
+                            <PriceFetcher
+                              setZecPrice={setZecPrice}
+                              backgroundColor={colors.bottomSheetBackground}
+                            />
+                          </View>
+                        </>
+                      )}
                   </View>
 
                   <View style={{ display: 'flex', flexDirection: 'column' }}>
@@ -1719,7 +1716,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                         >
                           {translate('send.spendable') as string}
                         </RegText>
-                        {inputZec ? (
+                        {inputZec ||
+                        server.chainName !== ChainNameEnum.mainChainName ? (
                           <ZecAmount
                             style={{ marginLeft: 0 }}
                             currencyName={info.currencyName}

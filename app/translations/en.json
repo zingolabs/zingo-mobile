@@ -153,7 +153,14 @@
     "serverchain-mismatch": "The server reports a different chain than the one you selected. Check the chain selector and try again.",
     "changingwallet-label": "Error changing Wallet",
     "restoringwallet-label": "Error restoring Wallet",
-    "computingtx": "Computing Transaction",
+    "computingtx": "Computing Transaction...",
+    "computingtx-hangon": "Hang on tight,\nthis will just take a moment...",
+    "transactioncreated-title": "Transaction created",
+    "transactioncreated-body": "You can find all the details in\nyour transaction history.",
+    "transactionfailed-title": "Transaction failed",
+    "transactionfailed-body": "Don't worry, your funds are safe and\nhave not been deducted.",
+    "transactionfailed-details": "Error details",
+    "continue": "Continue",
     "of": "of",
     "history-menu": "History",
     "send-menu": "Send",
@@ -184,6 +191,11 @@
     "backupwallet-error": "Error: Couldn't save the wallet backup."
   },
   "settings": {
+    "section-preferences": "Preferences",
+    "section-privacysecurity": "Privacy & Security",
+    "section-networkadvanced": "Network & Advanced",
+    "section-other": "Other",
+    "section-developer": "Developer",
     "memos": [
       {
         "value": "none",
@@ -427,6 +439,9 @@
     "nym-privacy-network": "Privacy Network",
     "nym-network": "NYM Network",
     "nym-enhanced-privacy": "Enhanced Privacy"
+  },
+  "header": {
+    "lastupdate": "Last update:"
   },
   "info": {
     "version": "Version",

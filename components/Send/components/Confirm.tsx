@@ -38,6 +38,7 @@ import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
 import {
   ButtonTypeEnum,
+  ChainNameEnum,
   PrivacyLevelFromEnum,
   GlobalConst,
   ScreenEnum,
@@ -82,6 +83,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Confirm;
+  const isMainChain = server.chainName === ChainNameEnum.mainChainName;
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
@@ -542,12 +544,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 size={28}
                 smallPrefix={true}
               />
-              <CurrencyAmount
-                amtZec={sendingTotal}
-                price={zecPrice.zecPrice}
-                currency={currency}
-                privacy={false}
-              />
+              {isMainChain && (
+                <CurrencyAmount
+                  amtZec={sendingTotal}
+                  price={zecPrice.zecPrice}
+                  currency={currency}
+                  privacy={false}
+                />
+              )}
             </View>
             <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}
@@ -594,13 +598,15 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 amtZec={calculatedFee}
                 privacy={privacy}
               />
-              <CurrencyAmount
-                style={{ fontSize: 18 }}
-                amtZec={calculatedFee}
-                price={zecPrice.zecPrice}
-                currency={currency}
-                privacy={privacy}
-              />
+              {isMainChain && (
+                <CurrencyAmount
+                  style={{ fontSize: 18 }}
+                  amtZec={calculatedFee}
+                  price={zecPrice.zecPrice}
+                  currency={currency}
+                  privacy={privacy}
+                />
+              )}
             </View>
 
             {[sendPageState.toaddr].map(to => {
@@ -631,13 +637,15 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                           amtZec={donationAmount}
                           privacy={privacy}
                         />
-                        <CurrencyAmount
-                          style={{ fontSize: 18 }}
-                          amtZec={donationAmount}
-                          price={zecPrice.zecPrice}
-                          currency={currency}
-                          privacy={privacy}
-                        />
+                        {isMainChain && (
+                          <CurrencyAmount
+                            style={{ fontSize: 18 }}
+                            amtZec={donationAmount}
+                            price={zecPrice.zecPrice}
+                            currency={currency}
+                            privacy={privacy}
+                          />
+                        )}
                       </View>
                     </>
                   )}
@@ -658,13 +666,15 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                       amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                       privacy={privacy}
                     />
-                    <CurrencyAmount
-                      style={{ fontSize: 18 }}
-                      amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
-                      price={zecPrice.zecPrice}
-                      currency={currency}
-                      privacy={privacy}
-                    />
+                    {isMainChain && (
+                      <CurrencyAmount
+                        style={{ fontSize: 18 }}
+                        amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
+                        price={zecPrice.zecPrice}
+                        currency={currency}
+                        privacy={privacy}
+                      />
+                    )}
                   </View>
                   {!!memoTotal && (
                     <>
