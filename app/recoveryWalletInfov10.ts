@@ -21,6 +21,12 @@ const buildSetOptions = async (): Promise<Keychain.SetOptions> => {
   // On Android, AES_GCM requires biometric auth specifically (not PIN/password).
   // When no biometrics are enrolled, use AES_GCM_NO_AUTH so the entry is still
   // encrypted in the Keystore but doesn't gate access behind a biometric prompt.
+  //
+  // We pick AES_GCM (not RSA) under biometrics because RSA + PKCS#1 v1.5 caps
+  // the plaintext at ~245 bytes (256 - 11) with a 2048-bit key, and a UFVK —
+  // or even some long mnemonics — can exceed that, causing the save to fail
+  // silently with IllegalBlockSizeException. AES_GCM has no practical payload
+  // limit and provides the same biometric-gated access we want.
   const androidPart =
     Platform.OS === 'android'
       ? {
@@ -28,7 +34,7 @@ const buildSetOptions = async (): Promise<Keychain.SetOptions> => {
             ? Keychain.SECURITY_LEVEL.SECURE_HARDWARE
             : Keychain.SECURITY_LEVEL.SECURE_SOFTWARE,
           storage: biometrics
-            ? Keychain.STORAGE_TYPE.RSA
+            ? Keychain.STORAGE_TYPE.AES_GCM
             : Keychain.STORAGE_TYPE.AES_GCM_NO_AUTH,
         }
       : {};
@@ -76,7 +82,7 @@ const buildBaseOptions = async (): Promise<Keychain.BaseOptions> => {
             ? Keychain.SECURITY_LEVEL.SECURE_HARDWARE
             : Keychain.SECURITY_LEVEL.SECURE_SOFTWARE,
           storage: biometrics
-            ? Keychain.STORAGE_TYPE.RSA
+            ? Keychain.STORAGE_TYPE.AES_GCM
             : Keychain.STORAGE_TYPE.AES_GCM_NO_AUTH,
         }
       : {};
