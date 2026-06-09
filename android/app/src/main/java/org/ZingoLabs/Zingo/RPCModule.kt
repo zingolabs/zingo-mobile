@@ -196,6 +196,31 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(fileExists(WalletBackupFileName.value))
     }
 
+    // Quick local Base64 well-formedness check. Used as a defensive guard so we
+    // never overwrite the wallet file with arbitrary text the Rust side might
+    // accidentally return (e.g. "the library is broken") that doesn't start with
+    // the `error:` prefix. We do this in Kotlin rather than re-sending the whole
+    // Base64 payload back to Rust because the round-trip allocates two extra
+    // full-size copies of the string (Java→native via RustBuffer + native→Java
+    // again for the result), which OOM-crashes on low-RAM 32-bit devices when
+    // wallets are large.
+    private fun isValidBase64(s: String): Boolean {
+        if (s.isEmpty() || s.length % 4 != 0) return false
+        var sawPadding = false
+        for (c in s) {
+            when {
+                c == '=' -> sawPadding = true
+                sawPadding -> return false
+                c in 'A'..'Z' -> {}
+                c in 'a'..'z' -> {}
+                c in '0'..'9' -> {}
+                c == '+' || c == '/' -> {}
+                else -> return false
+            }
+        }
+        return true
+    }
+
     fun saveWalletFile(): Boolean {
         try {
             uniffi.zingo.initLogging()
@@ -206,15 +231,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 return false
             }
 
-            val correct = uniffi.zingo.checkB64(b64encoded)
-            if (correct == "false") {
-                Log.e("MAIN", "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect.")
-                return false
-            }
-
             if (b64encoded.isEmpty()) {
                 Log.e("MAIN", "[Native] No need to save the wallet.")
                 return true
+            }
+
+            if (!isValidBase64(b64encoded)) {
+                Log.e("MAIN", "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect.")
+                return false
             }
 
             Log.i("MAIN", "[Native] file size: ${b64encoded.length} chars (Base64)")

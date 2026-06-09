@@ -38,6 +38,33 @@ class RPCModule: NSObject {
     return fileName
   }
   
+  // Quick local Base64 well-formedness check. Used as a defensive guard so we
+  // never overwrite the wallet file with arbitrary text the Rust side might
+  // accidentally return (e.g. "the library is broken") that doesn't start with
+  // the `error:` prefix. We do this in Swift rather than re-sending the whole
+  // Base64 payload back to Rust via `checkB64`, because that round-trip
+  // allocates two extra full-size copies of the string (Swift→Rust via
+  // RustBuffer + Rust→Swift again for the result) and has OOM-crashed on
+  // low-RAM 32-bit Android devices with large wallets. Symmetric guard for iOS.
+  private func isValidBase64(_ s: String) -> Bool {
+    let bytes = s.utf8
+    if bytes.isEmpty || bytes.count % 4 != 0 { return false }
+    var sawPadding = false
+    for b in bytes {
+      if b == 0x3D { // '='
+        sawPadding = true
+      } else if sawPadding {
+        return false
+      } else if !((0x41...0x5A).contains(b) ||  // 'A'-'Z'
+                  (0x61...0x7A).contains(b) ||  // 'a'-'z'
+                  (0x30...0x39).contains(b) ||  // '0'-'9'
+                  b == 0x2B || b == 0x2F) {     // '+', '/'
+        return false
+      }
+    }
+    return true
+  }
+
   func fileExists(_ fileName: String) throws -> String {
     let fileExists = try FileManager.default.fileExists(atPath: getFileName(fileName))
     if fileExists {
@@ -207,8 +234,7 @@ class RPCModule: NSObject {
         NSLog("[Native] file size: \(size) bytes")
         if size > 0 {
           // check if the content is correct. Stored Encoded.
-          let correct = checkB64(datab64: walletEncodedString)
-          if correct == "true" {
+          if isValidBase64(walletEncodedString) {
             try self.saveWalletFile(walletEncodedString)
           } else {
             let err = "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect. Size: \(walletEncodedString.count)"
@@ -393,8 +419,7 @@ class RPCModule: NSObject {
     do {
       let backupEncodedData = try self.readWalletBackup()
       // check if the content is correct. Stored Encoded.
-      let correct = checkB64(datab64: backupEncodedData)
-      if correct == "true" {
+      if isValidBase64(backupEncodedData) {
         if try fileExists(Constants.WalletFileName.rawValue) == "true" {
           // Both files exist: swap wallet ↔ backup
           let walletEncodedData = try self.readWalletUtf8String()
