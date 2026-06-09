@@ -26,6 +26,17 @@
 -keep class com.fasterxml.jackson.module.kotlin.** { *; }
 -keep class com.fasterxml.jackson.databind.** { *; }
 
+# Jackson core TypeReference — the inline reified `mapper.readValue<T>()` in
+# Kotlin generates anonymous subclasses whose generic Signature must survive
+# R8 optimisation, otherwise Jackson's TypeReference(...) constructor throws
+# "Internal error: TypeReference constructed without actual type information"
+# on release builds (seen in background sync on Play Store / signed APKs).
+-keep class com.fasterxml.jackson.core.type.TypeReference { *; }
+-keep class * extends com.fasterxml.jackson.core.type.TypeReference
+-keepclassmembers class * extends com.fasterxml.jackson.core.type.TypeReference {
+    <init>(...);
+}
+
 # JNA references AWT classes that don't exist on Android — suppress R8 warnings
 -dontwarn java.awt.**
 -dontwarn com.sun.jna.Native$AWT
