@@ -7,6 +7,14 @@ import React, {
   useState,
 } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import {
   NavigationProp,
   ParamListBase,
@@ -41,6 +49,65 @@ import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
 // in parallel — whichever finishes first (timer or send) decides what the
 // user sees.
 const PHASE1_DURATION_MS = 4000;
+
+// "Typing" dot animation timing (Signal-style indicator). Each dot fades in
+// and out over (DOT_PULSE_MS * 2) ms; consecutive dots are offset by
+// DOT_OFFSET_MS so the wave travels left-to-right. After all three finish,
+// there's a DOT_PAUSE_MS gap before the next round starts.
+const DOT_PULSE_MS = 500;
+const DOT_OFFSET_MS = 400;
+const DOT_PAUSE_MS = 1100;
+const DOT_COUNT = 3;
+const DOT_OPACITY_MIN = 0.25;
+const DOT_CYCLE_MS =
+  (DOT_COUNT - 1) * DOT_OFFSET_MS + DOT_PULSE_MS * 2 + DOT_PAUSE_MS;
+
+type TypingDotProps = {
+  delay: number;
+  color: string;
+};
+
+const TypingDot: React.FC<TypingDotProps> = ({ delay, color }) => {
+  const opacity = useSharedValue(DOT_OPACITY_MIN);
+  useEffect(() => {
+    // Each dot runs the same total cycle so the three of them stay in
+    // sync after every round: wait for its turn (delay), pulse in and
+    // out, then hold at min until the cycle ends.
+    const tailWait = DOT_CYCLE_MS - delay - DOT_PULSE_MS * 2;
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(DOT_OPACITY_MIN, { duration: delay }),
+        withTiming(1, {
+          duration: DOT_PULSE_MS,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        withTiming(DOT_OPACITY_MIN, {
+          duration: DOT_PULSE_MS,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        withTiming(DOT_OPACITY_MIN, { duration: tailWait }),
+      ),
+      -1,
+    );
+    return () => {
+      opacity.value = DOT_OPACITY_MIN;
+    };
+  }, [delay, opacity]);
+  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return (
+    <Animated.View
+      style={[
+        {
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+          backgroundColor: color,
+        },
+        style,
+      ]}
+    />
+  );
+};
 
 type ComputingTxContentProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -256,6 +323,19 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
               ) as string
             }
           </RegText>
+          {!isTerminal && (
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 24,
+                gap: 12,
+              }}
+            >
+              <TypingDot delay={0} color={colors.placeholder} />
+              <TypingDot delay={DOT_OFFSET_MS} color={colors.placeholder} />
+              <TypingDot delay={DOT_OFFSET_MS * 2} color={colors.placeholder} />
+            </View>
+          )}
           {isFailed && !!errorMessage && (
             <View style={{ marginTop: 16, alignItems: 'center' }}>
               <TouchableOpacity
