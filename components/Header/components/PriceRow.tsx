@@ -48,9 +48,7 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
   ({ translate, currency, zecPrice, info, selectServer, onLayout }) => {
     const { colors } = useTheme() as ThemeType;
 
-    const isUsd =
-      currency === CurrencyEnum.USDCurrency ||
-      currency === CurrencyEnum.USDTORCurrency;
+    const isUsd = currency === CurrencyEnum.USDCurrency;
     if (
       !isUsd ||
       zecPrice.zecPrice <= 0 ||

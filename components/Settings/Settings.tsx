@@ -1433,8 +1433,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     }}
                   >
                     <FadeText style={{ textAlign: 'center' }}>
-                      {CURRENCIES.find(d => String(d.value) === 'USDTOR')
-                        ?.text ?? ''}
+                      {CURRENCIES.find(
+                        d => String(d.value) === CurrencyEnum.USDCurrency,
+                      )?.text ?? ''}
                     </FadeText>
                   </View>
                 )}

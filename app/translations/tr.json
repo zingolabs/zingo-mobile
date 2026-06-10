@@ -218,10 +218,6 @@
       {
         "value": "USD",
         "text": "Dolar fiyat bilgisi internet üzerinden alınabilir."
-      },
-      {
-        "value": "USDTOR",
-        "text": "ABD Doları fiyatını internetten Tor kullanarak alabilirsiniz. Tor, kullanıcının IP adresini korumak için kullanılır ancak bazı ülkelerde yasal olmayabilir. Kendi takdirinize göre kullanın."
       }
     ],
     "languages": [
@@ -376,7 +372,6 @@
     "blockexplorer-title": "Block Explorer",
     "value-currency-": "Para birimi yok",
     "value-currency-USD": "Amerikan doları",
-    "value-currency-USDTOR": "ABD Doları (Tor)",
     "value-language-en": "İngilizce",
     "value-language-es": "İspanyolca",
     "value-language-pt": "Portekizce",
@@ -450,7 +445,6 @@
     "network": "Ağ",
     "serverblock": "Sunucu Blok Yüksekliği ",
     "zecprice": "ZEC Fiyatı ",
-    "zecpricetor": "Tor ile ZEC Fiyatı ",
     "unknown": "Bilinmeyen ",
     "title": "Sunucu Bilgisi",
     "errorgemini": "Error İnternetten fiyat alınırken hata oluştu.",
@@ -559,7 +553,6 @@
     "fetchpricetitle": "USD Fiyatını Getir",
     "fetchpricebody": "Lütfen USD fiyatını internetten almak istediğinizi onaylayın.",
     "fetch-button": "Getir",
-    "fetchwithtor-button": "Tor ile getir",
     "confirm-privacy-level": "Gizlilik Seviyesi",
     "private": "Gizli",
     "amountrevealed": "Açıklanan Tutar",

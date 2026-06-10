@@ -19,26 +19,18 @@ import { RPCSeedType } from '../types/RPCSeedType';
  *  -2   — error in RPCModule or this function
  *  > 0  — real USD price
  */
-export async function getZecPrice(
-  withTOR: boolean,
-): Promise<{ price: number; error: string }> {
+export async function getZecPrice(): Promise<{
+  price: number;
+  error: string;
+}> {
   try {
-    if (withTOR) {
-      // create the tor client if needed
-      const result: string = await RPCModule.createTorClientProcess();
-      if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Create Tor client error: ${result}`);
-      }
-    }
     // values:
     // 0   - initial/default value
     // -1  - error in zingolib.
     // -2  - error in RPCModule, likely.
     // > 0 - real value
     const start = Date.now();
-    const resultStr: string = await RPCModule.zecPriceInfo(
-      withTOR ? GlobalConst.true : GlobalConst.false,
-    );
+    const resultStr: string = await RPCModule.zecPriceInfo();
     if (Date.now() - start > 4000) {
       console.log(
         '=========================================== > get ZEC price - ',

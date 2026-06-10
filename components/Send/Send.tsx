@@ -249,10 +249,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const isMainChain = server.chainName === ChainNameEnum.mainChainName;
-    const withUsd =
-      isMainChain &&
-      (currency === CurrencyEnum.USDCurrency ||
-        currency === CurrencyEnum.USDTORCurrency);
+    const withUsd = isMainChain && currency === CurrencyEnum.USDCurrency;
     if (!withUsd) {
       setUsdRowH(0);
     }
@@ -260,10 +257,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const sendSnapPoints = useMemo(() => {
     const isMainChain = server.chainName === ChainNameEnum.mainChainName;
-    const withUsd =
-      isMainChain &&
-      (currency === CurrencyEnum.USDCurrency ||
-        currency === CurrencyEnum.USDTORCurrency);
+    const withUsd = isMainChain && currency === CurrencyEnum.USDCurrency;
     if (containerH <= 0 || headerH <= 0) {
       return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
@@ -1585,8 +1579,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         </TouchableOpacity>
                       ) : null}
                     </View>
-                    {(currency === CurrencyEnum.USDCurrency ||
-                      currency === CurrencyEnum.USDTORCurrency) &&
+                    {currency === CurrencyEnum.USDCurrency &&
                       server.chainName === ChainNameEnum.mainChainName && (
                         <>
                           <TouchableOpacity

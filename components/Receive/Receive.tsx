@@ -116,9 +116,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     const isMainChain =
       context.server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      isMainChain &&
-      (context.currency === CurrencyEnum.USDCurrency ||
-        context.currency === CurrencyEnum.USDTORCurrency);
+      isMainChain && context.currency === CurrencyEnum.USDCurrency;
     if (!withUsd) {
       setUsdRowH(0);
     }
@@ -128,9 +126,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     const isMainChain =
       context.server.chainName === ChainNameEnum.mainChainName;
     const withUsd =
-      isMainChain &&
-      (context.currency === CurrencyEnum.USDCurrency ||
-        context.currency === CurrencyEnum.USDTORCurrency);
+      isMainChain && context.currency === CurrencyEnum.USDCurrency;
     if (containerH <= 0 || headerH <= 0) {
       return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }

@@ -40,7 +40,6 @@ jest.mock('react-native', () => {
     getSpendableBalanceTotalInfo: jest.fn(() => '{}'),
     getOptionWalletInfo: jest.fn(() => '{}'),
     setOptionWalletProcess: jest.fn(() => '{}'),
-    createTorClientProcess: jest.fn(() => '{}'),
     getUnifiedAddressesInfo: jest.fn(() => '{}'),
     getTransparentAddressesInfo: jest.fn(() => '{}'),
     createNewUnifiedAddressProcess: jest.fn(() => '{}'),

@@ -2,6 +2,7 @@ import * as RNFS from 'react-native-fs';
 
 import {
   ChainNameEnum,
+  CurrencyEnum,
   GlobalConst,
   SecurityType,
   SecurityTypeEnum,
@@ -235,6 +236,11 @@ export default class SettingsFileImpl {
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.nym)) {
         settings.nym = false;
+      }
+      // Silent migration: legacy "USDTOR" currency is dropped in favor of "USD".
+      // Tor support has been removed; users on an older settings.json get rewritten transparently.
+      if ((settings.currency as string) === 'USDTOR') {
+        settings.currency = CurrencyEnum.USDCurrency;
       }
       return settings;
     } catch (err) {

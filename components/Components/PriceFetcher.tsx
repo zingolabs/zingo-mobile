@@ -9,7 +9,7 @@ import { ContextAppLoaded } from '../../app/context';
 import { getZecPrice } from '../../app/walletBackend';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
-import { CurrencyEnum, ModeEnum } from '../../app/AppState';
+import { ModeEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
 import { showConfirm, ConfirmButton } from '../../app/showConfirm';
 
@@ -25,14 +25,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   backgroundColor,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    zecPrice,
-    addLastSnackbar,
-    mode,
-    currency,
-    setCurrencyOption,
-  } = context;
+  const { translate, zecPrice, addLastSnackbar, mode } = context;
   const { colors } = useTheme() as ThemeType;
   const bg = backgroundColor ?? colors.card;
 
@@ -66,12 +59,12 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     }
   };
 
-  const onPressFetch = async (withTor: boolean) => {
+  const onPressFetch = async () => {
     setLoading(true);
     let price: number;
     let error: string;
     // first attempt
-    ({ price, error } = await getZecPrice(withTor));
+    ({ price, error } = await getZecPrice());
     //console.log('first price fetching', price, error);
     // values:
     // 0   - initial/default value
@@ -80,7 +73,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     // > 0 - real value
     if (price <= 0) {
       // second attempt
-      ({ price, error } = await getZecPrice(withTor));
+      ({ price, error } = await getZecPrice());
       //console.log('second price fetching', price, error);
     }
 
@@ -108,30 +101,13 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   };
 
   const onPressFetchAlert = () => {
-    const buttons: ConfirmButton[] = [];
-    if (currency === CurrencyEnum.USDCurrency) {
-      buttons.push({
+    const buttons: ConfirmButton[] = [
+      {
         text: translate('send.fetch-button') as string,
-        onPress: () => onPressFetch(false),
-      });
-    }
-    if (
-      currency === CurrencyEnum.USDCurrency ||
-      currency === CurrencyEnum.USDTORCurrency
-    ) {
-      buttons.push({
-        text: translate('send.fetchwithtor-button') as string,
-        onPress: async () => {
-          // If the user picked Tor while the preference was non-Tor USD,
-          // promote the preference so the next request only offers Tor.
-          if (currency === CurrencyEnum.USDCurrency) {
-            await setCurrencyOption(CurrencyEnum.USDTORCurrency);
-          }
-          onPressFetch(true);
-        },
-      });
-    }
-    buttons.push({ text: translate('cancel') as string, style: 'cancel' });
+        onPress: () => onPressFetch(),
+      },
+      { text: translate('cancel') as string, style: 'cancel' },
+    ];
     showConfirm({
       title: translate('send.fetchpricetitle') as string,
       message: translate('send.fetchpricebody') as string,
@@ -168,7 +144,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
         <TouchableOpacity
           disabled={loading}
           onPress={() =>
-            mode === ModeEnum.basic ? onPressFetch(false) : onPressFetchAlert()
+            mode === ModeEnum.basic ? onPressFetch() : onPressFetchAlert()
           }
         >
           <View

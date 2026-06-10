@@ -218,10 +218,6 @@
       {
         "value": "USD",
         "text": "Puedes consultar el precio para US Dólares de internet."
-      },
-      {
-        "value": "USDTOR",
-        "text": "Puedes consultar el precio para US Dólares de internet usando Tor.\nTor se usa para proteger la dirección IP del usuario, pero puede ser ilegal en algunos países. Úsalo bajo tu propio criterio."
       }
     ],
     "languages": [
@@ -376,7 +372,6 @@
     "blockexplorer-title": "Block Explorer",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
-    "value-currency-USDTOR": "US Dólares (Tor)",
     "value-language-en": "Inglés",
     "value-language-es": "Español",
     "value-language-pt": "Portugués",
@@ -450,7 +445,6 @@
     "network": "Red",
     "serverblock": "Altura de Bloque del Servidor",
     "zecprice": "Precio del ZEC",
-    "zecpricetor": "Precio del ZEC with Tor",
     "unknown": "Desconocido",
     "title": "Información del Servidor",
     "errorgemini": "Error extrayendo el precio de Internet.",
@@ -559,7 +553,6 @@
     "fetchpricetitle": "Consultar Precio USD",
     "fetchpricebody": "Por favor confirma que quieres recuperar/consultar el precio en USD de internet.",
     "fetch-button": "Consultar",
-    "fetchwithtor-button": "Consultar con Tor",
     "confirm-privacy-level": "Nivel de Privacidad",
     "private": "Privada",
     "amountrevealed": "Monto Revelado",
