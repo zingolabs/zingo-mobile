@@ -282,10 +282,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   useEffect(() => {
     const isMainChain = server.chainName === ChainNameEnum.mainChainName;
-    const withUsd =
-      isMainChain &&
-      (currency === CurrencyEnum.USDCurrency ||
-        currency === CurrencyEnum.USDTORCurrency);
+    const withUsd = isMainChain && currency === CurrencyEnum.USDCurrency;
     if (!withUsd) {
       setUsdRowH(0);
     }
@@ -293,10 +290,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const historySnapPoints = useMemo(() => {
     const isMainChain = server.chainName === ChainNameEnum.mainChainName;
-    const withUsd =
-      isMainChain &&
-      (currency === CurrencyEnum.USDCurrency ||
-        currency === CurrencyEnum.USDTORCurrency);
+    const withUsd = isMainChain && currency === CurrencyEnum.USDCurrency;
     // Until the layout reports the actual container + header heights, fall
     // back to percentages.
     if (containerH <= 0 || headerH <= 0) {

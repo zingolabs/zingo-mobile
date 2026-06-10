@@ -314,8 +314,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       }
       if (
         settings.currency === CurrencyEnum.noCurrency ||
-        settings.currency === CurrencyEnum.USDCurrency ||
-        settings.currency === CurrencyEnum.USDTORCurrency
+        settings.currency === CurrencyEnum.USDCurrency
       ) {
         setCurrency(settings.currency);
       } else {
@@ -1628,17 +1627,6 @@ export class LoadedAppClass extends Component<
       this.rpc.setServer(value);
       await this.rpc.clearTimers();
       await this.rpc.configure();
-      // If the user has USD currency selected, the Tor client is needed
-      // for price fetching — recreate it on the new server.
-      if (
-        this.state.currency === CurrencyEnum.USDTORCurrency ||
-        this.state.currency === CurrencyEnum.USDCurrency
-      ) {
-        const resp: string = await RPCModule.createTorClientProcess();
-        if (resp && resp.toLowerCase().startsWith(GlobalConst.error)) {
-          this.setLastError(`Create tor client error: ${resp}`);
-        }
-      }
       return { kind: 'ok' };
     }
 
@@ -1669,23 +1657,6 @@ export class LoadedAppClass extends Component<
     this.setState({
       currency: value as CurrencyEnum,
     });
-
-    if (
-      value === CurrencyEnum.USDTORCurrency ||
-      value === CurrencyEnum.USDCurrency
-    ) {
-      // when the user select USD
-      // the App have to create a Tor Client
-      const result = await RPCModule.createTorClientProcess();
-      if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
-        this.setLastError(`Create tor client error: ${result}`);
-      }
-    } else {
-      const result = await RPCModule.removeTorClientProcess();
-      if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
-        this.setLastError(`Remove tor client error: ${result}`);
-      }
-    }
   };
 
   setLanguageOption = async (value: string): Promise<void> => {

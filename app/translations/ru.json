@@ -218,10 +218,6 @@
       {
         "value": "USD",
         "text": "Цену в долларах США можно узнать из интернета."
-      },
-      {
-        "value": "USDTOR",
-        "text": "Цену в долларах США можно узнать из интернета с помощью Tor.\nTor используется для защиты IP-адреса пользователя, но может быть незаконным в некоторых странах. Используйте по своему усмотрению."
       }
     ],
     "languages": [
@@ -376,7 +372,6 @@
     "blockexplorer-title": "Block Explorer",
     "value-currency-": "Без указания валюты",
     "value-currency-USD": "Доллар США",
-    "value-currency-USDTOR": "Доллар США (Tor)",
     "value-language-en": "Английский",
     "value-language-es": "Испанский",
     "value-language-pt": "Португальский",
@@ -450,7 +445,6 @@
     "network": "Сеть",
     "serverblock": "Высота блока сервера",
     "zecprice": "Цена ZEC",
-    "zecpricetor": "Цена ZEC с Tor",
     "unknown": "Неизвестно",
     "title": "Данные сервера",
     "errorgemini": "Error при получении цены из Интернета.",
@@ -559,7 +553,6 @@
     "fetchpricetitle": "Загрузить цену в USD",
     "fetchpricebody": "Пожалуйста, подтвердите, что вы хотите получить цену в USD из Интернета.",
     "fetch-button": "Получить",
-    "fetchwithtor-button": "Получить с помощью Tor",
     "confirm-privacy-level": "Режим конфиденциальности",
     "private": "Приватный",
     "amountrevealed": "Раскрытая сумма",

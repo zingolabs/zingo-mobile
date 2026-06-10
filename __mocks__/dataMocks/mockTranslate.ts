@@ -33,10 +33,6 @@ export const mockTranslate = (p: string) => {
         value: CurrencyEnum.USDCurrency,
         text: 'text USD',
       },
-      {
-        value: CurrencyEnum.USDTORCurrency,
-        text: 'text USD TOR',
-      },
     ];
   } else if (p === 'settings.languages') {
     return [

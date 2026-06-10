@@ -218,10 +218,6 @@
       {
         "value": "USD",
         "text": "You can fetch the price for US Dollars from internet."
-      },
-      {
-        "value": "USDTOR",
-        "text": "You can fetch the price for US Dollars from internet using Tor.\nTor is used to protect the user's IP address but may be unlawful in some countries. Use at your own discretion."
       }
     ],
     "languages": [
@@ -376,7 +372,6 @@
     "blockexplorer-title": "Block Explorer",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
-    "value-currency-USDTOR": "US Dollar (Tor)",
     "value-language-en": "English",
     "value-language-es": "Spanish",
     "value-language-pt": "Portuguese",
@@ -450,7 +445,6 @@
     "network": "Network",
     "serverblock": "Server Block Height",
     "zecprice": "ZEC Price",
-    "zecpricetor": "ZEC Price with Tor",
     "unknown": "Unknown",
     "title": "Server Info",
     "errorgemini": "Error fetching the price from the Internet.",
@@ -559,7 +553,6 @@
     "fetchpricetitle": "Fetch USD Price",
     "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
     "fetch-button": "Fetch",
-    "fetchwithtor-button": "Fetch with Tor",
     "confirm-privacy-level": "Privacy Level",
     "private": "Private",
     "amountrevealed": "Amount Revealed",

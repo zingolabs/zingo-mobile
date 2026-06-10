@@ -459,7 +459,6 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
-        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
@@ -478,7 +477,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
-        val price: String = uniffi.zingo.zecPrice(tor)
+        val price: String = uniffi.zingo.zecPrice()
         println("\nPrice:")
         println(price)
 

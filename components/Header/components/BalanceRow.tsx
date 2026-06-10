@@ -189,8 +189,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             </View>
           )}
 
-        {(currency === CurrencyEnum.USDCurrency ||
-          currency === CurrencyEnum.USDTORCurrency) &&
+        {currency === CurrencyEnum.USDCurrency &&
           !noBalance &&
           selectServer !== SelectServerEnum.offline &&
           info.chainName === ChainNameEnum.mainChainName && (

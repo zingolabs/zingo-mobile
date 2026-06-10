@@ -1286,10 +1286,9 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnZecPriceInfo(_ dict: [AnyHashable: Any]) {
-      if let tor = dict["tor"] as? String,
-          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
-          let resp = try zecPrice(tor: tor)
+          let resp = try zecPrice()
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -1304,17 +1303,12 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       } else {
           let err = "Error: [Native] zec price. Command arguments problem."
           NSLog(err)
-          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
       }
   }
 
-  @objc(zecPriceInfo:resolve:reject:)
-  func zecPriceInfo(_ tor: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["tor": tor, "resolve": resolve]
+  @objc(zecPriceInfo:reject:)
+  func zecPriceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnZecPriceInfo(dict)
@@ -1486,80 +1480,6 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnSetOptionWalletProcess(dict)
-        }
-      }
-  }
-
-  func fnCreateTorClientProcess(_ dict: [AnyHashable: Any]) throws {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try createTorClient(datadir: try getDocumentsDirectory())
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] create tor client. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] create tor client. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
-  @objc(createTorClientProcess:reject:)
-  func createTorClientProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          do {
-            try self.fnCreateTorClientProcess(dict)
-          } catch {
-            let err = "Error: [Native] create tor client. Document dir."
-            NSLog(err)
-            resolve(err)
-          }
-        }
-      }
-  }
-
-  func fnRemoveTorClientProcess(_ dict: [AnyHashable: Any]) throws {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try removeTorClient()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] remove tor client. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] remove tor client. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
-  @objc(removeTorClientProcess:reject:)
-  func removeTorClientProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          do {
-            try self.fnRemoveTorClientProcess(dict)
-          } catch {
-            let err = "Error: [Native] remove tor client. Document dir."
-            NSLog(err)
-            resolve(err)
-          }
         }
       }
   }

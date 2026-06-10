@@ -266,8 +266,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       }
       if (
         settings.currency === CurrencyEnum.noCurrency ||
-        settings.currency === CurrencyEnum.USDCurrency ||
-        settings.currency === CurrencyEnum.USDTORCurrency
+        settings.currency === CurrencyEnum.USDCurrency
       ) {
         setCurrency(settings.currency);
       } else {
@@ -709,13 +708,6 @@ export class LoadingAppClass extends Component<
                 actionButtonsDisabled: false,
               });
               this.addLastSnackbar(walletKindStr);
-            }
-            // creating tor cliente if needed
-            if (
-              this.state.currency === CurrencyEnum.USDTORCurrency ||
-              this.state.currency === CurrencyEnum.USDCurrency
-            ) {
-              await RPCModule.createTorClientProcess();
             }
             // if the App is restoring another wallet backup...
             // needs to recalculate the Address Book.
@@ -1347,13 +1339,6 @@ export class LoadingAppClass extends Component<
         actionButtonsDisabled: false,
         walletExists: true,
       }));
-      // creating tor cliente if needed
-      if (
-        this.state.currency === CurrencyEnum.USDTORCurrency ||
-        this.state.currency === CurrencyEnum.USDCurrency
-      ) {
-        await RPCModule.createTorClientProcess();
-      }
     } else {
       this.walletErrorHandle(
         seed,
@@ -1544,13 +1529,6 @@ export class LoadingAppClass extends Component<
               actionButtonsDisabled: false,
             });
             this.addLastSnackbar(walletKindStr);
-          }
-          // creating tor cliente if needed
-          if (
-            this.state.currency === CurrencyEnum.USDTORCurrency ||
-            this.state.currency === CurrencyEnum.USDCurrency
-          ) {
-            await RPCModule.createTorClientProcess();
           }
           this.navigateToLoadedApp(
             readOnly,
