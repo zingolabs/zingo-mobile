@@ -16,7 +16,8 @@ appId: org.ZingoLabs.Zingo
     id: "menu.loadwalletfromseed"
 - back
 
-# About + Server Info live as the first two rows in Settings now.
+# Server info now lives inline inside Settings (see settings.*-server rows);
+# About remains as its own navigation row.
 - tapOn:
     id: "header.settings"
 - extendedWaitUntil:
@@ -25,8 +26,6 @@ appId: org.ZingoLabs.Zingo
     timeout: 10000
 - assertVisible:
     id: "settings.about"
-- assertVisible:
-    id: "settings.serverinfo"
 
 # Navigate to About and verify it loads
 - tapOn:
