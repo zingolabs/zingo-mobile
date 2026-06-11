@@ -407,8 +407,26 @@ extension AppDelegate {
       
         if exists == "true" {
             // load the wallet file
-            self.loadWalletFile()
-          
+            let shouldSync = self.loadWalletFile()
+
+            if !shouldSync {
+                NSLog("BGTask syncingProcessBackgroundTask - Offline mode, sync skipped")
+                let timeStampOffline = Date().timeIntervalSince1970
+                let timeStampStrOffline = String(format: "%.0f", timeStampOffline)
+                let jsonBackgroundOffline = self.buildBackgroundJSON(message: "Sync skipped - Offline mode.", dateEnd: timeStampStrOffline)
+                do {
+                  try rpcmodule.saveBackgroundFile(jsonBackgroundOffline)
+                  NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundOffline)")
+                } catch {
+                  NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundOffline) error: \(error.localizedDescription)")
+                }
+                if let task = self.bgTask {
+                  task.setTaskCompleted(success: true)
+                }
+                bgTask = nil
+                return
+            }
+
             // run the sync process.
             do {
               let syncing = try runSync()
@@ -595,17 +613,23 @@ extension AppDelegate {
         return json
     }
 
-    func loadWalletFile() {
+    /// Reads settings.json and loads the wallet file when a server URI is
+    /// configured. Returns `true` to signal the caller may proceed with sync, or
+    /// `false` only when the user is explicitly in offline mode (empty server
+    /// URI) and sync must be skipped. On any other unexpected condition the
+    /// function returns `true` so the downstream sync path surfaces its own
+    /// error rather than masquerading as offline mode.
+    func loadWalletFile() -> Bool {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         guard let documentsDirectory = paths.first else {
             NSLog("Error: Unable to find documents directory")
-            return
+            return true
         }
 
         let fileName = "\(documentsDirectory)/settings.json"
         guard let content = try? String(contentsOfFile: fileName, encoding: .utf8) else {
             NSLog("Error: Unable to read file at path \(fileName)")
-            return
+            return true
         }
 
         guard let contentData = content.data(using: .utf8),
@@ -614,7 +638,12 @@ extension AppDelegate {
               let serveruri = server["uri"] as? String,
               let chainhint = server["chainName"] as? String else {
             NSLog("Error: Unable to parse JSON object from file at path \(fileName)")
-            return
+            return true
+        }
+
+        if serveruri.isEmpty {
+            NSLog("Offline mode detected (empty serveruri) - skipping wallet load")
+            return false
         }
 
         NSLog("Opening the wallet file - No App active - serveruri: \(serveruri) chain: \(chainhint)")
@@ -624,6 +653,7 @@ extension AppDelegate {
         } catch {
           NSLog("Error: Unable to load the wallet. error: \(error.localizedDescription)")
         }
+        return true
     }
 
     func cancelExecutingTask() {

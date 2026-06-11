@@ -135,7 +135,23 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             try {
                 uniffi.zingo.initLogging()
                 // load the wallet file
-                loadWalletFile()
+                val shouldSync = loadWalletFile()
+
+                if (!shouldSync) {
+                    Log.i("SCHEDULED_TASK_RUN", "Offline mode, sync skipped")
+                    val timeStampOffline = Date().time / 1000
+                    val timeStampStrOffline = timeStampOffline.toString()
+                    val payload = JSONObject().apply {
+                        put("batches", "0")
+                        put("message", "Sync skipped - Offline mode.")
+                        put("date", "$timeStampStrStart")
+                        put("dateEnd", "$timeStampStrOffline")
+                    }
+                    val jsonBackgroundOffline = payload.toString()
+                    rpcModule.saveBackgroundFile(jsonBackgroundOffline)
+                    Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundOffline")
+                    return Result.success()
+                }
 
                 val syncing = uniffi.zingo.runSync()
                 Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
@@ -281,9 +297,16 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         return Result.success()
     }
 
-    private fun loadWalletFile() {
-        // I have to init from wallet file in order to do the sync
-        // and I need to read the settings.json to find the server & chain type
+    /**
+     * Reads settings.json and loads the wallet file when a server URI is
+     * configured. Returns `true` to signal the caller may proceed with sync, or
+     * `false` only when the user is explicitly in offline mode (empty server
+     * URI) and sync must be skipped. On any other unexpected condition the
+     * function returns `true` so the downstream sync path surfaces its own
+     * error rather than masquerading as offline mode.
+     */
+    private fun loadWalletFile(): Boolean {
+        var shouldSync = true
         context.openFileInput("settings.json")?.use { file: FileInputStream ->
             val settingsBytes = file.readBytes()
             file.close()
@@ -291,12 +314,21 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             val jsonObject = JSONObject(settingsString)
             val serveruri = jsonObject.getJSONObject("server").getString("uri")
             val chainhint = jsonObject.getJSONObject("server").getString("chainName")
+            if (serveruri.isEmpty()) {
+                Log.i(
+                    "SCHEDULED_TASK_RUN",
+                    "Offline mode detected (empty serveruri) - skipping wallet load"
+                )
+                shouldSync = false
+                return@use
+            }
             Log.i(
                 "SCHEDULED_TASK_RUN",
                 "Opening the wallet file - No App active - serveruri: $serveruri chain: $chainhint"
             )
             rpcModule.loadExistingWalletNative(serveruri, chainhint, "Medium", "3")
         }
+        return shouldSync
     }
 
 }
