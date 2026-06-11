@@ -2142,7 +2142,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                     }
                     accessible={true}
                     accessibilityLabel={'title ' + translate('send.button')}
-                    type={nym ? ButtonTypeEnum.Nym : ButtonTypeEnum.Primary}
+                    // NYM feature hidden for now — will be enabled in the future
+                    type={ButtonTypeEnum.Primary}
                     title={
                       validAmount === 1 &&
                       amountText &&
