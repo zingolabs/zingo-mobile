@@ -15,10 +15,9 @@ import {
 } from '../AppState';
 import TotalBalanceClass from '../AppState/classes/TotalBalanceClass';
 import NetInfoType from '../AppState/types/NetInfoType';
-import { shieldFunds as executeShieldFunds } from '../walletBackend';
+import { shieldConfirm, shieldPropose } from '../walletBackend';
 import { RPCShieldProposeType } from '../walletBackend/types/RPCShieldProposeType';
 import { RPCShieldType } from '../walletBackend/types/RPCShieldType';
-import RPCModule from '../RPCModule';
 import Utils from '../utils';
 
 type UseShieldFundsInput = {
@@ -87,7 +86,7 @@ export function useShieldFunds({
           return 'Error: shield propose already running...';
         }
         shieldProposeLockRef.current = true;
-        const proposeStr: string = await RPCModule.shieldProcess();
+        const proposeStr: string = await shieldPropose();
         if (proposeStr) {
           if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error propose ${proposeStr}`);
@@ -165,7 +164,7 @@ export function useShieldFunds({
     );
   }, [readOnly, shieldingAmount, somePending, selectServer]);
 
-  const shieldFunds = useCallback(async () => {
+  const handleShieldFunds = useCallback(async () => {
     if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
@@ -175,8 +174,8 @@ export function useShieldFunds({
     }
 
     navigation.navigate(RouteEnum.Computing);
-    await RPCModule.shieldProcess();
-    const shieldStr = await executeShieldFunds();
+    await shieldPropose();
+    const shieldStr = await shieldConfirm();
 
     if (shieldStr) {
       let success = false;
@@ -244,11 +243,11 @@ export function useShieldFunds({
       title: translate(`history.shield-title-${pools}`) as string,
       message: translate(`history.shield-alert-${pools}`) as string,
       buttons: [
-        { text: translate('confirm') as string, onPress: shieldFunds },
+        { text: translate('confirm') as string, onPress: handleShieldFunds },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
     });
-  }, [translate, calculatePoolsToShield, shieldFunds]);
+  }, [translate, calculatePoolsToShield, handleShieldFunds]);
 
   return {
     showShieldButton,

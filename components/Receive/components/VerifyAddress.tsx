@@ -16,7 +16,7 @@ import {
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import RPCModule from '../../../app/RPCModule';
+import { checkMyAddress } from '../../../app/walletBackend';
 import { parseZcashURI } from '../../../app/uris';
 import TextInputAddress from '../../Components/TextInputAddress';
 import FadeText from '../../Components/FadeText';
@@ -46,7 +46,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
 
   const verifyAddress = async () => {
     try {
-      const verifyAddressStr = await RPCModule.checkMyAddressInfo(address);
+      const verifyAddressStr = await checkMyAddress(address);
       //console.log(verifyAddressStr);
       if (verifyAddressStr) {
         if (verifyAddressStr.toLowerCase().startsWith(GlobalConst.error)) {

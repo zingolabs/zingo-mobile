@@ -21,7 +21,6 @@ import { DataService } from './modules/DataService';
 import { SyncCoordinator } from './modules/SyncCoordinator';
 import { TransactionService } from './modules/TransactionService';
 import { WalletLifecycleService } from './modules/WalletLifecycleService';
-import { fetchWallet, getZecPrice, shieldFunds } from './utils/walletUtils';
 
 export default class WalletBackend {
   private config: WalletBackendConfig;
@@ -128,9 +127,4 @@ export default class WalletBackend {
   setPerformanceLevel(performanceLevel: RPCPerformanceLevelEnum) {
     this.config.performanceLevel = performanceLevel;
   }
-
-  // Backward-compatible static delegates (bodies live in walletUtils.ts)
-  static rpcGetZecPrice = getZecPrice;
-  static rpcShieldFunds = shieldFunds;
-  static rpcFetchWallet = fetchWallet;
 }

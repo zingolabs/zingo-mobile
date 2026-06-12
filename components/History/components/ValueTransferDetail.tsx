@@ -55,7 +55,7 @@ import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useFullSheetSnapPoints } from '../../../app/hooks/useFullSheetSnapPoints';
 import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import Button from '../../Components/Button';
-import RPCModule from '../../../app/RPCModule';
+import { removeTransaction } from '../../../app/walletBackend';
 import { createAlert } from '../../../app/createAlert';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 // this is for https. (primary)
@@ -333,9 +333,7 @@ const ValueTransferDetail: React.FunctionComponent<
     // not use await here.
     navigation.navigate(RouteEnum.Computing);
 
-    let actionStr: string = await RPCModule.removeTransactionProcess(
-      valueTransfer.txid,
-    );
+    let actionStr: string = await removeTransaction(valueTransfer.txid);
 
     console.log('REMOVE', actionStr);
 

@@ -1,9 +1,9 @@
 import { GlobalConst, ServerUrisType } from './AppState';
-import RPCModule from './RPCModule';
+import { getLatestBlockServerInfo } from './walletBackend';
 
 const calculateLatency = async (server: ServerUrisType, _index: number) => {
   const start: number = Date.now();
-  const resp: string = await RPCModule.getLatestBlockServerInfo(server.uri);
+  const resp: string = await getLatestBlockServerInfo(server.uri);
 
   const end: number = Date.now();
   let latency = null;

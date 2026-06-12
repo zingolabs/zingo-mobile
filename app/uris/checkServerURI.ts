@@ -1,5 +1,5 @@
 import { ChainNameEnum, GlobalConst } from '../AppState';
-import RPCModule from '../RPCModule';
+import { changeServer, getBalanceInfo, getServerInfo } from '../walletBackend';
 import { RPCInfoType } from '../walletBackend/types/RPCInfoType';
 
 type checkServerURIReturn = {
@@ -26,7 +26,7 @@ const checkServerURI = async (
     // the call resolves before the race starts and the 15s timer is moot —
     // a failing RPC then blocks for as long as the native side decides
     // (observed ~4 min in the wild instead of the intended 15s cap).
-    const resultStrServerPromise = RPCModule.changeServerProcess(uri);
+    const resultStrServerPromise = changeServer(uri);
     const timeoutServerPromise = new Promise<never>((_, reject) => {
       setTimeout(() => {
         reject(new Error('Promise changeserver Timeout 15 seconds'));
@@ -37,15 +37,13 @@ const checkServerURI = async (
       resultStrServerPromise,
       timeoutServerPromise,
     ]);
-    //console.log(resultStrServer);
 
     if (
       resultStrServer &&
       resultStrServer.toLowerCase().startsWith(GlobalConst.error)
     ) {
       // I have to restore the old server again. Just in case.
-      //console.log('changeserver', resultStrServer);
-      await RPCModule.changeServerProcess(oldUri);
+      await changeServer(oldUri);
       // error, no timeout
       return {
         result: false,
@@ -58,7 +56,7 @@ const checkServerURI = async (
       if (uri) {
         // the new server is not Offline mode.
         // No `await` here so Promise.race can enforce the 15s cap.
-        const infoStrPromise = RPCModule.infoServerInfo();
+        const infoStrPromise = getServerInfo();
         const timeoutInfoPromise = new Promise<never>((_, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 15 seconds'));
@@ -69,12 +67,10 @@ const checkServerURI = async (
           infoStrPromise,
           timeoutInfoPromise,
         ]);
-        //console.log(infoStr);
 
         if (infoStr && infoStr.toLowerCase().startsWith(GlobalConst.error)) {
-          //console.log('info', infoStr);
           // I have to restore the old server again.
-          await RPCModule.changeServerProcess(oldUri);
+          await changeServer(oldUri);
           // error, no timeout
           return {
             result: false,
@@ -87,9 +83,8 @@ const checkServerURI = async (
             const infoJSON: RPCInfoType = await JSON.parse(infoStr);
             newChainName = infoJSON.chain_name;
           } catch (e) {
-            //console.log(infoStr);
             // I have to restore the old server again.
-            await RPCModule.changeServerProcess(oldUri);
+            await changeServer(oldUri);
             // error, no timeout
             return {
               result: false,
@@ -104,7 +99,7 @@ const checkServerURI = async (
       } else {
         // the new server is empty -> means Offline mode.
         // No `await` here so Promise.race can enforce the 15s cap.
-        const balanceStrPromise = RPCModule.getBalanceInfo();
+        const balanceStrPromise = getBalanceInfo();
         const timeoutInfoPromise = new Promise<never>((_, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 15 seconds'));
@@ -115,15 +110,13 @@ const checkServerURI = async (
           balanceStrPromise,
           timeoutInfoPromise,
         ]);
-        //console.log(balanceStr);
 
         if (
           balanceStr &&
           balanceStr.toLowerCase().startsWith(GlobalConst.error)
         ) {
-          //console.log('info', infoStr);
           // I have to restore the old server again.
-          await RPCModule.changeServerProcess(oldUri);
+          await changeServer(oldUri);
           // error, no timeout
           return {
             result: false,
@@ -137,9 +130,8 @@ const checkServerURI = async (
       }
     }
   } catch (error: unknown) {
-    //console.log('catch', error instanceof Error ? error.message : String(error));
     // I have to restore the old server again. Just in case.
-    await RPCModule.changeServerProcess(oldUri);
+    await changeServer(oldUri);
     // error, YES timeout
     return {
       result: false,

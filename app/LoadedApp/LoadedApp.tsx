@@ -27,7 +27,13 @@ import {
 } from '@sayem314/react-native-keep-awake';
 
 import WalletBackend, { fetchWallet } from '../walletBackend';
-import RPCModule from '../RPCModule';
+import {
+  changeServer,
+  doSave,
+  isWalletAddress,
+  loadExistingWallet,
+  setConfigWalletToProd,
+} from '../walletBackend';
 import {
   AppStateLoaded,
   TotalBalanceClass,
@@ -114,7 +120,6 @@ import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
 import { MessageList } from '../../components/Messages';
 import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
-import { RPCCheckAddressType } from '../walletBackend/types/RPCCheckAddressType';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
@@ -470,21 +475,7 @@ export default function LoadedApp(props: LoadedAppProps) {
           let own: boolean;
           if (!a.hasOwnProperty('own')) {
             // verify this address as own or not
-            const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-            if (
-              checkStr &&
-              !checkStr.toLowerCase().startsWith(GlobalConst.error)
-            ) {
-              try {
-                const checkJSON: RPCCheckAddressType = JSON.parse(checkStr);
-                own = checkJSON.is_wallet_address;
-              } catch {
-                own = false;
-              }
-            } else {
-              // error
-              own = false;
-            }
+            own = await isWalletAddress(a.address);
           } else {
             // no value
             own = a.own !== undefined ? a.own : false;
@@ -521,23 +512,8 @@ export default function LoadedApp(props: LoadedAppProps) {
         if (toUpdate.length > 1) {
           for (let i = 0; i < toUpdate.length; i++) {
             const a = toUpdate[i];
-            let own: boolean;
             // verify this address as own or not
-            const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-            if (
-              checkStr &&
-              !checkStr.toLowerCase().startsWith(GlobalConst.error)
-            ) {
-              try {
-                const checkJSON: RPCCheckAddressType = JSON.parse(checkStr);
-                own = checkJSON.is_wallet_address;
-              } catch {
-                own = false;
-              }
-            } else {
-              // error
-              own = false;
-            }
+            const own = await isWalletAddress(a.address);
             ab = await AddressBookFileImpl.updateColorAndOwnItem(
               a.label,
               a.address,
@@ -855,7 +831,7 @@ export class LoadedAppClass extends Component<
             this.setSyncingStatus({} as RPCSyncStatusType);
             // We need to save the wallet file here because
             // sometimes the App can lose the last synced chunk
-            await RPCModule.doSave();
+            await doSave();
             return;
           }
         }
@@ -919,7 +895,7 @@ export class LoadedAppClass extends Component<
           this.setSyncingStatus({} as RPCSyncStatusType);
           // We need to save the wallet file here because
           // sometimes the App can lose the last synced chunk
-          await RPCModule.doSave();
+          await doSave();
           if (Platform.OS === GlobalConst.platformOSios) {
             this.setState({ appStateStatus: nextAppState });
           }
@@ -1567,7 +1543,7 @@ export class LoadedAppClass extends Component<
     // navigate from here — navigation policy lives in the caller now.
     if (!sameServerChainName) {
       const oldSettings = await SettingsFileImpl.readSettings();
-      await RPCModule.changeServerProcess(oldSettings.server.uri);
+      await changeServer(oldSettings.server.uri);
       this.setState({
         newServer: value as ServerType,
         newSelectServer: selectServer,
@@ -1583,7 +1559,7 @@ export class LoadedAppClass extends Component<
     }
 
     // Same chain — try to open the wallet on the new server.
-    const result: string = await RPCModule.loadExistingWallet(
+    const result: string = await loadExistingWallet(
       value.uri,
       value.chainName,
       this.state.performanceLevel,
@@ -1636,7 +1612,7 @@ export class LoadedAppClass extends Component<
     // Seed/Ufvk on any RPC blip was the root cause of the "Settings save
     // sometimes doesn't apply" reports.
     const oldSettings = await SettingsFileImpl.readSettings();
-    await RPCModule.changeServerProcess(oldSettings.server.uri);
+    await changeServer(oldSettings.server.uri);
     this.setState({
       server: oldSettings.server,
       selectServer: oldSettings.selectServer,
@@ -1763,7 +1739,7 @@ export class LoadedAppClass extends Component<
     // change it in zingolib as well. Use `value` directly — `setState`
     // above is async, so `this.state.performanceLevel` here is still the
     // OLD value at this point in the same event handler.
-    const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
+    const setConfigWallet = await setConfigWalletToProd(
       value,
       GlobalConst.minConfirmations.toString(),
     );
@@ -1869,9 +1845,7 @@ export class LoadedAppClass extends Component<
       // No `await` here so Promise.race can actually enforce the 15s cap.
       // With `await` the RPC call resolves before the race starts and the
       // timer becomes a no-op (a failing server then blocks ~minutes).
-      const resultStrServerPromise = RPCModule.changeServerProcess(
-        this.state.newServer.uri,
-      );
+      const resultStrServerPromise = changeServer(this.state.newServer.uri);
       const timeoutServerPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 15 seconds'));
@@ -1991,16 +1965,7 @@ export class LoadedAppClass extends Component<
   // attach a label without leaving their current screen. Used from AddressItem
   // anywhere an address is displayed with a tappable "+ contact" icon.
   launchAddTagModal = async (address: string) => {
-    let own = false;
-    try {
-      const checkStr = await RPCModule.checkMyAddressInfo(address);
-      if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
-        const checkJSON = JSON.parse(checkStr);
-        own = !!checkJSON.is_wallet_address;
-      }
-    } catch (e) {
-      console.log('Error checking address ownership for add-tag modal', e);
-    }
+    const own = await isWalletAddress(address);
     this.setState({ addTagModalTarget: { address, own } }, () => {
       this.addTagModalRef.current?.present();
     });

@@ -73,7 +73,11 @@ import {
   ScreenEnum,
 } from '../../app/AppState';
 import { parseZcashURI, serverUris } from '../../app/uris';
-import RPCModule from '../../app/RPCModule';
+import {
+  getSpendableBalanceWithAddress,
+  parseAddress,
+  sendPropose,
+} from '../../app/walletBackend';
 import Utils from '../../app/utils';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -338,26 +342,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     [colors, translate],
   );
 
-  const runSendPropose = async (proposeJSON: string): Promise<string> => {
-    try {
-      const proposeStr: string = await RPCModule.sendProcess(proposeJSON);
-      if (proposeStr) {
-        if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error propose ${proposeStr}`);
-          return proposeStr;
-        }
-      } else {
-        console.log('Internal Error propose');
-        return 'Error: Internal RPC Error: propose';
-      }
-
-      return proposeStr;
-    } catch (error) {
-      console.log(`Critical Error propose ${error}`);
-      return `Error: ${error}`;
-    }
-  };
-
   const defaultValueFee = (): void => {
     setFee(0);
     setProposeSendLastError('');
@@ -439,7 +423,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       // fee
       let proposeFee = 0;
-      const runProposeStr = await runSendPropose(JSON.stringify(sendJson));
+      const runProposeStr = await sendPropose(JSON.stringify(sendJson));
 
       // discard result if a newer calculation (or a clear) has superseded this one
       if (feeCalculationGenRef.current !== generation) {
@@ -537,11 +521,10 @@ const Send: React.FunctionComponent<SendProps> = ({
         : 0;
       let zenniesForZingo = donationAddress ? false : donation;
       const start = Date.now();
-      const runSpendableBalanceStr =
-        await RPCModule.getSpendableBalanceWithAddressInfo(
-          addressPar,
-          zenniesForZingo ? 'true' : 'false',
-        );
+      const runSpendableBalanceStr = await getSpendableBalanceWithAddress(
+        addressPar,
+        zenniesForZingo ? 'true' : 'false',
+      );
       if (Date.now() - start > 4000) {
         console.log(
           '=========================================== > spendable balance with address - ',
@@ -777,15 +760,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [server.chainName, addressText]);
 
   useEffect(() => {
-    const parseAddress = async (
-      address: string,
-      serverChainName: string,
-    ): Promise<{ isValid: boolean; onlyOrchardUA: string }> => {
-      return await Utils.isValidAddress(address, serverChainName);
-    };
-
     if (addressText) {
-      parseAddress(addressText, server.chainName).then(r => {
+      Utils.isValidAddress(addressText, server.chainName).then(r => {
         setValidAddress(r.isValid ? 1 : -1);
         if (!r.isValid) {
           setSpendableBalanceLastError('');
@@ -2210,8 +2186,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }
                       // calculating for Privacy Level
                       let parseAddressInfoJSON: RPCParseAddressType;
-                      const result: string =
-                        await RPCModule.parseAddressInfo(addressText);
+                      const result: string = await parseAddress(addressText);
                       if (result) {
                         if (
                           result.toLowerCase().startsWith(GlobalConst.error)

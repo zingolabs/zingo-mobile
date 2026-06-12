@@ -21,7 +21,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import SelectBottomSheet from '../../Components/SelectBottomSheet';
-import RPCModule from '../../../app/RPCModule';
+import {
+  createNewTransparentAddress,
+  createNewUnifiedAddress,
+} from '../../../app/walletBackend';
 import { RPCUnifiedAddressType } from '../../../app/walletBackend/types/RPCUnifiedAddressType';
 import { RPCTransparentAddressType } from '../../../app/walletBackend/types/RPCTransparentAddressType';
 import Utils from '../../../app/utils';
@@ -81,10 +84,9 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
     try {
       let newAddressStr: string;
       if (receivers) {
-        newAddressStr =
-          await RPCModule.createNewUnifiedAddressProcess(receivers);
+        newAddressStr = await createNewUnifiedAddress(receivers);
       } else {
-        newAddressStr = await RPCModule.createNewTransparentAddressProcess();
+        newAddressStr = await createNewTransparentAddress();
       }
 
       if (newAddressStr) {

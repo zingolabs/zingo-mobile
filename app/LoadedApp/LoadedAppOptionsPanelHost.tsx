@@ -10,8 +10,7 @@ import { ContextAppLoaded } from '../context';
 import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../AppState';
 import simpleBiometrics from '../simpleBiometrics';
 import { sendEmail } from '../sendEmail';
-import RPCModule from '../RPCModule';
-import { GlobalConst } from '../AppState';
+import { walletBackupExists } from '../walletBackend';
 import { getZingoLogo, getZingoName } from '../utils/ZingoAppData';
 import { advancedTheme, basicTheme } from '../../App';
 
@@ -90,8 +89,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     (async () => {
-      const exists = await RPCModule.walletBackupExists();
-      setHasBackupWallet(!!exists && exists !== GlobalConst.false);
+      setHasBackupWallet(await walletBackupExists());
     })();
   }, [isOpen]);
 
