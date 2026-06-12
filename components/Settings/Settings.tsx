@@ -1601,7 +1601,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       {translate('settings.security-title') as string}
                     </BoldText>
                     <TouchableOpacity
-                      disabled={!deviceHasSecurity}
                       onPress={() => securityBottomSheetRef.current?.present()}
                     >
                       <View
@@ -1611,24 +1610,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           style={{
                             marginRight: 5,
                             fontWeight: '400',
-                            color: deviceHasSecurity
-                              ? colors.zingo
-                              : colors.primaryDisabled,
+                            color: colors.zingo,
                           }}
                         >
-                          {deviceHasSecurity
-                            ? securityLabel
-                            : (translate(
-                                'settings.security-not-available',
-                              ) as string)}
+                          {securityLabel}
                         </RegText>
-                        {deviceHasSecurity && (
-                          <FontAwesomeIcon
-                            icon={faChevronRight}
-                            size={12}
-                            color={colors.zingo}
-                          />
-                        )}
+                        <FontAwesomeIcon
+                          icon={faChevronRight}
+                          size={12}
+                          color={colors.zingo}
+                        />
                       </View>
                     </TouchableOpacity>
                   </View>

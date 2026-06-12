@@ -47,7 +47,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
   >
     <View
       collapsable={false}
-      handlerTag={-1}
+      handlerTag={8}
       handlerType="PanGestureHandler"
       onGestureHandlerEvent={[Function]}
       onGestureHandlerStateChange={[Function]}
@@ -241,7 +241,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
       <View
         collapsable={false}
         enabled={false}
-        handlerTag={-1}
+        handlerTag={7}
         handlerType="TapGestureHandler"
         onGestureHandlerEvent={[Function]}
         onGestureHandlerStateChange={[Function]}
@@ -612,7 +612,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
   >
     <View
       collapsable={false}
-      handlerTag={-1}
+      handlerTag={6}
       handlerType="PanGestureHandler"
       onGestureHandlerEvent={[Function]}
       onGestureHandlerStateChange={[Function]}
@@ -806,7 +806,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
       <View
         collapsable={false}
         enabled={false}
-        handlerTag={-1}
+        handlerTag={5}
         handlerType="TapGestureHandler"
         onGestureHandlerEvent={[Function]}
         onGestureHandlerStateChange={[Function]}
@@ -1126,7 +1126,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
   >
     <View
       collapsable={false}
-      handlerTag={-1}
+      handlerTag={4}
       handlerType="PanGestureHandler"
       onGestureHandlerEvent={[Function]}
       onGestureHandlerStateChange={[Function]}
@@ -1254,7 +1254,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
       <View
         collapsable={false}
         enabled={false}
-        handlerTag={-1}
+        handlerTag={3}
         handlerType="TapGestureHandler"
         onGestureHandlerEvent={[Function]}
         onGestureHandlerStateChange={[Function]}
@@ -1566,7 +1566,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
   >
     <View
       collapsable={false}
-      handlerTag={-1}
+      handlerTag={2}
       handlerType="PanGestureHandler"
       onGestureHandlerEvent={[Function]}
       onGestureHandlerStateChange={[Function]}
@@ -1760,7 +1760,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
       <View
         collapsable={false}
         enabled={false}
-        handlerTag={-1}
+        handlerTag={1}
         handlerType="TapGestureHandler"
         onGestureHandlerEvent={[Function]}
         onGestureHandlerStateChange={[Function]}

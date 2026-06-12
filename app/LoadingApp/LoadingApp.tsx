@@ -559,10 +559,10 @@ export class LoadingAppClass extends Component<
         const resultBio = this.state.security.startApp
           ? await simpleBiometrics({ translate: this.state.translate })
           : true;
-        // can be:
-        // - true      -> the user do pass the authentication
-        // - false     -> the user do NOT pass the authentication
-        // - undefined -> no biometric authentication available -> Passcode.
+        // resultBio:
+        // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
+        // - false     -> user cancelled or failed the prompt
+        // - undefined -> device has no auth method at all; allow (cannot lock the user out)
         if (resultBio === false) {
           this.setState({ biometricsFailed: true });
           return;

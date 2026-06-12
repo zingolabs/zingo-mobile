@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { Animated, View, TouchableOpacity } from 'react-native';
 import {
   NavigationProp,
@@ -49,7 +49,7 @@ type ValueTransferLineProps = {
   //setMessagesAddressModalShow: (vt: ValueTransferType) => void;
   addressProtected?: boolean;
   screenName: ScreenEnum;
-  registerSwipeable: (r: Swipeable) => void;
+  registerSwipeable: (r: Swipeable | null) => void;
   closeAllSwipeables: () => void;
   closeOtherSwipeables: () => void;
 };
@@ -79,6 +79,23 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     setSendPageState,
   } = context;
   const { colors } = useTheme() as ThemeType;
+
+  // When RecyclerListView reuses this row for a different transfer, the
+  // Swipeable's internal open/closed state stays pinned to the recycled view
+  // unless we explicitly close it on rebind. We keep a local ref alongside
+  // the parent's registry callback so the parent can still iterate and close
+  // all rows.
+  const swipeableRef = useRef<Swipeable | null>(null);
+  const setSwipeableRef = useCallback(
+    (r: Swipeable | null) => {
+      swipeableRef.current = r;
+      registerSwipeable(r);
+    },
+    [registerSwipeable],
+  );
+  useEffect(() => {
+    swipeableRef.current?.close();
+  }, [vt.txid]);
 
   const amountColor =
     vt.status === RPCValueTransfersStatusEnum.failed
@@ -245,7 +262,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
         }}
       >
         <Swipeable
-          ref={registerSwipeable}
+          ref={setSwipeableRef}
           onSwipeableWillOpen={closeOtherSwipeables}
           overshootLeft={false}
           overshootRight={false}

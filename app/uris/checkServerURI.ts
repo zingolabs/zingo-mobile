@@ -27,7 +27,7 @@ const checkServerURI = async (
     // a failing RPC then blocks for as long as the native side decides
     // (observed ~4 min in the wild instead of the intended 15s cap).
     const resultStrServerPromise = RPCModule.changeServerProcess(uri);
-    const timeoutServerPromise = new Promise((_, reject) => {
+    const timeoutServerPromise = new Promise<never>((_, reject) => {
       setTimeout(() => {
         reject(new Error('Promise changeserver Timeout 15 seconds'));
       }, 15 * 1000);
@@ -59,7 +59,7 @@ const checkServerURI = async (
         // the new server is not Offline mode.
         // No `await` here so Promise.race can enforce the 15s cap.
         const infoStrPromise = RPCModule.infoServerInfo();
-        const timeoutInfoPromise = new Promise((resolve, reject) => {
+        const timeoutInfoPromise = new Promise<never>((_, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 15 seconds'));
           }, 15 * 1000);
@@ -105,7 +105,7 @@ const checkServerURI = async (
         // the new server is empty -> means Offline mode.
         // No `await` here so Promise.race can enforce the 15s cap.
         const balanceStrPromise = RPCModule.getBalanceInfo();
-        const timeoutInfoPromise = new Promise((resolve, reject) => {
+        const timeoutInfoPromise = new Promise<never>((_, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 15 seconds'));
           }, 15 * 1000);

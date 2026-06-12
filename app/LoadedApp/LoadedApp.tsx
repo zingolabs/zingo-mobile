@@ -876,10 +876,10 @@ export class LoadedAppClass extends Component<
           const resultBio = this.state.security.foregroundApp
             ? await simpleBiometrics({ translate: this.state.translate })
             : true;
-          // can be:
-          // - true      -> the user do pass the authentication
-          // - false     -> the user do NOT pass the authentication
-          // - undefined -> no biometric authentication available -> Passcode -> Nothing.
+          // resultBio:
+          // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
+          // - false     -> user cancelled or failed the prompt
+          // - undefined -> device has no auth method at all; allow (cannot lock the user out)
           if (resultBio === false) {
             this.navigateToLoadingApp({
               startingApp: true,
@@ -1872,7 +1872,7 @@ export class LoadedAppClass extends Component<
       const resultStrServerPromise = RPCModule.changeServerProcess(
         this.state.newServer.uri,
       );
-      const timeoutServerPromise = new Promise((_, reject) => {
+      const timeoutServerPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 15 seconds'));
         }, 15 * 1000);
