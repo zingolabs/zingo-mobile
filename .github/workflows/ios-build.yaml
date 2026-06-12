@@ -116,7 +116,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.18.0'
+          node-version: 22.18.0
 
       - name: Build iOS Rust xcframework
         run: node rust/ios/build_ios.mjs
