@@ -7,5 +7,39 @@
  */
 import WalletBackend from './WalletBackend';
 
-export { fetchWallet, getZecPrice, shieldFunds } from './utils/walletUtils';
+export {
+  changeServer,
+  checkMyAddress,
+  createNewTransparentAddress,
+  createNewUnifiedAddress,
+  createNewWallet,
+  doSave,
+  fetchWallet,
+  getBalanceInfo,
+  getDonationAddress,
+  getLatestBlockServerInfo,
+  getServerInfo,
+  getSpendableBalanceWithAddress,
+  getTotalMemobytesToAddress,
+  getTotalSpendsToAddress,
+  getTotalValueToAddress,
+  getVersionInfo,
+  getWalletKind,
+  getZecPrice,
+  getZenniesDonationAddress,
+  isWalletAddress,
+  loadExistingWallet,
+  parseAddress,
+  removeTransaction,
+  restoreExistingWalletBackup,
+  restoreWalletFromSeed,
+  restoreWalletFromUfvk,
+  sendPropose,
+  setConfigWalletToProd,
+  setCryptoDefaultProvider,
+  shieldConfirm,
+  shieldPropose,
+  walletBackupExists,
+  walletExists,
+} from './utils/walletUtils';
 export default WalletBackend;

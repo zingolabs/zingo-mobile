@@ -33,7 +33,7 @@ import Button from '../../../components/Components/Button';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
 import Header from '../../../components/Header';
-import RPCModule from '../../RPCModule';
+import { getLatestBlockServerInfo } from '../../walletBackend';
 import {
   ButtonTypeEnum,
   GlobalConst,
@@ -77,9 +77,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   useEffect(() => {
     if (!netInfo.isConnected || selectServer !== SelectServerEnum.offline) {
       (async () => {
-        const resp: string = await RPCModule.getLatestBlockServerInfo(
-          server.uri,
-        );
+        const resp: string = await getLatestBlockServerInfo(server.uri);
         if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
           setLatestBlock(Number(resp));
         }

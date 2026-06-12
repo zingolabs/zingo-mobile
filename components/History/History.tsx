@@ -56,7 +56,6 @@ import {
   RecyclerListViewProps,
 } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
-import { isEqual } from 'lodash';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -177,16 +176,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const swipeablesRef = useRef(new Map<number, Swipeable>());
 
   const registerSwipeable = useCallback(
-    (key: number) => (ref: Swipeable) => {
-      swipeablesRef.current.set(key, ref);
+    (key: number) => (ref: Swipeable | null) => {
+      // React invokes the callback ref with null on unmount and on recycle;
+      // storing null in the map would crash closeAllSwipeables when it tries
+      // to call .close() on a recycled or unmounted row.
+      if (ref === null) {
+        swipeablesRef.current.delete(key);
+      } else {
+        swipeablesRef.current.set(key, ref);
+      }
     },
     [],
   );
 
   const closeAllSwipeables = useCallback((exceptKey?: number) => {
     swipeablesRef.current.forEach((ref, k) => {
-      if (k !== exceptKey) {
-        // soporta ambas APIs según versión
+      if (k !== exceptKey && ref) {
         ref.close();
       }
     });
@@ -260,7 +265,16 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const _dataProvider = useMemo(
     () =>
       new DataProvider(
-        (r1: ValueTransferType, r2: ValueTransferType) => !isEqual(r1, r2),
+        // RecyclerListView's diff fires on every poll (every 5s) with up to
+        // N×N row comparisons; a deep lodash.isEqual here is what was making
+        // the list freeze. Only fields that can actually change for an
+        // existing transfer matter visually: status (pending → confirmed)
+        // and confirmations (advance with each new block). txid is the
+        // identity guard.
+        (r1: ValueTransferType, r2: ValueTransferType) =>
+          r1.txid !== r2.txid ||
+          r1.status !== r2.status ||
+          r1.confirmations !== r2.confirmations,
       ),
     [],
   );
@@ -400,17 +414,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
       const vtfs = vtf.slice(0, numVt);
       setValueTransfersSliced(vtfs);
       setDataProvider(data => data.cloneWithRows(vtfs));
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
+      setLoading(false);
     }
   }, [fetchValueTransfersFiltered, numVt, valueTransfers, server.chainName]);
-
-  useEffect(() => {
-    const vtfs = valueTransfersFiltered.slice(0, numVt);
-    setValueTransfersSliced(vtfs);
-    setDataProvider(data => data.cloneWithRows(vtfs));
-  }, [numVt, valueTransfersFiltered]);
 
   const hasMore = numVt < valueTransfersFiltered.length;
 
@@ -778,7 +784,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
                     layoutProvider={layoutProvider}
                     dataProvider={dataProvider}
                     rowRenderer={rowRenderer}
-                    disableRecycling={true}
                     onEndReached={onEndReached}
                     onEndReachedThreshold={0.5}
                     renderFooter={() =>

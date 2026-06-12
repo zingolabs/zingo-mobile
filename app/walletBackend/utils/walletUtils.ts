@@ -72,7 +72,459 @@ export async function getZecPrice(): Promise<{
   }
 }
 
-export async function shieldFunds(): Promise<string> {
+// ---------------------------------------------------------------------------
+// Wallet lifecycle — create / load / restore / save / delete
+// ---------------------------------------------------------------------------
+
+// True iff a wallet file is present on disk. zingolib reports the answer as
+// the string "true"/"false"; collapsed to a real boolean here.
+export async function walletExists(): Promise<boolean> {
+  try {
+    const result: string = await RPCModule.walletExists();
+    return !!result && result !== GlobalConst.false;
+  } catch (error) {
+    console.log(`Critical Error walletExists ${error}`);
+    return false;
+  }
+}
+
+// Bootstraps a brand-new wallet for the given server/chain. Returns the raw
+// JSON (parseable as RPCWalletInfoType) or an "error: ..." prefix.
+export async function createNewWallet(
+  serverUri: string,
+  chainHint: string,
+  performanceLevel: string,
+  minConfirmations: string,
+): Promise<string> {
+  try {
+    return await RPCModule.createNewWallet(
+      serverUri,
+      chainHint,
+      performanceLevel,
+      minConfirmations,
+    );
+  } catch (error) {
+    console.log(`Critical Error createNewWallet ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Reconstructs a wallet from a 24-word seed + birthday block height.
+export async function restoreWalletFromSeed(
+  seed: string,
+  birthday: string,
+  serverUri: string,
+  chainHint: string,
+  performanceLevel: string,
+  minConfirmations: string,
+): Promise<string> {
+  try {
+    return await RPCModule.restoreWalletFromSeed(
+      seed,
+      birthday,
+      serverUri,
+      chainHint,
+      performanceLevel,
+      minConfirmations,
+    );
+  } catch (error) {
+    console.log(`Critical Error restoreWalletFromSeed ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Reconstructs a view-only wallet from a UFVK + birthday block height.
+export async function restoreWalletFromUfvk(
+  ufvk: string,
+  birthday: string,
+  serverUri: string,
+  chainHint: string,
+  performanceLevel: string,
+  minConfirmations: string,
+): Promise<string> {
+  try {
+    return await RPCModule.restoreWalletFromUfvk(
+      ufvk,
+      birthday,
+      serverUri,
+      chainHint,
+      performanceLevel,
+      minConfirmations,
+    );
+  } catch (error) {
+    console.log(`Critical Error restoreWalletFromUfvk ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Loads the wallet file already on disk against the given server/chain.
+export async function loadExistingWallet(
+  serverUri: string,
+  chainHint: string,
+  performanceLevel: string,
+  minConfirmations: string,
+): Promise<string> {
+  try {
+    return await RPCModule.loadExistingWallet(
+      serverUri,
+      chainHint,
+      performanceLevel,
+      minConfirmations,
+    );
+  } catch (error) {
+    console.log(`Critical Error loadExistingWallet ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Restores the wallet from its on-device backup file (the `.migrating`
+// twin EncryptedFile manages). Returns the raw response.
+export async function restoreExistingWalletBackup(): Promise<string> {
+  try {
+    return await RPCModule.restoreExistingWalletBackup();
+  } catch (error) {
+    console.log(`Critical Error restoreExistingWalletBackup ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Flushes the in-memory wallet state to disk. Returns "true"/"false" or
+// an "error: ..." prefix.
+export async function doSave(): Promise<string> {
+  try {
+    return await RPCModule.doSave();
+  } catch (error) {
+    console.log(`Critical Error doSave ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Server / network / config
+// ---------------------------------------------------------------------------
+
+// Points the running wallet at a different lightwalletd server. Caller is
+// responsible for racing this against a timeout and reverting on failure.
+export async function changeServer(serverUri: string): Promise<string> {
+  try {
+    return await RPCModule.changeServerProcess(serverUri);
+  } catch (error) {
+    console.log(`Critical Error changeServer ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Fetches lightwalletd / chain metadata. Returns raw JSON (parseable as
+// RPCInfoType).
+export async function getServerInfo(): Promise<string> {
+  try {
+    return await RPCModule.infoServerInfo();
+  } catch (error) {
+    console.log(`Critical Error getServerInfo ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Persists the runtime performance level + min-confirmations into the
+// wallet config so the next boot uses them.
+export async function setConfigWalletToProd(
+  performanceLevel: string,
+  minConfirmations: string,
+): Promise<string> {
+  try {
+    return await RPCModule.setConfigWalletToProdProcess(
+      performanceLevel,
+      minConfirmations,
+    );
+  } catch (error) {
+    console.log(`Critical Error setConfigWalletToProd ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Tells zingolib which crypto provider (e.g. ring) to use. One-shot at boot.
+export async function setCryptoDefaultProvider(): Promise<string> {
+  try {
+    return await RPCModule.setCryptoDefaultProvider();
+  } catch (error) {
+    console.log(`Critical Error setCryptoDefaultProvider ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Wallet metadata
+// ---------------------------------------------------------------------------
+
+// Returns the wallet balance breakdown (transparent / sapling / orchard,
+// spendable / unconfirmed). Raw JSON (parseable as RPCBalanceType).
+export async function getBalanceInfo(): Promise<string> {
+  try {
+    return await RPCModule.getBalanceInfo();
+  } catch (error) {
+    console.log(`Critical Error getBalanceInfo ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Returns the zingolib version string used to compose About/Settings.
+export async function getVersionInfo(): Promise<string> {
+  try {
+    return await RPCModule.getVersionInfo();
+  } catch (error) {
+    console.log(`Critical Error getVersionInfo ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Returns the wallet kind (seed vs ufvk). Raw JSON the caller parses.
+export async function getWalletKind(): Promise<string> {
+  try {
+    return await RPCModule.walletKindInfo();
+  } catch (error) {
+    console.log(`Critical Error getWalletKind ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Returns the ZingoLabs donation unified address (mainnet only — caller
+// must gate by chain). The bridge returns a freshly-generated UA every
+// time. On exception we return the raw "Error: ..." string for the caller
+// to surface — same pattern as the other one-shots in this file.
+export async function getDonationAddress(): Promise<string> {
+  try {
+    return await RPCModule.getDonationAddress();
+  } catch (error) {
+    console.log(`Critical Error getDonationAddress ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Same as `getDonationAddress` but for the Zennies-for-Zingo wallet.
+export async function getZenniesDonationAddress(): Promise<string> {
+  try {
+    return await RPCModule.getZenniesDonationAddress();
+  } catch (error) {
+    console.log(`Critical Error getZenniesDonationAddress ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Pre-calculates the fee and validates a send without broadcasting. Mirrors
+// the native `sendProcess` (propose phase). `proposeJson` is a stringified
+// SendJson zingolib expects, with recipients/amounts/memos.
+export async function sendPropose(proposeJson: string): Promise<string> {
+  try {
+    const proposeStr: string = await RPCModule.sendProcess(proposeJson);
+    if (proposeStr) {
+      if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error propose ${proposeStr}`);
+        return proposeStr;
+      }
+    } else {
+      console.log('Internal Error propose');
+      return 'Error: Internal RPC Error: propose';
+    }
+    return proposeStr;
+  } catch (error) {
+    console.log(`Critical Error propose ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Returns the spendable balance that could be sent to `address` right now,
+// honoring privacy levels and donation flags. Returns the raw JSON
+// (parseable as RPCSpendablebalanceType).
+export async function getSpendableBalanceWithAddress(
+  address: string,
+  zennies: string,
+): Promise<string> {
+  try {
+    return await RPCModule.getSpendableBalanceWithAddressInfo(address, zennies);
+  } catch (error) {
+    console.log(`Critical Error getSpendableBalanceWithAddress ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Validates and classifies a Zcash address. Returns the raw JSON
+// (parseable as RPCParseAddressType) — callers use it to decide whether
+// the address is transparent, sapling, orchard, unified or TEX.
+export async function parseAddress(address: string): Promise<string> {
+  try {
+    return await RPCModule.parseAddressInfo(address);
+  } catch (error) {
+    console.log(`Critical Error parseAddress ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Aggregated lifetime spending metrics, used by the Insight pie chart.
+// Each helper returns a raw JSON map keyed by recipient address; the caller
+// parses it into { [address]: number }. The three flavors return:
+//   value     — total ZEC sent (zats), plus a "fee" entry
+//   spends    — number of transactions sent to each recipient
+//   memobytes — total memo bytes sent to each recipient
+export async function getTotalValueToAddress(): Promise<string> {
+  try {
+    return await RPCModule.getTotalValueToAddressInfo();
+  } catch (error) {
+    console.log(`Critical Error getTotalValueToAddress ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+export async function getTotalSpendsToAddress(): Promise<string> {
+  try {
+    return await RPCModule.getTotalSpendsToAddressInfo();
+  } catch (error) {
+    console.log(`Critical Error getTotalSpendsToAddress ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+export async function getTotalMemobytesToAddress(): Promise<string> {
+  try {
+    return await RPCModule.getTotalMemobytesToAddressInfo();
+  } catch (error) {
+    console.log(`Critical Error getTotalMemobytesToAddress ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Generates a fresh unified address. `receivers` is the concatenation of
+// receiver tags zingolib understands (e.g. "o", "z", "oz"). Returns the raw
+// JSON response — the caller is expected to parse it as RPCUnifiedAddressType.
+export async function createNewUnifiedAddress(
+  receivers: string,
+): Promise<string> {
+  try {
+    return await RPCModule.createNewUnifiedAddressProcess(receivers);
+  } catch (error) {
+    console.log(`Critical Error createNewUnifiedAddress ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Generates a fresh transparent (t-) address. Returns the raw JSON response;
+// the caller is expected to parse it as RPCTransparentAddressType.
+export async function createNewTransparentAddress(): Promise<string> {
+  try {
+    return await RPCModule.createNewTransparentAddressProcess();
+  } catch (error) {
+    console.log(`Critical Error createNewTransparentAddress ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Requests zingolib to forget about a transaction. Returns the raw response
+// from the bridge — either an "error: ..." prefix on failure or a
+// human-readable status message on success, which the caller is expected to
+// surface in an alert. zingolib does not return structured data here.
+export async function removeTransaction(txid: string): Promise<string> {
+  try {
+    return await RPCModule.removeTransactionProcess(txid);
+  } catch (error) {
+    console.log(`Critical Error removeTransaction ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Asks zingolib whether the given address belongs to the loaded wallet.
+// Returns the raw JSON response (parseable as RPCCheckAddressType) or the
+// "error: ..." prefix. Callers that only need the boolean answer should use
+// `isWalletAddress` instead — it builds on this helper.
+export async function checkMyAddress(address: string): Promise<string> {
+  try {
+    return await RPCModule.checkMyAddressInfo(address);
+  } catch (error) {
+    console.log(`Critical Error checkMyAddress ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// True iff the given Zcash address belongs to the loaded wallet. Used by
+// the address book to flag own-vs-external entries. On any failure (RPC
+// error, parse error, exception) we conservatively return false — better to
+// show an external address as external than mislabel a stranger's as own.
+export async function isWalletAddress(address: string): Promise<boolean> {
+  const checkStr = await checkMyAddress(address);
+  if (!checkStr || checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+    return false;
+  }
+  try {
+    const parsed: { is_wallet_address?: boolean } = JSON.parse(checkStr);
+    return parsed.is_wallet_address === true;
+  } catch (error) {
+    console.log(`Critical Error isWalletAddress parse ${error}`);
+    return false;
+  }
+}
+
+// True iff a wallet backup file exists on disk. zingolib reports the answer
+// as the string "true"/"false"; we collapse it to a real boolean here so
+// callers don't have to repeat the GlobalConst.false comparison.
+export async function walletBackupExists(): Promise<boolean> {
+  try {
+    const result: string = await RPCModule.walletBackupExists();
+    return !!result && result !== GlobalConst.false;
+  } catch (error) {
+    console.log(`Critical Error walletBackupExists ${error}`);
+    return false;
+  }
+}
+
+// Returns the latest block height the given server reports as a plain string
+// (zingolib serializes it as a stringified integer). Callers measure wall-clock
+// time around this to compute server latency.
+export async function getLatestBlockServerInfo(
+  serverUri: string,
+): Promise<string> {
+  try {
+    const heightStr: string =
+      await RPCModule.getLatestBlockServerInfo(serverUri);
+    if (heightStr) {
+      if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error server height ${heightStr}`);
+        return heightStr;
+      }
+    } else {
+      console.log('Internal Error server height');
+      return 'Error: Internal RPC Error: server height';
+    }
+    return heightStr;
+  } catch (error) {
+    console.log(`Critical Error server height ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Pre-calculates the shielding fee and shieldable amount without broadcasting.
+// Mirrors the native `shieldProcess` (propose phase). Pair with `shieldConfirm`
+// to actually execute the shield.
+export async function shieldPropose(): Promise<string> {
+  try {
+    const proposeStr: string = await RPCModule.shieldProcess();
+    if (proposeStr) {
+      if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error propose ${proposeStr}`);
+        return proposeStr;
+      }
+    } else {
+      console.log('Internal Error propose');
+      return 'Error: Internal RPC Error: propose';
+    }
+    return proposeStr;
+  } catch (error) {
+    console.log(`Critical Error propose ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Executes the shielding transaction proposed by `shieldPropose`. Mirrors the
+// native `confirmProcess` (confirm phase). Must be called after a successful
+// propose with a still-valid balance.
+export async function shieldConfirm(): Promise<string> {
   try {
     const shieldStr: string = await RPCModule.confirmProcess();
     if (shieldStr) {

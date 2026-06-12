@@ -22,7 +22,11 @@ import {
 } from '../AppState';
 
 import randomColor from 'randomcolor';
-import RPCModule from '../RPCModule';
+import {
+  getDonationAddress,
+  getZenniesDonationAddress,
+  parseAddress,
+} from '../walletBackend';
 import { Buffer } from 'buffer';
 import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
 import { RPCParseAddressStatusEnum } from '../walletBackend/enums/RPCParseAddressStatusEnum';
@@ -115,9 +119,7 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      //const start = Date.now();
-      const ua: string = await RPCModule.getDonationAddress();
-      //console.log('=========================================== > get donation address - ', Date.now() - start);
+      const ua: string = await getDonationAddress();
       return ua;
     }
     return '';
@@ -140,9 +142,7 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      //const start = Date.now();
-      const ua: string = await RPCModule.getZenniesDonationAddress();
-      //console.log('=========================================== > get zennies donation address - ', Date.now() - start);
+      const ua: string = await getZenniesDonationAddress();
       return ua;
     }
     return '';
@@ -346,10 +346,7 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
-    //const start = Date.now();
-    const result: string = await RPCModule.parseAddressInfo(address);
-    //console.log('=========================================== > parse address - ', Date.now() - start);
-    //console.log(result);
+    const result: string = await parseAddress(address);
     let isValid: boolean = false;
     let isFullUA: boolean = false;
     let onlyOrchardUA: string = '';
@@ -399,10 +396,7 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<boolean> {
-    //const start = Date.now();
-    const result: string = await RPCModule.parseAddressInfo(address);
-    //console.log('=========================================== > parse address - ', Date.now() - start);
-    //console.log(result);
+    const result: string = await parseAddress(address);
     if (result) {
       if (result.toLowerCase().startsWith(GlobalConst.error)) {
         return false;
@@ -416,8 +410,6 @@ export default class Utils {
     } catch (e) {
       return false;
     }
-
-    //console.log('parse-memo', address, resultJSON);
 
     return (
       resultJSON.status === RPCParseAddressStatusEnum.successAddressParse &&

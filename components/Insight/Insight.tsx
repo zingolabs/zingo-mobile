@@ -29,7 +29,11 @@ import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
 import FadeText from '../Components/FadeText';
 import Header from '../Header';
-import RPCModule from '../../app/RPCModule';
+import {
+  getTotalMemobytesToAddress,
+  getTotalSpendsToAddress,
+  getTotalValueToAddress,
+} from '../../app/walletBackend';
 import AddressItem from '../Components/AddressItem';
 import {
   RouteEnum,
@@ -151,15 +155,15 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
       let resultStr: string = '';
       switch (tab) {
         case 'sent':
-          resultStr = await RPCModule.getTotalValueToAddressInfo();
+          resultStr = await getTotalValueToAddress();
           //console.log('################# value', resultStr);
           break;
         case 'sends':
-          resultStr = await RPCModule.getTotalSpendsToAddressInfo();
+          resultStr = await getTotalSpendsToAddress();
           //console.log('################# sends', resultStr);
           break;
         case 'memobytes':
-          resultStr = await RPCModule.getTotalMemobytesToAddressInfo();
+          resultStr = await getTotalMemobytesToAddress();
           //console.log('################# memobytes', resultStr);
           break;
         default:

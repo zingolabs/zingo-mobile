@@ -9,6 +9,7 @@ import { name as appName } from './app.json';
 if (!__DEV__) {
   console.log = () => {};
   console.debug = () => {};
+  console.info = () => {};
 }
 
 AppRegistry.registerComponent(appName, () => App);

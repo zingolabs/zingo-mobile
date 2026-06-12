@@ -399,11 +399,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     const resultBio = security.sendConfirm
       ? await simpleBiometrics({ translate: translate })
       : true;
-    // can be:
-    // - true      -> the user do pass the authentication
-    // - false     -> the user do NOT pass the authentication
-    // - undefined -> no biometric authentication available -> Passcode.
-    //console.log('BIOMETRIC --------> ', resultBio);
+    // resultBio:
+    // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
+    // - false     -> user cancelled or failed the prompt
+    // - undefined -> device has no auth method at all; allow (cannot lock the user out)
     if (resultBio === false) {
       // snack with Error
       addLastSnackbar(translate('biometrics-error') as string);

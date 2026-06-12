@@ -2,34 +2,17 @@ import { GlobalConst, TranslateType } from './AppState';
 
 import ReactNativeBiometrics from 'react-native-biometrics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DeviceInfo from 'react-native-device-info';
 
 type simpleBiometricsProps = {
   translate: (key: string) => TranslateType;
 };
 
-const simpleBiometrics = async (props: simpleBiometricsProps) => {
-  if (await DeviceInfo.isEmulator()) {
-    return true;
-  }
-
+const simpleBiometrics = async (
+  props: simpleBiometricsProps,
+): Promise<boolean | undefined> => {
   const rnBiometrics = new ReactNativeBiometrics({
     allowDeviceCredentials: true,
   });
-
-  const { available, biometryType, error } =
-    await rnBiometrics.isSensorAvailable();
-
-  console.log(available, biometryType, error);
-
-  if (!available) {
-    // in iOS when the Authentication screen shows up
-    // the App interpret that it is in background...
-    // here we need to restore the correct value
-    await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-    console.log('******* NOT available bio auth -> background NO');
-    return true;
-  }
 
   try {
     const result = await rnBiometrics.simplePrompt({
@@ -38,23 +21,20 @@ const simpleBiometrics = async (props: simpleBiometricsProps) => {
         'biometrics-message-ios',
       ) as string,
     });
-    if (result.success) {
-      console.log('Biometric auth success');
-      return true;
-    } else {
-      console.log('Biometric auth cancelled or failed');
-      return false;
-    }
+    return result.success === true;
   } catch (e) {
-    // Code to handle authentication failure
-    console.log(e);
-    return false;
+    // simplePrompt throws only when the device has no auth method at all
+    // (no biometric enrolled AND no passcode). With allowDeviceCredentials
+    // the OS already falls back to the passcode when biometry is missing,
+    // so reaching this branch means there is truly nothing to prompt with —
+    // returning undefined lets the caller proceed instead of locking the
+    // user out of their own wallet.
+    console.log('biometrics: no auth method available', e);
+    return undefined;
   } finally {
-    // in iOS when the Authentication screen shows up
-    // the App interpret that it is in background...
-    // here we need to restore the correct value
+    // iOS interprets the auth prompt as the app going to background;
+    // restore the foreground flag so background-state handling doesn't trip.
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-    console.log('******* FINALLY bio auth -> background NO');
   }
 };
 

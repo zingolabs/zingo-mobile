@@ -23,7 +23,6 @@ import {
   AddressBookFileClass,
   ButtonTypeEnum,
   FilterEnum,
-  GlobalConst,
   RouteEnum,
   ScreenEnum,
 } from '../../app/AppState';
@@ -51,8 +50,7 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import Utils from '../../app/utils';
-import RPCModule from '../../app/RPCModule';
-import { RPCCheckAddressType } from '../../app/walletBackend/types/RPCCheckAddressType';
+import { isWalletAddress } from '../../app/walletBackend';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
@@ -229,17 +227,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     if (a === AddressBookActionEnum.Delete) {
       ab = await AddressBookFileImpl.removeAddressBookItem(label, address);
     } else {
-      let own: boolean;
       // verify this address as own or not
-      const checkStr = await RPCModule.checkMyAddressInfo(address);
-      //console.log(checkStr);
-      if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
-        const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
-        own = checkJSON.is_wallet_address;
-      } else {
-        // error
-        own = false;
-      }
+      const own = await isWalletAddress(address);
       ab = await AddressBookFileImpl.writeAddressBookItem(
         label,
         address,

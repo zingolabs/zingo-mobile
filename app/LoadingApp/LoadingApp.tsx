@@ -27,7 +27,18 @@ import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '../../components/Components/ConfirmBottomSheet';
 import { showConfirm } from '../showConfirm';
 
-import RPCModule from '../RPCModule';
+import {
+  createNewWallet,
+  getVersionInfo,
+  getWalletKind,
+  loadExistingWallet,
+  restoreExistingWalletBackup,
+  restoreWalletFromSeed,
+  restoreWalletFromUfvk,
+  setCryptoDefaultProvider,
+  walletBackupExists,
+  walletExists as rpcWalletExists,
+} from '../walletBackend';
 import {
   AppStateLoading,
   BackgroundType,
@@ -95,9 +106,6 @@ const es = require('../translations/es.json');
 const pt = require('../translations/pt.json');
 const ru = require('../translations/ru.json');
 const tr = require('../translations/tr.json');
-
-// for testing
-//const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 type LoadingAppProps = {
   navigation: StackScreenProps<
@@ -378,9 +386,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         }
       }
 
-      // for testing
-      //await delay(5000);
-
       // reading background task info
       const backgroundSyncInfoJson = await BackgroundFileImpl.readBackground();
       setBackgroundSyncInfo(backgroundSyncInfoJson);
@@ -559,10 +564,10 @@ export class LoadingAppClass extends Component<
         const resultBio = this.state.security.startApp
           ? await simpleBiometrics({ translate: this.state.translate })
           : true;
-        // can be:
-        // - true      -> the user do pass the authentication
-        // - false     -> the user do NOT pass the authentication
-        // - undefined -> no biometric authentication available -> Passcode.
+        // resultBio:
+        // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
+        // - false     -> user cancelled or failed the prompt
+        // - undefined -> device has no auth method at all; allow (cannot lock the user out)
         if (resultBio === false) {
           this.setState({ biometricsFailed: true });
           return;
@@ -580,7 +585,7 @@ export class LoadingAppClass extends Component<
 
     // The App needs to set the crypto Provider by default to ring
     // before anything...
-    const r = await RPCModule.setCryptoDefaultProvider();
+    const r = await setCryptoDefaultProvider();
     console.log('crypto provider result', r);
 
     // Here the App ask about the new donation feature if needed.
@@ -625,24 +630,20 @@ export class LoadingAppClass extends Component<
 
     // Second, check if a wallet exists. Do it async so the basic screen has time to render
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-    const exists = await RPCModule.walletExists();
-    const backupExists = await RPCModule.walletBackupExists();
-    if (backupExists && backupExists !== GlobalConst.false) {
+    const exists = await rpcWalletExists();
+    const backupExists = await walletBackupExists();
+    if (backupExists) {
       this.setState({ hasBackupWallet: true });
     }
 
-    if (exists && exists !== GlobalConst.false) {
+    if (exists) {
       this.setState({ walletExists: true });
-      let result: string = await RPCModule.loadExistingWallet(
+      let result: string = await loadExistingWallet(
         this.state.server.uri,
         this.state.server.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
-      //let result = 'Error: pepe es guapo';
-
-      // for testing
-      //await delay(5000);
 
       let error = false;
       let errorText = '';
@@ -657,7 +658,7 @@ export class LoadingAppClass extends Component<
             let orchardPool: boolean = false;
             let saplingPool: boolean = false;
             let transparentPool: boolean = false;
-            const walletKindStr: string = await RPCModule.walletKindInfo();
+            const walletKindStr: string = await getWalletKind();
             try {
               const walletKindJSON: RPCWalletKindType =
                 await JSON.parse(walletKindStr);
@@ -1281,7 +1282,7 @@ export class LoadingAppClass extends Component<
       return;
     }
     this.setState({ actionButtonsDisabled: true });
-    let seed: string = await RPCModule.createNewWallet(
+    let seed: string = await createNewWallet(
       this.state.server.uri,
       this.state.server.chainName,
       this.state.performanceLevel,
@@ -1442,7 +1443,7 @@ export class LoadingAppClass extends Component<
 
     let result: string;
     if (type === RestoreFromTypeEnum.seedRestoreFrom) {
-      result = await RPCModule.restoreWalletFromSeed(
+      result = await restoreWalletFromSeed(
         seedUfvk.toLowerCase(),
         walletBirthday || '0',
         this.state.server.uri,
@@ -1451,7 +1452,7 @@ export class LoadingAppClass extends Component<
         GlobalConst.minConfirmations.toString(),
       );
     } else {
-      result = await RPCModule.restoreWalletFromUfvk(
+      result = await restoreWalletFromUfvk(
         seedUfvk.toLowerCase(),
         walletBirthday || '0',
         this.state.server.uri,
@@ -1478,7 +1479,7 @@ export class LoadingAppClass extends Component<
           let orchardPool: boolean = false;
           let saplingPool: boolean = false;
           let transparentPool: boolean = false;
-          const walletKindStr: string = await RPCModule.walletKindInfo();
+          const walletKindStr: string = await getWalletKind();
           console.log('KIND...', walletKindStr);
           try {
             const walletKindJSON: RPCWalletKindType =
@@ -1681,7 +1682,7 @@ export class LoadingAppClass extends Component<
 
   restoreLastBackup = async () => {
     this.setState({ screen: RouteEnum.Launching, actionButtonsDisabled: true });
-    const result = await RPCModule.restoreExistingWalletBackup();
+    const result = await restoreExistingWalletBackup();
     if (!result || result === GlobalConst.false) {
       this.addLastSnackbar(
         this.state.translate('rpc.backupnotfound-error') as string,
@@ -1698,7 +1699,7 @@ export class LoadingAppClass extends Component<
   async fetchZingolibVersion(): Promise<void> {
     try {
       const start = Date.now();
-      let zingolibStr: string = await RPCModule.getVersionInfo();
+      let zingolibStr: string = await getVersionInfo();
       if (Date.now() - start > 4000) {
         console.log(
           '=========================================== > zingolib version - ',
