@@ -18,7 +18,7 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import simpleBiometrics from '../../app/simpleBiometrics';
+import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
 import RegText from '../Components/RegText';
@@ -109,64 +109,14 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     (initialAction === UfvkActionEnum.backup &&
       (!!security?.seedUfvkScreen || !!security?.restoreWalletBackupScreen)) ||
     (initialAction === UfvkActionEnum.server && !!security?.seedUfvkScreen);
-  const [authPassed, setAuthPassed] = useState<boolean>(!needsAuth);
-  useEffect(() => {
-    if (!needsAuth) {
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      const r = await simpleBiometrics({ translate });
-      if (cancelled) {
-        return;
-      }
-      if (r === false) {
-        addLastSnackbar(translate('biometrics-error') as string);
-        navigation.goBack();
-      } else {
-        setAuthPassed(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-    // Mount-only: native stack remounts the screen on each navigation.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Re-fire the gate on background → active when security.foregroundApp
-  // is OFF (LoadedApp handles the ON case). See Seed.tsx for rationale.
-  const isFirstForegroundEpochRef = useRef(true);
-  useEffect(() => {
-    if (isFirstForegroundEpochRef.current) {
-      isFirstForegroundEpochRef.current = false;
-      return;
-    }
-    if (!needsAuth) {
-      return;
-    }
-    if (security?.foregroundApp) {
-      return;
-    }
-    setAuthPassed(false);
-    let cancelled = false;
-    (async () => {
-      const r = await simpleBiometrics({ translate });
-      if (cancelled) {
-        return;
-      }
-      if (r === false) {
-        addLastSnackbar(translate('biometrics-error') as string);
-        navigation.goBack();
-      } else {
-        setAuthPassed(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [foregroundEpoch]);
+  const authPassed = useBiometricGate({
+    needsAuth,
+    translate,
+    addLastSnackbar,
+    onCancel: () => navigation.goBack(),
+    foregroundAppEnabled: !!security?.foregroundApp,
+    foregroundEpoch,
+  });
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);

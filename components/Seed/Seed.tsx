@@ -32,7 +32,7 @@ import Button from '../Components/Button';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import simpleBiometrics from '../../app/simpleBiometrics';
+import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import {
   ModeEnum,
   ChainNameEnum,
@@ -119,66 +119,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     (initialAction === SeedActionEnum.backup &&
       (!!security?.seedUfvkScreen || !!security?.restoreWalletBackupScreen)) ||
     (initialAction === SeedActionEnum.server && !!security?.seedUfvkScreen);
-  const [authPassed, setAuthPassed] = useState<boolean>(!needsAuth);
-  useEffect(() => {
-    if (!needsAuth) {
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      const r = await simpleBiometrics({ translate });
-      if (cancelled) {
-        return;
-      }
-      if (r === false) {
-        addLastSnackbar?.(translate('biometrics-error') as string);
-        navigation.goBack();
-      } else {
-        setAuthPassed(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-    // Mount-only: native stack remounts the screen on each navigation.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Re-fire the gate when the app returns from background → active and
-  // security.foregroundApp is OFF (LoadedApp's own gate covers the ON
-  // case). Without this, the user could leave Seed open, lock the phone
-  // and come back to a visible seed without a fresh auth.
-  const isFirstForegroundEpochRef = useRef(true);
-  useEffect(() => {
-    if (isFirstForegroundEpochRef.current) {
-      isFirstForegroundEpochRef.current = false;
-      return;
-    }
-    if (!needsAuth) {
-      return;
-    }
-    if (security?.foregroundApp) {
-      return;
-    }
-    setAuthPassed(false);
-    let cancelled = false;
-    (async () => {
-      const r = await simpleBiometrics({ translate });
-      if (cancelled) {
-        return;
-      }
-      if (r === false) {
-        addLastSnackbar?.(translate('biometrics-error') as string);
-        navigation.goBack();
-      } else {
-        setAuthPassed(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [foregroundEpoch]);
+  const authPassed = useBiometricGate({
+    needsAuth,
+    translate,
+    addLastSnackbar,
+    onCancel: () => navigation.goBack(),
+    foregroundAppEnabled: !!security?.foregroundApp,
+    foregroundEpoch,
+  });
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);

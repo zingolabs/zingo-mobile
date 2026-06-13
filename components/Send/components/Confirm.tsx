@@ -31,7 +31,7 @@ import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
-import simpleBiometrics from '../../../app/simpleBiometrics';
+import { useBiometricGate } from '../../../app/hooks/useBiometricGate';
 import { useFullSheetSnapPoints } from '../../../app/hooks/useFullSheetSnapPoints';
 
 import { AppDrawerParamList, ThemeType } from '../../../app/types';
@@ -87,69 +87,19 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const isMainChain = server.chainName === ChainNameEnum.mainChainName;
 
   // Audit Issue D — bio gate for security.sendConfirm lives at the
-  // Confirm screen entry (mount-only), mirroring Seed / Ufvk / Settings
-  // / Rescan. Trade-off vs. the previous bio-on-press model: a brief
-  // window after auth where the Confirm button can be pressed without
-  // re-authenticating. Native stack remounts the screen on each
+  // Confirm screen entry. Mirrors Seed / Ufvk / Settings / Rescan via
+  // the shared hook. Trade-off vs. the previous bio-on-press model: a
+  // brief window after auth where the Confirm button can be pressed
+  // without re-authenticating. Native stack remounts the screen on each
   // navigation, so leaving and coming back forces a fresh prompt.
-  const [authPassed, setAuthPassed] = useState<boolean>(!security?.sendConfirm);
-  useEffect(() => {
-    if (!security?.sendConfirm) {
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      const r = await simpleBiometrics({ translate });
-      if (cancelled) {
-        return;
-      }
-      if (r === false) {
-        addLastSnackbar(translate('biometrics-error') as string);
-        navigation.goBack();
-      } else {
-        setAuthPassed(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-    // Mount-only: native stack remounts the screen on each navigation.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Re-fire the gate on background → active when security.foregroundApp
-  // is OFF (LoadedApp handles the ON case). See Seed.tsx for rationale.
-  const isFirstForegroundEpochRef = useRef(true);
-  useEffect(() => {
-    if (isFirstForegroundEpochRef.current) {
-      isFirstForegroundEpochRef.current = false;
-      return;
-    }
-    if (!security?.sendConfirm) {
-      return;
-    }
-    if (security?.foregroundApp) {
-      return;
-    }
-    setAuthPassed(false);
-    let cancelled = false;
-    (async () => {
-      const r = await simpleBiometrics({ translate });
-      if (cancelled) {
-        return;
-      }
-      if (r === false) {
-        addLastSnackbar(translate('biometrics-error') as string);
-        navigation.goBack();
-      } else {
-        setAuthPassed(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [foregroundEpoch]);
+  const authPassed = useBiometricGate({
+    needsAuth: !!security?.sendConfirm,
+    translate,
+    addLastSnackbar,
+    onCancel: () => navigation.goBack(),
+    foregroundAppEnabled: !!security?.foregroundApp,
+    foregroundEpoch,
+  });
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);

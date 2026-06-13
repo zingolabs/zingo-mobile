@@ -62,9 +62,8 @@ import {
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import simpleBiometrics, {
-  hasDeviceSecurity,
-} from '../../app/simpleBiometrics';
+import { hasDeviceSecurity } from '../../app/simpleBiometrics';
+import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -223,69 +222,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const screenName = ScreenEnum.Settings;
 
   // Audit Issue D — single source of truth for security.settingsScreen.
-  // The gate lives inside the screen (mount-only) so every navigation
-  // path is funnelled through the same check; callers only navigate.
-  const [authPassed, setAuthPassed] = useState<boolean>(
-    !securityContext.settingsScreen,
-  );
-  useEffect(() => {
-    if (!securityContext.settingsScreen) {
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      const r = await simpleBiometrics({ translate });
-      if (cancelled) {
-        return;
-      }
-      if (r === false) {
-        addLastSnackbar(translate('biometrics-error') as string);
-        navigation.goBack();
-      } else {
-        setAuthPassed(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-    // Mount-only: native stack remounts the screen on each navigation,
-    // so a single check at mount enforces the gate on every visit.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Re-fire the gate on background → active when security.foregroundApp
-  // is OFF (LoadedApp handles the ON case). See Seed.tsx for rationale.
-  const isFirstForegroundEpochRef = useRef(true);
-  useEffect(() => {
-    if (isFirstForegroundEpochRef.current) {
-      isFirstForegroundEpochRef.current = false;
-      return;
-    }
-    if (!securityContext.settingsScreen) {
-      return;
-    }
-    if (securityContext.foregroundApp) {
-      return;
-    }
-    setAuthPassed(false);
-    let cancelled = false;
-    (async () => {
-      const r = await simpleBiometrics({ translate });
-      if (cancelled) {
-        return;
-      }
-      if (r === false) {
-        addLastSnackbar(translate('biometrics-error') as string);
-        navigation.goBack();
-      } else {
-        setAuthPassed(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [foregroundEpoch]);
+  const authPassed = useBiometricGate({
+    needsAuth: !!securityContext.settingsScreen,
+    translate,
+    addLastSnackbar,
+    onCancel: () => navigation.goBack(),
+    foregroundAppEnabled: !!securityContext.foregroundApp,
+    foregroundEpoch,
+  });
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
