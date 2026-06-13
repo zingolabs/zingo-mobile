@@ -139,4 +139,12 @@ export default interface AppContextLoaded {
   setNymOption: (value: boolean) => Promise<void>;
   setModeOption: (value: string) => Promise<void>;
   setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
+
+  // Monotonically increasing counter incremented every time the app
+  // returns from background/inactive to active. Protected screens
+  // (Seed, ShowUfvk, Settings, Rescan, Confirm) watch it to re-fire
+  // their on-mount biometric gate when security.foregroundApp is OFF
+  // and the screen is still mounted on resume — closing the gap where
+  // a sensitive screen could be revealed without a fresh auth.
+  foregroundEpoch: number;
 }

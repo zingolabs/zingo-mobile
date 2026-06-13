@@ -32,6 +32,7 @@ import Button from '../Components/Button';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
+import simpleBiometrics from '../../app/simpleBiometrics';
 import {
   ModeEnum,
   ChainNameEnum,
@@ -46,7 +47,10 @@ import Header from '../Header';
 import Utils from '../../app/utils';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
+import {
+  getRecoveryWalletInfo,
+  saveRecoveryWalletInfo,
+} from '../../app/recoveryWalletInfo';
 import WalletType from '../../app/AppState/types/WalletType';
 import { fetchWallet } from '../../app/walletBackend';
 
@@ -84,6 +88,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     addLastSnackbar,
     setPrivacyOption,
     recoveryWalletInfoOnDevice,
+    security,
+    foregroundEpoch,
   } = context;
   const { colors } = useTheme() as ThemeType;
   // when this screen is open from LoadingApp (new wallet)
@@ -91,6 +97,88 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const screenName = ScreenEnum.Seed;
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Audit Issue D — single source of truth for the seed/UFVK biometric
+  // gate. Lives inside Seed.tsx so every navigation path (header, menu,
+  // basic-mode auto-trigger, chain-mismatch recovery, future callers) is
+  // funnelled through the same check.
+  //
+  // The "change" and "backup" actions render the seed AND perform their
+  // respective destructive operation. Each respects BOTH the per-action
+  // toggle (changeWalletScreen / restoreWalletBackupScreen) and the
+  // generic seedUfvkScreen toggle — if the user has asked for bio in
+  // either of the two contexts, the gate fires.
+  const initialAction: SeedActionEnum =
+    !!route.params && route.params.action !== undefined
+      ? route.params.action
+      : SeedActionEnum.view;
+  const needsAuth: boolean =
+    (initialAction === SeedActionEnum.view && !!security?.seedUfvkScreen) ||
+    (initialAction === SeedActionEnum.change &&
+      (!!security?.seedUfvkScreen || !!security?.changeWalletScreen)) ||
+    (initialAction === SeedActionEnum.backup &&
+      (!!security?.seedUfvkScreen || !!security?.restoreWalletBackupScreen)) ||
+    (initialAction === SeedActionEnum.server && !!security?.seedUfvkScreen);
+  const [authPassed, setAuthPassed] = useState<boolean>(!needsAuth);
+  useEffect(() => {
+    if (!needsAuth) {
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const r = await simpleBiometrics({ translate });
+      if (cancelled) {
+        return;
+      }
+      if (r === false) {
+        addLastSnackbar?.(translate('biometrics-error') as string);
+        navigation.goBack();
+      } else {
+        setAuthPassed(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Mount-only: native stack remounts the screen on each navigation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-fire the gate when the app returns from background → active and
+  // security.foregroundApp is OFF (LoadedApp's own gate covers the ON
+  // case). Without this, the user could leave Seed open, lock the phone
+  // and come back to a visible seed without a fresh auth.
+  const isFirstForegroundEpochRef = useRef(true);
+  useEffect(() => {
+    if (isFirstForegroundEpochRef.current) {
+      isFirstForegroundEpochRef.current = false;
+      return;
+    }
+    if (!needsAuth) {
+      return;
+    }
+    if (security?.foregroundApp) {
+      return;
+    }
+    setAuthPassed(false);
+    let cancelled = false;
+    (async () => {
+      const r = await simpleBiometrics({ translate });
+      if (cancelled) {
+        return;
+      }
+      if (r === false) {
+        addLastSnackbar?.(translate('biometrics-error') as string);
+        navigation.goBack();
+      } else {
+        setAuthPassed(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [foregroundEpoch]);
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -106,17 +194,59 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     {} as WalletType,
   );
   const [loadingSeed, setLoadingSeed] = useState<boolean>(true);
+  // Tracks where the seed actually came from so the loading legend can
+  // change mid-flight (keychain → wallet on fallback) and the post-load
+  // line under "tap to copy" can show its origin to the user.
+  const [seedSource, setSeedSource] = useState<'keychain' | 'wallet' | null>(
+    null,
+  );
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const seedSheetRef = useRef<BottomSheet>(null);
 
   useEffect(() => {
+    // Wait for the on-mount biometric gate to pass before touching the
+    // keychain. Otherwise both prompts (ours + the keychain accessControl)
+    // fire in parallel, and cancelling the gate's prompt cannot prevent
+    // the second one.
+    if (!authPassed) {
+      return;
+    }
     (async () => {
       setLoadingSeed(true);
       try {
-        const seedInfo = recoveryWalletInfoOnDevice
-          ? await getRecoveryWalletInfo()
-          : ((await fetchWallet(false)) ?? ({} as WalletType));
+        // Prefer the recovery-info keychain entry when the user enabled
+        // the on-device cache, but always fall back to fetching the seed
+        // directly from the wallet if the keychain returns empty — that
+        // happens on user-cancel of the keychain's own bio prompt as
+        // well as on genuine read errors. Leaving the field empty would
+        // surprise the user since they did not opt-in to the screen-
+        // level seedUfvkScreen gate. seedSource is updated as we go so
+        // the loading legend reflects what's actually being read at
+        // each moment (keychain → wallet on fallback).
+        let seedInfo: WalletType = {} as WalletType;
+        if (recoveryWalletInfoOnDevice) {
+          setSeedSource('keychain');
+          seedInfo = await getRecoveryWalletInfo();
+        }
+        if (!seedInfo.seed) {
+          setSeedSource('wallet');
+          const walletInfo = await fetchWallet(false);
+          if (walletInfo) {
+            seedInfo = walletInfo;
+            // Self-heal: the user opted into the on-device cache but the
+            // keychain entry is missing (startup save likely failed or the
+            // toggle was flipped without auth). Write it now while the
+            // gate's recent bio auth window is still warm so subsequent
+            // visits read from the keychain. Fire-and-forget so a save
+            // failure doesn't block the render.
+            if (recoveryWalletInfoOnDevice) {
+              saveRecoveryWalletInfo(walletInfo).catch(e =>
+                console.log('Self-heal save failed', e),
+              );
+            }
+          }
+        }
         const ufvkInfo = await fetchWallet(true);
         setFetchedWallet({ ...seedInfo, ufvk: ufvkInfo?.ufvk });
       } catch (e) {
@@ -125,7 +255,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         setLoadingSeed(false);
       }
     })();
-  }, [recoveryWalletInfoOnDevice]);
+  }, [recoveryWalletInfoOnDevice, authPassed]);
 
   const seedPhrase = fetchedWallet.seed || '';
   const ufvk = fetchedWallet.ufvk || '';
@@ -394,6 +524,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 ? ButtonTypeEnum.Secondary
                 : ButtonTypeEnum.Primary
             }
+            // In advanced mode the button drives the seed-dependent
+            // confirm/change/backup/server flow; without the seed phrase
+            // it has nothing to act on, so disable it instead of silently
+            // ignoring presses.
+            disabled={mode !== ModeEnum.basic && !seedPhrase}
             title={
               mode === ModeEnum.basic
                 ? !basicFirstViewSeed
@@ -430,6 +565,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       translate,
     ],
   );
+
+  if (!authPassed) {
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
 
   return (
     <View
@@ -474,11 +613,26 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         footerComponent={loadingSeed ? undefined : renderSeedFooter}
       >
         {loadingSeed ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.primary}
-            style={{ marginVertical: 20 }}
-          />
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginVertical: 20,
+            }}
+          >
+            <ActivityIndicator size="large" color={colors.primary} />
+            {seedSource !== null && (
+              <RegText style={{ marginTop: 12, textAlign: 'center' }}>
+                {
+                  translate(
+                    seedSource === 'keychain'
+                      ? 'seed.recovering-from-keychain'
+                      : 'seed.recovering-from-wallet',
+                  ) as string
+                }
+              </RegText>
+            )}
+          </View>
         ) : (
           <>
             <BottomSheetScrollView
@@ -555,6 +709,24 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   </TouchableOpacity>
                   <View />
                 </View>
+                {seedSource !== null && (
+                  <FadeText
+                    style={{
+                      textAlign: 'right',
+                      fontSize: 11,
+                      paddingHorizontal: 10,
+                      marginTop: -12,
+                    }}
+                  >
+                    {
+                      translate(
+                        seedSource === 'keychain'
+                          ? 'seed.from-keychain'
+                          : 'seed.from-wallet',
+                      ) as string
+                    }
+                  </FadeText>
+                )}
               </View>
 
               <View style={{ marginTop: 10, alignItems: 'center' }}>

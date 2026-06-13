@@ -85,6 +85,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   setNymOption: async () => {},
   setModeOption: async () => {},
   setCurrencyOption: async () => {},
+  foregroundEpoch: 0,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

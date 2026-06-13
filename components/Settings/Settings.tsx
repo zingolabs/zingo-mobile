@@ -62,7 +62,9 @@ import {
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import ReactNativeBiometrics from 'react-native-biometrics';
+import simpleBiometrics, {
+  hasDeviceSecurity,
+} from '../../app/simpleBiometrics';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -73,7 +75,7 @@ import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
+import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
@@ -152,6 +154,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
     nym: nymContext,
+    foregroundEpoch,
     readOnly,
     setPrivacyOption,
     setBackgroundError,
@@ -218,6 +221,71 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Settings;
+
+  // Audit Issue D — single source of truth for security.settingsScreen.
+  // The gate lives inside the screen (mount-only) so every navigation
+  // path is funnelled through the same check; callers only navigate.
+  const [authPassed, setAuthPassed] = useState<boolean>(
+    !securityContext.settingsScreen,
+  );
+  useEffect(() => {
+    if (!securityContext.settingsScreen) {
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const r = await simpleBiometrics({ translate });
+      if (cancelled) {
+        return;
+      }
+      if (r === false) {
+        addLastSnackbar(translate('biometrics-error') as string);
+        navigation.goBack();
+      } else {
+        setAuthPassed(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Mount-only: native stack remounts the screen on each navigation,
+    // so a single check at mount enforces the gate on every visit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-fire the gate on background → active when security.foregroundApp
+  // is OFF (LoadedApp handles the ON case). See Seed.tsx for rationale.
+  const isFirstForegroundEpochRef = useRef(true);
+  useEffect(() => {
+    if (isFirstForegroundEpochRef.current) {
+      isFirstForegroundEpochRef.current = false;
+      return;
+    }
+    if (!securityContext.settingsScreen) {
+      return;
+    }
+    if (securityContext.foregroundApp) {
+      return;
+    }
+    setAuthPassed(false);
+    let cancelled = false;
+    (async () => {
+      const r = await simpleBiometrics({ translate });
+      if (cancelled) {
+        return;
+      }
+      if (r === false) {
+        addLastSnackbar(translate('biometrics-error') as string);
+        navigation.goBack();
+      } else {
+        setAuthPassed(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [foregroundEpoch]);
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
@@ -338,15 +406,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   useEffect(() => {
     (async () => {
-      try {
-        const rnBiometrics = new ReactNativeBiometrics({
-          allowDeviceCredentials: true,
-        });
-        const { available } = await rnBiometrics.isSensorAvailable();
-        setDeviceHasSecurity(available);
-      } catch {
-        setDeviceHasSecurity(false);
-      }
+      setDeviceHasSecurity(await hasDeviceSecurity());
     })();
   }, []);
 
@@ -1202,6 +1262,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       {(translate(key) as string).toUpperCase()}
     </FadeText>
   );
+
+  if (!authPassed) {
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
 
   return (
     <KeyboardAvoidingView

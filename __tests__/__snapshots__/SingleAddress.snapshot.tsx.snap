@@ -94,7 +94,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           {
             "backgroundColor": "#c3c3c3",
             "marginHorizontal": 20,
-            "marginTop": 20,
+            "marginTop": 10,
             "padding": 10,
           }
         }
@@ -444,7 +444,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
           {
             "backgroundColor": "#c3c3c3",
             "marginHorizontal": 20,
-            "marginTop": 20,
+            "marginTop": 10,
             "padding": 10,
           }
         }

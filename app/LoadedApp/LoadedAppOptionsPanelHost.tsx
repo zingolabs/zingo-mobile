@@ -8,7 +8,6 @@ import type {
 import { closeOptionsPanel, useOptionsPanel } from '../context/optionsPanel';
 import { ContextAppLoaded } from '../context';
 import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../AppState';
-import simpleBiometrics from '../simpleBiometrics';
 import { sendEmail } from '../sendEmail';
 import { walletBackupExists } from '../walletBackend';
 import { getZingoLogo, getZingoName } from '../utils/ZingoAppData';
@@ -18,6 +17,7 @@ import AddressBookIcon from '../../assets/img/options/address-book.svg';
 import AddressBookBasicIcon from '../../assets/img/options/address-book-basic.svg';
 import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
 import WalletSeedBasicIcon from '../../assets/img/options/wallet-seed-basic.svg';
+import RefreshIcon from '../../assets/img/options/refresh.svg';
 import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.svg';
 import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
 import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
@@ -39,6 +39,7 @@ const SOCIAL_GITHUB_URL = 'https://github.com/zingolabs/zingo-mobile';
 const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.AddressBook]: 'menu.addressbook',
   [MenuItemEnum.WalletSeedUfvk]: 'menu.walletseedufvk',
+  [MenuItemEnum.Rescan]: 'menu.rescan',
   [MenuItemEnum.SyncReport]: 'menu.syncreport',
   [MenuItemEnum.FundPools]: 'menu.fundpools',
   [MenuItemEnum.Insight]: 'menu.insight',
@@ -72,7 +73,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   const {
     translate,
     mode,
-    security,
     addLastSnackbar,
     readOnly,
     selectServer,
@@ -80,6 +80,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     valueTransfersTotal,
     totalBalance,
     somePending,
+    rescanMenu,
   } = context;
   const { isOpen } = useOptionsPanel();
 
@@ -93,30 +94,16 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     })();
   }, [isOpen]);
 
-  // Runs biometrics for protected items, then forwards to the LoadedApp
-  // class-level dispatcher that knows which screen to navigate to. The
-  // panel is only closed after biometrics succeeds (or upfront for items
-  // that don't need it) — closing before would strand the user on the
-  // previous screen if they cancel the OS auth prompt.
+  // Audit Issue D — bio gates moved into the destination screens
+  // themselves (Seed.tsx, ShowUfvk.tsx, Rescan.tsx, Settings.tsx) so
+  // every navigation path is funnelled through the same check. Dispatch
+  // just closes the panel and forwards the menu selection.
   const dispatch = useMemo(
-    () => async (item: MenuItemEnum) => {
-      const needsBio =
-        (item === MenuItemEnum.WalletSeedUfvk && security.seedUfvkScreen) ||
-        (item === MenuItemEnum.Rescan && security.rescanScreen) ||
-        (item === MenuItemEnum.ChangeWallet && security.changeWalletScreen) ||
-        (item === MenuItemEnum.RestoreWalletBackup &&
-          security.restoreWalletBackupScreen);
-      if (needsBio) {
-        const ok = await simpleBiometrics({ translate });
-        if (ok === false) {
-          addLastSnackbar(translate('biometrics-error') as string);
-          return;
-        }
-      }
+    () => (item: MenuItemEnum) => {
       closeOptionsPanel();
       onMenuItemSelected(item);
     },
-    [security, translate, addLastSnackbar, onMenuItemSelected],
+    [onMenuItemSelected],
   );
 
   // Visibility rules mirror the legacy Menu.tsx so the grid behaves the
@@ -129,6 +116,8 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       isBasic && valueTransfersTotal !== null && valueTransfersTotal === 0;
 
     const showSeedUfvk = !isEmptyBasic;
+    // Legacy Menu.tsx parity: advanced + online + context-flag.
+    const showRescan = !isBasic && !isOffline && rescanMenu;
     const showSyncReport = !isBasic && !isOffline;
     const showFundPools = !isBasic;
     const showInsight = !isEmptyBasic;
@@ -193,6 +182,16 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
           <WalletSeedIcon width={28} height={28} />
         ),
         onPress: () => dispatch(MenuItemEnum.WalletSeedUfvk),
+      });
+    }
+
+    if (showRescan) {
+      list.push({
+        id: MenuItemEnum.Rescan,
+        testID: MENU_TEST_IDS[MenuItemEnum.Rescan],
+        label: translate('loadedapp.rescanwallet') as string,
+        icon: <RefreshIcon width={30} height={30} />,
+        onPress: () => dispatch(MenuItemEnum.Rescan),
       });
     }
 
@@ -286,6 +285,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     hasBackupWallet,
     totalBalance,
     somePending,
+    rescanMenu,
   ]);
 
   const socials = useMemo<OptionsPanelSocial[]>(

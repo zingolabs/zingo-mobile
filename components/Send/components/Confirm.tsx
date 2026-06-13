@@ -80,10 +80,76 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     addLastSnackbar,
     server,
     security,
+    foregroundEpoch,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Confirm;
   const isMainChain = server.chainName === ChainNameEnum.mainChainName;
+
+  // Audit Issue D — bio gate for security.sendConfirm lives at the
+  // Confirm screen entry (mount-only), mirroring Seed / Ufvk / Settings
+  // / Rescan. Trade-off vs. the previous bio-on-press model: a brief
+  // window after auth where the Confirm button can be pressed without
+  // re-authenticating. Native stack remounts the screen on each
+  // navigation, so leaving and coming back forces a fresh prompt.
+  const [authPassed, setAuthPassed] = useState<boolean>(!security?.sendConfirm);
+  useEffect(() => {
+    if (!security?.sendConfirm) {
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const r = await simpleBiometrics({ translate });
+      if (cancelled) {
+        return;
+      }
+      if (r === false) {
+        addLastSnackbar(translate('biometrics-error') as string);
+        navigation.goBack();
+      } else {
+        setAuthPassed(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Mount-only: native stack remounts the screen on each navigation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-fire the gate on background → active when security.foregroundApp
+  // is OFF (LoadedApp handles the ON case). See Seed.tsx for rationale.
+  const isFirstForegroundEpochRef = useRef(true);
+  useEffect(() => {
+    if (isFirstForegroundEpochRef.current) {
+      isFirstForegroundEpochRef.current = false;
+      return;
+    }
+    if (!security?.sendConfirm) {
+      return;
+    }
+    if (security?.foregroundApp) {
+      return;
+    }
+    setAuthPassed(false);
+    let cancelled = false;
+    (async () => {
+      const r = await simpleBiometrics({ translate });
+      if (cancelled) {
+        return;
+      }
+      if (r === false) {
+        addLastSnackbar(translate('biometrics-error') as string);
+        navigation.goBack();
+      } else {
+        setAuthPassed(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [foregroundEpoch]);
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
@@ -395,22 +461,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     translate,
   ]);
 
-  const confirmSendBiometrics = async () => {
-    const resultBio = security.sendConfirm
-      ? await simpleBiometrics({ translate: translate })
-      : true;
-    // resultBio:
-    // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
-    // - false     -> user cancelled or failed the prompt
-    // - undefined -> device has no auth method at all; allow (cannot lock the user out)
-    if (resultBio === false) {
-      // snack with Error
-      addLastSnackbar(translate('biometrics-error') as string);
-    } else {
-      await confirmSend(sendPageState);
-    }
-  };
-
   useEffect(() => {
     const sendingTot =
       Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) +
@@ -455,7 +505,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 ? (translate('send.confirm-button-all') as string)
                 : (translate('confirm') as string)
             }
-            onPress={async () => await confirmSendBiometrics()}
+            onPress={async () => await confirmSend(sendPageState)}
           />
         </View>
       </BottomSheetFooter>
@@ -463,6 +513,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [colors, nym, sendAllAmount, translate],
   );
+
+  if (!authPassed) {
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
 
   return (
     <View style={{ flex: 1 }}>

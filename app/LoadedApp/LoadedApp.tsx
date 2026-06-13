@@ -95,7 +95,7 @@ import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressA
 import {
   createUpdateRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../recoveryWalletInfov10';
+} from '../recoveryWalletInfo';
 
 import History from '../../components/History';
 import Send from '../../components/Send';
@@ -749,6 +749,10 @@ export class LoadedAppClass extends Component<
       scrollToBottom: false,
       isSeedViewModalOpen: false,
       addTagModalTarget: null,
+      // Bumped each time the app returns from background → active so
+      // protected screens currently mounted can re-fire their gate
+      // when security.foregroundApp is OFF.
+      foregroundEpoch: 0,
     };
 
     this.rpc = new WalletBackend({
@@ -848,6 +852,14 @@ export class LoadedAppClass extends Component<
           if (Platform.OS === GlobalConst.platformOSios) {
             this.setState({ appStateStatus: nextAppState });
           }
+          // Bump the foreground epoch so any currently-mounted
+          // protected screen (Seed/Ufvk/Settings/Rescan/Confirm) can
+          // re-fire its biometric gate when security.foregroundApp is
+          // OFF. Done before the foregroundApp simpleBiometrics so the
+          // screen-level effects don't race against the app-level one.
+          this.setState(state => ({
+            foregroundEpoch: state.foregroundEpoch + 1,
+          }));
           // (PIN or TouchID or FaceID)
           const resultBio = this.state.security.foregroundApp
             ? await simpleBiometrics({ translate: this.state.translate })
@@ -2063,6 +2075,7 @@ export class LoadedAppClass extends Component<
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
       nym: this.state.nym,
+      foregroundEpoch: this.state.foregroundEpoch,
     };
 
     return (

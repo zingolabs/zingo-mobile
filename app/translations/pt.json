@@ -514,7 +514,11 @@
     "tapreveal": "Toque para revelar",
     "showtransactions": "Mostrar Transações",
     "youreceived": "Você recebeu",
-    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência (limpa em 60s)"
+    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência (limpa em 60s)",
+    "recovering-from-keychain": "Recuperando a frase de recuperação do armazenamento seguro...",
+    "recovering-from-wallet": "Carregando a frase de recuperação da carteira...",
+    "from-keychain": "do armazenamento seguro",
+    "from-wallet": "da carteira"
   },
   "send": {
     "Broadcast": "Transmitido e aguardando confirmação Tx:",
@@ -728,7 +732,29 @@
     "scanaddress": "Escaneie um Endereço Zcash"
   },
   "ufvk": {
-    "buttontexts": {},
+    "buttontexts": {
+      "view": [
+        "Eu salvei a \n chave de visualização"
+      ],
+      "change": [
+        "",
+        "Abrir Nova Carteira",
+        "Você realmente quer\n alterar para a sua \n carteira atual",
+        "Tem certeza?"
+      ],
+      "server": [
+        "",
+        "Alterar Servidor",
+        "Você realmente quer \n alterar para o seu \n servidor atual",
+        "Tem certeza?"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Você realmente deseja \n restaurar sua \n carteira de backup",
+        "Tem certeza?"
+      ]
+    },
     "viewkey": "Chave de Visualização ",
     "tapcopy-message": "Chave Copiada para a Área de Transferência",
     "text-readonly": "Antes de fechar esta tela, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
@@ -738,7 +764,11 @@
     "change-warning": "Se você mudar para outra carteira, não terá mais acesso a esta carteira sem as frases de recuperação.",
     "backup-warning": "Se você mudar para sua carteira de backup, não terá mais acesso a esta carteira sem as Frases de recuperação.",
     "server-warning": "Se você mudar para um servidor com uma rede diferente, não terá mais acesso a esta carteira sem as frases de recuperação.",
-    "mainnet-warning": "Nenhum backup desta carteira, disponível apenas na 'MAINNET'."
+    "mainnet-warning": "Nenhum backup desta carteira, disponível apenas na 'MAINNET'.",
+    "recovering-from-keychain": "Recuperando a chave de visualização do armazenamento seguro...",
+    "recovering-from-wallet": "Carregando a chave de visualização da carteira...",
+    "from-keychain": "do armazenamento seguro",
+    "from-wallet": "da carteira"
   },
   "pools": {
     "title": "Fundos nas Pools",

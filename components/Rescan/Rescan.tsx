@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { View, TouchableOpacity } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
@@ -16,6 +22,7 @@ import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
+import simpleBiometrics from '../../app/simpleBiometrics';
 import Header from '../Header';
 import {
   ButtonTypeEnum,
@@ -39,10 +46,79 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   doRescan,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { birthday, translate, netInfo, addLastSnackbar, selectServer } =
-    context;
+  const {
+    birthday,
+    translate,
+    netInfo,
+    addLastSnackbar,
+    selectServer,
+    security,
+    foregroundEpoch,
+  } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Rescan;
+
+  // Audit Issue D — single source of truth for security.rescanScreen.
+  const [authPassed, setAuthPassed] = useState<boolean>(
+    !security?.rescanScreen,
+  );
+  useEffect(() => {
+    if (!security?.rescanScreen) {
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const r = await simpleBiometrics({ translate });
+      if (cancelled) {
+        return;
+      }
+      if (r === false) {
+        addLastSnackbar(translate('biometrics-error') as string);
+        navigation.goBack();
+      } else {
+        setAuthPassed(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Mount-only: native stack remounts the screen on each navigation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-fire the gate on background → active when security.foregroundApp
+  // is OFF (LoadedApp handles the ON case). See Seed.tsx for rationale.
+  const isFirstForegroundEpochRef = useRef(true);
+  useEffect(() => {
+    if (isFirstForegroundEpochRef.current) {
+      isFirstForegroundEpochRef.current = false;
+      return;
+    }
+    if (!security?.rescanScreen) {
+      return;
+    }
+    if (security?.foregroundApp) {
+      return;
+    }
+    setAuthPassed(false);
+    let cancelled = false;
+    (async () => {
+      const r = await simpleBiometrics({ translate });
+      if (cancelled) {
+        return;
+      }
+      if (r === false) {
+        addLastSnackbar(translate('biometrics-error') as string);
+        navigation.goBack();
+      } else {
+        setAuthPassed(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [foregroundEpoch]);
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -150,6 +226,10 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
     ),
     [colors, translate, doRescanAndClose],
   );
+
+  if (!authPassed) {
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
 
   return (
     <View

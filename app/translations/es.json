@@ -514,7 +514,11 @@
     "tapreveal": "Pulsar para revelar",
     "showtransactions": "Ver Transacciones",
     "youreceived": "Recibiste",
-    "tapcopy-ufvk-message": "Clave de visualización copiada al portapapeles (se borrará en 60s)"
+    "tapcopy-ufvk-message": "Clave de visualización copiada al portapapeles (se borrará en 60s)",
+    "recovering-from-keychain": "Recuperando la semilla del almacenamiento seguro...",
+    "recovering-from-wallet": "Cargando la semilla del monedero...",
+    "from-keychain": "del almacenamiento seguro",
+    "from-wallet": "del monedero"
   },
   "send": {
     "Broadcast": "Transmitida y esperando confirmación Tx:",
@@ -728,7 +732,29 @@
     "scanaddress": "Escanea una dirección Zcash"
   },
   "ufvk": {
-    "buttontexts": {},
+    "buttontexts": {
+      "view": [
+        "Ya he guardado \n la clave de visualización"
+      ],
+      "change": [
+        "",
+        "Abrir Nuevo",
+        "Realmente quieres \n cambiar tu \n monedero activo",
+        "Estás seguro/a?"
+      ],
+      "server": [
+        "",
+        "Cambiar Servidor",
+        "Realmente quieres \n cambiar el \n servidor activo",
+        "Estás seguro/a?"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Realmente quieres \n restaurar tu \n copia de seguridad",
+        "Estás seguro/a?"
+      ]
+    },
     "viewkey": "Clave de Visualización ",
     "tapcopy-message": "Clave copiada al portapapeles",
     "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
@@ -738,7 +764,11 @@
     "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
     "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
     "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
-    "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'."
+    "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'.",
+    "recovering-from-keychain": "Recuperando la clave de visualización del almacenamiento seguro...",
+    "recovering-from-wallet": "Cargando la clave de visualización del monedero...",
+    "from-keychain": "del almacenamiento seguro",
+    "from-wallet": "del monedero"
   },
   "pools": {
     "title": "Agrupaciones de Fondos",

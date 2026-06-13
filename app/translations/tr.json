@@ -514,7 +514,11 @@
     "tapreveal": "Görüntülemek için dokunun",
     "showtransactions": "İşlemleri Göster",
     "youreceived": "Aldınız",
-    "tapcopy-ufvk-message": "Görüntüleme Anahtarı panoya kopyalandı (60 sn sonra temizlenecek)"
+    "tapcopy-ufvk-message": "Görüntüleme Anahtarı panoya kopyalandı (60 sn sonra temizlenecek)",
+    "recovering-from-keychain": "Güvenli depolamadan seed kurtarılıyor...",
+    "recovering-from-wallet": "Cüzdandan seed yükleniyor...",
+    "from-keychain": "güvenli depolamadan",
+    "from-wallet": "cüzdandan"
   },
   "send": {
     "Broadcast": "Yayınlandı ve onay bekliyor: İşlem (Tx)",
@@ -728,7 +732,29 @@
     "scanaddress": "Bir Zcash Adresini Tara"
   },
   "ufvk": {
-    "buttontexts": {},
+    "buttontexts": {
+      "view": [
+        "Görüntüleme anahtarını\nKaydettim"
+      ],
+      "change": [
+        "",
+        "Yeni aç",
+        "Gerçek cüzdanınızı\nDeğiştirmek istiyor musunuz?",
+        "Emin misiniz?"
+      ],
+      "server": [
+        "",
+        "Sunucuyu değiştir",
+        "Gerçek cüzdanınızı\nDeğiştirmek istiyor musunuz?",
+        "Emin misiniz?"
+      ],
+      "backup": [
+        "",
+        "Geri yükle",
+        "Yedek cüzdanınızı \nGeri yüklemek \nİstiyorsunuz",
+        "Emin misiniz?"
+      ]
+    },
     "viewkey": "Görüntüleme Anahtarı",
     "tapcopy-message": "Anahtar panoya kopyalandı",
     "text-readonly": "Bu ekranı kapatmadan önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınızı geri yüklemenin veya erişmenin tek yolu budur.",
@@ -738,7 +764,11 @@
     "change-warning": "Başka bir cüzdana geçerseniz, bu cüzdana bir daha erişemezsiniz tohum ifadesi elinizde yoksa.",
     "backup-warning": "Yedek cüzdanınıza geçerseniz, tohum ifadesi olmadan bu cüzdana bir daha erişemezsiniz.",
     "server-warning": "Farklı bir blok zincirine sahip bir sunucuya geçerseniz, tohum ifadesi olmadan bu cüzdana artık erişemezsiniz.",
-    "mainnet-warning": "Bu cüzdanın yedeği yoktur, yalnızca 'MAINNET' üzerinde kullanılabilir."
+    "mainnet-warning": "Bu cüzdanın yedeği yoktur, yalnızca 'MAINNET' üzerinde kullanılabilir.",
+    "recovering-from-keychain": "Güvenli depolamadan görüntüleme anahtarı kurtarılıyor...",
+    "recovering-from-wallet": "Cüzdandan görüntüleme anahtarı yükleniyor...",
+    "from-keychain": "güvenli depolamadan",
+    "from-wallet": "cüzdandan"
   },
   "pools": {
     "title": "Fon Havuzları",
