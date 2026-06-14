@@ -1190,7 +1190,10 @@ export class LoadingAppClass extends Component<
       );
       const chainName = this.state.customServerChainName;
       if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
-        this.addLastSnackbar(this.state.translate('settings.isuri') as string);
+        // Surface the parser's specific message (bad URI, plaintext
+        // HTTP not allowed, etc.) instead of the generic "fill out a
+        // valid Server URI" snackbar so the user can fix the input.
+        this.addLastSnackbar(uri);
         this.setState({ actionButtonsDisabled: false });
         return;
       }

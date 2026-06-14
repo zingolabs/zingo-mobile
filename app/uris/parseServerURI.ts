@@ -1,6 +1,20 @@
 import Url from 'url-parse';
 import { GlobalConst, TranslateType } from '../AppState';
 
+// Audit Issue G — plaintext http:// is only acceptable when the user is
+// pointing at a server running on the same device (local development,
+// regtest, manual debugging). Anything else risks exposing wallet
+// metadata over an unencrypted connection. url-parse normalises the
+// hostname to lowercase and preserves IPv6 brackets, so we strip the
+// brackets before checking and rely on lowercasing already happening.
+const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
+
+const isLocalHost = (hostname: string): boolean => {
+  // Strip the [ ] brackets that url-parse keeps around IPv6 literals.
+  const cleaned = hostname.replace(/^\[/, '').replace(/\]$/, '');
+  return LOCAL_HOSTNAMES.has(cleaned.toLowerCase());
+};
+
 const parseServerURI = (
   uri: string,
   translate: (key: string) => TranslateType,
@@ -18,6 +32,14 @@ const parseServerURI = (
       parsedUri.protocol !== GlobalConst.https)
   ) {
     return translate('uris.baduri') as string;
+  }
+
+  // Reject http:// for any non-local host — see audit Issue G.
+  if (
+    parsedUri.protocol === GlobalConst.http &&
+    !isLocalHost(parsedUri.hostname)
+  ) {
+    return translate('uris.error-http-not-allowed') as string;
   }
 
   let port = parsedUri.port;
