@@ -436,7 +436,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         runProposeStr.toLowerCase().startsWith(GlobalConst.error)
       ) {
         // snack with error
-        console.log(runProposeStr);
         setProposeSendLastError(runProposeStr);
         //Alert.alert('Calculating the FEE', runProposeStr);
       } else {
@@ -477,7 +476,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           }
         } catch (e) {
           // snack with error
-          console.log(runProposeStr);
           setProposeSendLastError(runProposeStr);
           //Alert.alert('Calculating the FEE', runProposeJson.error);
         }
@@ -531,13 +529,11 @@ const Send: React.FunctionComponent<SendProps> = ({
           Date.now() - start,
         );
       }
-      console.log(runSpendableBalanceStr);
       if (
         runSpendableBalanceStr &&
         runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)
       ) {
         // snack with error
-        console.log(runSpendableBalanceStr);
         setSpendableBalanceLastError(runSpendableBalanceStr);
         //Alert.alert('Calculating the FEE', runProposeStr);
       } else {
@@ -555,11 +551,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           }
         } catch (e) {
           // snack with error
-          console.log(
-            'SPENDABLEBALANCE error',
-            runSpendableBalanceStr,
-            e instanceof Error ? e.message : String(e),
-          );
           setSpendableBalanceLastError(
             runSpendableBalanceStr +
               ' ' +
@@ -978,8 +969,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           // all of the servers return an error because they are unreachable probably.
           // the 15 seconds timout was fired.
         }
-        console.log(serverChecked);
-        console.log(fasterServer);
         if (fasterServer.uri !== server.uri) {
           await setServerOption(fasterServer, selectServer, false, true);
         }
