@@ -17,7 +17,7 @@ import AddressBookIcon from '../../assets/img/options/address-book.svg';
 import AddressBookBasicIcon from '../../assets/img/options/address-book-basic.svg';
 import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
 import WalletSeedBasicIcon from '../../assets/img/options/wallet-seed-basic.svg';
-import RefreshIcon from '../../assets/img/options/refresh.svg';
+import RescanIcon from '../../assets/img/options/rescan.svg';
 import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.svg';
 import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
 import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
@@ -190,7 +190,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
         id: MenuItemEnum.Rescan,
         testID: MENU_TEST_IDS[MenuItemEnum.Rescan],
         label: translate('loadedapp.rescanwallet') as string,
-        icon: <RefreshIcon width={30} height={30} />,
+        icon: <RescanIcon width={30} height={30} />,
         onPress: () => dispatch(MenuItemEnum.Rescan),
       });
     }
