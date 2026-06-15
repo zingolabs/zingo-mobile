@@ -1733,10 +1733,10 @@
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
-"@react-navigation/elements@^2.9.18", "@react-navigation/elements@^2.9.19", "@react-navigation/elements@^2.9.20":
-  version "2.9.21"
-  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.21.tgz#9a7a6eb1b7c6347fabb8baa0997065f1c745d257"
-  integrity sha512-O9sH1oMqWG/whbdkbJL68xNmeM5ShkVEhL0FFpyiA/bRUObFlMaLW4yzbiRcfAFNWFVDubhowlrnOg9hcWkc8w==
+"@react-navigation/elements@^2.9.19", "@react-navigation/elements@^2.9.20", "@react-navigation/elements@^2.9.25":
+  version "2.9.25"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.25.tgz#b42e6080a77cf06bc69de95a1936cbabca43abee"
+  integrity sha512-cV7Hny55aE/uge6f4UB0pbGQbFl3XjXLMW+lTBNuJs8P7a9tuf7dkkPHxxgnLIvxE+KJVI2K8CGabfDk4Ht0Sg==
   dependencies:
     color "^4.2.3"
     use-latest-callback "^0.2.4"
