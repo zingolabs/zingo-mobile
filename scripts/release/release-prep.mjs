@@ -23,7 +23,7 @@
 //     - ios/Zingo.xcodeproj/project.pbxproj target Zingo  Debug-Beta + Release-Beta
 //                                           (MARKETING_VERSION, CURRENT_PROJECT_VERSION)
 //     - android/app/build.gradle.kts        productFlavors.beta
-//                                           (versionCode)
+//                                           (versionName, versionCode)
 //
 // Idempotent: running with the values already on disk is a no-op.
 
@@ -104,13 +104,18 @@ if (channel === 'beta') {
   // iOS beta = target Zingo configs with "AppIcon-Beta".
   patch(PBXPROJ, src => patchPbxprojForChannel(src, '"AppIcon-Beta"', version, build));
 
-  // Android beta = productFlavors.beta. Only versionCode is overridden today;
-  // versionName follows defaultConfig (i.e. prod's versionName).
+  // Android beta = productFlavors.beta, which overrides both versionCode and
+  // versionName from defaultConfig so beta can ship a distinct semver from prod.
   patch(GRADLE, src =>
-    src.replace(
-      /(create\("beta"\) \{[\s\S]*?versionCode = )\d+/,
-      `$1${build}`,
-    ),
+    src
+      .replace(
+        /(create\("beta"\) \{[\s\S]*?versionCode = )\d+/,
+        `$1${build}`,
+      )
+      .replace(
+        /(create\("beta"\) \{[\s\S]*?versionName = )"[^"]+"/,
+        `$1"${version}"`,
+      ),
   );
 }
 
