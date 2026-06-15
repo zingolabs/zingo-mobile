@@ -18,6 +18,9 @@ class MainActivity : ReactActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("ON_CREATE", "Starting main activity")
         super.onCreate(null)
+        // Audit Issue I: tapjacking protection — drop touches if another
+        // window (e.g. SYSTEM_ALERT_WINDOW overlay) is on top of ours.
+        window.decorView.filterTouchesWhenObscured = true
     }
 
     override fun createReactActivityDelegate(): ReactActivityDelegate {
