@@ -1019,6 +1019,15 @@ export class LoadedAppClass extends Component<
         this.state.server,
       );
 
+      // Audit Issue H — surface the parser error and abort before any
+      // Send-state mutation. parseZcashURI now returns an empty target
+      // when error is non-empty, but the explicit guard keeps intent
+      // obvious here and protects against future contract changes.
+      if (error) {
+        this.addLastSnackbar(error);
+        return;
+      }
+
       if (target) {
         let update = false;
         if (

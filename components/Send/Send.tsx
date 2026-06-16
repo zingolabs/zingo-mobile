@@ -606,6 +606,15 @@ const Send: React.FunctionComponent<SendProps> = ({
           server,
         );
 
+        // Audit Issue H — surface the parser error and abort before any
+        // Send-state mutation. parseZcashURI now returns an empty target
+        // when error is non-empty, but the explicit guard keeps intent
+        // obvious here and protects against future contract changes.
+        if (error) {
+          addLastSnackbar(error);
+          return;
+        }
+
         if (target) {
           // redo the to addresses
           [target].forEach(tgt => {
@@ -621,10 +630,6 @@ const Send: React.FunctionComponent<SendProps> = ({
               setMemoText(tgt.memoString);
             }
           });
-        }
-        if (error) {
-          // Show the error message as a toast
-          addLastSnackbar(error);
         }
       } else {
         setAddressText(addressPar.replace(/[ \t\n\r]+/g, '')); // Remove spaces
@@ -2173,23 +2178,22 @@ const Send: React.FunctionComponent<SendProps> = ({
                         setMemoText('');
                         updateToField(null, null, null, '', false);
                       }
-                      // calculating for Privacy Level
-                      let parseAddressInfoJSON: RPCParseAddressType;
-                      const result: string = await parseAddress(addressText);
-                      if (result) {
-                        if (
-                          result.toLowerCase().startsWith(GlobalConst.error)
-                        ) {
-                          parseAddressInfoJSON = {} as RPCParseAddressType;
-                        } else {
-                          try {
-                            parseAddressInfoJSON = await JSON.parse(result);
-                          } catch (e) {
-                            parseAddressInfoJSON = {} as RPCParseAddressType;
-                          }
-                        }
-                      } else {
-                        parseAddressInfoJSON = {} as RPCParseAddressType;
+                      // Prefetch the parsed address for the Confirm screen
+                      // so its Privacy Level badge renders without waiting on
+                      // an RPC round-trip there. The address itself was
+                      // already validated upstream — any failure here (RPC
+                      // error string, non-JSON output, transient network)
+                      // degrades gracefully to a '-' badge in Confirm.tsx;
+                      // the validated address string is what actually drives
+                      // the transaction, so no Send state is corrupted.
+                      let parseAddressInfoJSON: RPCParseAddressType =
+                        {} as RPCParseAddressType;
+                      try {
+                        parseAddressInfoJSON = JSON.parse(
+                          await parseAddress(addressText),
+                        );
+                      } catch (_) {
+                        // best-effort prefetch; fall through to {}
                       }
                       setConfirmModalShow(parseAddressInfoJSON);
                       Keyboard.dismiss();
