@@ -1,4 +1,5 @@
-import { Platform } from 'react-native';
+import { DeviceEventEmitter, Platform } from 'react-native';
+
 import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -18,6 +19,13 @@ const SENTINEL_VALUE = '1';
 type simpleBiometricsProps = {
   translate: (key: string) => TranslateType;
 };
+
+// Emitted with a boolean payload (true=show, false=hide) so a root-level
+// overlay can cover the activity while the system BiometricPrompt is up.
+// Audit Issue C: on Android the prompt does not cover the whole screen and
+// sensitive content stays visible behind it. iOS already gets this from the
+// SceneDelegate privacyWindow (LocalAuthentication triggers willResignActive).
+export const BIOMETRIC_BLANKING_EVENT = 'biometric-blanking';
 
 const buildAuthPrompt = (
   translate: (key: string) => TranslateType,
@@ -74,6 +82,12 @@ const simpleBiometrics = async (
     return undefined;
   }
 
+  if (Platform.OS === 'android') {
+    DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, true);
+    // Yield one frame so the overlay paints before the system prompt opens.
+    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+  }
+
   try {
     const has = await Keychain.hasGenericPassword({
       service: SENTINEL_SERVICE,
@@ -100,6 +114,9 @@ const simpleBiometrics = async (
     console.log('biometrics: prompt failed', e);
     return false;
   } finally {
+    if (Platform.OS === 'android') {
+      DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
+    }
     // iOS treats the auth prompt as the app going to background;
     // restore the foreground flag so background-state handling doesn't trip.
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);

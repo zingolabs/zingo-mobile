@@ -794,7 +794,8 @@
     "amount": "No se pudo interpretar (amount)",
     "noparameter": "Parámetro desconocido",
     "noaddress": "No tenía una dirección",
-    "oneentry": "URI Debería tener al menos una entrada"
+    "oneentry": "URI Debería tener al menos una entrada",
+    "error-http-not-allowed": "Error: HTTP en texto plano solo está permitido para localhost. Usa HTTPS para servidores remotos."
   },
   "donation-button": "Donar a ZingoLabs ",
   "donation-legend": "Estás donando a ZingoLabs activamente, Gracias"

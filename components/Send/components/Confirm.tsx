@@ -275,9 +275,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       ),
     );
 
-    //console.log('total', totalAmount);
-    //console.log('header spendable', totalBalance?.totalSpendableBalance);
-
     // amount + fee
     if (
       totalAmount <= (totalBalance ? totalBalance.confirmedOrchardBalance : 0)
@@ -294,13 +291,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       from = PrivacyLevelFromEnum.saplingPrivacyLevel;
     }
 
-    //console.log(from);
-
     if (from === PrivacyLevelFromEnum.nonePrivacyLevel) {
       return '-';
     }
-
-    //console.log('parse-address', sendPageState.toaddr.to, resultJSON.status === RPCParseStatusEnum.successParse);
 
     if (
       parseAddressInfoJSON.status !==
@@ -309,8 +302,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     ) {
       return '-';
     }
-
-    //console.log(from, result, resultJSON);
 
     // Private -> orchard to orchard (UA with orchard receiver)
     if (

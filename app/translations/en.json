@@ -794,7 +794,8 @@
     "amount": "Couldn't parse (amount)",
     "noparameter": "Unknown parameter",
     "noaddress": "Didn't have an address",
-    "oneentry": "URI Should have at least 1 entry"
+    "oneentry": "URI Should have at least 1 entry",
+    "error-http-not-allowed": "Error: Plain HTTP is only allowed for localhost. Use HTTPS for remote servers."
   },
   "donation-button": "Donate To ZingoLabs ",
   "donation-legend": "You are donating to ZingoLabs activately, Thanks"

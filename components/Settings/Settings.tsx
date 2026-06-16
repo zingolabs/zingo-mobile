@@ -593,7 +593,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     ) {
       const resultUri = parseServerURI(serverUriParsed, translate);
       if (resultUri && resultUri.toLowerCase().startsWith(GlobalConst.error)) {
-        addLastSnackbar(translate('settings.isuri') as string);
+        // Surface the parser's specific message (bad URI, plaintext
+        // HTTP not allowed, etc.) instead of the generic "fill out a
+        // valid Server URI" snackbar so the user can fix the input.
+        addLastSnackbar(resultUri);
         return;
       }
       if (serverUriParsed !== resultUri) {

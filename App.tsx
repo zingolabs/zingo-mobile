@@ -18,6 +18,7 @@ import { ModeEnum, RouteEnum } from './app/AppState';
 import { BackHandler, LogBox, StatusBar } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import AppErrorBoundary from './components/ErrorBoundary/AppErrorBoundary';
+import BiometricBlankingOverlay from './app/BiometricBlankingOverlay';
 
 LogBox.ignoreLogs([
   '[Reanimated] Reduced motion setting is enabled on this device.',
@@ -157,6 +158,7 @@ const App: React.FunctionComponent = () => {
       <KeyboardProvider>
         <SafeAreaProvider>
           <StatusBar backgroundColor={theme.colors.background} />
+          <BiometricBlankingOverlay />
           <NavigationContainer ref={navigationRef} theme={theme}>
             <SafeAreaView
               edges={['top', 'left', 'right']}

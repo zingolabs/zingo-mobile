@@ -794,7 +794,8 @@
     "amount": "Não foi possível analisar (quantia)",
     "noparameter": "Parâmetro desconhecido",
     "noaddress": "Nenhum endereço válido informado",
-    "oneentry": "RI deve ter pelo menos 1 entrada"
+    "oneentry": "RI deve ter pelo menos 1 entrada",
+    "error-http-not-allowed": "Error: HTTP em texto plano só é permitido para localhost. Use HTTPS para servidores remotos."
   },
   "donation-button": "Doar para ZingoLabs ",
   "donation-legend": "Você está doando para ZingoLabs ativamente, Obrigado"
