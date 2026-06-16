@@ -764,7 +764,8 @@
     "amount": "Çözümlenemedi (Miktar)",
     "noparameter": "Bilinmeyen parametre",
     "noaddress": "Adres belirtilmemiş",
-    "oneentry": "URI en az 1 girişe sahip olmalıdır"
+    "oneentry": "URI en az 1 girişe sahip olmalıdır",
+    "error-http-not-allowed": "Error: Düz HTTP yalnızca localhost için izin verilir. Uzak sunucular için HTTPS kullanın."
   },
   "donation-button": "ZingoLabs’a Bağış Yap",
   "donation-legend": "ZingoLabs'a aktif olarak bağış yapıyorsunuz, Teşekkürler"
