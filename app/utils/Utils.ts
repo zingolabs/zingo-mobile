@@ -335,10 +335,6 @@ export default class Utils {
       });
     }
 
-    console.log('Sending:');
-    console.log(jsonFlat);
-    console.log(donationTransaction);
-
     return [...jsonFlat, ...donationTransaction];
   }
 
