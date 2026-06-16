@@ -27,12 +27,15 @@ const buildSetOptions = async (): Promise<Keychain.SetOptions> => {
   // or even some long mnemonics — can exceed that, causing the save to fail
   // silently with IllegalBlockSizeException. AES_GCM has no practical payload
   // limit and provides the same biometric-gated access we want.
+  //
+  // Audit Suggestion 2: hardware-backed key storage is independent of whether
+  // biometrics are enrolled. We always request SECURE_HARDWARE — the lib
+  // falls back to software-backed storage transparently when the device
+  // has no TEE/StrongBox available.
   const androidPart =
     Platform.OS === 'android'
       ? {
-          securityLevel: biometrics
-            ? Keychain.SECURITY_LEVEL.SECURE_HARDWARE
-            : Keychain.SECURITY_LEVEL.SECURE_SOFTWARE,
+          securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE,
           storage: biometrics
             ? Keychain.STORAGE_TYPE.AES_GCM
             : Keychain.STORAGE_TYPE.AES_GCM_NO_AUTH,
@@ -75,12 +78,12 @@ const buildBaseOptions = async (): Promise<Keychain.BaseOptions> => {
         }
       : {};
 
+  // Audit Suggestion 2: always SECURE_HARDWARE; lib falls back to software
+  // automatically when hw-backed storage is unavailable.
   const androidPart =
     Platform.OS === 'android'
       ? {
-          securityLevel: biometrics
-            ? Keychain.SECURITY_LEVEL.SECURE_HARDWARE
-            : Keychain.SECURITY_LEVEL.SECURE_SOFTWARE,
+          securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE,
           storage: biometrics
             ? Keychain.STORAGE_TYPE.AES_GCM
             : Keychain.STORAGE_TYPE.AES_GCM_NO_AUTH,
