@@ -62,7 +62,8 @@ import {
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import ReactNativeBiometrics from 'react-native-biometrics';
+import { hasDeviceSecurity } from '../../app/simpleBiometrics';
+import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -73,7 +74,7 @@ import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
+import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
@@ -152,6 +153,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
     nym: nymContext,
+    foregroundEpoch,
     readOnly,
     setPrivacyOption,
     setBackgroundError,
@@ -218,6 +220,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Settings;
+
+  // Audit Issue D — single source of truth for security.settingsScreen.
+  const authPassed = useBiometricGate({
+    needsAuth: !!securityContext.settingsScreen,
+    translate,
+    addLastSnackbar,
+    onCancel: () => navigation.goBack(),
+    foregroundAppEnabled: !!securityContext.foregroundApp,
+    foregroundEpoch,
+  });
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
@@ -338,15 +350,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   useEffect(() => {
     (async () => {
-      try {
-        const rnBiometrics = new ReactNativeBiometrics({
-          allowDeviceCredentials: true,
-        });
-        const { available } = await rnBiometrics.isSensorAvailable();
-        setDeviceHasSecurity(available);
-      } catch {
-        setDeviceHasSecurity(false);
-      }
+      setDeviceHasSecurity(await hasDeviceSecurity());
     })();
   }, []);
 
@@ -1205,6 +1209,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       {(translate(key) as string).toUpperCase()}
     </FadeText>
   );
+
+  if (!authPassed) {
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
 
   return (
     <KeyboardAvoidingView

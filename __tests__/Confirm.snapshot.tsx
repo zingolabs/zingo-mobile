@@ -65,7 +65,10 @@ describe('Confirm - snapshots', () => {
   state.totalBalance = mockTotalBalance;
   state.zecPrice = mockZecPrice;
   state.server = mockServer;
-  state.security = mockSecurity;
+  // sendConfirm disabled here so the on-mount biometric gate in Confirm.tsx
+  // stays inactive and the snapshot captures the actual Confirm UI rather
+  // than the auth placeholder.
+  state.security = { ...mockSecurity, sendConfirm: false };
   state.currency = CurrencyEnum.noCurrency;
   state.mode = ModeEnum.advanced;
   state.defaultUnifiedAddress = 'u1abc123def456abc123def456abc123def456abc123';

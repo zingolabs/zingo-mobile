@@ -259,7 +259,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 
             <View
               style={{
-                marginTop: 20,
+                marginTop: 10,
                 marginHorizontal: 20,
                 padding: 10,
                 backgroundColor: colors.text,

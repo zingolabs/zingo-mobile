@@ -53,7 +53,6 @@
     "randomcolor": "^0.6.2",
     "react": "19.1.4",
     "react-native": "0.81.6",
-    "react-native-biometrics": "^3.0.1",
     "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-device-info": "^15.0.2",
     "react-native-fs": "^2.20.0",

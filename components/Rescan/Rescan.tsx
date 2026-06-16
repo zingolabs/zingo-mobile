@@ -16,6 +16,7 @@ import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
+import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import Header from '../Header';
 import {
   ButtonTypeEnum,
@@ -39,10 +40,27 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   doRescan,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { birthday, translate, netInfo, addLastSnackbar, selectServer } =
-    context;
+  const {
+    birthday,
+    translate,
+    netInfo,
+    addLastSnackbar,
+    selectServer,
+    security,
+    foregroundEpoch,
+  } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Rescan;
+
+  // Audit Issue D — single source of truth for security.rescanScreen.
+  const authPassed = useBiometricGate({
+    needsAuth: !!security?.rescanScreen,
+    translate,
+    addLastSnackbar,
+    onCancel: () => navigation.goBack(),
+    foregroundAppEnabled: !!security?.foregroundApp,
+    foregroundEpoch,
+  });
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -150,6 +168,10 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
     ),
     [colors, translate, doRescanAndClose],
   );
+
+  if (!authPassed) {
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
 
   return (
     <View

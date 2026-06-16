@@ -89,7 +89,7 @@ import {
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../recoveryWalletInfov10';
+} from '../recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
 import ImportUfvk from './components/ImportUfvk';

@@ -32,7 +32,6 @@ import {
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
-import simpleBiometrics from '../../app/simpleBiometrics';
 import { getZingoLogo } from '../../app/utils/ZingoAppData';
 import { useShieldFunds } from '../../app/hooks/useShieldFunds';
 import { useSyncStatus } from '../../app/hooks/useSyncStatus';
@@ -120,7 +119,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     readOnly,
     valueTransfersTotal,
     somePending,
-    security,
     shieldingAmount,
     selectServer,
     setZecPrice,
@@ -178,17 +176,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     setScrollToBottom,
   });
 
-  const ufvkShowModal = async () => {
-    const resultBio = security.seedUfvkScreen
-      ? await simpleBiometrics({ translate })
-      : true;
-    if (resultBio === false) {
-      addLastSnackbar?.(translate('biometrics-error') as string);
-    } else {
-      navigation.navigate(RouteEnum.Ufvk, {
-        action: UfvkActionEnum.view,
-      });
-    }
+  // Audit Issue D — bio gate for seedUfvkScreen lives at the Ufvk screen
+  // entry (components/Ufvk/ShowUfvk.tsx). Caller only navigates.
+  const ufvkShowModal = () => {
+    navigation.navigate(RouteEnum.Ufvk, {
+      action: UfvkActionEnum.view,
+    });
   };
 
   return (
@@ -272,10 +265,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             top: 0,
           }}
         >
-          <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+          <View style={{ alignItems: 'center', flexDirection: 'row', gap: 14 }}>
             {!noDrawMenu && (
               <TouchableOpacity
-                style={{ marginRight: 5 }}
                 testID="header.drawmenu"
                 accessible={true}
                 accessibilityLabel={translate('menudrawer-acc') as string}
@@ -340,15 +332,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               <TouchableOpacity
                 style={{ marginRight: 5 }}
                 testID="header.settings"
-                onPress={async () => {
-                  const resultBio = security.settingsScreen
-                    ? await simpleBiometrics({ translate })
-                    : true;
-                  if (resultBio === false) {
-                    addLastSnackbar?.(translate('biometrics-error') as string);
-                  } else {
-                    navigation.navigate(RouteEnum.Settings);
-                  }
+                onPress={() => {
+                  // Bio gate for settingsScreen lives at the Settings
+                  // screen entry (components/Settings/Settings.tsx).
+                  navigation.navigate(RouteEnum.Settings);
                 }}
               >
                 <BoltIcon size={25} color="#B1BBC5" />

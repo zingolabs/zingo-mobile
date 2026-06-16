@@ -31,7 +31,7 @@ import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
-import simpleBiometrics from '../../../app/simpleBiometrics';
+import { useBiometricGate } from '../../../app/hooks/useBiometricGate';
 import { useFullSheetSnapPoints } from '../../../app/hooks/useFullSheetSnapPoints';
 
 import { AppDrawerParamList, ThemeType } from '../../../app/types';
@@ -80,10 +80,26 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     addLastSnackbar,
     server,
     security,
+    foregroundEpoch,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Confirm;
   const isMainChain = server.chainName === ChainNameEnum.mainChainName;
+
+  // Audit Issue D — bio gate for security.sendConfirm lives at the
+  // Confirm screen entry. Mirrors Seed / Ufvk / Settings / Rescan via
+  // the shared hook. Trade-off vs. the previous bio-on-press model: a
+  // brief window after auth where the Confirm button can be pressed
+  // without re-authenticating. Native stack remounts the screen on each
+  // navigation, so leaving and coming back forces a fresh prompt.
+  const authPassed = useBiometricGate({
+    needsAuth: !!security?.sendConfirm,
+    translate,
+    addLastSnackbar,
+    onCancel: () => navigation.goBack(),
+    foregroundAppEnabled: !!security?.foregroundApp,
+    foregroundEpoch,
+  });
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
@@ -386,22 +402,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     translate,
   ]);
 
-  const confirmSendBiometrics = async () => {
-    const resultBio = security.sendConfirm
-      ? await simpleBiometrics({ translate: translate })
-      : true;
-    // resultBio:
-    // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
-    // - false     -> user cancelled or failed the prompt
-    // - undefined -> device has no auth method at all; allow (cannot lock the user out)
-    if (resultBio === false) {
-      // snack with Error
-      addLastSnackbar(translate('biometrics-error') as string);
-    } else {
-      await confirmSend(sendPageState);
-    }
-  };
-
   useEffect(() => {
     const sendingTot =
       Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) +
@@ -446,7 +446,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 ? (translate('send.confirm-button-all') as string)
                 : (translate('confirm') as string)
             }
-            onPress={async () => await confirmSendBiometrics()}
+            onPress={async () => await confirmSend(sendPageState)}
           />
         </View>
       </BottomSheetFooter>
@@ -454,6 +454,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [colors, nym, sendAllAmount, translate],
   );
+
+  if (!authPassed) {
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
 
   return (
     <View style={{ flex: 1 }}>

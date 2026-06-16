@@ -18,9 +18,11 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
+import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
 import RegText from '../Components/RegText';
+import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import {
   ButtonTypeEnum,
@@ -44,7 +46,10 @@ import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import ExpandedAddress from '../Receive/components/ExpandedAddress';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { getRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
+import {
+  getRecoveryWalletInfo,
+  saveRecoveryWalletInfo,
+} from '../../app/recoveryWalletInfo';
 import WalletType from '../../app/AppState/types/WalletType';
 import { fetchWallet } from '../../app/walletBackend';
 
@@ -78,9 +83,40 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     addLastSnackbar,
     setPrivacyOption,
     recoveryWalletInfoOnDevice,
+    security,
+    foregroundEpoch,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.ShowUfvk;
+
+  // Audit Issue D — single source of truth for the seed/UFVK biometric
+  // gate. Lives inside ShowUfvk.tsx so every navigation path is funnelled
+  // through the same check.
+  //
+  // The "change" and "backup" actions render the UFVK AND perform their
+  // respective destructive operation. Each respects BOTH the per-action
+  // toggle (changeWalletScreen / restoreWalletBackupScreen) and the
+  // generic seedUfvkScreen toggle — if the user has asked for bio in
+  // either of the two contexts, the gate fires.
+  const initialAction: UfvkActionEnum =
+    !!route.params && route.params.action !== undefined
+      ? route.params.action
+      : UfvkActionEnum.view;
+  const needsAuth: boolean =
+    (initialAction === UfvkActionEnum.view && !!security?.seedUfvkScreen) ||
+    (initialAction === UfvkActionEnum.change &&
+      (!!security?.seedUfvkScreen || !!security?.changeWalletScreen)) ||
+    (initialAction === UfvkActionEnum.backup &&
+      (!!security?.seedUfvkScreen || !!security?.restoreWalletBackupScreen)) ||
+    (initialAction === UfvkActionEnum.server && !!security?.seedUfvkScreen);
+  const authPassed = useBiometricGate({
+    needsAuth,
+    translate,
+    addLastSnackbar,
+    onCancel: () => navigation.goBack(),
+    foregroundAppEnabled: !!security?.foregroundApp,
+    foregroundEpoch,
+  });
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -94,23 +130,55 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     {} as WalletType,
   );
   const [loadingUfvk, setLoadingUfvk] = useState<boolean>(true);
+  // Tracks where the UFVK actually came from so the loading legend can
+  // change mid-flight (keychain → wallet on fallback) and the post-load
+  // line under "tap to copy" can show its origin to the user.
+  const [ufvkSource, setUfvkSource] = useState<'keychain' | 'wallet' | null>(
+    null,
+  );
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const ufvkSheetRef = useRef<BottomSheet>(null);
 
   useEffect(() => {
+    // Wait for the on-mount biometric gate to pass before touching the
+    // keychain — otherwise both prompts fire in parallel.
+    if (!authPassed) {
+      return;
+    }
     (async () => {
       setLoadingUfvk(true);
+      // Same logic as Seed.tsx: try the keychain first when the user
+      // enabled the on-device recovery cache, but fall back to fetching
+      // the UFVK directly from the wallet when the keychain returns
+      // empty (user-cancel of the keychain bio prompt or read error).
+      // ufvkSource is updated as we go so the loading legend reflects
+      // what's actually being read at each moment.
+      let info: WalletType = {} as WalletType;
       if (recoveryWalletInfoOnDevice) {
-        const info = await getRecoveryWalletInfo();
-        setFetchedWallet(info);
-      } else {
-        const info = await fetchWallet(true);
-        setFetchedWallet(info ?? ({} as WalletType));
+        setUfvkSource('keychain');
+        info = await getRecoveryWalletInfo();
       }
+      if (!info.ufvk) {
+        setUfvkSource('wallet');
+        const walletInfo = await fetchWallet(true);
+        if (walletInfo) {
+          info = walletInfo;
+          // Self-heal: user opted into the on-device cache but the
+          // keychain entry is missing. Write it now while the gate's
+          // recent bio auth window is still warm so subsequent visits
+          // hit the keychain. Fire-and-forget.
+          if (recoveryWalletInfoOnDevice) {
+            saveRecoveryWalletInfo(walletInfo).catch(e =>
+              console.log('Self-heal save failed', e),
+            );
+          }
+        }
+      }
+      setFetchedWallet(info);
       setLoadingUfvk(false);
     })();
-  }, [recoveryWalletInfoOnDevice]);
+  }, [recoveryWalletInfoOnDevice, authPassed]);
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -319,6 +387,11 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                 ? ButtonTypeEnum.Secondary
                 : ButtonTypeEnum.Primary
             }
+            // Same rationale as Seed.tsx: in advanced mode the button
+            // drives the ufvk-dependent confirm/change/backup/server
+            // flow; disable when the UFVK is missing so presses don't
+            // silently no-op.
+            disabled={mode !== ModeEnum.basic && !fetchedWallet.ufvk}
             title={
               mode === ModeEnum.basic
                 ? (translate('cancel') as string)
@@ -344,8 +417,12 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     [colors, mode, texts, action, times, fetchedWallet.ufvk, translate],
   );
 
+  if (!authPassed) {
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
+
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <View
         style={{
           flex: 1,
@@ -381,11 +458,26 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           footerComponent={loadingUfvk ? undefined : renderUfvkFooter}
         >
           {loadingUfvk ? (
-            <ActivityIndicator
-              size="large"
-              color={colors.primary}
-              style={{ marginVertical: 20 }}
-            />
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginVertical: 20,
+              }}
+            >
+              <ActivityIndicator size="large" color={colors.primary} />
+              {ufvkSource !== null && (
+                <RegText style={{ marginTop: 12, textAlign: 'center' }}>
+                  {
+                    translate(
+                      ufvkSource === 'keychain'
+                        ? 'ufvk.recovering-from-keychain'
+                        : 'ufvk.recovering-from-wallet',
+                    ) as string
+                  }
+                </RegText>
+              )}
+            </View>
           ) : (
             <>
               <BottomSheetScrollView
@@ -434,7 +526,10 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                         total={1}
                         show={() => show('EA')}
                       />
-                      <TouchableOpacity onPress={doCopy}>
+                      <TouchableOpacity
+                        onPress={doCopy}
+                        style={{ marginTop: -80 }}
+                      >
                         <Text
                           style={{
                             color: colors.text,
@@ -447,6 +542,26 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                           {translate('seed.tapcopy') as string}
                         </Text>
                       </TouchableOpacity>
+                      {ufvkSource !== null && (
+                        <FadeText
+                          style={{
+                            alignSelf: 'stretch',
+                            textAlign: 'right',
+                            fontSize: 11,
+                            paddingHorizontal: 10,
+                            marginTop: -12,
+                            marginRight: 20,
+                          }}
+                        >
+                          {
+                            translate(
+                              ufvkSource === 'keychain'
+                                ? 'ufvk.from-keychain'
+                                : 'ufvk.from-wallet',
+                            ) as string
+                          }
+                        </FadeText>
+                      )}
                     </>
                   )}
                 </View>
