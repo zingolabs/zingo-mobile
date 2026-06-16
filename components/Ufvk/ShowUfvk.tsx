@@ -466,7 +466,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
               }}
             >
               <ActivityIndicator size="large" color={colors.primary} />
-              {ufvkSource !== null && (
+              {ufvkSource !== null && mode !== ModeEnum.basic && (
                 <RegText style={{ marginTop: 12, textAlign: 'center' }}>
                   {
                     translate(
@@ -542,7 +542,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                           {translate('seed.tapcopy') as string}
                         </Text>
                       </TouchableOpacity>
-                      {ufvkSource !== null && (
+                      {ufvkSource !== null && mode !== ModeEnum.basic && (
                         <FadeText
                           style={{
                             alignSelf: 'stretch',

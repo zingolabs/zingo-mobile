@@ -569,7 +569,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             }}
           >
             <ActivityIndicator size="large" color={colors.primary} />
-            {seedSource !== null && (
+            {seedSource !== null && mode !== ModeEnum.basic && (
               <RegText style={{ marginTop: 12, textAlign: 'center' }}>
                 {
                   translate(
@@ -657,7 +657,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   </TouchableOpacity>
                   <View />
                 </View>
-                {seedSource !== null && (
+                {seedSource !== null && mode !== ModeEnum.basic && (
                   <FadeText
                     style={{
                       textAlign: 'right',
