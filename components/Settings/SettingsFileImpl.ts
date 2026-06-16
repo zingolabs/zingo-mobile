@@ -1,3 +1,4 @@
+import EncryptedStorage from 'react-native-encrypted-storage';
 import * as RNFS from 'react-native-fs';
 
 import {
@@ -17,8 +18,15 @@ import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
 import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
 
+// Audit Issue N: settings are persisted in EncryptedStorage instead of a
+// plaintext JSON file. Android → EncryptedSharedPreferences (Jetpack Security,
+// AES-256-GCM, key in Android Keystore). iOS → Keychain Services.
+const STORAGE_KEY = 'settings';
+
 export default class SettingsFileImpl {
-  static async getFileName() {
+  // Kept for the one-time migration path that reads the legacy plaintext file
+  // from DocumentDirectory. Not used for writes anymore.
+  static async getLegacyFileName() {
     return RNFS.DocumentDirectoryPath + '/settings.json';
   }
 
@@ -27,36 +35,92 @@ export default class SettingsFileImpl {
     name: SettingsNameEnum,
     value: string | boolean | ServerType | SecurityType,
   ) {
-    const fileName = await this.getFileName();
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
 
-    //console.log(' settings write', newSettings);
-
-    await RNFS.writeFile(
-      fileName,
-      JSON.stringify(newSettings),
-      GlobalConst.utf8,
-    );
+    await EncryptedStorage.setItem(STORAGE_KEY, JSON.stringify(newSettings));
   }
 
   // Read the server setting
   static async readSettings(): Promise<SettingsFileClass> {
+    const defaults = (): SettingsFileClass =>
+      ({ firstInstall: true, version: null }) as SettingsFileClass;
+
+    let raw: string | null = null;
+
+    // Step 1: read encrypted storage. On failure, fall through to legacy
+    // recovery rather than masking as fresh install.
     try {
-      const fileName = await this.getFileName();
-      const fileExits: boolean = await RNFS.exists(fileName);
-      if (!fileExits) {
-        console.log('settings read file: The file does not exists');
-        const settings: SettingsFileClass = {
-          firstInstall: true,
-          version: null,
-        } as SettingsFileClass;
-        return settings;
+      raw = await EncryptedStorage.getItem(STORAGE_KEY);
+    } catch (err) {
+      console.log('settings: encrypted read failed, will try legacy:', err);
+    }
+
+    // Step 2: one-time migration from plaintext settings.json, or recovery
+    // when encrypted storage is unreadable but the legacy file is still around.
+    if (raw === null) {
+      const legacyPath = await this.getLegacyFileName();
+      let legacyExists = false;
+      try {
+        legacyExists = await RNFS.exists(legacyPath);
+      } catch (_) {
+        // best-effort
       }
 
-      const settings: SettingsFileClass = await JSON.parse(
-        (await RNFS.readFile(fileName, GlobalConst.utf8)).toString(),
+      if (legacyExists) {
+        let legacyRaw: string | null = null;
+        try {
+          legacyRaw = await RNFS.readFile(legacyPath, GlobalConst.utf8);
+        } catch (err) {
+          console.log('settings: legacy read failed:', err);
+          return defaults();
+        }
+
+        // Commit to encrypted storage. If this fails we still use legacyRaw
+        // for this session and retry the migration on the next launch.
+        let migrated = false;
+        try {
+          await EncryptedStorage.setItem(STORAGE_KEY, legacyRaw);
+          migrated = true;
+        } catch (err) {
+          console.log(
+            'settings: migration write failed, using legacy this session:',
+            err,
+          );
+        }
+
+        raw = legacyRaw;
+
+        // Only delete the legacy file once encrypted commit succeeded.
+        // If unlink itself fails it is non-fatal: subsequent boots will read
+        // from encrypted storage and skip this block entirely.
+        if (migrated) {
+          try {
+            await RNFS.unlink(legacyPath);
+          } catch (err) {
+            console.log('settings: legacy unlink failed (non-fatal):', err);
+          }
+        }
+      }
+    }
+
+    if (raw === null) {
+      console.log('settings read: no stored settings, fresh install');
+      return defaults();
+    }
+
+    let settings: SettingsFileClass;
+    try {
+      settings = JSON.parse(raw) as SettingsFileClass;
+    } catch (err) {
+      console.log(
+        'settings: JSON parse failed, treating as fresh install:',
+        err,
       );
+      return defaults();
+    }
+
+    try {
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {
@@ -244,14 +308,10 @@ export default class SettingsFileImpl {
       }
       return settings;
     } catch (err) {
-      // The File doesn't exist, so return nothing
-      // Here I know 100% it is a fresh install or the user cleaned the device staorage
-      console.log('settings read file:', err);
-      const settings: SettingsFileClass = {
-        firstInstall: true,
-        version: null,
-      } as SettingsFileClass;
-      return settings;
+      // Normalization failed on malformed data (e.g. a settings.server with
+      // unexpected shape). Fall back to defaults rather than propagating.
+      console.log('settings: normalization failed:', err);
+      return defaults();
     }
   }
 }

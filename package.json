@@ -55,6 +55,7 @@
     "react-native": "0.81.6",
     "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-device-info": "^15.0.2",
+    "react-native-encrypted-storage": "^4.0.3",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "2.31.2",
     "react-native-gifted-charts": "^1.4.77",
