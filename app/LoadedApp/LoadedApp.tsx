@@ -980,6 +980,22 @@ export class LoadedAppClass extends Component<
     );
   };
 
+  // Sync the externally-rebuilt `translate` (the outer functional
+  // LoadedApp rebuilds its memoized translate on every language change)
+  // into both `state.translate` and the WalletBackend config. Without this,
+  // memoized children whose useMemo / React.memo deps include `translate`
+  // (notably the OptionsPanel grid built in LoadedAppOptionsPanelHost) keep
+  // the identity-stable closure captured at mount and render in the old
+  // language. WalletBackend sub-services (WalletLifecycleService etc.)
+  // would likewise keep returning localized error strings in the language
+  // the user had at app mount.
+  componentDidUpdate = (prevProps: LoadedAppClassProps) => {
+    if (prevProps.translate !== this.props.translate) {
+      this.setState({ translate: this.props.translate });
+      this.rpc.setTranslate(this.props.translate);
+    }
+  };
+
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
     const safeRemove = (listener: unknown, name: string) => {
