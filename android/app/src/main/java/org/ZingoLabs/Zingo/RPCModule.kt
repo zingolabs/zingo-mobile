@@ -184,6 +184,81 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // Audit Issue P (a) — durable wrapper around writeEncryptedFile.
+    //
+    // The raw `writeEncryptedFile` deletes the target file before writing
+    // (forced by EncryptedFile.openFileOutput which won't overwrite). A
+    // crash between the delete and the write leaves the user with no
+    // file at the target path — the entire wallet is lost.
+    //
+    // This wrapper preserves a copy of the previous content at
+    // "$fileName.write.tmp" (own keyset, written via a separate
+    // writeEncryptedFile call) BEFORE the destructive delete. If a crash
+    // lands in the racy window of the inner write, `completePendingWrite`
+    // at the next launch detects the temp and restores the original.
+    //
+    // Cost: one extra read + one extra write per save (≈3× I/O vs the
+    // raw call). Saves happen on sync milestones, not on the hot path,
+    // so the cost is acceptable. iOS doesn't need this — its `writeFile`
+    // uses `String.write(toFile: atomically: true)` which is OS-atomic.
+    private fun writeEncryptedFileDurably(fileName: String, content: String) {
+        val tempName = "$fileName.write.tmp"
+        if (fileExists(fileName)) {
+            try {
+                val previous = readFileAsB64(fileName)
+                writeEncryptedFile(tempName, previous)
+            } catch (e: Exception) {
+                // Original is unreadable already — saving new content over
+                // it can't make things worse. Proceed without temp protection
+                // for this single write.
+                Log.w("MAIN", "[$fileName] could not stash original to temp; durable write degraded to raw: $e")
+            }
+        }
+        writeEncryptedFile(fileName, content)
+        // Best-effort cleanup. If we crash before reaching here,
+        // completePendingWrite will see the orphan temp and clean it up
+        // (the target file is now valid).
+        try {
+            File(applicationContext.filesDir, tempName).delete()
+        } catch (e: Exception) {
+            Log.w("MAIN", "[$tempName] orphan temp cleanup failed: $e")
+        }
+    }
+
+    // Audit Issue P (a) — durable-write recovery.
+    //
+    // If `writeEncryptedFileDurably` crashed between the inner delete and
+    // the inner write, the target file is missing and a temp file with
+    // the original content sits at "$fileName.write.tmp". Restore from
+    // the temp. If the target file is already valid, the temp is just a
+    // post-write cleanup orphan and gets deleted.
+    //
+    // Idempotent — no-op when no temp files are present.
+    fun completePendingWrite() {
+        for (fileName in listOf(WalletFileName.value, WalletBackupFileName.value)) {
+            val tempName = "$fileName.write.tmp"
+            if (!fileExists(tempName)) continue
+            try {
+                val targetReadable = fileExists(fileName) && try {
+                    readFileAsB64(fileName)
+                    true
+                } catch (_: Exception) {
+                    false
+                }
+                if (!targetReadable) {
+                    // Crash during the inner write — restore original from temp.
+                    val tempContent = readFileAsB64(tempName)
+                    writeEncryptedFile(fileName, tempContent)
+                    Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
+                }
+                deleteFile(tempName)
+            } catch (e: Exception) {
+                Log.e("MAIN", "Error: [Native] completePendingWrite for $fileName failed: $e", e)
+                // Leave temp in place for diagnosis / next attempt.
+            }
+        }
+    }
+
     // Audit Issue P (b) — wallet ↔ backup swap recovery.
     //
     // `restoreExistingWalletBackup` does its swap as:
@@ -241,14 +316,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun walletExists(promise: Promise) {
-        // Check if a wallet already exists
+        // Check if a wallet already exists.
+        // Write recovery runs first: a half-written save can leave main
+        // missing, which would make a pending swap unable to read main.
+        completePendingWrite()
         completePendingSwap()
         promise.resolve(fileExists(WalletFileName.value))
     }
 
     @ReactMethod
     fun walletBackupExists(promise: Promise) {
-        // Check if a wallet backup already exists
+        // Check if a wallet backup already exists. See walletExists for
+        // why write recovery runs before swap recovery.
+        completePendingWrite()
         completePendingSwap()
         promise.resolve(fileExists(WalletBackupFileName.value))
     }
@@ -299,7 +379,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
 
             Log.i("MAIN", "[Native] file size: ${b64encoded.length} chars (Base64)")
-            writeEncryptedFile(WalletFileName.value, b64encoded)
+            writeEncryptedFileDurably(WalletFileName.value, b64encoded)
             return true
         } catch (e: Exception) {
             Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the wallet. $e")
@@ -310,7 +390,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     private fun saveWalletBackupFile(): Boolean {
         return try {
             val content = readFileAsB64(WalletFileName.value)
-            writeEncryptedFile(WalletBackupFileName.value, content)
+            writeEncryptedFileDurably(WalletBackupFileName.value, content)
             true
         } catch (e: Exception) {
             Log.e("MAIN", "Error: [Native] Couldn't save the wallet backup: $e")
