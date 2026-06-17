@@ -184,15 +184,72 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // Audit Issue P (b) — wallet ↔ backup swap recovery.
+    //
+    // `restoreExistingWalletBackup` does its swap as:
+    //   (1) write temp(originalMain)   — preserves the wallet that would
+    //                                    otherwise only live in memory
+    //   (2) write main(originalBackup)
+    //   (3) write backup(originalMain)
+    //   (4) delete temp
+    // Jetpack Security `EncryptedFile` binds its keyset to the file path,
+    // so the iOS atomic-rename pattern doesn't apply on Android: we need
+    // to re-encrypt at each new path and recover by content comparison.
+    //
+    // Possible interrupted states (temp exists with originalMain):
+    //   between (1)–(2): main == temp  → write main(backup), write backup(temp)
+    //   between (2)–(3): main != temp AND backup != temp → write backup(temp)
+    //   between (3)–(4): main != temp AND backup == temp → nothing to write
+    // Idempotent — no-op when no temp file is present.
+    fun completePendingSwap() {
+        val tempFile = java.io.File(applicationContext.filesDir, WalletTempSwapFileName.value)
+        if (!tempFile.exists()) return
+        try {
+            val tempContent = readFileAsB64(WalletTempSwapFileName.value)
+            if (fileExists(WalletFileName.value)) {
+                val mainContent = readFileAsB64(WalletFileName.value)
+                if (mainContent == tempContent) {
+                    // (1)–(2) window: main not yet overwritten.
+                    if (fileExists(WalletBackupFileName.value)) {
+                        val backupContent = readFileAsB64(WalletBackupFileName.value)
+                        writeEncryptedFile(WalletFileName.value, backupContent)
+                    }
+                    writeEncryptedFile(WalletBackupFileName.value, tempContent)
+                } else {
+                    // (2)–(3) or post-(3) window: main already holds the new content.
+                    val backupExists = fileExists(WalletBackupFileName.value)
+                    val backupContent = if (backupExists) readFileAsB64(WalletBackupFileName.value) else null
+                    if (backupContent != tempContent) {
+                        // (2)–(3) window or backup missing — write the lost content.
+                        writeEncryptedFile(WalletBackupFileName.value, tempContent)
+                    }
+                    // else: post-(3), backup already correct.
+                }
+            } else {
+                // Main missing — restore from temp.
+                writeEncryptedFile(WalletFileName.value, tempContent)
+            }
+            deleteFile(WalletTempSwapFileName.value)
+            Log.i("MAIN", "[Native] completePendingSwap: interrupted swap recovered")
+        } catch (e: Exception) {
+            // Leave temp in place for diagnosis / the next attempt — deleting
+            // it here would lose the only copy of the original main wallet
+            // if we couldn't write it back into position.
+            Log.e("MAIN", "Error: [Native] completePendingSwap failed: $e", e)
+        }
+    }
+
     @ReactMethod
     fun walletExists(promise: Promise) {
         // Check if a wallet already exists
+        completePendingSwap()
         promise.resolve(fileExists(WalletFileName.value))
     }
 
     @ReactMethod
     fun walletBackupExists(promise: Promise) {
         // Check if a wallet backup already exists
+        completePendingSwap()
         promise.resolve(fileExists(WalletBackupFileName.value))
     }
 
@@ -366,10 +423,22 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         try {
             val backup = readFileAsB64(WalletBackupFileName.value)
             if (fileExists(WalletFileName.value)) {
-                // Both files exist: swap wallet ↔ backup
+                // Audit Issue P (b) — durable swap via temp file. The original
+                // main wallet only lives in memory while we overwrite main
+                // with backup; a crash before step (3) would lose it. By
+                // writing it to temp FIRST (step 1), any later crash leaves a
+                // recoverable on-disk copy that `completePendingSwap` can
+                // restore on the next launch.
+                //
+                // Belt-and-braces: recover any orphan temp from a prior crash
+                // before starting a new swap — deleting the temp blindly
+                // would destroy the only copy of that crash's original main.
+                completePendingSwap()
                 val wallet = readFileAsB64(WalletFileName.value)
-                writeEncryptedFile(WalletFileName.value, backup)
-                writeEncryptedFile(WalletBackupFileName.value, wallet)
+                writeEncryptedFile(WalletTempSwapFileName.value, wallet)   // (1) temp = original main
+                writeEncryptedFile(WalletFileName.value, backup)            // (2) main = backup
+                writeEncryptedFile(WalletBackupFileName.value, wallet)      // (3) backup = original main
+                deleteFile(WalletTempSwapFileName.value)                    // (4) cleanup
             } else {
                 // No wallet exists: restore backup as wallet and delete backup
                 writeEncryptedFile(WalletFileName.value, backup)

@@ -96,9 +96,47 @@ class RPCModule: NSObject {
   func deleteFile(_ fileName: String) throws {
     try FileManager.default.removeItem(atPath: getFileName(fileName))
   }
+
+  // Audit Issue P (b) — wallet ↔ backup swap recovery.
+  //
+  // `restoreExistingWalletBackup` does its swap as three atomic renames:
+  //   (1) main → temp
+  //   (2) backup → main
+  //   (3) temp → backup
+  // A crash between (1)–(2) or (2)–(3) leaves the temp file on disk.
+  // Calling this helper at startup detects that and finishes the swap.
+  //
+  // Possible interrupted states (temp exists, by construction):
+  //   between (1)–(2): main does NOT exist, backup exists → complete (2) then (3)
+  //   between (2)–(3): main exists,         backup does NOT → complete (3)
+  // Both branches end at the intended final state. Idempotent — when no
+  // temp file is present this is a near-zero-cost no-op.
+  func completePendingSwap() {
+    let fm = FileManager.default
+    guard let tempPath = try? getFileName(Constants.WalletTempSwapFileName.rawValue),
+          fm.fileExists(atPath: tempPath) else { return }
+    guard let mainPath = try? getFileName(Constants.WalletFileName.rawValue),
+          let backupPath = try? getFileName(Constants.WalletBackupFileName.rawValue) else {
+      NSLog("Error: [Native] completePendingSwap: could not resolve wallet paths")
+      return
+    }
+    do {
+      if fm.fileExists(atPath: backupPath) {
+        // Crash between (1) and (2): backup still in original position.
+        try fm.moveItem(atPath: backupPath, toPath: mainPath)
+      }
+      // Crash between (2) and (3): main now holds the former backup;
+      // only (3) is left.
+      try fm.moveItem(atPath: tempPath, toPath: backupPath)
+      NSLog("[Native] completePendingSwap: interrupted swap recovered")
+    } catch {
+      NSLog("Error: [Native] completePendingSwap failed: \(error.localizedDescription)")
+    }
+  }
   
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    completePendingSwap()
     do {
       let result = try fileExists(Constants.WalletFileName.rawValue)
       DispatchQueue.main.async {
@@ -114,6 +152,7 @@ class RPCModule: NSObject {
 
   @objc(walletBackupExists:reject:)
   func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    completePendingSwap()
     do {
       let result = try fileExists(Constants.WalletBackupFileName.rawValue)
       DispatchQueue.main.async {
@@ -421,10 +460,27 @@ class RPCModule: NSObject {
       // check if the content is correct. Stored Encoded.
       if isValidBase64(backupEncodedData) {
         if try fileExists(Constants.WalletFileName.rawValue) == "true" {
-          // Both files exist: swap wallet ↔ backup
-          let walletEncodedData = try self.readWalletUtf8String()
-          try self.saveWalletFile(backupEncodedData)
-          try self.saveWalletBackupFile(walletEncodedData)
+          // Audit Issue P (b) — atomic swap via three renames. APFS
+          // rename is atomic AND preserves the file's protection class
+          // and isExcludedFromBackup attribute, so this is strictly
+          // safer than the previous read-into-memory + two writes
+          // pattern, which lost the original main wallet on a crash
+          // between writes. `completePendingSwap` (called early on
+          // walletExists/walletBackupExists) finishes the swap if a
+          // crash interrupts these three steps.
+          // Belt-and-braces: if a previous swap left a temp behind and
+          // `completePendingSwap` was never called (e.g. JS jumped
+          // straight into restore without checking walletExists first),
+          // recover it before starting a new swap — deleting the temp
+          // would lose the orphaned original-main content.
+          self.completePendingSwap()
+          let fm = FileManager.default
+          let mainPath   = try getFileName(Constants.WalletFileName.rawValue)
+          let backupPath = try getFileName(Constants.WalletBackupFileName.rawValue)
+          let tempPath   = try getFileName(Constants.WalletTempSwapFileName.rawValue)
+          try fm.moveItem(atPath: mainPath,   toPath: tempPath)   // (1) main → temp
+          try fm.moveItem(atPath: backupPath, toPath: mainPath)   // (2) backup → main
+          try fm.moveItem(atPath: tempPath,   toPath: backupPath) // (3) temp → backup
         } else {
           // No wallet exists: restore backup as wallet and delete backup
           try self.saveWalletFile(backupEncodedData)
