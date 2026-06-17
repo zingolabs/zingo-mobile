@@ -795,6 +795,7 @@
     "noparameter": "Неизвестный параметр",
     "noaddress": "Не указан адрес",
     "oneentry": "URI должен иметь хотя бы одну запись",
+    "memo-too-long": "Слишком длинный memo в параметре",
     "error-http-not-allowed": "Error: Незащищённый HTTP разрешён только для localhost. Для удалённых серверов используйте HTTPS."
   },
   "donation-button": "Задонатить на разработку ZingoLabs ",
