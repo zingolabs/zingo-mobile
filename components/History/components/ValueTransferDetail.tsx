@@ -264,7 +264,9 @@ const ValueTransferDetail: React.FunctionComponent<
     if (supported) {
       await Linking.openURL(url);
     } else {
-      console.log("Don't know how to open URI: " + url);
+      // Audit Issue K — do not log the URL (contains the txid in the path).
+      // The diagnostic message itself is enough to flag a Linking failure.
+      console.log('Cannot open block explorer URL for this transaction');
     }
   };
 
