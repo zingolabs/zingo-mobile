@@ -1634,7 +1634,17 @@ export class LoadingAppClass extends Component<
               (security
                 ? ''
                 : ((this.props.translate('loadingapp.recoverkeysinstall') +
-                    '\n\n') as string)) + preview,
+                    '\n\n') as string)) +
+              preview +
+              '\n\n' +
+              // Audit Suggestion 5 — append the clipboard-exposure warning so
+              // the existing recover-keys confirm makes the security risk
+              // explicit before the user taps Copy.
+              ((this.props.translate(
+                Platform.OS === 'ios'
+                  ? 'seed.clipboard-confirm-message-ios'
+                  : 'seed.clipboard-confirm-message-android',
+              ) as string) || ''),
             buttons: [
               {
                 text: this.props.translate('copy') as string,
