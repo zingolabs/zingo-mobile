@@ -82,7 +82,15 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       addr.toLowerCase().includes(':')
     ) {
       const { error, target } = await parseZcashURI(addr, translate, server);
-      //console.log(targets);
+
+      // Audit Issue H — surface the parser error and abort before any
+      // address-state mutation. parseZcashURI returns an empty target
+      // when error is non-empty, but the explicit guard keeps intent
+      // obvious here and protects against future contract changes.
+      if (error) {
+        addLastSnackbar(error);
+        return;
+      }
 
       if (target) {
         // redo the to addresses
@@ -91,11 +99,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             setAddress(tgt.address);
           }
         });
-      }
-      if (error) {
-        // Show the error message as a toast
-        addLastSnackbar(error);
-        //return;
       }
     } else {
       setAddress(addr.replace(/[ \t\n\r]+/g, '')); // Remove spaces

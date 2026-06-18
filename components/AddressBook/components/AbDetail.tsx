@@ -139,7 +139,15 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         translate,
         server,
       );
-      //console.log(targets);
+
+      // Audit Issue H — surface the parser error and abort before any
+      // address-state mutation. parseZcashURI returns an empty target
+      // when error is non-empty, but the explicit guard keeps intent
+      // obvious here and protects against future contract changes.
+      if (errorTarget) {
+        setError(errorTarget);
+        return;
+      }
 
       if (target) {
         // redo the to addresses
@@ -148,11 +156,6 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             setAddress(tgt.address);
           }
         });
-      }
-      if (errorTarget) {
-        // Show the error message as a toast
-        setError(errorTarget);
-        //return;
       }
     } else {
       setAddress(addr.replace(/[ \t\n\r]+/g, '')); // Remove spaces

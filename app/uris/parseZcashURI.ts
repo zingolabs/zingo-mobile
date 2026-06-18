@@ -9,6 +9,10 @@ import {
 } from '../AppState';
 import Utils from '../utils';
 
+// Audit Issue H — when `error` is non-empty the returned `target` is
+// guaranteed to be a fresh empty ZcashURITargetClass. Callers may treat
+// `error` and `target` as mutually exclusive: a non-empty error means
+// no fields are safe to apply to UI state.
 const parseZcashURI = async (
   uri: string,
   translate: (key: string) => TranslateType,
@@ -155,7 +159,15 @@ const parseZcashURI = async (
     errors.push(`${0}. ${translate('uris.noaddress')}`);
   }
 
-  return { error: errors.join(', '), target: firstTarget };
+  // Audit Issue H — any parser error invalidates the whole target. The
+  // path-as-address and query-string address branches assign t.address
+  // before validating, so a target with a non-empty address can still
+  // accompany a non-empty errors list. Returning a fresh empty target
+  // here closes that gap for every caller.
+  if (errors.length > 0) {
+    return { error: errors.join(', '), target: new ZcashURITargetClass() };
+  }
+  return { error: '', target: firstTarget };
 };
 
 export default parseZcashURI;
