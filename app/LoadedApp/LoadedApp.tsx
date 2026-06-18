@@ -466,7 +466,8 @@ export default function LoadedApp(props: LoadedAppProps) {
           !a.hasOwnProperty('color') ||
           !a.hasOwnProperty('own'),
       );
-      console.log('Address Book -> TO UPDATE', toUpdate);
+      // Audit Issue K — do not log the toUpdate array (contains labels +
+      // addresses from the user's address book).
       console.log('Address Book items', ab.length);
       if (toUpdate.length > 0) {
         const randomColors = Utils.generateColorList(toUpdate.length);
@@ -1780,10 +1781,8 @@ export class LoadedAppClass extends Component<
       value,
       GlobalConst.minConfirmations.toString(),
     );
-    console.log(
-      '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET',
-      setConfigWallet,
-    );
+    // Audit Issue K — do not log the setConfigWallet response; on actual
+    // failure it is propagated via setLastError below.
     if (
       setConfigWallet &&
       setConfigWallet.toLowerCase().startsWith(GlobalConst.error)

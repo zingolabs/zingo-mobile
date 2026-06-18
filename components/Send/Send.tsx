@@ -443,13 +443,11 @@ const Send: React.FunctionComponent<SendProps> = ({
           let runProposeJson: RPCSendProposeType;
           runProposeJson = await JSON.parse(runProposeStr);
           if (runProposeJson.error) {
-            // snack with error
-            console.log('SEND error', runProposeJson.error);
+            // snack with error — the error message already reaches the UI via
+            // setProposeSendLastError; do not mirror to console (Audit Issue K).
             setProposeSendLastError(runProposeJson.error);
-            //Alert.alert('Calculating the FEE', runProposeJson.error);
           } else {
             if (runProposeJson.fee !== undefined) {
-              console.log('FEE', runProposeJson.fee);
               proposeFee = runProposeJson.fee / 10 ** 8;
               setProposeSendLastError('');
             }
@@ -463,7 +461,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                       Utils.getZenniesDonationAmount(),
                     )
                   : 0);
-              console.log('AMOUNT', newAmount);
               updateToField(
                 null,
                 Utils.parseNumberFloatToStringLocale(newAmount, 8),
@@ -541,10 +538,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           const runSpendableBalanceJson: RPCSpendablebalanceType =
             await JSON.parse(runSpendableBalanceStr);
           if (runSpendableBalanceJson.spendable_balance) {
-            console.log(
-              'SPENDABLEBALANCE result',
-              runSpendableBalanceJson.spendable_balance,
-            );
+            // Audit Issue K — do not log the spendable balance value.
             spendableBalance =
               runSpendableBalanceJson.spendable_balance / 10 ** 8;
             setSpendableBalanceLastError('');
