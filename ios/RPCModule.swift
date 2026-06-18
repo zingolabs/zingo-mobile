@@ -434,7 +434,9 @@ class RPCModule: NSObject {
           resolve("true")
         }
       } else {
-        NSLog("Error: [Native] Couldn't save the wallet backup. The Encoded content is incorrect: \(backupEncodedData)")
+        // Audit Issue A — redact the payload. Mirrors the saveExistingWallet
+        // path at L240: log only the size, never the encoded wallet bytes.
+        NSLog("Error: [Native] Couldn't save the wallet backup. The Encoded content is incorrect. Size: \(backupEncodedData.count)")
         DispatchQueue.main.async {
           resolve("false")
         }
