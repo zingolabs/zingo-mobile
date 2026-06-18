@@ -7,7 +7,13 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import { showConfirm } from '../../app/showConfirm';
 
 import { useTheme } from '@react-navigation/native';
@@ -285,25 +291,50 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   );
 
   const doCopy = () => {
-    if (!fetchedWallet.ufvk) {
+    // Capture into a local so the `string | undefined` narrowing from the
+    // guard below survives into the showConfirm callback closure.
+    const ufvk = fetchedWallet.ufvk;
+    if (!ufvk) {
       return;
     }
-    if (clipboardTimer.current) {
-      clearTimeout(clipboardTimer.current);
-    }
-    Clipboard.setString(fetchedWallet.ufvk);
-    addLastSnackbar(
-      translate('seed.tapcopy-ufvk-message') as string,
-      SnackbarDurationEnum.longer,
-    );
-    clipboardTimer.current = setTimeout(() => {
-      Clipboard.setString('');
-      clipboardTimer.current = null;
-      addLastSnackbar(
-        translate('seed.clipboard-cleared') as string,
-        SnackbarDurationEnum.long,
-      );
-    }, 60 * 1000);
+    // Audit Suggestion 5 — explicit user consent before exposing the
+    // viewing key to the system clipboard. The 60-second auto-clear is
+    // kept as defense-in-depth.
+    showConfirm({
+      title: translate('seed.clipboard-confirm-title') as string,
+      message: translate(
+        Platform.OS === 'ios'
+          ? 'seed.clipboard-confirm-message-ios'
+          : 'seed.clipboard-confirm-message-android',
+      ) as string,
+      buttons: [
+        {
+          text: translate('copy') as string,
+          onPress: () => {
+            if (clipboardTimer.current) {
+              clearTimeout(clipboardTimer.current);
+            }
+            Clipboard.setString(ufvk);
+            addLastSnackbar(
+              translate('seed.tapcopy-ufvk-message') as string,
+              SnackbarDurationEnum.longer,
+            );
+            clipboardTimer.current = setTimeout(() => {
+              Clipboard.setString('');
+              clipboardTimer.current = null;
+              addLastSnackbar(
+                translate('seed.clipboard-cleared') as string,
+                SnackbarDurationEnum.long,
+              );
+            }, 60 * 1000);
+          },
+        },
+        {
+          text: translate('cancel') as string,
+          style: 'cancel',
+        },
+      ],
+    });
   };
 
   const ufvkSnapPoints = useFullSheetSnapPoints(containerH, headerH);
