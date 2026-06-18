@@ -799,6 +799,7 @@
     "noparameter": "Bilinmeyen parametre",
     "noaddress": "Adres belirtilmemiş",
     "oneentry": "URI en az 1 girişe sahip olmalıdır",
+    "memo-too-long": "Parametrede memo çok uzun",
     "error-http-not-allowed": "Error: Düz HTTP yalnızca localhost için izin verilir. Uzak sunucular için HTTPS kullanın."
   },
   "donation-button": "ZingoLabs’a Bağış Yap",

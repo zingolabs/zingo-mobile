@@ -799,6 +799,7 @@
     "noparameter": "Unknown parameter",
     "noaddress": "Didn't have an address",
     "oneentry": "URI Should have at least 1 entry",
+    "memo-too-long": "Memo too long in parameter",
     "error-http-not-allowed": "Error: Plain HTTP is only allowed for localhost. Use HTTPS for remote servers."
   },
   "donation-button": "Donate To ZingoLabs ",

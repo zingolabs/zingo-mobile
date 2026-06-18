@@ -113,20 +113,36 @@ const parseZcashURI = async (
       case ZcashUriFieldEnum.memo:
         if (typeof target.memoBase64 !== 'undefined') {
           errors.push(`${translate('uris.duplicateparameter')} "${qName}"`);
-        } else {
-          // Parse as base64
-          try {
-            const decoded = Base64.decode(value);
-            if (decoded.length > GlobalConst.memoMaxLength) {
-              console.log(
-                `URI memo truncated from ${decoded.length} to ${GlobalConst.memoMaxLength} bytes`,
-              );
-            }
-            target.memoString = decoded.slice(0, GlobalConst.memoMaxLength);
-            target.memoBase64 = Base64.encode(target.memoString);
-          } catch (e) {
-            errors.push(`${translate('uris.base64')} "${value}"`);
+          break;
+        }
+        // Audit Issue O — bound the memo BEFORE decoding. Base64 encoding
+        // groups 3 input bytes into 4 output chars, so the largest valid
+        // base64 string that decodes to N bytes is `4 * ceil(N / 3)` chars
+        // (including padding). Rejecting on the encoded length first avoids
+        // allocating the decoded buffer for a malicious URI that ships a
+        // multi-MB memo parameter. The previous code silently truncated,
+        // which the audit explicitly recommended against — untrusted input
+        // should be rejected, not partially accepted into Send state.
+        const maxBase64Length = 4 * Math.ceil(GlobalConst.memoMaxLength / 3);
+        if (value.length > maxBase64Length) {
+          errors.push(`${translate('uris.memo-too-long')} "${qName}"`);
+          break;
+        }
+        try {
+          const decoded = Base64.decode(value);
+          if (decoded.length > GlobalConst.memoMaxLength) {
+            // Defensive: the encoded-length bound is the strict max for
+            // padded base64; unusual inputs (no padding, non-canonical
+            // chars accepted by the decoder) could still decode to more
+            // than `memoMaxLength`. Reject any decoded result that
+            // exceeds the actual limit.
+            errors.push(`${translate('uris.memo-too-long')} "${qName}"`);
+            break;
           }
+          target.memoString = decoded;
+          target.memoBase64 = Base64.encode(target.memoString);
+        } catch (e) {
+          errors.push(`${translate('uris.base64')} "${value}"`);
         }
         break;
       case ZcashUriFieldEnum.amount:

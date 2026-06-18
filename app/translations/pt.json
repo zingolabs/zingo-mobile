@@ -799,6 +799,7 @@
     "noparameter": "Parâmetro desconhecido",
     "noaddress": "Nenhum endereço válido informado",
     "oneentry": "RI deve ter pelo menos 1 entrada",
+    "memo-too-long": "Memo muito longo no parâmetro",
     "error-http-not-allowed": "Error: HTTP em texto plano só é permitido para localhost. Use HTTPS para servidores remotos."
   },
   "donation-button": "Doar para ZingoLabs ",
