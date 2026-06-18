@@ -126,6 +126,7 @@
     "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel.",
     "recoverkeys": "Recover last Keys used",
     "recoverkeysinstall": "Recovered the last Keys used in this device:",
+    "customserver-unreachable": "Your custom server didn't respond and the wallet returned an error. Open Settings to choose a different one or retry later.",
     "noservers": "None of the servers on the list are available, it is probably a connection error."
   },
   "loadedapp": {
@@ -501,6 +502,9 @@
     "tapcopy": "Tap to copy",
     "tapcopy-seed-message": "Seed copied to Clipboard (clears in 60s)",
     "clipboard-cleared": "Clipboard cleared for security",
+    "clipboard-confirm-title": "Copy to clipboard?",
+    "clipboard-confirm-message-ios": "This is sensitive recovery data. Copying it to the clipboard exposes it to other apps on this device and, if Universal Clipboard is enabled, can sync it to your other Apple devices on the same iCloud account. The clipboard will be cleared automatically after 60 seconds. Continue?",
+    "clipboard-confirm-message-android": "This is sensitive recovery data. Copying it to the clipboard exposes it to any other app on this device with clipboard access. If you use a keyboard with cloud-clipboard sync (Gboard, SwiftKey, etc.) this data may also be uploaded. The clipboard will be cleared automatically after 60 seconds. Continue?",
     "tapcopy-birthday-message": "Birthday copied to Clipboard",
     "birthday-readonly": "Wallet Birthday",
     "birthday-no-readonly": "Block height of first transaction. (It's OK, if you don't know)\nValue range between ",

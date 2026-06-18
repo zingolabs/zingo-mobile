@@ -126,6 +126,7 @@
     "alert-donation-body": "Você quer ajudar o ZingoLabs a tornar o Zcash mais útil? Opte por dar uma gorjeta de um Zenny (0.01 ZEC) para ZingoLabs em cada transação! Se sim, pressione confirmar, caso contrário, pressione Cancelar.",
     "recoverkeys": "Recuperar a última Clave de Recuperação usada",
     "recoverkeysinstall": "Recuperou a última Clave de Recuperação usada neste dispositivo:",
+    "customserver-unreachable": "Seu servidor personalizado não respondeu e a carteira retornou um erro. Abra Ajustes para escolher outro ou tente novamente mais tarde.",
     "noservers": "Nenhum dos servidores da lista está disponível, provavelmente é um erro de conexão."
   },
   "loadedapp": {
@@ -501,6 +502,9 @@
     "tapcopy": "Clique para Copiar",
     "tapcopy-seed-message": "Frases de Recuperação copiada para a Área de Transferência (limpa em 60s)",
     "clipboard-cleared": "Área de Transferência limpa por segurança",
+    "clipboard-confirm-title": "Copiar para a Área de Transferência?",
+    "clipboard-confirm-message-ios": "Estes dados de recuperação são sensíveis. Copiá-los para a Área de Transferência os expõe a outros apps neste dispositivo e, se o Universal Clipboard estiver ativado, pode sincronizá-los com seus outros dispositivos Apple na mesma conta iCloud. A Área de Transferência será limpa automaticamente após 60 segundos. Continuar?",
+    "clipboard-confirm-message-android": "Estes dados de recuperação são sensíveis. Copiá-los para a Área de Transferência os expõe a qualquer outro app neste dispositivo com acesso à Área de Transferência. Se você usar um teclado com sincronização em nuvem (Gboard, SwiftKey, etc.) estes dados também podem ser enviados. A Área de Transferência será limpa automaticamente após 60 segundos. Continuar?",
     "tapcopy-birthday-message": "Aniversário copiado para a Área de Transferência",
     "birthday-readonly": "Aniversário da Carteira",
     "birthday-no-readonly": "Altura do bloco da primeira transação. (Tudo bem, se você não sabe)\nIntervalo de valores entre ",

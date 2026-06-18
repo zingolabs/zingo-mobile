@@ -1069,6 +1069,35 @@ export class LoadingAppClass extends Component<
           screen,
         });
       } else {
+        // Audit Issue S — custom server users opted out of automatic
+        // server selection (almost always for privacy / self-hosting).
+        // The checkServer probe above is a 15-second latency check, not
+        // a causal diagnosis: even if it returns false, the original
+        // wallet error may or may not be server-related. Silently
+        // swapping the user's custom URI for a default would leak
+        // metadata to that default server. Surface the situation and
+        // let the user decide from Settings.
+        if (this.state.selectServer === SelectServerEnum.custom) {
+          createAlert(
+            this.setBackgroundError,
+            this.addLastSnackbar,
+            title,
+            this.state.translate(
+              'loadingapp.customserver-unreachable',
+            ) as string,
+            false,
+            this.state.translate,
+            sendEmail,
+            this.state.zingolibVersion,
+          );
+          this.setState({
+            actionButtonsDisabled: false,
+            serverErrorTries: 0,
+            screen,
+          });
+          return;
+        }
+
         // let's change to another server
         if (this.state.serverErrorTries === 0) {
           // first try
@@ -1634,7 +1663,17 @@ export class LoadingAppClass extends Component<
               (security
                 ? ''
                 : ((this.props.translate('loadingapp.recoverkeysinstall') +
-                    '\n\n') as string)) + preview,
+                    '\n\n') as string)) +
+              preview +
+              '\n\n' +
+              // Audit Suggestion 5 — append the clipboard-exposure warning so
+              // the existing recover-keys confirm makes the security risk
+              // explicit before the user taps Copy.
+              ((this.props.translate(
+                Platform.OS === 'ios'
+                  ? 'seed.clipboard-confirm-message-ios'
+                  : 'seed.clipboard-confirm-message-android',
+              ) as string) || ''),
             buttons: [
               {
                 text: this.props.translate('copy') as string,

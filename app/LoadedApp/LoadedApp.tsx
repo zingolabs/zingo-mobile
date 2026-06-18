@@ -466,7 +466,8 @@ export default function LoadedApp(props: LoadedAppProps) {
           !a.hasOwnProperty('color') ||
           !a.hasOwnProperty('own'),
       );
-      console.log('Address Book -> TO UPDATE', toUpdate);
+      // Audit Issue K — do not log the toUpdate array (contains labels +
+      // addresses from the user's address book).
       console.log('Address Book items', ab.length);
       if (toUpdate.length > 0) {
         const randomColors = Utils.generateColorList(toUpdate.length);
@@ -980,6 +981,22 @@ export class LoadedAppClass extends Component<
     );
   };
 
+  // Sync the externally-rebuilt `translate` (the outer functional
+  // LoadedApp rebuilds its memoized translate on every language change)
+  // into both `state.translate` and the WalletBackend config. Without this,
+  // memoized children whose useMemo / React.memo deps include `translate`
+  // (notably the OptionsPanel grid built in LoadedAppOptionsPanelHost) keep
+  // the identity-stable closure captured at mount and render in the old
+  // language. WalletBackend sub-services (WalletLifecycleService etc.)
+  // would likewise keep returning localized error strings in the language
+  // the user had at app mount.
+  componentDidUpdate = (prevProps: LoadedAppClassProps) => {
+    if (prevProps.translate !== this.props.translate) {
+      this.setState({ translate: this.props.translate });
+      this.rpc.setTranslate(this.props.translate);
+    }
+  };
+
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
     const safeRemove = (listener: unknown, name: string) => {
@@ -1018,6 +1035,15 @@ export class LoadedAppClass extends Component<
         this.state.translate,
         this.state.server,
       );
+
+      // Audit Issue H — surface the parser error and abort before any
+      // Send-state mutation. parseZcashURI now returns an empty target
+      // when error is non-empty, but the explicit guard keeps intent
+      // obvious here and protects against future contract changes.
+      if (error) {
+        this.addLastSnackbar(error);
+        return;
+      }
 
       if (target) {
         let update = false;
@@ -1755,10 +1781,8 @@ export class LoadedAppClass extends Component<
       value,
       GlobalConst.minConfirmations.toString(),
     );
-    console.log(
-      '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET',
-      setConfigWallet,
-    );
+    // Audit Issue K — do not log the setConfigWallet response; on actual
+    // failure it is propagated via setLastError below.
     if (
       setConfigWallet &&
       setConfigWallet.toLowerCase().startsWith(GlobalConst.error)

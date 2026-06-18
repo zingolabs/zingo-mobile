@@ -6,7 +6,7 @@ import React, {
   useRef,
   useCallback,
 } from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity, Text, Platform } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -34,6 +34,7 @@ import {
 import Header from '../../../components/Header';
 import Utils from '../../utils';
 import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
+import { showConfirm } from '../../showConfirm';
 
 type TextsType = {
   new: string[];
@@ -92,32 +93,55 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
 
   const copySeedToClipboard = (expandOnCopy?: boolean) => {
     if (!seedPhrase) return;
-    if (clipboardTimer.current) {
-      clearTimeout(clipboardTimer.current);
-    }
-    Clipboard.setString(seedPhrase);
-    if (addLastSnackbar) {
-      addLastSnackbar(
-        translate('seed.tapcopy-seed-message') as string,
-        SnackbarDurationEnum.longer,
-      );
-    }
-    if (expandOnCopy) {
-      setExpandSeed(true);
-      if (privacy) {
-        setTimeout(() => setExpandSeed(false), 5 * 1000);
-      }
-    }
-    clipboardTimer.current = setTimeout(() => {
-      Clipboard.setString('');
-      clipboardTimer.current = null;
-      if (addLastSnackbar) {
-        addLastSnackbar(
-          translate('seed.clipboard-cleared') as string,
-          SnackbarDurationEnum.long,
-        );
-      }
-    }, 60 * 1000);
+    // Audit Suggestion 5 — explicit user consent before exposing recovery
+    // material to the system clipboard. The 60-second auto-clear is kept
+    // as defense-in-depth; this dialog adds the human-in-the-loop step
+    // the audit asked for.
+    showConfirm({
+      title: translate('seed.clipboard-confirm-title') as string,
+      message: translate(
+        Platform.OS === 'ios'
+          ? 'seed.clipboard-confirm-message-ios'
+          : 'seed.clipboard-confirm-message-android',
+      ) as string,
+      buttons: [
+        {
+          text: translate('copy') as string,
+          onPress: () => {
+            if (clipboardTimer.current) {
+              clearTimeout(clipboardTimer.current);
+            }
+            Clipboard.setString(seedPhrase);
+            if (addLastSnackbar) {
+              addLastSnackbar(
+                translate('seed.tapcopy-seed-message') as string,
+                SnackbarDurationEnum.longer,
+              );
+            }
+            if (expandOnCopy) {
+              setExpandSeed(true);
+              if (privacy) {
+                setTimeout(() => setExpandSeed(false), 5 * 1000);
+              }
+            }
+            clipboardTimer.current = setTimeout(() => {
+              Clipboard.setString('');
+              clipboardTimer.current = null;
+              if (addLastSnackbar) {
+                addLastSnackbar(
+                  translate('seed.clipboard-cleared') as string,
+                  SnackbarDurationEnum.long,
+                );
+              }
+            }, 60 * 1000);
+          },
+        },
+        {
+          text: translate('cancel') as string,
+          style: 'cancel',
+        },
+      ],
+    });
   };
 
   useEffect(() => {

@@ -126,6 +126,7 @@
     "alert-donation-body": "ZingoLabs’in Zcash’i daha faydalı hale getirmesine yardımcı olmak ister misiniz? Her işlemde ZingoLabs’e bir Zenny (0.01 ZEC) bağışlamak için katılın! Katılmak istiyorsanız Onayla’ya, istemiyorsanız İptal’e basın.",
     "recoverkeys": "Son anahtarları geri yükle",
     "recoverkeysinstall": "Bu cihazda kullanılan son anahtarlar kurtarıldı:",
+    "customserver-unreachable": "Özel sunucunuz yanıt vermedi ve cüzdan bir hata döndürdü. Farklı bir sunucu seçmek için Ayarları açın veya daha sonra tekrar deneyin.",
     "noservers": "Listedeki sunucuların hiçbiri kullanılabilir değil, muhtemelen bir bağlantı hatası var."
   },
   "loadedapp": {
@@ -501,6 +502,9 @@
     "tapcopy": "Kopyalamak için tıkla",
     "tapcopy-seed-message": "Seed panoya kopyalandı (60 sn sonra temizlenecek)",
     "clipboard-cleared": "Pano güvenlik için temizlendi",
+    "clipboard-confirm-title": "Panoya kopyalansın mı?",
+    "clipboard-confirm-message-ios": "Bu hassas kurtarma verisidir. Panoya kopyalamak, bunu cihazdaki diğer uygulamalara açar ve Universal Clipboard etkinse aynı iCloud hesabındaki diğer Apple cihazlarınıza eşitleyebilir. Pano 60 saniye sonra otomatik olarak temizlenecektir. Devam edilsin mi?",
+    "clipboard-confirm-message-android": "Bu hassas kurtarma verisidir. Panoya kopyalamak, bunu cihazdaki pano erişimi olan herhangi bir uygulamaya açar. Bulut pano senkronizasyonu olan bir klavye kullanıyorsanız (Gboard, SwiftKey vb.) bu veriler de yüklenebilir. Pano 60 saniye sonra otomatik olarak temizlenecektir. Devam edilsin mi?",
     "tapcopy-birthday-message": "Cüzdan oluşturulma tarihi panoya kopyalandı",
     "birthday-readonly": "Cüzdan oluşturulma tarihi",
     "birthday-no-readonly": "İlk işlemin blok yüksekliği. (Bilmiyorsanız sorun değil) Değer aralığı arasında",

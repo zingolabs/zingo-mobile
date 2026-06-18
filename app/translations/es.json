@@ -126,6 +126,7 @@
     "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar.",
     "recoverkeys": "Recuperar la última Clave usada",
     "recoverkeysinstall": "Se recuperó la última Clave usada en este dispositivo:",
+    "customserver-unreachable": "Tu servidor personalizado no respondió y la billetera devolvió un error. Abre Ajustes para elegir otro o reintenta más tarde.",
     "noservers": "Ninguno de los servidores de la lista esta disponible, probablemente se trata de un error de conexion."
   },
   "loadedapp": {
@@ -501,6 +502,9 @@
     "tapcopy": "Pulsar para copiar",
     "tapcopy-seed-message": "Frase Semilla copiada al Portapapeles (se borrará en 60s)",
     "clipboard-cleared": "Portapapeles borrado por seguridad",
+    "clipboard-confirm-title": "¿Copiar al portapapeles?",
+    "clipboard-confirm-message-ios": "Estos datos de recuperación son sensibles. Copiarlos al portapapeles los expone a otras apps de este dispositivo y, si tienes activado Universal Clipboard, puede sincronizarlos con tus otros dispositivos Apple en la misma cuenta de iCloud. El portapapeles se borrará automáticamente tras 60 segundos. ¿Continuar?",
+    "clipboard-confirm-message-android": "Estos datos de recuperación son sensibles. Copiarlos al portapapeles los expone a cualquier otra app de este dispositivo con acceso al portapapeles. Si usas un teclado con sincronización en la nube (Gboard, SwiftKey, etc.) estos datos también pueden subirse. El portapapeles se borrará automáticamente tras 60 segundos. ¿Continuar?",
     "tapcopy-birthday-message": "Cumpleaños copiado al Portapapeles",
     "birthday-readonly": "Cumpleaños del Monedero",
     "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas)\nRango de valores entre ",

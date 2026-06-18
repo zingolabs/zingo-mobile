@@ -14,7 +14,7 @@
  * RPCModule is the React Native native module that bridges to zingolib (Rust).
  * This class never calls RPCModule directly.
  */
-import { SendJsonToTypeType, ServerType } from '../AppState';
+import { SendJsonToTypeType, ServerType, TranslateType } from '../AppState';
 import { WalletBackendConfig } from './config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';
@@ -126,5 +126,13 @@ export default class WalletBackend {
   // user's setting.
   setPerformanceLevel(performanceLevel: RPCPerformanceLevelEnum) {
     this.config.performanceLevel = performanceLevel;
+  }
+
+  // Active i18n helper. Same shared-reference pattern as setServer. The
+  // outer LoadedApp rebuilds `translate` on every language change; without
+  // this setter, sub-services (WalletLifecycleService etc.) keep returning
+  // localized error strings in the language the user had at app mount.
+  setTranslate(translate: (key: string) => TranslateType) {
+    this.config.translate = translate;
   }
 }
