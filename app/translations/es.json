@@ -126,6 +126,7 @@
     "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar.",
     "recoverkeys": "Recuperar la última Clave usada",
     "recoverkeysinstall": "Se recuperó la última Clave usada en este dispositivo:",
+    "customserver-unreachable": "Tu servidor personalizado no respondió y la billetera devolvió un error. Abre Ajustes para elegir otro o reintenta más tarde.",
     "noservers": "Ninguno de los servidores de la lista esta disponible, probablemente se trata de un error de conexion."
   },
   "loadedapp": {

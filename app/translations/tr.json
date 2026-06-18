@@ -126,6 +126,7 @@
     "alert-donation-body": "ZingoLabs’in Zcash’i daha faydalı hale getirmesine yardımcı olmak ister misiniz? Her işlemde ZingoLabs’e bir Zenny (0.01 ZEC) bağışlamak için katılın! Katılmak istiyorsanız Onayla’ya, istemiyorsanız İptal’e basın.",
     "recoverkeys": "Son anahtarları geri yükle",
     "recoverkeysinstall": "Bu cihazda kullanılan son anahtarlar kurtarıldı:",
+    "customserver-unreachable": "Özel sunucunuz yanıt vermedi ve cüzdan bir hata döndürdü. Farklı bir sunucu seçmek için Ayarları açın veya daha sonra tekrar deneyin.",
     "noservers": "Listedeki sunucuların hiçbiri kullanılabilir değil, muhtemelen bir bağlantı hatası var."
   },
   "loadedapp": {
