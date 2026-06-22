@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import {
   Image,
   ImageSourcePropType,
+  Linking,
   Pressable,
   ScrollView,
   Text,
@@ -93,15 +94,24 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   const handleSocialPress = useCallback(
-    (social: OptionsPanelSocial) => {
+    async (social: OptionsPanelSocial) => {
       if (social.id === 'mail') {
         setCopiedUrl(null);
         social.onPress();
         return;
       }
+      // Copy to clipboard + reveal the URL caption (so the user can review or re-copy).
       Clipboard.setString(social.url);
       setCopiedUrl(social.url);
       onLinkCopied?.(social.url);
+      // Also open the URL in the device's browser. Same pattern used by the
+      // block-explorer link in the transaction detail screen.
+      const supported = await Linking.canOpenURL(social.url);
+      if (supported) {
+        await Linking.openURL(social.url);
+      } else {
+        console.log('Cannot open social URL');
+      }
     },
     [onLinkCopied],
   );
