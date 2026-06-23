@@ -191,14 +191,25 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   }, [receiveSnapPoints]);
   // Bump the sheet up by one when the PriceRow first appears so the user
   // stays at the same visual snap instead of landing on the new price snap.
+  //
+  // `receiveSnapPoints` is in the deps so the effect runs after React has
+  // propagated the grown array to BottomSheet; clamp is the belt-and-braces
+  // guard against any residual race that would otherwise crash with
+  // "index ... out of the provided snap points range" — observed in the
+  // wild on iOS / Play pre-launch review when the PriceRow appears during
+  // first render.
   const prevHasPriceSnapRef = useRef<boolean>(false);
   useEffect(() => {
     const hasPriceSnap = priceRowH > 0;
-    if (!prevHasPriceSnapRef.current && hasPriceSnap) {
-      receiveSheetRef.current?.snapToIndex(internalSnapIndexRef.current + 1);
-    }
+    const justAppeared = !prevHasPriceSnapRef.current && hasPriceSnap;
     prevHasPriceSnapRef.current = hasPriceSnap;
-  }, [priceRowH]);
+    if (!justAppeared) return;
+    const target = Math.min(
+      internalSnapIndexRef.current + 1,
+      receiveSnapPoints.length - 1,
+    );
+    receiveSheetRef.current?.snapToIndex(target);
+  }, [priceRowH, receiveSnapPoints]);
 
   const priceSnapIndex = priceRowH > 0 ? 0 : null;
   const onPriceSnapChange = usePriceSnapAutoClose(

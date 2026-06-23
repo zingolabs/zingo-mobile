@@ -156,17 +156,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
   // disabled, 3 → 2 snaps), clamp the index in an effect so the sheet
   // doesn't throw "out of range" against the stale internal position.
   const internalSnapIndexRef = useRef<number>(0);
-  // Bump the sheet up by one when the PriceRow first appears so the user
-  // stays at the same visual snap (balance still showing) instead of
-  // landing on the new price snap.
+  // PriceRow-appearance bump is defined further down — it depends on
+  // `historySnapPoints`, declared later in this component.
   const prevHasPriceSnapRef = useRef<boolean>(false);
-  useEffect(() => {
-    const hasPriceSnap = priceRowH > 0;
-    if (!prevHasPriceSnapRef.current && hasPriceSnap) {
-      historySheetRef.current?.snapToIndex(internalSnapIndexRef.current + 1);
-    }
-    prevHasPriceSnapRef.current = hasPriceSnap;
-  }, [priceRowH]);
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
   const scrollViewRef =
@@ -347,6 +339,26 @@ const History: React.FunctionComponent<HistoryProps> = ({
       historySheetRef.current?.snapToIndex(historySnapPoints.length - 1);
     }
   }, [historySnapPoints]);
+
+  // Bump the sheet up by one when the PriceRow first appears so the user
+  // stays at the same visual snap (balance still showing) instead of
+  // landing on the new price snap.
+  //
+  // `historySnapPoints` is in the deps so the effect runs after React has
+  // propagated the grown array to BottomSheet; clamp is the belt-and-braces
+  // guard against any residual race that would otherwise crash with
+  // "index ... out of the provided snap points range".
+  useEffect(() => {
+    const hasPriceSnap = priceRowH > 0;
+    const justAppeared = !prevHasPriceSnapRef.current && hasPriceSnap;
+    prevHasPriceSnapRef.current = hasPriceSnap;
+    if (!justAppeared) return;
+    const target = Math.min(
+      internalSnapIndexRef.current + 1,
+      historySnapPoints.length - 1,
+    );
+    historySheetRef.current?.snapToIndex(target);
+  }, [priceRowH, historySnapPoints]);
 
   const fetchValueTransfersFiltered = useMemo(() => {
     if (!valueTransfers) {

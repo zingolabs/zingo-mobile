@@ -85,10 +85,15 @@ class AppErrorBoundary extends Component<React.PropsWithChildren, State> {
         <View style={styles.versionBlock}>
           <Text style={styles.versionLine}>{appLabel}</Text>
           {zingolibVersion ? (
-            <Text style={styles.versionLine}>{`Zingolib: ${zingolibVersion}`}</Text>
+            <Text
+              style={styles.versionLine}
+            >{`Zingolib: ${zingolibVersion}`}</Text>
           ) : null}
         </View>
-        <ScrollView style={styles.detailsBox} contentContainerStyle={styles.detailsContent}>
+        <ScrollView
+          style={styles.detailsBox}
+          contentContainerStyle={styles.detailsContent}
+        >
           <Text style={styles.detailsHeader}>{header}</Text>
           {stack ? <Text style={styles.detailsStack}>{stack}</Text> : null}
         </ScrollView>
@@ -102,7 +107,8 @@ class AppErrorBoundary extends Component<React.PropsWithChildren, State> {
                 `${getZingoName()} crash: ${error?.name ?? 'Error'}`,
                 this.buildReport(),
               )
-            }>
+            }
+          >
             <Text style={styles.buttonText}>Report</Text>
           </Pressable>
           <Pressable style={styles.button} onPress={() => RNRestart.Restart()}>
