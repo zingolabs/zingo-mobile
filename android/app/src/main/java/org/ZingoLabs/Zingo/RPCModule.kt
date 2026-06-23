@@ -11,6 +11,7 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 import org.ZingoLabs.Zingo.Constants.*
 import kotlinx.coroutines.*
 
@@ -157,18 +158,77 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // Reads a wallet file as a Base64 string. First tries the new encrypted format;
-    // if that fails (migration not yet complete or interrupted), falls back to reading
-    // the old raw binary and encoding it — the format zingolib has always expected.
-    // This makes migration failures invisible to the user on startup and during backup.
+    // A legitimate plain-binary wallet (pre-encryption format) starts with a
+    // u64-LE serialization version. zingolib currently writes 41; we accept
+    // up to 1_000 to leave generous headroom for future formats without
+    // risking misdetection of an encrypted envelope's header bytes as a
+    // version number. The actual encrypted envelope header (Tink) is
+    // essentially random from this check's perspective and reliably falls
+    // outside the range — observed in the wild as e.g. 11506714174589491496
+    // (0x9FA09A1F94EA5E68) on a Tecno AC8 after Keystore key loss.
+    private fun looksLikeLegacyPlainWallet(bytes: ByteArray): Boolean {
+        if (bytes.size < 8) return false
+        var version = 0L
+        for (i in 7 downTo 0) {
+            version = (version shl 8) or (bytes[i].toLong() and 0xFFL)
+        }
+        return version in 0..1000
+    }
+
+    // Reads a wallet file as a Base64 string.
+    //
+    // Primary path: EncryptedFile (Jetpack Security) — the format introduced
+    // in Zingo Beta 2.0.21 (313). Fallback path covers the legacy plain-
+    // binary format (Zingo Beta ≤ 2.0.21 (312); Zingo ≤ 2.0.20 (309) once
+    // the next prod release ships and runs this code for the first time),
+    // and is also valid mid-migration when the plain `.migrating` backup has
+    // been restored: base64-encode the raw bytes so zingolib sees what it
+    // expects.
+    //
+    // The fallback is ONLY safe when the raw bytes actually ARE a plain
+    // wallet. If the file is in the encrypted format but the decryption key
+    // is gone (Keystore reset/invalidated, or app data restored from a backup
+    // of an old wallet — observed on Tecno HiOS and other devices with
+    // quirky AndroidKeystore implementations), the raw bytes are the
+    // encrypted envelope. Feeding those to zingolib produced the useless
+    // "File error. Failed to read wallet version <huge garbage number>"
+    // error reported by users. Distinguish the two via the plain-wallet
+    // version-header check; if it fails, surface a clear, actionable error
+    // instead of returning corrupted bytes.
+    //
+    // The IOException message is prefixed with "Error:" so callers that
+    // forward `e.localizedMessage` to JS (and the JS-side check that strings
+    // starting with "error" are errors) keep working without special-casing.
     private fun readFileAsB64(fileName: String): String {
-        return try {
-            readEncryptedFile(fileName)
-        } catch (e: Exception) {
-            Log.w("MAIN", "[$fileName] encrypted read failed, trying binary fallback: $e")
-            applicationContext.openFileInput(fileName).use { input ->
-                Base64.encodeToString(input.readBytes(), Base64.NO_WRAP)
+        try {
+            return readEncryptedFile(fileName)
+        } catch (encryptedReadError: Exception) {
+            val rawBytes = try {
+                applicationContext.openFileInput(fileName).use { it.readBytes() }
+            } catch (binaryReadError: Exception) {
+                throw IOException(
+                    "Error: could not read $fileName as encrypted nor as binary: $binaryReadError",
+                    encryptedReadError
+                )
             }
+            if (looksLikeLegacyPlainWallet(rawBytes)) {
+                Log.w(
+                    "MAIN",
+                    "[$fileName] encrypted read failed, using legacy plain fallback: $encryptedReadError"
+                )
+                return Base64.encodeToString(rawBytes, Base64.NO_WRAP)
+            }
+            Log.e(
+                "MAIN",
+                "[$fileName] encrypted read failed AND raw bytes are not a plain wallet — Keystore key likely lost: $encryptedReadError"
+            )
+            throw IOException(
+                "Error: wallet decryption failed and the file is not a legacy plain wallet. " +
+                "This usually means the device Keystore was reset, a backup of an old " +
+                "wallet was restored, or the OEM Keystore lost its keys. Please restore " +
+                "the wallet from your seed phrase or from your Viewing Key (UFVK).",
+                encryptedReadError
+            )
         }
     }
 

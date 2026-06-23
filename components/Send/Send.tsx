@@ -225,17 +225,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   // disabled, 3 → 2 snaps), clamp the index in an effect so the sheet
   // doesn't throw "out of range" against the stale internal position.
   const internalSnapIndexRef = useRef<number>(0);
-  // Bump the sheet up by one when the PriceRow first appears so the user
-  // stays at the same visual snap (balance still showing) instead of
-  // landing on the new price snap.
+  // PriceRow-appearance bump is defined further down — it depends on
+  // `sendSnapPoints`, declared later in this component.
   const prevHasPriceSnapRef = useRef<boolean>(false);
-  useEffect(() => {
-    const hasPriceSnap = priceRowH > 0;
-    if (!prevHasPriceSnapRef.current && hasPriceSnap) {
-      sendSheetRef.current?.snapToIndex(internalSnapIndexRef.current + 1);
-    }
-    prevHasPriceSnapRef.current = hasPriceSnap;
-  }, [priceRowH]);
   const memoBottomSheetRef = useRef<BottomSheetModal>(null);
   const addressBookSelectRef = useRef<BottomSheetModal>(null);
   const feeCalculationGenRef = useRef<number>(0);
@@ -297,6 +289,26 @@ const Send: React.FunctionComponent<SendProps> = ({
       sendSheetRef.current?.snapToIndex(sendSnapPoints.length - 1);
     }
   }, [sendSnapPoints]);
+
+  // Bump the sheet up by one when the PriceRow first appears so the user
+  // stays at the same visual snap (balance still showing) instead of
+  // landing on the new price snap.
+  //
+  // `sendSnapPoints` is in the deps so the effect runs after React has
+  // propagated the grown array to BottomSheet; clamp is the belt-and-braces
+  // guard against any residual race that would otherwise crash with
+  // "index ... out of the provided snap points range".
+  useEffect(() => {
+    const hasPriceSnap = priceRowH > 0;
+    const justAppeared = !prevHasPriceSnapRef.current && hasPriceSnap;
+    prevHasPriceSnapRef.current = hasPriceSnap;
+    if (!justAppeared) return;
+    const target = Math.min(
+      internalSnapIndexRef.current + 1,
+      sendSnapPoints.length - 1,
+    );
+    sendSheetRef.current?.snapToIndex(target);
+  }, [priceRowH, sendSnapPoints]);
 
   const renderSendHandle = useCallback(
     () => (

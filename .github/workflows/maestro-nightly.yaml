@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -140,7 +140,7 @@ jobs:
           xcode-version: '16.4'
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # Restore the xcframework produced by .github/workflows/ios-build.yaml.
       # That reusable workflow saves both artefacts directly under `ios/` so the
