@@ -5,6 +5,7 @@ import RNRestart from 'react-native-restart';
 import RPCModule from '../../app/RPCModule';
 import { sendEmail } from '../../app/sendEmail';
 import { TranslateType } from '../../app/AppState';
+import { sanitizePaths } from '../../app/utils/sanitizePaths';
 import { getZingoName, getZingoVersion } from '../../app/utils/ZingoAppData';
 
 // The boundary is the React root, so the i18n context may not be mounted by
@@ -60,12 +61,14 @@ class AppErrorBoundary extends Component<React.PropsWithChildren, State> {
 
   // Body for the support email. sendEmail prepends device/app/zingolib info
   // automatically, so we only contribute the error specifics here.
+  // Paths are sanitized so the report doesn't leak the developer's username
+  // (Hermes bakes the compile-time absolute path into release stacks).
   private buildReport(): string {
     const { error } = this.state;
     const name = error?.name ?? 'Error';
     const message = error?.message ?? 'unknown error';
     const stack = error?.stack ?? '';
-    return `${name}: ${message}\n${stack}`;
+    return sanitizePaths(`${name}: ${message}\n${stack}`);
   }
 
   render() {
@@ -74,8 +77,10 @@ class AppErrorBoundary extends Component<React.PropsWithChildren, State> {
     }
     const { error, zingolibVersion } = this.state;
     const appLabel = `${getZingoName()} ${getZingoVersion()}`;
-    const header = error ? `${error.name}: ${error.message}` : 'Unknown error';
-    const stack = error?.stack ?? '';
+    const header = sanitizePaths(
+      error ? `${error.name}: ${error.message}` : 'Unknown error',
+    );
+    const stack = sanitizePaths(error?.stack ?? '');
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Something went wrong</Text>
