@@ -150,13 +150,21 @@ android {
         create("prod") {
             dimension = "channel"
             resValue("string", "app_name", "Zingo")
+            // Privacy/anti-tamper controls from the Least Authority audit.
+            // Prod enforces them; beta disables them so testers can take
+            // screenshots, record video, and so screen-recorder overlays
+            // don't drop touches. Toggling per-flavor (instead of editing
+            // MainActivity for releases) keeps prod safe by default — any
+            // future flavor MUST define this bool or compile will fail.
+            resValue("bool", "enforce_privacy_controls", "true")
         }
         create("beta") {
             dimension = "channel"
             applicationIdSuffix = ".Beta"
-            versionCode = 314 // beta override
+            versionCode = 315 // beta override
             versionName = "2.0.21" // beta override
             resValue("string", "app_name", "Zingo Beta")
+            resValue("bool", "enforce_privacy_controls", "false")
         }
     }
 
@@ -270,6 +278,18 @@ androidComponents {
         // we start overwriting per-ABI outputs. Falls back to defaultConfig for safety.
         val effectiveVersionCode = variant.outputs.firstOrNull()?.versionCode?.orNull
             ?: android.defaultConfig.versionCode ?: 1
+        // Hard ceiling for the `abi * 10000 + build` encoding. Past 9999 the
+        // build digits would collide with another ABI's prefix space (e.g. a
+        // universal APK 10000 is indistinguishable from a split armv7 with
+        // build 0), breaking both Play's per-ABI delivery ordering and the
+        // JS-side decode in app/utils/ZingoAppData.ts. Switching schemes is a
+        // deliberate choice — fail loudly here instead of shipping garbage.
+        check(effectiveVersionCode <= 9999) {
+            "versionCode $effectiveVersionCode exceeds 9999, the limit of the " +
+            "split-APK encoding (abi * 10000 + build). Either bump the multiplier " +
+            "(and update ABI_BY_PREFIX in app/utils/ZingoAppData.ts) or rework " +
+            "the scheme before raising the build number further."
+        }
         variant.outputs.forEach { output ->
             val abiFilter = output.filters.find {
                 it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI

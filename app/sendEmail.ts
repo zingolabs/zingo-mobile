@@ -1,7 +1,7 @@
 import { Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { GlobalConst, TranslateType } from './AppState';
-import { getZingoVersion } from './utils/ZingoAppData';
+import { getZingoName, getZingoVersion } from './utils/ZingoAppData';
 import { showConfirm } from './showConfirm';
 
 export const sendEmail = async (
@@ -13,7 +13,7 @@ export const sendEmail = async (
   const email: string = translate('email') as string;
   const subjectEmail: string = subject || (translate('subject') as string);
   const bodyEmail: string = body || (translate('body') as string);
-  const zingoVersionEmail: string = getZingoVersion();
+  const appLabel: string = `${getZingoName()} ${getZingoVersion()}`;
   const zingolibVersionEmail: string = zingolibVersion;
   const systemName = DeviceInfo.getSystemName();
   const systemVersion = DeviceInfo.getSystemVersion();
@@ -29,7 +29,7 @@ export const sendEmail = async (
       ' / ' +
       systemVersion +
       '\n' +
-      zingoVersionEmail +
+      appLabel +
       '\n' +
       (zingolibVersionEmail
         ? GlobalConst.zingolib + ': ' + zingolibVersionEmail

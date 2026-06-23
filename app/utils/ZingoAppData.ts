@@ -4,14 +4,34 @@ import {
   getBuildNumber,
 } from 'react-native-device-info';
 
+// Reverse of the split-APK encoding in android/app/build.gradle.kts:
+// `versionCode = abi * 10000 + build`. Universal APK and AAB-derived
+// Play installs have no ABI prefix (raw < 10000).
+const ABI_BY_PREFIX: Record<number, string> = {
+  1: 'arm-v7a',
+  2: 'x86',
+  3: 'arm64-v8a',
+  4: 'x86_64',
+};
+
 /**
- * Human-facing Zingo version, e.g. "2.0.19 (308)".
+ * Human-facing Zingo version, e.g. "2.0.19 (308)" or
+ * "2.0.19 (308, arm64-v8a)" when the install came from a split APK.
  *
  * Reads from the native binary at runtime so it reflects the channel the user
  * actually installed (prod vs beta), independent of the JS bundle.
  */
 export function getZingoVersion(): string {
-  return `${getVersion()} (${getBuildNumber()})`;
+  const raw = Number(getBuildNumber());
+  if (!Number.isFinite(raw)) {
+    return `${getVersion()} (${getBuildNumber()})`;
+  }
+  const prefix = Math.floor(raw / 10000);
+  const build = raw % 10000;
+  const abi = ABI_BY_PREFIX[prefix];
+  return abi
+    ? `${getVersion()} (${build}, ${abi})`
+    : `${getVersion()} (${build})`;
 }
 
 /**
