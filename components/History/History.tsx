@@ -47,6 +47,7 @@ import { ContextAppLoaded } from '../../app/context';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
+import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import Header from '../Header';
 import Utils from '../../app/utils';
 import {
@@ -332,11 +333,16 @@ const History: React.FunctionComponent<HistoryProps> = ({
     historySheetRef,
     priceSnapIndex,
     1,
+    historySnapPoints.length,
   );
 
   useEffect(() => {
     if (internalSnapIndexRef.current >= historySnapPoints.length) {
-      historySheetRef.current?.snapToIndex(historySnapPoints.length - 1);
+      safeSnapToIndex(
+        historySheetRef,
+        historySnapPoints.length - 1,
+        historySnapPoints.length,
+      );
     }
   }, [historySnapPoints]);
 
@@ -353,11 +359,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
     const justAppeared = !prevHasPriceSnapRef.current && hasPriceSnap;
     prevHasPriceSnapRef.current = hasPriceSnap;
     if (!justAppeared) return;
-    const target = Math.min(
+    safeSnapToIndex(
+      historySheetRef,
       internalSnapIndexRef.current + 1,
-      historySnapPoints.length - 1,
+      historySnapPoints.length,
     );
-    historySheetRef.current?.snapToIndex(target);
   }, [priceRowH, historySnapPoints]);
 
   const fetchValueTransfersFiltered = useMemo(() => {

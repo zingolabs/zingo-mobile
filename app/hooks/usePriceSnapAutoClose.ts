@@ -1,6 +1,8 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useCallback, useEffect, useRef } from 'react';
 
+import { safeSnapToIndex } from '../utils/safeSnapToIndex';
+
 const PRICE_SNAP_TIMEOUT_MS = 30 * 1000;
 
 /**
@@ -14,11 +16,17 @@ const PRICE_SNAP_TIMEOUT_MS = 30 * 1000;
  *
  * Passing `priceIndex === null` disables the hook (e.g. when the PriceRow
  * isn't mounted because zecPrice has no value yet).
+ *
+ * `snapPointsLength` is passed through to `safeSnapToIndex` so a stale
+ * `returnIndex` (e.g. left from a previous render where snapPoints was
+ * longer) is clamped to the current valid range instead of crashing
+ * gorhom's index-range invariant.
  */
 export function usePriceSnapAutoClose(
   sheetRef: React.RefObject<BottomSheet | null>,
   priceIndex: number | null,
   returnIndex: number,
+  snapPointsLength: number,
 ) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -36,10 +44,10 @@ export function usePriceSnapAutoClose(
       clear();
       if (priceIndex !== null && index === priceIndex) {
         timerRef.current = setTimeout(() => {
-          sheetRef.current?.snapToIndex(returnIndex);
+          safeSnapToIndex(sheetRef, returnIndex, snapPointsLength);
         }, PRICE_SNAP_TIMEOUT_MS);
       }
     },
-    [clear, priceIndex, returnIndex, sheetRef],
+    [clear, priceIndex, returnIndex, sheetRef, snapPointsLength],
   );
 }

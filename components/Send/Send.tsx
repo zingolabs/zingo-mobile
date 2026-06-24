@@ -93,6 +93,7 @@ import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
+import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import AddressItem from '../Components/AddressItem';
 import { RPCSendProposeType } from '../../app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
@@ -282,11 +283,16 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendSheetRef,
     priceSnapIndex,
     1,
+    sendSnapPoints.length,
   );
 
   useEffect(() => {
     if (internalSnapIndexRef.current >= sendSnapPoints.length) {
-      sendSheetRef.current?.snapToIndex(sendSnapPoints.length - 1);
+      safeSnapToIndex(
+        sendSheetRef,
+        sendSnapPoints.length - 1,
+        sendSnapPoints.length,
+      );
     }
   }, [sendSnapPoints]);
 
@@ -303,11 +309,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     const justAppeared = !prevHasPriceSnapRef.current && hasPriceSnap;
     prevHasPriceSnapRef.current = hasPriceSnap;
     if (!justAppeared) return;
-    const target = Math.min(
+    safeSnapToIndex(
+      sendSheetRef,
       internalSnapIndexRef.current + 1,
-      sendSnapPoints.length - 1,
+      sendSnapPoints.length,
     );
-    sendSheetRef.current?.snapToIndex(target);
   }, [priceRowH, sendSnapPoints]);
 
   const renderSendHandle = useCallback(
@@ -1987,8 +1993,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                             // Expand the Send sheet to its top snap so the memo
                             // field (and the rest of the form) is fully visible
                             // above the keyboard.
-                            sendSheetRef.current?.snapToIndex(
+                            safeSnapToIndex(
+                              sendSheetRef,
                               sendSnapPoints.length - 1,
+                              sendSnapPoints.length,
                             );
                             // I need to wait for the keyboard is totally open
                             // otherwise the scroll to end never happened.

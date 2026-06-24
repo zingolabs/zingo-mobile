@@ -55,6 +55,7 @@ import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
+import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 
 type ReceiveProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -186,7 +187,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const internalSnapIndexRef = useRef<number>(initialReceiveSnapIndex);
   useEffect(() => {
     if (internalSnapIndexRef.current >= receiveSnapPoints.length) {
-      receiveSheetRef.current?.snapToIndex(receiveSnapPoints.length - 1);
+      safeSnapToIndex(
+        receiveSheetRef,
+        receiveSnapPoints.length - 1,
+        receiveSnapPoints.length,
+      );
     }
   }, [receiveSnapPoints]);
   // Bump the sheet up by one when the PriceRow first appears so the user
@@ -204,11 +209,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     const justAppeared = !prevHasPriceSnapRef.current && hasPriceSnap;
     prevHasPriceSnapRef.current = hasPriceSnap;
     if (!justAppeared) return;
-    const target = Math.min(
+    safeSnapToIndex(
+      receiveSheetRef,
       internalSnapIndexRef.current + 1,
-      receiveSnapPoints.length - 1,
+      receiveSnapPoints.length,
     );
-    receiveSheetRef.current?.snapToIndex(target);
   }, [priceRowH, receiveSnapPoints]);
 
   const priceSnapIndex = priceRowH > 0 ? 0 : null;
@@ -216,6 +221,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     receiveSheetRef,
     priceSnapIndex,
     1,
+    receiveSnapPoints.length,
   );
 
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
