@@ -34,7 +34,7 @@ jobs:
 
       - name: Check if native rust cache exists
         id: native-check-build-cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
           key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
@@ -46,7 +46,7 @@ jobs:
 
       - name: Check if kotlin uniffi cache exists
         id: kotlin-check-build-cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
           key: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
@@ -224,7 +224,7 @@ jobs:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
 
       - name: Cache native rust
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
           key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
@@ -236,7 +236,7 @@ jobs:
           path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
 
       - name: Cache kotlin uniffi
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
           key: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
