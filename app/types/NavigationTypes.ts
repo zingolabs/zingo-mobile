@@ -57,6 +57,7 @@ export type AppDrawerParamList = {
   [RouteEnum.History]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
+  [RouteEnum.Swap]: undefined;
   [RouteEnum.Messages]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
@@ -74,6 +75,7 @@ export type AppDrawerParamList = {
   [RouteEnum.ValueTransferDetail]:
     | ValueTransferDetailNavigationState
     | undefined;
+  [RouteEnum.SwapDetail]: SwapDetailNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
   [RouteEnum.Seed]: SeedNavigationState | undefined;
@@ -103,6 +105,20 @@ export type ValueTransferDetailNavigationState = {
   index: number;
   vt: ValueTransferType;
   valueTransfersSliced: ValueTransferType[];
+  totalLength: number;
+};
+
+/**
+ * Params for the SwapDetail screen. Mirrors `ValueTransferDetailNavigationState`
+ * structure (index + slice + total) so the up/down chevron navigation feels
+ * identical, but the slice is a list of `recordId`s rather than full
+ * `SwapRecord` snapshots. The screen looks up the current record live from
+ * `context.swapRecords` on every render so background mutations by the
+ * poller surface without the params going stale.
+ */
+export type SwapDetailNavigationState = {
+  index: number;
+  recordIds: string[];
   totalLength: number;
 };
 

@@ -3,6 +3,8 @@ package org.ZingoLabs.Zingo
 import android.content.Context
 import android.app.ActivityManager
 import android.os.Build
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import android.util.Log
@@ -12,6 +14,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import java.io.File
+import java.io.FileInputStream
 import java.util.*
 import org.json.JSONObject
 import kotlinx.datetime.Clock
@@ -31,7 +35,6 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
 import org.ZingoLabs.Zingo.Constants.*
-import java.io.FileInputStream
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 
@@ -298,37 +301,92 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
     }
 
     /**
-     * Reads settings.json and loads the wallet file when a server URI is
-     * configured. Returns `true` to signal the caller may proceed with sync, or
-     * `false` only when the user is explicitly in offline mode (empty server
-     * URI) and sync must be skipped. On any other unexpected condition the
-     * function returns `true` so the downstream sync path surfaces its own
-     * error rather than masquerading as offline mode.
+     * Reads the persisted settings as a JSON string.
+     *
+     * Primary source: the `EncryptedSharedPreferences` file used by
+     * `react-native-encrypted-storage` (the JS-side `SettingsFileImpl` writes
+     * here since Zingo Beta 2.0.21 (313), Audit Issue N). We open it directly
+     * with the same Jetpack Security configuration the RN module uses (same
+     * filename, same master-key alias derived from `AES256_GCM_SPEC`, same
+     * key/value encryption schemes), so we read the same bytes the JS side
+     * wrote without going through the React bridge — which isn't available
+     * inside a WorkManager Worker.
+     *
+     * Fallback: the legacy plain `settings.json` in app files dir. Still
+     * present when the user has not yet opened the app under Zingo Beta
+     * 2.0.21 (313) or later (the JS `readSettings` migrates and deletes it
+     * on first read). Without this fallback a fresh upgrade that schedules
+     * the background task before the user opens the app would have no
+     * settings to read.
+     *
+     * Returns null when neither source has data.
+     */
+    private fun readSettingsString(): String? {
+        try {
+            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+            val prefs = EncryptedSharedPreferences.create(
+                "RN_ENCRYPTED_STORAGE_SHARED_PREF",
+                masterKeyAlias,
+                context,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+            val value = prefs.getString("settings", null)
+            if (value != null) {
+                return value
+            }
+        } catch (e: Exception) {
+            Log.w(
+                "SCHEDULED_TASK_RUN",
+                "EncryptedSharedPreferences read failed, will try legacy settings.json: $e"
+            )
+        }
+
+        val legacy = File(context.filesDir, "settings.json")
+        if (!legacy.exists()) {
+            return null
+        }
+        return try {
+            FileInputStream(legacy).use { it.readBytes().toString(Charsets.UTF_8) }
+        } catch (e: Exception) {
+            Log.w("SCHEDULED_TASK_RUN", "Legacy settings.json read failed: $e")
+            null
+        }
+    }
+
+    /**
+     * Reads settings and loads the wallet file when a server URI is
+     * configured. Returns `true` to signal the caller may proceed with sync,
+     * or `false` only when the user is explicitly in offline mode (empty
+     * server URI) and sync must be skipped. On any other unexpected condition
+     * the function returns `true` so the downstream sync path surfaces its
+     * own error rather than masquerading as offline mode.
      */
     private fun loadWalletFile(): Boolean {
-        var shouldSync = true
-        context.openFileInput("settings.json")?.use { file: FileInputStream ->
-            val settingsBytes = file.readBytes()
-            file.close()
-            val settingsString = settingsBytes.toString(Charsets.UTF_8)
-            val jsonObject = JSONObject(settingsString)
-            val serveruri = jsonObject.getJSONObject("server").getString("uri")
-            val chainhint = jsonObject.getJSONObject("server").getString("chainName")
-            if (serveruri.isEmpty()) {
-                Log.i(
-                    "SCHEDULED_TASK_RUN",
-                    "Offline mode detected (empty serveruri) - skipping wallet load"
-                )
-                shouldSync = false
-                return@use
-            }
+        val settingsString = readSettingsString()
+        if (settingsString == null) {
+            Log.w(
+                "SCHEDULED_TASK_RUN",
+                "Settings not found in EncryptedSharedPreferences nor legacy file - proceeding with sync; downstream will surface any error"
+            )
+            return true
+        }
+        val jsonObject = JSONObject(settingsString)
+        val serveruri = jsonObject.getJSONObject("server").getString("uri")
+        val chainhint = jsonObject.getJSONObject("server").getString("chainName")
+        if (serveruri.isEmpty()) {
             Log.i(
                 "SCHEDULED_TASK_RUN",
-                "Opening the wallet file - No App active - serveruri: $serveruri chain: $chainhint"
+                "Offline mode detected (empty serveruri) - skipping wallet load"
             )
-            rpcModule.loadExistingWalletNative(serveruri, chainhint, "Medium", "3")
+            return false
         }
-        return shouldSync
+        Log.i(
+            "SCHEDULED_TASK_RUN",
+            "Opening the wallet file - No App active - serveruri: $serveruri chain: $chainhint"
+        )
+        rpcModule.loadExistingWalletNative(serveruri, chainhint, "Medium", "3")
+        return true
     }
 
 }

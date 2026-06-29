@@ -101,3 +101,6 @@ buck-out/
 .claude/
 # Jest coverage output
 coverage/
+
+# SwapKit API key (real file, not the .example template)
+app/swap/swapKitSecrets.ts

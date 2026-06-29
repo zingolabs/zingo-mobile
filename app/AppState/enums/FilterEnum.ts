@@ -8,6 +8,7 @@ export enum FilterEnum {
   sent = 'sent',
   received = 'received',
   shielded = 'shielded',
+  swap = 'swap',
   // new one - Status
   failed = 'failed',
   // new one
