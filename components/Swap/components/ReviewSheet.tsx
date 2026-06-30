@@ -480,10 +480,15 @@ function ReviewView(props: {
     const receive = parseFloat(receiveAmount);
     if (!Number.isFinite(sell) || sell <= 0) return '—';
     if (!Number.isFinite(receive) || receive <= 0) return '—';
-    const isOutbound = direction === SwapDirectionEnum.Outbound;
-    const perZec = isOutbound ? receive / sell : sell / receive;
-    const decimals = perZec >= 1 ? 4 : 8;
-    return perZec.toFixed(decimals);
+    // Compute from the user's perspective so the label `1 sell ≈ X receive`
+    // reads literally in both directions: outbound (ZEC → USDT) yields
+    // USDT-per-ZEC (a large number); inbound (USDT → ZEC) yields
+    // ZEC-per-USDT (a tiny number). The previous code always produced
+    // non-ZEC-per-ZEC and labelled it inverted on inbound — surfacing a
+    // headline rate that was off by orders of magnitude.
+    const perSell = receive / sell;
+    const decimals = perSell >= 1 ? 4 : 8;
+    return perSell.toFixed(decimals);
   })();
   // The sourceAddress is the refund destination on outbound (our ephemeral
   // t-addr) — surfacing it lets the user verify before committing. On inbound
@@ -752,11 +757,14 @@ function PostCommitView(props: {
           colors={colors}
           label={t('swap.expected-receive', 'Expected to receive')}
           primary={`${record.expectedReceiveAmount} ${
-            // Keep the precise catalog symbol here: the post-commit success
-            // row is the last place the user sees what they are actually
-            // receiving (NEAR-wrapped nbtc vs native BTC, etc.) and the
-            // variant string is genuinely useful.
-            record.receiveAsset.symbol
+            // Use the clean ticker, falling back to symbol only when the
+            // catalog omits a ticker. Mirrors the "You sent" row above.
+            // The previous `symbol`-only version was emitting noise like
+            // `USDT-TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t` for TRON USDT — the
+            // contract-address suffix is information the user already
+            // committed to via the asset picker, not something the
+            // confirmation row needs to repeat verbatim.
+            record.receiveAsset.ticker ?? record.receiveAsset.symbol
           }`}
         />
 

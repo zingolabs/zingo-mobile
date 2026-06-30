@@ -3,10 +3,16 @@
 # Generates app/swap/swapKitSecrets.ts from the SWAPKIT_API_KEY environment
 # variable. Invoked by CI workflows that bundle JS or run Jest.
 #
-# When SWAPKIT_API_KEY is empty (e.g. external-fork PRs that cannot see repo
-# secrets), a placeholder is written instead. The TypeScript still compiles
-# and Jest still runs; the SwapKitClient constructor throws at runtime if it
-# detects the placeholder, so any swap execution path will fail loudly.
+# Behaviour by env-var presence:
+#   - SWAPKIT_API_KEY set       → overwrite the file with the real key.
+#   - SWAPKIT_API_KEY unset AND file already exists → preserve as-is. This
+#     stops a local developer from accidentally nuking their working key by
+#     running the script with no env var set (e.g. for debugging or refresh).
+#   - SWAPKIT_API_KEY unset AND file missing → write a placeholder so the
+#     TypeScript still compiles and Jest still runs. The SwapKitClient
+#     constructor throws on the placeholder at runtime, so any swap
+#     execution path fails loudly rather than silently shipping a broken
+#     APK. This branch covers external-fork PRs that cannot see secrets.
 #
 # The key is encoded as a JSON string before being injected into the TS file,
 # which is robust against quotes, backslashes, or any other character that
@@ -15,7 +21,16 @@
 set -euo pipefail
 
 OUT="app/swap/swapKitSecrets.ts"
-KEY="${SWAPKIT_API_KEY:-replace-me-with-real-key}"
+
+if [ -z "${SWAPKIT_API_KEY:-}" ]; then
+  if [ -f "$OUT" ]; then
+    echo "INFO: SWAPKIT_API_KEY not set; preserving existing $OUT" >&2
+    exit 0
+  fi
+  KEY="replace-me-with-real-key"
+else
+  KEY="$SWAPKIT_API_KEY"
+fi
 
 # Use Python (always present on GitHub-hosted runners) to JSON-encode the key.
 ENCODED=$(printf '%s' "$KEY" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
@@ -26,7 +41,7 @@ export const SWAPKIT_API_KEY = $ENCODED;
 EOF
 
 if [ "$KEY" = "replace-me-with-real-key" ]; then
-  echo "WARN: SWAPKIT_API_KEY not set; wrote placeholder to $OUT" >&2
+  echo "WARN: SWAPKIT_API_KEY not set and $OUT did not exist; wrote placeholder" >&2
 else
   echo "Wrote $OUT (key length: ${#KEY})"
 fi

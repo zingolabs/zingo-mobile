@@ -215,11 +215,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     const justAppeared = !prevHasPriceSnapRef.current && hasPriceSnap;
     prevHasPriceSnapRef.current = hasPriceSnap;
     if (!justAppeared) return;
-    const target = Math.min(
+    safeSnapToIndex(
+      receiveSheetRef,
       internalSnapIndexRef.current + 1,
-      receiveSnapPoints.length - 1,
+      receiveSnapPoints.length,
     );
-    receiveSheetRef.current?.snapToIndex(target);
   }, [priceRowH, receiveSnapPoints]);
 
   const priceSnapIndex = priceRowH > 0 ? 0 : null;
@@ -227,6 +227,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     receiveSheetRef,
     priceSnapIndex,
     1,
+    receiveSnapPoints.length,
   );
 
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {

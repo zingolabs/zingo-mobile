@@ -396,11 +396,17 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   const [refundAddressTouched, setRefundAddressTouched] =
     useState<boolean>(false);
 
-  // Reset the touched flags when the user changes asset or direction — the
-  // input may be carrying an address valid for the previous chain that
-  // wouldn't validate against the new one, and we don't want to flash an
-  // error before they have a chance to retype.
+  // When the user switches asset/chain, clear both address fields (and
+  // their touched flags) — an address valid for the previous chain is
+  // almost certainly invalid for the new one, and leaving the stale value
+  // sitting in the field without an error indicator is misleading. The
+  // touched-flag reset alone (which is what we used to do) hid the error
+  // banner but let the user submit an address that wouldn't route.
+  // `onToggleDirection` already clears both for the same reason on
+  // direction flip; this mirrors that pattern.
   useEffect(() => {
+    setDestinationAddress('');
+    setRefundAddress('');
     setDestinationAddressTouched(false);
     setRefundAddressTouched(false);
   }, [direction, selectedToken?.chain]);
@@ -705,6 +711,14 @@ const Swap: React.FunctionComponent<SwapProps> = ({
       return;
     }
 
+    // Flip the spinner ON before any async work — the ephemeral address
+    // reservation below is a native RPC that can take a noticeable beat,
+    // and the SwapKit `/v3/quote` request after it is also non-trivial.
+    // The previous order (spinner after reservation) made the CTA appear
+    // frozen for the user.
+    Keyboard.dismiss();
+    setIsQuoting(true);
+
     // Reserve a fresh ephemeral t-address if we don't already have one for
     // this swap intent. The reserved index is persisted in the wallet, so
     // even if the user abandons the swap the index is "burned" — no funds at
@@ -730,12 +744,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({
           (translate?.('swap.ephemeral-error') as string) ||
           'Failed to reserve a swap address';
         addLastSnackbar?.(`${label}: ${errMsg}`, SnackbarDurationEnum.long);
+        setIsQuoting(false);
         return;
       }
     }
-
-    Keyboard.dismiss();
-    setIsQuoting(true);
     try {
       const nonZecAsset: SwapAssetType = {
         swapKitId: selectedToken.identifier,
@@ -1006,6 +1018,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     swapSheetRef,
     priceSnapIndex,
     1,
+    swapSnapPoints.length,
   );
 
   // Per-card derived values. SwapKit's `ticker` field is the clean

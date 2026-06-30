@@ -48,12 +48,24 @@ export function applyDefaultTrackUpdate(
     (isRealLegHash(record.destinationTxHash)
       ? record.destinationTxHash
       : undefined);
-  // Provider's actually-realised payout in the destination asset, when
-  // SwapKit has surfaced it. We accept whatever value is present (in
-  // flight values are also valid — they reflect the running stream for
-  // streaming swaps) and keep the most recent.
+  // Provider's actually-realised payout in the destination asset. SwapKit's
+  // `/track` surfaces intermediate-leg amounts during multi-step swaps
+  // (NEAR Intents, Mayachain streaming, etc.) — the top-level `toAmount`
+  // may temporarily refer to a hop's intermediate asset rather than our
+  // configured receive asset. Naively persisting whatever comes through
+  // caused the History row to jitter between unrelated values (e.g. a
+  // USDT-leg amount displayed as ZEC) before the swap converged on the
+  // real destination amount. Guard the write: only accept `toAmount` when
+  // `toAsset` matches the record's `receiveAsset.swapKitId`. Otherwise
+  // keep the previous value (or fall back to the quote-time estimate via
+  // `swapRecordToValueTransfer`).
+  const toAssetMatches =
+    typeof response.toAsset === 'string' &&
+    response.toAsset === record.receiveAsset.swapKitId;
   const actualReceiveAmount =
-    typeof response.toAmount === 'string' && response.toAmount.length > 0
+    toAssetMatches &&
+    typeof response.toAmount === 'string' &&
+    response.toAmount.length > 0
       ? response.toAmount
       : record.actualReceiveAmount;
 
