@@ -62,6 +62,11 @@ export class SwapKitNetworkError extends SwapKitError {
 
 /** Wrap a non-2xx HTTP response. */
 export class SwapKitHttpError extends SwapKitError {
+  /** True when the response is the CF "Sorry, you have been blocked" page
+   *  (or any 403 returning an HTML body). Used by the UI to render a
+   *  region-specific banner instead of the generic error message. */
+  readonly isEdgeBlocked: boolean;
+
   constructor(args: {
     operation: SwapOperationEnum;
     httpStatus: number;
@@ -82,7 +87,20 @@ export class SwapKitHttpError extends SwapKitError {
       httpStatus: args.httpStatus,
     });
     this.name = 'SwapKitHttpError';
+    this.isEdgeBlocked = isEdgeBlockedResponse(args.httpStatus, args.body);
   }
+}
+
+/**
+ * Detect Cloudflare's "Sorry, you have been blocked" / generic block page.
+ * Triggered when SwapKit's edge rejects the request before it reaches the
+ * API backend — typically a WAF rule (region/IP reputation) rather than a
+ * backend authorization failure. The body is HTML in this case.
+ */
+function isEdgeBlockedResponse(httpStatus: number, body: string): boolean {
+  if (httpStatus !== 403) return false;
+  const trimmed = body.trimStart();
+  return trimmed.startsWith('<');
 }
 
 function extractServerReason(body: string): string {
@@ -97,6 +115,14 @@ function extractServerReason(body: string): string {
     }
   } catch {
     // not JSON
+  }
+  // When SwapKit's edge (Cloudflare) returns its own error page the body is
+  // HTML — dumping the markup into a snackbar reads like garbage. Detect
+  // that case and emit a short, descriptive label instead. Cheap heuristic:
+  // anything starting with `<` after trimming is treated as markup.
+  const trimmed = body.trimStart();
+  if (trimmed.startsWith('<')) {
+    return 'edge blocked request';
   }
   return body.slice(0, 240);
 }

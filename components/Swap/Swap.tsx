@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import {
   ActivityIndicator,
+  AppState,
   Keyboard,
   Pressable,
   ScrollView,
@@ -53,6 +54,7 @@ import {
   SwapAssetType,
   SwapDirectionEnum,
   SwapErrorCategoryEnum,
+  SwapKitHttpError,
   TokenEntryType,
   classifySwapError,
   isValidChainAddress,
@@ -231,41 +233,102 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   );
   const assetPickerRef = useRef<BottomSheetModal>(null);
 
-  useEffect(() => {
+  // True after a catalog fetch failed with SwapKit's edge-block page (CF
+  // "Sorry, you have been blocked"). Drives the persistent banner above the
+  // form. Cleared the moment a fetch succeeds — which is how the banner
+  // disappears as soon as the user activates a VPN and the catalog comes
+  // through. Snackbar is emitted only once per blocked transition.
+  const [catalogEdgeBlocked, setCatalogEdgeBlocked] = useState<boolean>(false);
+  const [catalogRetrying, setCatalogRetrying] = useState<boolean>(false);
+
+  // Catalog fetch lifted out of the mount-effect so it can be invoked from
+  // the manual "retry" button on the banner and from the AppState listener
+  // when the app comes back to foreground (typical "I just turned the VPN
+  // on" flow). The `cancelled` flag protects against re-entry: only the
+  // most recent invocation writes to state.
+  const loadCatalogRef = useRef<{
+    cancelled: boolean;
+  } | null>(null);
+  const loadCatalog = useCallback(async () => {
     if (!swapService) return;
-    let cancelled = false;
-    // Routability-filtered listing. The TokenCatalog fetches `/swapTo`
-    // and `/swapFrom` once per session in parallel with `/tokens`, then
-    // intersects the catalog with the routability set so we never show
-    // an asset that has no current route. Falls back to the full catalog
-    // when SwapKit's routability endpoints fail — see TokenCatalog.
+    // Cancel any in-flight previous load so a stale response can't
+    // overwrite the success of a fresh retry.
+    if (loadCatalogRef.current) loadCatalogRef.current.cancelled = true;
+    const token = { cancelled: false };
+    loadCatalogRef.current = token;
+    setCatalogRetrying(true);
     const directionForFilter: 'outbound' | 'inbound' = isOutbound
       ? 'outbound'
       : 'inbound';
-    swapService
-      .listRoutableTokens(directionForFilter)
-      .then(list => {
-        if (cancelled) return;
-        setTokens(list);
-        // Default selection: prefer canonical BTC. If for any reason that
-        // entry is missing, fall back to the first token in the list so the
-        // UI always has something to render in the chip.
-        const btc =
-          list.find(item => item.identifier === 'BTC.BTC') ?? list[0] ?? null;
-        setSelectedToken(prev => prev ?? btc);
-      })
-      .catch(err => {
-        const errMsg = err instanceof Error ? err.message : String(err);
-        console.log('Swap: listRoutableTokens failed:', errMsg, err);
+    try {
+      const list = await swapService.listRoutableTokens(directionForFilter);
+      if (token.cancelled) return;
+      setTokens(list);
+      setCatalogEdgeBlocked(false);
+      const btc =
+        list.find(item => item.identifier === 'BTC.BTC') ?? list[0] ?? null;
+      setSelectedToken(prev => prev ?? btc);
+    } catch (err) {
+      if (token.cancelled) return;
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.log('Swap: listRoutableTokens failed:', errMsg, err);
+      // Differentiate the SwapKit edge-block page (CF "Sorry, you have
+      // been blocked") from any other failure: the first case is region /
+      // ISP-driven and the user needs a VPN; everything else is a normal
+      // network / server issue and the legacy snackbar still applies.
+      const edgeBlocked = err instanceof SwapKitHttpError && err.isEdgeBlocked;
+      if (edgeBlocked) {
+        if (!catalogEdgeBlocked) {
+          // Only fire the snackbar on the *first* failure of a streak so
+          // subsequent silent retries don't spam.
+          addLastSnackbar?.(
+            (translate?.('swap.edge-blocked-snackbar') as string) ||
+              'Swap service is blocked on your network. Try a VPN.',
+            SnackbarDurationEnum.long,
+          );
+        }
+        setCatalogEdgeBlocked(true);
+      } else {
         const errLabel =
           (translate?.('swap.catalog-error') as string) ||
           'Failed to load tokens';
         addLastSnackbar?.(`${errLabel}: ${errMsg}`, SnackbarDurationEnum.long);
-      });
+      }
+    } finally {
+      if (!token.cancelled) setCatalogRetrying(false);
+    }
+  }, [swapService, isOutbound, addLastSnackbar, translate, catalogEdgeBlocked]);
+
+  // Initial fetch on mount and whenever the dependencies of `loadCatalog`
+  // change (direction flip, service ready). The actual cancellation is
+  // handled inside `loadCatalog` via the ref-tracked token.
+  useEffect(() => {
+    loadCatalog().catch(() => {
+      // loadCatalog handles its own errors via state/snackbar; the catch
+      // is just to satisfy lint's no-floating-promises stance.
+    });
     return () => {
-      cancelled = true;
+      if (loadCatalogRef.current) loadCatalogRef.current.cancelled = true;
     };
-  }, [swapService, addLastSnackbar, translate, isOutbound]);
+  }, [loadCatalog]);
+
+  // Auto-retry when the app returns to foreground while the banner is up.
+  // Natural flow: user sees banner → backgrounds the app → opens VPN client
+  // → returns to Zingo. We re-attempt the catalog silently; if it succeeds
+  // the banner disappears without any user gesture.
+  useEffect(() => {
+    if (!catalogEdgeBlocked) return;
+    const sub = AppState.addEventListener('change', state => {
+      if (state === 'active') {
+        loadCatalog().catch(() => {
+          // Handled inside loadCatalog.
+        });
+      }
+    });
+    return () => {
+      sub.remove();
+    };
+  }, [catalogEdgeBlocked, loadCatalog]);
 
   // Catalog view shown in the asset picker. Wrapped-ZEC variants (NEAR, SOL,
   // STRK bridges) are hidden when the user is sending native ZEC out — there
@@ -1113,6 +1176,59 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                 bounces={false}
                 alwaysBounceVertical={false}
               >
+                {/* Region-block banner. Visible only while a catalog fetch
+                    has returned the SwapKit edge-block page (CF "Sorry,
+                    you have been blocked"). Auto-retries on resume from
+                    background so activating a VPN and switching back is
+                    enough to clear it; the "Retry" button covers the
+                    in-app retry without leaving the screen. */}
+                {catalogEdgeBlocked && (
+                  <View
+                    style={[
+                      styles.regionBlockBanner,
+                      {
+                        backgroundColor: colors.warning.background,
+                        borderColor: colors.warning.border,
+                      },
+                    ]}
+                  >
+                    <BoldText
+                      style={{ color: colors.warning.title, marginBottom: 4 }}
+                    >
+                      {t(
+                        'swap.edge-blocked-banner-title',
+                        'Swap service unavailable on this network',
+                      )}
+                    </BoldText>
+                    <RegText style={{ color: colors.warning.text }}>
+                      {t(
+                        'swap.edge-blocked-banner-body',
+                        'The swap provider is blocking requests from your network. If your country or ISP is restricted, connecting through a VPN usually resolves this.',
+                      )}
+                    </RegText>
+                    <Pressable
+                      onPress={loadCatalog}
+                      disabled={catalogRetrying}
+                      style={({ pressed }) => ({
+                        marginTop: 10,
+                        alignSelf: 'flex-start',
+                        opacity: pressed || catalogRetrying ? 0.6 : 1,
+                      })}
+                    >
+                      {catalogRetrying ? (
+                        <ActivityIndicator
+                          size="small"
+                          color={colors.warning.primary}
+                        />
+                      ) : (
+                        <BoldText style={{ color: colors.warning.primary }}>
+                          {t('swap.edge-blocked-retry', 'Retry')}
+                        </BoldText>
+                      )}
+                    </Pressable>
+                  </View>
+                )}
+
                 {renderAssetCard({
                   role: 'source',
                   isZec: sourceIsZec,
@@ -1729,6 +1845,12 @@ const styles = StyleSheet.create({
     // sitting under the navigator chrome.
     paddingBottom: 200,
     paddingTop: 8,
+  },
+  regionBlockBanner: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 12,
+    marginBottom: 16,
   },
   card: {
     borderRadius: 16,
