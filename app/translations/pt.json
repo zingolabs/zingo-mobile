@@ -153,6 +153,8 @@
     "differentchain-error": "Você está mudando para um servidor com uma rede diferente, você não terá mais acesso a essa carteira sem suas frases de recuperação.",
     "serverchain-mismatch": "O servidor informa uma rede diferente da selecionada. Verifique o seletor de rede e tente novamente.",
     "changingwallet-label": "Error ao Alterar a Carteira",
+    "changewallet-pending-swaps-title": "Swaps pendentes",
+    "changewallet-pending-swaps-body": "Você tem {count} swap(s) ainda em andamento. Alterar a carteira removerá permanentemente o histórico de acompanhamento deste dispositivo. Continuar?",
     "restoringwallet-label": "Error ao Restaurar a Carteira",
     "computingtx": "Processando Transação...",
     "computingtx-hangon": "Aguarde um momento,\nisto vai demorar só um instante...",

@@ -27,7 +27,7 @@ import {
 } from '@sayem314/react-native-keep-awake';
 
 import WalletBackend, { fetchWallet } from '../walletBackend';
-import { SwapRecordType, SwapStore } from '../swap';
+import { SwapRecordType, SwapStore, isTerminalStatus } from '../swap';
 import {
   changeServer,
   doSave,
@@ -1870,6 +1870,48 @@ export class LoadedAppClass extends Component<
 
   onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
     const { server } = this.state;
+
+    // Warn before destroying the current wallet if there are still in-flight
+    // swap records. The user might walk away thinking a swap is still
+    // tracked when in reality the wallet that owned it is about to vanish
+    // (the no-backup path wipes the bucket; even the backup path will,
+    // until Phase 2 of per-wallet backup lands, leave them orphaned).
+    try {
+      const records = await SwapStore.readAll();
+      const inFlight = records.filter(r => !isTerminalStatus(r.status)).length;
+      if (inFlight > 0) {
+        const confirmed = await new Promise<boolean>(resolve => {
+          showConfirm({
+            title: this.state.translate(
+              'loadedapp.changewallet-pending-swaps-title',
+            ) as string,
+            message: (
+              this.state.translate(
+                'loadedapp.changewallet-pending-swaps-body',
+              ) as string
+            ).replace('{count}', String(inFlight)),
+            buttons: [
+              {
+                text: this.state.translate('cancel') as string,
+                style: 'cancel',
+                onPress: () => resolve(false),
+              },
+              {
+                text: this.state.translate('confirm') as string,
+                style: 'destructive',
+                onPress: () => resolve(true),
+              },
+            ],
+          });
+        });
+        if (!confirmed) return;
+      }
+    } catch (err) {
+      console.log(
+        'LoadedApp: in-flight swap check failed (proceeding anyway):',
+        err,
+      );
+    }
 
     // if the App is working with a test server
     // no need to do backups of the wallets.

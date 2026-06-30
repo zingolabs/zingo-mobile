@@ -48,6 +48,7 @@ import {
   SwapKitTrackParams,
 } from './SwapKitClient';
 import { SwapStore, SwapStoreChangeListener } from './SwapStore';
+import { deriveWalletFingerprint } from './walletFingerprint';
 import {
   swapRecordToValueTransfer,
   isOutboundSwap,
@@ -148,6 +149,7 @@ export {
   // Persistence
   SwapStore,
   SwapStoreChangeListener,
+  deriveWalletFingerprint,
   swapRecordToValueTransfer,
   isOutboundSwap,
 

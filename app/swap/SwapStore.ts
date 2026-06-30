@@ -42,7 +42,46 @@ import { SwapRecordType } from './types/SwapRecordType';
  * show the unaffected records on next swap. Storage corruption of swap
  * tracking is not a wallet-fatal event.
  */
-const STORAGE_KEY = 'swap:records';
+/**
+ * Legacy global storage key — used by versions of the app that predated
+ * per-wallet namespacing. Read once at boot via `bindToWallet` so existing
+ * users' records are migrated into the current wallet's namespaced bucket,
+ * then deleted from storage so the global key never serves as a future
+ * leak vector between wallets.
+ */
+const LEGACY_STORAGE_KEY = 'swap:records';
+
+/**
+ * Storage key for the current wallet's swap bucket. The suffix is the
+ * wallet's UFVK-derived fingerprint (see `walletFingerprint.ts`). Different
+ * wallets on the same device write to different keys; that is the privacy
+ * boundary.
+ */
+function storageKeyFor(fingerprint: string): string {
+  return `swap:records:${fingerprint}`;
+}
+
+/**
+ * Single-slot backup key. Mirrors the semantics of `wallet.backup.dat.txt`:
+ * each `changeWallet` (with backup) overwrites it with the current wallet's
+ * records (plus a `fp` marker so we know which wallet owns them). The marker
+ * lets `bindToWallet` decide whether the next wallet to load is the one
+ * that produced the backup and therefore eligible to restore from it.
+ */
+const BACKUP_STORAGE_KEY = 'swap:records:backup';
+
+type BackupSlotPayload = {
+  fp: string;
+  records: SwapRecordType[];
+};
+
+/**
+ * Module-level binding to the currently-loaded wallet. Set by
+ * `SwapStore.bindToWallet`; read by every storage operation. While `null`,
+ * read-paths return empty and write-paths no-op so the activity list never
+ * surfaces records from a wallet that is not the current one.
+ */
+let currentWalletFingerprint: string | null = null;
 
 /**
  * Callback fired after every mutation that successfully reaches storage.
@@ -180,25 +219,180 @@ export class SwapStore {
   }
 
   /**
-   * Wipe all swap records. Called from the account-deletion flow once the
-   * guard has confirmed no records have in-flight broadcasts.
+   * Bind the store to the wallet identified by `fingerprint`. Must be called
+   * before any read/write path returns useful data — until then `readAll`
+   * yields `[]` and writes are no-ops (the activity list shows nothing
+   * rather than risking exposure of records from a different wallet).
+   *
+   * One-shot legacy migration: on the first call ever, if the pre-namespace
+   * global key `swap:records` exists, its contents are moved into the
+   * current wallet's bucket (only if that bucket is empty — we never
+   * silently merge across wallets) and the global key is deleted. Subsequent
+   * calls find no legacy key and skip the migration cheaply.
+   *
+   * After binding, all current subscribers are notified with the freshly-
+   * loaded bucket so any reader that called `readAll` before the bind
+   * resolved gets the real data via the subscription rather than the
+   * empty placeholder.
    */
-  static async clear(): Promise<void> {
+  static async bindToWallet(fingerprint: string): Promise<void> {
     return this.enqueue(async () => {
+      currentWalletFingerprint = fingerprint;
       try {
-        await EncryptedStorage.removeItem(STORAGE_KEY);
+        const legacy = await EncryptedStorage.getItem(LEGACY_STORAGE_KEY);
+        if (legacy !== null) {
+          const targetKey = storageKeyFor(fingerprint);
+          const existing = await EncryptedStorage.getItem(targetKey);
+          if (existing === null) {
+            await EncryptedStorage.setItem(targetKey, legacy);
+          }
+          // Delete the legacy key regardless of whether we wrote — once
+          // namespacing is live, the global key must never persist or it
+          // becomes a future leak vector when a different wallet binds.
+          await EncryptedStorage.removeItem(LEGACY_STORAGE_KEY);
+        }
+      } catch (err) {
+        console.log('SwapStore: legacy migration failed:', err);
+      }
+      // Phase 2: opportunistic restore from the single-slot backup. If the
+      // last wallet that was saved-with-backup was THIS one (matching fp),
+      // move the records back into the live bucket and clear the slot.
+      // Different fp → leave the backup untouched; it may still be needed
+      // by a future bind. No-op if the slot is empty (typical case).
+      try {
+        const raw = await EncryptedStorage.getItem(BACKUP_STORAGE_KEY);
+        if (raw !== null) {
+          let payload: BackupSlotPayload | null = null;
+          try {
+            const parsed = JSON.parse(raw) as Partial<BackupSlotPayload>;
+            if (
+              parsed &&
+              typeof parsed.fp === 'string' &&
+              Array.isArray(parsed.records)
+            ) {
+              payload = parsed as BackupSlotPayload;
+            }
+          } catch (parseErr) {
+            console.log(
+              'SwapStore: backup slot parse failed, discarding:',
+              parseErr,
+            );
+            await EncryptedStorage.removeItem(BACKUP_STORAGE_KEY);
+          }
+          if (payload && payload.fp === fingerprint) {
+            // Merge by recordId so a live bucket that already exists from
+            // some other path (legacy migration, previous orphan) does not
+            // get silently overwritten. Backup wins on collision because it
+            // is the "more recent" snapshot — the one captured at the
+            // moment of the wallet change.
+            const liveKey = storageKeyFor(fingerprint);
+            const liveRaw = await EncryptedStorage.getItem(liveKey);
+            const liveRecords: SwapRecordType[] = liveRaw
+              ? (() => {
+                  try {
+                    const p = JSON.parse(liveRaw);
+                    return Array.isArray(p) ? (p as SwapRecordType[]) : [];
+                  } catch {
+                    return [];
+                  }
+                })()
+              : [];
+            const merged = mergeRecordsById(liveRecords, payload.records);
+            await EncryptedStorage.setItem(liveKey, JSON.stringify(merged));
+            await EncryptedStorage.removeItem(BACKUP_STORAGE_KEY);
+          }
+        }
+      } catch (err) {
+        console.log('SwapStore: backup restore failed:', err);
+      }
+      // Push the current bucket out to subscribers so anyone that read
+      // before the bind sees the real records now.
+      const fresh = await this._readRaw();
+      SwapStore.notify(fresh);
+    });
+  }
+
+  /**
+   * Phase 2 — write the current wallet's swap records to the single-slot
+   * backup key (overwriting whatever was there) and delete the live bucket.
+   * Mirrors `RPCModule.doSaveBackup` for the wallet file: invoked from
+   * `WalletLifecycleService.changeWallet` (the with-backup path) right
+   * before the wallet file itself is replaced.
+   *
+   * Pre-condition: the store must be bound (the slot is keyed off the
+   * current fingerprint). No-op if unbound; callers should pass through to
+   * the existing wallet-backup flow rather than failing the whole change.
+   */
+  static async backupCurrentToSlot(): Promise<void> {
+    return this.enqueue(async () => {
+      const fp = currentWalletFingerprint;
+      if (!fp) {
+        console.log('SwapStore: backupCurrentToSlot — no wallet bound, skip');
+        return;
+      }
+      try {
+        const liveKey = storageKeyFor(fp);
+        const liveRaw = await EncryptedStorage.getItem(liveKey);
+        const records: SwapRecordType[] = liveRaw
+          ? (() => {
+              try {
+                const p = JSON.parse(liveRaw);
+                return Array.isArray(p) ? (p as SwapRecordType[]) : [];
+              } catch {
+                return [];
+              }
+            })()
+          : [];
+        const payload: BackupSlotPayload = { fp, records };
+        await EncryptedStorage.setItem(
+          BACKUP_STORAGE_KEY,
+          JSON.stringify(payload),
+        );
+        await EncryptedStorage.removeItem(liveKey);
         SwapStore.notify([]);
       } catch (err) {
-        console.log('SwapStore: clear failed:', err);
+        console.log('SwapStore: backupCurrentToSlot failed:', err);
       }
     });
   }
 
+  /**
+   * Wipe the records for a specific wallet's bucket. Invoked from the
+   * wallet-lifecycle hooks (e.g. `changeWalletNoBackup`) before the wallet
+   * file itself is deleted, so the swap records of a wallet the user is
+   * abandoning do not linger on disk.
+   */
+  static async clearForWallet(fingerprint: string): Promise<void> {
+    return this.enqueue(async () => {
+      try {
+        await EncryptedStorage.removeItem(storageKeyFor(fingerprint));
+        if (fingerprint === currentWalletFingerprint) {
+          SwapStore.notify([]);
+        }
+      } catch (err) {
+        console.log('SwapStore: clearForWallet failed:', err);
+      }
+    });
+  }
+
+  /**
+   * Wipe the current wallet's records. No-op if no wallet is bound (we
+   * cannot know which bucket to target). Callers that hold an explicit
+   * fingerprint should prefer `clearForWallet`.
+   */
+  static async clear(): Promise<void> {
+    if (!currentWalletFingerprint) return;
+    return this.clearForWallet(currentWalletFingerprint);
+  }
+
   /** Bypasses the queue — only call from within an `enqueue` callback. */
   private static async _readRaw(): Promise<SwapRecordType[]> {
+    if (!currentWalletFingerprint) return [];
     let raw: string | null = null;
     try {
-      raw = await EncryptedStorage.getItem(STORAGE_KEY);
+      raw = await EncryptedStorage.getItem(
+        storageKeyFor(currentWalletFingerprint),
+      );
     } catch (err) {
       console.log('SwapStore: encrypted read failed, returning empty:', err);
       return [];
@@ -223,7 +417,14 @@ export class SwapStore {
 
   /** Bypasses the queue — only call from within an `enqueue` callback. */
   private static async _writeRaw(records: SwapRecordType[]): Promise<void> {
-    await EncryptedStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    if (!currentWalletFingerprint) {
+      console.log('SwapStore: write skipped — no wallet bound');
+      return;
+    }
+    await EncryptedStorage.setItem(
+      storageKeyFor(currentWalletFingerprint),
+      JSON.stringify(records),
+    );
   }
 }
 
@@ -278,4 +479,20 @@ function migrateBroadcastTxIds(record: SwapRecordType): SwapRecordType {
 function migrateRecordId(record: SwapRecordType): SwapRecordType {
   if (record.recordId && record.recordId.length > 0) return record;
   return { ...record, recordId: record.depositAddress };
+}
+
+/**
+ * Merge two record lists by `recordId`, with entries from `winners` taking
+ * precedence on collision. Order: every winning entry first (in its own
+ * order), then any loser that has no winning counterpart, preserving
+ * loser order. Used by `bindToWallet` when the backup slot for the
+ * current wallet has to be merged into an already-existing live bucket.
+ */
+function mergeRecordsById(
+  losers: SwapRecordType[],
+  winners: SwapRecordType[],
+): SwapRecordType[] {
+  const winnerIds = new Set(winners.map(r => r.recordId));
+  const survivingLosers = losers.filter(r => !winnerIds.has(r.recordId));
+  return [...winners, ...survivingLosers];
 }

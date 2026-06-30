@@ -153,6 +153,8 @@
     "differentchain-error": "Farklı bir zincire sahip bir sunucuya geçiyorsunuz, bu kurtarma ifadesi olmadan bu cüzdana artık erişiminiz olmayacak.",
     "serverchain-mismatch": "Sunucu seçtiğinizden farklı bir zincir bildiriyor. Zincir seçiciyi kontrol edip tekrar deneyin.",
     "changingwallet-label": "Error Cüzdan değiştirilirken bir hata oluştu",
+    "changewallet-pending-swaps-title": "Bekleyen swap işlemleri",
+    "changewallet-pending-swaps-body": "Hâlâ devam eden {count} swap işlemin var. Cüzdanı değiştirmek bu cihazdan takip geçmişini kalıcı olarak silecek. Devam edilsin mi?",
     "restoringwallet-label": "Error Cüzdan geri yüklenirken bir hata oluştu",
     "computingtx": "İşlem Hesaplanıyor...",
     "computingtx-hangon": "Sabırlı olun,\nbir an sürecek...",

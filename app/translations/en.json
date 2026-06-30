@@ -153,6 +153,8 @@
     "differentchain-error": "You are changing to a server with a different chain, you will no longer have access to this wallet without the seed phrase.",
     "serverchain-mismatch": "The server reports a different chain than the one you selected. Check the chain selector and try again.",
     "changingwallet-label": "Error changing Wallet",
+    "changewallet-pending-swaps-title": "Pending swaps",
+    "changewallet-pending-swaps-body": "You have {count} swap(s) still in progress. Changing wallet will permanently remove their tracking history from this device. Continue?",
     "restoringwallet-label": "Error restoring Wallet",
     "computingtx": "Computing Transaction...",
     "computingtx-hangon": "Hang on tight,\nthis will just take a moment...",

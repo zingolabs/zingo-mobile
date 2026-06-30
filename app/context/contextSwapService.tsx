@@ -3,11 +3,17 @@ import React, {
   ReactNode,
   useContext,
   useEffect,
-  useMemo,
+  useState,
 } from 'react';
 
 import { ChainNameEnum } from '../AppState/enums/ChainNameEnum';
-import { SwapService, createSwapService } from '../swap';
+import RPCModule from '../RPCModule';
+import {
+  SwapService,
+  SwapStore,
+  createSwapService,
+  deriveWalletFingerprint,
+} from '../swap';
 import { SWAPKIT_API_KEY } from '../swap/swapKitSecrets';
 
 /**
@@ -49,26 +55,64 @@ export function SwapServiceProvider({
   apiKey,
   children,
 }: SwapServiceProviderProps): React.JSX.Element {
-  const service = useMemo<SwapService | null>(() => {
-    if (chainName !== ChainNameEnum.mainChainName) return null;
-    try {
-      return createSwapService({
-        apiKey: apiKey ?? SWAPKIT_API_KEY,
-        chainName,
-      });
-    } catch (err) {
-      console.log('SwapServiceProvider: createSwapService failed:', err);
-      return null;
-    }
-  }, [chainName, apiKey]);
+  // The service is gated on two async preconditions:
+  //   1. The wallet must be loaded so `RPCModule.getUfvkInfo()` returns a
+  //      UFVK we can derive a per-wallet fingerprint from. SwapServiceProvider
+  //      lives inside LoadedApp so the wallet is already in memory by the
+  //      time we mount; the call resolves in milliseconds.
+  //   2. `SwapStore.bindToWallet(fp)` must complete so any subsequent
+  //      record read/write lands in the namespaced bucket — never in the
+  //      legacy global key that pre-namespacing builds wrote to.
+  // Until both succeed we publish `null` so callers (the Swap screen and
+  // poller-aware consumers) gate themselves the same way they already gate
+  // on testnet/regtest. Failures (missing UFVK, bind crash) also resolve to
+  // `null`; the swap entry point hides itself and the rest of the app
+  // proceeds normally.
+  const [service, setService] = useState<SwapService | null>(null);
 
   useEffect(() => {
-    if (!service) return;
-    service.startPolling();
+    if (chainName !== ChainNameEnum.mainChainName) {
+      setService(null);
+      return;
+    }
+    let cancelled = false;
+    let created: SwapService | null = null;
+    (async () => {
+      try {
+        const raw = await RPCModule.getUfvkInfo();
+        if (cancelled) return;
+        if (raw.startsWith('error')) {
+          console.log('SwapServiceProvider: getUfvkInfo error:', raw);
+          return;
+        }
+        const parsed = JSON.parse(raw) as { ufvk?: string };
+        const ufvk = parsed.ufvk ?? '';
+        const fingerprint = deriveWalletFingerprint(ufvk);
+        if (!fingerprint) {
+          console.log('SwapServiceProvider: empty fingerprint, skipping bind');
+          return;
+        }
+        await SwapStore.bindToWallet(fingerprint);
+        if (cancelled) return;
+        created = createSwapService({
+          apiKey: apiKey ?? SWAPKIT_API_KEY,
+          chainName,
+        });
+        if (cancelled) return;
+        setService(created);
+        created.startPolling();
+      } catch (err) {
+        console.log('SwapServiceProvider: init failed:', err);
+      }
+    })();
     return () => {
-      service.stopPolling();
+      cancelled = true;
+      if (created) {
+        created.stopPolling();
+      }
+      setService(null);
     };
-  }, [service]);
+  }, [chainName, apiKey]);
 
   return (
     <SwapServiceContext.Provider value={service}>

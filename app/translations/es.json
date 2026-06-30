@@ -153,6 +153,8 @@
     "differentchain-error": "Estás cambiando a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin tu frase semilla.",
     "serverchain-mismatch": "El servidor reporta una cadena diferente a la seleccionada. Revisa el selector de cadena e inténtalo de nuevo.",
     "changingwallet-label": "Error cambiando de Monedero",
+    "changewallet-pending-swaps-title": "Swaps pendientes",
+    "changewallet-pending-swaps-body": "Tienes {count} swap(s) aún en curso. Cambiar de billetera eliminará definitivamente su historial de seguimiento de este dispositivo. ¿Continuar?",
     "restoringwallet-label": "Error restaurando el Monedero",
     "computingtx": "Procesando Transacción...",
     "computingtx-hangon": "Aguanta un poco,\nesto solo tardará un momento...",
