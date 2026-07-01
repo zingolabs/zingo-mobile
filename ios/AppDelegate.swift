@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 import BackgroundTasks
 import Network
-import Security
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 
@@ -614,68 +613,22 @@ extension AppDelegate {
         return json
     }
 
-    /// Reads the persisted settings as a JSON string.
-    ///
-    /// Primary source: the Keychain item written by `react-native-encrypted-storage`
-    /// (the JS-side `SettingsFileImpl` writes here since Zingo Beta 2.0.21 (313),
-    /// Audit Issue N). We issue the same `SecItemCopyMatching` query the RN
-    /// module uses (`kSecClassGenericPassword` + account `"settings"`), so we
-    /// read the same bytes the JS side wrote without going through the React
-    /// bridge — which isn't available inside a `BGProcessingTask` callback.
-    ///
-    /// Fallback: the legacy plain `settings.json` in the Documents directory.
-    /// Still present when the user has not yet opened the app under Zingo Beta
-    /// 2.0.21 (313) or later (the JS `readSettings` migrates and deletes it
-    /// on first read). Without this fallback a fresh upgrade that schedules
-    /// the background task before the user opens the app would have no
-    /// settings to read.
-    ///
-    /// Caveat — device-locked: `react-native-encrypted-storage` stores items
-    /// with the default accessibility (`kSecAttrAccessibleWhenUnlocked`),
-    /// so a background task that fires while the device is locked cannot
-    /// read the Keychain. In that case we also fall back to the legacy file
-    /// (which may not exist either, in which case the caller proceeds and
-    /// lets the downstream sync surface its own error).
-    ///
-    /// Returns nil when neither source has data.
-    private func readSettingsString() -> String? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: "settings",
-            kSecReturnData as String: kCFBooleanTrue!,
-            kSecMatchLimit as String: kSecMatchLimitOne,
-        ]
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &item)
-        if status == errSecSuccess,
-           let data = item as? Data,
-           let value = String(data: data, encoding: .utf8) {
-            return value
-        }
-        if status != errSecItemNotFound {
-            NSLog("Keychain read for 'settings' failed (status \(status)), will try legacy settings.json")
-        }
-
+    /// Reads settings.json and loads the wallet file when a server URI is
+    /// configured. Returns `true` to signal the caller may proceed with sync, or
+    /// `false` only when the user is explicitly in offline mode (empty server
+    /// URI) and sync must be skipped. On any other unexpected condition the
+    /// function returns `true` so the downstream sync path surfaces its own
+    /// error rather than masquerading as offline mode.
+    func loadWalletFile() -> Bool {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         guard let documentsDirectory = paths.first else {
-            return nil
+            NSLog("Error: Unable to find documents directory")
+            return true
         }
-        let legacyPath = "\(documentsDirectory)/settings.json"
-        guard FileManager.default.fileExists(atPath: legacyPath) else {
-            return nil
-        }
-        return try? String(contentsOfFile: legacyPath, encoding: .utf8)
-    }
 
-    /// Reads settings and loads the wallet file when a server URI is
-    /// configured. Returns `true` to signal the caller may proceed with sync,
-    /// or `false` only when the user is explicitly in offline mode (empty
-    /// server URI) and sync must be skipped. On any other unexpected
-    /// condition the function returns `true` so the downstream sync path
-    /// surfaces its own error rather than masquerading as offline mode.
-    func loadWalletFile() -> Bool {
-        guard let content = readSettingsString() else {
-            NSLog("Settings not found in Keychain nor legacy file - proceeding with sync; downstream will surface any error")
+        let fileName = "\(documentsDirectory)/settings.json"
+        guard let content = try? String(contentsOfFile: fileName, encoding: .utf8) else {
+            NSLog("Error: Unable to read file at path \(fileName)")
             return true
         }
 
@@ -684,7 +637,7 @@ extension AppDelegate {
               let server = jsonObject["server"] as? [String: Any],
               let serveruri = server["uri"] as? String,
               let chainhint = server["chainName"] as? String else {
-            NSLog("Error: Unable to parse JSON object from settings")
+            NSLog("Error: Unable to parse JSON object from file at path \(fileName)")
             return true
         }
 

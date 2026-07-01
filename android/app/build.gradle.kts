@@ -378,30 +378,6 @@ dependencies {
     // back navigation implementation
     implementation("androidx.activity:activity:1.10.1")
 
-    // Encrypted file/preferences storage.
-    //
-    // Force `androidx.security:security-crypto:1.1.0-alpha06` over the 1.0.0
-    // we used to declare and the 1.1.0-alpha03 that `react-native-encrypted-
-    // storage` drags in transitively: alpha06 is the most recent in the
-    // 1.1.x line and ships with a Tink Aead/DAead path that handles
-    // masterKey-invalidation gracefully (the older versions threw
-    // GeneralSecurityException, which the RN lib then catches and silently
-    // falls back to plain SharedPreferences over the same file — corrupting
-    // the encrypted blobs and effectively wiping persisted settings on the
-    // next read).
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
-}
-
-// Force a modern Tink so the AndroidKeysetManager has the wrapped-keyset
-// recovery improvements introduced after 1.5.x. `security-crypto:1.1.0-alpha03`
-// (still pulled transitively from `react-native-encrypted-storage`) defaults
-// to `tink-android:1.5.0`, which throws on a wrapped-keyset that can't be
-// decrypted with the current masterKey — the trigger for the silent settings
-// loss observed in production. Tink 1.9+ replaces the throw with a controlled
-// re-generation path; we pin 1.9.0 as a conservative choice (newer minor
-// versions are API-compatible but introduce more surface we don't exercise).
-configurations.all {
-    resolutionStrategy {
-        force("com.google.crypto.tink:tink-android:1.9.0")
-    }
+    // encrypted file storage
+    implementation("androidx.security:security-crypto:1.0.0")
 }

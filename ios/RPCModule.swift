@@ -94,9 +94,6 @@ class RPCModule: NSObject {
   //
   // `saveBackgroundFile` deliberately does NOT route through this
   // helper — see its own comment for the BGAppRefreshTask rationale.
-  // Settings (the other path the audit cited) live in
-  // `react-native-encrypted-storage`, which is backed by Keychain
-  // Services on iOS.
   func writeFile(_ fileName: String, fileBase64EncodedString: String) throws {
     let filePath = try getFileName(fileName)
     try fileBase64EncodedString.write(toFile: filePath, atomically: true, encoding: .utf8)
@@ -206,9 +203,8 @@ class RPCModule: NSObject {
   // So this path stays at the iOS default protection class
   // (`completeUntilFirstUserAuthentication` since iOS 7): still
   // encrypted at rest, key available after the first post-boot unlock,
-  // accessible to background tasks afterwards. Audit Issue N's literal
-  // scope was wallet + settings (both covered elsewhere); the sync
-  // metadata stored here is not wallet-recovery material.
+  // accessible to background tasks afterwards. The sync metadata
+  // stored here is not wallet-recovery material.
   func saveBackgroundFile(_ jsonString: String) throws {
     do {
       // the content of this JSON can be represented safely in utf8.
