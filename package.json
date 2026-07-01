@@ -47,7 +47,7 @@
     "buffer": "^6.0.3",
     "date-fns": "^4.4.0",
     "i18n-js": "^4.5.1",
-    "js-base64": "^3.7.8",
+    "js-base64": "^3.8.0",
     "lodash": "^4.17.21",
     "patch-package": "^8.0.0",
     "randomcolor": "^0.6.2",
