@@ -3,6 +3,58 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import { SwapRecordType } from './types/SwapRecordType';
 
 /**
+ * "Delete" a key by overwriting it with a valid but empty payload and
+ * *then* trying to remove it. Rationale:
+ *
+ *   - iOS's `EncryptedStorage.removeItem` throws `errSecItemNotFound`
+ *     (-25300) in states where `getItem` for the same key returns
+ *     non-null. Once the module reaches this state, subsequent `removeItem`
+ *     calls fail forever, and every bind logs the same failure.
+ *   - By writing `emptyPayload` first, we force the key into a
+ *     known-good, no-op state (`[]` for buckets, or a stub for the
+ *     backup slot). Even if the removeItem below fails, future reads
+ *     parse successfully and produce empty results — the noise stops.
+ *   - `removeItem` failures are still logged at debug so we can spot
+ *     platform-level bugs but never surface as recurring errors.
+ */
+async function markKeyAsCleared(
+  key: string,
+  emptyPayload: string,
+): Promise<void> {
+  try {
+    await EncryptedStorage.setItem(key, emptyPayload);
+  } catch (err) {
+    // If we can't even overwrite, log and move on. Future reads will
+    // return whatever was there (parseable or not); the read paths
+    // tolerate both.
+    const msg = err instanceof Error ? err.message : String(err);
+    console.log(`SwapStore: markKeyAsCleared(${key}) setItem failed:`, msg);
+    return;
+  }
+  try {
+    await EncryptedStorage.removeItem(key);
+  } catch {
+    // Removal is best-effort; the overwrite above is what actually
+    // makes future reads harmless. Swallow silently — no log noise.
+  }
+}
+
+/**
+ * Parse a raw string as a JSON array of `SwapRecordType`. Returns `null` on
+ * any failure so callers can distinguish "invalid data, discard" from
+ * "empty array, keep". Used to validate the legacy-key contents and the
+ * backup slot before we act on them.
+ */
+function tryParseRecordsArray(raw: string): SwapRecordType[] | null {
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as SwapRecordType[]) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Persistent store for `SwapRecord`s.
  *
  * Backed by `react-native-encrypted-storage` (Android Keystore-backed
@@ -238,27 +290,45 @@ export class SwapStore {
   static async bindToWallet(fingerprint: string): Promise<void> {
     return this.enqueue(async () => {
       currentWalletFingerprint = fingerprint;
+      // Legacy-key migration. Two failure modes to handle silently on a
+      // fresh install:
+      //   1. Key absent — `getItem` returns null, we skip.
+      //   2. Key present but garbage (e.g. the literal string "undefined"
+      //      from a corrupted prior write). Do NOT propagate garbage into
+      //      the namespaced bucket — parse and validate first; if the
+      //      contents don't look like a SwapRecord[], discard the legacy
+      //      key without migrating.
       try {
         const legacy = await EncryptedStorage.getItem(LEGACY_STORAGE_KEY);
         if (legacy !== null) {
-          const targetKey = storageKeyFor(fingerprint);
-          const existing = await EncryptedStorage.getItem(targetKey);
-          if (existing === null) {
-            await EncryptedStorage.setItem(targetKey, legacy);
+          const legacyRecords = tryParseRecordsArray(legacy);
+          if (legacyRecords !== null) {
+            const targetKey = storageKeyFor(fingerprint);
+            const existing = await EncryptedStorage.getItem(targetKey);
+            if (existing === null) {
+              await EncryptedStorage.setItem(
+                targetKey,
+                JSON.stringify(legacyRecords),
+              );
+            }
           }
-          // Delete the legacy key regardless of whether we wrote — once
-          // namespacing is live, the global key must never persist or it
-          // becomes a future leak vector when a different wallet binds.
-          await EncryptedStorage.removeItem(LEGACY_STORAGE_KEY);
+          // Overwrite the legacy key with an empty array (and try to
+          // remove it too). If the underlying platform refuses removal
+          // — e.g. iOS Keychain rejects removeItem despite a successful
+          // read — the overwrite still normalises the value so future
+          // reads see a valid empty array and this whole branch becomes
+          // a silent no-op instead of a re-triggered error every session.
+          await markKeyAsCleared(LEGACY_STORAGE_KEY, '[]');
         }
       } catch (err) {
-        console.log('SwapStore: legacy migration failed:', err);
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log('SwapStore: legacy migration failed:', msg);
       }
       // Phase 2: opportunistic restore from the single-slot backup. If the
       // last wallet that was saved-with-backup was THIS one (matching fp),
       // move the records back into the live bucket and clear the slot.
-      // Different fp → leave the backup untouched; it may still be needed
-      // by a future bind. No-op if the slot is empty (typical case).
+      // Different fp → leave the backup untouched. Absent/corrupt slot →
+      // discard silently. Fresh install → no-op.
       try {
         const raw = await EncryptedStorage.getItem(BACKUP_STORAGE_KEY);
         if (raw !== null) {
@@ -273,11 +343,12 @@ export class SwapStore {
               payload = parsed as BackupSlotPayload;
             }
           } catch (parseErr) {
+            const msg =
+              parseErr instanceof Error ? parseErr.message : String(parseErr);
             console.log(
               'SwapStore: backup slot parse failed, discarding:',
-              parseErr,
+              msg,
             );
-            await EncryptedStorage.removeItem(BACKUP_STORAGE_KEY);
           }
           if (payload && payload.fp === fingerprint) {
             // Merge by recordId so a live bucket that already exists from
@@ -288,22 +359,34 @@ export class SwapStore {
             const liveKey = storageKeyFor(fingerprint);
             const liveRaw = await EncryptedStorage.getItem(liveKey);
             const liveRecords: SwapRecordType[] = liveRaw
-              ? (() => {
-                  try {
-                    const p = JSON.parse(liveRaw);
-                    return Array.isArray(p) ? (p as SwapRecordType[]) : [];
-                  } catch {
-                    return [];
-                  }
-                })()
+              ? (tryParseRecordsArray(liveRaw) ?? [])
               : [];
             const merged = mergeRecordsById(liveRecords, payload.records);
             await EncryptedStorage.setItem(liveKey, JSON.stringify(merged));
-            await EncryptedStorage.removeItem(BACKUP_STORAGE_KEY);
+            // Mark the slot consumed with an empty-fp payload so future
+            // binds parse it cleanly and skip the restore path (no fp
+            // ever matches the empty string). Preferred over
+            // `removeItem`, which iOS Keychain sometimes rejects.
+            await markKeyAsCleared(
+              BACKUP_STORAGE_KEY,
+              JSON.stringify({ fp: '', records: [] }),
+            );
+          } else if (payload === null) {
+            // Slot existed but its contents were garbage — clean it up so
+            // we don't hit the same parse error on every bind.
+            // Mark the slot consumed with an empty-fp payload so future
+            // binds parse it cleanly and skip the restore path (no fp
+            // ever matches the empty string). Preferred over
+            // `removeItem`, which iOS Keychain sometimes rejects.
+            await markKeyAsCleared(
+              BACKUP_STORAGE_KEY,
+              JSON.stringify({ fp: '', records: [] }),
+            );
           }
         }
       } catch (err) {
-        console.log('SwapStore: backup restore failed:', err);
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log('SwapStore: backup restore failed:', msg);
       }
       // Push the current bucket out to subscribers so anyone that read
       // before the bind sees the real records now.
@@ -333,25 +416,33 @@ export class SwapStore {
       try {
         const liveKey = storageKeyFor(fp);
         const liveRaw = await EncryptedStorage.getItem(liveKey);
-        const records: SwapRecordType[] = liveRaw
-          ? (() => {
-              try {
-                const p = JSON.parse(liveRaw);
-                return Array.isArray(p) ? (p as SwapRecordType[]) : [];
-              } catch {
-                return [];
-              }
-            })()
-          : [];
+        // Only write a backup slot when there is something to preserve.
+        // Fresh wallets have no live bucket → skip both the setItem and
+        // the removeItem. This is the "no swaps" case where the previous
+        // implementation was surfacing spurious errSecItemNotFound errors.
+        if (liveRaw === null) return;
+        const records = tryParseRecordsArray(liveRaw);
+        if (records === null || records.length === 0) {
+          // Garbage or empty array in the live bucket — normalise to
+          // valid empty without writing a backup that would carry the
+          // garbage forward.
+          await markKeyAsCleared(liveKey, '[]');
+          SwapStore.notify([]);
+          return;
+        }
         const payload: BackupSlotPayload = { fp, records };
         await EncryptedStorage.setItem(
           BACKUP_STORAGE_KEY,
           JSON.stringify(payload),
         );
-        await EncryptedStorage.removeItem(liveKey);
+        // Live bucket is now duplicated in the backup slot — safe to
+        // normalise it to empty. Same overwrite strategy as everywhere
+        // else in this file.
+        await markKeyAsCleared(liveKey, '[]');
         SwapStore.notify([]);
       } catch (err) {
-        console.log('SwapStore: backupCurrentToSlot failed:', err);
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log('SwapStore: backupCurrentToSlot failed:', msg);
       }
     });
   }
@@ -364,13 +455,11 @@ export class SwapStore {
    */
   static async clearForWallet(fingerprint: string): Promise<void> {
     return this.enqueue(async () => {
-      try {
-        await EncryptedStorage.removeItem(storageKeyFor(fingerprint));
-        if (fingerprint === currentWalletFingerprint) {
-          SwapStore.notify([]);
-        }
-      } catch (err) {
-        console.log('SwapStore: clearForWallet failed:', err);
+      // Overwrite to `[]` (and best-effort remove) so future binds see a
+      // clean empty bucket even if the platform rejects the removal.
+      await markKeyAsCleared(storageKeyFor(fingerprint), '[]');
+      if (fingerprint === currentWalletFingerprint) {
+        SwapStore.notify([]);
       }
     });
   }
@@ -388,31 +477,31 @@ export class SwapStore {
   /** Bypasses the queue — only call from within an `enqueue` callback. */
   private static async _readRaw(): Promise<SwapRecordType[]> {
     if (!currentWalletFingerprint) return [];
+    const key = storageKeyFor(currentWalletFingerprint);
     let raw: string | null = null;
     try {
-      raw = await EncryptedStorage.getItem(
-        storageKeyFor(currentWalletFingerprint),
-      );
+      raw = await EncryptedStorage.getItem(key);
     } catch (err) {
       console.log('SwapStore: encrypted read failed, returning empty:', err);
       return [];
     }
     if (raw === null) return [];
-    try {
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) {
-        console.log(
-          'SwapStore: stored value is not an array, treating as empty',
-        );
-        return [];
+    const parsed = tryParseRecordsArray(raw);
+    if (parsed === null) {
+      // Corrupt or non-array data. Self-heal by overwriting with `[]` so
+      // future reads succeed cleanly and we don't log the same parse
+      // failure every time the poller or a subscriber tick reads the
+      // bucket. Log once, then move on.
+      console.log('SwapStore: live bucket unparseable, healing with []');
+      try {
+        await EncryptedStorage.setItem(key, '[]');
+      } catch {
+        // Best-effort. If setItem also fails we still return empty —
+        // the app keeps working; only the log noise persists.
       }
-      return (parsed as SwapRecordType[])
-        .map(migrateBroadcastTxIds)
-        .map(migrateRecordId);
-    } catch (err) {
-      console.log('SwapStore: JSON parse failed, treating as empty:', err);
       return [];
     }
+    return parsed.map(migrateBroadcastTxIds).map(migrateRecordId);
   }
 
   /** Bypasses the queue — only call from within an `enqueue` callback. */

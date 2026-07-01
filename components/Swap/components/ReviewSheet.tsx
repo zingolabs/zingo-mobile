@@ -41,6 +41,7 @@ import {
   SwapKitProviderEnum,
   SwapRecordType,
   SwapService,
+  formatAmountForDisplay,
 } from '../../../app/swap';
 import { FiatValueBasisType } from '../../../app/swap/types/FiatValueBasisType';
 import BoldText from '../../Components/BoldText';
@@ -503,7 +504,7 @@ function ReviewView(props: {
       <SummaryRow
         colors={colors}
         label={t('swap.you-send', 'You send')}
-        primary={`${sellAmount} ${sellSymbol}`}
+        primary={`${formatAmountForDisplay(sellAmount)} ${sellSymbol}`}
         secondary={
           fiatValueBasis.sellUsdUnitPrice > 0
             ? `≈ $${sellUsd.toFixed(2)}`
@@ -513,7 +514,7 @@ function ReviewView(props: {
       <SummaryRow
         colors={colors}
         label={t('swap.you-receive', 'You receive')}
-        primary={`${receiveAmount} ${receiveSymbol}`}
+        primary={`${formatAmountForDisplay(receiveAmount)} ${receiveSymbol}`}
         secondary={
           fiatValueBasis.receiveUsdUnitPrice > 0
             ? `≈ $${receiveUsd.toFixed(2)}`
@@ -749,14 +750,14 @@ function PostCommitView(props: {
         <SummaryRow
           colors={colors}
           label={t('swap.you-sent', 'You sent')}
-          primary={`${instructions.amountHumanDecimal} ${
+          primary={`${formatAmountForDisplay(instructions.amountHumanDecimal)} ${
             record.sellAsset.ticker ?? record.sellAsset.symbol
           }`}
         />
         <SummaryRow
           colors={colors}
           label={t('swap.expected-receive', 'Expected to receive')}
-          primary={`${record.expectedReceiveAmount} ${
+          primary={`${formatAmountForDisplay(record.expectedReceiveAmount)} ${
             // Use the clean ticker, falling back to symbol only when the
             // catalog omits a ticker. Mirrors the "You sent" row above.
             // The previous `symbol`-only version was emitting noise like

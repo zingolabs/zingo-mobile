@@ -13,7 +13,7 @@ import {
 
 import { ThemeType } from '../../../app/types';
 import { TranslateType } from '../../../app/AppState';
-import { RouteOptionType } from '../../../app/swap';
+import { RouteOptionType, formatAmountForDisplay } from '../../../app/swap';
 import BoldText from '../../Components/BoldText';
 import FadeText from '../../Components/FadeText';
 import RegText from '../../Components/RegText';
@@ -220,7 +220,7 @@ const QuotesPickerSheet = forwardRef<BottomSheetModal, QuotesPickerSheetProps>(
                       )}
                     </View>
                     <BoldText style={{ color: colors.primary }}>
-                      {`${formatAmount(route.expectedReceiveAmount)} ${receiveSymbol}`}
+                      {`${formatAmountForDisplay(route.expectedReceiveAmount)} ${receiveSymbol}`}
                     </BoldText>
                   </View>
                   <View style={styles.cardBottomRow}>
@@ -243,7 +243,7 @@ const QuotesPickerSheet = forwardRef<BottomSheetModal, QuotesPickerSheetProps>(
                       </RegText>
                     </View>
                     <FadeText style={styles.feeText}>
-                      {`${t('swap.fee-prefix', 'Fee')}: ${formatAmount(
+                      {`${t('swap.fee-prefix', 'Fee')}: ${formatAmountForDisplay(
                         feeInZec,
                       )} ZEC`}
                     </FadeText>
@@ -260,14 +260,6 @@ const QuotesPickerSheet = forwardRef<BottomSheetModal, QuotesPickerSheetProps>(
 
 QuotesPickerSheet.displayName = 'QuotesPickerSheet';
 export default QuotesPickerSheet;
-
-/** Compact display formatter for receive/fee amounts. 4 decimals for values
- *  ≥ 1, 8 decimals otherwise. Returns "0" for missing / zero. */
-function formatAmount(raw: string | undefined): string {
-  const n = parseFloat(raw ?? '0');
-  if (!Number.isFinite(n) || n === 0) return '0';
-  return n >= 1 ? n.toFixed(4) : n.toFixed(8);
-}
 
 const styles = StyleSheet.create({
   body: {

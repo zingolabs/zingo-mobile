@@ -49,6 +49,7 @@ import {
 } from './SwapKitClient';
 import { SwapStore, SwapStoreChangeListener } from './SwapStore';
 import { deriveWalletFingerprint } from './walletFingerprint';
+import { formatAmountForDisplay } from './formatAmountForDisplay';
 import {
   swapRecordToValueTransfer,
   isOutboundSwap,
@@ -152,6 +153,9 @@ export {
   deriveWalletFingerprint,
   swapRecordToValueTransfer,
   isOutboundSwap,
+
+  // Display helpers
+  formatAmountForDisplay,
 
   // Token catalog
   TokenCatalog,

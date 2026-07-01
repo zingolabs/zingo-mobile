@@ -51,6 +51,7 @@ import {
   SwapRecordType,
   SwapStatusEnum,
   SwapStore,
+  formatAmountForDisplay,
 } from '../../app/swap';
 import { FiatValueBasisType } from '../../app/swap/types/FiatValueBasisType';
 import { SwapAssetType } from '../../app/swap/types/SwapAssetType';
@@ -572,7 +573,7 @@ function SwapDetailBody(props: {
           style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}
         >
           <RegText style={{ color: colors.text, fontSize: 16 }}>
-            {`${record.sellAmountHumanDecimal} ${sellSymbol}`}
+            {`${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSymbol}`}
           </RegText>
           <RegText
             style={{ color: colors.text, marginHorizontal: 10, fontSize: 18 }}
@@ -580,7 +581,7 @@ function SwapDetailBody(props: {
             {directionArrow}
           </RegText>
           <RegText style={{ color: colors.text, fontSize: 16 }}>
-            {`${record.expectedReceiveAmount} ${receiveSymbol}`}
+            {`${formatAmountForDisplay(record.expectedReceiveAmount)} ${receiveSymbol}`}
           </RegText>
         </View>
         {(() => {
@@ -661,17 +662,17 @@ function SwapDetailBody(props: {
         <DetailRow
           colors={colors}
           label={translate('swapdetail.amount-sent') as string}
-          value={`${record.sellAmountHumanDecimal} ${sellSymbol}`}
+          value={`${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSymbol}`}
         />
         <DetailRow
           colors={colors}
           label={translate('swapdetail.amount-expected') as string}
-          value={`${record.expectedReceiveAmount} ${receiveSymbol}`}
+          value={`${formatAmountForDisplay(record.expectedReceiveAmount)} ${receiveSymbol}`}
         />
         <DetailRow
           colors={colors}
           label={translate('swapdetail.amount-min') as string}
-          value={`${record.minReceiveAmount} ${receiveSymbol}`}
+          value={`${formatAmountForDisplay(record.minReceiveAmount)} ${receiveSymbol}`}
         />
       </View>
 
@@ -690,7 +691,7 @@ function SwapDetailBody(props: {
             <FeesAggregateRow
               colors={colors}
               label={translate('swapdetail.fees-total') as string}
-              value={`${record.totalFeesInReceiveAsset} ${receiveSymbol}`}
+              value={`${formatAmountForDisplay(record.totalFeesInReceiveAsset)} ${receiveSymbol}`}
               tappable={
                 Array.isArray(record.feesRaw) && record.feesRaw.length > 0
               }
@@ -1251,7 +1252,7 @@ const FeesBreakdownSheet = forwardRef<
             const conv = conversions[i];
             const targetText =
               conv.kind === 'unconvertible'
-                ? `${conv.originalAmount} ${conv.originalAsset}`.trim()
+                ? `${formatFeeAmount(parseFloat(conv.originalAmount))} ${conv.originalAsset}`.trim()
                 : `${formatFeeAmount(conv.amountInTarget)} ${targetTicker}`.trim();
             // Subtitle: when we converted (original asset != target),
             // surface the original units in fade so the user can audit
@@ -1264,7 +1265,7 @@ const FeesBreakdownSheet = forwardRef<
               subtitle =
                 (t('swapdetail.fees-was', 'was') as string) +
                 ' ' +
-                `${conv.originalAmount} ${conv.originalAsset}`.trim();
+                `${formatFeeAmount(parseFloat(conv.originalAmount))} ${conv.originalAsset}`.trim();
             } else if (conv.kind === 'unconvertible') {
               subtitle = t(
                 'swapdetail.fees-not-convertible',

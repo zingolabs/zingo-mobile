@@ -95,11 +95,20 @@ export default function TokenLogo({
     .toUpperCase();
 
   return (
-    <View style={{ width: size, height: size }}>
+    <View style={{ width: size, height: size, overflow: 'visible' }}>
       {token.logoURI && !mainLoadFailed ? (
         <Image
+          // Force a fresh mount when the URI first becomes available or
+          // changes. iOS RN's `<Image>` occasionally fails to trigger
+          // the network fetch when the `source` prop transitions from
+          // undefined (e.g. token=null → renders LetterAvatar) to a
+          // real URI on the same node — the Image sticks on its empty
+          // state until forcibly remounted. Keying by URI sidesteps
+          // this by handing React a distinct element for each URI.
+          key={token.logoURI}
           source={{ uri: token.logoURI }}
           onError={() => setMainLoadFailed(true)}
+          resizeMode="cover"
           style={{ width: size, height: size, borderRadius: size / 2 }}
         />
       ) : (
@@ -122,11 +131,14 @@ export default function TokenLogo({
             backgroundColor: surfaceColor,
             alignItems: 'center',
             justifyContent: 'center',
+            overflow: 'visible',
           }}
         >
           <Image
+            key={chainLogoUri}
             source={{ uri: chainLogoUri }}
             onError={() => setBadgeLoadFailed(true)}
+            resizeMode="cover"
             style={{
               width: badgeSize,
               height: badgeSize,
