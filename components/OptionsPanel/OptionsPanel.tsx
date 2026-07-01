@@ -216,6 +216,20 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
 
       {/* Footer: socials + mode pill */}
       <View style={{ paddingHorizontal: 24, paddingBottom: 24 }}>
+        {/* Caption: URL copied to clipboard. Rendered ABOVE the social row
+            so the Android snackbar (anchored to the bottom of the screen)
+            cannot occlude it. Selectable so the user can also grab the URL
+            manually if the clipboard write failed silently. */}
+        {!!copiedUrl && (
+          <View
+            style={{ paddingTop: 16, paddingBottom: 4, alignItems: 'center' }}
+          >
+            <FadeText style={{ fontSize: 12, textAlign: 'center' }} selectable>
+              {copiedUrl}
+            </FadeText>
+          </View>
+        )}
+
         {socials && socials.length > 0 && (
           <View
             style={{
@@ -243,16 +257,6 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 {social.id === 'mail' && <Mail width={29} height={29} />}
               </Pressable>
             ))}
-          </View>
-        )}
-
-        {/* Caption: URL copied to clipboard. Selectable so the user can also
-            grab it manually if the clipboard write failed silently. */}
-        {!!copiedUrl && (
-          <View style={{ paddingBottom: 12, alignItems: 'center' }}>
-            <FadeText style={{ fontSize: 12, textAlign: 'center' }} selectable>
-              {copiedUrl}
-            </FadeText>
           </View>
         )}
 
