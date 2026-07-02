@@ -64,8 +64,7 @@ export type AppDrawerParamList = {
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Insight]: undefined;
   [RouteEnum.Computing]:
-    | { phase?: 'created' | 'failed'; errorMessage?: string }
-    | undefined;
+    { phase?: 'created' | 'failed'; errorMessage?: string } | undefined;
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
 
@@ -73,8 +72,7 @@ export type AppDrawerParamList = {
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
   [RouteEnum.AddressList]: AddressListNavigationState | undefined;
   [RouteEnum.ValueTransferDetail]:
-    | ValueTransferDetailNavigationState
-    | undefined;
+    ValueTransferDetailNavigationState | undefined;
   [RouteEnum.SwapDetail]: SwapDetailNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
