@@ -46,7 +46,8 @@ type SyncStatusBarProps = {
   noPrivacy: boolean | undefined;
   setPrivacyOption: ((value: boolean) => Promise<void>) | undefined;
   addLastSnackbar:
-    ((msg: string, duration?: SnackbarDurationEnum) => void) | undefined;
+    | ((msg: string, duration?: SnackbarDurationEnum) => void)
+    | undefined;
   noBalance: boolean | undefined;
 };
 

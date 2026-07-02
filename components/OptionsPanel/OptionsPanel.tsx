@@ -46,7 +46,8 @@ export type OptionsPanelAction = {
  *    native mail composer via the existing sendEmail helper).
  */
 export type OptionsPanelSocial =
-  { id: 'x' | 'github'; url: string } | { id: 'mail'; onPress: () => void };
+  | { id: 'x' | 'github'; url: string }
+  | { id: 'mail'; onPress: () => void };
 
 export type OptionsPanelProps = {
   /** Localized "Options" heading. */

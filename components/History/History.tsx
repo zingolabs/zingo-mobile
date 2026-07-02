@@ -51,7 +51,6 @@ import { swapRecordToValueTransfer } from '../../app/swap';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import Header from '../Header';
 import Utils from '../../app/utils';
-import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import {
   DataProvider,
   RecyclerListView,

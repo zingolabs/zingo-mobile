@@ -38,7 +38,8 @@ type BalanceRowProps = {
   noPrivacy: boolean | undefined;
   setPrivacyOption: ((value: boolean) => Promise<void>) | undefined;
   addLastSnackbar:
-    ((msg: string, duration?: SnackbarDurationEnum) => void) | undefined;
+    | ((msg: string, duration?: SnackbarDurationEnum) => void)
+    | undefined;
   privacy: boolean;
   translate: (key: string) => TranslateType;
   totalBalance: TotalBalanceClass | null;
