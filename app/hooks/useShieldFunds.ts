@@ -30,8 +30,7 @@ type UseShieldFundsInput = {
   translate: (key: string) => TranslateType;
   netInfo: NetInfoType;
   addLastSnackbar:
-    | ((msg: string, duration?: SnackbarDurationEnum) => void)
-    | undefined;
+    ((msg: string, duration?: SnackbarDurationEnum) => void) | undefined;
   setBackgroundError: ((title: string, err: string) => void) | undefined;
   setScrollToTop: ((v: boolean) => void) | undefined;
   setScrollToBottom: ((v: boolean) => void) | undefined;

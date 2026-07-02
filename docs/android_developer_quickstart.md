@@ -12,7 +12,14 @@
 6. Android SDK Command-line Tools.
    Install via Android Studio SDK Manager: https://developer.android.com/studio/install
    or as standalone: https://developer.android.com/tools
-7. Cargo nextest (https://nexte.st/book/installing-from-source.html)
+7. Android SDK components (via SDK Manager): Platform API 36, Build-Tools 35.0.0,
+   NDK 28.2.13676358, CMake. Required to build the app (New Architecture / C++).
+8. ccache (must be on `PATH`). React Native uses it as the C++ compiler launcher;
+   the build fails without it.
+   - **macOS**: `brew install ccache`
+   - **Linux**: `sudo apt install ccache`
+   - **Windows**: `winget install Ccache.Ccache`
+9. Cargo nextest (https://nexte.st/book/installing-from-source.html)
 
 ## Environment variables
 The React Native tools need `ANDROID_HOME`, `JAVA_HOME` and some entries on `PATH`.
@@ -56,8 +63,7 @@ For faster iteration during development you can also build natively on the host
 - `yarn rust:android-local` _(all 4 ABIs)_
 - `yarn rust:android-local arm64` _(only arm64-v8a)_
 
-Native mode requires these extras on the host:
-- NDK 28.2.13676358 (Android Studio → SDK Manager → SDK Tools → NDK Side-by-side)
+Native mode requires these extras on the host (NDK is already listed above):
 - `cargo install --version 4.0.1 cargo-ndk`
 - `cargo install --force --locked bindgen-cli`
 - `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android`
@@ -73,9 +79,12 @@ Native mode requires these extras on the host:
 2. In `File > Settings`, navigate to `Build, Execution and Deployment > Build Tools > Gradle` and
    check the `Gradle JDK` matches your JDK 18 install.
 3. In a terminal, run: `yarn start`
-4. Open the `android` directory in Android Studio as a project, select 'app' and the previously
-   created AVD in the upper toolbar and click "Run 'app'".
-   Alternatively, launch an AVD and in a separate terminal, run: `yarn android`
+4. Open the `android` directory in Android Studio as a project. In `Build Variants`,
+   select `prodDebug` (or `betaDebug`). Pick 'app' and your AVD in the toolbar and
+   click "Run 'app'".
+   Alternatively, launch an AVD and in a separate terminal, run one of:
+   - `yarn android:prod` (prodDebug)
+   - `yarn android:beta` (betaDebug)
 
 ### Android SDK Command-line Tools (Standalone)
 You can also emulate Android from the command line without using Android Studio.

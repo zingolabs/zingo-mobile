@@ -39,7 +39,7 @@ jobs:
         run: ./scripts/ci/generate-swapkit-secrets.sh
 
       - name: Restore iOS xcframework cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: |
             ios/Zingolib.xcframework
