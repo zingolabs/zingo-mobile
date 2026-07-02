@@ -1693,7 +1693,6 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
         token={ZEC_TOKEN_ENTRY}
         size={22}
         surfaceColor={colors.bottomSheetBackground}
-        forceBadge
         chainLogoUri={getChainLogoUri(ZEC_TOKEN_ENTRY.chain)}
       />
       <BoldText style={{ ...styles.assetSymbol, color: colors.primary }}>
