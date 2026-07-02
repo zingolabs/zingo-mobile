@@ -28,7 +28,7 @@ describe('VerifyAddress - snapshot', () => {
           <VerifyAddress
             closeSheet={onFn}
             screenName={ScreenEnum.Receive}
-            setHeightLayout={onFn}
+            navigation={{ navigate: onFn } as never}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),

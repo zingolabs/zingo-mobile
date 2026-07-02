@@ -14,7 +14,9 @@ import {
   Dimensions,
   Platform,
   Pressable,
+  StyleSheet,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import {
   NavigationProp,
   ParamListBase,
@@ -22,10 +24,11 @@ import {
   useTheme,
 } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
-  ButtonTypeEnum,
+  ChainNameEnum,
+  CurrencyEnum,
   FilterEnum,
   GlobalConst,
   RouteEnum,
@@ -38,9 +41,13 @@ import {
 } from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
-import Button from '../Components/Button';
+import BoldText from '../Components/BoldText';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
+import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
+import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
+import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
+import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import Header from '../Header';
 import Utils from '../../app/utils';
 import {
@@ -50,14 +57,14 @@ import {
   RecyclerListViewProps,
 } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
-import { isEqual } from 'lodash';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Swipeable } from 'react-native-gesture-handler';
-import { RPCValueTransfersStatusEnum } from '../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
+  BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
@@ -70,7 +77,10 @@ const ViewTypes = {
   WITHOUT_MONTH_REFRESH: 3,
 };
 
-type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> & {
+type HistoryProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.History
+> & {
   // side menu
   toggleMenuDrawer: () => void;
   // privacy
@@ -113,12 +123,13 @@ const History: React.FunctionComponent<HistoryProps> = ({
     doRefresh,
     zenniesDonationAddress,
     setPrivacyOption,
+    currency,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.History;
 
-  const [numVt, setNumVt] = useState<number>(50);
-  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
+  const PAGE_SIZE = 50;
+  const [numVt, setNumVt] = useState<number>(PAGE_SIZE);
   const [valueTransfersSliced, setValueTransfersSliced] = useState<
     ValueTransferType[]
   >([]);
@@ -134,10 +145,23 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [filterFailed, setFilterFailed] = useState<boolean>(false);
   const [filterMemos, setFilterMemos] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [showFooter, setShowFooter] = useState<boolean>(false);
-  const [heightLayout, setHeightLayout] = useState<number>(10);
+  // measured dynamically to compute history sheet snap points
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
+  const [usdRowH, setUsdRowH] = useState<number>(0);
+  const [priceRowH, setPriceRowH] = useState<number>(0);
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const historySheetRef = useRef<BottomSheet>(null);
+  // Track internal snap index; when snapPoints shrinks (e.g., USD currency
+  // disabled, 3 → 2 snaps), clamp the index in an effect so the sheet
+  // doesn't throw "out of range" against the stale internal position.
+  const internalSnapIndexRef = useRef<number>(0);
+  // PriceRow-appearance bump is defined further down — it depends on
+  // `historySnapPoints`, declared later in this component.
+  const prevHasPriceSnapRef = useRef<boolean>(false);
+  useDismissSheetsOnBlur();
+  const sheetSlideStyle = useOptionsPanelSheetSlide();
   const scrollViewRef =
     useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(
       null,
@@ -145,16 +169,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const swipeablesRef = useRef(new Map<number, Swipeable>());
 
   const registerSwipeable = useCallback(
-    (key: number) => (ref: Swipeable) => {
-      swipeablesRef.current.set(key, ref);
+    (key: number) => (ref: Swipeable | null) => {
+      // React invokes the callback ref with null on unmount and on recycle;
+      // storing null in the map would crash closeAllSwipeables when it tries
+      // to call .close() on a recycled or unmounted row.
+      if (ref === null) {
+        swipeablesRef.current.delete(key);
+      } else {
+        swipeablesRef.current.set(key, ref);
+      }
     },
     [],
   );
 
   const closeAllSwipeables = useCallback((exceptKey?: number) => {
     swipeablesRef.current.forEach((ref, k) => {
-      if (k !== exceptKey) {
-        // soporta ambas APIs según versión
+      if (k !== exceptKey && ref) {
         ref.close();
       }
     });
@@ -228,24 +258,113 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const _dataProvider = useMemo(
     () =>
       new DataProvider(
-        (r1: ValueTransferType, r2: ValueTransferType) => !isEqual(r1, r2),
+        // RecyclerListView's diff fires on every poll (every 5s) with up to
+        // N×N row comparisons; a deep lodash.isEqual here is what was making
+        // the list freeze. Only fields that can actually change for an
+        // existing transfer matter visually: status (pending → confirmed)
+        // and confirmations (advance with each new block). txid is the
+        // identity guard.
+        (r1: ValueTransferType, r2: ValueTransferType) =>
+          r1.txid !== r2.txid ||
+          r1.status !== r2.status ||
+          r1.confirmations !== r2.confirmations,
       ),
     [],
   );
 
   const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
 
-  const snapPoints = useMemo(() => {
-    let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
-    if (snap1 < 1) {
-      snap1 = 1;
+  // Bottom-sheet that hosts the history list itself. Snap points are ordered
+  // from smallest sheet height (most balance area visible above) to largest
+  // (only the top icons row visible above). Computed in absolute pixels from
+  // the Header's measured height + the USD row's measured height when shown.
+  //   - With USD: 3 snaps -> [ZEC+USD visible, only ZEC visible, only top icons visible]
+  //   - Without USD: 2 snaps -> [ZEC visible, only top icons visible]
+  // Top icons strip height is a code-side constant (~55 px) — same on any phone.
+  const TOP_ICONS_H = 55;
+  const SNAP_GAP = 4;
+  // Bump applied to the snaps that sit just below a balance row (low + mid);
+  // the max snap (just below the top icons strip) doesn't need it.
+  const BALANCE_SNAP_BUMP = 10;
+
+  useEffect(() => {
+    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
+    const withUsd = isMainChain && currency === CurrencyEnum.USDCurrency;
+    if (!withUsd) {
+      setUsdRowH(0);
     }
-    let snap2: number = 80;
-    if (snap1 < 80) {
-      snap2 = snap1 + 20;
+  }, [currency, server.chainName]);
+
+  const historySnapPoints = useMemo(() => {
+    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
+    const withUsd = isMainChain && currency === CurrencyEnum.USDCurrency;
+    // Until the layout reports the actual container + header heights, fall
+    // back to percentages.
+    if (containerH <= 0 || headerH <= 0) {
+      return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
-    return [`${snap1}%`, `${snap2}%`];
-  }, [heightLayout]);
+    const snapBase = containerH - headerH - SNAP_GAP;
+    // Smallest sheet: full header visible, including the PriceRow at the
+    // bottom of the Header (only present when zecPrice > 0).
+    const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
+    // "Balance visible" snap covers the PriceRow but keeps balance + USD
+    // showing — when there's no PriceRow, this collapses back to the
+    // original snapLow value.
+    const snapLow = Math.max(snapBase + priceRowH + BALANCE_SNAP_BUMP, 100);
+    const snapMid = Math.min(
+      Math.max(snapBase + priceRowH + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
+      containerH - TOP_ICONS_H - SNAP_GAP,
+    );
+    const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
+    const points: number[] = [];
+    if (priceRowH > 0) {
+      points.push(snapPrice);
+    }
+    points.push(snapLow);
+    if (withUsd && usdRowH > 0) {
+      points.push(snapMid);
+    }
+    points.push(snapMax);
+    return points;
+  }, [currency, server.chainName, containerH, headerH, usdRowH, priceRowH]);
+
+  const priceSnapIndex = priceRowH > 0 ? 0 : null;
+  const onPriceSnapChange = usePriceSnapAutoClose(
+    historySheetRef,
+    priceSnapIndex,
+    1,
+    historySnapPoints.length,
+  );
+
+  useEffect(() => {
+    if (internalSnapIndexRef.current >= historySnapPoints.length) {
+      safeSnapToIndex(
+        historySheetRef,
+        historySnapPoints.length - 1,
+        historySnapPoints.length,
+      );
+    }
+  }, [historySnapPoints]);
+
+  // Bump the sheet up by one when the PriceRow first appears so the user
+  // stays at the same visual snap (balance still showing) instead of
+  // landing on the new price snap.
+  //
+  // `historySnapPoints` is in the deps so the effect runs after React has
+  // propagated the grown array to BottomSheet; clamp is the belt-and-braces
+  // guard against any residual race that would otherwise crash with
+  // "index ... out of the provided snap points range".
+  useEffect(() => {
+    const hasPriceSnap = priceRowH > 0;
+    const justAppeared = !prevHasPriceSnapRef.current && hasPriceSnap;
+    prevHasPriceSnapRef.current = hasPriceSnap;
+    if (!justAppeared) return;
+    safeSnapToIndex(
+      historySheetRef,
+      internalSnapIndexRef.current + 1,
+      historySnapPoints.length,
+    );
+  }, [priceRowH, historySnapPoints]);
 
   const fetchValueTransfersFiltered = useMemo(() => {
     if (!valueTransfers) {
@@ -310,22 +429,23 @@ const History: React.FunctionComponent<HistoryProps> = ({
     if (valueTransfers !== null) {
       const vtf = fetchValueTransfersFiltered;
       setValueTransfersFiltered(vtf);
-      setLoadMoreButton(numVt < vtf.length);
       const vtfs = vtf.slice(0, numVt);
       setValueTransfersSliced(vtfs);
       setDataProvider(data => data.cloneWithRows(vtfs));
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
+      setLoading(false);
     }
   }, [fetchValueTransfersFiltered, numVt, valueTransfers, server.chainName]);
 
-  useEffect(() => {
-    setLoadMoreButton(numVt < valueTransfersFiltered.length);
-    const vtfs = valueTransfersFiltered.slice(0, numVt);
-    setValueTransfersSliced(vtfs);
-    setDataProvider(data => data.cloneWithRows(vtfs));
-  }, [numVt, valueTransfersFiltered]);
+  const hasMore = numVt < valueTransfersFiltered.length;
+
+  // Auto-pagination: RecyclerListView fires onEndReached when the user
+  // approaches the bottom of the list — bump `numVt` so the next page
+  // appears without any user action.
+  const onEndReached = useCallback(() => {
+    if (hasMore) {
+      setNumVt(prev => prev + PAGE_SIZE);
+    }
+  }, [hasMore]);
 
   const handleScrollToTop = useCallback(() => {
     if (scrollViewRef.current && !isScrollingToTop) {
@@ -377,10 +497,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     }
   }, [scrollToTop, handleScrollToTop, setScrollToTop]);
 
-  const loadMoreClicked = useCallback(() => {
-    setNumVt(numVt + 50);
-  }, [numVt]);
-
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
       const isTop = offsetY <= 100;
@@ -396,39 +512,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
       // Always update isAtTop for manual scrolling
       setIsAtTop(isTop);
-
-      setShowFooter(offsetY > 0);
     },
     [isScrollingToTop],
   );
 
   const setValueTransferDetailModalShow = useCallback(
     (index: number, vt: ValueTransferType) => {
-      navigation.navigate(RouteEnum.ValueTransferDetailStack, {
-        screen: RouteEnum.ValueTransferDetail,
-        params: {
-          index: index,
-          vt: vt,
-          valueTransfersSliced: valueTransfersSliced,
-          totalLength:
-            valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0,
-        },
+      navigation.navigate(RouteEnum.ValueTransferDetail, {
+        index: index,
+        vt: vt,
+        valueTransfersSliced: valueTransfersSliced,
+        totalLength:
+          valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0,
       });
     },
     [navigation, valueTransfersSliced, valueTransfersFiltered],
   );
-
-  /*
-  const setMessagesAddressModalShow = (vt: ValueTransferType) => {
-    navigation.navigate(RouteEnum.MessagesAddress, {
-      setScrollToBottom: setScrollToBottom,
-      scrollToBottom: scrollToBottom,
-      address: Utils.messagesAddress(vt),
-      sendTransaction: sendTransaction,
-      setServerOption: setServerOption,
-    });
-  };
-  */
 
   const rowRenderer = (
     type: string | number,
@@ -473,68 +572,61 @@ const History: React.FunctionComponent<HistoryProps> = ({
     />
   );
 
-  const hide = useCallback(() => {
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
-    setShowFilters(false);
-    setHeightLayout(10);
-  }, []);
-
-  return (
-    <View style={{ flex: 1 }}>
+  const renderHistoryHandle = useCallback(
+    () => (
       <View
-        accessible={true}
-        accessibilityLabel={translate('history.title-acc') as string}
         style={{
-          flex: 1,
-          display: 'flex',
-          justifyContent: 'flex-start',
-          width: '100%',
+          paddingTop: 8,
+          paddingBottom: 6,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 0.5,
+          borderRightWidth: 0.5,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
         }}
       >
-        <Header
-          testID="valuetransfer text"
-          title={translate('history.title') as string}
-          toggleMenuDrawer={toggleMenuDrawer}
-          setPrivacyOption={setPrivacyOption}
-          addLastSnackbar={addLastSnackbar /* context */}
-          screenName={screenName}
-          setShieldingAmount={setShieldingAmount}
-          setScrollToTop={setScrollToTop}
-          setScrollToBottom={setScrollToBottom}
-          setBackgroundError={setBackgroundError /* context */}
-        />
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            width: '100%',
-            marginHorizontal: 5,
-            marginBottom: 2,
           }}
         >
-          <View style={{ width: 20 }} />
-
+          {/* Left spacer matches the filter Pressable width
+              (paddingHorizontal: 14 × 2 + icon 20 = 48) so the title
+              stays perfectly centered. flex/textAlign/numberOfLines on
+              the BoldText keep a long translation from being clipped. */}
+          <View style={{ width: 48 }} />
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
+            {translate('history.title') as string}
+          </BoldText>
           <Pressable
             onPress={() => {
               setShowFilters(true);
-              bottomSheetRef.current?.snapToIndex(0);
+              bottomSheetRef.current?.present();
             }}
+            hitSlop={8}
             style={{
-              marginTop: -35,
-              marginRight: 20,
               flexDirection: 'row',
-              alignSelf: 'flex-start',
-              paddingHorizontal: 1,
+              alignItems: 'center',
+              paddingHorizontal: 14,
               paddingVertical: 4,
             }}
           >
-            <FiltersIcon
-              style={{ marginLeft: 5, marginRight: 5 }}
-              color={colors.zingo}
-              size={20}
-            />
+            <FiltersIcon color={colors.zingo} size={20} />
             {(!!filterKind ||
               filterFailed ||
               filterMemos ||
@@ -545,163 +637,284 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   width: 7,
                   height: 7,
                   borderRadius: 7,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: -3,
-                  marginLeft: -5,
+                  marginLeft: -3,
+                  marginTop: -8,
                 }}
               />
             )}
           </Pressable>
         </View>
-        {loading ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.primary}
-            style={{ marginVertical: 20 }}
+      </View>
+    ),
+    [colors, translate, filterKind, filterFailed, filterMemos, filterWithFunds],
+  );
+
+  const renderFiltersHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 8,
+          paddingBottom: 6,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 0.5,
+          borderRightWidth: 0.5,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* Left spacer matches the X Pressable width
+              (paddingHorizontal: 14 × 2 + icon 20 = 48) so the title
+              stays perfectly centered. */}
+          <View style={{ width: 48 }} />
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
+            {translate('history.filters') as string}
+          </BoldText>
+          <Pressable
+            onPress={() => bottomSheetRef.current?.dismiss()}
+            hitSlop={8}
+            style={{
+              paddingHorizontal: 14,
+              paddingVertical: 4,
+            }}
+          >
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+          </Pressable>
+        </View>
+      </View>
+    ),
+    [colors, translate],
+  );
+
+  const hide = useCallback(() => {
+    bottomSheetRef.current?.dismiss();
+    setShowFilters(false);
+  }, []);
+
+  return (
+    <View
+      style={{ flex: 1 }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
+    >
+      <View
+        accessible={true}
+        accessibilityLabel={translate('history.title-acc') as string}
+        style={{
+          flex: 1,
+          display: 'flex',
+          justifyContent: 'flex-start',
+          width: '100%',
+        }}
+      >
+        <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
+          <Header
+            testID="valuetransfer text"
+            title={''}
+            toggleMenuDrawer={toggleMenuDrawer}
+            setPrivacyOption={setPrivacyOption}
+            addLastSnackbar={addLastSnackbar /* context */}
+            screenName={screenName}
+            setShieldingAmount={setShieldingAmount}
+            setScrollToTop={setScrollToTop}
+            setScrollToBottom={setScrollToBottom}
+            setBackgroundError={setBackgroundError /* context */}
+            showMessagesIcon={true}
+            onUsdRowLayout={setUsdRowH}
+            onPriceRowLayout={setPriceRowH}
           />
-        ) : (
-          <>
-            {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
-              <RecyclerListView
-                ref={scrollViewRef}
-                renderAheadOffset={500}
-                scrollViewProps={{
-                  refreshControl: (
-                    <RefreshControl
-                      refreshing={false}
-                      onRefresh={() => doRefresh(screenName)}
-                      tintColor={colors.text}
-                      title={translate('history.refreshing') as string}
-                    />
-                  ),
-                  style: {
-                    flexGrow: 1,
-                    marginTop: 10,
-                    width: '100%',
-                  },
-                }}
-                onScroll={handleScroll}
-                scrollThrottle={100}
-                layoutProvider={layoutProvider}
-                dataProvider={dataProvider}
-                rowRenderer={rowRenderer}
-                onEndReachedThreshold={0.75}
-                onEndReached={() => {
-                  setShowFooter(true);
-                }}
-                disableRecycling={true}
-                renderFooter={() => (
-                  <>
-                    {showFooter ? (
-                      <>
-                        {loadMoreButton ? (
-                          <View
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'flex-start',
-                              marginTop: 20,
-                              marginBottom: 60,
-                            }}
-                          >
-                            <Button
-                              type={ButtonTypeEnum.Secondary}
-                              title={translate('history.loadmore') as string}
-                              onPress={loadMoreClicked}
-                            />
-                          </View>
-                        ) : (
-                          <>
-                            {!!valueTransfersSliced &&
-                              !!valueTransfersSliced.length && (
-                                <View
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'flex-start',
-                                    marginTop: 20,
-                                    marginBottom: 60,
-                                  }}
-                                >
-                                  <FadeText style={{ color: colors.primary }}>
-                                    {translate('history.end') as string}
-                                  </FadeText>
-                                </View>
-                              )}
-                          </>
-                        )}
-                      </>
-                    ) : null}
-                  </>
-                )}
+        </View>
+      </View>
+      <Animated.View
+        pointerEvents="box-none"
+        style={[StyleSheet.absoluteFill, sheetSlideStyle]}
+      >
+        <BottomSheet
+          ref={historySheetRef}
+          snapPoints={historySnapPoints}
+          index={0}
+          onChange={i => {
+            internalSnapIndexRef.current = i;
+            onPriceSnapChange(i);
+          }}
+          enableDynamicSizing={false}
+          enablePanDownToClose={false}
+          enableContentPanningGesture={false}
+          backgroundStyle={{
+            backgroundColor: colors.bottomSheetBackground,
+            borderTopLeftRadius: 40,
+            borderTopRightRadius: 40,
+          }}
+          handleComponent={renderHistoryHandle}
+        >
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: colors.bottomSheetBackground,
+            }}
+          >
+            {loading ? (
+              <ActivityIndicator
+                size="large"
+                color={colors.primary}
+                style={{ marginVertical: 20 }}
               />
             ) : (
-              <View
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: 30,
-                }}
-              >
-                <FadeText style={{ color: colors.primary }}>
-                  {translate('history.empty') as string}
-                </FadeText>
+              <View style={{ flex: 1, width: '100%' }}>
+                {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
+                  <RecyclerListView
+                    ref={scrollViewRef}
+                    renderAheadOffset={500}
+                    scrollViewProps={{
+                      refreshControl: (
+                        <RefreshControl
+                          refreshing={false}
+                          onRefresh={() => doRefresh(screenName)}
+                          tintColor={colors.text}
+                          title={translate('history.refreshing') as string}
+                        />
+                      ),
+                      style: {
+                        flexGrow: 1,
+                        width: '100%',
+                      },
+                    }}
+                    onScroll={handleScroll}
+                    scrollThrottle={100}
+                    layoutProvider={layoutProvider}
+                    dataProvider={dataProvider}
+                    rowRenderer={rowRenderer}
+                    onEndReached={onEndReached}
+                    onEndReachedThreshold={0.5}
+                    renderFooter={() =>
+                      hasMore ? (
+                        <View
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            marginTop: 20,
+                            marginBottom: 60,
+                          }}
+                        >
+                          <ActivityIndicator
+                            size="small"
+                            color={colors.primary}
+                          />
+                        </View>
+                      ) : !!valueTransfersSliced &&
+                        !!valueTransfersSliced.length ? (
+                        <View
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            marginTop: 20,
+                            marginBottom: 60,
+                          }}
+                        >
+                          <FadeText style={{ color: colors.primary }}>
+                            {translate('history.end') as string}
+                          </FadeText>
+                        </View>
+                      ) : null
+                    }
+                  />
+                ) : (
+                  <View
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 30,
+                    }}
+                  >
+                    <FadeText style={{ color: colors.primary }}>
+                      {translate('history.empty') as string}
+                    </FadeText>
+                  </View>
+                )}
               </View>
             )}
-            {!isAtTop && (
-              <Pressable
-                onPress={handleScrollToTop}
-                disabled={isScrollingToTop}
-                style={({ pressed }) => ({
-                  position: 'absolute',
-                  bottom: 30,
-                  right: 10,
-                  paddingHorizontal: 5,
-                  paddingVertical: 10,
-                  backgroundColor: colors.sideMenuBackground,
-                  borderRadius: 50,
-                  transform: [{ scale: pressed ? 0.9 : 1 }],
-                  borderWidth: 1,
-                  borderColor: colors.zingo,
-                  opacity: isScrollingToTop ? 0.5 : 1,
-                })}
-              >
-                <FontAwesomeIcon
-                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={16}
-                  icon={faAngleUp}
-                  color={colors.zingo}
-                />
-              </Pressable>
-            )}
-          </>
+          </View>
+        </BottomSheet>
+        {/* Floating "back to top" anchored to the Animated.View (full
+            screen) instead of the BottomSheet content. On Android, the
+            inner container ends above the system nav bar; anchoring there
+            pushed the button visibly higher than on iOS. Pinning it to
+            the outer wrapper keeps it at the same visual offset across
+            platforms. */}
+        {!isAtTop && (
+          <Pressable
+            onPress={handleScrollToTop}
+            disabled={isScrollingToTop}
+            style={({ pressed }) => ({
+              position: 'absolute',
+              bottom: 30,
+              right: 10,
+              paddingHorizontal: 5,
+              paddingVertical: 10,
+              backgroundColor: colors.sideMenuBackground,
+              borderRadius: 50,
+              transform: [{ scale: pressed ? 0.9 : 1 }],
+              borderWidth: 1,
+              borderColor: colors.zingo,
+              opacity: isScrollingToTop ? 0.5 : 1,
+            })}
+          >
+            <FontAwesomeIcon
+              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+              size={16}
+              icon={faAngleUp}
+              color={colors.zingo}
+            />
+          </Pressable>
         )}
-      </View>
-      <BottomSheet
+      </Animated.View>
+      <BottomSheetModal
         ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enableDynamicSizing={false}
+        enableDynamicSizing={true}
         enablePanDownToClose
+        stackBehavior="push"
         keyboardBehavior={'interactive'}
-        handleStyle={{ display: 'none' }}
-        backgroundStyle={{ backgroundColor: colors.background }}
-        onChange={index => {
-          if (index === -1) {
-            setShowFilters(false);
-          }
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
+        handleComponent={renderFiltersHandle}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
         }}
+        onDismiss={() => setShowFilters(false)}
         backdropComponent={renderBackdrop}
       >
         <BottomSheetView
-          style={{ backgroundColor: colors.background, height: '100%' }}
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingBottom: 30,
+          }}
         >
           {showFilters && (
             <Filters
               closeSheet={hide}
-              setHeightLayout={setHeightLayout}
               filterKind={filterKind}
               setFilterKind={setFilterKind}
               filterFailed={filterFailed}
@@ -713,7 +926,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             />
           )}
         </BottomSheetView>
-      </BottomSheet>
+      </BottomSheetModal>
     </View>
   );
 };

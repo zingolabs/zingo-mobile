@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
-import { Animated, Platform, View, TouchableOpacity } from 'react-native';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import { Animated, View, TouchableOpacity } from 'react-native';
 import {
   NavigationProp,
   ParamListBase,
@@ -36,7 +36,7 @@ import { ThemeType } from '../../../app/types';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
-import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import Utils from '../../../app/utils';
 //import Utils from '../../../app/utils';
 
@@ -49,7 +49,7 @@ type ValueTransferLineProps = {
   //setMessagesAddressModalShow: (vt: ValueTransferType) => void;
   addressProtected?: boolean;
   screenName: ScreenEnum;
-  registerSwipeable: (r: Swipeable) => void;
+  registerSwipeable: (r: Swipeable | null) => void;
   closeAllSwipeables: () => void;
   closeOtherSwipeables: () => void;
 };
@@ -80,13 +80,22 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   } = context;
   const { colors } = useTheme() as ThemeType;
 
-  //const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
-
-  //const dimensions = {
-  //  width: Dimensions.get('window').width,
-  //  height: Dimensions.get('window').height,
-  //};
-  //const maxWidthHit = useRef<boolean>(false);
+  // When RecyclerListView reuses this row for a different transfer, the
+  // Swipeable's internal open/closed state stays pinned to the recycled view
+  // unless we explicitly close it on rebind. We keep a local ref alongside
+  // the parent's registry callback so the parent can still iterate and close
+  // all rows.
+  const swipeableRef = useRef<Swipeable | null>(null);
+  const setSwipeableRef = useCallback(
+    (r: Swipeable | null) => {
+      swipeableRef.current = r;
+      registerSwipeable(r);
+    },
+    [registerSwipeable],
+  );
+  useEffect(() => {
+    swipeableRef.current?.close();
+  }, [vt.txid]);
 
   const amountColor =
     vt.status === RPCValueTransfersStatusEnum.failed
@@ -109,75 +118,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
         : faArrowUp;
 
   const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
-
-  //useEffect(() => {
-  //  setMessagesAddress(Utils.isMessagesAddress(vt));
-  //}, [vt]);
-
-  /*
-  const handleRenderRightActions = (
-    progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>,
-    swipeable: Swipeable,
-  ) => {
-    const width = dimensions.width * 0.7;
-    const trans = progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [width, 0],
-      extrapolate: 'extend',
-    });
-
-    dragX.addListener(({ value }) => {
-      if (-value >= dimensions.width * (1 / 2) && messagesAddress) {
-        if (!maxWidthHit.current) {
-          //console.log(value);
-          setValueTransferDetail(vt);
-          setValueTransferDetailIndex(index);
-          setMessagesAddressModalShow(true);
-          swipeable.reset();
-        }
-        maxWidthHit.current = true;
-      } else {
-        maxWidthHit.current = false;
-      }
-    });
-
-    return (
-      <>
-        {showSwipeableIcons && (
-          <Animated.View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              transform: [{ translateX: trans }],
-              backgroundColor: colors.sideMenuBackground,
-            }}>
-            {messagesAddress && (
-              <View
-                style={{
-                  width: width,
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                }}>
-                <TouchableOpacity
-                  style={{ zIndex: 999, padding: 20, alignSelf: 'flex-start' }}
-                  onPress={() => {
-                    setValueTransferDetail(vt);
-                    setValueTransferDetailIndex(index);
-                    setMessagesAddressModalShow(true);
-                    swipeable.reset();
-                  }}>
-                  <FontAwesomeIcon style={{ opacity: 0.8 }} size={24} icon={faComments} color={colors.money} />
-                </TouchableOpacity>
-              </View>
-            )}
-          </Animated.View>
-        )}
-      </>
-    );
-  };
-  */
 
   const handleRenderLeftActions = (
     progress: Animated.AnimatedInterpolation<number>,
@@ -307,10 +247,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             paddingLeft: 15,
             paddingTop: 10,
             paddingBottom: 0,
-            borderTopWidth: 1,
-            borderBottomWidth: 1,
-            borderColor: colors.card,
-            backgroundColor: colors.background,
+            backgroundColor: colors.bottomSheetBackground,
           }}
         >
           <FadeText>{month}</FadeText>
@@ -325,7 +262,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
         }}
       >
         <Swipeable
-          ref={registerSwipeable}
+          ref={setSwipeableRef}
           onSwipeableWillOpen={closeOtherSwipeables}
           overshootLeft={false}
           overshootRight={false}
@@ -343,19 +280,12 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   : 'flex-start',
               marginTop: 10,
               paddingBottom: 10,
-              borderBottomWidth: nextLineWithSameTxid
-                ? Platform.OS === GlobalConst.platformOSandroid
-                  ? 1
-                  : 0.5
-                : 1.5,
-              borderBottomColor: nextLineWithSameTxid
-                ? colors.primaryDisabled
-                : colors.border,
-              borderStyle: nextLineWithSameTxid
-                ? Platform.OS === GlobalConst.platformOSandroid
-                  ? 'dotted'
-                  : 'solid'
-                : 'solid',
+              // Lines that belong to the same TXID render flush against
+              // each other — no separator. The separator only marks the
+              // boundary between distinct transactions.
+              borderBottomWidth: nextLineWithSameTxid ? 0 : 1.5,
+              borderBottomColor: '#122033',
+              borderStyle: 'solid',
             }}
           >
             <View
@@ -435,67 +365,70 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       : vt.status === RPCValueTransfersStatusEnum.failed &&
                           vt.kind === ValueTransferKindEnum.Shield
                         ? (translate('history.shield-failed') as string)
-                        : vt.kind === ValueTransferKindEnum.Sent &&
-                            vt.confirmations === 0
-                          ? (translate('history.sending') as string)
+                        : vt.status === RPCValueTransfersStatusEnum.failed &&
+                            vt.kind === ValueTransferKindEnum.Received
+                          ? (translate('history.received-failed') as string)
                           : vt.kind === ValueTransferKindEnum.Sent &&
-                              vt.confirmations !== 0
-                            ? (translate('history.sent') as string)
-                            : vt.kind === ValueTransferKindEnum.Received &&
-                                vt.confirmations === 0
-                              ? (translate('history.receiving') as string)
+                              vt.confirmations === 0
+                            ? (translate('history.sending') as string)
+                            : vt.kind === ValueTransferKindEnum.Sent &&
+                                vt.confirmations !== 0
+                              ? (translate('history.sent') as string)
                               : vt.kind === ValueTransferKindEnum.Received &&
-                                  vt.confirmations !== 0
-                                ? (translate('history.received') as string)
-                                : vt.kind ===
-                                      ValueTransferKindEnum.MemoToSelf &&
-                                    vt.confirmations === 0
-                                  ? (translate(
-                                      'history.sendingtoself',
-                                    ) as string)
+                                  vt.confirmations === 0
+                                ? (translate('history.receiving') as string)
+                                : vt.kind === ValueTransferKindEnum.Received &&
+                                    vt.confirmations !== 0
+                                  ? (translate('history.received') as string)
                                   : vt.kind ===
                                         ValueTransferKindEnum.MemoToSelf &&
-                                      vt.confirmations !== 0
+                                      vt.confirmations === 0
                                     ? (translate(
-                                        'history.memotoself',
+                                        'history.sendingtoself',
                                       ) as string)
                                     : vt.kind ===
-                                          ValueTransferKindEnum.SendToSelf &&
-                                        vt.confirmations === 0
+                                          ValueTransferKindEnum.MemoToSelf &&
+                                        vt.confirmations !== 0
                                       ? (translate(
-                                          'history.sendingtoself',
+                                          'history.memotoself',
                                         ) as string)
                                       : vt.kind ===
                                             ValueTransferKindEnum.SendToSelf &&
-                                          vt.confirmations !== 0
+                                          vt.confirmations === 0
                                         ? (translate(
-                                            'history.sendtoself',
+                                            'history.sendingtoself',
                                           ) as string)
                                         : vt.kind ===
-                                              ValueTransferKindEnum.Shield &&
-                                            vt.confirmations === 0
+                                              ValueTransferKindEnum.SendToSelf &&
+                                            vt.confirmations !== 0
                                           ? (translate(
-                                              'history.shielding',
+                                              'history.sendtoself',
                                             ) as string)
                                           : vt.kind ===
                                                 ValueTransferKindEnum.Shield &&
-                                              vt.confirmations !== 0
+                                              vt.confirmations === 0
                                             ? (translate(
-                                                'history.shield',
+                                                'history.shielding',
                                               ) as string)
                                             : vt.kind ===
-                                                  ValueTransferKindEnum.Rejection &&
-                                                vt.confirmations === 0
+                                                  ValueTransferKindEnum.Shield &&
+                                                vt.confirmations !== 0
                                               ? (translate(
-                                                  'history.sending',
+                                                  'history.shield',
                                                 ) as string)
                                               : vt.kind ===
                                                     ValueTransferKindEnum.Rejection &&
-                                                  vt.confirmations !== 0
+                                                  vt.confirmations === 0
                                                 ? (translate(
-                                                    'history.rejection',
+                                                    'history.sending',
                                                   ) as string)
-                                                : ''}
+                                                : vt.kind ===
+                                                      ValueTransferKindEnum.Rejection &&
+                                                    vt.confirmations !== 0
+                                                  ? (translate(
+                                                      'history.rejection',
+                                                    ) as string)
+                                                  : ''}
                   </FadeText>
                   <View
                     style={{

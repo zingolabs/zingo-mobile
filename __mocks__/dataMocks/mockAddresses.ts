@@ -3,7 +3,7 @@ import {
   AddressKindEnum,
   TransparentAddressClass,
 } from '../../app/AppState';
-import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
+import { RPCAddressScopeEnum } from '../../app/walletBackend/enums/RPCAddressScopeEnum';
 
 export const mockAddresses: (UnifiedAddressClass | TransparentAddressClass)[] =
   [

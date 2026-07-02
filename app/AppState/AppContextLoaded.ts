@@ -19,10 +19,10 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
-import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
+import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
 export default interface AppContextLoaded {
@@ -95,8 +95,10 @@ export default interface AppContextLoaded {
   // List of our contacts - Address book
   addressBook: AddressBookFileClass[];
 
-  // helpers to open the address book modal from different places in the App
-  launchAddressBook: (add: string, s: ScreenEnum) => void;
+  // Opens the shared "Add Tag / Add Contact" BottomSheet modal in-place,
+  // pre-filled with the given address. Used from any screen that displays an
+  // address (AddressItem's + icon).
+  launchAddTagModal: (address: string) => void;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;
@@ -136,4 +138,13 @@ export default interface AppContextLoaded {
   nym: boolean;
   setNymOption: (value: boolean) => Promise<void>;
   setModeOption: (value: string) => Promise<void>;
+  setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
+
+  // Monotonically increasing counter incremented every time the app
+  // returns from background/inactive to active. Protected screens
+  // (Seed, ShowUfvk, Settings, Rescan, Confirm) watch it to re-fire
+  // their on-mount biometric gate when security.foregroundApp is OFF
+  // and the screen is still mounted on resume — closing the gap where
+  // a sensitive screen could be revealed without a fresh auth.
+  foregroundEpoch: number;
 }

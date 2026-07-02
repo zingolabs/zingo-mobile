@@ -19,15 +19,18 @@ import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import { RPCParseAddressStatusEnum } from '../app/rpc/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '../app/rpc/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../app/rpc/enums/RPCReceiversEnum';
+import { RPCParseAddressStatusEnum } from '../app/walletBackend/enums/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '../app/walletBackend/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '../app/walletBackend/enums/RPCReceiversEnum';
 import { ChainNameEnum } from '../app/AppState';
 
-function makeProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Confirm> {
+function makeProps(): NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Confirm
+> {
   return {
     navigation: mockNavigation,
     route: {
@@ -62,7 +65,10 @@ describe('Confirm - snapshots', () => {
   state.totalBalance = mockTotalBalance;
   state.zecPrice = mockZecPrice;
   state.server = mockServer;
-  state.security = mockSecurity;
+  // sendConfirm disabled here so the on-mount biometric gate in Confirm.tsx
+  // stays inactive and the snapshot captures the actual Confirm UI rather
+  // than the auth placeholder.
+  state.security = { ...mockSecurity, sendConfirm: false };
   state.currency = CurrencyEnum.noCurrency;
   state.mode = ModeEnum.advanced;
   state.defaultUnifiedAddress = 'u1abc123def456abc123def456abc123def456abc123';

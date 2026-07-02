@@ -1,33 +1,48 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  Modal,
-  Keyboard,
-} from 'react-native';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+} from 'react';
+import { View, TouchableOpacity, TextInput, Keyboard } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
-import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
+import {
+  faChevronLeft,
+  faQrcode,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import BottomSheet, {
+  BottomSheetFooter,
+  BottomSheetFooterProps,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
+
 import FadeText from '../../../components/Components/FadeText';
 import RegText from '../../../components/Components/RegText';
+import BoldText from '../../../components/Components/BoldText';
 import Button from '../../../components/Components/Button';
-import ScannerUfvk from './ScannerUfvk';
 import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
 import Header from '../../../components/Header';
-import RPCModule from '../../RPCModule';
+import { getLatestBlockServerInfo } from '../../walletBackend';
 import {
   ButtonTypeEnum,
   GlobalConst,
+  RouteEnum,
   ScreenEnum,
   SelectServerEnum,
 } from '../../AppState';
+import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
+import { useKeyboardHeight } from '../../hooks/useKeyboardHeight';
 
 const activationHeight = {
   main: 419200,
@@ -44,6 +59,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   onClickCancel,
   onClickOK,
 }) => {
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, mode, addLastSnackbar, selectServer } =
     context;
@@ -52,20 +68,18 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
-  const [qrcodeModalVisible, setQrcodeModalVisible] = useState<boolean>(false);
   const [latestBlock, setLatestBlock] = useState<number>(0);
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
+  const importUfvkSheetRef = useRef<BottomSheet>(null);
+  const keyboardHeight = useKeyboardHeight();
 
   useEffect(() => {
     if (!netInfo.isConnected || selectServer !== SelectServerEnum.offline) {
       (async () => {
-        const resp: string = await RPCModule.getLatestBlockServerInfo(
-          server.uri,
-        );
-        //console.log(resp);
+        const resp: string = await getLatestBlockServerInfo(server.uri);
         if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
           setLatestBlock(Number(resp));
-        } else {
-          //console.log('error latest block', resp);
         }
       })();
     }
@@ -83,10 +97,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           .trim()
           .replaceAll('  ', ' ')
           .split(' ');
-        //console.log(seedufvkTextArray);
         // if the ufvk have 2 -> means it is a copy/paste from the stored ufvk in the device.
         if (seedufvkTextArray.length === 2) {
-          // if the last word is a number -> move it to the birthday field
           const lastWord: string =
             seedufvkTextArray[seedufvkTextArray.length - 1];
           const possibleBirthday: number | null = isNaN(Number(lastWord))
@@ -104,10 +116,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           .trim()
           .replaceAll('  ', ' ')
           .split(' ');
-        //console.log(seedufvkTextArray);
         // if the seed have 25 -> means it is a copy/paste from the stored seed in the device.
         if (seedufvkTextArray.length === 25) {
-          // if the last word is a number -> move it to the birthday field
           const lastWord: string =
             seedufvkTextArray[seedufvkTextArray.length - 1];
           const possibleBirthday: number | null = isNaN(Number(lastWord))
@@ -120,7 +130,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         }
       }
     }
-    // only if seedufvk changed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seedufvkText]);
 
@@ -134,47 +143,107 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   };
 
   const showQrcodeModalVisible = () => {
-    //if (Platform.OS === GlobalConst.platformOSandroid) {
-    //  BarcodeZxingScan.showQrReader(async (a: string) => {
-    //    setSeedufvkText(a);
-    //  });
-    //} else {
-    setQrcodeModalVisible(true);
-    //}
+    navigation.navigate(RouteEnum.ScannerUfvk, {
+      setUfvkText: (k: string) => setSeedufvkText(k),
+      active: true,
+    });
   };
 
+  const importUfvkSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  const renderImportUfvkHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 12,
+          paddingBottom: 8,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 0.5,
+          borderRightWidth: 0.5,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <TouchableOpacity
+            onPress={onClickCancel}
+            hitSlop={8}
+            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronLeft}
+              size={20}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
+            {translate('import.title') as string}
+          </BoldText>
+          <View style={{ width: 28 }} />
+        </View>
+      </View>
+    ),
+    [colors, onClickCancel, translate],
+  );
+
+  const renderImportUfvkFooter = useCallback(
+    (props: BottomSheetFooterProps) => (
+      <BottomSheetFooter {...props} bottomInset={keyboardHeight}>
+        <View
+          style={{
+            backgroundColor: colors.bottomSheetBackground,
+            paddingTop: 10,
+            paddingBottom: 24,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            testID="import.button.ok"
+            type={ButtonTypeEnum.Primary}
+            title={translate('import.button') as string}
+            onPress={() => {
+              okButton();
+            }}
+          />
+        </View>
+      </BottomSheetFooter>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [colors, translate, seedufvkText, birthday, keyboardHeight],
+  );
+
   return (
-    <KeyboardAvoidingView
-      behavior={
-        Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'
-      }
-      keyboardVerticalOffset={
-        Platform.OS === GlobalConst.platformOSios ? 10 : 0
-      }
+    <View
       style={{
         flex: 1,
         backgroundColor: colors.background,
       }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}
-      >
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={qrcodeModalVisible}
-          onRequestClose={() => setQrcodeModalVisible(false)}
-        >
-          <ScannerUfvk
-            setUfvkText={setSeedufvkText}
-            closeModal={() => setQrcodeModalVisible(false)}
-          />
-        </Modal>
+      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
-          title={translate('import.title') as string}
+          title={''}
           screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
@@ -184,15 +253,39 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           translate={translate}
           netInfo={netInfo}
           mode={mode}
-          closeScreen={onClickCancel}
         />
-        <ScrollView
+      </View>
+      <BottomSheet
+        ref={importUfvkSheetRef}
+        snapPoints={importUfvkSnapPoints}
+        index={0}
+        enableDynamicSizing={false}
+        enablePanDownToClose={false}
+        enableContentPanningGesture={false}
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        handleComponent={renderImportUfvkHandle}
+        footerComponent={renderImportUfvkFooter}
+      >
+        <BottomSheetScrollView
           keyboardShouldPersistTaps="handled"
-          style={{ height: '80%', maxHeight: '80%' }}
+          bounces={false}
+          alwaysBounceVertical={false}
+          style={{
+            flex: 1,
+            backgroundColor: colors.bottomSheetBackground,
+          }}
           contentContainerStyle={{
             flexDirection: 'column',
             alignItems: 'stretch',
             justifyContent: 'flex-start',
+            paddingBottom: 80,
           }}
         >
           <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
@@ -205,7 +298,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               borderWidth: 1,
               borderRadius: 10,
               borderColor: colors.text,
-              maxHeight: '40%',
               flexDirection: 'row',
               justifyContent: 'space-between',
             }}
@@ -226,6 +318,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               <TextInput
                 testID="import.seedufvkinput"
                 multiline
+                autoCorrect={false}
+                autoComplete="off"
+                spellCheck={false}
+                textContentType="none"
+                keyboardType="visible-password"
                 style={{
                   color: colors.text,
                   fontWeight: '600',
@@ -335,27 +432,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               {translate('import.text') as string}
             </RegText>
           </View>
-        </ScrollView>
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-          }}
-        >
-          <Button
-            testID="import.button.ok"
-            type={ButtonTypeEnum.Primary}
-            title={translate('import.button') as string}
-            onPress={() => {
-              okButton();
-            }}
-          />
-        </View>
-      </View>
-    </KeyboardAvoidingView>
+        </BottomSheetScrollView>
+      </BottomSheet>
+    </View>
   );
 };
 

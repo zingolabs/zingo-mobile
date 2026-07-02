@@ -30,18 +30,6 @@ describe('Component Components - test', () => {
     expect(currencyAmount).toMatchSnapshot();
   });
 
-  test('CurrencyAmount Normal Privacy with TOR - snapshot', () => {
-    const currencyAmount = render(
-      <CurrencyAmount
-        price={1.12345678}
-        amtZec={39.99}
-        style={{ backgroundColor: 'red' }}
-        currency={CurrencyEnum.USDTORCurrency}
-      />,
-    );
-    expect(currencyAmount).toMatchSnapshot();
-  });
-
   test('ZecAmount High Privacy - snapshot', () => {
     const zecAmount = render(
       <ZecAmount

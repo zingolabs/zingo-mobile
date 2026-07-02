@@ -140,8 +140,7 @@ RCT_EXTERN_METHOD(getTotalSpendsToAddressInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(zecPriceInfo:
-    (NSString)tor 
-                  resolve:(RCTPromiseResolveBlock)resolve
+    (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(removeTransactionProcess:
     (NSString)txid 
@@ -159,12 +158,6 @@ RCT_EXTERN_METHOD(getOptionWalletInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(setOptionWalletProcess:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(createTorClientProcess:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(removeTorClientProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getUnifiedAddressesInfo:

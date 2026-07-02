@@ -1,16 +1,11 @@
 {
-  "zingo": "Zingo",
-  "version": "zingo-2.0.19 (307)",
-  "loading": "carregando...",
-  "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
-  "workingonit": "Estamos trabalhando neste recurso.",
-  "updating" : {
-    "firstlaunchingmessage-title": "Otimizando a Zingo",
-    "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine",
+  "updating": {
+    "firstlaunchingmessage-title": "Otimizando a {name}",
+    "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine.",
     "firstlaunchingmessage-footer": "Obrigado."
   },
-  "installing" : {
+  "installing": {
     "firstlaunchingmessage-title": "Criando uma nova carteira",
     "firstlaunchingmessage-body": "Mantenha o aplicativo aberto até que o processo seja concluído.",
     "firstlaunchingmessage-footer": "Obrigado."
@@ -19,7 +14,6 @@
   "biometricsfailed-body": "Por questões de segurança, o aplicativo está bloqueado.",
   "biometricsfailed-footer": "Use o método de autenticação para desbloquear.",
   "biometricsfailed-button": "Desbloquear",
-  "biometrics-title": "Autenticação",
   "biometrics-message": "Por favor, autentique-se",
   "biometrics-message-ios": "Por favor, autentique-se com sua senha",
   "biometrics-error": "Para sua segurança, você precisa autenticar essa ação novamente para executá-la. Você pode alterar isso em Configurações sempre que desejar.",
@@ -29,22 +23,17 @@
   "verify": "Verificar",
   "save": "Salvar",
   "copy": "Cópia de",
-  "share": "Compartilhar",
   "confirm": "Confirmar",
   "support": "Enviar E-mail",
   "view-error": "Ver/Relatar Erro",
   "menudrawer-acc": "Abrir Menu Lateral",
-  "menu-acc": "Abrir Menu",
   "donation": "Doação para o Zingo!\nObrigado por apoiar o ZingoLabs!",
   "zenny-tips-ab": "Zenny Gorjetas",
-  "nym-donation": "Eu preciso de segurança de rede Nym!",
-  "restarting": "Erro ao conectar ao servidor, o aplicativo será reiniciado em alguns segundos.",
+  "restarting": "Error ao conectar ao servidor, o aplicativo será reiniciado em alguns segundos.",
   "change-privacy": "Nova política de privacidade: ",
-  "warning-binance": "AVISO: A Binance está coletando e mantendo fundos dos usuários sem recurso oportuno. NÃO deposite na Binance a partir desta Carteira.",
   "email": "support@zingolabs.org",
-  "subject": "Suporte Zingo...",
+  "subject": "Suporte {name}...",
   "body": "Preciso de ajuda com...",
-  "connecting": "Conectando",
   "syncing": "Sincronizando",
   "synced": "Sincronizada",
   "messages": {
@@ -59,8 +48,7 @@
     "filter-no-contacts": "Sem contatos",
     "clear-filter": "Limpar:",
     "contacts-empty": "Sem contatos ou endereços.",
-    "link-all": "Global",
-    "link-anonymous": "Anônimo"
+    "link-all": "Global"
   },
   "addresslist": {
     "title": "Lista de Endereços",
@@ -83,16 +71,22 @@
     "bothexists": "Esse contato e endereço já existem. ",
     "labelexists": "Esse contato já existe. ",
     "addressexists": "Este endereço já existe. ",
-    "select-placeholder": "Escolha um Contato",
+    "select-placeholder": "Escolha um Contato...",
     "delete-title": "Excluir Contato",
     "delete-alert": "Você realmente deseja excluir este Contato/Apelido?",
     "likely": "Provavelmente: ",
     "thiswalletaddress": "Endereço desta Carteira",
     "addto": "Adicionar à ",
-    "filter-wallet": "Carteira"
+    "filter-wallet": "Carteira",
+    "add-tag": "Adicionar etiqueta",
+    "add-contact": "Adicionar contato",
+    "tag": "Etiqueta",
+    "contact": "Contato",
+    "address": "Endereço"
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
+  "linkcopied": "Link copiado para a Área de Transferência",
   "insight": {
     "title": "Visão Financeira",
     "no-data": "Não há dados em sua Carteira que correspondam ao gráfico selecionado.",
@@ -106,13 +100,13 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
+    "welcome": "Bem-vindo",
     "actualserver": "Servidor atual:",
-    "changeserver": "Alterar o Servidor",
     "createnewwallet": "Criar uma nova carteira",
     "opencurrentwallet": "Abrir Carteira Atual",
     "restorewalletseedufvk": "Restaurar carteira",
-    "creatingwallet-label": "Erro ao criar a Carteira",
-    "readingwallet-label": "Erro ao ler a Carteira",
+    "creatingwallet-label": "Error ao criar a Carteira",
+    "readingwallet-label": "Error ao ler a Carteira",
     "invalidseedufvk-label": "Frases de Recuperação / Chave de Visualização invalidas",
     "invalidseedufvk-error": "As Frases de Recuperação / Chave de Visualização estavam invalidas. Revise o valor e corrija-o.",
     "invalidbirthday-label": "Data de nascimento inválida",
@@ -122,10 +116,8 @@
     "custom": "Servidor Personalizado...",
     "nointernet-message": "Não há conexão com a Internet estabelecida. Por favor, corrija esse problema.",
     "offline-message": "Não há carteira ativa. No modo offline, não é possível criar ou restaurar uma carteira. Escolha um servidor para continuar.",
-    "basicmode": "Alterar para o Modo Básico",
     "advancedmode": "Alterar para o Modo Avançado",
     "noopenwallet-message": "Ocorreu um erro enquanto o aplicativo tentava abrir a carteira atual.",
-    "changeserver-basic": "Altere o Servidor e\nAbra a Carteira Atual",
     "alert-newwallet-title": "CRIAR UMA NOVA CARTEIRA",
     "alert-newwallet-body": "Você pode confirmar que deseja realmente criar uma nova carteira e perder o acesso à carteira atual.",
     "serverfirsttry": "Ocorreu um erro ao tentar conectar-se ao servidor acima, atualmente verificando os servidores na lista.",
@@ -134,13 +126,13 @@
     "alert-donation-body": "Você quer ajudar o ZingoLabs a tornar o Zcash mais útil? Opte por dar uma gorjeta de um Zenny (0.01 ZEC) para ZingoLabs em cada transação! Se sim, pressione confirmar, caso contrário, pressione Cancelar.",
     "recoverkeys": "Recuperar a última Clave de Recuperação usada",
     "recoverkeysinstall": "Recuperou a última Clave de Recuperação usada neste dispositivo:",
+    "customserver-unreachable": "Seu servidor personalizado não respondeu e a carteira retornou um erro. Abra Ajustes para escolher outro ou tente novamente mais tarde.",
     "noservers": "Nenhum dos servidores da lista está disponível, provavelmente é um erro de conexão."
   },
   "loadedapp": {
-    "about": "Sobre a Zingo",
+    "about": "Sobre a {name}",
     "info": "Informações do Servidor",
     "options": "Opções",
-    "settings": "Configurações",
     "walletseed": "Frases da Carteira",
     "walletseed-basic": "Backup das Frases da Carteira",
     "walletufvk": "Chave de Visualização",
@@ -155,26 +147,27 @@
     "loadwalletfromseed-basic": "Restaurar outra Carteira",
     "addressbook": "Agenda de Endereços",
     "tipzingolabs-basic": "Apoiar a ZingoLabs",
-    "votefornym": "Vote em Nym",
-    "support": "E-mail de suporte do Zingo",
-    "restoremainnet-error": "Esta opção está disponível apenas para servidores da 'Mainnet'.",
-    "changeservernew-error": "Erro ao tentar alterar para um novo servidor: ",
-    "readingwallet-error": "Erro ao tentar ler a carteira com o novo servidor:",
-    "changeserverold-error": "Erro ao tentar mudar para o antigo servidor: ",
+    "support": "E-mail de suporte do {name}",
+    "changeservernew-error": "Error ao tentar alterar para um novo servidor: ",
+    "readingwallet-error": "Error ao tentar ler a carteira com o novo servidor:",
     "differentchain-error": "Você está mudando para um servidor com uma rede diferente, você não terá mais acesso a essa carteira sem suas frases de recuperação.",
-    "changingwallet-label": "Erro ao Alterar a Carteira",
-    "restoringwallet-label": "Erro ao Restaurar a Carteira",
-    "computingtx": "Avaliando a Transação",
-    "step": "Passo",
+    "serverchain-mismatch": "O servidor informa uma rede diferente da selecionada. Verifique o seletor de rede e tente novamente.",
+    "changingwallet-label": "Error ao Alterar a Carteira",
+    "restoringwallet-label": "Error ao Restaurar a Carteira",
+    "computingtx": "Processando Transação...",
+    "computingtx-hangon": "Aguarde um momento,\nisto vai demorar só um instante...",
+    "transactioncreated-title": "Transação criada",
+    "transactioncreated-body": "Você pode ver todos os detalhes em\nseu histórico de transações.",
+    "transactionfailed-title": "Transação falhou",
+    "transactionfailed-body": "Não se preocupe, seus fundos estão a salvo\ne não foram descontados.",
+    "transactionfailed-details": "Detalhes do erro",
+    "continue": "Continuar",
     "of": "de",
-    "eta": "ETA",
-    "sec": "sec",
     "history-menu": "Historico",
     "send-menu": "Enviar",
     "receive-menu": "Receber",
     "messages-menu": "Mensagens",
     "syncing": "Parando a sincronização para poder redefinir a carteira... Pode levar alguns segundos.",
-    "zcash-url": "Você já possui um endereço na tela de envio",
     "connection-error": "Esta opção requer uma conexão com a Internet para ser executada.",
     "tryingnewserver": "Tentando conectar-se ao novo servidor... Pode levar alguns segundos.",
     "tryingnewserver-error": "Após 15 segundos o novo servidor não responde.",
@@ -187,25 +180,23 @@
     "incoming-funds": "Fundos recebidos\n",
     "valuetransfer-confirmed": "Transação confirmada\n",
     "payment-made": "Pagamento efetuado\n",
-    "valuetransfer-reverted": "A transação nunca foi confirmada por um validador.",
-    "email-error-title": "Erro ao abrir o cliente de e-mail",
+    "email-error-title": "Error ao abrir o cliente de e-mail",
     "email-error-body": "Acesse as configurações do seu dispositivo e defina um aplicativo de e-mail padrão para enviar o relatório.",
     "migration-title": "Migração de carteira",
     "migration-body": "Estamos migrando sua carteira para o novo sistema de sincronização. Mantenha seu dispositivo conectado à energia e ao Wi-Fi.\n\nSeu saldo mudará conforme a migração avança. Não se preocupe, seus fundos estão seguros!"
   },
   "rpc": {
-    "parsebirthday-error": "Erro: Não foi possível analisar como um número:",
-    "syncstart-message": "Processo de sincronização iniciado.",
-    "syncend-message": "O processo de sincronização foi concluído com sucesso.",
-    "walletstored-message": "Armazenou a carteira porque um lote terminou:",
-    "sixtyseconds-message": "Armazenou a carteira a cada 60 segundos, lote:",
-    "walletnotfound-error": "Erro: não foi possível encontrar nenhuma carteira.",
-    "backupnotfound-error": "Erro: não foi possível encontrar nenhum backup de nenhuma carteira.",
-    "of": "of",
-    "deletewallet-error": "Erro: não foi possível excluir a carteira atual.",
-    "backupwallet-error": "Erro: não foi possível salvar o backup da carteira."
+    "walletnotfound-error": "Error: não foi possível encontrar nenhuma carteira.",
+    "backupnotfound-error": "Error: não foi possível encontrar nenhum backup de nenhuma carteira.",
+    "deletewallet-error": "Error: não foi possível excluir a carteira atual.",
+    "backupwallet-error": "Error: não foi possível salvar o backup da carteira."
   },
   "settings": {
+    "section-preferences": "Preferências",
+    "section-privacysecurity": "Privacidade e Segurança",
+    "section-networkadvanced": "Rede e Avançado",
+    "section-other": "Outros",
+    "section-developer": "Desenvolvedor",
     "memos": [
       {
         "value": "none",
@@ -228,10 +219,6 @@
       {
         "value": "USD",
         "text": "Você pode obter o preço em USD na internet."
-      },
-      {
-        "value": "USDTOR",
-        "text": "Você pode obter o preço em USD na internet usando o Tor.\nO Tor é usado para proteger o endereço IP do usuário, mas pode ser ilegal em alguns países. Use a seu critério."
       }
     ],
     "languages": [
@@ -289,7 +276,7 @@
     "modes": [
       {
         "value": "basic",
-        "text": "Modo Básico, a maneira mais simples de usar a Zingo."
+        "text": "Modo Básico, a maneira mais simples de usar a {name}."
       },
       {
         "value": "advanced",
@@ -349,6 +336,7 @@
       }
     ],
     "nochanges": "Nenhuma alteração registrada.",
+    "save-error": "Não foi possível salvar as configurações",
     "ismemo": "Você precisa escolher a opção MEMO para salvar.",
     "isthreshold": "Você precisa escolher a opção Limite para salvar.",
     "isserver": "Você precisa escolher um Servidor Ativo da lista ou preencher um URI válido para poder salvar.",
@@ -385,7 +373,6 @@
     "blockexplorer-title": "Block Explorer",
     "value-currency-": "Sem Saldo",
     "value-currency-USD": "US Dólares",
-    "value-currency-USDTOR": "US Dólares (Tor)",
     "value-language-en": "Inglês",
     "value-language-es": "Espanhol",
     "value-language-pt": "Português",
@@ -417,6 +404,7 @@
     "security-all": "Todos",
     "security-some": "Alguns",
     "security-none": "Nenhum",
+    "security-device-locked-hint": "Sem biometria neste dispositivo. As opções de segurança usarão o código do sistema, se estiver configurado; caso contrário, não terão efeito.",
     "security-startapp": "Quando o App inicia",
     "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano",
     "security-sendconfirm": "Confirmar Transação",
@@ -447,6 +435,9 @@
     "nym-network": "Rede NYM",
     "nym-enhanced-privacy": "Privacidade Aprimorada"
   },
+  "header": {
+    "lastupdate": "Última atualização:"
+  },
   "info": {
     "version": "Versão",
     "serverversion": "Versão do Servidor",
@@ -454,13 +445,9 @@
     "network": "Rede",
     "serverblock": "Altura do Bloco do Servidor",
     "zecprice": "Preço do ZEC",
-    "zecpricetor": "Preço do ZEC com Tor",
     "unknown": "Desconhecido",
     "title": "Informações do Servidor",
-    "resolution": "Tela do Dispositivo",
-    "tablet": "Tablet",
-    "phone": "Celular",
-    "errorgemini": "Erro ao buscar o preço na Internet.",
+    "errorgemini": "Error ao buscar o preço na Internet.",
     "errorrpcmodule": "Erro interno ao buscar o preço na Internet",
     "zingolib": "Versão Zingolib"
   },
@@ -515,6 +502,9 @@
     "tapcopy": "Clique para Copiar",
     "tapcopy-seed-message": "Frases de Recuperação copiada para a Área de Transferência (limpa em 60s)",
     "clipboard-cleared": "Área de Transferência limpa por segurança",
+    "clipboard-confirm-title": "Copiar para a Área de Transferência?",
+    "clipboard-confirm-message-ios": "Estes dados de recuperação são sensíveis. Copiá-los para a Área de Transferência os expõe a outros apps neste dispositivo e, se o Universal Clipboard estiver ativado, pode sincronizá-los com seus outros dispositivos Apple na mesma conta iCloud. A Área de Transferência será limpa automaticamente após 60 segundos. Continuar?",
+    "clipboard-confirm-message-android": "Estes dados de recuperação são sensíveis. Copiá-los para a Área de Transferência os expõe a qualquer outro app neste dispositivo com acesso à Área de Transferência. Se você usar um teclado com sincronização em nuvem (Gboard, SwiftKey, etc.) estes dados também podem ser enviados. A Área de Transferência será limpa automaticamente após 60 segundos. Continuar?",
     "tapcopy-birthday-message": "Aniversário copiado para a Área de Transferência",
     "birthday-readonly": "Aniversário da Carteira",
     "birthday-no-readonly": "Altura do bloco da primeira transação. (Tudo bem, se você não sabe)\nIntervalo de valores entre ",
@@ -528,13 +518,16 @@
     "tapreveal": "Toque para revelar",
     "showtransactions": "Mostrar Transações",
     "youreceived": "Você recebeu",
-    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência (limpa em 60s)"
+    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência (limpa em 60s)",
+    "recovering-from-keychain": "Recuperando a frase de recuperação do armazenamento seguro...",
+    "recovering-from-wallet": "Carregando a frase de recuperação da carteira...",
+    "from-keychain": "do armazenamento seguro",
+    "from-wallet": "da carteira"
   },
   "send": {
     "Broadcast": "Transmitido e aguardando confirmação Tx:",
-    "sending-error": "Erro ao enviar transação",
+    "sending-error": "Error ao enviar transação",
     "title": "Enviar",
-    "more": "mais...",
     "toaddress": "Endereço",
     "invalidaddress": "Endereço Inválido!",
     "addressplaceholder": "Unificado, Z-Sapling ou Transparente",
@@ -545,7 +538,6 @@
     "memo": "Memo(s) (Opcional)",
     "button": "Enviar",
     "button-all": "Enviar Tudo",
-    "clear": "Limpar",
     "confirm-title": "Confirmar Transação",
     "sending-title": "Processando",
     "confirm-amount": "Quantia",
@@ -559,20 +551,15 @@
     "zec-acc": "Campo de Valor ZEC",
     "usd-acc": "Campo de Valor USD",
     "memo-acc": "Campo de MEMO",
-    "amountplaceholder": "número",
-    "nofetchprice": "Buscar preço em Dólar",
     "sendall": "Enviar Tudo",
     "sendall-message": "Você está prestes a enviar todo os fundos da sua carteira",
-    "includeua": "Inclua seu endereço de retorno:",
     "confirm-memo": "Memo(s)",
     "duplicate-nullifier-error": "Seus fundos ainda estão sendo confirmados e provavelmente sincronizados. Você pode esperar até que os fundos sejam confirmados ou tentar enviar agora com um valor menor. A compilação da transação falhou!",
     "dust-error": "A quantia que você está tentando enviar para um endereço Transparente é muito pequena. A compilação da transação falhou!",
     "needtoshield": "Você tem fundos para blindar",
-    "needtoupgrade": "Você tem fundos para atualizar",
     "fetchpricetitle": "Buscar preço em USD",
     "fetchpricebody": "Confirme que você deseja obter o preço em USD na Internet.",
     "fetch-button": "Buscar",
-    "fetchwithtor-button": "Buscar com Tor",
     "confirm-privacy-level": "Nível de Privacidade",
     "private": "Privado",
     "amountrevealed": "Quantia Revelada",
@@ -587,33 +574,23 @@
   },
   "receive": {
     "u-title": "Blindadas",
-    "z-title": "Z-Sapling",
     "t-title": "Transparente exposto",
+    "scope-shielded": "Endereço Blindado",
+    "scope-transparent": "Endereço Transparente",
+    "select-scope-placeholder": "Selecione o tipo de endereço",
+    "transparent-expose-warning": "Endereços transparentes expõem seus dados.",
     "noaddress": "Sem Endereço",
-    "unoprivkey": "Nenhum endereço unificado para importar a Chave de Gastos",
-    "unoviewkey": "Nenhum endereço unificado para importar a Chave de Visualização completa",
     "title-address": "Meu Endereço",
-    "title-ufvk": "Minha Chave de Visualização",
     "title-basic-alone": "Meu Endereço de Recebimento",
     "newu-option": "Novo Endereço Unificado Diversificado",
     "danger-zone": "ZONA DE PERIGO",
     "go-to-transparent": "Ver endereço transparente",
-    "more": "mais...",
-    "privkey-option": "Exportar Chave de Gastos",
-    "viewkey-option": "Exportar Chave de Visualização Completa",
-    "import-option": "Chave de Importação...",
     "title-acc": "Tela de Recebimento",
-    "of": " of ",
-    "prev": "Anterior",
-    "next": "Próximo",
     "shielded-orchard": "Apenas Orchard",
     "shielded-sapling": "Apenas Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
-    "shielded-full": "Completa",
-    "showtip": "Toque para selecionar outro endereço.",
     "verify": "Verificar Endereços",
     "copy-address-button": "Copiar endereço",
-    "copy-ufvk-button": "Copiar chave visualização",
     "modal-transparent": {
       "title": "Aviso de Privacidade",
       "message": "Endereços transparentes expõem os detalhes das suas transações na blockchain pública. Isso compromete sua privacidade e não é recomendado para a maioria das transações.",
@@ -621,7 +598,6 @@
       "button": "Entendo os riscos, mostrar endereços transparentes"
     },
     "transparent": {
-      "address-title": "Transparente exposto",
       "newt-option": "Novo endereço transparente",
       "warning": {
         "title": "Aviso de Privacidade",
@@ -643,9 +619,9 @@
     "shield-message-all": "Blindado em Tx:",
     "shield-message-transparent": "Blindado em Tx:",
     "shield-message-sapling": "Atualização em Tx:",
-    "shield-error-all": "Erro na Blindagem :",
-    "shield-error-transparent": "Erro na Blindagem :",
-    "shield-error-sapling": "Erro na Atualização :",
+    "shield-error-all": "Error na Blindagem :",
+    "shield-error-transparent": "Error na Blindagem :",
+    "shield-error-sapling": "Error na Atualização :",
     "shield-legend-all": "Aumente seus fundos não blindados disponíveis blindando-os: ",
     "shield-legend-transparent": "Aumente seus fundos blindados disponíveis blindando-os: ",
     "shield-legend-sapling": "Migre seus fundos para a pool Orchard:",
@@ -664,6 +640,7 @@
     "sent": "Enviado ",
     "sent-failed": "Envio ",
     "received": "Recebido ",
+    "received-failed": "Recebimento ",
     "memotoself": "Memo-Enviar-si-Mesmo ",
     "sendtoself": "Enviar-si-Mesmo ",
     "shield": "Blindado ",
@@ -693,7 +670,7 @@
     "details": "Detalhes da Transação",
     "pool": "Pool",
     "contactcopied": "Contato copiado para a Área de Transparência",
-    "address-http": "Zingo não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
+    "address-http": "{name} não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
     "address-https": "Endereço Zingo-Authenticated",
     "type": "Tipo",
     "not-confirmed": "Transação ainda não confirmada",
@@ -707,7 +684,7 @@
     "empty": "Nenhuma transação.",
     "remove": "Remover",
     "remove-title": "Remover",
-    "remove-error": "Erro ao remover :",
+    "remove-error": "Error ao remover :",
     "remove-message": "",
     "remove-alert": "Confirme para remover a transação com falha do dispositivo",
     "remove-legend": "Remover transação para restaurar o saldo",
@@ -718,21 +695,9 @@
     "title": "Relatório de Sincronização / Rescan",
     "running": "Em Processo...",
     "finished": "Finalizado",
-    "paused": "Pausado",
     "server-title": "SERVIDOR: ",
     "blocks": " Blocos. ",
     "wallet": "Carteira: ",
-    "syncedbefore": "Sincronizado Anteriormente: ",
-    "syncednow": "Sincronizado Atualmente: ",
-    "notyetsynced": "Ainda Não Sincronizado: ",
-    "batches": "LOTES",
-    "processingbatch": "Processando Lote: ",
-    "totalbatches": " de um TOTAL de Lotes: ",
-    "blocksperbatch": "Blocos por Lote",
-    "secondsperbatch": "Lote Atual (segundos)",
-    "blocks-title": "BLOCOS: ",
-    "processingblock": "Processando Bloco: ",
-    "totalblocks": " de um TOTAL de Blocos: ",
     "lastbackgroundsync": "ÚLTIMA SINCRONIZAÇÃO DE FUNDO",
     "batches-date": " Lotes em: ",
     "networkstatus": "Status da Rede (Internet)",
@@ -754,7 +719,6 @@
     "birthday": "Aniversário",
     "text": "A restauração da frases de recuperação / chave de visualização requer uma nova verificação e pode levar muito tempo para ser concluída.",
     "button": "Restaurar Carteira",
-    "key-acc": "Campo de Frase-Chave",
     "birthday-acc": "Campo de Aniversário"
   },
   "about": {
@@ -769,33 +733,24 @@
   },
   "scanner": {
     "text": "Faça o Scan de uma Chave de Visualização Unificada completa",
-    "uri-error": "Erro no URI:",
-    "nozcash-error": "Não é um endereço Zcash válido",
-    "scanaddress": "Escaneie um Endereço Zcash",
-    "noviewkey-error": "Não é uma Chave de Visualização Unificada completa válida"
+    "scanaddress": "Escaneie um Endereço Zcash"
   },
   "ufvk": {
     "buttontexts": {
-      "new": [
-        "Eu salvei a Chave \n de Visualização"
+      "view": [
+        "Eu salvei a \n chave de visualização"
       ],
       "change": [
         "",
         "Abrir Nova Carteira",
-        "Você realmente deseja \n alterar sua carteira \n atual",
+        "Você realmente quer\n alterar para a sua \n carteira atual",
         "Tem certeza?"
       ],
       "server": [
         "",
-        "Alterar o Servidor",
-        "Você realmente quer \n mudar seu servidor \n atual",
+        "Alterar Servidor",
+        "Você realmente quer \n alterar para o seu \n servidor atual",
         "Tem certeza?"
-      ],
-      "view": [
-        "Eu salvei \na Chave de Visualização"
-      ],
-      "restore": [
-        "Restaurar Carteira"
       ],
       "backup": [
         "",
@@ -804,20 +759,20 @@
         "Tem certeza?"
       ]
     },
-    "privkey": "Disponível/Privado ",
     "viewkey": "Chave de Visualização ",
-    "nokey": "Sem Chave",
     "tapcopy-message": "Chave Copiada para a Área de Transferência",
-    "title": "Chave",
-    "address": "Endereço",
     "text-readonly": "Antes de fechar esta tela, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-readonly-backup": "Antes de restaurar o backup da carteira anterior, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-readonly-change": "Antes de acessar outra carteira, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-readonly-server": "Antes de alterar outro servidor, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
     "change-warning": "Se você mudar para outra carteira, não terá mais acesso a esta carteira sem as frases de recuperação.",
-    "backup-warning": "Se você mudar para sua carteira de backup, não terá mais acesso a esta carteira sem as Frases de recuperação",
+    "backup-warning": "Se você mudar para sua carteira de backup, não terá mais acesso a esta carteira sem as Frases de recuperação.",
     "server-warning": "Se você mudar para um servidor com uma rede diferente, não terá mais acesso a esta carteira sem as frases de recuperação.",
-    "mainnet-warning": "Nenhum backup desta carteira, disponível apenas na 'MAINNET'."
+    "mainnet-warning": "Nenhum backup desta carteira, disponível apenas na 'MAINNET'.",
+    "recovering-from-keychain": "Recuperando a chave de visualização do armazenamento seguro...",
+    "recovering-from-wallet": "Carregando a chave de visualização da carteira...",
+    "from-keychain": "do armazenamento seguro",
+    "from-wallet": "da carteira"
   },
   "pools": {
     "title": "Fundos nas Pools",
@@ -842,10 +797,10 @@
     "base64": "Não foi possível analisar (base64)",
     "amount": "Não foi possível analisar (quantia)",
     "noparameter": "Parâmetro desconhecido",
-    "noamount": "Nenhuma quantia válida informada",
     "noaddress": "Nenhum endereço válido informado",
     "oneentry": "RI deve ter pelo menos 1 entrada",
-    "parseerror": "nesse momento não é possível verificar o endereço com o servidor"
+    "memo-too-long": "Memo muito longo no parâmetro",
+    "error-http-not-allowed": "Error: HTTP em texto plano só é permitido para localhost. Use HTTPS para servidores remotos."
   },
   "donation-button": "Doar para ZingoLabs ",
   "donation-legend": "Você está doando para ZingoLabs ativamente, Obrigado"

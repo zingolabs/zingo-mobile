@@ -325,7 +325,7 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
   <View
     style={
       {
-        "backgroundColor": "#011401",
+        "backgroundColor": "#031124",
         "borderBottomWidth": 1,
         "borderColor": "#011401",
         "borderTopWidth": 1,

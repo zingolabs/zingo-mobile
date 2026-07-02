@@ -1,7 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect } from 'react';
 import { View, TextInput, Keyboard } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useTheme,
+} from '@react-navigation/native';
 
 import {
   AddressBookActionEnum,
@@ -16,6 +20,7 @@ import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import TextInputAddress from '../../Components/TextInputAddress';
+import Utils from '../../../app/utils';
 import { parseZcashURI } from '../../../app/uris';
 import Button from '../../Components/Button';
 import FadeText from '../../Components/FadeText';
@@ -32,9 +37,12 @@ type AbDetailProps = {
     color: string,
   ) => void;
   currentAddress?: string;
-  //setSecurityOption: (s: SecurityType) => Promise<void>;
   screenName: ScreenEnum;
   routeStack: RouteEnum;
+  // AbDetail is rendered inside a portaled BottomSheetModal; the host screen
+  // (AddressBook) must pass its own `navigation` so the QR button can
+  // navigate to ScannerAddress (useNavigation context is lost in the portal).
+  navigation: NavigationProp<ParamListBase>;
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   index,
@@ -43,9 +51,9 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   action: actionProp,
   doAction,
   currentAddress,
-  //setSecurityOption,
   screenName,
   routeStack,
+  navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addressBook } = context;
@@ -131,7 +139,15 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         translate,
         server,
       );
-      //console.log(targets);
+
+      // Audit Issue H — surface the parser error and abort before any
+      // address-state mutation. parseZcashURI returns an empty target
+      // when error is non-empty, but the explicit guard keeps intent
+      // obvious here and protects against future contract changes.
+      if (errorTarget) {
+        setError(errorTarget);
+        return;
+      }
 
       if (target) {
         // redo the to addresses
@@ -140,11 +156,6 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             setAddress(tgt.address);
           }
         });
-      }
-      if (errorTarget) {
-        // Show the error message as a toast
-        setError(errorTarget);
-        //return;
       }
     } else {
       setAddress(addr.replace(/[ \t\n\r]+/g, '')); // Remove spaces
@@ -160,12 +171,35 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        borderColor: colors.primary,
-        borderWidth: 1,
-        margin: 10,
+        backgroundColor: colors.bottomSheetBackground,
+        paddingBottom: 5,
       }}
     >
-      <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
+      {action === AddressBookActionEnum.Add ? (
+        <TextInputAddress
+          address={address}
+          setAddress={updateAddress}
+          setError={setErrorAddress}
+          disabled={false}
+          showLabel={true}
+          screenName={screenName}
+          routeStack={routeStack}
+          navigation={navigation}
+        />
+      ) : (
+        // Modify / Delete: address is read-only — same UX as NewAddressTag.
+        // To change an address the user must delete this entry and create a
+        // new one.
+        <View>
+          <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
+            {translate('addressbook.address') as string}
+          </RegText>
+          <View style={{ paddingHorizontal: 10, marginTop: 6 }}>
+            <RegText>{Utils.trimToSmall(address, 10)}</RegText>
+          </View>
+        </View>
+      )}
+      <RegText style={{ marginTop: 18, paddingHorizontal: 10 }}>
         {translate('addressbook.label') as string}
       </RegText>
       <View
@@ -209,15 +243,6 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           />
         </View>
       </View>
-      <TextInputAddress
-        address={address}
-        setAddress={updateAddress}
-        setError={setErrorAddress}
-        disabled={action === AddressBookActionEnum.Delete || item.own}
-        showLabel={true}
-        screenName={screenName}
-        routeStack={routeStack}
-      />
       {(!!error || !!errorAddress) && (
         <View
           style={{
@@ -240,6 +265,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           justifyContent: 'center',
           alignItems: 'center',
           marginVertical: 5,
+          marginTop: 15,
         }}
       >
         <Button

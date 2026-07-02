@@ -16,7 +16,7 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
-import { RPCValueTransfersStatusEnum } from '../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '../app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
 const FIXED_TIME = 1704067200; // 2024-01-01 00:00:00 UTC (seconds)
 const fixedValueTransfers = mockValueTransfers.map(vt => ({

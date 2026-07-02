@@ -12,24 +12,26 @@ import {
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
-  ContactType,
   GlobalConst,
   LanguageEnum,
   SendJsonToTypeType,
   SendPageStateClass,
   ServerType,
   TranslateType,
-  ValueTransferType,
   BlockExplorerEnum,
 } from '../AppState';
 
 import randomColor from 'randomcolor';
-import RPCModule from '../RPCModule';
+import {
+  getDonationAddress,
+  getZenniesDonationAddress,
+  parseAddress,
+} from '../walletBackend';
 import { Buffer } from 'buffer';
-import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
-import { RPCParseAddressStatusEnum } from '../rpc/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../rpc/enums/RPCReceiversEnum';
+import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
+import { RPCParseAddressStatusEnum } from '../walletBackend/enums/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '../walletBackend/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '../walletBackend/enums/RPCReceiversEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -85,6 +87,11 @@ export default class Utils {
       decimalPart = decimalPart.replace(/0+$/, '') || '0';
     }
 
+    // Drop the "0." suffix entirely when the value is exactly zero — show plain "0".
+    if (intPart === 0 && smallPart === '0000' && decimalPart === '0') {
+      return { bigPart: '0', smallPart };
+    }
+
     return { bigPart: intPart + decimalSeparator + decimalPart, smallPart };
   }
 
@@ -112,9 +119,7 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      //const start = Date.now();
-      const ua: string = await RPCModule.getDonationAddress();
-      //console.log('=========================================== > get donation address - ', Date.now() - start);
+      const ua: string = await getDonationAddress();
       return ua;
     }
     return '';
@@ -137,9 +142,7 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      //const start = Date.now();
-      const ua: string = await RPCModule.getZenniesDonationAddress();
-      //console.log('=========================================== > get zennies donation address - ', Date.now() - start);
+      const ua: string = await getZenniesDonationAddress();
       return ua;
     }
     return '';
@@ -152,30 +155,6 @@ export default class Utils {
   }
 
   // NYM
-  static async getNymDonationAddress(
-    chainName: ChainNameEnum,
-  ): Promise<string> {
-    // donations only for mainnet.
-    if (chainName === ChainNameEnum.mainChainName) {
-      // UA -> we need a fresh one.
-      //const start = Date.now();
-      const ua: string = await RPCModule.getDonationAddress();
-      //console.log('=========================================== > get nym donation address - ', Date.now() - start);
-      return ua;
-    }
-    return '';
-  }
-
-  static getNymDonationAmount(): string {
-    const { decimalSeparator } = getNumberFormatSettings();
-
-    return '0' + decimalSeparator + '01';
-  }
-
-  static getNymDonationMemo(translate: (key: string) => TranslateType): string {
-    return translate('nym-donation') as string;
-  }
-
   static utf16Split(s: string, chunksize: number): string[] {
     const ans = [];
 
@@ -293,8 +272,7 @@ export default class Utils {
     const to = sendPageState.toaddr;
     const donationAddress: boolean =
       to.to === (await Utils.getDonationAddress(server.chainName)) ||
-      to.to === (await Utils.getZenniesDonationAddress(server.chainName)) ||
-      to.to === (await Utils.getNymDonationAddress(server.chainName));
+      to.to === (await Utils.getZenniesDonationAddress(server.chainName));
 
     const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
     const amount = parseInt(
@@ -357,10 +335,6 @@ export default class Utils {
       });
     }
 
-    console.log('Sending:');
-    console.log(jsonFlat);
-    console.log(donationTransaction);
-
     return [...jsonFlat, ...donationTransaction];
   }
 
@@ -368,10 +342,7 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
-    //const start = Date.now();
-    const result: string = await RPCModule.parseAddressInfo(address);
-    //console.log('=========================================== > parse address - ', Date.now() - start);
-    //console.log(result);
+    const result: string = await parseAddress(address);
     let isValid: boolean = false;
     let isFullUA: boolean = false;
     let onlyOrchardUA: string = '';
@@ -421,10 +392,7 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<boolean> {
-    //const start = Date.now();
-    const result: string = await RPCModule.parseAddressInfo(address);
-    //console.log('=========================================== > parse address - ', Date.now() - start);
-    //console.log(result);
+    const result: string = await parseAddress(address);
     if (result) {
       if (result.toLowerCase().startsWith(GlobalConst.error)) {
         return false;
@@ -439,8 +407,6 @@ export default class Utils {
       return false;
     }
 
-    //console.log('parse-memo', address, resultJSON);
-
     return (
       resultJSON.status === RPCParseAddressStatusEnum.successAddressParse &&
       resultJSON.address_kind !== RPCAddressKindEnum.transparentAddressKind &&
@@ -448,36 +414,6 @@ export default class Utils {
       resultJSON.chain_name === serverChainName
     );
   }
-
-  static isMessagesAddress(vt: ValueTransferType | ContactType): boolean {
-    // we can't check here in this VT if the memo is empty
-    // because this address/contact could have memos in another
-    // VT in the list.
-    // only for orchard or sapling
-    if (vt.address) {
-      // the performance in the list is really bad if here I asked properly
-      // to zingolib (parse_address command) about the type of the address.
-      return !vt.address.startsWith('t');
-    } else {
-      const { memoUA } = Utils.splitMemo(vt.memos);
-      return !!memoUA;
-    }
-  }
-
-  static messagesAddress = (vt: ValueTransferType | ContactType): string => {
-    // we can't check here in this VT if the memo is empty
-    // because this address/contact could have memos in another
-    // VT in the list.
-    // only for orchard or sapling
-    if (vt.address) {
-      // the performance in the list is really bad if here I asked properly
-      // to zingolib (parse_address command) about the type of the address.
-      return !vt.address.startsWith('t') ? vt.address : '';
-    } else {
-      const { memoUA } = Utils.splitMemo(vt.memos);
-      return memoUA ? memoUA : '';
-    }
-  };
 
   static splitMemo = (
     memos: string[] | undefined,
@@ -535,5 +471,26 @@ export default class Utils {
 
   static diffInMinutes(from: Date, to: Date): number {
     return differenceInMinutes(from, to);
+  }
+
+  /**
+   * zingolib surfaces chain-mismatch errors with the raw `ChainNameEnum`
+   * values ("main" / "test" / "regtest") embedded in the message (e.g.
+   * "Wallet chain name main doesn't match expected test"). This helper
+   * rewrites any standalone occurrence of those tokens with the matching
+   * `settings.value-chainname-*` translation (Mainnet / Testnet / Regtest)
+   * so error alerts and snackbars read naturally to the user.
+   *
+   * The match is word-bounded, so the substitution is safe for messages
+   * that don't contain a chain reference at all.
+   */
+  static humanizeChainTokens(
+    text: string,
+    translate: (key: string) => TranslateType,
+  ): string {
+    return text.replace(
+      /\b(main|test|regtest)\b/g,
+      token => translate(`settings.value-chainname-${token}`) as string,
+    );
   }
 }

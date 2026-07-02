@@ -1,6 +1,9 @@
-import { Alert, Linking } from 'react-native';
+import { Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { GlobalConst, TranslateType } from './AppState';
+import { sanitizePaths } from './utils/sanitizePaths';
+import { getZingoName, getZingoVersion } from './utils/ZingoAppData';
+import { showConfirm } from './showConfirm';
 
 export const sendEmail = async (
   translate: (key: string) => TranslateType,
@@ -9,9 +12,16 @@ export const sendEmail = async (
   body?: string,
 ) => {
   const email: string = translate('email') as string;
-  const subjectEmail: string = subject || (translate('subject') as string);
-  const bodyEmail: string = body || (translate('body') as string);
-  const zingoVersionEmail: string = translate('version') as string;
+  // Sanitize subject + body so a stack-trace or path baked into an error
+  // never leaks the developer's username (Hermes embeds compile-time
+  // absolute paths into release stacks) or the user's profile folder.
+  const subjectEmail: string = sanitizePaths(
+    subject || (translate('subject') as string),
+  );
+  const bodyEmail: string = sanitizePaths(
+    body || (translate('body') as string),
+  );
+  const appLabel: string = `${getZingoName()} ${getZingoVersion()}`;
   const zingolibVersionEmail: string = zingolibVersion;
   const systemName = DeviceInfo.getSystemName();
   const systemVersion = DeviceInfo.getSystemVersion();
@@ -27,7 +37,7 @@ export const sendEmail = async (
       ' / ' +
       systemVersion +
       '\n' +
-      zingoVersionEmail +
+      appLabel +
       '\n' +
       (zingolibVersionEmail
         ? GlobalConst.zingolib + ': ' + zingolibVersionEmail
@@ -44,9 +54,10 @@ export const sendEmail = async (
       'Error opening email client:',
       err instanceof Error ? err.message : String(err),
     );
-    Alert.alert(
-      translate('loadedapp.email-error-title') as string,
-      translate('loadedapp.email-error-body') as string,
-    );
+    showConfirm({
+      title: translate('loadedapp.email-error-title') as string,
+      message: translate('loadedapp.email-error-body') as string,
+      buttons: [{ text: translate('close') as string }],
+    });
   }
 };

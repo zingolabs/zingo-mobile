@@ -71,8 +71,8 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
           flexDirection: 'row',
           marginTop: 15,
           paddingBottom: 15,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
+          borderBottomWidth: 1.5,
+          borderBottomColor: '#122033',
           opacity: 1,
         }}
       >

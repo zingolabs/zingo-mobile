@@ -10,6 +10,8 @@ type RegTextProps = {
   testID?: string;
   children: string | string[];
   selectable?: boolean;
+  numberOfLines?: number;
+  ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
 };
 
 const RegText: React.FunctionComponent<RegTextProps> = ({
@@ -19,6 +21,8 @@ const RegText: React.FunctionComponent<RegTextProps> = ({
   testID,
   children,
   selectable,
+  numberOfLines,
+  ellipsizeMode,
 }) => {
   const { colors } = useTheme() as ThemeType;
 
@@ -36,6 +40,8 @@ const RegText: React.FunctionComponent<RegTextProps> = ({
       style={styleSum}
       onPress={onPress}
       selectable={selectable}
+      numberOfLines={numberOfLines}
+      ellipsizeMode={ellipsizeMode}
     >
       {children}
     </Text>

@@ -1,0 +1,330 @@
+name: Android Release
+
+# Builds the 4 ABI APKs + the universal APK on a `zingo-*` tag and attaches
+# them to a fresh GitHub Release.
+#
+# Reliability note: this workflow does NOT read from or write to any
+# cross-run `actions/cache`. Rust libraries and uniffi kotlin bindings are
+# built from source on the tagged commit and passed between jobs via
+# `upload-artifact` (which is run-scoped and disappears after the workflow
+# finishes). The gradle `setup-gradle` step keeps Maven dependency caching
+# enabled because Maven artifacts are content-addressed and signed — that
+# cache cannot affect what code ends up in the APK.
+
+on:
+  push:
+    tags:
+      - 'zingo-*'
+
+permissions:
+  contents: write
+
+jobs:
+  uniffi-kotlin:
+    name: Generate uniffi kotlin bindings
+    runs-on: ubuntu-24.04
+    container:
+      image: zingodevops/android_builder:018
+    env:
+      RUSTUP_HOME: ${{ github.workspace }}/.rustup
+      CARGO_HOME:  ${{ github.workspace }}/.cargo
+    steps:
+      - name: Install libraries
+        run: |
+          apt update \
+            && apt upgrade -y \
+            && apt install -y --no-install-recommends --no-install-suggests \
+            build-essential cmake golang clang-18 libclang-18-dev protobuf-compiler gcc g++
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Cargo default stable
+        run: |
+          rustup update
+          rustup upgrade
+          rustup toolchain install stable --profile minimal --component rust-src
+          rustup default stable
+
+      - name: AWS libcrypto rust building
+        run: cargo install --force --locked bindgen-cli
+
+      - name: Cargo uniffi kotlin
+        working-directory: ./rust/lib
+        run: |
+          cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
+          generate ./src/zingo.udl --language kotlin \
+          --out-dir ../../android/app/build/generated/source/uniffi/release/java
+
+      - name: Upload kotlin uniffi
+        uses: actions/upload-artifact@v7
+        with:
+          name: uniffi-kotlin
+          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo/zingo.kt
+
+  native-rust:
+    name: Build native rust (${{ matrix.arch }})
+    runs-on: ubuntu-24.04
+    container:
+      image: zingodevops/android_builder:018
+    env:
+      RUSTUP_HOME: ${{ github.workspace }}/.rustup
+      CARGO_HOME:  ${{ github.workspace }}/.cargo
+    strategy:
+      fail-fast: true
+      matrix:
+        arch: [x86_64, x86, arm64-v8a, armeabi-v7a]
+    steps:
+      - name: Install libraries
+        run: |
+          apt update \
+            && apt upgrade -y \
+            && apt install -y --no-install-recommends --no-install-suggests \
+            build-essential cmake golang clang-18 libclang-18-dev protobuf-compiler gcc g++
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Cargo default stable
+        run: |
+          rustup update
+          rustup upgrade
+          rustup toolchain install stable --profile minimal --component rust-src
+          rustup default stable
+
+      - name: AWS libcrypto rust building
+        run: cargo install --force --locked bindgen-cli
+
+      - name: Set envs for x86_64
+        if: ${{ matrix.arch == 'x86_64' }}
+        run: |
+          rustup target add x86_64-linux-android
+          echo "TARGET=x86_64-linux-android" >> $GITHUB_ENV
+          echo "CC=x86_64-linux-android"     >> $GITHUB_ENV
+          echo "CARGO_FEATURE_STD=false"     >> $GITHUB_ENV
+
+      - name: Set envs for x86
+        if: ${{ matrix.arch == 'x86' }}
+        run: |
+          rustup target add i686-linux-android
+          echo "TARGET=i686-linux-android" >> $GITHUB_ENV
+          echo "CC=i686-linux-android"     >> $GITHUB_ENV
+          echo "CARGO_FEATURE_STD=false"   >> $GITHUB_ENV
+
+      - name: Set envs for arm64-v8a
+        if: ${{ matrix.arch == 'arm64-v8a' }}
+        run: |
+          rustup target add aarch64-linux-android
+          echo "TARGET=aarch64-linux-android" >> $GITHUB_ENV
+          echo "CC=aarch64-linux-android"     >> $GITHUB_ENV
+          echo "CARGO_FEATURE_STD=true"       >> $GITHUB_ENV
+
+      - name: Set envs for armeabi-v7a
+        if: ${{ matrix.arch == 'armeabi-v7a' }}
+        run: |
+          rustup target add armv7-linux-androideabi
+          echo "TARGET=armv7-linux-androideabi" >> $GITHUB_ENV
+          echo "CC=armv7a-linux-androideabi"    >> $GITHUB_ENV
+          echo "CARGO_FEATURE_STD=false"        >> $GITHUB_ENV
+
+      - name: Cargo NDK
+        run: cargo install --version 4.0.1 cargo-ndk
+
+      - name: Cargo build
+        working-directory: ./rust/lib
+        run: |
+          cargo ndk \
+          --target ${{ env.TARGET }} build \
+          --release
+        env:
+          AR: llvm-ar
+          LD: ld
+          RANLIB: llvm-ranlib
+          CC: ${{ env.CC }}26-clang
+          CARGO_FEATURE_STD: ${{ env.CARGO_FEATURE_STD }}
+          LIBCLANG_PATH: /usr/lib/llvm-18/lib
+          CARGO_NDK_PLATFORM: 26
+          CARGO_NDK_ANDROID_PLATFORM: 26
+
+      - name: LLVM Strip
+        working-directory: ./rust/target
+        run: llvm-strip --strip-all ./${{ env.TARGET }}/release/libzingo.so
+
+      - name: LLVM Obj Copy
+        working-directory: ./rust/target
+        run: llvm-objcopy --remove-section .comment ./${{ env.TARGET }}/release/libzingo.so
+
+      - name: Rename the rust lib for uniffi compatibility
+        working-directory: ./rust/target/${{ env.TARGET }}/release
+        run: mv ./libzingo.so ./libuniffi_zingo.so
+
+      - name: Upload native rust
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-rust-${{ matrix.arch }}
+          path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
+
+  android-release:
+    name: Assemble APKs and create GitHub Release
+    runs-on: ubuntu-24.04
+    needs: [uniffi-kotlin, native-rust]
+    steps:
+      - name: Derive channel + version + build from tag
+        id: channel
+        run: |
+          set -eu
+          TAG="${GITHUB_REF_NAME}"
+
+          # Tag formats:
+          #   prod: zingo-X.Y.Z-BUILD
+          #   beta: zingo-beta-X.Y.Z-BUILD
+          BUILD="${TAG##*-}"             # last segment
+          WITHOUT_BUILD="${TAG%-*}"      # strip -BUILD
+          VERSION="${WITHOUT_BUILD##*-}" # next segment
+          PREFIX="${WITHOUT_BUILD%-*}"   # the rest: zingo or zingo-beta
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "build=${BUILD}"     >> "$GITHUB_OUTPUT"
+          echo "prefix=${PREFIX}"   >> "$GITHUB_OUTPUT"
+
+          if [[ "$TAG" == zingo-beta-* ]]; then
+            echo "channel=beta"                       >> "$GITHUB_OUTPUT"
+            echo "flavor=beta"                        >> "$GITHUB_OUTPUT"
+            echo "gradle_task=assembleBetaRelease"    >> "$GITHUB_OUTPUT"
+            echo "apk_prefix=app-beta"                >> "$GITHUB_OUTPUT"
+            echo "label=Zingo Beta"                   >> "$GITHUB_OUTPUT"
+          else
+            echo "channel=prod"                       >> "$GITHUB_OUTPUT"
+            echo "flavor=prod"                        >> "$GITHUB_OUTPUT"
+            echo "gradle_task=assembleProdRelease"    >> "$GITHUB_OUTPUT"
+            echo "apk_prefix=app-prod"                >> "$GITHUB_OUTPUT"
+            echo "label=Zingo"                        >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Free up disk space
+        run: |
+          set -eux
+          df -h
+          sudo rm -rf /usr/local/graalvm/ \
+                      /usr/local/share/powershell \
+                      /usr/local/share/chromium \
+                      /usr/local/.ghcup \
+                      /opt/hostedtoolcache/CodeQL \
+                      /usr/local/lib/android/sdk/ndk \
+                      /usr/share/dotnet \
+                      /opt/ghc \
+                      /usr/local/share/boost
+          df -h
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Maven dependency caching only — content-addressed, immutable, signed
+      # by upstream. No build outputs are cached cross-run.
+      - name: Gradle setup (Maven dep cache only)
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: wrapper
+          cache-read-only: true
+
+      - name: Download native rust (x86_64)
+        uses: actions/download-artifact@v4
+        with:
+          name: native-rust-x86_64
+          path: android/app/src/main/jniLibs/x86_64
+
+      - name: Download native rust (x86)
+        uses: actions/download-artifact@v4
+        with:
+          name: native-rust-x86
+          path: android/app/src/main/jniLibs/x86
+
+      - name: Download native rust (arm64-v8a)
+        uses: actions/download-artifact@v4
+        with:
+          name: native-rust-arm64-v8a
+          path: android/app/src/main/jniLibs/arm64-v8a
+
+      - name: Download native rust (armeabi-v7a)
+        uses: actions/download-artifact@v4
+        with:
+          name: native-rust-armeabi-v7a
+          path: android/app/src/main/jniLibs/armeabi-v7a
+
+      - name: Download kotlin uniffi
+        uses: actions/download-artifact@v4
+        with:
+          name: uniffi-kotlin
+          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      - name: Yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: Assemble APKs (4 ABI splits + universal)
+        working-directory: android
+        run: ./gradlew ${{ steps.channel.outputs.gradle_task }} -PsplitApk=true -PincludeUniversalApk=true
+
+      - name: Collect APKs
+        run: |
+          set -eu
+          SRC="android/app/build/outputs/apk/${{ steps.channel.outputs.flavor }}/release"
+          DST="release-artifacts"
+          mkdir -p "$DST"
+          IN_PREFIX="${{ steps.channel.outputs.apk_prefix }}"
+          OUT_PREFIX="${{ steps.channel.outputs.prefix }}"
+          VERSION="${{ steps.channel.outputs.version }}"
+          BUILD="${{ steps.channel.outputs.build }}"
+          for abi in armeabi-v7a arm64-v8a x86 x86_64 universal; do
+            src_file="$SRC/${IN_PREFIX}-${abi}-release.apk"
+            dst_file="$DST/${OUT_PREFIX}-${abi}-${VERSION}-${BUILD}.apk"
+            if [[ ! -f "$src_file" ]]; then
+              echo "missing expected APK: $src_file" >&2
+              ls -la "$SRC" >&2 || true
+              exit 1
+            fi
+            cp "$src_file" "$dst_file"
+            echo "  $dst_file"
+          done
+          ls -la "$DST"
+
+      - name: Generate release notes
+        id: notes
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const tag = context.ref.replace('refs/tags/', '');
+            const { data } = await github.rest.repos.generateReleaseNotes({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+            });
+            return data.body;
+          result-encoding: string
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: ${{ steps.channel.outputs.label }} ${{ github.ref_name }}
+          body: |
+            ${{ steps.notes.outputs.result }}
+
+            ## Zingolabs
+            * @Oscar-Pepper @fluidvanadium @AloeareV @idky137 @dorianvp @nachog00 @karentaponte and @zancas making the magic behind the scenes.
+
+            ## Manual Testing
+            * Android & IOS by @edicksonjga & @juanky201271.
+          files: release-artifacts/*.apk
+          draft: false
+          prerelease: ${{ steps.channel.outputs.channel == 'beta' }}

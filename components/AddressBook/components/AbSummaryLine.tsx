@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, TouchableOpacity, Alert } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import { showConfirm } from '../../../app/showConfirm';
 import {
   NavigationProp,
   ParamListBase,
@@ -34,8 +35,7 @@ import { ContextAppLoaded } from '../../../app/context';
 type AbSummaryLineProps = {
   index: number;
   item: AddressBookFileClass;
-  setCurrentItem: (b: number) => void;
-  setAction: (action: AddressBookActionEnum) => void;
+  openAbDetail: (index: number, action: AddressBookActionEnum) => void;
   handleScrollToTop: () => void;
   doAction: (
     action: AddressBookActionEnum,
@@ -48,8 +48,7 @@ type AbSummaryLineProps = {
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   index,
   item,
-  setCurrentItem,
-  setAction,
+  openAbDetail,
   handleScrollToTop,
   doAction,
   addressProtected,
@@ -76,10 +75,10 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
     : (translate('info.unknown') as string);
 
   const onPressDelete = () => {
-    Alert.alert(
-      translate('addressbook.delete-title') as string,
-      translate('addressbook.delete-alert') as string,
-      [
+    showConfirm({
+      title: translate('addressbook.delete-title') as string,
+      message: translate('addressbook.delete-alert') as string,
+      buttons: [
         {
           text: translate('confirm') as string,
           onPress: () =>
@@ -92,8 +91,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
         },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: false },
-    );
+    });
   };
 
   //console.log('render Ab SummaryLine - 5', index);
@@ -109,9 +107,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           flexDirection: 'row',
           marginTop: 15,
           paddingBottom: 15,
-          borderBottomWidth: addressProtected ? 3 : 1,
-          borderBottomColor: addressProtected ? colors.zingo : colors.border,
-          opacity: addressProtected ? 0.5 : 1,
+          borderBottomWidth: 1.5,
+          borderBottomColor: '#122033',
         }}
       >
         <View
@@ -124,8 +121,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           <TouchableOpacity
             onPress={() => {
               if (!addressProtected) {
-                setCurrentItem(index);
-                setAction(AddressBookActionEnum.Modify);
+                openAbDetail(index, AddressBookActionEnum.Modify);
                 handleScrollToTop();
               }
             }}
@@ -186,8 +182,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             <TouchableOpacity
               style={{ zIndex: 999, padding: 10 }}
               onPress={() => {
-                setCurrentItem(index);
-                setAction(AddressBookActionEnum.Modify);
+                openAbDetail(index, AddressBookActionEnum.Modify);
                 handleScrollToTop();
               }}
             >

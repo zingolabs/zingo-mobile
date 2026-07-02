@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, TextInput, TouchableOpacity, Keyboard } from 'react-native';
+import { View, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { AddressBookFileClass, ButtonTypeEnum } from '../../../app/AppState';
@@ -8,22 +8,20 @@ import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../../app/utils';
 import { AddressBookFileImpl } from '../../AddressBook';
 
 type NewAddressTagProps = {
   address: string;
+  own: boolean;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
-  setHeightLayout: (h: number) => void;
 };
 const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   address,
+  own,
   closeSheet,
   setAddressBook,
-  setHeightLayout,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
@@ -36,15 +34,13 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
       if (!label) {
         return;
       }
-      //console.log(label, address);
       const randomColors = Utils.generateColorList(1);
       const ab = await AddressBookFileImpl.writeAddressBookItem(
         label,
         address,
         randomColors[0],
-        true,
+        own,
       );
-      //console.log(ab);
       setAddressBook(ab);
     } catch (error) {
       console.log(`Critical Error new address ${error}`);
@@ -59,39 +55,29 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
 
   return (
     <View
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        //console.log('LAYOUTTT', height);
-        setHeightLayout(height + 70);
-      }}
       style={{
-        backgroundColor: colors.background,
+        backgroundColor: colors.bottomSheetBackground,
       }}
     >
-      <TouchableOpacity
-        onPress={() => {
-          setLabel('');
-          Keyboard.dismiss();
-          setTimeout(() => {
-            closeSheet();
-          }, 100);
-        }}
-      >
-        <FontAwesomeIcon
-          size={24}
-          icon={faXmark}
-          color={colors.text}
-          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
-        />
-      </TouchableOpacity>
-      <RegText
-        style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}
-      >
-        {translate('receive.add-tag') as string}
-      </RegText>
       <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
         <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
-          {'Tag'}
+          {translate('addressbook.address') as string}
+        </RegText>
+        <View
+          style={{
+            paddingHorizontal: 10,
+            marginTop: 6,
+          }}
+        >
+          <RegText>{Utils.trimToSmall(address, 10)}</RegText>
+        </View>
+
+        <RegText style={{ marginTop: 18, paddingHorizontal: 10 }}>
+          {
+            (own
+              ? translate('addressbook.tag')
+              : translate('addressbook.contact')) as string
+          }
         </RegText>
         <View
           style={{
@@ -121,7 +107,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
                 fontSize: 14,
                 minWidth: 48,
                 minHeight: 48,
-                marginLeft: 5,
+                padding: 10,
                 backgroundColor: 'transparent',
               }}
               placeholder={translate('addressbook.label-placeholder') as string}
@@ -140,7 +126,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-            marginTop: 30,
+            marginTop: 15,
           }}
         >
           <Button

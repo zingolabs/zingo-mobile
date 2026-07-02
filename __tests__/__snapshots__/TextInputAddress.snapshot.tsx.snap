@@ -56,7 +56,7 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
                 "color": "#c3c3c3",
                 "fontSize": 14,
                 "fontWeight": "600",
-                "marginLeft": 5,
+                "padding": 10,
               }
             }
             testID="send.addressplaceholder"
@@ -95,6 +95,7 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
             accessible={true}
             collapsable={false}
             focusable={false}
+            hitSlop={8}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -217,7 +218,7 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
                 "color": "#c3c3c3",
                 "fontSize": 14,
                 "fontWeight": "600",
-                "marginLeft": 5,
+                "padding": 10,
               }
             }
             testID="send.addressplaceholder"
@@ -256,6 +257,7 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
             accessible={true}
             collapsable={false}
             focusable={true}
+            hitSlop={8}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}

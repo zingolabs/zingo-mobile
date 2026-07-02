@@ -19,8 +19,8 @@ import {
   BlockExplorerEnum,
 } from '../AppState';
 
-import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
+import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
@@ -67,7 +67,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   restartApp: () => {},
   somePending: false,
   addressBook: [] as AddressBookFileClass[],
-  launchAddressBook: () => {},
+  launchAddTagModal: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,
@@ -84,6 +84,8 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   nym: false,
   setNymOption: async () => {},
   setModeOption: async () => {},
+  setCurrencyOption: async () => {},
+  foregroundEpoch: 0,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

@@ -3,7 +3,7 @@ import {
   LanguageEnum,
   BlockExplorerEnum,
 } from '../../app/AppState';
-import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const mockTranslate = (p: string) => {
   if (p === 'about.copyright') {
@@ -32,10 +32,6 @@ export const mockTranslate = (p: string) => {
       {
         value: CurrencyEnum.USDCurrency,
         text: 'text USD',
-      },
-      {
-        value: CurrencyEnum.USDTORCurrency,
-        text: 'text USD TOR',
       },
     ];
   } else if (p === 'settings.languages') {

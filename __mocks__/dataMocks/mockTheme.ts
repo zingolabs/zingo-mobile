@@ -18,6 +18,8 @@ export const mockTheme: ThemeType = {
     syncing: '#ebff5a',
     notification: '',
     sideMenuBackground: '#040C17',
+    bottomSheetBackground: '#031124',
+    bottomSheetBorder: '#05234C',
     warning: {
       background: '#262527',
       border: '#65491C',

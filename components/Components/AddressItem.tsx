@@ -38,7 +38,9 @@ type AddressItemProps = {
 
 const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   address,
-  screenName,
+  // screenName is still in the type for backward compat with all callers but
+  // no longer consumed here — launchAddTagModal works the same regardless of
+  // where it's invoked from.
   oneLine,
   onlyContact,
   withIcon,
@@ -52,7 +54,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     translate,
     addLastSnackbar,
     addressBook,
-    launchAddressBook,
+    launchAddTagModal,
     privacy,
     readOnly,
     mode,
@@ -196,9 +198,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             )}
           </View>
           {withIcon && !contact && oneLine && (
-            <TouchableOpacity
-              onPress={() => launchAddressBook(address, screenName)}
-            >
+            <TouchableOpacity onPress={() => launchAddTagModal(address)}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -218,9 +218,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             </TouchableOpacity>
           )}
           {withIcon && !contact && !oneLine && (
-            <TouchableOpacity
-              onPress={() => launchAddressBook(address, screenName)}
-            >
+            <TouchableOpacity onPress={() => launchAddTagModal(address)}>
               <FontAwesomeIcon
                 style={{ marginTop: 3 }}
                 size={24}

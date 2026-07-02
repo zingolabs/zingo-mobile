@@ -1,35 +1,33 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-  Alert,
-  AlertButton,
-} from 'react-native';
+import { TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import FadeText from './FadeText';
 import { ContextAppLoaded } from '../../app/context';
-import RPC from '../../app/rpc';
+import { getZecPrice } from '../../app/walletBackend';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
-import { CurrencyEnum, ModeEnum } from '../../app/AppState';
+import { ModeEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
+import { showConfirm, ConfirmButton } from '../../app/showConfirm';
 
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
   textBefore?: string;
+  backgroundColor?: string;
 };
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   setZecPrice,
   textBefore,
+  backgroundColor,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode, currency } = context;
+  const { translate, zecPrice, addLastSnackbar, mode } = context;
   const { colors } = useTheme() as ThemeType;
+  const bg = backgroundColor ?? colors.card;
 
   const [refreshMinutes, setRefreshMinutes] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -61,12 +59,12 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     }
   };
 
-  const onPressFetch = async (withTor: boolean) => {
+  const onPressFetch = async () => {
     setLoading(true);
     let price: number;
     let error: string;
     // first attempt
-    ({ price, error } = await RPC.rpcGetZecPrice(withTor));
+    ({ price, error } = await getZecPrice());
     //console.log('first price fetching', price, error);
     // values:
     // 0   - initial/default value
@@ -75,7 +73,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     // > 0 - real value
     if (price <= 0) {
       // second attempt
-      ({ price, error } = await RPC.rpcGetZecPrice(withTor));
+      ({ price, error } = await getZecPrice());
       //console.log('second price fetching', price, error);
     }
 
@@ -103,32 +101,18 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   };
 
   const onPressFetchAlert = () => {
-    const buttons: AlertButton[] = [
-      ...[
-        currency === CurrencyEnum.USDCurrency
-          ? {
-              text: translate('send.fetch-button') as string,
-              onPress: () => onPressFetch(false),
-            }
-          : {},
-      ],
-      ...[
-        currency === CurrencyEnum.USDCurrency ||
-        currency === CurrencyEnum.USDTORCurrency
-          ? {
-              text: translate('send.fetchwithtor-button') as string,
-              onPress: () => onPressFetch(true),
-            }
-          : {},
-      ],
+    const buttons: ConfirmButton[] = [
+      {
+        text: translate('send.fetch-button') as string,
+        onPress: () => onPressFetch(),
+      },
       { text: translate('cancel') as string, style: 'cancel' },
     ];
-    Alert.alert(
-      translate('send.fetchpricetitle') as string,
-      translate('send.fetchpricebody') as string,
-      buttons.filter((b: AlertButton) => !!b.text),
-      { cancelable: false },
-    );
+    showConfirm({
+      title: translate('send.fetchpricetitle') as string,
+      message: translate('send.fetchpricebody') as string,
+      buttons,
+    });
   };
 
   return (
@@ -140,7 +124,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.card,
+            backgroundColor: bg,
             margin: 0,
             marginTop: 10,
             padding: 5,
@@ -160,7 +144,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
         <TouchableOpacity
           disabled={loading}
           onPress={() =>
-            mode === ModeEnum.basic ? onPressFetch(false) : onPressFetchAlert()
+            mode === ModeEnum.basic ? onPressFetch() : onPressFetchAlert()
           }
         >
           <View
@@ -169,7 +153,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
               flexWrap: 'wrap',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.card,
+              backgroundColor: bg,
               margin: 0,
               marginTop: 10,
               padding: 5,

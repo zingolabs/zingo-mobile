@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
-
-exports[`MessagesAll - snapshot MessagesAll renders (currently returns null) 1`] = `null`;

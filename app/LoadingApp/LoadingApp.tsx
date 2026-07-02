@@ -1,7 +1,5 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
-  Alert,
-  Modal,
   I18nManager,
   EmitterSubscription,
   AppState,
@@ -19,7 +17,28 @@ import NetInfo, {
   NetInfoState,
 } from '@react-native-community/netinfo/src/index';
 
-import RPCModule from '../RPCModule';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
+import CustomServerModalHost from './components/CustomServerModalHost';
+import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
+import ConfirmBottomSheet from '../../components/Components/ConfirmBottomSheet';
+import { showConfirm } from '../showConfirm';
+
+import {
+  createNewWallet,
+  getVersionInfo,
+  getWalletKind,
+  loadExistingWallet,
+  restoreExistingWalletBackup,
+  restoreWalletFromSeed,
+  restoreWalletFromUfvk,
+  setCryptoDefaultProvider,
+  walletBackupExists,
+  walletExists as rpcWalletExists,
+} from '../walletBackend';
 import {
   AppStateLoading,
   BackgroundType,
@@ -49,16 +68,18 @@ import {
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import RPC from '../rpc';
+import { fetchWallet } from '../walletBackend';
 import { ThemeType } from '../types';
 import { ContextAppLoadingProvider } from '../context';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
-import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
+import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
+import Utils from '../utils';
+import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../rpc/types/RPCSeedType';
+import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
@@ -68,15 +89,15 @@ import {
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../recoveryWalletInfov10';
+} from '../recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
 import ImportUfvk from './components/ImportUfvk';
 import { sendEmail } from '../sendEmail';
-import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
+import { RPCWalletKindEnum } from '../walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
-import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
+import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
 
@@ -85,9 +106,6 @@ const es = require('../translations/es.json');
 const pt = require('../translations/pt.json');
 const ru = require('../translations/ru.json');
 const tr = require('../translations/tr.json');
-
-// for testing
-//const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 type LoadingAppProps = {
   navigation: StackScreenProps<
@@ -167,7 +185,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const i18n = useMemo(() => new I18n(file), [file]);
 
   const translate: (key: string) => TranslateType = (key: string) =>
-    i18n.t(key);
+    substituteZingoName(i18n.t(key) as TranslateType);
 
   useEffect(() => {
     (async () => {
@@ -189,7 +207,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         setFirstLaunchingMessage(LaunchingModeEnum.installing);
       } else if (
         settings.version === '' ||
-        settings.version !== (translate('version') as string)
+        settings.version !== getZingoVersion()
       ) {
         // this is an update
         setFirstLaunchingMessage(LaunchingModeEnum.updating);
@@ -256,8 +274,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       }
       if (
         settings.currency === CurrencyEnum.noCurrency ||
-        settings.currency === CurrencyEnum.USDCurrency ||
-        settings.currency === CurrencyEnum.USDTORCurrency
+        settings.currency === CurrencyEnum.USDCurrency
       ) {
         setCurrency(settings.currency);
       } else {
@@ -369,9 +386,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         }
       }
 
-      // for testing
-      //await delay(5000);
-
       // reading background task info
       const backgroundSyncInfoJson = await BackgroundFileImpl.readBackground();
       setBackgroundSyncInfo(backgroundSyncInfoJson);
@@ -454,6 +468,9 @@ export class LoadingAppClass extends Component<
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
   clipboardTimer: ReturnType<typeof setTimeout> | null = null;
+  customServerModalRef: React.RefObject<React.ComponentRef<
+    typeof BottomSheetModal
+  > | null>;
   screenName = ScreenEnum.LoadingApp;
 
   constructor(props: LoadingAppClassProps) {
@@ -496,11 +513,10 @@ export class LoadingAppClass extends Component<
       screen:
         !!props.route.params && props.route.params.screen !== undefined
           ? props.route.params.screen
-          : 0,
+          : RouteEnum.Launching,
       actionButtonsDisabled: false,
       walletExists: false,
       hasBackupWallet: false,
-      customServerShow: false,
       customServerUri: '',
       customServerChainName: ChainNameEnum.mainChainName,
       customServerOffline: false,
@@ -522,6 +538,7 @@ export class LoadingAppClass extends Component<
     this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
+    this.customServerModalRef = React.createRef();
   }
 
   componentDidMount = async () => {
@@ -547,10 +564,10 @@ export class LoadingAppClass extends Component<
         const resultBio = this.state.security.startApp
           ? await simpleBiometrics({ translate: this.state.translate })
           : true;
-        // can be:
-        // - true      -> the user do pass the authentication
-        // - false     -> the user do NOT pass the authentication
-        // - undefined -> no biometric authentication available -> Passcode.
+        // resultBio:
+        // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
+        // - false     -> user cancelled or failed the prompt
+        // - undefined -> device has no auth method at all; allow (cannot lock the user out)
         if (resultBio === false) {
           this.setState({ biometricsFailed: true });
           return;
@@ -568,7 +585,7 @@ export class LoadingAppClass extends Component<
 
     // The App needs to set the crypto Provider by default to ring
     // before anything...
-    const r = await RPCModule.setCryptoDefaultProvider();
+    const r = await setCryptoDefaultProvider();
     console.log('crypto provider result', r);
 
     // Here the App ask about the new donation feature if needed.
@@ -613,24 +630,20 @@ export class LoadingAppClass extends Component<
 
     // Second, check if a wallet exists. Do it async so the basic screen has time to render
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-    const exists = await RPCModule.walletExists();
-    const backupExists = await RPCModule.walletBackupExists();
-    if (backupExists && backupExists !== GlobalConst.false) {
+    const exists = await rpcWalletExists();
+    const backupExists = await walletBackupExists();
+    if (backupExists) {
       this.setState({ hasBackupWallet: true });
     }
 
-    if (exists && exists !== GlobalConst.false) {
+    if (exists) {
       this.setState({ walletExists: true });
-      let result: string = await RPCModule.loadExistingWallet(
+      let result: string = await loadExistingWallet(
         this.state.server.uri,
         this.state.server.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
-      //let result = 'Error: pepe es guapo';
-
-      // for testing
-      //await delay(5000);
 
       let error = false;
       let errorText = '';
@@ -645,7 +658,7 @@ export class LoadingAppClass extends Component<
             let orchardPool: boolean = false;
             let saplingPool: boolean = false;
             let transparentPool: boolean = false;
-            const walletKindStr: string = await RPCModule.walletKindInfo();
+            const walletKindStr: string = await getWalletKind();
             try {
               const walletKindJSON: RPCWalletKindType =
                 await JSON.parse(walletKindStr);
@@ -670,7 +683,7 @@ export class LoadingAppClass extends Component<
               transparentPool = walletKindJSON.transparent;
               // if the seed & birthday are not stored in Keychain/Keystore, do it now.
               if (this.state.recoveryWalletInfoOnDevice) {
-                const wallet = await RPC.rpcFetchWallet(readOnly);
+                const wallet = await fetchWallet(readOnly);
                 if (wallet) {
                   await createUpdateRecoveryWalletInfo(wallet);
                 }
@@ -696,13 +709,6 @@ export class LoadingAppClass extends Component<
                 actionButtonsDisabled: false,
               });
               this.addLastSnackbar(walletKindStr);
-            }
-            // creating tor cliente if needed
-            if (
-              this.state.currency === CurrencyEnum.USDTORCurrency ||
-              this.state.currency === CurrencyEnum.USDCurrency
-            ) {
-              await RPCModule.createTorClientProcess();
             }
             // if the App is restoring another wallet backup...
             // needs to recalculate the Address Book.
@@ -733,9 +739,9 @@ export class LoadingAppClass extends Component<
       }
       if (error) {
         await this.walletErrorHandle(
-          errorText,
+          Utils.humanizeChainTokens(errorText, this.state.translate),
           this.state.translate('loadingapp.readingwallet-label') as string,
-          1,
+          RouteEnum.StartMenu,
           true,
         );
       }
@@ -753,7 +759,7 @@ export class LoadingAppClass extends Component<
           // go to the initial menu, giving the opportunity to the user
           // to use the seed & birthday recovered from the device.
           this.setState({
-            screen: 1,
+            screen: RouteEnum.StartMenu,
             walletExists: false,
             actionButtonsDisabled: false,
           });
@@ -765,7 +771,7 @@ export class LoadingAppClass extends Component<
             this.state.selectServer === SelectServerEnum.offline
           ) {
             this.setState({
-              screen: 1,
+              screen: RouteEnum.StartMenu,
               walletExists: false,
               actionButtonsDisabled: false,
             });
@@ -789,7 +795,10 @@ export class LoadingAppClass extends Component<
           true,
         );
         this.setState(state => ({
-          screen: state.screen === 3 ? 3 : 1,
+          screen:
+            state.screen === RouteEnum.ImportUfvk
+              ? RouteEnum.ImportUfvk
+              : RouteEnum.StartMenu,
           walletExists: false,
           actionButtonsDisabled: false,
         }));
@@ -816,10 +825,11 @@ export class LoadingAppClass extends Component<
             (this.state.backgroundError.title ||
               this.state.backgroundError.error)
           ) {
-            Alert.alert(
-              this.state.backgroundError.title,
-              this.state.backgroundError.error,
-            );
+            showConfirm({
+              title: this.state.backgroundError.title,
+              message: this.state.backgroundError.error,
+              buttons: [{ text: this.state.translate('close') as string }],
+            });
             this.setBackgroundError('', '');
           }
         }
@@ -851,14 +861,17 @@ export class LoadingAppClass extends Component<
               isConnectionExpensive:
                 state.details && state.details.isConnectionExpensive,
             },
-            screen: screen === 3 ? 3 : screen !== 0 ? 1 : 0,
+            screen:
+              screen === RouteEnum.ImportUfvk
+                ? RouteEnum.ImportUfvk
+                : screen !== RouteEnum.Launching
+                  ? RouteEnum.StartMenu
+                  : RouteEnum.Launching,
             //actionButtonsDisabled: true,
           });
           if (isConnected !== state.isConnected) {
             if (!state.isConnected) {
-              this.setState({
-                customServerShow: false,
-              });
+              this.customServerModalRef.current?.dismiss();
             } else {
               // if it is offline & there is no wallet file
               // the screen is going to be empty
@@ -867,13 +880,14 @@ export class LoadingAppClass extends Component<
                 this.state.selectServer === SelectServerEnum.offline &&
                 !this.state.walletExists
               ) {
-                this.setState({
-                  customServerShow: true,
-                });
+                this.customServerModalRef.current?.present();
               }
-              if (screen !== 0) {
+              if (screen !== RouteEnum.Launching) {
                 this.setState({
-                  screen: screen === 3 ? 3 : screen !== 0 ? 1 : 0,
+                  screen:
+                    screen === RouteEnum.ImportUfvk
+                      ? RouteEnum.ImportUfvk
+                      : RouteEnum.StartMenu,
                 });
               }
             }
@@ -890,9 +904,7 @@ export class LoadingAppClass extends Component<
       this.state.selectServer === SelectServerEnum.offline &&
       !this.state.walletExists
     ) {
-      this.setState({
-        customServerShow: true,
-      });
+      this.customServerModalRef.current?.present();
     }
   };
 
@@ -908,10 +920,14 @@ export class LoadingAppClass extends Component<
 
   showDonationAlertAsync = (): Promise<void> => {
     return new Promise((resolve, reject) => {
-      Alert.alert(
-        this.state.translate('loadingapp.alert-donation-title') as string,
-        this.state.translate('loadingapp.alert-donation-body') as string,
-        [
+      showConfirm({
+        title: this.state.translate(
+          'loadingapp.alert-donation-title',
+        ) as string,
+        message: this.state.translate(
+          'loadingapp.alert-donation-body',
+        ) as string,
+        buttons: [
           {
             text: this.state.translate('confirm') as string,
             onPress: () => resolve(),
@@ -922,8 +938,7 @@ export class LoadingAppClass extends Component<
             onPress: () => reject(),
           },
         ],
-        { cancelable: false },
-      );
+      });
     });
   };
 
@@ -998,7 +1013,7 @@ export class LoadingAppClass extends Component<
   walletErrorHandle = async (
     result: string,
     title: string,
-    screen: number,
+    screen: RouteEnum,
     start: boolean,
   ) => {
     // first check the actual server
@@ -1054,6 +1069,35 @@ export class LoadingAppClass extends Component<
           screen,
         });
       } else {
+        // Audit Issue S — custom server users opted out of automatic
+        // server selection (almost always for privacy / self-hosting).
+        // The checkServer probe above is a 15-second latency check, not
+        // a causal diagnosis: even if it returns false, the original
+        // wallet error may or may not be server-related. Silently
+        // swapping the user's custom URI for a default would leak
+        // metadata to that default server. Surface the situation and
+        // let the user decide from Settings.
+        if (this.state.selectServer === SelectServerEnum.custom) {
+          createAlert(
+            this.setBackgroundError,
+            this.addLastSnackbar,
+            title,
+            this.state.translate(
+              'loadingapp.customserver-unreachable',
+            ) as string,
+            false,
+            this.state.translate,
+            sendEmail,
+            this.state.zingolibVersion,
+          );
+          this.setState({
+            actionButtonsDisabled: false,
+            serverErrorTries: 0,
+            screen,
+          });
+          return;
+        }
+
         // let's change to another server
         if (this.state.serverErrorTries === 0) {
           // first try
@@ -1146,12 +1190,6 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  setCustomServerShow = (customServerShow: boolean) => {
-    this.setState({
-      customServerShow,
-    });
-  };
-
   usingCustomServer = async () => {
     if (!this.state.customServerUri && !this.state.customServerOffline) {
       return;
@@ -1169,11 +1207,11 @@ export class LoadingAppClass extends Component<
       this.setState({
         selectServer: SelectServerEnum.offline,
         server: { uri: '', chainName: this.state.server.chainName },
-        customServerShow: false,
         customServerUri: '',
         customServerChainName: this.state.server.chainName,
         customServerOffline: false,
       });
+      this.customServerModalRef.current?.dismiss();
     } else {
       const uri: string = parseServerURI(
         this.state.customServerUri,
@@ -1181,7 +1219,10 @@ export class LoadingAppClass extends Component<
       );
       const chainName = this.state.customServerChainName;
       if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
-        this.addLastSnackbar(this.state.translate('settings.isuri') as string);
+        // Surface the parser's specific message (bad URI, plaintext
+        // HTTP not allowed, etc.) instead of the generic "fill out a
+        // valid Server URI" snackbar so the user can fix the input.
+        this.addLastSnackbar(uri);
         this.setState({ actionButtonsDisabled: false });
         return;
       }
@@ -1190,38 +1231,47 @@ export class LoadingAppClass extends Component<
         this.state.translate('loadedapp.tryingnewserver') as string,
       );
 
+      // In LoadingApp there is no lightclient instance yet, so we can't
+      // use `checkServerURI` (which calls `changeServerProcess` /
+      // `infoServerInfo` — both require an open wallet). The right probe
+      // at this stage is a wallet-less latency check against the URI:
+      // `getLatestBlockServerInfo` only hits the gRPC endpoint to fetch
+      // the tip height, no client state needed. Chain selection is taken
+      // from the user's toggle on the modal — it's a config choice, not
+      // something we can introspect without a wallet.
       const cs = {
-        uri: uri,
-        chainName: chainName,
+        uri,
+        chainName,
         region: '',
         default: false,
         latency: null,
         obsolete: false,
       } as ServerUrisType;
       const serverChecked = await selectingServer([cs]);
-      if (serverChecked && serverChecked.latency) {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, {
-          uri,
-          chainName,
-        });
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.selectServer,
-          SelectServerEnum.custom,
-        );
-        this.setState({
-          selectServer: SelectServerEnum.custom,
-          server: { uri, chainName },
-          customServerShow: false,
-          customServerUri: '',
-          customServerChainName: this.state.server.chainName,
-          customServerOffline: false,
-        });
-      } else {
+      if (!serverChecked || !serverChecked.latency) {
         this.addLastSnackbar(
           (this.state.translate('loadedapp.changeservernew-error') as string) +
             uri,
         );
+        this.setState({ actionButtonsDisabled: false });
+        return;
       }
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, {
+        uri,
+        chainName,
+      });
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.selectServer,
+        SelectServerEnum.custom,
+      );
+      this.setState({
+        selectServer: SelectServerEnum.custom,
+        server: { uri, chainName },
+        customServerUri: '',
+        customServerChainName: this.state.server.chainName,
+        customServerOffline: false,
+      });
+      this.customServerModalRef.current?.dismiss();
     }
     this.setState({ actionButtonsDisabled: false });
   };
@@ -1264,7 +1314,7 @@ export class LoadingAppClass extends Component<
       return;
     }
     this.setState({ actionButtonsDisabled: true });
-    let seed: string = await RPCModule.createNewWallet(
+    let seed: string = await createNewWallet(
       this.state.server.uri,
       this.state.server.chainName,
       this.state.performanceLevel,
@@ -1318,29 +1368,22 @@ export class LoadingAppClass extends Component<
       // basic mode -> same screen.
       this.setState(state => ({
         wallet,
-        screen: goSeedScreen ? 2 : state.screen,
+        screen: goSeedScreen ? RouteEnum.NewSeed : state.screen,
         actionButtonsDisabled: false,
         walletExists: true,
       }));
-      // creating tor cliente if needed
-      if (
-        this.state.currency === CurrencyEnum.USDTORCurrency ||
-        this.state.currency === CurrencyEnum.USDCurrency
-      ) {
-        await RPCModule.createTorClientProcess();
-      }
     } else {
       this.walletErrorHandle(
         seed,
         this.state.translate('loadingapp.creatingwallet-label') as string,
-        1,
+        RouteEnum.StartMenu,
         false,
       );
     }
   };
 
   getwalletToRestore = async () => {
-    this.setState({ wallet: {} as WalletType, screen: 3 });
+    this.setState({ wallet: {} as WalletType, screen: RouteEnum.ImportUfvk });
   };
 
   doRestore = async (seedUfvk: string, birthday: number) => {
@@ -1432,7 +1475,7 @@ export class LoadingAppClass extends Component<
 
     let result: string;
     if (type === RestoreFromTypeEnum.seedRestoreFrom) {
-      result = await RPCModule.restoreWalletFromSeed(
+      result = await restoreWalletFromSeed(
         seedUfvk.toLowerCase(),
         walletBirthday || '0',
         this.state.server.uri,
@@ -1441,7 +1484,7 @@ export class LoadingAppClass extends Component<
         GlobalConst.minConfirmations.toString(),
       );
     } else {
-      result = await RPCModule.restoreWalletFromUfvk(
+      result = await restoreWalletFromUfvk(
         seedUfvk.toLowerCase(),
         walletBirthday || '0',
         this.state.server.uri,
@@ -1468,7 +1511,7 @@ export class LoadingAppClass extends Component<
           let orchardPool: boolean = false;
           let saplingPool: boolean = false;
           let transparentPool: boolean = false;
-          const walletKindStr: string = await RPCModule.walletKindInfo();
+          const walletKindStr: string = await getWalletKind();
           console.log('KIND...', walletKindStr);
           try {
             const walletKindJSON: RPCWalletKindType =
@@ -1493,7 +1536,7 @@ export class LoadingAppClass extends Component<
             transparentPool = walletKindJSON.transparent;
             // if the seed & birthday are not stored in Keychain/Keystore, do it now.
             if (this.state.recoveryWalletInfoOnDevice) {
-              const wallet = await RPC.rpcFetchWallet(readOnly);
+              const wallet = await fetchWallet(readOnly);
               if (wallet) {
                 await createUpdateRecoveryWalletInfo(wallet);
               }
@@ -1520,13 +1563,6 @@ export class LoadingAppClass extends Component<
             });
             this.addLastSnackbar(walletKindStr);
           }
-          // creating tor cliente if needed
-          if (
-            this.state.currency === CurrencyEnum.USDTORCurrency ||
-            this.state.currency === CurrencyEnum.USDCurrency
-          ) {
-            await RPCModule.createTorClientProcess();
-          }
           this.navigateToLoadedApp(
             readOnly,
             orchardPool,
@@ -1551,7 +1587,7 @@ export class LoadingAppClass extends Component<
       this.walletErrorHandle(
         errorText,
         this.state.translate('loadingapp.readingwallet-label') as string,
-        3,
+        RouteEnum.ImportUfvk,
         false,
       );
     }
@@ -1569,7 +1605,7 @@ export class LoadingAppClass extends Component<
   };
 
   customServer = () => {
-    this.setState({ customServerShow: true });
+    this.customServerModalRef.current?.present();
   };
 
   onPressServerChainName = (chain: ChainNameEnum) => {
@@ -1601,7 +1637,7 @@ export class LoadingAppClass extends Component<
     // if the user selects advanced mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen
     // the result will be the same -> create a new wallet.
-    this.setState({ mode, screen: 0 }, () => {
+    this.setState({ mode, screen: RouteEnum.Launching }, () => {
       this.componentDidMount();
     });
   };
@@ -1621,13 +1657,24 @@ export class LoadingAppClass extends Component<
         : `${(wallet.ufvk || '').slice(0, 5)} ... ${(wallet.ufvk || '').slice(-5)}`;
       setTimeout(
         () => {
-          Alert.alert(
-            this.props.translate('loadedapp.walletseed-basic') as string,
-            (security
-              ? ''
-              : ((this.props.translate('loadingapp.recoverkeysinstall') +
-                  '\n\n') as string)) + preview,
-            [
+          showConfirm({
+            title: this.props.translate('loadedapp.walletseed-basic') as string,
+            message:
+              (security
+                ? ''
+                : ((this.props.translate('loadingapp.recoverkeysinstall') +
+                    '\n\n') as string)) +
+              preview +
+              '\n\n' +
+              // Audit Suggestion 5 — append the clipboard-exposure warning so
+              // the existing recover-keys confirm makes the security risk
+              // explicit before the user taps Copy.
+              ((this.props.translate(
+                Platform.OS === 'ios'
+                  ? 'seed.clipboard-confirm-message-ios'
+                  : 'seed.clipboard-confirm-message-android',
+              ) as string) || ''),
+            buttons: [
               {
                 text: this.props.translate('copy') as string,
                 onPress: () => {
@@ -1658,8 +1705,7 @@ export class LoadingAppClass extends Component<
                 style: 'cancel',
               },
             ],
-            { cancelable: false },
-          );
+          });
           // IOS needs time to close the biometric screen.
           // but Android I don't think so, a little bit Just in case.
         },
@@ -1677,13 +1723,16 @@ export class LoadingAppClass extends Component<
   };
 
   restoreLastBackup = async () => {
-    this.setState({ screen: 0, actionButtonsDisabled: true });
-    const result = await RPCModule.restoreExistingWalletBackup();
+    this.setState({ screen: RouteEnum.Launching, actionButtonsDisabled: true });
+    const result = await restoreExistingWalletBackup();
     if (!result || result === GlobalConst.false) {
       this.addLastSnackbar(
         this.state.translate('rpc.backupnotfound-error') as string,
       );
-      this.setState({ screen: 1, actionButtonsDisabled: false });
+      this.setState({
+        screen: RouteEnum.StartMenu,
+        actionButtonsDisabled: false,
+      });
       return;
     }
     this.openCurrentWallet();
@@ -1692,7 +1741,7 @@ export class LoadingAppClass extends Component<
   async fetchZingolibVersion(): Promise<void> {
     try {
       const start = Date.now();
-      let zingolibStr: string = await RPCModule.getVersionInfo();
+      let zingolibStr: string = await getVersionInfo();
       if (Date.now() - start > 4000) {
         console.log(
           '=========================================== > zingolib version - ',
@@ -1726,7 +1775,6 @@ export class LoadingAppClass extends Component<
       actionButtonsDisabled,
       walletExists,
       hasBackupWallet,
-      customServerShow,
       customServerUri,
       customServerChainName,
       customServerOffline,
@@ -1775,86 +1823,74 @@ export class LoadingAppClass extends Component<
     return (
       <>
         <ContextAppLoadingProvider value={context}>
-          {screen === 0 && (
-            <Launching
-              translate={translate}
-              firstLaunchingMessage={firstLaunchingMessage}
-              biometricsFailed={biometricsFailed}
-              tryAgain={() => {
-                this.setState({ biometricsFailed: false }, () =>
-                  this.componentDidMount(),
-                );
-              }}
-            />
-          )}
-          {screen === 1 && (
-            <StartMenu
-              actionButtonsDisabled={actionButtonsDisabled}
-              hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
-              recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
-              changeMode={this.changeMode}
-              customServer={this.customServer}
-              customServerShow={customServerShow}
-              customServerOffline={customServerOffline}
-              onPressServerOffline={this.onPressServerOffline}
-              customServerChainName={customServerChainName}
-              onPressServerChainName={this.onPressServerChainName}
-              customServerUri={customServerUri}
-              setCustomServerUri={this.setCustomServerUri}
-              usingCustomServer={this.usingCustomServer}
-              setCustomServerShow={this.setCustomServerShow}
-              walletExists={walletExists}
-              hasBackupWallet={hasBackupWallet}
-              openCurrentWallet={this.openCurrentWallet}
-              createNewWallet={this.createNewWallet}
-              getwalletToRestore={this.getwalletToRestore}
-              restoreLastBackup={this.restoreLastBackup}
-            />
-          )}
-          {screen === 2 && wallet && (
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={screen === 2}
-              onRequestClose={() =>
-                this.navigateToLoadedApp(
-                  readOnly,
-                  orchardPool,
-                  saplingPool,
-                  transparentPool,
-                  true,
-                  firstLaunchingMessage,
-                )
-              }
-            >
-              <NewSeed
-                wallet={this.state.wallet}
-                onClickOK={() =>
-                  this.navigateToLoadedApp(
-                    readOnly,
-                    orchardPool,
-                    saplingPool,
-                    transparentPool,
-                    true,
-                    firstLaunchingMessage,
-                  )
-                }
+          <GestureHandlerRootView>
+            <BottomSheetModalProvider>
+              <BottomSheetBackHandler />
+              <ConfirmBottomSheet />
+              {screen === RouteEnum.Launching && (
+                <Launching
+                  translate={translate}
+                  firstLaunchingMessage={firstLaunchingMessage}
+                  biometricsFailed={biometricsFailed}
+                  tryAgain={() => {
+                    this.setState({ biometricsFailed: false }, () =>
+                      this.componentDidMount(),
+                    );
+                  }}
+                />
+              )}
+              {screen === RouteEnum.StartMenu && (
+                <StartMenu
+                  actionButtonsDisabled={actionButtonsDisabled}
+                  hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
+                  recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
+                  changeMode={this.changeMode}
+                  customServer={this.customServer}
+                  walletExists={walletExists}
+                  hasBackupWallet={hasBackupWallet}
+                  openCurrentWallet={this.openCurrentWallet}
+                  createNewWallet={this.createNewWallet}
+                  getwalletToRestore={this.getwalletToRestore}
+                  restoreLastBackup={this.restoreLastBackup}
+                />
+              )}
+              <CustomServerModalHost
+                ref={this.customServerModalRef}
+                actionButtonsDisabled={actionButtonsDisabled}
+                customServerOffline={customServerOffline}
+                onPressServerOffline={this.onPressServerOffline}
+                customServerChainName={customServerChainName}
+                onPressServerChainName={this.onPressServerChainName}
+                customServerUri={customServerUri}
+                setCustomServerUri={this.setCustomServerUri}
+                usingCustomServer={this.usingCustomServer}
+                translate={translate}
               />
-            </Modal>
-          )}
-          {screen === 3 && (
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={screen === 3}
-              onRequestClose={() => this.setState({ screen: 1 })}
-            >
-              <ImportUfvk
-                onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                onClickCancel={() => this.setState({ screen: 1 })}
-              />
-            </Modal>
-          )}
+              {screen === RouteEnum.NewSeed && wallet && (
+                <NewSeed
+                  wallet={this.state.wallet}
+                  onClickOK={() =>
+                    this.navigateToLoadedApp(
+                      readOnly,
+                      orchardPool,
+                      saplingPool,
+                      transparentPool,
+                      true,
+                      firstLaunchingMessage,
+                    )
+                  }
+                />
+              )}
+              {screen === RouteEnum.ImportUfvk && (
+                <ImportUfvk
+                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                  onClickCancel={() =>
+                    this.setState({ screen: RouteEnum.StartMenu })
+                  }
+                />
+              )}
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
         </ContextAppLoadingProvider>
         <Toast config={toastConfig} />
       </>
