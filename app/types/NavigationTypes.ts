@@ -72,8 +72,7 @@ export type AppDrawerParamList = {
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
   [RouteEnum.AddressList]: AddressListNavigationState | undefined;
   [RouteEnum.ValueTransferDetail]:
-    | ValueTransferDetailNavigationState
-    | undefined;
+    ValueTransferDetailNavigationState | undefined;
   [RouteEnum.SwapDetail]: SwapDetailNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;

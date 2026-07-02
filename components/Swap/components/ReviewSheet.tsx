@@ -98,8 +98,7 @@ type ReviewSheetProps = {
   }) => Promise<string[]>;
   translate: (key: string) => TranslateType;
   addLastSnackbar:
-    | ((message: string, duration?: SnackbarDurationEnum) => void)
-    | undefined;
+    ((message: string, duration?: SnackbarDurationEnum) => void) | undefined;
   /** Fired exactly once per swap when the user dismisses the post-commit
    *  view. The Swap screen uses it to clear the per-intent form state
    *  (amount, address, live quote, ephemeral address) so the next
