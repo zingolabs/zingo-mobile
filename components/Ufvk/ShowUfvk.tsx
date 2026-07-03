@@ -485,9 +485,17 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
           }}
-          handleComponent={renderUfvkHandle}
+          // Rendering the handle as sheet CONTENT (via `handleComponent={null}`
+          // plus an inline call to `renderUfvkHandle` below) is what lets its
+          // `borderTopRadius: 40` actually clip against the sheet's
+          // `backgroundStyle`. When passed via `handleComponent`, gorhom wraps
+          // the handle in an internal container that does not honour the
+          // inner View's border-radius, so the corners render square. Same
+          // pattern as `components/Receive/Receive.tsx`.
+          handleComponent={null}
           footerComponent={loadingUfvk ? undefined : renderUfvkFooter}
         >
+          {renderUfvkHandle()}
           {loadingUfvk ? (
             <View
               style={{
