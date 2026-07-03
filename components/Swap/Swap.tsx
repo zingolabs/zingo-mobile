@@ -22,7 +22,11 @@ import Animated from 'react-native-reanimated';
 import { useTheme } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
+import {
+  faChevronDown,
+  faRotateRight,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { getNumberFormatSettings } from 'react-native-localize';
 
@@ -57,6 +61,7 @@ import {
   SwapKitHttpError,
   TokenEntryType,
   classifySwapError,
+  formatAmountForDisplay,
   isValidChainAddress,
 } from '../../app/swap';
 import AssetPickerSheet from './components/AssetPickerSheet';
@@ -85,13 +90,6 @@ const MAX_SYMBOL_CHARS = 8;
 function truncateSymbol(s: string): string {
   if (s.length <= MAX_SYMBOL_CHARS) return s;
   return `${s.slice(0, MAX_SYMBOL_CHARS)}…`;
-}
-
-function formatCountdown(seconds: number): string {
-  const safe = Math.max(0, Math.floor(seconds));
-  const mm = Math.floor(safe / 60);
-  const ss = safe % 60;
-  return `${mm}:${ss.toString().padStart(2, '0')}`;
 }
 
 /**
@@ -445,8 +443,28 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   }, []);
   const reviewSheetRef = useRef<BottomSheetModal>(null);
   const openReviewSheet = useCallback(() => {
+    // Refresh the addresses on the pinned `quoteInput` snapshot to whatever
+    // the user has now typed. Auto-quoting fires while the address field is
+    // still empty (SwapKit's `/v3/quote` tolerates that), so at commit time
+    // we need to materialise the real address before `commitRoute` runs.
+    // Addresses do not affect the quoted rate — they only ride into the
+    // provider's deposit-instructions payload — so patching here is safe.
+    setLiveQuote(prev => {
+      if (!prev) return prev;
+      const isOut = direction === SwapDirectionEnum.Outbound;
+      return {
+        ...prev,
+        quoteInput: {
+          ...prev.quoteInput,
+          sourceAddress: isOut ? prev.quoteInput.sourceAddress : refundAddress,
+          destinationAddress: isOut
+            ? destinationAddress
+            : prev.quoteInput.destinationAddress,
+        },
+      };
+    });
     reviewSheetRef.current?.present();
-  }, []);
+  }, [direction, destinationAddress, refundAddress]);
   const quotesPickerSheetRef = useRef<BottomSheetModal>(null);
   const openQuotesPickerSheet = useCallback(() => {
     quotesPickerSheetRef.current?.present();
@@ -501,6 +519,27 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   // fresh input — and the review sheet never commits a value the user didn't
   // confirm against.
   const [isQuoting, setIsQuoting] = useState<boolean>(false);
+  // "The last quote attempt for the current inputs failed" — kept as a
+  // separate flag so the auto-fire debounce doesn't retry the same
+  // failing combination forever (amount below provider minimum, no
+  // route, network transient, etc.). Cleared whenever an input that
+  // affects the quote actually changes; also cleared when a successful
+  // quote lands so a legitimate refetch can happen after invalidation.
+  const [quoteAttemptFailed, setQuoteAttemptFailed] = useState<boolean>(false);
+  // Ref-latched pointer to the current `liveQuote` so `onGetQuote`'s catch
+  // block can tell "initial fetch failed" (no previous snapshot → clear
+  // and warn) apart from "refresh failed" (keep previous snapshot visible,
+  // silently reset the countdown so the section doesn't flicker away).
+  // Kept in a ref rather than the useCallback deps so `onGetQuote` stays
+  // stable across every `liveQuote` change.
+  const liveQuoteRef = useRef<typeof liveQuote>(null);
+  // Manual-refresh rate limit. The refresh icon next to the countdown
+  // triggers an immediate re-quote; without a cooldown, a spammed tap
+  // would fire an HTTP request per press. Debounces the button to a
+  // maximum of one manual fetch every 5 seconds.
+  const MANUAL_REFRESH_COOLDOWN_MS = 5_000;
+  const [manualRefreshCooldownUntilMs, setManualRefreshCooldownUntilMs] =
+    useState<number>(0);
   const [liveQuote, setLiveQuote] = useState<{
     expectedReceive: string;
     /** Non-ZEC per ZEC. Inverted from the wire form so the rate label
@@ -530,33 +569,48 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   // on its own if they take too long.
   const [isReviewSheetOpen, setIsReviewSheetOpen] = useState<boolean>(false);
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
-  const quoteExpiresAtMs = useMemo<number | null>(() => {
+  // Quote refresh cadence. We ignore SwapKit's `route.expiresAtMs` on
+  // purpose: providers advertise expiries of tens of minutes (NEAR 1 h,
+  // Maya Streaming ~75 min), which give the user a false sense of price
+  // stability — the rate at commit time can easily drift 5–10% from what
+  // was displayed 40 min earlier. Instead we re-quote every 30 s. Short
+  // enough that the displayed price stays close to the current market,
+  // long enough not to hammer the API. Countdown pauses while the
+  // ReviewSheet is open (the user is committing to the pinned snapshot).
+  const QUOTE_REFRESH_INTERVAL_MS = 30_000;
+  const quoteNextRefreshAtMs = useMemo<number | null>(() => {
     if (!liveQuote) return null;
-    const fromRoute = liveQuote.route.expiresAtMs;
-    if (typeof fromRoute === 'number' && Number.isFinite(fromRoute)) {
-      return fromRoute;
-    }
-    return liveQuote.receivedAtMs + 60_000;
+    return liveQuote.receivedAtMs + QUOTE_REFRESH_INTERVAL_MS;
   }, [liveQuote]);
   const quoteSecondsLeft = useMemo<number | null>(() => {
-    if (!liveQuote || quoteExpiresAtMs === null) return null;
-    return Math.max(0, Math.ceil((quoteExpiresAtMs - nowMs) / 1000));
-  }, [liveQuote, quoteExpiresAtMs, nowMs]);
+    if (!liveQuote || quoteNextRefreshAtMs === null) return null;
+    return Math.max(0, Math.ceil((quoteNextRefreshAtMs - nowMs) / 1000));
+  }, [liveQuote, quoteNextRefreshAtMs, nowMs]);
   useEffect(() => {
     if (!liveQuote || isReviewSheetOpen) return;
     const id = setInterval(() => setNowMs(Date.now()), 1000);
     return () => clearInterval(id);
   }, [liveQuote, isReviewSheetOpen]);
+  // On countdown → 0 we DO NOT null out `liveQuote`. Instead we fire
+  // `onGetQuote` directly, which sets `isQuoting=true` and then, when the
+  // response lands, overwrites `liveQuote` in place. All sections that
+  // gate on `liveQuote` keep rendering the previous values throughout the
+  // refresh — the user just sees the numbers swap for the new snapshot,
+  // not the whole panel flicker away and reappear. The `!isQuoting`
+  // guard prevents duplicate fires while one refresh is already in
+  // flight (the countdown ticks by 1 s intervals; without the guard a
+  // fresh tick during the request would re-enter).
   useEffect(() => {
     if (
       liveQuote &&
       !isReviewSheetOpen &&
-      quoteExpiresAtMs !== null &&
-      nowMs >= quoteExpiresAtMs
+      !isQuoting &&
+      quoteNextRefreshAtMs !== null &&
+      nowMs >= quoteNextRefreshAtMs
     ) {
-      setLiveQuote(null);
+      onGetQuoteRef.current?.();
     }
-  }, [liveQuote, isReviewSheetOpen, quoteExpiresAtMs, nowMs]);
+  }, [liveQuote, isReviewSheetOpen, isQuoting, quoteNextRefreshAtMs, nowMs]);
 
   // Post-quote affordability check (outbound only). The route's
   // `totalFeesInSellAsset` already aggregates every leg's fee converted to
@@ -636,12 +690,16 @@ const Swap: React.FunctionComponent<SwapProps> = ({
           ? sourceNum * liveQuote.ratePerZec // was OUT, now IN: new source is the old dest non-ZEC amount
           : sourceNum / liveQuote.ratePerZec; // was IN, now OUT: new source is the old dest ZEC amount
         if (newSourceNum > 0) {
-          // String(n) drops trailing zeros and gives us a `.`-separated number;
-          // swap to the locale separator before showing it in the TextInput.
-          const stringified = String(newSourceNum).replace(
-            '.',
-            decimalSeparator,
-          );
+          // Round to sensible precision before showing. `String(n)` on the
+          // raw product / division leaks JS float rounding noise like
+          // `0.01076140999999999` (verified in-app after a direction
+          // flip). `formatAmountForDisplay` caps at 4 dp for values ≥ 1
+          // and 8 dp otherwise, trimming trailing zeros — same policy as
+          // every other amount shown in the swap surface, so the input
+          // reads consistent with the display next to it.
+          const stringified = formatAmountForDisplay(
+            String(newSourceNum),
+          ).replace('.', decimalSeparator);
           setSourceInput(stringified);
         } else {
           setSourceInput('');
@@ -658,15 +716,36 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   }, [sourceNum, decimalSeparator, liveQuote]);
 
   useEffect(() => {
+    // Hard-invalidate the snapshot only on the "big" context changes:
+    // flipping direction swaps which side is ZEC, and picking a new
+    // asset makes the previous quote's fields meaningless. Both would
+    // paint nonsensical values if we let the old quote linger.
+    //
+    // `sourceInput` and `slippageBps` are intentionally OUT of this
+    // effect: they cause a fresh quote too, but we do that in place via
+    // the auto-fire effect below — the previous snapshot keeps rendering
+    // until the new one lands, so the panel does not flicker away and
+    // reappear on every keystroke or slippage adjustment.
+    //
+    // Address fields are also intentionally excluded: SwapKit's
+    // `/v3/quote` price is a function of assets + amount + slippage, not
+    // of destination / refund address. Including them would refetch on
+    // every char of an address paste, and the address is materialised
+    // into the pinned `quoteInput` at commit time by `openReviewSheet`.
     setLiveQuote(null);
-  }, [
-    sourceInput,
-    direction,
-    selectedToken?.identifier,
-    destinationAddress,
-    refundAddress,
-    slippageBps,
-  ]);
+    setQuoteAttemptFailed(false);
+  }, [direction, selectedToken?.identifier]);
+
+  // Any input change that could make a previously-failed attempt worth
+  // retrying: clear the "failed" flag so the auto-fire debounce fires
+  // again for the new inputs. Kept as a separate effect from the hard-
+  // invalidation above so the panel does NOT flicker (`liveQuote` stays
+  // put). Without this, changing the amount after a "no routes" error
+  // would leave `quoteAttemptFailed = true` forever and the auto-fire
+  // would refuse to schedule anything for the new value.
+  useEffect(() => {
+    setQuoteAttemptFailed(false);
+  }, [sourceInput, slippageBps]);
 
   // Our wallet-side ZEC address for the swap. We reserve a one-shot
   // ZIP-320 refund-scope (ephemeral) t-address so providers see a fresh
@@ -687,11 +766,66 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   // are surfaced via snackbar on tap so the user always understands why
   // a request is not going through, instead of staring at a disabled
   // button with no explanation.
-  const canFetchQuote =
-    !isQuoting &&
-    sourceNum > 0 &&
-    activeAddressValue.trim().length > 0 &&
-    activeAddressValid;
+  // Requirements to fire a quote request. Address is intentionally NOT
+  // required here — SwapKit's `/v3/quote` accepts an empty
+  // `destinationAddress` (verified against the live endpoint) and returns
+  // the same routes it would with a real one. The refund/destination
+  // address is only needed at commit time, so we defer that check to the
+  // "Continue" button's disabled logic.
+  const canFetchQuote = !isQuoting && sourceNum > 0 && !!selectedToken;
+
+  // Auto-fire the quote 500ms after the user stops changing the amount /
+  // asset / direction. Removes the manual "Get Quote" tap: the user types
+  // and the quote appears. `liveQuote` is already cleared on every input
+  // change by the effect further up, so between input changes the button
+  // reads as `!liveQuote` (disabled) and the debounced fetch produces a
+  // fresh quote for the new inputs. 500ms absorbs typing bursts without
+  // feeling laggy.
+  useEffect(() => {
+    if (!canFetchQuote) return;
+    // Do NOT re-fire when the last attempt for the CURRENT inputs already
+    // failed (below-minimum amount, no-route, provider transient…).
+    // Without this guard the debounce would keep hammering the API with
+    // the same failing request every 500ms. The flag clears when an
+    // input actually changes, so a legitimate new attempt can happen.
+    if (quoteAttemptFailed) return;
+    // If we already hold a live quote AND its pinned inputs match what
+    // the user has on-screen now, do nothing — this is the "we just
+    // quoted the same thing" case that avoids an infinite loop after
+    // every successful fetch (canFetchQuote flips false→true, effect
+    // re-runs). When `sourceInput` or `slippageBps` differ from the
+    // pinned snapshot we DO fire, but crucially we DO NOT null out
+    // `liveQuote` first — the debounce takes 500 ms + the fetch, and
+    // during that window the panel keeps showing the previous values
+    // instead of flickering to an empty state.
+    if (liveQuote) {
+      const sellForApi =
+        decimalSeparator === ',' ? sourceInput.replace(',', '.') : sourceInput;
+      const sameAmount =
+        liveQuote.quoteInput.sellAmountHumanDecimal === sellForApi;
+      const sameSlippage = liveQuote.quoteInput.slippageBps === slippageBps;
+      if (sameAmount && sameSlippage) return;
+    }
+    const timer = setTimeout(() => {
+      onGetQuoteRef.current?.();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [
+    canFetchQuote,
+    liveQuote,
+    quoteAttemptFailed,
+    sourceInput,
+    decimalSeparator,
+    sourceNum,
+    selectedToken?.identifier,
+    direction,
+    slippageBps,
+  ]);
+  // Ref-latched handle to `onGetQuote` so the debounce effect above does
+  // not need `onGetQuote` in its deps — that callback rebuilds on every
+  // render and would restart the timer on every keystroke, defeating the
+  // debounce.
+  const onGetQuoteRef = useRef<(() => void) | null>(null);
 
   const onGetQuote = useCallback(async () => {
     if (!swapService) {
@@ -716,7 +850,12 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     // and the SwapKit `/v3/quote` request after it is also non-trivial.
     // The previous order (spinner after reservation) made the CTA appear
     // frozen for the user.
-    Keyboard.dismiss();
+    //
+    // We deliberately DO NOT `Keyboard.dismiss()` here anymore. Auto-quote
+    // fires from a debounce on the amount input; dismissing the keyboard
+    // on every quote kicks the user out of the field while they are still
+    // editing. The keyboard is dismissed elsewhere (direction flip, review
+    // sheet open) where doing so is contextually correct.
     setIsQuoting(true);
 
     // Reserve a fresh ephemeral t-address if we don't already have one for
@@ -779,12 +918,19 @@ const Swap: React.FunctionComponent<SwapProps> = ({
       const result = await swapService.quote(quoteInputForApi);
 
       if (result.routes.length === 0) {
+        // "No routes" is a real signal about the current market state
+        // (amount below every provider's minimum right now, provider
+        // liquidity gone, etc.) — NOT a transient network glitch. Hide
+        // the panel and surface the reason so the user cannot commit
+        // a stale snapshot expecting a rate that no longer exists.
+        // Same treatment whether this was an initial fetch or a refresh.
         addLastSnackbar?.(
           (translate?.('swap.quote-no-route') as string) ||
             'No route available for this swap.',
           SnackbarDurationEnum.long,
         );
         setLiveQuote(null);
+        setQuoteAttemptFailed(true);
         return;
       }
 
@@ -855,25 +1001,42 @@ const Swap: React.FunctionComponent<SwapProps> = ({
         fiatValueBasis,
         receivedAtMs: Date.now(),
       });
+      setQuoteAttemptFailed(false);
       setNowMs(Date.now());
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
       // Mirror the snackbar message to the JS console so it can be
       // copy-pasted from the device log when triaging a failure.
       console.log('Swap.onGetQuote failed:', errMsg, err);
-      // `noRoutesFound` 404s often mean the amount sits below a provider's
-      // minimum or above its maximum — show the action-oriented copy instead
-      // of the raw HTTP message in that case.
-      const category = classifySwapError(err);
-      const snackbarText =
-        category === SwapErrorCategoryEnum.NoQuoteOrLiquidity
-          ? (translate?.('swap.quote-no-route') as string) ||
-            'No route available for this amount. Try a different amount.'
-          : `${
-              (translate?.('swap.quote-error') as string) || 'Quote failed'
-            }: ${errMsg}`;
-      addLastSnackbar?.(snackbarText, SnackbarDurationEnum.long);
-      setLiveQuote(null);
+      const previous = liveQuoteRef.current;
+      if (previous) {
+        // Refresh failed. Keep the previous snapshot visible so the
+        // form doesn't flicker away and reappear; bump `receivedAtMs`
+        // so the countdown restarts and we don't hammer the API on
+        // every tick trying to retry. Stay silent — the previous rate
+        // is still shown, no need to surface a snackbar per failed
+        // background retry.
+        setLiveQuote({ ...previous, receivedAtMs: Date.now() });
+      } else {
+        // Initial fetch failed. Surface the actionable copy so the
+        // user knows why nothing is showing, and mark the current
+        // inputs as unquotable so the debounce loop doesn't retry
+        // them forever.
+        // `noRoutesFound` 404s often mean the amount sits below a
+        // provider's minimum or above its maximum — show the action-
+        // oriented copy instead of the raw HTTP message in that case.
+        const category = classifySwapError(err);
+        const snackbarText =
+          category === SwapErrorCategoryEnum.NoQuoteOrLiquidity
+            ? (translate?.('swap.quote-no-route') as string) ||
+              'No route available for this amount. Try a different amount.'
+            : `${
+                (translate?.('swap.quote-error') as string) || 'Quote failed'
+              }: ${errMsg}`;
+        addLastSnackbar?.(snackbarText, SnackbarDurationEnum.long);
+        setLiveQuote(null);
+        setQuoteAttemptFailed(true);
+      }
     } finally {
       setIsQuoting(false);
     }
@@ -890,6 +1053,20 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     addLastSnackbar,
     translate,
   ]);
+
+  // Keep the ref-latched pointer to the newest `onGetQuote` in sync so the
+  // debounce effect above can call the up-to-date callback without needing
+  // it in its deps (which would restart the timer every keystroke and kill
+  // the debounce).
+  useEffect(() => {
+    onGetQuoteRef.current = onGetQuote;
+  }, [onGetQuote]);
+  // Sync the ref to the freshest live quote so the catch inside
+  // `onGetQuote` can distinguish refresh-fail (keep previous snapshot,
+  // stay silent) from initial-fetch-fail (clear + snackbar).
+  useEffect(() => {
+    liveQuoteRef.current = liveQuote;
+  }, [liveQuote]);
 
   // Layout measurements drive the BottomSheet snap points so the user can
   // drag the sheet down to reveal the price/balance rows in the Header.
@@ -1429,24 +1606,56 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   </Pressable>
                 </View>
 
-                {/* Quote countdown. Visible only while a live quote exists.
-                    Reads `route.expiresAtMs` (absolute unix-ms from SwapKit)
-                    or falls back to 60s from receipt. Turns warning hue at
-                    ≤10s. When it hits 0 the expiry effect clears
-                    `liveQuote`, which both hides this row and flips the CTA
-                    back to "Get Quote". */}
+                {/* Quote refresh countdown. Visible only while a live quote
+                    exists. Ticks 15 → 0 seconds; at 0 the effect above
+                    clears `liveQuote`, the auto-fire debounce picks up,
+                    and a fresh quote lands. The label tells the user
+                    exactly what will happen, so the countdown reads as
+                    "we're keeping this fresh" rather than "you're
+                    running out of time to click something". */}
                 {liveQuote && quoteSecondsLeft !== null && (
                   <View style={styles.countdownRow}>
-                    <FadeText
-                      style={{
-                        color:
-                          quoteSecondsLeft <= 10
-                            ? colors.warning.primary
-                            : colors.text,
-                      }}
-                    >
-                      {`${t('swap.quote-expires-in', 'Quote expires in')} ${formatCountdown(quoteSecondsLeft)}`}
+                    <FadeText style={{ color: colors.text }}>
+                      {isQuoting
+                        ? t('swap.quote-refreshing', 'Refreshing quote…')
+                        : `${t('swap.quote-refetch-in', 'Quote will re-fetch in')} ${quoteSecondsLeft} ${t('swap.seconds-abbrev', 'seconds')}.`}
                     </FadeText>
+                    {/* Manual refresh. Fires a re-quote immediately and
+                        locks itself for 5 s after each tap so a spammed
+                        button never turns into a burst of HTTP calls.
+                        Also disabled while a fetch is already in flight
+                        (`isQuoting`) — the icon dims to communicate the
+                        wait state without a separate spinner. */}
+                    {(() => {
+                      const manualDisabled =
+                        isQuoting || nowMs < manualRefreshCooldownUntilMs;
+                      return (
+                        <Pressable
+                          onPress={() => {
+                            if (manualDisabled) return;
+                            setManualRefreshCooldownUntilMs(
+                              Date.now() + MANUAL_REFRESH_COOLDOWN_MS,
+                            );
+                            onGetQuoteRef.current?.();
+                          }}
+                          disabled={manualDisabled}
+                          accessibilityRole="button"
+                          hitSlop={8}
+                          style={{
+                            marginLeft: 8,
+                            padding: 4,
+                            opacity: manualDisabled ? 0.4 : 1,
+                          }}
+                          testID="swap.manual-refresh"
+                        >
+                          <FontAwesomeIcon
+                            icon={faRotateRight}
+                            size={14}
+                            color={colors.text}
+                          />
+                        </Pressable>
+                      );
+                    })()}
                   </View>
                 )}
 
@@ -1483,42 +1692,50 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   </View>
                 )}
 
-                {/* CTA. After a successful quote the button flips to a
-                    "Continue" action that opens the review/commit sheet,
-                    pinned against the exact values that produced the quote.
-                    Any form edit that invalidates the quote clears
-                    `liveQuote` and we fall back to the Get Quote action.
-                    Outbound: when amount + ZEC-side fees exceed the
-                    spendable balance the Continue action is disabled but
-                    Get Quote remains available (the quote itself doesn't
-                    spend funds). The hint below offers a "Reduce to X"
-                    tap-action that edits the source input — which in turn
-                    invalidates the quote and surfaces Get Quote again so
-                    the user can re-fetch against the new amount. */}
+                {/* CTA — single-purpose "Continue" button. The quote is
+                    fetched automatically by the debounced effect on amount
+                    change, so there is no manual "Get Quote" step. The
+                    button is:
+                      - spinning while the auto-quote request is in flight,
+                      - disabled without a live quote (still typing /
+                        awaiting the debounce),
+                      - disabled when the address field is empty or
+                        invalid (validated in the input itself),
+                      - disabled on outbound when amount + ZEC fees exceed
+                        spendable balance (the "Reduce to X" hint above
+                        offers the fix).
+                    Otherwise it opens the review/commit sheet. */}
                 <View style={styles.ctaWrap}>
                   <Pressable
-                    onPress={liveQuote ? openReviewSheet : onGetQuote}
+                    onPress={openReviewSheet}
                     disabled={
-                      liveQuote ? insufficientForCommit : !canFetchQuote
+                      !liveQuote ||
+                      insufficientForCommit ||
+                      !activeAddressValid ||
+                      activeAddressValue.trim().length === 0
                     }
                     accessibilityRole="button"
                     accessibilityState={{
-                      disabled: liveQuote
-                        ? insufficientForCommit
-                        : !canFetchQuote,
+                      disabled:
+                        !liveQuote ||
+                        insufficientForCommit ||
+                        !activeAddressValid ||
+                        activeAddressValue.trim().length === 0,
                       busy: isQuoting,
                     }}
                     style={[
                       styles.cta,
                       {
                         backgroundColor:
-                          (liveQuote && !insufficientForCommit) ||
-                          (!liveQuote && canFetchQuote)
+                          liveQuote &&
+                          !insufficientForCommit &&
+                          activeAddressValid &&
+                          activeAddressValue.trim().length > 0
                             ? colors.primary
                             : colors.primaryDisabled,
                       },
                     ]}
-                    testID={liveQuote ? 'swap.continue' : 'swap.get-quote'}
+                    testID="swap.continue"
                   >
                     {isQuoting ? (
                       <ActivityIndicator color={colors.background} />
@@ -1526,9 +1743,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                       <BoldText
                         style={{ ...styles.ctaText, color: colors.background }}
                       >
-                        {liveQuote
-                          ? t('swap.continue', 'Continue')
-                          : t('swap.get-quote', 'Get Quote')}
+                        {t('swap.continue', 'Continue')}
                       </BoldText>
                     )}
                   </Pressable>
@@ -1977,7 +2192,9 @@ const styles = StyleSheet.create({
   },
   countdownRow: {
     marginTop: 12,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   ctaWrap: {
     marginTop: 8,
