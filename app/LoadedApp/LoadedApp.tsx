@@ -1581,23 +1581,6 @@ export class LoadedAppClass extends Component<
           { text: translate('cancel') as string, style: 'cancel' },
         ],
       });
-    } else if (item === MenuItemEnum.TipZingoLabs) {
-      const { translate } = this.state;
-      showConfirm({
-        title: translate('loadingapp.alert-donation-title') as string,
-        message: translate('loadingapp.alert-donation-body') as string,
-        buttons: [
-          {
-            text: translate('confirm') as string,
-            onPress: async () => await this.setDonationOption(true),
-          },
-          {
-            text: translate('cancel') as string,
-            onPress: async () => await this.setDonationOption(false),
-            style: 'cancel',
-          },
-        ],
-      });
     } else if (item === MenuItemEnum.AddressBook) {
       this.drawerNav?.navigate(RouteEnum.AddressBook);
       return;
