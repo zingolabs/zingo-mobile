@@ -1,11 +1,14 @@
 import * as Keychain from 'react-native-keychain';
-import { Platform } from 'react-native';
 import { GlobalConst, WalletType } from './AppState';
+import {
+  buildBaseOptions,
+  buildGetOptions,
+  buildSetOptions,
+} from './utils/keychainOptions';
 
 const service = GlobalConst.serviceKeyChain;
 
-// Encryption-at-rest only — no biometric accessControl on the keychain
-// item itself. Rationale:
+// SILENT_SECURE profile — encryption-at-rest only, no prompt. Rationale:
 //   - The recovery seed/UFVK is gated at the SCREEN level (Seed.tsx /
 //     ShowUfvk.tsx call simpleBiometrics on mount when the user enables
 //     security.seedUfvkScreen). That is the user-visible authorisation.
@@ -26,15 +29,18 @@ const service = GlobalConst.serviceKeyChain;
 //   - Android: AES-GCM in the hardware-backed Keystore. No biometric
 //     binding, but the Keystore is the device's secure enclave.
 
-const baseOptions: Keychain.BaseOptions = {
+const baseOptions: Keychain.BaseOptions = buildBaseOptions(
   service,
-  ...(Platform.OS === 'ios'
-    ? { accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY }
-    : {
-        securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE,
-        storage: Keychain.STORAGE_TYPE.AES_GCM_NO_AUTH,
-      }),
-};
+  'SILENT_SECURE',
+);
+const setOptions: Keychain.SetOptions = buildSetOptions(
+  service,
+  'SILENT_SECURE',
+);
+const getOptions: Keychain.GetOptions = buildGetOptions(
+  service,
+  'SILENT_SECURE',
+);
 
 export const saveRecoveryWalletInfo = async (
   keys: WalletType,
@@ -48,7 +54,7 @@ export const saveRecoveryWalletInfo = async (
     await Keychain.setGenericPassword(
       GlobalConst.keyKeyChain,
       password,
-      baseOptions,
+      setOptions,
     );
   } catch (error) {
     // An existing entry from a previous app version may use an
@@ -71,7 +77,7 @@ export const saveRecoveryWalletInfo = async (
 
 export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
   try {
-    const credentials = await Keychain.getGenericPassword(baseOptions);
+    const credentials = await Keychain.getGenericPassword(getOptions);
     if (credentials) {
       if (
         credentials.username === GlobalConst.keyKeyChain &&

@@ -810,17 +810,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.runSync()
 
-                if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-                    val save = saveWalletFile()
-                    if (!save) {
-                        val errorMessage = "Error: [Native] sync run process: Couldn't save the wallet."
-                        Log.e("MAIN", errorMessage)
-
-                        withContext(Dispatchers.Main) {
-                            promise.resolve(errorMessage)
-                        }
-                    }
-                }
+                // Persistence is owned by JS (SyncCoordinator → doSave when
+                // getWalletSaveRequired returns true). Auto-saving here was
+                // racing against that doSave on the same wallet.dat — two
+                // Dispatchers.IO threads writing in parallel produced the
+                // EncryptedFile "output file already exists" crashes in the
+                // logs. Single source of truth for save decisions = JS.
 
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)
@@ -1373,6 +1368,27 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: [Native] create new transparent address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun reserveEphemeralAddressProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.reserveEphemeralAddress()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] reserve ephemeral address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {

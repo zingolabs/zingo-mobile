@@ -196,6 +196,43 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
+                setFilterKindLocal(
+                  filterKindLocal === FilterEnum.swap ? null : FilterEnum.swap,
+                );
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor:
+                    filterKindLocal === FilterEnum.swap
+                      ? colors.primary
+                      : colors.sideMenuBackground,
+                  borderRadius: 15,
+                  borderColor:
+                    filterKindLocal === FilterEnum.swap
+                      ? colors.primary
+                      : colors.zingo,
+                  borderWidth: 1,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  marginRight: 10,
+                }}
+              >
+                <FadeText
+                  style={{
+                    color:
+                      filterKindLocal === FilterEnum.swap
+                        ? colors.sideMenuBackground
+                        : colors.zingo,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {translate('history.swap') as string}
+                </FadeText>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
                 setFilterFailedLocal(!filterFailedLocal);
               }}
             >

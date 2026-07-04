@@ -588,17 +588,6 @@ export class LoadingAppClass extends Component<
     const r = await setCryptoDefaultProvider();
     console.log('crypto provider result', r);
 
-    // Here the App ask about the new donation feature if needed.
-    // only for Advance Users
-    if (this.state.donationAlert && this.state.mode === ModeEnum.advanced) {
-      await this.showDonationAlertAsync()
-        .then(() => {
-          this.setState({ donation: true });
-          SettingsFileImpl.writeSettings(SettingsNameEnum.donation, true);
-        })
-        .catch(() => {}); // user cancelled the alert — expected
-    }
-
     // has the device the Wallet Keys stored?
     const has = await hasRecoveryWalletInfo();
     this.setState({ hasRecoveryWalletInfoSaved: has });
@@ -916,30 +905,6 @@ export class LoadingAppClass extends Component<
     this.unsubscribeNetInfo &&
       typeof this.unsubscribeNetInfo === 'function' &&
       this.unsubscribeNetInfo();
-  };
-
-  showDonationAlertAsync = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      showConfirm({
-        title: this.state.translate(
-          'loadingapp.alert-donation-title',
-        ) as string,
-        message: this.state.translate(
-          'loadingapp.alert-donation-body',
-        ) as string,
-        buttons: [
-          {
-            text: this.state.translate('confirm') as string,
-            onPress: () => resolve(),
-          },
-          {
-            text: this.state.translate('cancel') as string,
-            style: 'cancel',
-            onPress: () => reject(),
-          },
-        ],
-      });
-    });
   };
 
   selectTheBestServer = async (aDifferentOne: boolean): Promise<boolean> => {

@@ -79,6 +79,7 @@ import {
   sendPropose,
 } from '../../app/walletBackend';
 import Utils from '../../app/utils';
+import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
@@ -93,7 +94,6 @@ import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
-import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import AddressItem from '../Components/AddressItem';
 import { RPCSendProposeType } from '../../app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';

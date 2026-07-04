@@ -158,33 +158,39 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     priceRowH,
   ]);
 
-  // Stable initial index — the `index` prop is controlled, so recomputing
-  // it reactively when snapPoints grows (2 → 3 with USD currency) forces a
-  // snapToIndex that races snapPoints propagation and throws "out of
-  // range". Set once on mount and let user/effect changes go through the
-  // ref instead.
-  const [initialReceiveSnapIndex] = useState<number>(
-    () => receiveSnapPoints.length - 1,
-  );
-
-  // iOS-only crash guard: until the container/header are measured, the
-  // memoized snap points fall back to a 2/3-element hardcoded array whose
-  // size can differ from the dynamic post-layout array. If `initialReceive-
-  // SnapIndex` was captured from the larger fallback and the post-layout
-  // array is smaller, BottomSheet trips its "index out of range" invariant
-  // on first render. We defer mounting BottomSheet until measurements
-  // settle, and additionally clamp the index prop so a later shrink of
-  // snapPoints (e.g. currency toggle) cannot reintroduce the same crash.
+  // The BottomSheet `index` prop is hardcoded to 0 below (NOT reactive). This
+  // is critical: gorhom v5.2.14 has an internal useEffect that fires
+  // `handleSnapToIndex(_providedIndex)` whenever the prop changes, but the
+  // `detents` SharedValue (derived from snapPoints) only updates when the
+  // underlying layoutState changes — NOT when the snapPoints prop closure
+  // changes. So a reactive `index` racing with a snapPoints change crashes
+  // with "out of the provided snap points range" using a stale detents array.
+  // History/Send avoid the crash precisely because they hardcode `index={0}`.
+  // We do the same and use a post-layout effect below to move to the desired
+  // initial snap via the ref (which goes through `safeSnapToIndex` and so
+  // tolerates whatever detents state gorhom currently has).
   const sheetMeasured = containerH > 0 && headerH > 0;
-  const safeReceiveSnapIndex = Math.min(
-    initialReceiveSnapIndex,
-    receiveSnapPoints.length - 1,
-  );
   // Track the sheet's internal snap index (updated via onChange). When
   // snapPoints shrinks (3 → 2) and that index is now out of range, clamp
   // it via the ref from an effect (post-commit, after BottomSheet has
   // processed the new snapPoints prop).
-  const internalSnapIndexRef = useRef<number>(initialReceiveSnapIndex);
+  const internalSnapIndexRef = useRef<number>(0);
+  // One-shot: once the layout settles, snap to the natural "open" position
+  // (the largest snap) via the ref. Done in an effect rather than via the
+  // `index` prop so we don't trigger gorhom's reactive `_providedIndex`
+  // effect at all.
+  const didInitialSnapRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (didInitialSnapRef.current) return;
+    if (!sheetMeasured) return;
+    if (receiveSnapPoints.length === 0) return;
+    didInitialSnapRef.current = true;
+    safeSnapToIndex(
+      receiveSheetRef,
+      receiveSnapPoints.length - 1,
+      receiveSnapPoints.length,
+    );
+  }, [sheetMeasured, receiveSnapPoints]);
   useEffect(() => {
     if (internalSnapIndexRef.current >= receiveSnapPoints.length) {
       safeSnapToIndex(
@@ -431,7 +437,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             ref={receiveSheetRef}
             accessible={false}
             snapPoints={receiveSnapPoints}
-            index={safeReceiveSnapIndex}
+            index={0}
             onChange={i => {
               internalSnapIndexRef.current = i;
               onPriceSnapChange(i);

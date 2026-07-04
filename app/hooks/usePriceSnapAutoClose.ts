@@ -17,10 +17,11 @@ const PRICE_SNAP_TIMEOUT_MS = 30 * 1000;
  * Passing `priceIndex === null` disables the hook (e.g. when the PriceRow
  * isn't mounted because zecPrice has no value yet).
  *
- * `snapPointsLength` is passed through to `safeSnapToIndex` so a stale
- * `returnIndex` (e.g. left from a previous render where snapPoints was
- * longer) is clamped to the current valid range instead of crashing
- * gorhom's index-range invariant.
+ * `snapPointsLength` is needed because the auto-return snap goes through
+ * `safeSnapToIndex` (which clamps + defers + try/catches gorhom's
+ * out-of-range invariant). Without it, a `returnIndex` that becomes stale
+ * mid-timer — e.g. the sheet shrunk while the user wasn't interacting —
+ * would crash the screen when the timeout fires.
  */
 export function usePriceSnapAutoClose(
   sheetRef: React.RefObject<BottomSheet | null>,

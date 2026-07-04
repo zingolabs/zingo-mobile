@@ -65,6 +65,7 @@ interface RPCModuleAPI {
   getTransparentAddressesInfo(): Promise<string>;
   createNewUnifiedAddressProcess(receivers: string): Promise<string>;
   createNewTransparentAddressProcess(): Promise<string>;
+  reserveEphemeralAddressProcess(): Promise<string>;
   checkMyAddressInfo(address: string): Promise<string>;
   parseAddressInfo(address: string): Promise<string>;
   parseUfvkInfo(ufvk: string): Promise<string>;

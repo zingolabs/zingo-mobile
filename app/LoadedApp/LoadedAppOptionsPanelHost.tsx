@@ -25,8 +25,6 @@ import FinancialInsightBasicIcon from '../../assets/img/options/financial-insigh
 import RestoreBackupIcon from '../../assets/img/options/restore-backup.svg';
 import SwitchWalletIcon from '../../assets/img/options/switch-wallet.svg';
 import LoadWalletFromSeedBasicIcon from '../../assets/img/options/switch-wallet-basic.svg';
-import TipZingoLabsIcon from '../../assets/img/options/tip-zingolabs.svg';
-import TipZingoLabsBasicIcon from '../../assets/img/options/tip-zingolabs-basic.svg';
 
 const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
 const SOCIAL_GITHUB_URL = 'https://github.com/zingolabs/zingo-mobile';
@@ -46,7 +44,6 @@ const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.ChangeWallet]: 'menu.changewallet',
   [MenuItemEnum.LoadWalletFromSeed]: 'menu.loadwalletfromseed',
   [MenuItemEnum.RestoreWalletBackup]: 'menu.restorebackupwallet',
-  [MenuItemEnum.TipZingoLabs]: 'menu.tipzingolabs',
 };
 
 type LoadedAppOptionsPanelHostProps = {
@@ -78,8 +75,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     selectServer,
     netInfo,
     valueTransfersTotal,
-    totalBalance,
-    somePending,
     rescanMenu,
   } = context;
   const { isOpen } = useOptionsPanel();
@@ -130,23 +125,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       valueTransfersTotal === 0 &&
       netInfo.isConnected &&
       !isOffline;
-    // Tip ZingoLabs is available in both basic and advanced modes — it
-    // only requires an actual Send to be possible (online, not read-only,
-    // confirmed funds or pending-incoming funds).
-    const canTipZingoLabs =
-      !readOnly &&
-      !isOffline &&
-      ((!!totalBalance &&
-        totalBalance.confirmedOrchardBalance +
-          totalBalance.confirmedSaplingBalance >
-          0) ||
-        (!!totalBalance &&
-          ((totalBalance.totalOrchardBalance > 0 &&
-            totalBalance.confirmedOrchardBalance === 0) ||
-            (totalBalance.totalSaplingBalance > 0 &&
-              totalBalance.confirmedSaplingBalance === 0)) &&
-          somePending));
-
     const list: OptionsPanelAction[] = [];
 
     // AddressBook — always visible.
@@ -259,20 +237,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       });
     }
 
-    if (canTipZingoLabs) {
-      list.push({
-        id: MenuItemEnum.TipZingoLabs,
-        testID: MENU_TEST_IDS[MenuItemEnum.TipZingoLabs],
-        label: translate('loadedapp.tipzingolabs-basic') as string,
-        icon: isBasic ? (
-          <TipZingoLabsBasicIcon width={30} height={30} />
-        ) : (
-          <TipZingoLabsIcon width={30} height={30} />
-        ),
-        onPress: () => dispatch(MenuItemEnum.TipZingoLabs),
-      });
-    }
-
     return list;
   }, [
     translate,
@@ -283,8 +247,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     netInfo.isConnected,
     valueTransfersTotal,
     hasBackupWallet,
-    totalBalance,
-    somePending,
     rescanMenu,
   ]);
 

@@ -38,6 +38,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Generate SwapKit secrets module
+        env:
+          SWAPKIT_API_KEY: ${{ secrets.SWAPKIT_API_KEY }}
+        run: ./scripts/ci/generate-swapkit-secrets.sh
+
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
@@ -141,6 +146,11 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v7
+
+      - name: Generate SwapKit secrets module
+        env:
+          SWAPKIT_API_KEY: ${{ secrets.SWAPKIT_API_KEY }}
+        run: ./scripts/ci/generate-swapkit-secrets.sh
 
       # Restore the xcframework produced by .github/workflows/ios-build.yaml.
       # That reusable workflow saves both artefacts directly under `ios/` so the

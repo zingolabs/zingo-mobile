@@ -31,6 +31,7 @@ export {
   loadExistingWallet,
   parseAddress,
   removeTransaction,
+  reserveEphemeralAddress,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,

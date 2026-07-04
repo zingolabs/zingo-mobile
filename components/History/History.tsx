@@ -47,6 +47,7 @@ import { ContextAppLoaded } from '../../app/context';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
+import { swapRecordToValueTransfer } from '../../app/swap';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import Header from '../Header';
 import Utils from '../../app/utils';
@@ -116,6 +117,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const {
     translate,
     valueTransfers,
+    swapRecords,
     language,
     setBackgroundError,
     addLastSnackbar,
@@ -366,14 +368,27 @@ const History: React.FunctionComponent<HistoryProps> = ({
     );
   }, [priceRowH, historySnapPoints]);
 
+  // Merge zingolib-reported value transfers with swap rows projected from the
+  // app-level `swapRecords` mirror. We do NOT dedup against the underlying
+  // outbound Sent VT — by design (see Phase 5 decision in swap-backlog): the
+  // user sees the Swap row alongside the underlying Sent so the chronology
+  // stays explicit. Sorted by `time` descending so the merged stream still
+  // looks chronological to the list.
+  const mergedValueTransfers = useMemo(() => {
+    const swapRows = (swapRecords ?? []).map(swapRecordToValueTransfer);
+    const base = valueTransfers ?? [];
+    if (swapRows.length === 0) return base;
+    return [...base, ...swapRows].sort((a, b) => b.time - a.time);
+  }, [valueTransfers, swapRecords]);
+
   const fetchValueTransfersFiltered = useMemo(() => {
-    if (!valueTransfers) {
+    if (mergedValueTransfers.length === 0 && valueTransfers === null) {
       return [] as ValueTransferType[];
     }
     if (!filterKind && !filterFailed && !filterMemos && !filterWithFunds) {
-      return valueTransfers;
+      return mergedValueTransfers;
     }
-    return valueTransfers.filter((vt: ValueTransferType) => {
+    return mergedValueTransfers.filter((vt: ValueTransferType) => {
       let selectedKind: boolean = true;
       let selectedFailed: boolean = true;
       let selectedMemos: boolean = true;
@@ -396,6 +411,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
         } else if (
           filterKind === FilterEnum.shielded &&
           vt.kind === ValueTransferKindEnum.Shield
+        ) {
+          selectedKind = true;
+        } else if (
+          filterKind === FilterEnum.swap &&
+          vt.kind === ValueTransferKindEnum.Swap
         ) {
           selectedKind = true;
         }
@@ -423,7 +443,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
         selectedKind && selectedFailed && selectedMemos && selectedWithFunds
       );
     });
-  }, [filterFailed, filterKind, filterMemos, filterWithFunds, valueTransfers]);
+  }, [
+    filterFailed,
+    filterKind,
+    filterMemos,
+    filterWithFunds,
+    mergedValueTransfers,
+    valueTransfers,
+  ]);
 
   useEffect(() => {
     if (valueTransfers !== null) {
@@ -517,13 +544,53 @@ const History: React.FunctionComponent<HistoryProps> = ({
   );
 
   const setValueTransferDetailModalShow = useCallback(
-    (index: number, vt: ValueTransferType) => {
+    (_index: number, vt: ValueTransferType) => {
+      // VTD and SwapDetail each navigate ONLY through rows of their own
+      // kind so the up/down chevrons never land on a record the screen
+      // cannot render. We derive the per-kind slice + new index here at
+      // tap time from the same `valueTransfersSliced` the list is
+      // showing — no separate state, just two filtered projections of
+      // the same source array. `totalLength` reflects the matching kind
+      // in the broader filtered set (so "3 of 12" reads coherently).
+      if (
+        vt.kind === ValueTransferKindEnum.Swap &&
+        vt.swapRecordId !== undefined
+      ) {
+        const swapSlice = valueTransfersSliced.filter(
+          item =>
+            item.kind === ValueTransferKindEnum.Swap &&
+            item.swapRecordId !== undefined,
+        );
+        const recordIds = swapSlice.map(item => item.swapRecordId!);
+        const targetIndex = recordIds.indexOf(vt.swapRecordId);
+        const totalLength =
+          valueTransfersFiltered !== null
+            ? valueTransfersFiltered.filter(
+                item => item.kind === ValueTransferKindEnum.Swap,
+              ).length
+            : recordIds.length;
+        navigation.navigate(RouteEnum.SwapDetail, {
+          index: targetIndex >= 0 ? targetIndex : 0,
+          recordIds,
+          totalLength,
+        });
+        return;
+      }
+      const vtSlice = valueTransfersSliced.filter(
+        item => item.kind !== ValueTransferKindEnum.Swap,
+      );
+      const targetIndex = vtSlice.indexOf(vt);
+      const totalLength =
+        valueTransfersFiltered !== null
+          ? valueTransfersFiltered.filter(
+              item => item.kind !== ValueTransferKindEnum.Swap,
+            ).length
+          : vtSlice.length;
       navigation.navigate(RouteEnum.ValueTransferDetail, {
-        index: index,
+        index: targetIndex >= 0 ? targetIndex : 0,
         vt: vt,
-        valueTransfersSliced: valueTransfersSliced,
-        totalLength:
-          valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0,
+        valueTransfersSliced: vtSlice,
+        totalLength,
       });
     },
     [navigation, valueTransfersSliced, valueTransfersFiltered],
@@ -805,6 +872,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
                     onEndReached={onEndReached}
                     onEndReachedThreshold={0.5}
                     renderFooter={() =>
+                      // Generous bottom margin so the last transaction (and
+                      // the loading spinner / "end of list" label) can be
+                      // scrolled clear of the bottom tab bar on small
+                      // screens — otherwise the final row sits hidden
+                      // behind the navigator chrome.
                       hasMore ? (
                         <View
                           style={{
@@ -812,7 +884,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             alignItems: 'center',
                             justifyContent: 'flex-start',
                             marginTop: 20,
-                            marginBottom: 60,
+                            marginBottom: 200,
                           }}
                         >
                           <ActivityIndicator
@@ -828,7 +900,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             alignItems: 'center',
                             justifyContent: 'flex-start',
                             marginTop: 20,
-                            marginBottom: 60,
+                            marginBottom: 200,
                           }}
                         >
                           <FadeText style={{ color: colors.primary }}>
@@ -868,7 +940,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
             disabled={isScrollingToTop}
             style={({ pressed }) => ({
               position: 'absolute',
-              bottom: 30,
+              // Raised so the button clears the bottom tab bar on every
+              // platform — matches the offset used by AddressList. The
+              // previous `30` left it visually overlapping the tabs.
+              bottom: 105,
               right: 10,
               paddingHorizontal: 5,
               paddingVertical: 10,

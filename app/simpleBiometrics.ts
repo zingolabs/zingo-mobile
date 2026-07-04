@@ -4,6 +4,7 @@ import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { GlobalConst, TranslateType } from './AppState';
+import { buildGetOptions, buildSetOptions } from './utils/keychainOptions';
 
 // Single biometric library: react-native-keychain. We use a "sentinel" entry
 // stored under a dedicated service to drive every biometric prompt — the lib
@@ -34,33 +35,11 @@ const buildAuthPrompt = (
   cancel: translate('cancel') as string,
 });
 
-const buildSetOptions = (
-  translate: (key: string) => TranslateType,
-): Keychain.SetOptions => {
-  const iosPart =
-    Platform.OS === 'ios'
-      ? {
-          accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-          accessControl:
-            Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE,
-        }
-      : {};
-  const androidPart =
-    Platform.OS === 'android' ? { storage: Keychain.STORAGE_TYPE.AES_GCM } : {};
-  return {
-    service: SENTINEL_SERVICE,
-    ...iosPart,
-    ...androidPart,
-    authenticationPrompt: buildAuthPrompt(translate),
-  };
-};
-
-const buildGetOptions = (
-  translate: (key: string) => TranslateType,
-): Keychain.GetOptions => ({
-  service: SENTINEL_SERVICE,
-  authenticationPrompt: buildAuthPrompt(translate),
-});
+// All set/get options for the sentinel come from the central
+// `keychainOptions` module (INTERACTIVE_AUTH profile) — see that module for
+// the rationale on accessControl, storage type, and the cross-platform
+// mapping. Any future Keychain call site should reuse one of the profiles
+// there instead of hand-rolling options.
 
 /**
  * Triggers an OS biometric / device-credential prompt.
@@ -99,13 +78,21 @@ const simpleBiometrics = async (
       await Keychain.setGenericPassword(
         SENTINEL_USERNAME,
         SENTINEL_VALUE,
-        buildSetOptions(props.translate),
+        buildSetOptions(
+          SENTINEL_SERVICE,
+          'INTERACTIVE_AUTH',
+          buildAuthPrompt(props.translate),
+        ),
       );
     }
     // Always exercise the access-controlled read so every call surfaces a
     // prompt (or reuses a recent auth window if one is still valid).
     const cred = await Keychain.getGenericPassword(
-      buildGetOptions(props.translate),
+      buildGetOptions(
+        SENTINEL_SERVICE,
+        'INTERACTIVE_AUTH',
+        buildAuthPrompt(props.translate),
+      ),
     );
     return !!cred;
   } catch (e) {

@@ -78,6 +78,64 @@ export default class WalletBackend {
     return this.transactionService.sendTransaction(sendJson);
   }
 
+  /**
+   * Send a swap deposit: a single-receiver transparent send that optionally
+   * carries an OP_RETURN payload (Maya / THORChain memo) and optionally
+   * forces a ZIP-320 ephemeral indirection (`routeViaEphemeral`).
+   *
+   * Hides the "magic op_return field on the first receiver" detail from
+   * callers — the swap screen builds an object with `depositAddress`, `amount`
+   * (atomic zatoshis), `memoBytes` (from `DepositInstructionsType`) and a
+   * boolean flag; we marshal it into the shape that `sendTransaction` already
+   * understands.
+   *
+   * `routeViaEphemeral` should be set for Mayachain / THORChain deposits so
+   * the on-chain `from_address` is a wallet-controlled ephemeral t-addr the
+   * provider can refund to. Without it, refunds from shielded sources are
+   * unrecoverable. Has no effect for NEAR Intents / Flashnet deposits, which
+   * derive refund routing from the per-quote deposit address itself.
+   *
+   * Returns the list of broadcast tx hashes in chronological order:
+   *   - Single-hop send → one-element array `[txid]`.
+   *   - 2-hop ZIP-320 send → `[txid0, txid1]` where `txid0` is the
+   *     shielded → ephemeral hop and `txid1` is the ephemeral → deposit
+   *     address tx (the one the provider observes).
+   *
+   * Order assumption: `LightWallet::calculate_transactions` in zingolib
+   * builds the steps in the same order the proposal lists them (step 0 first,
+   * step 1 last), and zingo-mobile's bridge surfaces them via
+   * `TransactionService.sendTransaction` joined by `", "`. If that ordering
+   * ever changes, callers that pick `[length - 1]` as the deposit tx
+   * (`SwapService.markBroadcasted`) would silently track the wrong hash —
+   * see the comment in `ReviewSheet.onConfirm`.
+   */
+  async sendSwapDeposit(args: {
+    depositAddress: string;
+    amountAtomic: number;
+    memoBytes?: Uint8Array;
+    routeViaEphemeral?: boolean;
+  }): Promise<string[]> {
+    const sendJson: Array<SendJsonToTypeType> = [
+      {
+        address: args.depositAddress,
+        amount: args.amountAtomic,
+        op_return:
+          args.memoBytes && args.memoBytes.length > 0
+            ? bytesToHex(args.memoBytes)
+            : undefined,
+        route_via_ephemeral: args.routeViaEphemeral || undefined,
+      },
+    ];
+    const joined = await this.transactionService.sendTransaction(sendJson);
+    // `TransactionService.sendTransaction` joins the rust-side `txids[]`
+    // with `", "`. Split it back so the caller sees the array shape and can
+    // pick the relevant txid by index without re-parsing the string.
+    return joined
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+  }
+
   // Wallet lifecycle
   async changeWallet() {
     return this.walletLifecycle.changeWallet();
@@ -135,4 +193,12 @@ export default class WalletBackend {
   setTranslate(translate: (key: string) => TranslateType) {
     this.config.translate = translate;
   }
+}
+
+function bytesToHex(bytes: Uint8Array): string {
+  let hex = '';
+  for (let i = 0; i < bytes.length; i++) {
+    hex += bytes[i].toString(16).padStart(2, '0');
+  }
+  return hex;
 }
