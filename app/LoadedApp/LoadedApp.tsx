@@ -150,10 +150,6 @@ const tr = require('../translations/tr.json');
 
 const Tab = createBottomTabNavigator<AppDrawerParamList>();
 
-// TEMP: swaps disabled — hides the Swap tab from the bottom bar.
-// Set back to `true` to restore swaps.
-const SWAP_ENABLED = false;
-
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -2317,7 +2313,7 @@ export class LoadedAppClass extends Component<
                                       />
                                     )}
                                   </Tab.Screen>
-                                  {SWAP_ENABLED &&
+                                  {GlobalConst.swapEnabled &&
                                     !readOnly &&
                                     selectServer !== SelectServerEnum.offline &&
                                     this.state.server.chainName ===

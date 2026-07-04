@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react';
 import { View, TouchableOpacity, ScrollView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { ButtonTypeEnum, FilterEnum } from '../../../app/AppState';
+import { ButtonTypeEnum, FilterEnum, GlobalConst } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
@@ -194,43 +194,47 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                 </FadeText>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setFilterKindLocal(
-                  filterKindLocal === FilterEnum.swap ? null : FilterEnum.swap,
-                );
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor:
+            {GlobalConst.swapEnabled && (
+              <TouchableOpacity
+                onPress={() => {
+                  setFilterKindLocal(
                     filterKindLocal === FilterEnum.swap
-                      ? colors.primary
-                      : colors.sideMenuBackground,
-                  borderRadius: 15,
-                  borderColor:
-                    filterKindLocal === FilterEnum.swap
-                      ? colors.primary
-                      : colors.zingo,
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  marginRight: 10,
+                      ? null
+                      : FilterEnum.swap,
+                  );
                 }}
               >
-                <FadeText
+                <View
                   style={{
-                    color:
+                    backgroundColor:
                       filterKindLocal === FilterEnum.swap
-                        ? colors.sideMenuBackground
+                        ? colors.primary
+                        : colors.sideMenuBackground,
+                    borderRadius: 15,
+                    borderColor:
+                      filterKindLocal === FilterEnum.swap
+                        ? colors.primary
                         : colors.zingo,
-                    fontWeight: 'bold',
+                    borderWidth: 1,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginRight: 10,
                   }}
                 >
-                  {translate('history.swap') as string}
-                </FadeText>
-              </View>
-            </TouchableOpacity>
+                  <FadeText
+                    style={{
+                      color:
+                        filterKindLocal === FilterEnum.swap
+                          ? colors.sideMenuBackground
+                          : colors.zingo,
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {translate('history.swap') as string}
+                  </FadeText>
+                </View>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               onPress={() => {
                 setFilterFailedLocal(!filterFailedLocal);

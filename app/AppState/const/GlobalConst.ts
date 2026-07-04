@@ -32,4 +32,7 @@ export const GlobalConst = {
   keyStore: 'KeyStore',
   utf8: 'utf8',
   minConfirmations: 3,
+  // TEMP: swaps disabled — hides the Swap tab and the Swap history filter.
+  // Set back to `true` to restore swaps.
+  swapEnabled: false,
 };
