@@ -148,7 +148,11 @@ const QuotesPickerSheet = forwardRef<BottomSheetModal, QuotesPickerSheetProps>(
         keyboardBlurBehavior="restore"
         backdropComponent={renderBackdrop}
         handleComponent={() => handle}
-        backgroundStyle={{ backgroundColor: colors.bottomSheetBackground }}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
       >
         <BottomSheetScrollView
           contentContainerStyle={styles.body}

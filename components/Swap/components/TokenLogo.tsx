@@ -78,7 +78,13 @@ export default function TokenLogo({
   }
 
   const isNative = token.chain === token.symbol;
-  const showBadge = forceBadge || !isNative;
+  // Suppress the badge when it would just duplicate the main image — e.g. on
+  // ETH-native L2s (ARB.ETH, OP.ETH, BASE.ETH…) where SwapKit's chain-logo
+  // convention (`<chain>.<native>.png`) resolves to the same ETH diamond as
+  // the token itself. Adds no info and reads as visual noise.
+  const badgeMatchesMain =
+    !!chainLogoUri && !!token.logoURI && chainLogoUri === token.logoURI;
+  const showBadge = (forceBadge || !isNative) && !badgeMatchesMain;
   const badgeSize = Math.max(10, Math.round(size * 0.42));
   const ring = 2; // thickness of the surface-coloured ring around the badge
   const badgeWrap = badgeSize + ring * 2;

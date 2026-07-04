@@ -1008,31 +1008,31 @@ const Swap: React.FunctionComponent<SwapProps> = ({
       // Mirror the snackbar message to the JS console so it can be
       // copy-pasted from the device log when triaging a failure.
       console.log('Swap.onGetQuote failed:', errMsg, err);
+      const category = classifySwapError(err);
+      const noRoutes = category === SwapErrorCategoryEnum.NoQuoteOrLiquidity;
       const previous = liveQuoteRef.current;
-      if (previous) {
-        // Refresh failed. Keep the previous snapshot visible so the
-        // form doesn't flicker away and reappear; bump `receivedAtMs`
-        // so the countdown restarts and we don't hammer the API on
-        // every tick trying to retry. Stay silent — the previous rate
-        // is still shown, no need to surface a snackbar per failed
-        // background retry.
+      if (previous && !noRoutes) {
+        // Transient failure while a previous snapshot is on-screen (real
+        // network glitch, HTTP 5xx, edge timeout, etc.). Keep the panel
+        // visible and bump the timer so we retry silently on the next
+        // cycle — no snackbar noise per failed background attempt.
         setLiveQuote({ ...previous, receivedAtMs: Date.now() });
       } else {
-        // Initial fetch failed. Surface the actionable copy so the
-        // user knows why nothing is showing, and mark the current
-        // inputs as unquotable so the debounce loop doesn't retry
-        // them forever.
-        // `noRoutesFound` 404s often mean the amount sits below a
-        // provider's minimum or above its maximum — show the action-
-        // oriented copy instead of the raw HTTP message in that case.
-        const category = classifySwapError(err);
-        const snackbarText =
-          category === SwapErrorCategoryEnum.NoQuoteOrLiquidity
-            ? (translate?.('swap.quote-no-route') as string) ||
-              'No route available for this amount. Try a different amount.'
-            : `${
-                (translate?.('swap.quote-error') as string) || 'Quote failed'
-              }: ${errMsg}`;
+        // Either it's the very first fetch, or SwapKit is telling us
+        // "no route for these inputs" (404 `noRoutesFound`, common on
+        // sub-minimum amounts). Both cases need to hide the previous
+        // snapshot and surface the reason so the user cannot commit a
+        // stale rate against inputs the market has now rejected.
+        // Without this branch, a valid quote followed by a sub-minimum
+        // amount looped forever: the `noRoutesFound` throw was treated
+        // as a "keep previous, retry in 30 s" transient failure, and
+        // every 30 s cycle re-threw the same 404 with the same amount.
+        const snackbarText = noRoutes
+          ? (translate?.('swap.quote-no-route') as string) ||
+            'No route available for this amount. Try a different amount.'
+          : `${
+              (translate?.('swap.quote-error') as string) || 'Quote failed'
+            }: ${errMsg}`;
         addLastSnackbar?.(snackbarText, SnackbarDurationEnum.long);
         setLiveQuote(null);
         setQuoteAttemptFailed(true);
@@ -1078,6 +1078,40 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   const swapSheetRef = useRef<BottomSheet>(null);
   const sheetSlideStyle = useOptionsPanelSheetSlide();
   useDismissSheetsOnBlur();
+
+  // Rounded sheet header, mounted as gorhom's real handle so its top
+  // border seams cleanly into the sheet's `backgroundStyle`. Wrapped in
+  // `useCallback` (same shape as SlippageSheet's `renderHandle`) so the
+  // handle identity is stable across renders — otherwise gorhom would
+  // remount the handle on every parent render, defeating the point.
+  const renderSwapSheetHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 8,
+          paddingBottom: 6,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 0.5,
+          borderRightWidth: 0.5,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View style={styles.sheetTitleRow}>
+          <BoldText style={{ ...styles.sheetTitle, color: colors.text }}>
+            {t('swap.title', 'Swap Assets')}
+          </BoldText>
+        </View>
+      </View>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [colors],
+  );
 
   // Identical snap-point math to Receive/History so dragging feels the same
   // across screens.
@@ -1323,42 +1357,22 @@ const Swap: React.FunctionComponent<SwapProps> = ({
             }}
             enableDynamicSizing={false}
             enablePanDownToClose={false}
-            enableContentPanningGesture={true}
+            enableContentPanningGesture={false}
             backgroundStyle={{
               backgroundColor: colors.bottomSheetBackground,
               borderTopLeftRadius: 40,
               borderTopRightRadius: 40,
             }}
-            handleComponent={null}
+            // Header rendered via `handleComponent` (mirrors History/Send/
+            // SlippageSheet): gorhom mounts the rounded header as the
+            // sheet's real handle, so its top border blends into the
+            // `backgroundStyle` without leaving the small "pico" seam
+            // that showed up when the header was drawn inside `children`.
+            handleComponent={renderSwapSheetHandle}
           >
-            <View style={{ flex: 1 }}>
-              {/* Sheet header drawn inside content (mirrors Receive) so
-                  index-change re-renders don't remount the body. */}
-              <View
-                style={{
-                  paddingTop: 8,
-                  paddingBottom: 6,
-                  paddingHorizontal: 16,
-                  backgroundColor: colors.bottomSheetBackground,
-                  borderTopLeftRadius: 40,
-                  borderTopRightRadius: 40,
-                  borderTopWidth: 1,
-                  borderLeftWidth: 0.5,
-                  borderRightWidth: 0.5,
-                  borderTopColor: colors.bottomSheetBorder,
-                  borderLeftColor: colors.bottomSheetBorder,
-                  borderRightColor: colors.bottomSheetBorder,
-                }}
-              >
-                <View style={styles.sheetTitleRow}>
-                  <BoldText
-                    style={{ ...styles.sheetTitle, color: colors.text }}
-                  >
-                    {t('swap.title', 'Swap Assets')}
-                  </BoldText>
-                </View>
-              </View>
-
+            <View
+              style={{ flex: 1, backgroundColor: colors.bottomSheetBackground }}
+            >
               <ScrollView
                 style={{ flex: 1 }}
                 contentContainerStyle={styles.scrollContent}
@@ -2129,8 +2143,7 @@ const styles = StyleSheet.create({
   },
   toggleWrap: {
     alignItems: 'center',
-    marginVertical: -14,
-    zIndex: 1,
+    marginVertical: 8,
   },
   toggleBtn: {
     width: 36,
