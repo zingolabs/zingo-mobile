@@ -34,5 +34,5 @@ export const GlobalConst = {
   minConfirmations: 3,
   // TEMP: swaps disabled — hides the Swap tab and the Swap history filter.
   // Set back to `true` to restore swaps.
-  swapEnabled: false,
+  swapEnabled: true,
 };

@@ -51,28 +51,11 @@ type AssetPickerSheetProps = {
   selectedIdentifier: string | null;
   onChange: (token: TokenEntryType) => void;
   translate: (key: string) => TranslateType;
-  /**
-   * Resolves a chain code (e.g. "ETH", "BASE") to the canonical chain badge
-   * logo URL. Passed through to each `<TokenLogo>` instance instead of
-   * synthesised inside the icon component.
-   */
-  getChainLogoUri: (chain: string) => string | undefined;
   testID?: string;
 };
 
 const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
-  (
-    {
-      title,
-      tokens,
-      selectedIdentifier,
-      onChange,
-      translate,
-      getChainLogoUri,
-      testID,
-    },
-    ref,
-  ) => {
+  ({ title, tokens, selectedIdentifier, onChange, translate, testID }, ref) => {
     const { colors } = useTheme() as ThemeType;
     const keyboardHeight = useKeyboardHeight();
 
@@ -280,9 +263,18 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
                     token={token}
                     size={35}
                     surfaceColor={colors.bottomSheetBackground}
-                    chainLogoUri={getChainLogoUri(token.chain)}
                   />
                   <View style={{ flex: 1 }}>
+                    {/* SwapKit-demo convention: clean `ticker` on top, chain
+                        below. `name`/`symbol` are intentionally NOT shown —
+                        SwapKit ships `name` inconsistently ("Tether" vs "USDT"
+                        vs "L2 Standard Bridged USDT (Base)") and `symbol`
+                        contract-suffixed ("USDT-0xdac1…"). Within the buckets we
+                        keep (Maya/Near/Flashnet) ticker+chain is effectively
+                        unique: real variants carry distinct tickers (USDT vs
+                        nrUsdt vs USDT0), so no two rows collide. The chain text
+                        also fixes the ambiguous L2 badge (Base/ARB/OP all render
+                        the ETH diamond, since their gas token is ETH). */}
                     <RegText
                       style={{
                         fontSize: 16,
@@ -290,7 +282,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
                         fontWeight: selected ? '600' : '500',
                       }}
                     >
-                      {token.name}
+                      {token.ticker || token.name || token.symbol}
                     </RegText>
                     <FadeText style={{ fontSize: 12 }}>
                       {chainDisplayName(token.chain)}

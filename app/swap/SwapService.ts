@@ -147,17 +147,6 @@ export class SwapService {
     this.tokenCatalog.invalidate();
   }
 
-  /**
-   * Canonical chain badge logo URI for the given chain code (e.g. `"BASE"`
-   * resolves to the URL SwapKit hosts for the BASE native token, currently
-   * `…/base.eth.png`). Returns `undefined` when the catalog has not been
-   * fetched yet — UI consumers should fall back to a no-badge render in
-   * that case rather than synthesise a URL by hand.
-   */
-  chainLogoUri(chain: string): string | undefined {
-    return this.tokenCatalog.chainLogoUri(chain);
-  }
-
   async quote(input: QuoteInput): Promise<QuoteResult> {
     // SwapKit applies the affiliate identifier and fee tier server-side based
     // on the API key, so we do not pass affiliate params explicitly. Trusting

@@ -1,11 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
 
 import { TokenEntryType } from '../../../app/swap';
-import { ThemeType } from '../../../app/types';
 import BoldText from '../../Components/BoldText';
+import { getChainIcon } from './chainIcons';
 
 /**
  * Composed asset icon: the token's logo as the main image, with a small
@@ -37,13 +36,6 @@ type Props = {
    * of the swap look balanced.
    */
   forceBadge?: boolean;
-  /**
-   * Resolved chain badge logo URI. Comes from the `TokenCatalog` (via
-   * `SwapService.chainLogoUri(token.chain)`) which derives the URL from
-   * each chain's native token in the live `/tokens` response — no URL
-   * synthesis in this component. When `undefined` the badge is omitted.
-   */
-  chainLogoUri?: string;
 };
 
 export default function TokenLogo({
@@ -51,10 +43,7 @@ export default function TokenLogo({
   size,
   surfaceColor,
   forceBadge,
-  chainLogoUri,
 }: Props) {
-  const { colors } = useTheme() as ThemeType;
-
   // SwapKit's CDN occasionally hosts a `logoURI` pointer to an image that
   // does not actually exist (observed: `strk.xrp-…png` returns 404 even
   // though the response advertises that URL). Fall back to the coin icon
@@ -64,27 +53,19 @@ export default function TokenLogo({
   useEffect(() => {
     setMainLoadFailed(false);
     setBadgeLoadFailed(false);
-  }, [token?.logoURI, chainLogoUri]);
+  }, [token?.logoURI]);
 
   if (!token) {
-    return (
-      <LetterAvatar
-        letter="?"
-        size={size}
-        bg={colors.border}
-        fg={colors.text}
-      />
-    );
+    return <LetterAvatar label="?" size={size} bg="#E8E8E8" fg="#040C17" />;
   }
 
   const isNative = token.chain === token.symbol;
-  // Suppress the badge when it would just duplicate the main image — e.g. on
-  // ETH-native L2s (ARB.ETH, OP.ETH, BASE.ETH…) where SwapKit's chain-logo
-  // convention (`<chain>.<native>.png`) resolves to the same ETH diamond as
-  // the token itself. Adds no info and reads as visual noise.
-  const badgeMatchesMain =
-    !!chainLogoUri && !!token.logoURI && chainLogoUri === token.logoURI;
-  const showBadge = (forceBadge || !isNative) && !badgeMatchesMain;
+  // The chain badge is a bundled per-chain icon (see `chainIcons.ts`), keyed by
+  // `token.chain`. Shown for non-native assets (a token sitting on a chain);
+  // suppressed for a chain's own native asset, where the main image already IS
+  // the chain — unless `forceBadge` asks for it (keeps the swap chips balanced).
+  const chainIcon = getChainIcon(token.chain);
+  const showBadge = (forceBadge || !isNative) && !!chainIcon;
   const badgeSize = Math.max(10, Math.round(size * 0.42));
   const ring = 2; // thickness of the surface-coloured ring around the badge
   const badgeWrap = badgeSize + ring * 2;
@@ -93,11 +74,12 @@ export default function TokenLogo({
   // feel without colliding with neighbouring text.
   const badgeOverhang = ring + 2;
 
-  // First letter for the avatar fallback — prefer the clean `ticker`, fall
-  // back to whichever short identifier is available. Same approach as
-  // Vultisig's `Text(String(ticker.prefix(1)).uppercased())`.
-  const avatarLetter = (token.ticker || token.symbol || '?')
-    .charAt(0)
+  // Up to the first three characters for the avatar fallback — prefer the
+  // clean `ticker`, fall back to whichever short identifier is available. Three
+  // letters read as a mini-ticker (BTC, SOL, USD…) and fill the circle better
+  // than a single glyph.
+  const avatarLabel = (token.ticker || token.symbol || '?')
+    .slice(0, 3)
     .toUpperCase();
 
   return (
@@ -115,17 +97,27 @@ export default function TokenLogo({
           source={{ uri: token.logoURI }}
           onError={() => setMainLoadFailed(true)}
           resizeMode="cover"
-          style={{ width: size, height: size, borderRadius: size / 2 }}
+          // Light-grey canvas behind the logo. Many token PNGs are a dark/mono
+          // glyph on a transparent background (e.g. NEAR-bridged assets), which
+          // vanished against the dark sheet. Token logos are authored for light
+          // surfaces, so a light neutral is the safe default; fully-opaque logos
+          // (USDT's green disc, etc.) simply cover it and look unchanged.
+          style={{
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            backgroundColor: '#E8E8E8',
+          }}
         />
       ) : (
         <LetterAvatar
-          letter={avatarLetter}
+          label={avatarLabel}
           size={size}
-          bg={colors.border}
-          fg={colors.text}
+          bg="#E8E8E8"
+          fg="#040C17"
         />
       )}
-      {showBadge && chainLogoUri && !badgeLoadFailed && (
+      {showBadge && !badgeLoadFailed && (
         <View
           style={{
             position: 'absolute',
@@ -141,8 +133,7 @@ export default function TokenLogo({
           }}
         >
           <Image
-            key={chainLogoUri}
-            source={{ uri: chainLogoUri }}
+            source={chainIcon}
             onError={() => setBadgeLoadFailed(true)}
             resizeMode="cover"
             style={{
@@ -164,16 +155,20 @@ export default function TokenLogo({
  * generic coin icon — the user can tell at a glance which token it is.
  */
 function LetterAvatar({
-  letter,
+  label,
   size,
   bg,
   fg,
 }: {
-  letter: string;
+  label: string;
   size: number;
   bg: string;
   fg: string;
 }) {
+  // Shrink the font as the label grows so up to three characters fit inside the
+  // circle without clipping. Centering is handled by the container's
+  // align/justify, so no explicit lineHeight (which would offset shorter text).
+  const fontScale = label.length >= 3 ? 0.3 : label.length === 2 ? 0.4 : 0.5;
   return (
     <View
       style={[
@@ -187,14 +182,14 @@ function LetterAvatar({
       ]}
     >
       <BoldText
+        numberOfLines={1}
         style={{
-          fontSize: Math.round(size * 0.5),
+          fontSize: Math.round(size * fontScale),
           color: fg,
-          lineHeight: size,
           textAlign: 'center',
         }}
       >
-        {letter}
+        {label}
       </BoldText>
     </View>
   );

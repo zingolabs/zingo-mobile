@@ -365,15 +365,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     assetPickerRef.current?.present();
   }, [displayedTokens]);
 
-  // Resolves a chain code (e.g. "BASE") to its badge logo URL via the
-  // catalog-derived map kept on `SwapService`. The function reference is
-  // stable across renders while `swapService` is stable.
-  const getChainLogoUri = useCallback(
-    (chain: string): string | undefined =>
-      swapService?.chainLogoUri(chain) ?? undefined,
-    [swapService],
-  );
-
   // Both directions ask the user for a non-ZEC address, but the role is
   // different:
   //   - Outbound (ZEC -> non-ZEC): destination — where the non-ZEC asset is
@@ -1445,7 +1436,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   onChangeAmount: onChangeSourceAmount,
                   decimalSeparator,
                   onSelectAsset: openAssetPicker,
-                  getChainLogoUri,
                   colors,
                   t,
                   currency,
@@ -1505,7 +1495,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   amount: destAmountStr,
                   editable: false,
                   onSelectAsset: openAssetPicker,
-                  getChainLogoUri,
                   colors,
                   t,
                   currency,
@@ -1774,7 +1763,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
         selectedIdentifier={selectedToken?.identifier ?? null}
         onChange={setSelectedToken}
         translate={translate}
-        getChainLogoUri={getChainLogoUri}
         testID="swap.asset-picker"
       />
       <SlippageSheet
@@ -1843,11 +1831,6 @@ type AssetCardArgs = {
   decimalSeparator?: string;
   /** Invoked when the user taps the non-ZEC chip (ZEC's chip is non-tappable). */
   onSelectAsset: () => void;
-  /**
-   * Resolves a chain code to its badge logo URL. Provided by the caller so
-   * the helper does not need direct access to `swapService`.
-   */
-  getChainLogoUri: (chain: string) => string | undefined;
   colors: ThemeType['colors'];
   t: (key: string, fallback: string) => string;
   /** Active fiat currency from app context. Drives USD conversion display. */
@@ -1887,7 +1870,6 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
     onChangeAmount,
     decimalSeparator,
     onSelectAsset,
-    getChainLogoUri,
     colors,
     t,
     currency,
@@ -1922,7 +1904,6 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
         token={ZEC_TOKEN_ENTRY}
         size={22}
         surfaceColor={colors.bottomSheetBackground}
-        chainLogoUri={getChainLogoUri(ZEC_TOKEN_ENTRY.chain)}
       />
       <BoldText style={{ ...styles.assetSymbol, color: colors.primary }}>
         ZEC
@@ -1940,9 +1921,6 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
         token={nonZecToken}
         size={22}
         surfaceColor={colors.bottomSheetBackground}
-        chainLogoUri={
-          nonZecToken ? getChainLogoUri(nonZecToken.chain) : undefined
-        }
       />
       <BoldText style={{ ...styles.assetSymbol, color: colors.text }}>
         {nonZecSymbol}
