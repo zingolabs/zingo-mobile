@@ -285,7 +285,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             flexDirection: 'column',
             alignItems: 'stretch',
             justifyContent: 'flex-start',
-            paddingBottom: 80,
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 80 : 80,
           }}
         >
           <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
