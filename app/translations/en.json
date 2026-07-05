@@ -639,6 +639,7 @@
     "seconds-abbrev": "seconds",
     "quote-refreshing": "Refreshing quote…",
     "insufficient-for-commit": "Not enough ZEC to cover amount + network fee.",
+    "insufficient-title": "Insufficient funds",
     "reduce-to": "Reduce to",
     "edge-blocked-snackbar": "Swap service is blocked on your network. Try a VPN.",
     "edge-blocked-banner-title": "Swap service unavailable on this network",

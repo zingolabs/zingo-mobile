@@ -639,6 +639,7 @@
     "seconds-abbrev": "segundos",
     "quote-refreshing": "Actualizando cotización…",
     "insufficient-for-commit": "No hay suficiente ZEC para cubrir el importe + comisión de red.",
+    "insufficient-title": "Fondos insuficientes",
     "reduce-to": "Reducir a",
     "edge-blocked-snackbar": "El servicio de swap está bloqueado en tu red. Prueba con una VPN.",
     "edge-blocked-banner-title": "Servicio de swap no disponible en esta red",

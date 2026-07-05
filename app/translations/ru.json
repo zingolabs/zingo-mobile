@@ -639,6 +639,7 @@
     "seconds-abbrev": "секунд",
     "quote-refreshing": "Обновление котировки…",
     "insufficient-for-commit": "Недостаточно ZEC для покрытия суммы + сетевой комиссии.",
+    "insufficient-title": "Недостаточно средств",
     "reduce-to": "Уменьшить до",
     "edge-blocked-snackbar": "Сервис обмена заблокирован в вашей сети. Попробуйте VPN.",
     "edge-blocked-banner-title": "Сервис обмена недоступен в этой сети",

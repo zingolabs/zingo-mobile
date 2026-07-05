@@ -31,6 +31,7 @@ import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { getNumberFormatSettings } from 'react-native-localize';
 
 import {
+  ButtonTypeEnum,
   ChainNameEnum,
   CurrencyEnum,
   RouteEnum,
@@ -43,6 +44,7 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import BoldText from '../Components/BoldText';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
+import Button from '../Components/Button';
 import Header from '../Header';
 import { SwapFilledIcon } from '../Components/Icons/SwapFilledIcon';
 import CurrencyAmount from '../Components/CurrencyAmount';
@@ -72,6 +74,7 @@ import { providerShortLabel } from './components/providerLabels';
 import SlippageSheet, {
   formatSlippagePercent,
 } from './components/SlippageSheet';
+import InsufficientFundsSheet from './components/InsufficientFundsSheet';
 import TokenLogo from './components/TokenLogo';
 
 /**
@@ -433,6 +436,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     slippageSheetRef.current?.present();
   }, []);
   const reviewSheetRef = useRef<BottomSheetModal>(null);
+  const insufficientSheetRef = useRef<BottomSheetModal>(null);
   const openReviewSheet = useCallback(() => {
     // Refresh the addresses on the pinned `quoteInput` snapshot to whatever
     // the user has now typed. Auto-quoting fires while the address field is
@@ -564,11 +568,11 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   // purpose: providers advertise expiries of tens of minutes (NEAR 1 h,
   // Maya Streaming ~75 min), which give the user a false sense of price
   // stability — the rate at commit time can easily drift 5–10% from what
-  // was displayed 40 min earlier. Instead we re-quote every 30 s. Short
+  // was displayed 40 min earlier. Instead we re-quote every 20 s. Short
   // enough that the displayed price stays close to the current market,
-  // long enough not to hammer the API. Countdown pauses while the
+  // long enough not to hammer the API. Refresh pauses while the
   // ReviewSheet is open (the user is committing to the pinned snapshot).
-  const QUOTE_REFRESH_INTERVAL_MS = 30_000;
+  const QUOTE_REFRESH_INTERVAL_MS = 20_000;
   const quoteNextRefreshAtMs = useMemo<number | null>(() => {
     if (!liveQuote) return null;
     return liveQuote.receivedAtMs + QUOTE_REFRESH_INTERVAL_MS;
@@ -1609,20 +1613,13 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   </Pressable>
                 </View>
 
-                {/* Quote refresh countdown. Visible only while a live quote
-                    exists. Ticks 15 → 0 seconds; at 0 the effect above
-                    clears `liveQuote`, the auto-fire debounce picks up,
-                    and a fresh quote lands. The label tells the user
-                    exactly what will happen, so the countdown reads as
-                    "we're keeping this fresh" rather than "you're
-                    running out of time to click something". */}
+                {/* Manual re-quote affordance. The auto-refresh runs silently
+                    every 20 s; we no longer show a countdown / seconds label
+                    (it read as "you're running out of time to click"). The
+                    refresh-in-flight state is surfaced on the CTA
+                    ("Actualizando cotización…") instead. */}
                 {liveQuote && quoteSecondsLeft !== null && (
                   <View style={styles.countdownRow}>
-                    <FadeText style={{ color: colors.text }}>
-                      {isQuoting
-                        ? t('swap.quote-refreshing', 'Refreshing quote…')
-                        : `${t('swap.quote-refetch-in', 'Quote will re-fetch in')} ${quoteSecondsLeft} ${t('swap.seconds-abbrev', 'seconds')}.`}
-                    </FadeText>
                     {/* Manual refresh. Fires a re-quote immediately and
                         locks itself for 5 s after each tap so a spammed
                         button never turns into a burst of HTTP calls.
@@ -1662,94 +1659,63 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   </View>
                 )}
 
-                {/* Affordability hint. Rendered *above* the CTA so the
-                    "Reduce to X" tap-action stays visible regardless of
-                    bottom-tab/safe-area overlap. Only renders when the
-                    quote arrived and the math doesn't fit. */}
-                {liveQuote && insufficientForCommit && (
-                  <View style={styles.insufficientHint}>
-                    <FadeText
-                      style={{
-                        color: colors.warning.primary,
-                        textAlign: 'center',
-                      }}
-                    >
-                      {t(
-                        'swap.insufficient-for-commit',
-                        'Not enough ZEC to cover amount + network fee.',
-                      )}
-                    </FadeText>
-                    {maxSpendableForSwap > 0 && (
-                      <Pressable
-                        onPress={onReduceToMax}
-                        style={styles.reduceToMaxPress}
-                      >
-                        <RegText style={{ color: colors.primary }}>
-                          {`${t(
-                            'swap.reduce-to',
-                            'Reduce to',
-                          )} ${maxSpendableForSwap.toFixed(8)} ZEC`}
-                        </RegText>
-                      </Pressable>
-                    )}
-                  </View>
-                )}
-
-                {/* CTA — single-purpose "Continue" button. The quote is
-                    fetched automatically by the debounced effect on amount
-                    change, so there is no manual "Get Quote" step. The
-                    button is:
-                      - spinning while the auto-quote request is in flight,
-                      - disabled without a live quote (still typing /
-                        awaiting the debounce),
-                      - disabled when the address field is empty or
-                        invalid (validated in the input itself),
-                      - disabled on outbound when amount + ZEC fees exceed
-                        spendable balance (the "Reduce to X" hint above
-                        offers the fix).
-                    Otherwise it opens the review/commit sheet. */}
+                {/* CTA. The quote is fetched automatically by the debounced
+                    effect on amount change, so there is no manual "Get Quote"
+                    step. Uses the shared <Button> so it matches the other
+                    primary/secondary buttons in the app. Three states:
+                      - Quoting (isQuoting, first fetch or 20 s refresh):
+                        "Actualizando cotización…", disabled.
+                      - Insufficient funds: SECONDARY + tappable, opens the
+                        InsufficientFundsSheet (long copy + "reduce to max").
+                      - Otherwise "Continue": opens the review/commit sheet,
+                        disabled until a live quote + a valid address exist. */}
                 <View style={styles.ctaWrap}>
-                  <Pressable
-                    onPress={openReviewSheet}
-                    disabled={
-                      !liveQuote ||
-                      insufficientForCommit ||
-                      !activeAddressValid ||
-                      activeAddressValue.trim().length === 0
+                  {(() => {
+                    const addressReady =
+                      activeAddressValid &&
+                      activeAddressValue.trim().length > 0;
+                    if (isQuoting) {
+                      // Same label for the first fetch and every 20 s refresh;
+                      // `swap.quote-refreshing` already reads "Actualizando
+                      // cotización…" in es.
+                      return (
+                        <Button
+                          type={ButtonTypeEnum.Primary}
+                          disabled
+                          title={t(
+                            'swap.quote-refreshing',
+                            'Refreshing quote…',
+                          )}
+                          onPress={() => {}}
+                          testID="swap.continue"
+                        />
+                      );
                     }
-                    accessibilityRole="button"
-                    accessibilityState={{
-                      disabled:
-                        !liveQuote ||
-                        insufficientForCommit ||
-                        !activeAddressValid ||
-                        activeAddressValue.trim().length === 0,
-                      busy: isQuoting,
-                    }}
-                    style={[
-                      styles.cta,
-                      {
-                        backgroundColor:
-                          liveQuote &&
-                          !insufficientForCommit &&
-                          activeAddressValid &&
-                          activeAddressValue.trim().length > 0
-                            ? colors.primary
-                            : colors.primaryDisabled,
-                      },
-                    ]}
-                    testID="swap.continue"
-                  >
-                    {isQuoting ? (
-                      <ActivityIndicator color={colors.background} />
-                    ) : (
-                      <BoldText
-                        style={{ ...styles.ctaText, color: colors.background }}
-                      >
-                        {t('swap.continue', 'Continue')}
-                      </BoldText>
-                    )}
-                  </Pressable>
+                    if (liveQuote && insufficientForCommit) {
+                      return (
+                        <Button
+                          type={ButtonTypeEnum.Secondary}
+                          title={`${t(
+                            'swap.insufficient-title',
+                            'Insufficient funds',
+                          )} ⓘ`}
+                          onPress={() =>
+                            insufficientSheetRef.current?.present()
+                          }
+                          testID="swap.continue"
+                        />
+                      );
+                    }
+                    return (
+                      <Button
+                        type={ButtonTypeEnum.Primary}
+                        title={t('swap.continue', 'Continue')}
+                        disabled={!liveQuote || !addressReady}
+                        onPress={openReviewSheet}
+                        testID="swap.continue"
+                      />
+                    );
+                  })()}
                 </View>
               </ScrollView>
             </View>
@@ -1769,6 +1735,12 @@ const Swap: React.FunctionComponent<SwapProps> = ({
         ref={slippageSheetRef}
         slippageBps={slippageBps}
         onChange={setSlippageBps}
+        translate={translate}
+      />
+      <InsufficientFundsSheet
+        ref={insufficientSheetRef}
+        maxSpendable={maxSpendableForSwap}
+        onReduceToMax={onReduceToMax}
         translate={translate}
       />
       <ReviewSheet
@@ -2189,22 +2161,7 @@ const styles = StyleSheet.create({
   },
   ctaWrap: {
     marginTop: 8,
-  },
-  insufficientHint: {
-    marginTop: 12,
     alignItems: 'center',
-  },
-  reduceToMaxPress: {
-    marginTop: 6,
-    paddingVertical: 4,
-  },
-  cta: {
-    borderRadius: 32,
-    paddingVertical: 18,
-    alignItems: 'center',
-  },
-  ctaText: {
-    fontSize: 16,
   },
 });
 

@@ -639,6 +639,7 @@
     "seconds-abbrev": "saniye",
     "quote-refreshing": "Fiyat teklifi yenileniyor…",
     "insufficient-for-commit": "Tutar + ağ ücretini karşılamaya yetecek ZEC yok.",
+    "insufficient-title": "Yetersiz bakiye",
     "reduce-to": "Şu miktara düşür:",
     "edge-blocked-snackbar": "Swap servisi ağında engelleniyor. VPN dene.",
     "edge-blocked-banner-title": "Swap servisi bu ağda kullanılamıyor",
