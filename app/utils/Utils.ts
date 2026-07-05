@@ -245,6 +245,19 @@ export default class Utils {
     return colorList;
   }
 
+  // Deterministic bright colour keyed by an arbitrary string (e.g. a token
+  // ticker). Same seed always yields the same colour, so a per-asset avatar
+  // keeps a stable identity across re-renders instead of flickering a new
+  // random colour each time. Mirrors `generateColorList`'s options; only the
+  // `seed` makes it reproducible.
+  static generateColorFromSeed(seed: string): string {
+    return randomColor({
+      seed,
+      luminosity: 'bright',
+      format: 'hex',
+    });
+  }
+
   static getLabelColor(bgColor: string): string {
     // Remove the '#' if present.
     if (bgColor.startsWith('#')) {

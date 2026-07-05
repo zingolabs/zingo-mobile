@@ -4,7 +4,9 @@ import { Image, StyleSheet, View } from 'react-native';
 
 import { TokenEntryType } from '../../../app/swap';
 import BoldText from '../../Components/BoldText';
+import Utils from '../../../app/utils';
 import { getChainIcon } from './chainIcons';
+import { DARK_LOGO_BACKDROP, isDarkLogo } from './darkLogos';
 
 /**
  * Composed asset icon: the token's logo as the main image, with a small
@@ -82,6 +84,21 @@ export default function TokenLogo({
     .slice(0, 3)
     .toUpperCase();
 
+  // Fallback avatar colour (only used when there is no logo image):
+  // deterministic on the ticker so each token owns a stable, distinct colour
+  // instead of the old uniform grey. `getLabelColor` picks black/white text so
+  // the letters stay legible on that colour.
+  const seed = token.ticker || token.symbol || '?';
+  const avatarBg = Utils.generateColorFromSeed(seed);
+  const avatarFg = Utils.getLabelColor(avatarBg);
+
+  // Real logos render with NO background — most are colour marks that read
+  // fine on the dark sheet and many carry transparent areas that an added
+  // disc would ruin. The exception is the handful of near-black marks (see
+  // `darkLogos.ts`): those get a light neutral canvas so their glyph stays
+  // visible. Everything else stays transparent.
+  const imageBg = isDarkLogo(token) ? DARK_LOGO_BACKDROP : 'transparent';
+
   return (
     <View style={{ width: size, height: size, overflow: 'visible' }}>
       {token.logoURI && !mainLoadFailed ? (
@@ -97,24 +114,21 @@ export default function TokenLogo({
           source={{ uri: token.logoURI }}
           onError={() => setMainLoadFailed(true)}
           resizeMode="cover"
-          // Light-grey canvas behind the logo. Many token PNGs are a dark/mono
-          // glyph on a transparent background (e.g. NEAR-bridged assets), which
-          // vanished against the dark sheet. Token logos are authored for light
-          // surfaces, so a light neutral is the safe default; fully-opaque logos
-          // (USDT's green disc, etc.) simply cover it and look unchanged.
+          // Transparent for normal logos; a light neutral only for the curated
+          // dark-mark assets so their glyph does not vanish on the dark sheet.
           style={{
             width: size,
             height: size,
             borderRadius: size / 2,
-            backgroundColor: '#E8E8E8',
+            backgroundColor: imageBg,
           }}
         />
       ) : (
         <LetterAvatar
           label={avatarLabel}
           size={size}
-          bg="#E8E8E8"
-          fg="#040C17"
+          bg={avatarBg}
+          fg={avatarFg}
         />
       )}
       {showBadge && !badgeLoadFailed && (

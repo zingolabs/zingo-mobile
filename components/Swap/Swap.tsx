@@ -573,6 +573,14 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   // long enough not to hammer the API. Refresh pauses while the
   // ReviewSheet is open (the user is committing to the pinned snapshot).
   const QUOTE_REFRESH_INTERVAL_MS = 20_000;
+  // Debounce window shared by two effects below: (1) the auto-fire that
+  // requests a fresh quote after the amount settles, and (2) the delayed
+  // clear that drops a stale quote once the field is *left* empty. Using the
+  // same window means erasing the last digit of `0.02` to type `0.03` at a
+  // normal pace never blanks the panel — the transient zero is absorbed and
+  // the quote transitions in place — while a field genuinely left empty
+  // still clears (and stops the countdown) after the window elapses.
+  const QUOTE_DEBOUNCE_MS = 1000;
   const quoteNextRefreshAtMs = useMemo<number | null>(() => {
     if (!liveQuote) return null;
     return liveQuote.receivedAtMs + QUOTE_REFRESH_INTERVAL_MS;
@@ -742,6 +750,24 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     setQuoteAttemptFailed(false);
   }, [sourceInput, slippageBps]);
 
+  // Emptying the amount (or typing a 0) means there is nothing to quote, but
+  // we must NOT blank the panel the instant `sourceNum` hits 0: erasing the
+  // last digit of `0.02` to retype `0.03` momentarily passes through `0.0`,
+  // and clearing there would make the quote jump to empty and back on every
+  // edit. Instead we debounce the clear with the same window as the auto-
+  // fire — if a positive amount returns first, the cleanup cancels this and
+  // the quote transitions in place; only a field *left* empty/zero clears.
+  // Dropping `liveQuote` also stops the countdown, since the tick interval
+  // and the auto-refresh effect both gate on `liveQuote`.
+  useEffect(() => {
+    if (sourceNum > 0) return;
+    const timer = setTimeout(() => {
+      setLiveQuote(null);
+      setQuoteAttemptFailed(false);
+    }, QUOTE_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [sourceNum]);
+
   // Our wallet-side ZEC address for the swap. We reserve a one-shot
   // ZIP-320 refund-scope (ephemeral) t-address so providers see a fresh
   // identifier per swap, refunds aren't linked to the user's persistent
@@ -769,19 +795,19 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   // "Continue" button's disabled logic.
   const canFetchQuote = !isQuoting && sourceNum > 0 && !!selectedToken;
 
-  // Auto-fire the quote 500ms after the user stops changing the amount /
-  // asset / direction. Removes the manual "Get Quote" tap: the user types
-  // and the quote appears. `liveQuote` is already cleared on every input
-  // change by the effect further up, so between input changes the button
-  // reads as `!liveQuote` (disabled) and the debounced fetch produces a
-  // fresh quote for the new inputs. 500ms absorbs typing bursts without
-  // feeling laggy.
+  // Auto-fire the quote QUOTE_DEBOUNCE_MS after the user stops changing the
+  // amount / asset / direction. Removes the manual "Get Quote" tap: the user
+  // types and the quote appears. The `clearTimeout` cleanup restarts the
+  // timer on every keystroke, so a burst of edits fires exactly ONE request
+  // once typing settles — never one per key. The window is long enough that
+  // typing or erasing a decimal digit by digit (e.g. the "1" before ".5" in
+  // "1.5") does not fire an intermediate quote for the half-typed value.
   useEffect(() => {
     if (!canFetchQuote) return;
     // Do NOT re-fire when the last attempt for the CURRENT inputs already
     // failed (below-minimum amount, no-route, provider transient…).
     // Without this guard the debounce would keep hammering the API with
-    // the same failing request every 500ms. The flag clears when an
+    // the same failing request on every tick. The flag clears when an
     // input actually changes, so a legitimate new attempt can happen.
     if (quoteAttemptFailed) return;
     // If we already hold a live quote AND its pinned inputs match what
@@ -790,8 +816,8 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     // every successful fetch (canFetchQuote flips false→true, effect
     // re-runs). When `sourceInput` or `slippageBps` differ from the
     // pinned snapshot we DO fire, but crucially we DO NOT null out
-    // `liveQuote` first — the debounce takes 500 ms + the fetch, and
-    // during that window the panel keeps showing the previous values
+    // `liveQuote` first — the debounce takes QUOTE_DEBOUNCE_MS + the fetch,
+    // and during that window the panel keeps showing the previous values
     // instead of flickering to an empty state.
     if (liveQuote) {
       const sellForApi =
@@ -803,7 +829,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     }
     const timer = setTimeout(() => {
       onGetQuoteRef.current?.();
-    }, 500);
+    }, QUOTE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [
     canFetchQuote,
@@ -2092,8 +2118,15 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   toggleWrap: {
+    // Pull the two asset cards together and let the 36px round button
+    // straddle the seam, overlapping the bottom of the source card and
+    // the top of the destination card. Gap between the cards = button
+    // height + 2 × margin = 36 + 2 × (-12) = 12px. `zIndex` keeps the
+    // button painted above both cards (the destination card renders after
+    // it in the tree and would otherwise cover its lower half).
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: -12,
+    zIndex: 1,
   },
   toggleBtn: {
     width: 36,
