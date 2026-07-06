@@ -109,8 +109,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
         <View
           style={{
             borderWidth: 1,
-            borderRadius: 5,
-            borderColor: colors.text,
+            borderRadius: 12,
+            borderColor: colors.border,
             marginTop: 5,
           }}
         >

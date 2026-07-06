@@ -1,17 +1,24 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import React, { useContext, useEffect } from 'react';
+import {
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  ViewStyle,
+} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-import FadeText from './FadeText';
+import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 import { ContextAppLoaded } from '../../app/context';
-import { getZecPrice } from '../../app/walletBackend';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
 import { ModeEnum } from '../../app/AppState';
-import Utils from '../../app/utils';
 import { showConfirm, ConfirmButton } from '../../app/showConfirm';
+import QuoteRefreshRing from '../Swap/components/QuoteRefreshRing';
+import {
+  PRICE_AUTO_REFRESH_MS,
+  priceFetcherStore,
+  usePriceFetcherStore,
+} from './priceFetcherStore';
 
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
@@ -29,82 +36,20 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   const { colors } = useTheme() as ThemeType;
   const bg = backgroundColor ?? colors.card;
 
-  const [refreshMinutes, setRefreshMinutes] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
+  // Shared state across every mounted PriceFetcher.
+  const { started, loading, coolingDown } = usePriceFetcherStore();
 
+  // Feed the shared store the latest context-bound callbacks (identical across
+  // instances, so the last writer wins harmlessly).
   useEffect(() => {
-    const fn = () => {
-      if (zecPrice.date > 0) {
-        setRefreshMinutes(
-          Utils.diffInMinutes(new Date(), new Date(zecPrice.date)),
-        );
-      }
-    };
-
-    fn();
-    const inter: NodeJS.Timeout = setInterval(fn, 1000);
-
-    return () => clearInterval(inter);
-  }, [zecPrice.date]);
-
-  const formatMinutes = (min: number) => {
-    if (min < 60) {
-      return min.toString();
-    } else {
-      return (
-        (min / 60).toFixed(0).toString() +
-        ':' +
-        (min % 60).toFixed(0).toString().padStart(2, '0')
-      );
-    }
-  };
-
-  const onPressFetch = async () => {
-    setLoading(true);
-    let price: number;
-    let error: string;
-    // first attempt
-    ({ price, error } = await getZecPrice());
-    //console.log('first price fetching', price, error);
-    // values:
-    // 0   - initial/default value
-    // -1  - error in Gemini/zingolib.
-    // -2  - error in RPCModule, likely.
-    // > 0 - real value
-    if (price <= 0) {
-      // second attempt
-      ({ price, error } = await getZecPrice());
-      //console.log('second price fetching', price, error);
-    }
-
-    if (price === -1) {
-      addLastSnackbar(`${translate('info.errorgemini')} - ${error}`);
-      setLoading(false);
-      return;
-    }
-    if (price === -2) {
-      addLastSnackbar(`${translate('info.errorrpcmodule')} - ${error}`);
-      setLoading(false);
-      return;
-    }
-    if (price <= 0) {
-      addLastSnackbar(`${translate('info.errorgemini')} - ${error}`);
-      setZecPrice(price, 0);
-    } else {
-      setZecPrice(price, Date.now());
-    }
-    setRefreshMinutes(0);
-    // the app needs time to recover the price from the context.
-    setTimeout(() => {
-      setLoading(false);
-    }, 1 * 1000);
-  };
+    priceFetcherStore.setDeps({ setZecPrice, translate, addLastSnackbar });
+  });
 
   const onPressFetchAlert = () => {
     const buttons: ConfirmButton[] = [
       {
         text: translate('send.fetch-button') as string,
-        onPress: () => onPressFetch(),
+        onPress: () => priceFetcherStore.fetch(),
       },
       { text: translate('cancel') as string, style: 'cancel' },
     ];
@@ -115,71 +60,75 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     });
   };
 
+  const onManualPress = () => {
+    // Confirm only on the very first request in advanced mode; afterwards a tap
+    // fetches straight away. Basic mode never confirms. The store swallows the
+    // tap while loading / within the 5 s cooldown, so this can't be spammed.
+    if (!started && mode === ModeEnum.advanced) {
+      onPressFetchAlert();
+    } else {
+      priceFetcherStore.fetch();
+    }
+  };
+
+  const containerStyle: ViewStyle = {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: bg,
+    margin: 0,
+    marginTop: 10,
+    padding: 5,
+    minWidth: 40,
+    minHeight: 40,
+    rowGap: 5,
+    columnGap: 10,
+  };
+
+  // First fetch in flight (no ring yet): show the spinner.
+  if (loading && !started) {
+    return (
+      <View style={containerStyle}>
+        {textBefore && (
+          <RegText style={{ color: colors.text }}>{textBefore}</RegText>
+        )}
+        <ActivityIndicator size="small" color={colors.primary} />
+      </View>
+    );
+  }
+
   return (
-    <>
-      {loading && (
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: bg,
-            margin: 0,
-            marginTop: 10,
-            padding: 5,
-            minWidth: 40,
-            minHeight: 40,
-            rowGap: 5,
-            columnGap: 10,
-          }}
-        >
-          {textBefore && (
-            <RegText style={{ color: colors.text }}>{textBefore}</RegText>
-          )}
-          <ActivityIndicator size="small" color={colors.primary} />
-        </View>
+    <View style={containerStyle}>
+      {textBefore && (
+        <RegText style={{ color: colors.text }}>{textBefore}</RegText>
       )}
-      {!loading && (
+      {started ? (
+        <QuoteRefreshRing
+          size={22}
+          color={colors.primary}
+          ringColor={'rgba(255,255,255,0.55)'}
+          trackColor={'rgba(255,255,255,0.12)'}
+          durationMs={PRICE_AUTO_REFRESH_MS}
+          resetKey={zecPrice.date}
+          onPress={onManualPress}
+          disabled={loading || coolingDown}
+          testID="pricefetcher.ring"
+        />
+      ) : (
         <TouchableOpacity
           disabled={loading}
-          onPress={() =>
-            mode === ModeEnum.basic ? onPressFetch() : onPressFetchAlert()
-          }
+          onPress={onManualPress}
+          testID="pricefetcher.fetch"
         >
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: bg,
-              margin: 0,
-              marginTop: 10,
-              padding: 5,
-              minWidth: 40,
-              minHeight: 40,
-              rowGap: 5,
-              columnGap: 10,
-            }}
-          >
-            {textBefore && (
-              <RegText style={{ color: colors.text }}>{textBefore}</RegText>
-            )}
-            <FontAwesomeIcon
-              icon={faRefresh}
-              size={16}
-              color={colors.primary}
-            />
-            {refreshMinutes > 0 && (
-              <FadeText>
-                {formatMinutes(refreshMinutes) + translate('history.minago')}
-              </FadeText>
-            )}
-          </View>
+          <FontAwesomeIcon
+            icon={faRotateRight}
+            size={16}
+            color={colors.primary}
+          />
         </TouchableOpacity>
       )}
-    </>
+    </View>
   );
 };
 

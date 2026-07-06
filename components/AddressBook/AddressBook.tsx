@@ -8,6 +8,7 @@ import React, {
   useRef,
 } from 'react';
 import {
+  Keyboard,
   View,
   ScrollView,
   NativeScrollEvent,
@@ -484,6 +485,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         enableContentPanningGesture={false}
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
           borderTopLeftRadius: 40,
@@ -772,6 +776,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting a keyboard the sheet itself focuses later.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         handleComponent={renderAbDetailHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,

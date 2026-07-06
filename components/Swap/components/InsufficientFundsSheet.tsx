@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Keyboard, Pressable, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faWallet, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -12,9 +12,10 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import { ThemeType } from '../../../app/types';
-import { TranslateType } from '../../../app/AppState';
+import { ButtonTypeEnum, TranslateType } from '../../../app/AppState';
 import BoldText from '../../Components/BoldText';
 import RegText from '../../Components/RegText';
+import Button from '../../Components/Button';
 
 /**
  * Informational sheet shown when the requested swap amount + network fee
@@ -121,6 +122,17 @@ const InsufficientFundsSheet = forwardRef<
       enableDynamicSizing={true}
       enablePanDownToClose
       stackBehavior="push"
+      keyboardBehavior={'interactive'}
+      keyboardBlurBehavior={'restore'}
+      android_keyboardInputMode={'adjustResize'}
+      onAnimate={(from, to) => {
+        // Opening (from === -1) dismisses a keyboard left open by the
+        // underlying screen so the sheet never renders behind it. Guard
+        // avoids fighting a keyboard the sheet itself focuses later.
+        if (from === -1 && to >= 0) {
+          Keyboard.dismiss();
+        }
+      }}
       handleComponent={renderHandle}
       backgroundStyle={{
         backgroundColor: colors.bottomSheetBackground,
@@ -138,76 +150,42 @@ const InsufficientFundsSheet = forwardRef<
           rowGap: 16,
         }}
       >
-        <View
-          style={[
-            styles.infoRow,
-            {
-              backgroundColor: colors.background,
-              borderColor: colors.border,
-            },
-          ]}
-        >
+        <View style={{ alignItems: 'center', paddingTop: 4 }}>
           <FontAwesomeIcon
-            icon={faCircleInfo}
-            size={16}
-            color={colors.primary}
+            icon={faWallet}
+            size={44}
+            color={colors.warning.primary}
           />
-          <RegText
-            style={{
-              color: colors.text,
-              flex: 1,
-              marginLeft: 10,
-              fontSize: 14,
-            }}
-          >
-            {t(
-              'swap.insufficient-for-commit',
-              'Not enough ZEC to cover amount + network fee.',
-            )}
-          </RegText>
         </View>
+        <RegText
+          style={{
+            color: colors.text,
+            textAlign: 'center',
+            fontSize: 14,
+            lineHeight: 20,
+          }}
+        >
+          {t(
+            'swap.insufficient-desc',
+            "Your available ZEC doesn't cover this amount plus the network fee. Lower the amount to swap, or add more ZEC to your wallet, and try again.",
+          )}
+        </RegText>
 
         {maxSpendable > 0 && (
-          <Pressable
-            onPress={onReducePress}
-            accessibilityRole="button"
-            testID="swap.insufficient.reduce"
-            style={({ pressed }) => [
-              styles.reduceBtn,
-              {
-                backgroundColor: colors.primary,
-                opacity: pressed ? 0.7 : 1,
-              },
-            ]}
-          >
-            <BoldText style={{ color: colors.background, textAlign: 'center' }}>
-              {`${t('swap.reduce-to', 'Reduce to')} ${maxSpendable.toFixed(
+          <View style={{ alignItems: 'center' }}>
+            <Button
+              type={ButtonTypeEnum.Primary}
+              title={`${t('swap.reduce-to', 'Reduce to')} ${maxSpendable.toFixed(
                 8,
               )} ZEC`}
-            </BoldText>
-          </Pressable>
+              onPress={onReducePress}
+              testID="swap.insufficient.reduce"
+            />
+          </View>
         )}
       </BottomSheetView>
     </BottomSheetModal>
   );
-});
-
-const styles = StyleSheet.create({
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  reduceBtn: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 });
 
 export default React.memo(InsufficientFundsSheet);

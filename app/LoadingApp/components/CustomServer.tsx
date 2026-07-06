@@ -90,6 +90,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
             style={{
               borderColor: colors.border,
               borderWidth: 1,
+              borderRadius: 12,
               marginLeft: 5,
               width: 'auto',
               maxWidth: '90%',

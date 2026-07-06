@@ -296,8 +296,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               margin: 10,
               padding: 10,
               borderWidth: 1,
-              borderRadius: 10,
-              borderColor: colors.text,
+              borderRadius: 12,
+              borderColor: colors.border,
               flexDirection: 'row',
               justifyContent: 'space-between',
             }}
@@ -307,9 +307,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               accessibilityLabel={translate('seed.seed-acc') as string}
               style={{
                 marginRight: 5,
-                borderWidth: 1,
-                borderRadius: 10,
-                borderColor: colors.text,
                 width: 'auto',
                 flex: 1,
                 justifyContent: 'center',
@@ -379,8 +376,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               style={{
                 margin: 10,
                 borderWidth: 1,
-                borderRadius: 10,
-                borderColor: colors.text,
+                borderRadius: 12,
+                borderColor: colors.border,
                 width: '30%',
                 maxWidth: '40%',
                 maxHeight: 48,

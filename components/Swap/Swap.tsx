@@ -22,7 +22,11 @@ import Animated from 'react-native-reanimated';
 import { useTheme } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
+import {
+  faChevronDown,
+  faGear,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { getNumberFormatSettings } from 'react-native-localize';
 
@@ -1372,6 +1376,9 @@ const Swap: React.FunctionComponent<SwapProps> = ({
             enableDynamicSizing={false}
             enablePanDownToClose={false}
             enableContentPanningGesture={false}
+            keyboardBehavior={'interactive'}
+            keyboardBlurBehavior={'restore'}
+            android_keyboardInputMode={'adjustResize'}
             backgroundStyle={{
               backgroundColor: colors.bottomSheetBackground,
               borderTopLeftRadius: 40,
@@ -1569,7 +1576,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                       return (
                         <QuoteRefreshRing
                           size={22}
-                          color={colors.text}
+                          color={colors.primary}
                           ringColor={'rgba(255,255,255,0.55)'}
                           trackColor={'rgba(255,255,255,0.12)'}
                           durationMs={QUOTE_REFRESH_INTERVAL_MS}
@@ -1652,17 +1659,24 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   </View>
                 )}
 
-                {/* Slippage row */}
-                <View style={styles.slippageRow}>
+                {/* Slippage — right-aligned; tap the value or the gear to
+                    adjust it (no separate "Change" text). */}
+                <Pressable
+                  onPress={openSlippageSheet}
+                  accessibilityRole="button"
+                  hitSlop={6}
+                  style={styles.slippageRow}
+                >
                   <FadeText>
                     {`${t('swap.slippage', 'Slippage')}: ${formatSlippagePercent(slippageBps, decimalSeparator)}%`}
                   </FadeText>
-                  <Pressable onPress={openSlippageSheet}>
-                    <RegText style={{ color: colors.primary }}>
-                      {t('swap.change', 'Change')}
-                    </RegText>
-                  </Pressable>
-                </View>
+                  <FontAwesomeIcon
+                    icon={faGear}
+                    size={16}
+                    color={colors.primary}
+                    style={{ marginLeft: 6 }}
+                  />
+                </Pressable>
 
                 {/* CTA. The quote is fetched automatically by the debounced
                     effect on amount change, so there is no manual "Get Quote"
@@ -1686,6 +1700,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                       return (
                         <Button
                           type={ButtonTypeEnum.Primary}
+                          style={{ width: '90%' }}
                           disabled
                           title={t(
                             'swap.quote-refreshing',
@@ -1700,6 +1715,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                       return (
                         <Button
                           type={ButtonTypeEnum.Secondary}
+                          style={{ width: '90%' }}
                           title={`${t(
                             'swap.insufficient-title',
                             'Insufficient funds',
@@ -1714,6 +1730,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                     return (
                       <Button
                         type={ButtonTypeEnum.Primary}
+                        style={{ width: '90%' }}
                         title={t('swap.continue', 'Continue')}
                         disabled={!liveQuote || !addressReady}
                         onPress={openReviewSheet}
@@ -2161,7 +2178,7 @@ const styles = StyleSheet.create({
   slippageRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginTop: 16,
     paddingHorizontal: 4,
   },

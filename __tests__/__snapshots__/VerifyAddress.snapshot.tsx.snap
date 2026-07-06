@@ -28,8 +28,8 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
       <View
         style={
           {
-            "borderColor": "#c3c3c3",
-            "borderRadius": 5,
+            "borderColor": "#ffffff",
+            "borderRadius": 12,
             "borderWidth": 1,
             "marginTop": 5,
           }

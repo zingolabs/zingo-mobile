@@ -216,8 +216,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           style={{
             flexGrow: 1,
             borderWidth: 1,
-            borderRadius: 5,
-            borderColor: colors.text,
+            borderRadius: 12,
+            borderColor: colors.border,
             minWidth: 48,
             minHeight: 48,
             maxHeight: 150,

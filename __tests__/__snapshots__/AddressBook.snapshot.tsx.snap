@@ -309,8 +309,8 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         <View
           style={
             {
-              "borderColor": "#c3c3c3",
-              "borderRadius": 5,
+              "borderColor": "#ffffff",
+              "borderRadius": 12,
               "borderWidth": 1,
               "marginTop": 5,
             }
@@ -454,8 +454,8 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         accessible={true}
         style={
           {
-            "borderColor": "#c3c3c3",
-            "borderRadius": 5,
+            "borderColor": "#ffffff",
+            "borderRadius": 12,
             "borderWidth": 1,
             "flexGrow": 1,
             "maxHeight": 150,

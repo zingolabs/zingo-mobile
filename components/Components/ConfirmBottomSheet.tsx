@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions, View } from 'react-native';
+import { Dimensions, Keyboard, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import {
   BottomSheetBackdrop,
@@ -115,6 +115,17 @@ const ConfirmBottomSheet: React.FC = () => {
       accessible={false}
       enableDynamicSizing={true}
       stackBehavior="push"
+      keyboardBehavior={'interactive'}
+      keyboardBlurBehavior={'restore'}
+      android_keyboardInputMode={'adjustResize'}
+      onAnimate={(from, to) => {
+        // Opening (from === -1) dismisses a keyboard left open by the
+        // underlying screen so the sheet never renders behind it. Guard
+        // avoids fighting a keyboard the sheet itself focuses later.
+        if (from === -1 && to >= 0) {
+          Keyboard.dismiss();
+        }
+      }}
       detached={true}
       bottomInset={VERTICAL_LIFT}
       handleComponent={renderHandle}

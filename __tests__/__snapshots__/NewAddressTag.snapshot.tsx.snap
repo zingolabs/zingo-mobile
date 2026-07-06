@@ -81,8 +81,8 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
         accessible={true}
         style={
           {
-            "borderColor": "#c3c3c3",
-            "borderRadius": 5,
+            "borderColor": "#ffffff",
+            "borderRadius": 12,
             "borderWidth": 1,
             "flexGrow": 1,
             "maxHeight": 150,

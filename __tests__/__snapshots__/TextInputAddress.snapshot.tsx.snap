@@ -21,8 +21,8 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
     <View
       style={
         {
-          "borderColor": "#c3c3c3",
-          "borderRadius": 5,
+          "borderColor": "#ffffff",
+          "borderRadius": 12,
           "borderWidth": 1,
           "marginTop": 5,
         }
@@ -183,8 +183,8 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
     <View
       style={
         {
-          "borderColor": "#c3c3c3",
-          "borderRadius": 5,
+          "borderColor": "#ffffff",
+          "borderRadius": 12,
           "borderWidth": 1,
           "marginTop": 5,
         }

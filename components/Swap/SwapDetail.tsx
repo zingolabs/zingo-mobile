@@ -7,7 +7,13 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Linking, Pressable, TouchableOpacity, View } from 'react-native';
+import {
+  Keyboard,
+  Linking,
+  Pressable,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {
   NavigationProp,
   ParamListBase,
@@ -339,6 +345,9 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({ route }) => {
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         enableContentPanningGesture={false}
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
           borderTopLeftRadius: 40,
@@ -1171,6 +1180,17 @@ const FeesBreakdownSheet = forwardRef<
       enableDynamicSizing={true}
       enablePanDownToClose
       stackBehavior="push"
+      keyboardBehavior={'interactive'}
+      keyboardBlurBehavior={'restore'}
+      android_keyboardInputMode={'adjustResize'}
+      onAnimate={(from, to) => {
+        // Opening (from === -1) dismisses a keyboard left open by the
+        // underlying screen so the sheet never renders behind it. Guard
+        // avoids fighting a keyboard the sheet itself focuses later.
+        if (from === -1 && to >= 0) {
+          Keyboard.dismiss();
+        }
+      }}
       handleComponent={handleComponent}
       backdropComponent={renderBackdrop}
       backgroundStyle={{
@@ -1414,6 +1434,17 @@ const TrackersSheet = forwardRef<
       enableDynamicSizing={true}
       enablePanDownToClose
       stackBehavior="push"
+      keyboardBehavior={'interactive'}
+      keyboardBlurBehavior={'restore'}
+      android_keyboardInputMode={'adjustResize'}
+      onAnimate={(from, to) => {
+        // Opening (from === -1) dismisses a keyboard left open by the
+        // underlying screen so the sheet never renders behind it. Guard
+        // avoids fighting a keyboard the sheet itself focuses later.
+        if (from === -1 && to >= 0) {
+          Keyboard.dismiss();
+        }
+      }}
       handleComponent={handleComponent}
       backdropComponent={renderBackdrop}
       backgroundStyle={{

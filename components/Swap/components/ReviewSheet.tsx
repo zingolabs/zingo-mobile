@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Keyboard, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -401,6 +401,15 @@ const ReviewSheet = forwardRef<BottomSheetModal, ReviewSheetProps>(
         enablePanDownToClose={!isCommitting && !blockEasyClose}
         keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
+        android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting a keyboard the sheet itself focuses later.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         backdropComponent={renderBackdrop}
         handleComponent={() => handle}
         backgroundStyle={{
@@ -603,6 +612,7 @@ function ReviewView(props: {
       <View style={styles.ctaWrap}>
         <Button
           type={ButtonTypeEnum.Primary}
+          style={{ width: '90%' }}
           disabled={isCommitting}
           title={
             isCommitting
@@ -795,6 +805,7 @@ function PostCommitView(props: {
         <View style={styles.ctaWrap}>
           <Button
             type={ButtonTypeEnum.Primary}
+            style={{ width: '90%' }}
             title={t('swap.done', 'Done')}
             onPress={onDone}
             testID="swap.review.done"
@@ -1002,6 +1013,7 @@ function PostCommitView(props: {
       <View style={styles.ctaWrap}>
         <Button
           type={ButtonTypeEnum.Primary}
+          style={{ width: '90%' }}
           title={t('swap.done', 'Done')}
           onPress={onDone}
           testID="swap.review.done"

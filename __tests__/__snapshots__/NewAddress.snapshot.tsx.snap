@@ -46,8 +46,8 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
         accessible={true}
         style={
           {
-            "borderColor": "#c3c3c3",
-            "borderRadius": 5,
+            "borderColor": "#ffffff",
+            "borderRadius": 12,
             "borderWidth": 1,
             "flexGrow": 1,
             "maxHeight": 150,
@@ -474,8 +474,8 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
         accessible={true}
         style={
           {
-            "borderColor": "#c3c3c3",
-            "borderRadius": 5,
+            "borderColor": "#ffffff",
+            "borderRadius": 12,
             "borderWidth": 1,
             "flexGrow": 1,
             "maxHeight": 150,

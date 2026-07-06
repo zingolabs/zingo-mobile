@@ -1256,6 +1256,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             enableDynamicSizing={false}
             enablePanDownToClose={false}
             enableContentPanningGesture={false}
+            keyboardBehavior={'interactive'}
+            keyboardBlurBehavior={'restore'}
+            android_keyboardInputMode={'adjustResize'}
             backgroundStyle={{
               backgroundColor: colors.bottomSheetBackground,
               borderTopLeftRadius: 40,
@@ -2009,6 +2012,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting a keyboard the sheet itself focuses later.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         handleComponent={renderSecurityHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
@@ -2091,6 +2102,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting the server field's own keyboard.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         handleComponent={renderServerHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
@@ -2396,6 +2415,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   style={{
                     borderColor: colors.border,
                     borderWidth: 1,
+                    borderRadius: 12,
                     marginLeft: 5,
                     width: 'auto',
                     maxWidth: '90%',
