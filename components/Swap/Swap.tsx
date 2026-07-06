@@ -22,11 +22,7 @@ import Animated from 'react-native-reanimated';
 import { useTheme } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faChevronDown,
-  faRotateRight,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { getNumberFormatSettings } from 'react-native-localize';
 
@@ -75,6 +71,7 @@ import SlippageSheet, {
   formatSlippagePercent,
 } from './components/SlippageSheet';
 import InsufficientFundsSheet from './components/InsufficientFundsSheet';
+import QuoteRefreshRing from './components/QuoteRefreshRing';
 import TokenLogo from './components/TokenLogo';
 
 /**
@@ -585,10 +582,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     if (!liveQuote) return null;
     return liveQuote.receivedAtMs + QUOTE_REFRESH_INTERVAL_MS;
   }, [liveQuote]);
-  const quoteSecondsLeft = useMemo<number | null>(() => {
-    if (!liveQuote || quoteNextRefreshAtMs === null) return null;
-    return Math.max(0, Math.ceil((quoteNextRefreshAtMs - nowMs) / 1000));
-  }, [liveQuote, quoteNextRefreshAtMs, nowMs]);
   useEffect(() => {
     if (!liveQuote || isReviewSheetOpen) return;
     const id = setInterval(() => setNowMs(Date.now()), 1000);
@@ -1566,6 +1559,38 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                       },
                     ]}
                   >
+                    {/* Manual re-quote — top-right corner of the fees card. The
+                        ring fills over the 20 s auto-refresh window and resets
+                        on each fresh quote; tapping forces a re-quote (locked
+                        5 s after each tap; dimmed while a fetch is in flight). */}
+                    {(() => {
+                      const manualDisabled =
+                        isQuoting || nowMs < manualRefreshCooldownUntilMs;
+                      return (
+                        <QuoteRefreshRing
+                          size={22}
+                          color={colors.text}
+                          ringColor={'rgba(255,255,255,0.55)'}
+                          trackColor={'rgba(255,255,255,0.12)'}
+                          durationMs={QUOTE_REFRESH_INTERVAL_MS}
+                          resetKey={liveQuote.receivedAtMs}
+                          disabled={manualDisabled}
+                          onPress={() => {
+                            setManualRefreshCooldownUntilMs(
+                              Date.now() + MANUAL_REFRESH_COOLDOWN_MS,
+                            );
+                            onGetQuoteRef.current?.();
+                          }}
+                          style={{
+                            position: 'absolute',
+                            top: 4,
+                            right: 6,
+                            zIndex: 1,
+                          }}
+                          testID="swap.manual-refresh"
+                        />
+                      );
+                    })()}
                     {rateHeader && (
                       <FadeText style={styles.feesRateHeader}>
                         {rateHeader}
@@ -1638,52 +1663,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                     </RegText>
                   </Pressable>
                 </View>
-
-                {/* Manual re-quote affordance. The auto-refresh runs silently
-                    every 20 s; we no longer show a countdown / seconds label
-                    (it read as "you're running out of time to click"). The
-                    refresh-in-flight state is surfaced on the CTA
-                    ("Actualizando cotización…") instead. */}
-                {liveQuote && quoteSecondsLeft !== null && (
-                  <View style={styles.countdownRow}>
-                    {/* Manual refresh. Fires a re-quote immediately and
-                        locks itself for 5 s after each tap so a spammed
-                        button never turns into a burst of HTTP calls.
-                        Also disabled while a fetch is already in flight
-                        (`isQuoting`) — the icon dims to communicate the
-                        wait state without a separate spinner. */}
-                    {(() => {
-                      const manualDisabled =
-                        isQuoting || nowMs < manualRefreshCooldownUntilMs;
-                      return (
-                        <Pressable
-                          onPress={() => {
-                            if (manualDisabled) return;
-                            setManualRefreshCooldownUntilMs(
-                              Date.now() + MANUAL_REFRESH_COOLDOWN_MS,
-                            );
-                            onGetQuoteRef.current?.();
-                          }}
-                          disabled={manualDisabled}
-                          accessibilityRole="button"
-                          hitSlop={8}
-                          style={{
-                            marginLeft: 8,
-                            padding: 4,
-                            opacity: manualDisabled ? 0.4 : 1,
-                          }}
-                          testID="swap.manual-refresh"
-                        >
-                          <FontAwesomeIcon
-                            icon={faRotateRight}
-                            size={14}
-                            color={colors.text}
-                          />
-                        </Pressable>
-                      );
-                    })()}
-                  </View>
-                )}
 
                 {/* CTA. The quote is fetched automatically by the debounced
                     effect on amount change, so there is no manual "Get Quote"
@@ -2185,12 +2164,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 16,
     paddingHorizontal: 4,
-  },
-  countdownRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   ctaWrap: {
     marginTop: 8,

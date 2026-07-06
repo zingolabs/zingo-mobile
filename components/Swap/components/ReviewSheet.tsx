@@ -6,13 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import {
-  ActivityIndicator,
-  Linking,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -32,7 +26,12 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 
 import { ThemeType } from '../../../app/types';
-import { SnackbarDurationEnum, TranslateType } from '../../../app/AppState';
+import {
+  ButtonTypeEnum,
+  SnackbarDurationEnum,
+  TranslateType,
+} from '../../../app/AppState';
+import { showConfirm } from '../../../app/showConfirm';
 import {
   DepositInstructionsType,
   QuoteInput,
@@ -47,11 +46,13 @@ import { FiatValueBasisType } from '../../../app/swap/types/FiatValueBasisType';
 import BoldText from '../../Components/BoldText';
 import FadeText from '../../Components/FadeText';
 import RegText from '../../Components/RegText';
+import Button from '../../Components/Button';
 import { providerLongLabel } from './providerLabels';
 import {
   EVM_SOURCE_CHAINS,
   UTXO_SOURCE_CHAINS,
   buildEip681Uri,
+  buildMemolessPaymentUri,
   isEvmSourceChain,
   isUtxoSourceChain,
   memoToHexCalldata,
@@ -153,6 +154,33 @@ const ReviewSheet = forwardRef<BottomSheetModal, ReviewSheetProps>(
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
     }, [ref]);
 
+    // Once committed and awaiting the external deposit (inbound, or outbound
+    // before zingolib broadcasts), closing abandons an in-flight exchange:
+    // block the swipe/backdrop close and route the X through a confirmation so
+    // the user doesn't lose the deposit instructions by accident.
+    const blockEasyClose = !!postCommit && !postCommit.txId;
+
+    const handleCloseRequest = useCallback(() => {
+      if (!blockEasyClose) {
+        dismiss();
+        return;
+      }
+      showConfirm({
+        title: t('swap.abandon-title', 'Stop the exchange?'),
+        message: t(
+          'swap.abandon-message',
+          'The deposit address is ready. If you close without sending the exact amount, the exchange will not complete.',
+        ),
+        buttons: [
+          {
+            text: t('swap.abandon-confirm', 'Stop exchange'),
+            onPress: () => dismiss(),
+          },
+          { text: t('cancel', 'Cancel'), style: 'cancel' },
+        ],
+      });
+    }, [blockEasyClose, dismiss, t]);
+
     // Reset internal state whenever the sheet closes so a new commit starts
     // clean, and so `postCommit` from a previous swap doesn't leak through if
     // the user re-opens the sheet for a different intent.
@@ -173,13 +201,12 @@ const ReviewSheet = forwardRef<BottomSheetModal, ReviewSheetProps>(
           {...props}
           disappearsOnIndex={-1}
           appearsOnIndex={0}
-          // While committing the network round-trip is mid-flight: pressing the
-          // backdrop would leave the user not knowing whether the swap was
-          // submitted. Gate the close on the post-commit state instead.
-          pressBehavior={isCommitting ? 'none' : 'close'}
+          // No easy backdrop-close while committing (round-trip mid-flight) or
+          // while awaiting the external deposit (would abandon the exchange).
+          pressBehavior={isCommitting || blockEasyClose ? 'none' : 'close'}
         />
       ),
-      [isCommitting],
+      [isCommitting, blockEasyClose],
     );
 
     const onConfirm = useCallback(async () => {
@@ -351,7 +378,7 @@ const ReviewSheet = forwardRef<BottomSheetModal, ReviewSheetProps>(
                 : t('swap.review-title', 'Review swap')}
             </BoldText>
             <Pressable
-              onPress={dismiss}
+              onPress={handleCloseRequest}
               disabled={isCommitting}
               accessibilityRole="button"
               hitSlop={8}
@@ -362,7 +389,7 @@ const ReviewSheet = forwardRef<BottomSheetModal, ReviewSheetProps>(
           </View>
         </View>
       ),
-      [colors, dismiss, isCommitting, postCommit, t],
+      [colors, handleCloseRequest, isCommitting, postCommit, t],
     );
 
     return (
@@ -371,13 +398,15 @@ const ReviewSheet = forwardRef<BottomSheetModal, ReviewSheetProps>(
         index={0}
         snapPoints={SNAP_POINTS}
         enableDynamicSizing={false}
-        enablePanDownToClose={!isCommitting}
+        enablePanDownToClose={!isCommitting && !blockEasyClose}
         keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
         backdropComponent={renderBackdrop}
         handleComponent={() => handle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
         }}
         onChange={onSheetChange}
       >
@@ -571,30 +600,21 @@ function ReviewView(props: {
         t={t}
       />
 
-      <Pressable
-        onPress={onConfirm}
-        disabled={isCommitting}
-        accessibilityRole="button"
-        style={[
-          styles.cta,
-          {
-            backgroundColor: isCommitting
-              ? colors.primaryDisabled
-              : colors.primary,
-          },
-        ]}
-        testID="swap.review.confirm"
-      >
-        {isCommitting ? (
-          <ActivityIndicator color={colors.background} />
-        ) : (
-          <BoldText style={{ ...styles.ctaText, color: colors.background }}>
-            {direction === SwapDirectionEnum.Outbound
-              ? t('swap.confirm-outbound', 'Send swap')
-              : t('swap.confirm-inbound', 'Get deposit address')}
-          </BoldText>
-        )}
-      </Pressable>
+      <View style={styles.ctaWrap}>
+        <Button
+          type={ButtonTypeEnum.Primary}
+          disabled={isCommitting}
+          title={
+            isCommitting
+              ? t('swap.committing', 'Processing…')
+              : direction === SwapDirectionEnum.Outbound
+                ? t('swap.confirm-outbound', 'Send swap')
+                : t('swap.confirm-inbound', 'Get deposit address')
+          }
+          onPress={onConfirm}
+          testID="swap.review.confirm"
+        />
+      </View>
     </View>
   );
 }
@@ -614,22 +634,27 @@ function ReviewView(props: {
  * tracked separately in the backlog with the memo-handling work it needs.
  */
 function PaymentUriBlock(props: {
-  uri: string;
+  /** QR payload: a full payment URI, or a bare deposit address. */
+  value: string;
+  /** Show the "Open in wallet" deep-link button (only for real URIs). */
+  openable: boolean;
+  /** Caption below the QR. */
+  hint: string;
   colors: ColorsType;
   t: TFn;
 }): React.ReactElement {
-  const { uri, colors, t } = props;
+  const { value, openable, hint, colors, t } = props;
   const openInWallet = React.useCallback(async () => {
     try {
-      const supported = await Linking.canOpenURL(uri);
-      if (supported) await Linking.openURL(uri);
+      const supported = await Linking.canOpenURL(value);
+      if (supported) await Linking.openURL(value);
     } catch (err) {
       // Silently swallow — the user still has the QR + manual rows
       // below as fallback paths.
       const msg = err instanceof Error ? err.message : String(err);
       console.log('PaymentUriBlock: openURL failed:', msg);
     }
-  }, [uri]);
+  }, [value]);
 
   return (
     <View
@@ -652,7 +677,7 @@ function PaymentUriBlock(props: {
         }}
       >
         <QRCode
-          value={uri}
+          value={value}
           size={180}
           ecl="M"
           backgroundColor={colors.text}
@@ -666,34 +691,33 @@ function PaymentUriBlock(props: {
           paddingHorizontal: 8,
         }}
       >
-        {t(
-          'swap.payment-uri-hint',
-          'Scan this from any wallet that supports payment URIs, or tap below to open the wallet on this device. Everything (address, amount, memo) is included.',
-        )}
+        {hint}
       </FadeText>
-      <Pressable
-        onPress={openInWallet}
-        accessibilityRole="button"
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingVertical: 8,
-          paddingHorizontal: 14,
-          borderRadius: 8,
-          borderWidth: 1,
-          borderColor: colors.primary,
-        }}
-      >
-        <FontAwesomeIcon
-          icon={faExternalLinkAlt}
-          size={14}
-          color={colors.primary}
-          style={{ marginRight: 8 }}
-        />
-        <BoldText style={{ color: colors.primary, fontSize: 13 }}>
-          {t('swap.payment-uri-open', 'Open in wallet')}
-        </BoldText>
-      </Pressable>
+      {openable ? (
+        <Pressable
+          onPress={openInWallet}
+          accessibilityRole="button"
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingVertical: 8,
+            paddingHorizontal: 14,
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: colors.primary,
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faExternalLinkAlt}
+            size={14}
+            color={colors.primary}
+            style={{ marginRight: 8 }}
+          />
+          <BoldText style={{ color: colors.primary, fontSize: 13 }}>
+            {t('swap.payment-uri-open', 'Open in wallet')}
+          </BoldText>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -768,24 +792,27 @@ function PostCommitView(props: {
           }`}
         />
 
-        <Pressable
-          onPress={onDone}
-          accessibilityRole="button"
-          style={[styles.cta, { backgroundColor: colors.primary }]}
-          testID="swap.review.done"
-        >
-          <BoldText style={{ ...styles.ctaText, color: colors.background }}>
-            {t('swap.done', 'Done')}
-          </BoldText>
-        </Pressable>
+        <View style={styles.ctaWrap}>
+          <Button
+            type={ButtonTypeEnum.Primary}
+            title={t('swap.done', 'Done')}
+            onPress={onDone}
+            testID="swap.review.done"
+          />
+        </View>
       </View>
     );
   }
 
-  // Build the EIP-681 payment URI once per render. Returns null for
-  // non-EVM source chains (UTXO/Cosmos/etc.) where we lack a clean way to
-  // encode the memo — those keep the manual flow only.
-  const paymentUri = memoText
+  // Build the QR shown above the manual rows. Selected on memo presence:
+  //   - Maya / THORChain (memo) → EIP-681 with the memo as calldata (EVM only;
+  //     null elsewhere — a UTXO BIP-21 URI can't carry the OP_RETURN memo, so a
+  //     partial URI would mislead).
+  //   - NEAR / Flashnet (no memo) → memo-less URI (EIP-681 for EVM, BIP-21 for
+  //     UTXO) that also pre-fills the exact amount. On chains without a payment
+  //     URI scheme (NEAR, etc.) fall back to a plain-address QR so the user can
+  //     at least scan the deposit address — the exact amount is in the row below.
+  const memoUri = memoText
     ? buildEip681Uri({
         chain: record.sellAsset.chain,
         chainId: record.sellAsset.chainId,
@@ -795,11 +822,50 @@ function PostCommitView(props: {
         memoHexWithPrefix: memoToHexCalldata(memoText),
       })
     : null;
+  const memolessUri = memoText
+    ? null
+    : buildMemolessPaymentUri({
+        chain: record.sellAsset.chain,
+        chainId: record.sellAsset.chainId,
+        decimals: record.sellAsset.decimals,
+        address: instructions.depositAddress,
+        amountHumanDecimal: instructions.amountHumanDecimal,
+        // Native gas asset = SwapKit id without a `-<contract>` suffix
+        // (e.g. `SOL.SOL`, `TON.TON`, `BASE.ETH`). Tokens must not get a
+        // native-transfer URI (it would send the gas token); they fall back
+        // to the address-only QR below.
+        isNative: !record.sellAsset.swapKitId.includes('-'),
+      });
+  const paymentUri = memoUri ?? memolessUri;
+  // No-memo swap on a chain we can't build a URI for (NEAR, …): show a
+  // plain-address QR rather than nothing.
+  const addressQrFallback =
+    !memoText && !paymentUri && !!instructions.depositAddress;
 
   return (
     <View style={{ rowGap: 12, paddingTop: 16 }}>
       {paymentUri ? (
-        <PaymentUriBlock uri={paymentUri} colors={colors} t={t} />
+        <PaymentUriBlock
+          value={paymentUri}
+          openable={true}
+          hint={t(
+            'swap.payment-uri-hint',
+            'Scan this from any wallet that supports payment URIs, or tap below to open the wallet on this device. Everything (address, amount, memo) is included.',
+          )}
+          colors={colors}
+          t={t}
+        />
+      ) : addressQrFallback ? (
+        <PaymentUriBlock
+          value={instructions.depositAddress}
+          openable={false}
+          hint={t(
+            'swap.address-qr-hint',
+            'Scan to fill the deposit address in your wallet, then enter the exact amount shown below.',
+          )}
+          colors={colors}
+          t={t}
+        />
       ) : null}
       <AddressLine
         colors={colors}
@@ -933,16 +999,14 @@ function PostCommitView(props: {
         />
       ) : null}
 
-      <Pressable
-        onPress={onDone}
-        accessibilityRole="button"
-        style={[styles.cta, { backgroundColor: colors.primary }]}
-        testID="swap.review.done"
-      >
-        <BoldText style={{ ...styles.ctaText, color: colors.background }}>
-          {t('swap.done', 'Done')}
-        </BoldText>
-      </Pressable>
+      <View style={styles.ctaWrap}>
+        <Button
+          type={ButtonTypeEnum.Primary}
+          title={t('swap.done', 'Done')}
+          onPress={onDone}
+          testID="swap.review.done"
+        />
+      </View>
     </View>
   );
 }
@@ -1177,14 +1241,8 @@ const styles = StyleSheet.create({
   copyBtn: {
     padding: 4,
   },
-  cta: {
+  ctaWrap: {
     marginTop: 8,
-    paddingVertical: 14,
-    borderRadius: 14,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  ctaText: {
-    fontSize: 16,
   },
 });

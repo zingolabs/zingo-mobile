@@ -28,6 +28,7 @@ import {
   faCheck,
   faInfoCircle,
   faAddressCard,
+  faUserPlus,
   faMagnifyingGlassPlus,
   faMoneyCheckDollar,
   faXmark,
@@ -151,6 +152,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     mode,
     somePending,
     addressBook,
+    launchAddTagModal,
     donation,
     addresses,
     defaultUnifiedAddress,
@@ -1228,8 +1230,9 @@ const Send: React.FunctionComponent<SendProps> = ({
               <View
                 style={{
                   display: 'flex',
-                  padding: 10,
+                  paddingHorizontal: 16,
                   paddingTop: 5,
+                  paddingBottom: 10,
                   marginTop: 0,
                 }}
               >
@@ -1269,12 +1272,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                   style={{
                     flex: 1,
                     borderWidth: 1,
-                    borderRadius: 5,
-                    borderColor: colors.text,
+                    borderRadius: 12,
+                    borderColor: colors.border,
                     marginTop: 5,
+                    minHeight: 48,
+                    justifyContent: 'center',
                   }}
                 >
-                  <View style={{ flexDirection: 'row' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View
                       accessible={true}
                       accessibilityLabel={
@@ -1295,7 +1300,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           color: colors.text,
                           fontWeight: '600',
                           fontSize: 14,
-                          padding: 10,
+                          padding: 12,
                           backgroundColor: 'transparent',
                         }}
                         value={addressText}
@@ -1327,9 +1332,36 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </TouchableOpacity>
                       )}
-                      {itemsPicker.length > 0 && (
-                        <>
-                          {!updatingToField ? (
+                      {(() => {
+                        // A valid, not-yet-saved address swaps the open-book
+                        // button for an "add to address book" one. It reverts
+                        // automatically after saving: `addressBook` updates and
+                        // this recomputes `addressIsSaved`.
+                        const addressIsSaved =
+                          !!addressText &&
+                          addressBook.some(ab => ab.address === addressText);
+                        if (validAddress === 1 && !addressIsSaved) {
+                          return (
+                            <TouchableOpacity
+                              testID="send.add-address"
+                              disabled={updatingToField}
+                              onPress={() => launchAddTagModal(addressText)}
+                            >
+                              <FontAwesomeIcon
+                                style={{ marginRight: 5 }}
+                                size={28}
+                                icon={faUserPlus}
+                                color={
+                                  updatingToField
+                                    ? colors.primaryDisabled
+                                    : colors.primary
+                                }
+                              />
+                            </TouchableOpacity>
+                          );
+                        }
+                        if (itemsPicker.length > 0) {
+                          return !updatingToField ? (
                             <TouchableOpacity
                               onPress={() =>
                                 addressBookSelectRef.current?.present()
@@ -1349,9 +1381,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                               icon={faAddressCard}
                               color={colors.primaryDisabled}
                             />
-                          )}
-                        </>
-                      )}
+                          );
+                        }
+                        return null;
+                      })()}
                       <TouchableOpacity
                         testID="send.scan-button"
                         accessible={true}
@@ -1396,46 +1429,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     >
                       <FadeText>{`${translate('send.amount')}`}</FadeText>
                     </View>
-                    {sendAll && mode !== ModeEnum.basic && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          //if (fee > 0) {
-                          updateToField(
-                            null,
-                            Utils.parseNumberFloatToStringLocale(maxAmount, 8),
-                            null,
-                            null,
-                            null,
-                          );
-                          //}
-                          calculateFeeWithPropose(
-                            Utils.parseNumberFloatToStringLocale(maxAmount, 8),
-                            addressText,
-                            memoText,
-                            includeUAMemoBoolean,
-                          );
-                          //setSendAllClick(true);
-                          //setTimeout(() => {
-                          //  setSendAllClick(false);
-                          //}, 1000);
-                        }}
-                      >
-                        <View
-                          style={{
-                            alignItems: 'center',
-                            justifyContent: 'flex-end',
-                            borderRadius: 10,
-                            margin: 0,
-                            padding: 0,
-                            marginLeft: 10,
-                          }}
-                        >
-                          <RegText color={colors.primary}>
-                            {translate('send.sendall') as string}
-                          </RegText>
-                        </View>
-                      </TouchableOpacity>
-                    )}
                   </View>
                   {validAmount === -1 && (
                     <ErrorText>
@@ -1457,19 +1450,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                       marginTop: 5,
                     }}
                   >
-                    {inputZec ? (
-                      <SvgXml
-                        width={12}
-                        height={20}
-                        xml={zecIconXml}
-                        fill={colors.text}
-                        style={{ marginRight: 5 }}
-                      />
-                    ) : (
-                      <RegText style={{ marginRight: 5, fontSize: 20 }}>
-                        $
-                      </RegText>
-                    )}
                     <View
                       accessible={true}
                       accessibilityLabel={
@@ -1482,23 +1462,42 @@ const Send: React.FunctionComponent<SendProps> = ({
                         flexDirection: 'row',
                         alignItems: 'center',
                         borderWidth: 1,
-                        borderRadius: 5,
-                        borderColor: colors.text,
+                        borderRadius: 12,
+                        borderColor: colors.border,
                         minWidth: 48,
                         minHeight: 48,
                       }}
                     >
                       {inputZec ? (
+                        <SvgXml
+                          width={12}
+                          height={20}
+                          xml={zecIconXml}
+                          fill={colors.text}
+                          style={{ marginLeft: 10 }}
+                        />
+                      ) : (
+                        <BoldText
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 22,
+                            color: colors.text,
+                          }}
+                        >
+                          $
+                        </BoldText>
+                      )}
+                      {inputZec ? (
                         <TextInput
                           testID="send.amount"
-                          placeholder={`#${decimalSeparator}########`}
+                          placeholder={`0${decimalSeparator}00000`}
                           placeholderTextColor={colors.placeholder}
                           keyboardType="numeric"
                           style={{
                             flex: 1,
                             color: colors.text,
                             fontWeight: '600',
-                            fontSize: 16,
+                            fontSize: 14,
                             minHeight: 48,
                             marginLeft: 5,
                             backgroundColor: 'transparent',
@@ -1518,14 +1517,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                         />
                       ) : (
                         <TextInput
-                          placeholder={`#${decimalSeparator}##`}
+                          placeholder={`0${decimalSeparator}00`}
                           placeholderTextColor={colors.placeholder}
                           keyboardType="numeric"
                           style={{
                             flex: 1,
                             color: colors.text,
                             fontWeight: '600',
-                            fontSize: 16,
+                            fontSize: 14,
                             minHeight: 48,
                             marginLeft: 5,
                             backgroundColor: 'transparent',
@@ -1553,13 +1552,37 @@ const Send: React.FunctionComponent<SendProps> = ({
                           }
                         >
                           <FontAwesomeIcon
-                            style={{ marginRight: 5 }}
                             size={16}
                             icon={faXmark}
                             color={colors.primaryDisabled}
                           />
                         </TouchableOpacity>
                       ) : null}
+                      {sendAll && mode !== ModeEnum.basic && (
+                        <TouchableOpacity
+                          testID="send.max"
+                          onPress={() => {
+                            const maxStr = Utils.parseNumberFloatToStringLocale(
+                              maxAmount,
+                              8,
+                            );
+                            updateToField(null, maxStr, null, null, null);
+                            calculateFeeWithPropose(
+                              maxStr,
+                              addressText,
+                              memoText,
+                              includeUAMemoBoolean,
+                            );
+                          }}
+                          style={{ paddingHorizontal: 8, paddingVertical: 4 }}
+                        >
+                          <BoldText
+                            style={{ color: colors.primary, fontSize: 13 }}
+                          >
+                            MAX
+                          </BoldText>
+                        </TouchableOpacity>
+                      )}
                     </View>
                     {currency === CurrencyEnum.USDCurrency &&
                       server.chainName === ChainNameEnum.mainChainName && (

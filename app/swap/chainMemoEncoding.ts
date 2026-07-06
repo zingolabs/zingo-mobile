@@ -52,6 +52,21 @@ export const UTXO_SOURCE_CHAINS: ReadonlyArray<string> = [
   'ZEC',
 ];
 
+/**
+ * BIP-21-style URI scheme per UTXO source chain (used for the memo-less
+ * payment URI of channel-based providers). BCH uses the `bitcoincash:`
+ * cashaddr scheme; ZEC is present for completeness though ZEC is never a
+ * swap *source* in this wallet.
+ */
+const UTXO_URI_SCHEME: Readonly<Record<string, string>> = {
+  BTC: 'bitcoin',
+  LTC: 'litecoin',
+  DOGE: 'dogecoin',
+  DASH: 'dash',
+  BCH: 'bitcoincash',
+  ZEC: 'zcash',
+};
+
 export function isEvmSourceChain(chain: string): boolean {
   return EVM_SOURCE_CHAINS.includes(chain.toUpperCase());
 }
@@ -148,4 +163,72 @@ export function buildEip681Uri(args: {
     `?value=${wei}` +
     `&data=${args.memoHexWithPrefix}`
   );
+}
+
+/**
+ * Build a memo-LESS payment URI for channel-based providers (NEAR Intents,
+ * Flashnet), which mint a unique deposit address per swap and require no
+ * memo. Encodes address + exact amount, so a wallet that honours the URI
+ * pre-fills the amount too — mitigating the exact-amount foot-gun these
+ * providers are strict about (a satoshi short triggers a refund).
+ *
+ *   - EVM chains  → EIP-681      `ethereum:<addr>@<chainId>?value=<wei>`.
+ *   - UTXO chains → BIP-21       `<scheme>:<addr>?amount=<decimal>`.
+ *   - Solana      → Solana Pay   `solana:<addr>?amount=<decimal SOL>`.
+ *   - TON         → TON transfer `ton://transfer/<addr>?amount=<nanoton>`.
+ *   - Other chains → `null` (caller shows an address-only QR).
+ *
+ * NATIVE ASSETS ONLY (`isNative`): every scheme above encodes a native
+ * gas-token transfer. Emitting one for a token (ERC-20 / SPL / Jetton) would
+ * make the wallet send the GAS token instead of the token — a wrong-asset
+ * foot-gun. For tokens we return null and let the caller fall back to an
+ * address-only QR, which is safe (no amount, so nothing to get wrong).
+ *
+ * MUST NOT be used for Maya / THORChain: those carry a memo a memo-less URI
+ * would silently drop — use `buildEip681Uri` there instead. The caller
+ * selects between the two on the presence of a memo.
+ */
+export function buildMemolessPaymentUri(args: {
+  chain: string;
+  chainId: string;
+  decimals: number;
+  address: string;
+  amountHumanDecimal: string;
+  /** True only for a chain's native gas asset (identifier has no token
+   *  contract). Tokens return null — see the wrong-asset note above. */
+  isNative: boolean;
+}): string | null {
+  if (!args.address || !args.isNative) return null;
+  const chain = args.chain.toUpperCase();
+
+  if (isEvmSourceChain(chain)) {
+    if (!/^\d+$/.test(args.chainId)) return null;
+    const wei = humanDecimalToBaseUnits(args.amountHumanDecimal, args.decimals);
+    if (wei === null) return null;
+    return `ethereum:${args.address}@${args.chainId}?value=${wei}`;
+  }
+
+  const utxoScheme = UTXO_URI_SCHEME[chain];
+  if (utxoScheme) {
+    if (!/^\d+(\.\d+)?$/.test(args.amountHumanDecimal)) return null;
+    return `${utxoScheme}:${args.address}?amount=${args.amountHumanDecimal}`;
+  }
+
+  if (chain === 'SOL' || chain === 'SOLANA') {
+    // Solana Pay — amount is a decimal in SOL units (not lamports).
+    if (!/^\d+(\.\d+)?$/.test(args.amountHumanDecimal)) return null;
+    return `solana:${args.address}?amount=${args.amountHumanDecimal}`;
+  }
+
+  if (chain === 'TON') {
+    // ton://transfer — amount in nanoton (integer base units, 9 decimals).
+    const nano = humanDecimalToBaseUnits(
+      args.amountHumanDecimal,
+      args.decimals,
+    );
+    if (nano === null) return null;
+    return `ton://transfer/${args.address}?amount=${nano}`;
+  }
+
+  return null;
 }
