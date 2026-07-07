@@ -1715,7 +1715,8 @@ const CHAIN_EXPLORER_TX_URL: Record<string, (hash: string) => string> = {
  * Build a block-explorer URL for a (chain, hash) pair. ZEC is routed
  * through `Utils.getBlockExplorerTxIDURL` so the link respects the
  * user-selected explorer in Settings (Zcashexplorer / Cipherscan /
- * Zypherscan) — same util VTD uses for the "View in explorer" affordance,
+ * Zexplorer, or none) — same util VTD uses for the "View in explorer"
+ * affordance,
  * so the two screens always agree. Every other chain uses the static
  * default in `CHAIN_EXPLORER_TX_URL`.
  */

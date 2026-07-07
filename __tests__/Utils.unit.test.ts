@@ -191,24 +191,44 @@ describe('Utils.getBlockExplorerTxIDURL', () => {
     ).toBe(`https://testnet.cipherscan.app/tx/${txid}`);
   });
 
-  test('Zypherscan mainnet', () => {
+  test('Zexplorer mainnet', () => {
     expect(
       Utils.getBlockExplorerTxIDURL(
         txid,
         ChainNameEnum.mainChainName,
-        BlockExplorerEnum.Zypherscan,
+        BlockExplorerEnum.Zexplorer,
       ),
-    ).toBe(`https://www.zypherscan.com/tx/${txid}`);
+    ).toBe(`https://zexplorer.app/mainnet/tx/${txid}`);
   });
 
-  test('Zypherscan testnet', () => {
+  test('Zexplorer testnet', () => {
     expect(
       Utils.getBlockExplorerTxIDURL(
         txid,
         ChainNameEnum.testChainName,
-        BlockExplorerEnum.Zypherscan,
+        BlockExplorerEnum.Zexplorer,
       ),
-    ).toBe(`https://testnet.zypherscan.com/tx/${txid}`);
+    ).toBe(`https://zexplorer.app/testnet/tx/${txid}`);
+  });
+
+  test('None returns empty string', () => {
+    expect(
+      Utils.getBlockExplorerTxIDURL(
+        txid,
+        ChainNameEnum.mainChainName,
+        BlockExplorerEnum.None,
+      ),
+    ).toBe('');
+  });
+
+  test('regtest returns empty string for any explorer', () => {
+    expect(
+      Utils.getBlockExplorerTxIDURL(
+        txid,
+        ChainNameEnum.regtestChainName,
+        BlockExplorerEnum.Zcashexplorer,
+      ),
+    ).toBe('');
   });
 
   test('unknown explorer returns empty string', () => {

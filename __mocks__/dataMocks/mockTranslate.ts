@@ -131,8 +131,12 @@ export const mockTranslate = (p: string) => {
         text: 'text Zcashexplorer',
       },
       {
-        value: BlockExplorerEnum.Zypherscan,
-        text: 'text Zypherscan',
+        value: BlockExplorerEnum.Zexplorer,
+        text: 'text Zexplorer',
+      },
+      {
+        value: BlockExplorerEnum.None,
+        text: 'text None',
       },
     ];
   } else {

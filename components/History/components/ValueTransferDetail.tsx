@@ -20,6 +20,7 @@ import {
 
 import {
   AddressBookFileClass,
+  BlockExplorerEnum,
   ChainNameEnum,
   SnackbarDurationEnum,
   ValueTransferType,
@@ -824,6 +825,7 @@ const ValueTransferDetail: React.FunctionComponent<
                       {valueTransfer.txid}
                     </RegText>
                     {server.chainName !== ChainNameEnum.regtestChainName &&
+                      blockExplorer !== BlockExplorerEnum.None &&
                       valueTransfer.status !==
                         RPCValueTransfersStatusEnum.failed && (
                         <TouchableOpacity

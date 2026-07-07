@@ -362,7 +362,8 @@ export default function LoadingApp(props: LoadingAppProps) {
       if (
         settings.blockExplorer === BlockExplorerEnum.Cipherscan ||
         settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
-        settings.blockExplorer === BlockExplorerEnum.Zypherscan
+        settings.blockExplorer === BlockExplorerEnum.Zexplorer ||
+        settings.blockExplorer === BlockExplorerEnum.None
       ) {
         setBlockExplorer(settings.blockExplorer);
       } else {
