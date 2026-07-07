@@ -175,6 +175,7 @@ const ReviewSheet = forwardRef<BottomSheetModal, ReviewSheetProps>(
           {
             text: t('swap.abandon-confirm', 'Stop exchange'),
             onPress: () => dismiss(),
+            style: 'destructive',
           },
           { text: t('cancel', 'Cancel'), style: 'cancel' },
         ],
@@ -612,7 +613,6 @@ function ReviewView(props: {
       <View style={styles.ctaWrap}>
         <Button
           type={ButtonTypeEnum.Primary}
-          style={{ width: '90%' }}
           disabled={isCommitting}
           title={
             isCommitting
@@ -805,7 +805,6 @@ function PostCommitView(props: {
         <View style={styles.ctaWrap}>
           <Button
             type={ButtonTypeEnum.Primary}
-            style={{ width: '90%' }}
             title={t('swap.done', 'Done')}
             onPress={onDone}
             testID="swap.review.done"
@@ -1013,7 +1012,6 @@ function PostCommitView(props: {
       <View style={styles.ctaWrap}>
         <Button
           type={ButtonTypeEnum.Primary}
-          style={{ width: '90%' }}
           title={t('swap.done', 'Done')}
           onPress={onDone}
           testID="swap.review.done"

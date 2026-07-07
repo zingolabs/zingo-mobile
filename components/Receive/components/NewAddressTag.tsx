@@ -125,6 +125,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
+            gap: 10,
             marginVertical: 5,
             marginTop: 15,
           }}
@@ -144,7 +145,6 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
           <Button
             type={ButtonTypeEnum.Primary}
             title={translate('save') as string}
-            style={{ marginLeft: 10 }}
             onPress={() => {
               createAddressTag();
             }}

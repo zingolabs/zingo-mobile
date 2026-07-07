@@ -248,7 +248,7 @@
     "sendalls": [
       {
         "value": true,
-        "text": "Activa la posibilidad de enviar toda la cantidad del monedero con un botón."
+        "text": "Activa el botón 'MÁX' para rellenar el importe con todo el saldo del monedero."
       },
       {
         "value": false,
@@ -365,7 +365,7 @@
     "currency-title": "Precio de la Moneda",
     "language-title": "Idioma",
     "islanguage": "Necesitas escoger un Idioma para poder guardar.",
-    "sendall-title": "El Botón 'Enviar Todo'",
+    "sendall-title": "El Botón 'MÁX'",
     "donation-title": "Propina para ZingoLabs",
     "privacy-title": "High Privacy",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",

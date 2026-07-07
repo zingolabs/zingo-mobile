@@ -206,6 +206,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({ route }) => {
       buttons: [
         {
           text: translate('confirm') as string,
+          style: 'destructive',
           onPress: async () => {
             try {
               await SwapStore.deleteByRecordId(record.recordId);
@@ -853,6 +854,8 @@ function SwapDetailBody(props: {
             <Button
               type={ButtonTypeEnum.Secondary}
               title={translate('swapdetail.remove') as string}
+              style={{ borderColor: colors.danger.text }}
+              textStyle={{ color: colors.danger.text }}
               onPress={onRemove}
             />
           </View>

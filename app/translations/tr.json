@@ -248,7 +248,7 @@
     "sendalls": [
       {
         "value": true,
-        "text": "Tüm cüzdan bakiyesini tek bir butonla gönderme seçeneğini etkinleştir."
+        "text": "Tutar alanını tüm cüzdan bakiyenizle doldurmak için 'MAKS' düğmesini etkinleştirin."
       },
       {
         "value": false,
@@ -365,7 +365,7 @@
     "currency-title": "Döviz Fiyatı",
     "language-title": "Dil",
     "islanguage": "Kaydetmek için bir dil seçmeniz gerekiyor.",
-    "sendall-title": "Tümünü Gönder' Butonu",
+    "sendall-title": "'MAKS' Butonu",
     "donation-title": "ZingoLabs’a katkıda bulun",
     "privacy-title": "High Privacy",
     "mode-title": "Temel ve Gelişmiş Mod arasında geçiş yapın.",

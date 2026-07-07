@@ -187,6 +187,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
+            gap: 10,
             marginVertical: 5,
             marginTop: 15,
           }}
@@ -206,7 +207,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           <Button
             type={ButtonTypeEnum.Primary}
             title={translate('verify') as string}
-            style={{ marginLeft: 10 }}
             onPress={() => {
               verifyAddress();
             }}

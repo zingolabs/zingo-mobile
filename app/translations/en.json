@@ -248,7 +248,7 @@
     "sendalls": [
       {
         "value": true,
-        "text": "Enable the possibility of sending all the wallet amount with a button."
+        "text": "Enable the 'MAX' button to fill the amount with your entire wallet balance."
       },
       {
         "value": false,
@@ -365,7 +365,7 @@
     "currency-title": "Currency Price",
     "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
-    "sendall-title": "The Button 'Send All'",
+    "sendall-title": "The 'MAX' Button",
     "donation-title": "Tip ZingoLabs",
     "privacy-title": "High Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",

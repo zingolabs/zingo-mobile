@@ -264,6 +264,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
+          gap: 10,
           marginVertical: 5,
           marginTop: 15,
         }}
@@ -279,9 +280,22 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         />
         <Button
           testID="addressbook.button.action"
-          type={ButtonTypeEnum.Primary}
+          type={
+            action === AddressBookActionEnum.Delete
+              ? ButtonTypeEnum.Secondary
+              : ButtonTypeEnum.Primary
+          }
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
-          style={{ marginLeft: 10 }}
+          style={
+            action === AddressBookActionEnum.Delete
+              ? { borderColor: colors.danger.text }
+              : undefined
+          }
+          textStyle={
+            action === AddressBookActionEnum.Delete
+              ? { color: colors.danger.text }
+              : undefined
+          }
           onPress={() => {
             doAction(
               action,

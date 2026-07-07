@@ -248,7 +248,7 @@
     "sendalls": [
       {
         "value": true,
-        "text": "Habilitar a possibilidade de ENVIAR TODO o saldo da carteira com um botão."
+        "text": "Habilita o botão 'MÁX' para preencher o valor com todo o saldo da carteira."
       },
       {
         "value": false,
@@ -365,7 +365,7 @@
     "currency-title": "Preço da Moeda",
     "language-title": "Linguagem",
     "islanguage": "Você precisa escolher um idioma para salvar.",
-    "sendall-title": "O Botão 'Enviar Tudo'",
+    "sendall-title": "O Botão 'MÁX'",
     "donation-title": "Dica ZingoLabs",
     "privacy-title": "High Privacy",
     "mode-title": "Alterar entre o modo Básico ou Avançado",

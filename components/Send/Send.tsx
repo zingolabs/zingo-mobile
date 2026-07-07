@@ -1621,6 +1621,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                               color: colors.primary,
                               fontSize: 20,
                               lineHeight: 20,
+                              letterSpacing: -1.5,
+                              transform: [{ scaleX: 0.8 }],
                             }}
                           >
                             {translate('send.max') as string}

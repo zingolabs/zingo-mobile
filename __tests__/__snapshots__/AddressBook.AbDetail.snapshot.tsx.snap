@@ -236,6 +236,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
+        "gap": 10,
         "justifyContent": "center",
         "marginTop": 15,
         "marginVertical": 5,
@@ -354,7 +355,6 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
           "borderRadius": 24,
           "borderWidth": 2,
           "justifyContent": "center",
-          "marginLeft": 10,
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",
@@ -516,6 +516,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
+        "gap": 10,
         "justifyContent": "center",
         "marginTop": 15,
         "marginVertical": 5,
@@ -629,12 +630,11 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "#18bd18",
-          "borderColor": "#18bd18",
+          "backgroundColor": "#031124",
+          "borderColor": "#FFB972",
           "borderRadius": 24,
           "borderWidth": 2,
           "justifyContent": "center",
-          "marginLeft": 10,
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",
@@ -664,7 +664,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
         <Text
           style={
             {
-              "color": "#011401",
+              "color": "#FFB972",
               "fontSize": 16,
               "fontWeight": "600",
               "textAlign": "center",
@@ -818,6 +818,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
+        "gap": 10,
         "justifyContent": "center",
         "marginTop": 15,
         "marginVertical": 5,
@@ -936,7 +937,6 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
           "borderRadius": 24,
           "borderWidth": 2,
           "justifyContent": "center",
-          "marginLeft": 10,
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",

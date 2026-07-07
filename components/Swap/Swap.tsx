@@ -1700,7 +1700,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                       return (
                         <Button
                           type={ButtonTypeEnum.Primary}
-                          style={{ width: '90%' }}
                           disabled
                           title={t(
                             'swap.quote-refreshing',
@@ -1715,7 +1714,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                       return (
                         <Button
                           type={ButtonTypeEnum.Secondary}
-                          style={{ width: '90%' }}
                           title={`${t(
                             'swap.insufficient-title',
                             'Insufficient funds',
@@ -1730,7 +1728,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                     return (
                       <Button
                         type={ButtonTypeEnum.Primary}
-                        style={{ width: '90%' }}
                         title={t('swap.continue', 'Continue')}
                         disabled={!liveQuote || !addressReady}
                         onPress={openReviewSheet}

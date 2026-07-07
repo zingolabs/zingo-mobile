@@ -157,6 +157,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
+          gap: 10,
           marginVertical: 5,
           marginTop: 15,
         }}
@@ -182,7 +183,6 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
             usingCustomServer();
             Keyboard.dismiss();
           }}
-          style={{ marginLeft: 10 }}
           twoButtons={true}
         />
       </View>

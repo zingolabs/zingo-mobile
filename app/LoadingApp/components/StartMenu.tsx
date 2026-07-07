@@ -405,6 +405,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                     buttons: [
                       {
                         text: translate('confirm') as string,
+                        style: 'destructive',
                         onPress: () => createNewWallet(),
                       },
                       { text: translate('cancel') as string, style: 'cancel' },
