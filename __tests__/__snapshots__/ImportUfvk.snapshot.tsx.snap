@@ -157,9 +157,11 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       accessible={true}
       style={
         {
+          "alignItems": "center",
           "borderColor": "#ffffff",
           "borderRadius": 12,
           "borderWidth": 1,
+          "flexDirection": "row",
           "margin": 10,
           "maxHeight": 48,
           "maxWidth": "40%",
@@ -179,11 +181,11 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           {
             "backgroundColor": "transparent",
             "color": "#c3c3c3",
+            "flex": 1,
             "fontSize": 18,
             "fontWeight": "600",
             "marginLeft": 5,
             "minHeight": 48,
-            "minWidth": "20%",
           }
         }
         testID="import.birthdayinput"

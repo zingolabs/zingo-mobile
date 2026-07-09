@@ -9,7 +9,7 @@ import { render } from '@testing-library/react-native';
 import { LoadedApp } from '../app/LoadedApp';
 import { StackScreenProps } from '@react-navigation/stack';
 import { AppStackParamList } from '../app/types';
-import { LaunchingModeEnum, RouteEnum } from '../app/AppState';
+import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('react-native-localize', () => ({
@@ -36,6 +36,7 @@ function makeDrawerProps(): StackScreenProps<
         transparentPool: true,
         newWallet: false,
         firstLaunchingMessage: LaunchingModeEnum.opening,
+        walletChainName: ChainNameEnum.mainChainName,
       },
     },
   };

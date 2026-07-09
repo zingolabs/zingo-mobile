@@ -1,6 +1,10 @@
 import { RouteProp } from '@react-navigation/native';
 import { AppStackParamList } from '../../app/types';
-import { LaunchingModeEnum, RouteEnum } from '../../app/AppState';
+import {
+  ChainNameEnum,
+  LaunchingModeEnum,
+  RouteEnum,
+} from '../../app/AppState';
 
 export const mockLoadedAppRoute: RouteProp<
   AppStackParamList,
@@ -15,5 +19,6 @@ export const mockLoadedAppRoute: RouteProp<
     transparentPool: true,
     newWallet: false,
     firstLaunchingMessage: LaunchingModeEnum.opening,
+    walletChainName: ChainNameEnum.mainChainName,
   },
 };

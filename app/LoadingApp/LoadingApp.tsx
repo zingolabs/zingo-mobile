@@ -66,7 +66,7 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
 } from '../AppState';
-import { parseServerURI, serverUris } from '../uris';
+import { parseServerURI, serverUris, fetchServerList } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { fetchWallet } from '../walletBackend';
 import { ThemeType } from '../types';
@@ -201,6 +201,8 @@ export default function LoadingApp(props: LoadingAppProps) {
       //I have to check what language and other things are in the settings
       const settings = await SettingsFileImpl.readSettings();
 
+      console.log('^^^', settings);
+
       // checking the version of the App in settings
       if (settings.version === null) {
         // this is a fresh install
@@ -284,7 +286,23 @@ export default function LoadingApp(props: LoadingAppProps) {
         );
       }
       if (settings.server) {
-        setServer(settings.server);
+        // Offline (empty uri) has no chain. Normalize any residual chainName to
+        // the empty sentinel so a stale value never reaches the wallet open (the
+        // real chain is derived from the wallet). Persist it only when we
+        // actually cleared a residual, so we don't rewrite on every boot.
+        const normalizedServer: ServerType = settings.server.uri
+          ? settings.server
+          : { uri: '', chainName: ChainNameEnum.noneChainName };
+        setServer(normalizedServer);
+        if (
+          !settings.server.uri &&
+          settings.server.chainName !== ChainNameEnum.noneChainName
+        ) {
+          await SettingsFileImpl.writeSettings(
+            SettingsNameEnum.server,
+            normalizedServer,
+          );
+        }
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
       }
@@ -593,10 +611,9 @@ export class LoadingAppClass extends Component<
     const has = await hasRecoveryWalletInfo();
     this.setState({ hasRecoveryWalletInfoSaved: has });
 
-    // First, if it's server automatic
-    // here I need to check the servers and select the best one
-    // likely only when the user install or update the new version with this feature or
-    // select automatic in settings.
+    // Boot-time server selection. `auto` refetches the live list and activates
+    // the best server on every launch; `list` validates that the user's server
+    // is still listed (else promotes to auto). `custom`/`offline` are respected.
     if (this.state.selectServer === SelectServerEnum.auto) {
       if (netInfoState.isConnected) {
         setTimeout(() => {
@@ -605,17 +622,13 @@ export class LoadingAppClass extends Component<
             SnackbarDurationEnum.longer,
           );
         }, 10);
-        // not a different one, can be the same.
-        const someServerIsWorking = await this.selectTheBestServer(false);
-        console.log('some server is working?', someServerIsWorking);
-      } else {
-        // if NO internet then I have to chose a server (the first one)
-        const s: ServerType = SERVER_DEFAULT_0;
-        this.setState({
-          server: s,
-        });
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, s);
       }
+      const someServerIsWorking = await this.selectServerOnBoot(
+        !!netInfoState.isConnected,
+      );
+      console.log('some server is working?', someServerIsWorking);
+    } else if (this.state.selectServer === SelectServerEnum.list) {
+      await this.selectServerOnBoot(!!netInfoState.isConnected);
     }
 
     // Second, check if a wallet exists. Do it async so the basic screen has time to render
@@ -714,6 +727,10 @@ export class LoadingAppClass extends Component<
               transparentPool,
               newWallet,
               this.state.firstLaunchingMessage,
+              // The wallet's own chain, surfaced by the native result (reliable
+              // even Offline). The server's chain is only a pre-rebuild fallback.
+              (resultJson.chain_name as ChainNameEnum) ||
+                this.state.server.chainName,
             );
           } else {
             error = true;
@@ -775,6 +792,8 @@ export class LoadingAppClass extends Component<
               true,
               true,
               this.state.firstLaunchingMessage,
+              // create requires a live server → its chain is the wallet's chain.
+              this.state.server.chainName,
             );
           }
         }
@@ -908,14 +927,117 @@ export class LoadingAppClass extends Component<
       this.unsubscribeNetInfo();
   };
 
-  selectTheBestServer = async (aDifferentOne: boolean): Promise<boolean> => {
+  // Default server for a chain = the `default` entry for that chain in the
+  // static `serverUris` list (mainnet and testnet both have one). Same lookup
+  // for both chains, no per-chain special-casing.
+  defaultServerForChain = (chainName: ChainNameEnum): ServerType => {
+    const found = serverUris(this.state.translate).find(
+      (s: ServerUrisType) => s.chainName === chainName && s.default,
+    );
+    return found
+      ? { uri: found.uri, chainName: found.chainName }
+      : SERVER_DEFAULT_0;
+  };
+
+  // Boot-time server selection driven by the persisted mode:
+  //  - auto: refetch the live list every launch and activate the best server;
+  //          if the registry is unreachable fall back to the static latency
+  //          probe (staying in auto).
+  //  - list: keep the user's server if it is still in the live list; if it has
+  //          vanished, switch to the best server and promote the mode to auto.
+  //  - custom / offline: respected, never touched here.
+  selectServerOnBoot = async (isConnected: boolean): Promise<boolean> => {
+    const mode = this.state.selectServer;
+    const chainName = this.state.server.chainName;
+
+    if (mode === SelectServerEnum.auto) {
+      if (!isConnected) {
+        const s = this.defaultServerForChain(chainName);
+        this.setState({ server: s });
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, s);
+        return false;
+      }
+      const list = await fetchServerList(chainName);
+      if (list.length > 0) {
+        const best: ServerType = {
+          uri: list[0].uri,
+          chainName: list[0].chainName,
+        };
+        this.setState({ server: best });
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
+        if (this.state.mode === ModeEnum.advanced) {
+          this.addLastSnackbar(
+            (this.state.translate('loadedapp.selectingserverbest') as string) +
+              ' ' +
+              best.uri,
+            SnackbarDurationEnum.long,
+          );
+        }
+        return true;
+      }
+      // Registry unreachable → current static latency probe, staying in auto.
+      return await this.selectTheBestServer(false, SelectServerEnum.auto);
+    }
+
+    if (mode === SelectServerEnum.list) {
+      // Can't validate offline or with an unreachable registry: respect the
+      // stored server and stay in list mode.
+      if (!isConnected) {
+        return true;
+      }
+      const list = await fetchServerList(chainName);
+      if (list.length === 0) {
+        return true;
+      }
+      const stillListed = list.some(
+        (s: ServerUrisType) => s.uri === this.state.server.uri,
+      );
+      if (stillListed) {
+        return true;
+      }
+      // The chosen server dropped off the list → activate the best one and
+      // promote the mode to auto (it is no longer a manual list choice).
+      const best: ServerType = {
+        uri: list[0].uri,
+        chainName: list[0].chainName,
+      };
+      this.setState({ server: best, selectServer: SelectServerEnum.auto });
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.selectServer,
+        SelectServerEnum.auto,
+      );
+      if (this.state.mode === ModeEnum.advanced) {
+        this.addLastSnackbar(
+          (this.state.translate('loadedapp.selectingserverbest') as string) +
+            ' ' +
+            best.uri,
+          SnackbarDurationEnum.long,
+        );
+      }
+      return true;
+    }
+
+    // custom / offline: respected.
+    return true;
+  };
+
+  selectTheBestServer = async (
+    aDifferentOne: boolean,
+    targetMode: SelectServerEnum = SelectServerEnum.list,
+  ): Promise<boolean> => {
     // avoiding obsolete ones
     let someServerIsWorking: boolean = true;
     const actualServer = this.state.server;
     const server = await selectingServer(
       serverUris(this.state.translate).filter(
         (s: ServerUrisType) =>
-          !s.obsolete && s.uri !== (aDifferentOne ? actualServer.uri : ''),
+          !s.obsolete &&
+          // stay on the active wallet's chain — the static list now also
+          // carries a testnet default, and picking it for a mainnet wallet
+          // (or vice versa) would swap chains under the wallet.
+          s.chainName === actualServer.chainName &&
+          s.uri !== (aDifferentOne ? actualServer.uri : ''),
       ),
     );
     let fasterServer: ServerType = {} as ServerType;
@@ -931,12 +1053,12 @@ export class LoadingAppClass extends Component<
     console.log(fasterServer);
     this.setState({
       server: fasterServer,
-      selectServer: SelectServerEnum.list,
+      selectServer: targetMode,
     });
     await SettingsFileImpl.writeSettings(SettingsNameEnum.server, fasterServer);
     await SettingsFileImpl.writeSettings(
       SettingsNameEnum.selectServer,
-      SelectServerEnum.list,
+      targetMode,
     );
     // message with the result only for advanced users
     if (this.state.mode === ModeEnum.advanced && someServerIsWorking) {
@@ -955,6 +1077,38 @@ export class LoadingAppClass extends Component<
       }
     }
     return someServerIsWorking;
+  };
+
+  // On a wallet/RPC failure with an unreachable server, pick the next one with
+  // the same pattern as boot: first the best from the live registry (excluding
+  // the failed server, no probe), then fall back to the static list ranked by
+  // latency (also excluding the failed server). The current mode is preserved.
+  selectRecoveryServer = async (): Promise<boolean> => {
+    const actualServer = this.state.server;
+    const live = await fetchServerList(actualServer.chainName);
+    const liveCandidates = live.filter(
+      (s: ServerUrisType) => s.uri !== actualServer.uri,
+    );
+    if (liveCandidates.length > 0) {
+      const best: ServerType = {
+        uri: liveCandidates[0].uri,
+        chainName: liveCandidates[0].chainName,
+      };
+      this.setState({ server: best });
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
+      if (this.state.mode === ModeEnum.advanced) {
+        this.addLastSnackbar(
+          (this.state.translate('loadedapp.selectingserverbest') as string) +
+            ' ' +
+            best.uri,
+          SnackbarDurationEnum.long,
+        );
+      }
+      return true;
+    }
+    // Registry empty/unreachable → static list ranked by latency, excluding the
+    // failed server, staying in the current mode.
+    return await this.selectTheBestServer(true, this.state.selectServer);
   };
 
   checkServer: (s: ServerType) => Promise<boolean> = async (
@@ -1072,8 +1226,8 @@ export class LoadingAppClass extends Component<
             this.state.translate('loadingapp.serverfirsttry') as string,
             SnackbarDurationEnum.longer,
           );
-          // a different server.
-          const someServerIsWorking = await this.selectTheBestServer(true);
+          // a different server (live registry first, then static by latency).
+          const someServerIsWorking = await this.selectRecoveryServer();
           if (someServerIsWorking) {
             if (start) {
               this.setState(
@@ -1162,9 +1316,11 @@ export class LoadingAppClass extends Component<
     }
     this.setState({ actionButtonsDisabled: true });
     if (this.state.customServerOffline) {
+      // Offline = no server → no chain. Clear the residual chainName; the real
+      // chain is derived from the wallet when it is opened offline.
       await SettingsFileImpl.writeSettings(SettingsNameEnum.server, {
         uri: '',
-        chainName: this.state.server.chainName,
+        chainName: ChainNameEnum.noneChainName,
       });
       await SettingsFileImpl.writeSettings(
         SettingsNameEnum.selectServer,
@@ -1172,7 +1328,7 @@ export class LoadingAppClass extends Component<
       );
       this.setState({
         selectServer: SelectServerEnum.offline,
-        server: { uri: '', chainName: this.state.server.chainName },
+        server: { uri: '', chainName: ChainNameEnum.noneChainName },
         customServerUri: '',
         customServerChainName: this.state.server.chainName,
         customServerOffline: false,
@@ -1249,6 +1405,7 @@ export class LoadingAppClass extends Component<
     transparentPool: boolean,
     newWallet: boolean,
     firstLaunchingMessage: LaunchingModeEnum,
+    walletChainName: ChainNameEnum,
   ) => {
     this.setState(s => ({ wallet: { ...s.wallet, seed: '', ufvk: '' } }));
     this.props.navigationApp.reset({
@@ -1263,6 +1420,7 @@ export class LoadingAppClass extends Component<
             transparentPool,
             newWallet,
             firstLaunchingMessage,
+            walletChainName,
           },
         },
       ],
@@ -1536,6 +1694,8 @@ export class LoadingAppClass extends Component<
             transparentPool,
             true,
             this.state.firstLaunchingMessage,
+            // restore requires a live server → its chain is the wallet's chain.
+            this.state.server.chainName,
           );
         } else {
           error = true;
@@ -1843,6 +2003,8 @@ export class LoadingAppClass extends Component<
                       transparentPool,
                       true,
                       firstLaunchingMessage,
+                      // advanced create is online → server chain = wallet chain.
+                      this.state.server.chainName,
                     )
                   }
                 />

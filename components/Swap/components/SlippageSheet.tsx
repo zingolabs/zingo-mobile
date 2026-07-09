@@ -300,6 +300,19 @@ const SlippageSheet = forwardRef<BottomSheetModal, SlippageSheetProps>(
               style={[styles.customInput, { color: colors.text }]}
               testID="swap.slippage.custom"
             />
+            {customStr ? (
+              <Pressable
+                onPress={() => onCustomChange('')}
+                hitSlop={8}
+                style={{ marginRight: 6 }}
+              >
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  size={16}
+                  color={colors.primaryDisabled}
+                />
+              </Pressable>
+            ) : null}
             <RegText style={{ color: colors.text }}>%</RegText>
           </View>
           {showWarning && (

@@ -72,7 +72,7 @@ import {
   SecurityType,
   ScreenEnum,
 } from '../../app/AppState';
-import { parseZcashURI, serverUris } from '../../app/uris';
+import { parseZcashURI, serverUris, fetchServerList } from '../../app/uris';
 import {
   getSpendableBalanceWithAddress,
   parseAddress,
@@ -987,21 +987,37 @@ const Send: React.FunctionComponent<SendProps> = ({
       // here is worth it to try again with the best working server...
       // if the user selected a `custom` server, then we cannot change it.
       if (!customError && selectServer !== SelectServerEnum.custom) {
-        // try send again with a working server
-        const serverChecked = await selectingServer(
-          serverUris(translate).filter((s: ServerUrisType) => !s.obsolete),
-        );
+        // Pick a working server, same pattern as boot/recovery: the live
+        // registry first (best, excluding the failed server, no probe), then
+        // the static list ranked by latency (also excluding the failed one).
         let fasterServer: ServerType = {} as ServerType;
-        if (serverChecked && serverChecked.latency) {
+        const live = await fetchServerList(server.chainName);
+        const liveCandidates = live.filter(
+          (s: ServerUrisType) => s.uri !== server.uri,
+        );
+        if (liveCandidates.length > 0) {
           fasterServer = {
-            uri: serverChecked.uri,
-            chainName: serverChecked.chainName,
+            uri: liveCandidates[0].uri,
+            chainName: liveCandidates[0].chainName,
           };
         } else {
-          fasterServer = server;
-          // likely here there is a internet conection problem
-          // all of the servers return an error because they are unreachable probably.
-          // the 15 seconds timout was fired.
+          const serverChecked = await selectingServer(
+            serverUris(translate).filter(
+              (s: ServerUrisType) =>
+                !s.obsolete &&
+                s.chainName === server.chainName &&
+                s.uri !== server.uri,
+            ),
+          );
+          if (serverChecked && serverChecked.latency) {
+            fasterServer = {
+              uri: serverChecked.uri,
+              chainName: serverChecked.chainName,
+            };
+          } else {
+            fasterServer = server;
+            // likely a connection problem — all servers unreachable / timeout.
+          }
         }
         if (fasterServer.uri !== server.uri) {
           await setServerOption(fasterServer, selectServer, false, true);

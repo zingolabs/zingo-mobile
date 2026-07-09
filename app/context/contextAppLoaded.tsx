@@ -15,6 +15,7 @@ import {
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
+  ChainNameEnum,
   AppContextLoaded,
   BlockExplorerEnum,
 } from '../AppState';
@@ -71,6 +72,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   launchAddTagModal: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
+  walletChainName: ChainNameEnum.noneChainName,
   rescanMenu: false,
   recoveryWalletInfoOnDevice: false,
   shieldingAmount: 0,

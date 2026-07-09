@@ -1,7 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, TextInput, Keyboard } from 'react-native';
+import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { AddressBookFileClass, ButtonTypeEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
@@ -98,6 +100,8 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
               minWidth: 48,
               minHeight: 48,
               maxHeight: 150,
+              flexDirection: 'row',
+              alignItems: 'center',
             }}
           >
             <TextInput
@@ -105,7 +109,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
                 color: colors.text,
                 fontWeight: '600',
                 fontSize: 14,
-                minWidth: 48,
+                flex: 1,
                 minHeight: 48,
                 padding: 10,
                 backgroundColor: 'transparent',
@@ -116,6 +120,16 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
               onChangeText={(text: string) => setLabel(text)}
               maxLength={50}
             />
+            {label && (
+              <TouchableOpacity onPress={() => setLabel('')}>
+                <FontAwesomeIcon
+                  style={{ marginRight: 10 }}
+                  size={20}
+                  icon={faXmark}
+                  color={colors.primaryDisabled}
+                />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 

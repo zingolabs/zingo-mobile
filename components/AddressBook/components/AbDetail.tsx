@@ -1,11 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect } from 'react';
-import { View, TextInput, Keyboard } from 'react-native';
+import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
 import {
   NavigationProp,
   ParamListBase,
   useTheme,
 } from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
   AddressBookActionEnum,
@@ -221,6 +223,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             minWidth: 48,
             minHeight: 48,
             maxHeight: 150,
+            flexDirection: 'row',
+            alignItems: 'center',
           }}
         >
           <TextInput
@@ -229,7 +233,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
               color: colors.text,
               fontWeight: '600',
               fontSize: 14,
-              minWidth: 48,
+              flex: 1,
               minHeight: 48,
               marginLeft: 5,
               backgroundColor: 'transparent',
@@ -241,6 +245,16 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             editable={action !== AddressBookActionEnum.Delete}
             maxLength={50}
           />
+          {label && action !== AddressBookActionEnum.Delete && (
+            <TouchableOpacity onPress={() => setLabel('')}>
+              <FontAwesomeIcon
+                style={{ marginRight: 10 }}
+                size={20}
+                icon={faXmark}
+                color={colors.primaryDisabled}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       {(!!error || !!errorAddress) && (

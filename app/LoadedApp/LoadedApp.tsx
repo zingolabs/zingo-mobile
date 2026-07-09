@@ -263,6 +263,12 @@ export default function LoadedApp(props: LoadedAppProps) {
     props.route.params.firstLaunchingMessage !== undefined
       ? props.route.params.firstLaunchingMessage
       : LaunchingModeEnum.opening;
+  // The opened wallet's own chain, resolved by LoadingApp at open time (reliable
+  // even Offline). Empty when unknown.
+  const walletChainName =
+    !!props.route.params && props.route.params.walletChainName !== undefined
+      ? props.route.params.walletChainName
+      : ChainNameEnum.noneChainName;
 
   useEffect(() => {
     (async () => {
@@ -332,7 +338,23 @@ export default function LoadedApp(props: LoadedAppProps) {
         );
       }
       if (settings.server) {
-        setServer(settings.server);
+        // Offline (empty uri) has no chain. Normalize any residual chainName to
+        // the empty sentinel so a stale value never reaches the wallet open (the
+        // real chain is derived from the wallet). Persist it only when we
+        // actually cleared a residual, so we don't rewrite on every boot.
+        const normalizedServer: ServerType = settings.server.uri
+          ? settings.server
+          : { uri: '', chainName: ChainNameEnum.noneChainName };
+        setServer(normalizedServer);
+        if (
+          !settings.server.uri &&
+          settings.server.chainName !== ChainNameEnum.noneChainName
+        ) {
+          await SettingsFileImpl.writeSettings(
+            SettingsNameEnum.server,
+            normalizedServer,
+          );
+        }
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
       }
@@ -586,6 +608,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         addressBook={addressBook}
         security={security}
         selectServer={selectServer}
+        walletChainName={walletChainName}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         zenniesDonationAddress={zenniesDonationAddress}
@@ -648,6 +671,7 @@ type LoadedAppClassProps = {
   addressBook: AddressBookFileClass[];
   security: SecurityType;
   selectServer: SelectServerEnum;
+  walletChainName: ChainNameEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   zenniesDonationAddress: string;
@@ -741,6 +765,7 @@ export class LoadedAppClass extends Component<
       mode: props.mode,
       security: props.security,
       selectServer: props.selectServer,
+      walletChainName: props.walletChainName,
       rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
@@ -1853,8 +1878,6 @@ export class LoadedAppClass extends Component<
   };
 
   onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
-    const { server } = this.state;
-
     // Warn before destroying the current wallet if there are still in-flight
     // swap records. The user might walk away thinking a swap is still
     // tracked when in reality the wallet that owned it is about to vanish
@@ -1897,10 +1920,12 @@ export class LoadedAppClass extends Component<
       );
     }
 
-    // if the App is working with a test server
-    // no need to do backups of the wallets.
+    // Back up any MAINNET wallet being abandoned. The decision keys on the
+    // WALLET's own chain (walletChainName), not the server's — Offline has no
+    // server chain, yet a mainnet wallet must still be backed up when it is
+    // left. Testnet/regtest are never backed up.
     let resultStr = '';
-    if (server.chainName === ChainNameEnum.mainChainName) {
+    if (this.state.walletChainName === ChainNameEnum.mainChainName) {
       // backup
       resultStr = (await this.rpc.changeWallet()) as string;
     } else {
@@ -1949,8 +1974,6 @@ export class LoadedAppClass extends Component<
 
   onClickOKServerWallet = async () => {
     if (this.state.newServer && this.state.newSelectServer) {
-      const beforeServer = this.state.server;
-
       // No `await` here so Promise.race can actually enforce the 15s cap.
       // With `await` the RPC call resolves before the race starts and the
       // timer becomes a no-op (a failing server then blocks ~minutes).
@@ -1998,8 +2021,10 @@ export class LoadedAppClass extends Component<
       await this.rpc.fetchInfoAndServerHeight();
 
       let resultStr2 = '';
-      // if the server was testnet or regtest -> no need backup the wallet.
-      if (beforeServer.chainName === ChainNameEnum.mainChainName) {
+      // Back up any MAINNET wallet being abandoned — keyed on the WALLET's own
+      // chain (walletChainName), not the server's, so a mainnet wallet left
+      // while Offline still gets backed up. Testnet/regtest are not backed up.
+      if (this.state.walletChainName === ChainNameEnum.mainChainName) {
         // backup
         resultStr2 = (await this.rpc.changeWallet()) as string;
       } else {
@@ -2168,6 +2193,7 @@ export class LoadedAppClass extends Component<
       mode: this.state.mode,
       security: this.state.security,
       selectServer: this.state.selectServer,
+      walletChainName: this.state.walletChainName,
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,

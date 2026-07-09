@@ -383,6 +383,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 maxHeight: 48,
                 minWidth: '20%',
                 minHeight: 48,
+                flexDirection: 'row',
+                alignItems: 'center',
               }}
             >
               <TextInput
@@ -393,7 +395,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                   color: colors.text,
                   fontWeight: '600',
                   fontSize: 18,
-                  minWidth: '20%',
+                  flex: 1,
                   minHeight: 48,
                   marginLeft: 5,
                   backgroundColor: 'transparent',
@@ -423,6 +425,18 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 }
                 keyboardType="numeric"
               />
+              {!!birthday &&
+                (!!latestBlock ||
+                  selectServer === SelectServerEnum.offline) && (
+                  <TouchableOpacity onPress={() => setBirthday('')}>
+                    <FontAwesomeIcon
+                      style={{ marginRight: 5 }}
+                      size={20}
+                      icon={faXmark}
+                      color={colors.primaryDisabled}
+                    />
+                  </TouchableOpacity>
+                )}
             </View>
 
             <RegText style={{ margin: 20, marginBottom: 30 }}>

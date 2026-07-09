@@ -199,9 +199,11 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       accessible={true}
       style={
         {
+          "alignItems": "center",
           "borderColor": "#ffffff",
           "borderRadius": 12,
           "borderWidth": 1,
+          "flexDirection": "row",
           "flexGrow": 1,
           "maxHeight": 150,
           "minHeight": 48,
@@ -219,11 +221,11 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
           {
             "backgroundColor": "transparent",
             "color": "#c3c3c3",
+            "flex": 1,
             "fontSize": 14,
             "fontWeight": "600",
             "marginLeft": 5,
             "minHeight": 48,
-            "minWidth": 48,
           }
         }
         testID="addressbook.label-field"
@@ -478,9 +480,11 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       accessible={true}
       style={
         {
+          "alignItems": "center",
           "borderColor": "#ffffff",
           "borderRadius": 12,
           "borderWidth": 1,
+          "flexDirection": "row",
           "flexGrow": 1,
           "maxHeight": 150,
           "minHeight": 48,
@@ -498,11 +502,11 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
           {
             "backgroundColor": "transparent",
             "color": "#c3c3c3",
+            "flex": 1,
             "fontSize": 14,
             "fontWeight": "600",
             "marginLeft": 5,
             "minHeight": 48,
-            "minWidth": 48,
           }
         }
         testID="addressbook.label-field"
@@ -758,9 +762,11 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       accessible={true}
       style={
         {
+          "alignItems": "center",
           "borderColor": "#ffffff",
           "borderRadius": 12,
           "borderWidth": 1,
+          "flexDirection": "row",
           "flexGrow": 1,
           "maxHeight": 150,
           "minHeight": 48,
@@ -778,16 +784,83 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
           {
             "backgroundColor": "transparent",
             "color": "#c3c3c3",
+            "flex": 1,
             "fontSize": 14,
             "fontWeight": "600",
             "marginLeft": 5,
             "minHeight": 48,
-            "minWidth": 48,
           }
         }
         testID="addressbook.label-field"
         value="pepe"
       />
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <
+          color="#5a8c5a"
+          icon={
+            {
+              "icon": [
+                384,
+                512,
+                [
+                  128473,
+                  10005,
+                  10006,
+                  10060,
+                  215,
+                  "close",
+                  "multiply",
+                  "remove",
+                  "times",
+                ],
+                "f00d",
+                "M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z",
+              ],
+              "iconName": "xmark",
+              "prefix": "fas",
+            }
+          }
+          size={20}
+          style={
+            {
+              "marginRight": 10,
+            }
+          }
+        />
+      </View>
     </View>
   </View>
   <View

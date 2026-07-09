@@ -3,7 +3,7 @@ import React from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faWifi } from '@fortawesome/free-solid-svg-icons';
+import { faWifi, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
@@ -96,6 +96,8 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
               maxWidth: '90%',
               minWidth: '50%',
               minHeight: 48,
+              flexDirection: 'row',
+              alignItems: 'center',
             }}
           >
             <TextInput
@@ -105,8 +107,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
                 color: colors.text,
                 fontWeight: '600',
                 fontSize: 18,
-                minWidth: '50%',
-                maxWidth: '90%',
+                flex: 1,
                 minHeight: 48,
                 marginLeft: 5,
                 backgroundColor: 'transparent',
@@ -121,6 +122,16 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
               spellCheck={false}
               textContentType="URL"
             />
+            {customServerUri && !actionButtonsDisabled && (
+              <TouchableOpacity onPress={() => setCustomServerUri('')}>
+                <FontAwesomeIcon
+                  style={{ marginRight: 10 }}
+                  size={20}
+                  icon={faXmark}
+                  color={colors.primaryDisabled}
+                />
+              </TouchableOpacity>
+            )}
           </View>
           <View
             style={{

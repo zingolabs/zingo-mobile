@@ -81,9 +81,11 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
         accessible={true}
         style={
           {
+            "alignItems": "center",
             "borderColor": "#ffffff",
             "borderRadius": 12,
             "borderWidth": 1,
+            "flexDirection": "row",
             "flexGrow": 1,
             "maxHeight": 150,
             "minHeight": 48,
@@ -100,10 +102,10 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
             {
               "backgroundColor": "transparent",
               "color": "#c3c3c3",
+              "flex": 1,
               "fontSize": 14,
               "fontWeight": "600",
               "minHeight": 48,
-              "minWidth": 48,
               "padding": 10,
             }
           }
