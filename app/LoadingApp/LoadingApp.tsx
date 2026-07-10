@@ -615,14 +615,8 @@ export class LoadingAppClass extends Component<
     // the best server on every launch; `list` validates that the user's server
     // is still listed (else promotes to auto). `custom`/`offline` are respected.
     if (this.state.selectServer === SelectServerEnum.auto) {
-      if (netInfoState.isConnected) {
-        setTimeout(() => {
-          this.addLastSnackbar(
-            this.state.translate('loadedapp.selectingserver') as string,
-            SnackbarDurationEnum.longer,
-          );
-        }, 10);
-      }
+      // Boot-time selection is silent — the app just picks the best server on
+      // launch without announcing it.
       const someServerIsWorking = await this.selectServerOnBoot(
         !!netInfoState.isConnected,
       );
@@ -965,18 +959,11 @@ export class LoadingAppClass extends Component<
         };
         this.setState({ server: best });
         await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
-        if (this.state.mode === ModeEnum.advanced) {
-          this.addLastSnackbar(
-            (this.state.translate('loadedapp.selectingserverbest') as string) +
-              ' ' +
-              best.uri,
-            SnackbarDurationEnum.long,
-          );
-        }
         return true;
       }
       // Registry unreachable → current static latency probe, staying in auto.
-      return await this.selectTheBestServer(false, SelectServerEnum.auto);
+      // Silent: this is still boot-time selection.
+      return await this.selectTheBestServer(false, SelectServerEnum.auto, true);
     }
 
     if (mode === SelectServerEnum.list) {
@@ -1007,14 +994,6 @@ export class LoadingAppClass extends Component<
         SettingsNameEnum.selectServer,
         SelectServerEnum.auto,
       );
-      if (this.state.mode === ModeEnum.advanced) {
-        this.addLastSnackbar(
-          (this.state.translate('loadedapp.selectingserverbest') as string) +
-            ' ' +
-            best.uri,
-          SnackbarDurationEnum.long,
-        );
-      }
       return true;
     }
 
@@ -1025,6 +1004,9 @@ export class LoadingAppClass extends Component<
   selectTheBestServer = async (
     aDifferentOne: boolean,
     targetMode: SelectServerEnum = SelectServerEnum.list,
+    // Boot selection passes `silent` so it never announces the pick; mid-session
+    // recovery leaves it false so the user is told the server was switched.
+    silent: boolean = false,
   ): Promise<boolean> => {
     // avoiding obsolete ones
     let someServerIsWorking: boolean = true;
@@ -1060,8 +1042,12 @@ export class LoadingAppClass extends Component<
       SettingsNameEnum.selectServer,
       targetMode,
     );
-    // message with the result only for advanced users
-    if (this.state.mode === ModeEnum.advanced && someServerIsWorking) {
+    // message with the result only for advanced users (never at boot)
+    if (
+      !silent &&
+      this.state.mode === ModeEnum.advanced &&
+      someServerIsWorking
+    ) {
       if (isEqual(actualServer, fasterServer)) {
         this.addLastSnackbar(
           this.state.translate('loadedapp.selectingserversame') as string,

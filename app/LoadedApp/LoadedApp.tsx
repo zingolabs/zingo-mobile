@@ -2235,6 +2235,9 @@ export class LoadedAppClass extends Component<
                               // Swap entry — a fresh basic-mode wallet with
                               // zero balance still needs an inbound path
                               // (BTC -> ZEC) discoverable from the tab bar.
+                              // Hidden for read-only wallets and Offline (the
+                              // swap feature needs connectivity); the swap
+                              // history still shows as rows in the History list.
                               (!readOnly &&
                                 selectServer !== SelectServerEnum.offline &&
                                 this.state.server.chainName ===

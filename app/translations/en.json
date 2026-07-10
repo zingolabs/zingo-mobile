@@ -176,7 +176,6 @@
     "readingwallet": "Reading successfully the wallet with the server:",
     "restorewallet-title": "Advanced Option",
     "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase.",
-    "selectingserver": "Determining the best server.",
     "selectingserversame": "Your actual server is the most optimized one already.",
     "selectingserverbest": "In this moment this is the most optimized server:",
     "incoming-funds": "Incoming funds\n",
