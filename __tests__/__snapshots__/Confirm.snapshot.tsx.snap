@@ -479,7 +479,7 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
                   }
                 }
               >
-                UA-1234...4567890
+                UA.....
               </Text>
             </View>
           </View>

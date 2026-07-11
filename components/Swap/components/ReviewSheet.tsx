@@ -1254,5 +1254,9 @@ const styles = StyleSheet.create({
   ctaWrap: {
     marginTop: 8,
     alignItems: 'center',
+    // Cancel the sheet's horizontal padding for the button row so the shared
+    // <Button>'s `width: '80%'` matches the main-screen primary buttons instead
+    // of rendering narrower inside the padded sheet.
+    marginHorizontal: -16,
   },
 });

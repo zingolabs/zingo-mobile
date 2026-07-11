@@ -2340,6 +2340,11 @@ const styles = StyleSheet.create({
   ctaWrap: {
     marginTop: 8,
     alignItems: 'center',
+    // Cancel the scroll content's horizontal padding for the button row only,
+    // so the shared <Button>'s `width: '80%'` is measured against the full
+    // width — matching the primary buttons on the main screens instead of
+    // rendering ~32px narrower inside the padded sheet.
+    marginHorizontal: -16,
   },
 });
 

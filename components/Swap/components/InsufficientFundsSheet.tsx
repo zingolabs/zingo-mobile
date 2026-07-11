@@ -172,7 +172,7 @@ const InsufficientFundsSheet = forwardRef<
         </RegText>
 
         {maxSpendable > 0 && (
-          <View style={{ alignItems: 'center' }}>
+          <View style={{ alignItems: 'center', marginHorizontal: -20 }}>
             <Button
               type={ButtonTypeEnum.Primary}
               title={`${t('swap.reduce-to', 'Reduce to')} ${maxSpendable.toFixed(

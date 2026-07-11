@@ -183,7 +183,15 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 >
                   {!address && <RegText>{'Unknown'}</RegText>}
                   {!expandAddress && !!address && (
-                    <RegText>{Utils.trimToSmall(address, 7)}</RegText>
+                    <RegText>
+                      {privacy
+                        ? // Privacy on: even the partial address leaks too many
+                          // clues in the list/detail — show only the first 2
+                          // characters followed by 5 dots. Tapping still reveals
+                          // the full address for 5 s (handled above).
+                          `${address.slice(0, 2)}.....`
+                        : Utils.trimToSmall(address, 7)}
+                    </RegText>
                   )}
                   {expandAddress &&
                     !!address &&

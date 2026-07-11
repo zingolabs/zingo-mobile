@@ -352,7 +352,7 @@ exports[`AddressItem - snapshots AddressItem privacy mode 1`] = `
             }
           }
         >
-          u1abc12...6abc123
+          u1.....
         </Text>
       </View>
     </View>
