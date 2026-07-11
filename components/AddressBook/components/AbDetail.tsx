@@ -29,6 +29,7 @@ import { parseZcashURI } from '../../../app/uris';
 import {
   possibleChainsForAddress,
   validateAddressForChain,
+  extractPlainAddress,
   SWAP_ADDRESS_CHAINS,
 } from '../../../app/swap';
 import Button from '../../Components/Button';
@@ -176,12 +177,14 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       setAddress('');
       return;
     }
-    // Attempt to parse as a Zcash URI — only meaningful for ZEC contacts; a
-    // non-ZEC address (BTC/ETH/...) is taken verbatim.
+    // A real Zcash payment URI keeps its full parse (address + amount/memo) when
+    // this is a ZEC contact — unchanged behaviour. We only match an actual
+    // `zcash:` URI now (not any string containing ':'), so a foreign payment URI
+    // scanned while ZEC is selected falls through to the generic unwrap below
+    // and the chain auto-detects.
     if (
       swapChain === GlobalConst.zecSwapChain &&
-      (addr.toLowerCase().startsWith(GlobalConst.zcash) ||
-        addr.toLowerCase().includes(':'))
+      addr.toLowerCase().startsWith(GlobalConst.zcash)
     ) {
       const { error: errorTarget, target } = await parseZcashURI(
         addr,
@@ -207,7 +210,10 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         });
       }
     } else {
-      setAddress(addr.replace(/[ \t\n\r]+/g, '')); // Remove spaces
+      // Any other input: unwrap a foreign payment URI (BIP-21 `bitcoin:…`,
+      // EIP-681 `ethereum:…`, cashaddr `bitcoincash:…`, …) down to the bare
+      // address; a plain address passes through unchanged.
+      setAddress(extractPlainAddress(addr).replace(/[ \t\n\r]+/g, ''));
     }
   };
 

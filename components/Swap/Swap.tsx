@@ -76,6 +76,7 @@ import {
   classifySwapError,
   formatAmountForDisplay,
   isValidChainAddress,
+  extractPlainAddress,
 } from '../../app/swap';
 import AssetPickerSheet from './components/AssetPickerSheet';
 import QuotesPickerSheet from './components/QuotesPickerSheet';
@@ -467,7 +468,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   const onScanAddress = () => {
     rootNavigation.navigate(RouteEnum.ScannerAddress, {
       setAddress: (a: string) => {
-        setActiveAddress(a);
+        // Unwrap a payment URI (BIP-21 / EIP-681 / cashaddr / `zcash:` …) from
+        // another app or website down to the bare address before it lands in
+        // the field.
+        setActiveAddress(extractPlainAddress(a));
         setActiveAddressTouched(true);
       },
       active: true,
