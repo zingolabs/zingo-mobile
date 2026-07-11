@@ -1,6 +1,10 @@
 import * as RNFS from 'react-native-fs';
 
-import { AddressBookFileClass, GlobalConst } from '../../app/AppState';
+import {
+  AddressBookFileClass,
+  ChainNameEnum,
+  GlobalConst,
+} from '../../app/AppState';
 
 export default class AddressBookFileImpl {
   static async getFileName() {
@@ -14,24 +18,29 @@ export default class AddressBookFileImpl {
     own: boolean,
   ): Promise<AddressBookFileClass[]> {
     const addressBook = await this.readAddressBook();
-    if (
-      addressBook.filter(
-        item => item.label === label && item.address === address,
-      ).length === 0
-    ) {
+    const existing = addressBook.find(
+      item => item.label === label && item.address === address,
+    );
+    if (!existing) {
       // no exists, do nothing
       return addressBook;
-    } else {
-      let newAddressBook: AddressBookFileClass[];
-      const newItem: AddressBookFileClass = { label, address, color, own };
-      newAddressBook = [
-        ...addressBook.filter(
-          item => item.label !== label && item.address !== address,
-        ),
-        newItem,
-      ];
-      return await this.writeAddressBook(newAddressBook);
     }
+    // Spread the existing entry so the multi-chain fields (chain, swapChain)
+    // survive a color/own-only refresh.
+    const newItem: AddressBookFileClass = {
+      ...existing,
+      label,
+      address,
+      color,
+      own,
+    };
+    const newAddressBook: AddressBookFileClass[] = [
+      ...addressBook.filter(
+        item => item.label !== label && item.address !== address,
+      ),
+      newItem,
+    ];
+    return await this.writeAddressBook(newAddressBook);
   }
 
   // Write only one item
@@ -40,6 +49,11 @@ export default class AddressBookFileImpl {
     address: string,
     color: string,
     own: boolean,
+    // Default to a mainnet Zcash contact — the common case and what the
+    // existing Zcash-only callers expect. Chain-aware callers (the swap flow /
+    // the AbDetail chain selector) pass explicit values.
+    chain: ChainNameEnum = ChainNameEnum.mainChainName,
+    swapChain: string = GlobalConst.zecSwapChain,
   ): Promise<AddressBookFileClass[]> {
     const addressBook = await this.readAddressBook();
     if (
@@ -48,11 +62,19 @@ export default class AddressBookFileImpl {
       ).length > 0
     ) {
       // already exists the combination of label & address -> update fields
+      // (updateColorAndOwnItem preserves chain/swapChain via spread).
       return await this.updateColorAndOwnItem(label, address, color, own);
     }
 
     let newAddressBook: AddressBookFileClass[];
-    const newItem: AddressBookFileClass = { label, address, color, own };
+    const newItem: AddressBookFileClass = {
+      label,
+      address,
+      color,
+      own,
+      chain,
+      swapChain,
+    };
 
     if (addressBook.filter(item => item.label === label).length > 0) {
       // already exists the label -> update the address

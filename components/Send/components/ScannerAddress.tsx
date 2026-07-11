@@ -39,7 +39,16 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
     setActive(_active);
   }, [route, route.params, route.params?.active]);
 
+  const raw =
+    !!route.params && route.params.raw !== undefined ? route.params.raw : false;
+
   const validateAddress = (scannedAddress: string) => {
+    if (raw) {
+      // Non-Zcash scan (address book / swap): hand back the string verbatim;
+      // the caller validates it for its chain. No `zcash:` prefixing.
+      setAddress(scannedAddress);
+      return;
+    }
     if (scannedAddress.toLowerCase().startsWith(GlobalConst.zcash)) {
       setAddress(scannedAddress);
     } else if (scannedAddress.toLowerCase().includes(':')) {

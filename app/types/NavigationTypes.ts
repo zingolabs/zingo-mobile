@@ -96,6 +96,10 @@ export type AddressListNavigationState = {
 export type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
   active: boolean;
+  // When true the scanner returns the scanned string verbatim — no `zcash:`
+  // prefixing — for non-Zcash address fields (address book / swap). The caller
+  // validates it per its own chain.
+  raw?: boolean;
 };
 
 export type ScannerUfvkNavigationState = {

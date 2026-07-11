@@ -151,3 +151,17 @@ export function isValidChainAddress(chain: string, address: string): boolean {
   if (!v) return true;
   return v(trimmed);
 }
+
+/**
+ * Chains the address book / swap can offer AND validate: every chain we model a
+ * validator for, plus ZEC (validated separately by zingolib). Derived from
+ * `VALIDATORS` so adding a validator automatically surfaces the chain — there
+ * is no parallel list to maintain. Encoding is the SwapKit chain code
+ * ('ZEC','BTC','ETH'); the display name comes from `chainDisplayName`. ZEC/BTC/
+ * ETH are pinned first for UX; the rest keep the `VALIDATORS` definition order.
+ */
+const PRIORITY_CHAINS: readonly string[] = ['ZEC', 'BTC', 'ETH'];
+export const SWAP_ADDRESS_CHAINS: readonly string[] = [
+  ...PRIORITY_CHAINS,
+  ...Object.keys(VALIDATORS).filter(c => !PRIORITY_CHAINS.includes(c)),
+];

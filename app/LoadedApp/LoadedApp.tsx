@@ -33,6 +33,7 @@ import {
   doSave,
   isWalletAddress,
   loadExistingWallet,
+  parseAddress,
   setConfigWalletToProd,
 } from '../walletBackend';
 import {
@@ -551,6 +552,41 @@ export default function LoadedApp(props: LoadedAppProps) {
           sort = true;
         }
       }
+      // Multi-chain migration (first boot with the feature): stamp `swapChain`
+      // and `chain` on any entry that predates them. Existing contacts are all
+      // Zcash → swapChain 'ZEC'; the Zcash network is read from the address
+      // itself via parseAddress (main/test/regtest), defaulting to mainnet.
+      if (
+        ab.some(
+          (a: AddressBookFileClassObsolete) =>
+            !a.hasOwnProperty('swapChain') || !a.hasOwnProperty('chain'),
+        )
+      ) {
+        const migrated: AddressBookFileClass[] = [];
+        for (const a of ab as AddressBookFileClassObsolete[]) {
+          if (a.hasOwnProperty('swapChain') && a.hasOwnProperty('chain')) {
+            migrated.push(a as AddressBookFileClass);
+            continue;
+          }
+          let chain: ChainNameEnum = ChainNameEnum.mainChainName;
+          try {
+            const parsed = JSON.parse(await parseAddress(a.address));
+            if (parsed && parsed.chain_name) {
+              chain = parsed.chain_name as ChainNameEnum;
+            }
+          } catch {
+            // unparseable address → keep the mainnet default
+          }
+          migrated.push({
+            ...(a as AddressBookFileClass),
+            swapChain: GlobalConst.zecSwapChain,
+            chain,
+          });
+        }
+        ab = migrated;
+        sort = true;
+      }
+
       let abSorted = [] as AddressBookFileClass[];
       if (sort) {
         // this is a good place to sort properly these data
@@ -2098,11 +2134,21 @@ export class LoadedAppClass extends Component<
   // Determines `own` via RPC, then opens the shared modal so the user can
   // attach a label without leaving their current screen. Used from AddressItem
   // anywhere an address is displayed with a tappable "+ contact" icon.
-  launchAddTagModal = async (address: string) => {
-    const own = await isWalletAddress(address);
-    this.setState({ addTagModalTarget: { address, own } }, () => {
-      this.addTagModalRef.current?.present();
-    });
+  launchAddTagModal = (
+    address: string,
+    swapChain: string = GlobalConst.zecSwapChain,
+  ) => {
+    // Every launcher (Send, Swap, address rows) saves a recipient/destination,
+    // i.e. a contact — never a label for one of the wallet's own addresses.
+    // Tagging an own address is the Receive flow, which renders NewAddressTag
+    // with own={true} directly. So this modal is always a contact (own=false),
+    // and Send matches Swap ("Add contact", not "Add tag").
+    this.setState(
+      { addTagModalTarget: { address, own: false, swapChain } },
+      () => {
+        this.addTagModalRef.current?.present();
+      },
+    );
   };
 
   setScrollToTop = (value: boolean) => {

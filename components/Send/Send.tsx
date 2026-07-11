@@ -148,6 +148,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     netInfo,
     privacy,
     server,
+    walletChainName,
     setBackgroundError,
     addLastSnackbar,
     mode,
@@ -877,16 +878,23 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
+    // Send always targets ZEC on the wallet's own network, so only offer ZEC
+    // contacts for that chain — never non-ZEC swap contacts, nor ZEC contacts
+    // saved on a different Zcash network.
+    const walletChain = walletChainName || server.chainName;
     const items = addressBook
       .filter(
-        (item: AddressBookFileClass) => item.address !== zenniesDonationAddress,
+        (item: AddressBookFileClass) =>
+          item.address !== zenniesDonationAddress &&
+          item.swapChain === GlobalConst.zecSwapChain &&
+          item.chain === walletChain,
       )
       .map((item: AddressBookFileClass) => ({
         label: item.label,
         value: item.address,
       }));
     setItemsPicker(items);
-  }, [addressBook, zenniesDonationAddress]);
+  }, [addressBook, zenniesDonationAddress, walletChainName, server.chainName]);
 
   useEffect(() => {
     if (addressText) {
@@ -2357,6 +2365,10 @@ const Send: React.FunctionComponent<SendProps> = ({
       <SelectBottomSheet
         ref={addressBookSelectRef}
         title={translate('addressbook.select-placeholder') as string}
+        searchable={true}
+        searchPlaceholder={
+          translate('addressbook.search-placeholder') as string
+        }
         items={itemsPicker}
         value={addressText ?? ''}
         onChange={async itemValue => {

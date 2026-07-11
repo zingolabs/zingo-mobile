@@ -19,12 +19,20 @@ import {
   View,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
+  faAddressCard,
   faChevronDown,
   faGear,
+  faQrcode,
+  faUserPlus,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -34,6 +42,7 @@ import {
   ButtonTypeEnum,
   ChainNameEnum,
   CurrencyEnum,
+  GlobalConst,
   RouteEnum,
   ScreenEnum,
   SnackbarDurationEnum,
@@ -48,6 +57,8 @@ import Button from '../Components/Button';
 import Header from '../Header';
 import { SwapFilledIcon } from '../Components/Icons/SwapFilledIcon';
 import CurrencyAmount from '../Components/CurrencyAmount';
+import SelectBottomSheet from '../Components/SelectBottomSheet';
+import AddressItem from '../Components/AddressItem';
 import Utils from '../../app/utils';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
@@ -195,8 +206,14 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     totalBalance,
     zecPrice,
     privacy,
+    addressBook,
+    launchAddTagModal,
   } = context;
   const { colors } = useTheme() as ThemeType;
+  // A root-level navigator handle so the QR button reaches ScannerAddress (a
+  // top-level route) reliably from inside this portaled screen — same approach
+  // as TextInputAddress.
+  const rootNavigation = useNavigation<NavigationProp<ParamListBase>>();
 
   const t = (key: string, fallback: string): string =>
     (translate?.(key) as string) || fallback;
@@ -421,6 +438,57 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     activeAddressTouched &&
     activeAddressValue.trim().length > 0 &&
     !activeAddressValid;
+
+  // ── Address-book / QR / save mechanisms for the active (non-ZEC) address,
+  // mirroring the Send field. Contacts are filtered to the active chain by
+  // their stored `swapChain`. ──────────────────────────────────────────────
+  const setActiveAddress = isOutbound
+    ? setDestinationAddress
+    : setRefundAddress;
+  const setActiveAddressTouched = isOutbound
+    ? setDestinationAddressTouched
+    : setRefundAddressTouched;
+  const contactPickerRef = useRef<BottomSheetModal>(null);
+  const swapContacts = useMemo(
+    () =>
+      (addressBook ?? [])
+        .filter(c => c.swapChain === activeAddressChain)
+        .map(c => ({ label: c.label, value: c.address })),
+    [addressBook, activeAddressChain],
+  );
+  const activeAddressSaved = useMemo(
+    () => (addressBook ?? []).some(c => c.address === activeAddressValue),
+    [addressBook, activeAddressValue],
+  );
+  const onPickAddress = () => {
+    Keyboard.dismiss();
+    contactPickerRef.current?.present();
+  };
+  const onScanAddress = () => {
+    rootNavigation.navigate(RouteEnum.ScannerAddress, {
+      setAddress: (a: string) => {
+        setActiveAddress(a);
+        setActiveAddressTouched(true);
+      },
+      active: true,
+      // Non-ZEC chains take the scanned string verbatim (no `zcash:` prefix).
+      raw: activeAddressChain !== GlobalConst.zecSwapChain,
+    });
+  };
+  const onSaveAddress = () => {
+    launchAddTagModal(activeAddressValue, activeAddressChain);
+  };
+  // Which icons to expose on the active address field.
+  const addressPick = swapContacts.length > 0 ? onPickAddress : undefined;
+  const addressScan = onScanAddress;
+  const addressSave =
+    activeAddressValid &&
+    activeAddressValue.trim().length > 0 &&
+    !activeAddressSaved
+      ? onSaveAddress
+      : undefined;
+  const addressShowContact =
+    activeAddressValid && activeAddressValue.trim().length > 0;
 
   // Source amount input. Locale-aware decimal separator: in Spanish the user
   // types `1,5`; in English `1.5`. We filter input to digits + the locale
@@ -1485,6 +1553,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                         invalid: activeAddressShowError,
                         errorText: invalidAddressMessage,
                         testID: 'swap.refund-address',
+                        onPick: addressPick,
+                        onScan: addressScan,
+                        onSave: addressSave,
+                        showContact: addressShowContact,
                       }
                     : undefined,
                 })}
@@ -1544,6 +1616,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                         invalid: activeAddressShowError,
                         errorText: invalidAddressMessage,
                         testID: 'swap.destination-address',
+                        onPick: addressPick,
+                        onScan: addressScan,
+                        onSave: addressSave,
+                        showContact: addressShowContact,
                       }
                     : undefined,
                 })}
@@ -1787,6 +1863,20 @@ const Swap: React.FunctionComponent<SwapProps> = ({
         isOutbound={isOutbound}
         translate={translate}
       />
+      <SelectBottomSheet
+        ref={contactPickerRef}
+        title={translate('addressbook.select-placeholder') as string}
+        searchable={true}
+        searchPlaceholder={
+          translate('addressbook.search-placeholder') as string
+        }
+        items={swapContacts}
+        value={activeAddressValue}
+        onChange={a => {
+          setActiveAddress(a);
+          setActiveAddressTouched(true);
+        }}
+      />
     </View>
   );
 };
@@ -1845,6 +1935,15 @@ type AssetCardArgs = {
     invalid?: boolean;
     errorText?: string;
     testID?: string;
+    // Send-style mechanisms. Each is undefined when its icon should be hidden
+    // (no contacts for the chain / already saved).
+    onPick?: () => void;
+    onScan?: () => void;
+    onSave?: () => void;
+    // Show the matching contact's name next to the label (only for a valid,
+    // non-empty address — same as Send). AddressItem renders nothing if the
+    // address isn't in the book.
+    showContact?: boolean;
   };
 };
 
@@ -1972,12 +2071,39 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
       </View>
       {address && (
         <View style={[styles.addressBlock, { borderTopColor: colors.border }]}>
-          <FadeText style={styles.addressLabel}>{address.label}</FadeText>
-          {/* The X-clear sits absolutely positioned inside the input so the
-              input's border stays a single visual unit (same pattern as
-              TextInputAddress in the rest of the app). When the field is
-              empty, the X is unmounted entirely — no faded ghost. */}
-          <View style={{ position: 'relative' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            <FadeText style={{ ...styles.addressLabel, marginRight: 10 }}>
+              {address.label}
+            </FadeText>
+            {address.showContact ? (
+              <AddressItem
+                address={address.value}
+                screenName={ScreenEnum.Swap}
+                oneLine={true}
+                onlyContact={true}
+                withIcon={false}
+              />
+            ) : null}
+          </View>
+          {/* Input + icon row (clear / pick-from-book / save / QR), mirroring
+              the Send address field. Each icon renders only when its handler
+              is provided. */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              borderWidth: 1,
+              borderRadius: 12,
+              borderColor: address.invalid ? colors.danger.text : colors.border,
+              backgroundColor: colors.bottomSheetBackground,
+            }}
+          >
             <TextInput
               value={address.value}
               onChangeText={address.onChange}
@@ -1987,38 +2113,66 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
               autoCapitalize="none"
               autoCorrect={false}
               spellCheck={false}
-              style={[
-                styles.addressInput,
-                {
-                  color: colors.text,
-                  backgroundColor: colors.bottomSheetBackground,
-                  borderColor: address.invalid
-                    ? colors.danger.text
-                    : colors.border,
-                  // Reserve room on the right so user text never slides
-                  // under the X icon.
-                  paddingRight: address.value.length > 0 ? 36 : 12,
-                },
-              ]}
+              style={{
+                flex: 1,
+                color: colors.text,
+                fontWeight: '600',
+                fontSize: 14,
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                backgroundColor: 'transparent',
+              }}
               testID={address.testID}
             />
             {address.value.length > 0 ? (
               <TouchableOpacity
                 onPress={() => address.onChange('')}
                 accessibilityRole="button"
-                hitSlop={8}
-                style={{
-                  position: 'absolute',
-                  right: 10,
-                  top: 0,
-                  bottom: 0,
-                  justifyContent: 'center',
-                }}
               >
                 <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
                   icon={faXmark}
-                  size={18}
+                  size={20}
                   color={colors.primaryDisabled}
+                />
+              </TouchableOpacity>
+            ) : null}
+            {address.onPick ? (
+              <TouchableOpacity
+                onPress={address.onPick}
+                testID="swap.pick-address"
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
+                  icon={faAddressCard}
+                  size={28}
+                  color={colors.primary}
+                />
+              </TouchableOpacity>
+            ) : null}
+            {address.onSave ? (
+              <TouchableOpacity
+                onPress={address.onSave}
+                testID="swap.save-address"
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
+                  icon={faUserPlus}
+                  size={28}
+                  color={colors.primary}
+                />
+              </TouchableOpacity>
+            ) : null}
+            {address.onScan ? (
+              <TouchableOpacity
+                onPress={address.onScan}
+                testID="swap.scan-address"
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
+                  icon={faQrcode}
+                  size={28}
+                  color={colors.border}
                 />
               </TouchableOpacity>
             ) : null}

@@ -22,6 +22,8 @@ import FadeText from '../../Components/FadeText';
 import {
   AddressBookActionEnum,
   AddressBookFileClass,
+  ChainNameEnum,
+  GlobalConst,
   SendPageStateClass,
   ToAddrClass,
   ModeEnum,
@@ -31,6 +33,7 @@ import {
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
+import { ChainLogo } from '../../Components/ChainSelect';
 
 type AbSummaryLineProps = {
   index: number;
@@ -42,6 +45,8 @@ type AbSummaryLineProps = {
     label: string,
     address: string,
     color: string,
+    chain: ChainNameEnum,
+    swapChain: string,
   ) => void;
   addressProtected?: boolean;
 };
@@ -74,6 +79,12 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
       : item.label
     : (translate('info.unknown') as string);
 
+  // Every contact carries a chain badge — the Zcash mark for external ZEC
+  // contacts, the chain logo for non-ZEC ones. The wallet's own addresses
+  // (tags) and protected internal entries (e.g. the Zennies tip address) show
+  // the bare icon with nothing beside it.
+  const showChainBadge = !item.own && !addressProtected;
+
   const onPressDelete = () => {
     showConfirm({
       title: translate('addressbook.delete-title') as string,
@@ -87,6 +98,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
               item.label,
               item.address,
               item.color ? item.color : '',
+              item.chain,
+              item.swapChain,
             ),
         },
         { text: translate('cancel') as string, style: 'cancel' },
@@ -126,19 +139,56 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
               }
             }}
           >
-            <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-              <FontAwesomeIcon
-                style={{ marginHorizontal: 10 }}
-                size={20}
-                icon={item.own ? faWallet : faAddressCard}
-                color={
-                  addressProtected || item.own
-                    ? colors.zingo
-                    : item.color
-                      ? item.color
-                      : colors.primarydisabled
-                }
-              />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: 5,
+              }}
+            >
+              <View
+                style={{
+                  width: 28,
+                  height: 28,
+                  marginHorizontal: 10,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <FontAwesomeIcon
+                  size={28}
+                  icon={item.own ? faWallet : faAddressCard}
+                  color={
+                    addressProtected || item.own
+                      ? colors.zingo
+                      : item.color
+                        ? item.color
+                        : colors.primarydisabled
+                  }
+                />
+                {/* Chain badge: a small circle pinned to the bottom-right
+                    corner of the contact icon, overlapping it, with a
+                    background-coloured ring so it reads as "on top". Zcash mark
+                    for ZEC contacts, chain logo for the rest. */}
+                {showChainBadge && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      right: -8,
+                      bottom: -4,
+                      borderRadius: 10,
+                      borderWidth: 1.5,
+                      borderColor: colors.background,
+                      backgroundColor: colors.background,
+                    }}
+                  >
+                    <ChainLogo
+                      chain={item.swapChain || GlobalConst.zecSwapChain}
+                      size={17}
+                    />
+                  </View>
+                )}
+              </View>
               <FadeText
                 style={{
                   fontSize: 18,
@@ -198,6 +248,9 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
         {!readOnly &&
           selectServer !== SelectServerEnum.offline &&
           !addressProtected &&
+          // The wallet can only send to Zcash addresses — hide the send action
+          // for non-ZEC (swap) contacts.
+          item.swapChain === GlobalConst.zecSwapChain &&
           !(
             mode === ModeEnum.basic &&
             totalBalance &&
