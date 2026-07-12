@@ -2869,11 +2869,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     borderColor: colors.border,
                     borderWidth: 1,
                     borderRadius: 12,
-                    marginLeft: 5,
+                    marginHorizontal: 5,
                     marginTop: -10,
-                    width: 'auto',
-                    maxWidth: '90%',
-                    minWidth: '50%',
+                    // Fill the full available width (the parent centres its
+                    // children, so stretch to override that).
+                    alignSelf: 'stretch',
                     minHeight: 48,
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -2923,10 +2923,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     translate('settings.server-acc') as string
                   }
                   style={{
-                    marginLeft: 5,
-                    width: 'auto',
-                    maxWidth: '90%',
-                    minWidth: '50%',
+                    marginHorizontal: 5,
+                    alignSelf: 'stretch',
                     minHeight: 48,
                   }}
                 >

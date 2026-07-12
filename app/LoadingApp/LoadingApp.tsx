@@ -539,6 +539,7 @@ export class LoadingAppClass extends Component<
       customServerUri: '',
       customServerChainName: ChainNameEnum.mainChainName,
       customServerOffline: false,
+      customServerAuto: false,
       biometricsFailed:
         !!props.route.params &&
         props.route.params.biometricsFailed !== undefined
@@ -1297,10 +1298,42 @@ export class LoadingAppClass extends Component<
   };
 
   usingCustomServer = async () => {
-    if (!this.state.customServerUri && !this.state.customServerOffline) {
+    if (
+      !this.state.customServerUri &&
+      !this.state.customServerOffline &&
+      !this.state.customServerAuto
+    ) {
       return;
     }
     this.setState({ actionButtonsDisabled: true });
+    if (this.state.customServerAuto) {
+      // Automatic: enter `auto` mode on mainnet, then let the standard boot-time
+      // picker choose the best live server (falling back to the static default
+      // when offline / the registry is unreachable). Same result the app's
+      // default first-run experience gives.
+      const fallback = this.defaultServerForChain(ChainNameEnum.mainChainName);
+      await new Promise<void>(resolve =>
+        this.setState(
+          {
+            selectServer: SelectServerEnum.auto,
+            server: fallback,
+            customServerUri: '',
+            customServerChainName: this.state.server.chainName,
+            customServerOffline: false,
+            customServerAuto: false,
+          },
+          () => resolve(),
+        ),
+      );
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.selectServer,
+        SelectServerEnum.auto,
+      );
+      await this.selectServerOnBoot(!!this.state.netInfo.isConnected);
+      this.customServerModalRef.current?.dismiss();
+      this.setState({ actionButtonsDisabled: false });
+      return;
+    }
     if (this.state.customServerOffline) {
       // Offline = no server → no chain. Clear the residual chainName; the real
       // chain is derived from the wallet when it is opened offline.
@@ -1725,7 +1758,18 @@ export class LoadingAppClass extends Component<
   };
 
   onPressServerOffline = (value: boolean) => {
-    this.setState({ customServerOffline: value });
+    // The three modes are mutually exclusive; turning one on clears the other.
+    this.setState({
+      customServerOffline: value,
+      customServerAuto: value ? false : this.state.customServerAuto,
+    });
+  };
+
+  onPressServerAuto = (value: boolean) => {
+    this.setState({
+      customServerAuto: value,
+      customServerOffline: value ? false : this.state.customServerOffline,
+    });
   };
 
   addLastSnackbar = (message: string, duration?: SnackbarDurationEnum) => {
@@ -1890,6 +1934,7 @@ export class LoadingAppClass extends Component<
       customServerUri,
       customServerChainName,
       customServerOffline,
+      customServerAuto,
       firstLaunchingMessage,
       biometricsFailed,
       translate,
@@ -1971,6 +2016,8 @@ export class LoadingAppClass extends Component<
                 actionButtonsDisabled={actionButtonsDisabled}
                 customServerOffline={customServerOffline}
                 onPressServerOffline={this.onPressServerOffline}
+                customServerAuto={customServerAuto}
+                onPressServerAuto={this.onPressServerAuto}
                 customServerChainName={customServerChainName}
                 onPressServerChainName={this.onPressServerChainName}
                 customServerUri={customServerUri}

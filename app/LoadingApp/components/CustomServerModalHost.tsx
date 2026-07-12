@@ -21,6 +21,8 @@ type CustomServerModalHostProps = {
   actionButtonsDisabled: boolean;
   customServerOffline: boolean;
   onPressServerOffline: (v: boolean) => void;
+  customServerAuto: boolean;
+  onPressServerAuto: (v: boolean) => void;
   customServerChainName: string;
   onPressServerChainName: (v: ChainNameEnum) => void;
   customServerUri: string;
@@ -38,6 +40,8 @@ const CustomServerModalHost = forwardRef<
       actionButtonsDisabled,
       customServerOffline,
       onPressServerOffline,
+      customServerAuto,
+      onPressServerAuto,
       customServerChainName,
       onPressServerChainName,
       customServerUri,
@@ -158,6 +162,8 @@ const CustomServerModalHost = forwardRef<
             actionButtonsDisabled={actionButtonsDisabled}
             customServerOffline={customServerOffline}
             onPressServerOffline={onPressServerOffline}
+            customServerAuto={customServerAuto}
+            onPressServerAuto={onPressServerAuto}
             customServerChainName={customServerChainName}
             onPressServerChainName={onPressServerChainName}
             customServerUri={customServerUri}
