@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  Keyboard,
   View,
   ActivityIndicator,
   Text,
@@ -480,6 +481,9 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           enableDynamicSizing={false}
           enablePanDownToClose={false}
           enableContentPanningGesture={false}
+          keyboardBehavior={'interactive'}
+          keyboardBlurBehavior={'restore'}
+          android_keyboardInputMode={'adjustResize'}
           backgroundStyle={{
             backgroundColor: colors.bottomSheetBackground,
             borderTopLeftRadius: 40,
@@ -619,6 +623,14 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting a keyboard the sheet itself focuses later.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         handleStyle={{ display: 'none' }}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,

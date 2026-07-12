@@ -63,6 +63,8 @@
     "label": "Contacto",
     "label-placeholder": "Apodo/Etiqueta",
     "add": "Añadir",
+    "add-confirm-title": "¿Agregar contacto?",
+    "add-confirm-message": "Comprueba la dirección y la red detectada antes de guardar.",
     "modify": "Modificar",
     "delete": "Borrar",
     "empty": "Todavía no has guardado nuevas direcciones.",
@@ -72,6 +74,9 @@
     "labelexists": "Esta etiqueta ya existe. ",
     "addressexists": "Esta dirección ya existe. ",
     "select-placeholder": "Elige un Contacto...",
+    "search-placeholder": "Buscar",
+    "chain": "Cadena",
+    "select-chain-placeholder": "Elige una cadena...",
     "delete-title": "Borrar etiqueta",
     "delete-alert": "¿Realmente quieres borrar este Contacto de tu libreta de direcciones?",
     "likely": "Probablemente: ",
@@ -176,7 +181,6 @@
     "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:",
     "restorewallet-title": "Opción Avanzada",
     "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla.",
-    "selectingserver": "Determinando el mejor zainod.",
     "selectingserversame": "Su servidor actual ya es el más optimizado.",
     "selectingserverbest": "En este momento este es el servidor más optimizado:",
     "incoming-funds": "Fondos entrantes\n",
@@ -248,7 +252,7 @@
     "sendalls": [
       {
         "value": true,
-        "text": "Activa la posibilidad de enviar toda la cantidad del monedero con un botón."
+        "text": "Activa el botón 'MÁX' para rellenar el importe con todo el saldo del monedero."
       },
       {
         "value": false,
@@ -333,8 +337,12 @@
         "text": "CipherScan.App"
       },
       {
-        "value": "Zypherscan",
-        "text": "ZypherScan.Com"
+        "value": "Zexplorer",
+        "text": "ZExplorer.App"
+      },
+      {
+        "value": "None",
+        "text": "None"
       }
     ],
     "nochanges": "No se han registrado cambios.",
@@ -352,6 +360,7 @@
     "server-auto-text": "La próxima vez que la aplicación se inicie, calculará cuál es el mejor servidor de la lista y lo hará activo.",
     "server-list-text": "Selecciona un servidor de la lista.",
     "server-custom-text": "Rellena la informacion del servidor que quieres usar.",
+    "server-checking": "Comprobando servidor…",
     "server-offline-text": "La aplicación funcionará sin conexión a ningún servidor.",
     "threshold-title": "Umbral Para el Filtro de Transacciones",
     "number": "Número...",
@@ -365,7 +374,7 @@
     "currency-title": "Precio de la Moneda",
     "language-title": "Idioma",
     "islanguage": "Necesitas escoger un Idioma para poder guardar.",
-    "sendall-title": "El Botón 'Enviar Todo'",
+    "sendall-title": "El Botón 'MÁX'",
     "donation-title": "Propina para ZingoLabs",
     "privacy-title": "High Privacy",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
@@ -391,6 +400,9 @@
     "value-chainname-main": "Mainnet",
     "value-chainname-test": "Testnet",
     "value-chainname-regtest": "Regtest",
+    "value-chainname-none": "Ninguna",
+    "server-chain-title": "Red",
+    "select-chain-placeholder": "Selecciona una Red...",
     "value-rescanmenu-true": "Activar",
     "value-rescanmenu-false": "Desactivar",
     "value-recoverywalletinfoondevice-true": "Activar",
@@ -401,7 +413,8 @@
     "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-Cipherscan": "Cipherscan",
-    "value-blockexplorer-Zypherscan": "Zypherscan",
+    "value-blockexplorer-Zexplorer": "Zexplorer",
+    "value-blockexplorer-None": "Ninguno",
     "security-title": "Apply Device Security",
     "security-all": "Todo",
     "security-some": "Algunos",
@@ -443,7 +456,7 @@
   "info": {
     "version": "Versión",
     "serverversion": "Versión del Servidor",
-    "zainod": "Zainod URL",
+    "zainod": "URL del servidor",
     "network": "Red",
     "serverblock": "Altura de Bloque del Servidor",
     "zecprice": "Precio del ZEC",
@@ -537,7 +550,9 @@
     "invalidnumber": "¡Número Incorrecto!",
     "spendable": "Disponible: ",
     "somefunds": "Algunos fondos todavía se están confirmando o sincronizando",
-    "memo": "Memo(s) (Opcional)",
+    "memo": "Memo(s)",
+    "memo-placeholder": "Mensaje cifrado (opcional)",
+    "max": "MÁX",
     "button": "Enviar",
     "button-all": "Enviar Todo",
     "confirm-title": "Confirmar Transacción",
@@ -562,6 +577,8 @@
     "fetchpricetitle": "Consultar Precio USD",
     "fetchpricebody": "Por favor confirma que quieres recuperar/consultar el precio en USD de internet.",
     "fetch-button": "Consultar",
+    "refreshing-price": "Actualizando precio…",
+    "calc-error": "Error de cálculo",
     "confirm-privacy-level": "Nivel de Privacidad",
     "private": "Privada",
     "amountrevealed": "Monto Revelado",
@@ -639,7 +656,13 @@
     "seconds-abbrev": "segundos",
     "quote-refreshing": "Actualizando cotización…",
     "insufficient-for-commit": "No hay suficiente ZEC para cubrir el importe + comisión de red.",
+    "insufficient-title": "Fondos insuficientes",
+    "insufficient-desc": "Tu ZEC disponible no cubre este importe más la comisión de red. Reduce el importe a intercambiar, o añade más ZEC a tu wallet, e inténtalo de nuevo.",
     "reduce-to": "Reducir a",
+    "committing": "Procesando…",
+    "abandon-title": "¿Detener el intercambio?",
+    "abandon-message": "La dirección de depósito está lista. Si cierras sin enviar el importe exacto, el intercambio no se completará.",
+    "abandon-confirm": "Detener",
     "edge-blocked-snackbar": "El servicio de swap está bloqueado en tu red. Prueba con una VPN.",
     "edge-blocked-banner-title": "Servicio de swap no disponible en esta red",
     "edge-blocked-banner-body": "El proveedor de swap está bloqueando peticiones desde tu red. Si tu país o ISP está restringido, conectarte mediante una VPN suele resolverlo.",
@@ -671,6 +694,7 @@
     "memo": "Memo",
     "memo-hex-label": "Memo (calldata hex)",
     "payment-uri-hint": "Escanéalo desde cualquier wallet que soporte URIs de pago, o toca abajo para abrir el wallet en este dispositivo. Lleva todo: dirección, monto y memo.",
+    "address-qr-hint": "Escanéalo para rellenar la dirección de depósito en tu wallet, y luego introduce el importe exacto que se muestra abajo.",
     "payment-uri-open": "Abrir en wallet",
     "memo-required-warning": "Este memo es obligatorio. Adjúntalo a la transacción de depósito usando el mecanismo de memo o data que ofrezca tu wallet en esa cadena; si el proveedor no lo ve, los fondos quedarán bloqueados a la espera de reembolso.",
     "memo-required-warning-utxo": "Este memo es obligatorio. La transacción de depósito debe incluirlo en una salida OP_RETURN; si no, el proveedor no puede enrutar el intercambio y los fondos quedarán bloqueados a la espera de reembolso.",

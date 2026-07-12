@@ -8,10 +8,12 @@ import React, {
   useRef,
 } from 'react';
 import {
+  Keyboard,
   View,
   ScrollView,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   Pressable,
@@ -22,6 +24,7 @@ import {
   AddressBookActionEnum,
   AddressBookFileClass,
   ButtonTypeEnum,
+  ChainNameEnum,
   FilterEnum,
   RouteEnum,
   ScreenEnum,
@@ -39,6 +42,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faAngleUp,
   faChevronLeft,
+  faMagnifyingGlass,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, {
@@ -54,7 +58,6 @@ import { isWalletAddress } from '../../app/walletBackend';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
-import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 
 type AddressBookProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -69,9 +72,18 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addressBook, zenniesDonationAddress } = context;
+  const {
+    translate,
+    addressBook,
+    zenniesDonationAddress,
+    walletChainName,
+    server,
+  } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.AddressBook;
+  // The wallet's own Zcash network (reliable even offline); the chain subfilter
+  // defaults to it.
+  const walletChain = walletChainName || server.chainName;
 
   const [numAb, setNumAb] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
@@ -90,6 +102,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
+  // Chain subfilter: which Zcash network's contacts to show. Defaults to the
+  // wallet's network; the row only appears when contacts span more than one.
+  const [networkFilter, setNetworkFilter] =
+    useState<ChainNameEnum>(walletChain);
+  // Free-text search over both the contact label and the address, so the user
+  // can also look a contact up by the start of its address.
+  const [search, setSearch] = useState<string>('');
   const [currentAddress, setCurrentAddress] = useState<string>(
     !!route.params && route.params.currentAddress !== undefined
       ? route.params.currentAddress
@@ -107,9 +126,45 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const addressBookSheetRef = useRef<BottomSheet>(null);
   const abDetailSheetRef = useRef<BottomSheetModal>(null);
   const keyboardHeight = useKeyboardHeight();
-  useDismissSheetsOnBlur();
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
+
+  // Zcash networks that actually have a contact (protected/internal entries
+  // aside), in a stable order. When there is only one, the chain subfilter row
+  // is hidden — there is nothing to choose.
+  const availableChains = useMemo(() => {
+    const present = new Set<ChainNameEnum>();
+    addressBook.forEach((ab: AddressBookFileClass) => {
+      if (ab.address !== zenniesDonationAddress && ab.chain) {
+        present.add(ab.chain);
+      }
+    });
+    return [
+      ChainNameEnum.mainChainName,
+      ChainNameEnum.testChainName,
+      ChainNameEnum.regtestChainName,
+    ].filter(c => present.has(c));
+  }, [addressBook, zenniesDonationAddress]);
+  const showNetworkRow = availableChains.length > 1;
+  const networkLabel = (c: ChainNameEnum): string => {
+    switch (c) {
+      case ChainNameEnum.testChainName:
+        return translate('settings.value-chainname-test') as string;
+      case ChainNameEnum.regtestChainName:
+        return translate('settings.value-chainname-regtest') as string;
+      default:
+        return translate('settings.value-chainname-main') as string;
+    }
+  };
+  // The chain actually applied: the user's pick if still present, otherwise the
+  // wallet's chain, otherwise the first available.
+  const effectiveNetwork: ChainNameEnum = availableChains.includes(
+    networkFilter,
+  )
+    ? networkFilter
+    : availableChains.includes(walletChain)
+      ? walletChain
+      : (availableChains[0] ?? walletChain);
 
   const fetchAddressBookFiltered = useMemo(async () => {
     const filterApply = (ab: AddressBookFileClass) => {
@@ -121,12 +176,29 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         return ab.own;
       }
     };
-    // excluding this address from the list
+    const q = search.trim().toLowerCase();
+    const searchApply = (ab: AddressBookFileClass) =>
+      q.length === 0 ||
+      ab.label.toLowerCase().includes(q) ||
+      ab.address.toLowerCase().includes(q);
+    // excluding this address from the list; the chain subfilter (when visible)
+    // narrows to the selected network on top of the type filter, and the search
+    // matches label + address.
     return addressBook.filter(
       (ab: AddressBookFileClass) =>
-        ab.address !== zenniesDonationAddress && filterApply(ab),
+        ab.address !== zenniesDonationAddress &&
+        (!showNetworkRow || ab.chain === effectiveNetwork) &&
+        filterApply(ab) &&
+        searchApply(ab),
     );
-  }, [addressBook, filter, zenniesDonationAddress]);
+  }, [
+    addressBook,
+    filter,
+    zenniesDonationAddress,
+    showNetworkRow,
+    effectiveNetwork,
+    search,
+  ]);
 
   const fetchAddressBookProtected = useMemo(async () => {
     // only protected address to use internally ZingoLabs.
@@ -219,6 +291,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     label: string,
     address: string,
     color: string,
+    chain: ChainNameEnum,
+    swapChain: string,
   ) => {
     if (!label || !address) {
       return;
@@ -227,13 +301,15 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     if (a === AddressBookActionEnum.Delete) {
       ab = await AddressBookFileImpl.removeAddressBookItem(label, address);
     } else {
-      // verify this address as own or not
+      // verify this address as own or not (false for non-Zcash swap chains)
       const own = await isWalletAddress(address);
       ab = await AddressBookFileImpl.writeAddressBookItem(
         label,
         address,
         color ? color : Utils.generateColorList(1)[0],
         own,
+        chain,
+        swapChain,
       );
     }
     const abSorted = ab.sort((aa, bb) => {
@@ -484,6 +560,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         enableContentPanningGesture={false}
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
           borderTopLeftRadius: 40,
@@ -492,6 +571,111 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         handleComponent={renderAddressBookHandle}
         footerComponent={renderAddressBookFooter}
       >
+        <View style={{ paddingHorizontal: 16, marginTop: 10 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              columnGap: 8,
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              borderRadius: 12,
+              borderWidth: 1,
+              backgroundColor: colors.background,
+              borderColor: colors.border,
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              size={14}
+              color={colors.placeholder}
+            />
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder={
+                translate('addressbook.search-placeholder') as string
+              }
+              placeholderTextColor={colors.placeholder}
+              autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
+              style={{ flex: 1, fontSize: 14, padding: 0, color: colors.text }}
+              testID="addressbook.search"
+            />
+            {search.length > 0 && (
+              <Pressable onPress={() => setSearch('')} hitSlop={8}>
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  size={14}
+                  color={colors.placeholder}
+                />
+              </Pressable>
+            )}
+          </View>
+        </View>
+        {showNetworkRow && (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              marginHorizontal: 5,
+              marginTop: 4,
+            }}
+          >
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                width: '100%',
+                marginTop: 8,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {availableChains.map(c => {
+                const selected = effectiveNetwork === c;
+                return (
+                  <TouchableOpacity
+                    key={c}
+                    onPress={() => {
+                      cancel();
+                      setNetworkFilter(c);
+                      setLoading(true);
+                    }}
+                  >
+                    <View
+                      style={{
+                        backgroundColor: selected
+                          ? colors.primary
+                          : colors.sideMenuBackground,
+                        borderRadius: 15,
+                        borderColor: selected ? colors.primary : colors.zingo,
+                        borderWidth: 1,
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        marginRight: 10,
+                      }}
+                    >
+                      <FadeText
+                        style={{
+                          color: selected
+                            ? colors.sideMenuBackground
+                            : colors.zingo,
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {networkLabel(c)}
+                      </FadeText>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        )}
         <View
           style={{
             flexDirection: 'row',
@@ -772,6 +956,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting a keyboard the sheet itself focuses later.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         handleComponent={renderAbDetailHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,

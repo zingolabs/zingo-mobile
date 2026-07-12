@@ -3,7 +3,12 @@ import React from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faWifi } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBolt,
+  faServer,
+  faWifi,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
@@ -20,6 +25,8 @@ type CustomServerProps = {
   actionButtonsDisabled: boolean;
   customServerOffline: boolean;
   onPressServerOffline: (v: boolean) => void;
+  customServerAuto: boolean;
+  onPressServerAuto: (v: boolean) => void;
   customServerChainName: string;
   onPressServerChainName: (v: ChainNameEnum) => void;
   customServerUri: string;
@@ -33,6 +40,8 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
   actionButtonsDisabled,
   customServerOffline,
   onPressServerOffline,
+  customServerAuto,
+  onPressServerAuto,
   customServerChainName,
   onPressServerChainName,
   customServerUri,
@@ -42,6 +51,39 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
   translate,
 }) => {
   const { colors } = useTheme() as ThemeType;
+
+  // The three mutually-exclusive modes. "Custom" is the fallback when neither
+  // Offline nor Automatic is active — it reveals the URI + chain inputs.
+  const isCustom = !customServerOffline && !customServerAuto;
+  const modes = [
+    {
+      key: 'offline',
+      label: translate('settings.server-offline') as string,
+      icon: faWifi,
+      selected: customServerOffline,
+      iconColor: customServerOffline ? 'red' : colors.zingo,
+      onPress: () => onPressServerOffline(true),
+    },
+    {
+      key: 'auto',
+      label: translate('settings.server-auto') as string,
+      icon: faBolt,
+      selected: customServerAuto,
+      iconColor: customServerAuto ? colors.primary : colors.zingo,
+      onPress: () => onPressServerAuto(true),
+    },
+    {
+      key: 'custom',
+      label: translate('settings.server-custom') as string,
+      icon: faServer,
+      selected: isCustom,
+      iconColor: isCustom ? colors.primary : colors.zingo,
+      onPress: () => {
+        onPressServerOffline(false);
+        onPressServerAuto(false);
+      },
+    },
+  ];
 
   return (
     <View
@@ -55,46 +97,49 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
     >
       <View
         style={{
-          alignSelf: 'center',
-          alignItems: 'center',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
           justifyContent: 'center',
-          margin: 0,
-          marginBottom: 10,
-          paddingHorizontal: 5,
-          paddingVertical: 1,
-          borderColor: customServerOffline ? colors.primary : colors.zingo,
-          borderWidth: customServerOffline ? 2 : 1,
-          borderRadius: 10,
-          minWidth: 25,
-          minHeight: 25,
+          gap: 8,
+          marginBottom: 12,
         }}
       >
-        <TouchableOpacity
-          onPress={() => onPressServerOffline(!customServerOffline)}
-        >
-          <View style={{ flexDirection: 'row', margin: 0, padding: 0 }}>
-            <FontAwesomeIcon
-              icon={faWifi}
-              color={customServerOffline ? 'red' : colors.zingo}
-              size={14}
-            />
-            <FadeText style={{ marginLeft: 10, marginRight: 5 }}>
-              {translate('settings.server-offline') as string}
-            </FadeText>
-          </View>
-        </TouchableOpacity>
+        {modes.map(m => (
+          <TouchableOpacity
+            key={m.key}
+            testID={`customserver.mode.${m.key}`}
+            disabled={actionButtonsDisabled}
+            onPress={m.onPress}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                borderColor: m.selected ? colors.primary : colors.zingo,
+                borderWidth: m.selected ? 2 : 1,
+                borderRadius: 10,
+              }}
+            >
+              <FontAwesomeIcon icon={m.icon} color={m.iconColor} size={14} />
+              <FadeText style={{ marginLeft: 8 }}>{m.label}</FadeText>
+            </View>
+          </TouchableOpacity>
+        ))}
       </View>
-      {!customServerOffline && (
+      {isCustom && (
         <>
           <View
             style={{
               borderColor: colors.border,
               borderWidth: 1,
-              marginLeft: 5,
-              width: 'auto',
-              maxWidth: '90%',
-              minWidth: '50%',
+              borderRadius: 12,
+              marginHorizontal: 5,
+              alignSelf: 'stretch',
               minHeight: 48,
+              flexDirection: 'row',
+              alignItems: 'center',
             }}
           >
             <TextInput
@@ -104,8 +149,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
                 color: colors.text,
                 fontWeight: '600',
                 fontSize: 18,
-                minWidth: '50%',
-                maxWidth: '90%',
+                flex: 1,
                 minHeight: 48,
                 marginLeft: 5,
                 backgroundColor: 'transparent',
@@ -120,13 +164,21 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
               spellCheck={false}
               textContentType="URL"
             />
+            {customServerUri && !actionButtonsDisabled && (
+              <TouchableOpacity onPress={() => setCustomServerUri('')}>
+                <FontAwesomeIcon
+                  style={{ marginRight: 10 }}
+                  size={20}
+                  icon={faXmark}
+                  color={colors.primaryDisabled}
+                />
+              </TouchableOpacity>
+            )}
           </View>
           <View
             style={{
-              marginLeft: 5,
-              width: 'auto',
-              maxWidth: '90%',
-              minWidth: '50%',
+              marginHorizontal: 5,
+              alignSelf: 'stretch',
               minHeight: 48,
             }}
           >
@@ -156,6 +208,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
+          gap: 10,
           marginVertical: 5,
           marginTop: 15,
         }}
@@ -166,6 +219,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
           disabled={actionButtonsDisabled}
           onPress={() => {
             onPressServerOffline(false);
+            onPressServerAuto(false);
             onPressServerChainName(ChainNameEnum.mainChainName);
             setCustomServerUri('');
             Keyboard.dismiss();
@@ -181,7 +235,6 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
             usingCustomServer();
             Keyboard.dismiss();
           }}
-          style={{ marginLeft: 10 }}
           twoButtons={true}
         />
       </View>

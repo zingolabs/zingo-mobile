@@ -80,6 +80,8 @@ type HeaderProps = {
   onUsdRowLayout?: (height: number) => void;
   // optional layout reporting for the pull-down PriceRow snap point
   onPriceRowLayout?: (height: number) => void;
+  // reveal the pull-down PriceRow when the price fetch button is tapped
+  onManualFetchPrice?: () => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -107,6 +109,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   showMessagesIcon,
   onUsdRowLayout,
   onPriceRowLayout,
+  onManualFetchPrice,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -240,6 +243,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             onPressShieldFunds={onPressShieldFunds}
             receivedLegend={receivedLegend}
             onUsdRowLayout={onUsdRowLayout}
+            onManualFetchPrice={onManualFetchPrice}
           />
 
           {!noBalance && (

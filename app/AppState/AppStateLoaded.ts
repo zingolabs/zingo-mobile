@@ -21,5 +21,9 @@ export default interface AppStateLoaded {
 
   // Address+ownership pair for the shared "Add Tag/Contact" BottomSheetModal
   // hosted at LoadedApp level. `null` while hidden.
-  addTagModalTarget: { address: string; own: boolean } | null;
+  addTagModalTarget: {
+    address: string;
+    own: boolean;
+    swapChain: string;
+  } | null;
 }

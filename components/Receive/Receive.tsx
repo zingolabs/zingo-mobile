@@ -79,8 +79,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addresses, defaultUnifiedAddress, mode, addLastSnackbar } =
-    context;
+  const {
+    translate,
+    addresses,
+    defaultUnifiedAddress,
+    mode,
+    addLastSnackbar,
+    setPrivacyOption,
+  } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Receive;
 
@@ -229,6 +235,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     1,
     receiveSnapPoints.length,
   );
+
+  // Tapping the price fetch button reveals the header PriceRow (smallest snap).
+  // The auto-close timer armed by usePriceSnapAutoClose returns it afterwards.
+  const revealPrice = useCallback(() => {
+    if (priceSnapIndex === null) return;
+    safeSnapToIndex(receiveSheetRef, priceSnapIndex, receiveSnapPoints.length);
+  }, [priceSnapIndex, receiveSnapPoints.length]);
 
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
     setSheetType(_sheetType);
@@ -423,9 +436,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           title={''}
           screenName={screenName}
           toggleMenuDrawer={toggleMenuDrawer}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar}
           showMessagesIcon={true}
           onUsdRowLayout={setUsdRowH}
           onPriceRowLayout={setPriceRowH}
+          onManualFetchPrice={revealPrice}
         />
       </View>
       <Animated.View
@@ -445,6 +461,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             enableDynamicSizing={false}
             enablePanDownToClose={false}
             enableContentPanningGesture={true}
+            keyboardBehavior={'interactive'}
+            keyboardBlurBehavior={'restore'}
+            android_keyboardInputMode={'adjustResize'}
             backgroundStyle={{
               backgroundColor: colors.bottomSheetBackground,
               borderTopLeftRadius: 40,
@@ -563,6 +582,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting a keyboard the sheet itself focuses later.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         handleComponent={renderModalHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,

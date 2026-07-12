@@ -1,5 +1,6 @@
 import {
   AddressKindEnum,
+  ChainNameEnum,
   LaunchingModeEnum,
   RouteEnum,
   SeedActionEnum,
@@ -45,6 +46,9 @@ export type LoadedAppNavigationState = {
   transparentPool: boolean;
   newWallet: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
+  // The opened wallet's own chain, resolved at open time (reliable even
+  // Offline). Threaded to LoadedApp so its context can hold it.
+  walletChainName: ChainNameEnum;
 };
 
 /**
@@ -92,6 +96,10 @@ export type AddressListNavigationState = {
 export type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
   active: boolean;
+  // When true the scanner returns the scanned string verbatim — no `zcash:`
+  // prefixing — for non-Zcash address fields (address book / swap). The caller
+  // validates it per its own chain.
+  raw?: boolean;
 };
 
 export type ScannerUfvkNavigationState = {

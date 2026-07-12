@@ -7,7 +7,13 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Linking, Pressable, TouchableOpacity, View } from 'react-native';
+import {
+  Keyboard,
+  Linking,
+  Pressable,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {
   NavigationProp,
   ParamListBase,
@@ -200,6 +206,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({ route }) => {
       buttons: [
         {
           text: translate('confirm') as string,
+          style: 'destructive',
           onPress: async () => {
             try {
               await SwapStore.deleteByRecordId(record.recordId);
@@ -339,6 +346,9 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({ route }) => {
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         enableContentPanningGesture={false}
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
           borderTopLeftRadius: 40,
@@ -844,6 +854,8 @@ function SwapDetailBody(props: {
             <Button
               type={ButtonTypeEnum.Secondary}
               title={translate('swapdetail.remove') as string}
+              style={{ borderColor: colors.danger.text }}
+              textStyle={{ color: colors.danger.text }}
               onPress={onRemove}
             />
           </View>
@@ -1171,6 +1183,17 @@ const FeesBreakdownSheet = forwardRef<
       enableDynamicSizing={true}
       enablePanDownToClose
       stackBehavior="push"
+      keyboardBehavior={'interactive'}
+      keyboardBlurBehavior={'restore'}
+      android_keyboardInputMode={'adjustResize'}
+      onAnimate={(from, to) => {
+        // Opening (from === -1) dismisses a keyboard left open by the
+        // underlying screen so the sheet never renders behind it. Guard
+        // avoids fighting a keyboard the sheet itself focuses later.
+        if (from === -1 && to >= 0) {
+          Keyboard.dismiss();
+        }
+      }}
       handleComponent={handleComponent}
       backdropComponent={renderBackdrop}
       backgroundStyle={{
@@ -1414,6 +1437,17 @@ const TrackersSheet = forwardRef<
       enableDynamicSizing={true}
       enablePanDownToClose
       stackBehavior="push"
+      keyboardBehavior={'interactive'}
+      keyboardBlurBehavior={'restore'}
+      android_keyboardInputMode={'adjustResize'}
+      onAnimate={(from, to) => {
+        // Opening (from === -1) dismisses a keyboard left open by the
+        // underlying screen so the sheet never renders behind it. Guard
+        // avoids fighting a keyboard the sheet itself focuses later.
+        if (from === -1 && to >= 0) {
+          Keyboard.dismiss();
+        }
+      }}
       handleComponent={handleComponent}
       backdropComponent={renderBackdrop}
       backgroundStyle={{
@@ -1681,7 +1715,8 @@ const CHAIN_EXPLORER_TX_URL: Record<string, (hash: string) => string> = {
  * Build a block-explorer URL for a (chain, hash) pair. ZEC is routed
  * through `Utils.getBlockExplorerTxIDURL` so the link respects the
  * user-selected explorer in Settings (Zcashexplorer / Cipherscan /
- * Zypherscan) — same util VTD uses for the "View in explorer" affordance,
+ * Zexplorer, or none) — same util VTD uses for the "View in explorer"
+ * affordance,
  * so the two screens always agree. Every other chain uses the static
  * default in `CHAIN_EXPLORER_TX_URL`.
  */

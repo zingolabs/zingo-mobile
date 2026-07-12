@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions, View } from 'react-native';
+import { Dimensions, Keyboard, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import {
   BottomSheetBackdrop,
@@ -115,6 +115,17 @@ const ConfirmBottomSheet: React.FC = () => {
       accessible={false}
       enableDynamicSizing={true}
       stackBehavior="push"
+      keyboardBehavior={'interactive'}
+      keyboardBlurBehavior={'restore'}
+      android_keyboardInputMode={'adjustResize'}
+      onAnimate={(from, to) => {
+        // Opening (from === -1) dismisses a keyboard left open by the
+        // underlying screen so the sheet never renders behind it. Guard
+        // avoids fighting a keyboard the sheet itself focuses later.
+        if (from === -1 && to >= 0) {
+          Keyboard.dismiss();
+        }
+      }}
       detached={true}
       bottomInset={VERTICAL_LIFT}
       handleComponent={renderHandle}
@@ -163,7 +174,16 @@ const ConfirmBottomSheet: React.FC = () => {
           // 3+ buttons would overflow horizontally (Button at 40% each):
           // stack actions in one row and cancel below on its own.
           const stacked = all.length > 2 && !!cancel;
-          const rowButtons = stacked ? actions : all;
+          // App-wide standard for two-button rows: Secondary/Cancel on the
+          // LEFT, Primary action on the RIGHT (matches every inline sheet body
+          // — VerifyAddress, NewAddressTag, AbDetail, CustomServer). Callers
+          // pass the action first and cancel last, so pull cancel to the front
+          // here rather than requiring every caller to reorder.
+          const rowButtons = stacked
+            ? actions
+            : cancel
+              ? [cancel, ...actions]
+              : all;
           const useTwoButtonsWidth = rowButtons.length > 1 || stacked;
           return (
             <>
@@ -178,12 +198,25 @@ const ConfirmBottomSheet: React.FC = () => {
                 {rowButtons.map((b, i) => (
                   <Button
                     key={`${i}-${b.text}`}
+                    // Destructive actions share the Secondary (outline) shape as
+                    // cancel but carry a soft-coral border/text so the risky
+                    // choice reads as a warning rather than the positive Primary.
                     type={
-                      b.style === 'cancel'
+                      b.style === 'cancel' || b.style === 'destructive'
                         ? ButtonTypeEnum.Secondary
                         : ButtonTypeEnum.Primary
                     }
                     title={b.text}
+                    style={
+                      b.style === 'destructive'
+                        ? { borderColor: colors.danger.text }
+                        : undefined
+                    }
+                    textStyle={
+                      b.style === 'destructive'
+                        ? { color: colors.danger.text }
+                        : undefined
+                    }
                     onPress={() => handleButton(b)}
                     twoButtons={useTwoButtonsWidth}
                   />

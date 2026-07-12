@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faClock, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -146,6 +146,15 @@ const QuotesPickerSheet = forwardRef<BottomSheetModal, QuotesPickerSheetProps>(
         enableDynamicSizing={false}
         keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
+        android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting a keyboard the sheet itself focuses later.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         backdropComponent={renderBackdrop}
         handleComponent={() => handle}
         backgroundStyle={{

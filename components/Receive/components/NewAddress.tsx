@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useMemo, useRef, useState } from 'react';
-import { View, TextInput, Keyboard, Pressable } from 'react-native';
+import {
+  View,
+  TextInput,
+  Keyboard,
+  Pressable,
+  TouchableOpacity,
+} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import {
@@ -18,7 +24,7 @@ import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
 import { AddressUnifiedTypeEnum } from '../../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import SelectBottomSheet from '../../Components/SelectBottomSheet';
 import {
@@ -164,11 +170,13 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             style={{
               flexGrow: 1,
               borderWidth: 1,
-              borderRadius: 5,
-              borderColor: colors.text,
+              borderRadius: 12,
+              borderColor: colors.border,
               minWidth: 48,
               minHeight: 48,
               maxHeight: 150,
+              flexDirection: 'row',
+              alignItems: 'center',
             }}
           >
             <TextInput
@@ -176,7 +184,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 color: colors.text,
                 fontWeight: '600',
                 fontSize: 14,
-                minWidth: 48,
+                flex: 1,
                 minHeight: 48,
                 marginLeft: 5,
                 backgroundColor: 'transparent',
@@ -187,6 +195,16 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
               onChangeText={(text: string) => setLabel(text)}
               maxLength={50}
             />
+            {label && (
+              <TouchableOpacity onPress={() => setLabel('')}>
+                <FontAwesomeIcon
+                  style={{ marginRight: 10 }}
+                  size={20}
+                  icon={faXmark}
+                  color={colors.primaryDisabled}
+                />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 

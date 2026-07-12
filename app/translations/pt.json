@@ -63,6 +63,8 @@
     "label": "Contato",
     "label-placeholder": "Apelido/Tag",
     "add": "Adicionar",
+    "add-confirm-title": "Adicionar contato?",
+    "add-confirm-message": "Verifique o endereço e a rede detectada antes de salvar.",
     "modify": "Modificar",
     "delete": "Excluir",
     "empty": "Você ainda não salvou nenhum endereço novo.",
@@ -72,6 +74,9 @@
     "labelexists": "Esse contato já existe. ",
     "addressexists": "Este endereço já existe. ",
     "select-placeholder": "Escolha um Contato...",
+    "search-placeholder": "Procurar",
+    "chain": "Cadeia",
+    "select-chain-placeholder": "Escolha uma cadeia...",
     "delete-title": "Excluir Contato",
     "delete-alert": "Você realmente deseja excluir este Contato/Apelido?",
     "likely": "Provavelmente: ",
@@ -176,7 +181,6 @@
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
     "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação.",
-    "selectingserver": "Determinando a melhor zainod.",
     "selectingserversame": "Seu servidor atual já é o mais otimizado.",
     "selectingserverbest": "Neste momento ele é o servidor mais otimizado:",
     "incoming-funds": "Fundos recebidos\n",
@@ -248,7 +252,7 @@
     "sendalls": [
       {
         "value": true,
-        "text": "Habilitar a possibilidade de ENVIAR TODO o saldo da carteira com um botão."
+        "text": "Habilita o botão 'MÁX' para preencher o valor com todo o saldo da carteira."
       },
       {
         "value": false,
@@ -333,8 +337,12 @@
         "text": "CipherScan.App"
       },
       {
-        "value": "Zypherscan",
-        "text": "ZypherScan.Com"
+        "value": "Zexplorer",
+        "text": "ZExplorer.App"
+      },
+      {
+        "value": "None",
+        "text": "None"
       }
     ],
     "nochanges": "Nenhuma alteração registrada.",
@@ -352,6 +360,7 @@
     "server-auto-text": "Na próxima vez que o aplicativo for iniciado, ele calculará qual é o melhor servidor da lista e o ativará.",
     "server-list-text": "Selecione um servidor na lista.",
     "server-custom-text": "Preencha as informações do servidor que deseja usar.",
+    "server-checking": "Verificando servidor…",
     "server-offline-text": "O aplicativo funcionará sem conexão com o servidor.",
     "threshold-title": "Limite do Filtro das Transações",
     "number": "Número...",
@@ -365,7 +374,7 @@
     "currency-title": "Preço da Moeda",
     "language-title": "Linguagem",
     "islanguage": "Você precisa escolher um idioma para salvar.",
-    "sendall-title": "O Botão 'Enviar Tudo'",
+    "sendall-title": "O Botão 'MÁX'",
     "donation-title": "Dica ZingoLabs",
     "privacy-title": "High Privacy",
     "mode-title": "Alterar entre o modo Básico ou Avançado",
@@ -391,6 +400,9 @@
     "value-chainname-main": "Mainnet",
     "value-chainname-test": "Testnet",
     "value-chainname-regtest": "Regtest",
+    "value-chainname-none": "Nenhuma",
+    "server-chain-title": "Rede",
+    "select-chain-placeholder": "Selecione uma Rede...",
     "value-rescanmenu-true": "Habilitar",
     "value-rescanmenu-false": "Desabilitar",
     "value-recoverywalletinfoondevice-true": "Habilitar",
@@ -401,7 +413,8 @@
     "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-Cipherscan": "Cipherscan",
-    "value-blockexplorer-Zypherscan": "Zypherscan",
+    "value-blockexplorer-Zexplorer": "Zexplorer",
+    "value-blockexplorer-None": "Nenhum",
     "security-title": "Apply Device Security",
     "security-all": "Todos",
     "security-some": "Alguns",
@@ -443,7 +456,7 @@
   "info": {
     "version": "Versão",
     "serverversion": "Versão do Servidor",
-    "zainod": "Zainod URL",
+    "zainod": "URL do servidor",
     "network": "Rede",
     "serverblock": "Altura do Bloco do Servidor",
     "zecprice": "Preço do ZEC",
@@ -537,7 +550,9 @@
     "invalidnumber": "Número Inválido!",
     "spendable": "Disponível: ",
     "somefunds": "Alguns fundos ainda estão sendo confirmados ou sincronizados",
-    "memo": "Memo(s) (Opcional)",
+    "memo": "Memo(s)",
+    "memo-placeholder": "Mensagem cifrada (opcional)",
+    "max": "MÁX",
     "button": "Enviar",
     "button-all": "Enviar Tudo",
     "confirm-title": "Confirmar Transação",
@@ -562,6 +577,8 @@
     "fetchpricetitle": "Buscar preço em USD",
     "fetchpricebody": "Confirme que você deseja obter o preço em USD na Internet.",
     "fetch-button": "Buscar",
+    "refreshing-price": "Atualizando preço…",
+    "calc-error": "Erro de cálculo",
     "confirm-privacy-level": "Nível de Privacidade",
     "private": "Privado",
     "amountrevealed": "Quantia Revelada",
@@ -639,7 +656,13 @@
     "seconds-abbrev": "segundos",
     "quote-refreshing": "Atualizando cotação…",
     "insufficient-for-commit": "ZEC insuficiente para cobrir valor + taxa de rede.",
+    "insufficient-title": "Fundos insuficientes",
+    "insufficient-desc": "O seu ZEC disponível não cobre este valor mais a taxa de rede. Reduza o valor a trocar, ou adicione mais ZEC à sua carteira, e tente novamente.",
     "reduce-to": "Reduzir para",
+    "committing": "Processando…",
+    "abandon-title": "Parar a troca?",
+    "abandon-message": "O endereço de depósito está pronto. Se fechar sem enviar o valor exato, a troca não será concluída.",
+    "abandon-confirm": "Parar",
     "edge-blocked-snackbar": "O serviço de swap está bloqueado na sua rede. Tente uma VPN.",
     "edge-blocked-banner-title": "Serviço de swap indisponível nesta rede",
     "edge-blocked-banner-body": "O provedor de swap está bloqueando solicitações da sua rede. Se o seu país ou ISP estiver restrito, conectar-se via VPN normalmente resolve o problema.",
@@ -671,6 +694,7 @@
     "memo": "Memo",
     "memo-hex-label": "Memo (calldata hex)",
     "payment-uri-hint": "Escaneie de qualquer carteira que suporte URIs de pagamento, ou toque abaixo para abrir a carteira neste dispositivo. Inclui tudo: endereço, valor e memo.",
+    "address-qr-hint": "Escaneie para preencher o endereço de depósito na sua carteira e depois insira o valor exato mostrado abaixo.",
     "payment-uri-open": "Abrir na carteira",
     "memo-required-warning": "Este memo é obrigatório. Anexe-o à transação de depósito usando o mecanismo de memo / data que sua carteira oferecer nessa cadeia; se o provedor não o vir, os fundos ficarão presos aguardando reembolso.",
     "memo-required-warning-utxo": "Este memo é obrigatório. A transação de depósito deve incluí-lo em uma saída OP_RETURN; caso contrário, o provedor não consegue rotear a troca e os fundos ficarão presos aguardando reembolso.",

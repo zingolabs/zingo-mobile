@@ -16,6 +16,7 @@ import {
   Keyboard,
   Pressable,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
@@ -29,13 +30,19 @@ import {
   faChevronRight,
   faInfoCircle,
   faXmark,
+  faCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import { checkServerURI, parseServerURI, serverUris } from '../../app/uris';
+import {
+  checkServerURI,
+  fetchServerList,
+  parseServerURI,
+  serverUris,
+} from '../../app/uris';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -53,12 +60,15 @@ import {
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
+  CurrencyNameEnum,
+  InfoType,
   ButtonTypeEnum,
   GlobalConst,
   RouteEnum,
   ScreenEnum,
   BlockExplorerEnum,
 } from '../../app/AppState';
+import { getLatestBlockServerInfo } from '../../app/walletBackend';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -148,6 +158,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     addLastSnackbar,
     security: securityContext,
     selectServer: selectServerContext,
+    walletChainName,
     rescanMenu: rescanMenuContext,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
@@ -238,9 +249,37 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [customServerUri, setCustomServerUri] = useState<string>('');
   const [customServerChainName, setCustomServerChainName] =
     useState<string>('');
-  const [itemsPicker, setItemsPicker] = useState<
+  // The chain the server selector operates on — i.e. which chain's servers are
+  // fetched from the external registry (auto/list) and used for custom. It is
+  // decoupled from the wallet's chain so the user can, for example, line up a
+  // testnet server while a mainnet wallet is open. `noneChainName` ('') means
+  // Offline (no server, no chain).
+  const [serverChain, setServerChain] = useState<ChainNameEnum>(
+    selectServerContext === SelectServerEnum.offline
+      ? ChainNameEnum.noneChainName
+      : (serverContext.chainName as ChainNameEnum),
+  );
+  // Server lists for the two public chains, fetched ONCE when the screen opens
+  // (see the mount effect below) and reused for the whole life of the server BS
+  // — no refetch on chain switch or picker open. Each falls back to the static
+  // `serverUris` entries for its chain if the live request fails.
+  const [mainServerList, setMainServerList] = useState<
     { label: string; value: string }[]
   >([]);
+  const [testServerList, setTestServerList] = useState<
+    { label: string; value: string }[]
+  >([]);
+  // The picker source for the CURRENT chain: main/test map to their pre-fetched
+  // list; Offline (none) and Regtest have no registry → empty.
+  const itemsPicker = useMemo(
+    () =>
+      serverChain === ChainNameEnum.mainChainName
+        ? mainServerList
+        : serverChain === ChainNameEnum.testChainName
+          ? testServerList
+          : [],
+    [serverChain, mainServerList, testServerList],
+  );
   const [currency, setCurrency] = useState<CurrencyEnum>(currencyContext);
   const [language, setLanguage] = useState<LanguageEnum>(languageContext);
   const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
@@ -369,6 +408,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     })();
   }, [translate]);
 
+  // Default server to display for the "auto" option: the `default` entry for
+  // the active chain (mainnet and testnet each have one), falling back to the
+  // first server. Keeps the auto placeholder coherent with the selected chain.
+  const autoDefaultForChain = (chainName: ServerUrisType['chainName']) =>
+    serverUris(translate).find(
+      (s: ServerUrisType) => s.chainName === chainName && s.default,
+    ) ?? serverUris(translate)[0];
+
+  // Reset the auto & list labels to the active server so switching modes never
+  // leaves a stale, previously-picked server showing. The list picker then
+  // highlights the active server until the user explicitly picks another.
+  const syncSelectableServersToActive = () => {
+    setAutoServerUri(serverContext.uri);
+    setAutoServerChainName(serverContext.chainName);
+    setListServerUri(serverContext.uri);
+    setListServerChainName(serverContext.chainName);
+  };
+
   const setServer = () => {
     if (selectServerContext === SelectServerEnum.auto) {
       setAutoIcon(faDotCircle); // ->
@@ -396,18 +453,22 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setCustomServerUri(serverContext.uri);
       setCustomServerChainName(serverContext.chainName);
       // I have to update them in auto as well
-      // with the first of the list
-      setAutoServerUri(serverUris(translate)[0].uri);
-      setAutoServerChainName(serverUris(translate)[0].chainName);
+      // with the default server for the active chain
+      setAutoServerUri(autoDefaultForChain(serverContext.chainName).uri);
+      setAutoServerChainName(
+        autoDefaultForChain(serverContext.chainName).chainName,
+      );
     } else if (selectServerContext === SelectServerEnum.offline) {
       setAutoIcon(farCircle);
       setListIcon(farCircle);
       setCustomIcon(farCircle);
       setOfflineIcon(faDotCircle); // ->
       // I have to update them in auto as well
-      // with the first of the list
-      setAutoServerUri(serverUris(translate)[0].uri);
-      setAutoServerChainName(serverUris(translate)[0].chainName);
+      // with the default server for the active chain
+      setAutoServerUri(autoDefaultForChain(serverContext.chainName).uri);
+      setAutoServerChainName(
+        autoDefaultForChain(serverContext.chainName).chainName,
+      );
     }
   };
 
@@ -416,16 +477,143 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // only the first time
 
+  // Local copy of the info shown in the header. Seeded from the global context
+  // info when the screen opens, then updated to reflect the server the user
+  // selects here — WITHOUT touching the global info (that only changes on Save).
+  // A server's block height is readable wallet-less (getLatestBlockServerInfo);
+  // its version is not readable without connecting, so it's left empty for a
+  // not-yet-connected server and the version row is hidden.
+  const [selectedInfo, setSelectedInfo] = useState<InfoType>(info);
+  // Whether the selected server responded: null = not checked / checking,
+  // true = reachable, false = unreachable or invalid URI.
+  const [selectedServerActive, setSelectedServerActive] = useState<
+    boolean | null
+  >(null);
+  // True while a reachability probe is in flight (shows a spinner + text).
+  const [checkingServer, setCheckingServer] = useState<boolean>(false);
+
+  // Build the local InfoType for a server. `chainName` may be '' (the
+  // *ServerChainName states use '' as an unset sentinel), so it's a plain
+  // string narrowed here; an empty chain renders as '-'. Version is left empty
+  // (not readable without connecting) so its header row is hidden.
+  const buildSelectedInfo = (
+    uri: string,
+    latestBlock: number,
+    chainName: string,
+  ): InfoType => ({
+    serverUri: uri,
+    chainName: chainName as ChainNameEnum,
+    latestBlock,
+    version: '',
+    currencyName:
+      chainName === ChainNameEnum.mainChainName
+        ? CurrencyNameEnum.ZEC
+        : CurrencyNameEnum.TAZ,
+  });
+
+  const updateSelectedInfo = async (
+    uri: string,
+    chainName: string,
+  ): Promise<void> => {
+    if (uri && uri === info.serverUri) {
+      // the currently-connected server → keep the full context info (version).
+      setCheckingServer(false);
+      setSelectedInfo(info);
+      setSelectedServerActive(true);
+      return;
+    }
+    if (!uri) {
+      setCheckingServer(false);
+      setSelectedInfo(buildSelectedInfo('', 0, chainName));
+      setSelectedServerActive(null);
+      return;
+    }
+    setCheckingServer(true);
+    // Probe the block height, capped by the app's standard 15s server timeout
+    // so a dead/slow server can't hang the check.
+    const heightStr = await Promise.race([
+      getLatestBlockServerInfo(uri),
+      new Promise<string>(resolve =>
+        setTimeout(() => resolve('Error: timeout'), 15 * 1000),
+      ),
+    ]);
+    const working = /^\d+$/.test(heightStr);
+    setCheckingServer(false);
+    setSelectedServerActive(working);
+    setSelectedInfo(
+      buildSelectedInfo(uri, working ? Number(heightStr) : 0, chainName),
+    );
+  };
+
+  // Custom server: validate the typed URI exactly like Save (bad URI / plaintext
+  // http rejected via parseServerURI), then probe it. Empty input → neutral.
+  const checkCustomServer = (): void => {
+    if (!customServerUri) {
+      setCheckingServer(false);
+      setSelectedInfo(buildSelectedInfo('', 0, customServerChainName));
+      setSelectedServerActive(null);
+      return;
+    }
+    const parsed = parseServerURI(customServerUri, translate);
+    if (parsed.toLowerCase().startsWith(GlobalConst.error)) {
+      setCheckingServer(false);
+      setSelectedInfo(
+        buildSelectedInfo(customServerUri, 0, customServerChainName),
+      );
+      setSelectedServerActive(false);
+      return;
+    }
+    updateSelectedInfo(parsed, customServerChainName);
+  };
+
+  // Debounced custom-server check — same mechanism as the Swap amount → quote:
+  // each keystroke restarts the timer (clearTimeout cleanup), so the check runs
+  // once ~1s after the user stops typing, not on every key.
   useEffect(() => {
-    // avoiding obsolete ones
-    const items = serverUris(translate)
-      .filter((s: ServerUrisType) => !s.obsolete)
-      .map((item: ServerUrisType) => ({
+    if (selectServer !== SelectServerEnum.custom) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      checkCustomServer();
+    }, 1000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customServerUri, customServerChainName]);
+
+  // Fetch BOTH public chains' server lists ONCE, when the screen opens, and keep
+  // them for the whole life of the server BS — no refresh on chain switch or
+  // picker open. Each list falls back to the static `serverUris` entries (that
+  // chain only, obsolete excluded) if its live request fails.
+  useEffect(() => {
+    const toItems = (list: ServerUrisType[]) =>
+      list.map((item: ServerUrisType) => ({
         label: (item.region ? item.region + ' ' : '') + item.uri,
         value: item.uri,
       }));
-    setItemsPicker(items);
-  }, [translate]);
+    const staticFor = (chain: ChainNameEnum) =>
+      toItems(
+        serverUris(translate).filter(
+          (s: ServerUrisType) => !s.obsolete && s.chainName === chain,
+        ),
+      );
+    (async () => {
+      const [mainLive, testLive] = await Promise.all([
+        fetchServerList(ChainNameEnum.mainChainName),
+        fetchServerList(ChainNameEnum.testChainName),
+      ]);
+      setMainServerList(
+        mainLive.length > 0
+          ? toItems(mainLive)
+          : staticFor(ChainNameEnum.mainChainName),
+      );
+      setTestServerList(
+        testLive.length > 0
+          ? toItems(testLive)
+          : staticFor(ChainNameEnum.testChainName),
+      );
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // once, for the whole screen life
 
   const securityObject: () => SecurityType = useCallback(() => {
     return {
@@ -463,7 +651,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       chainNameParsed = customServerChainName;
     } else if (selectServer === SelectServerEnum.offline) {
       serverUriParsed = '';
-      chainNameParsed = ChainNameEnum.mainChainName;
+      // Offline = no server → no chain. Clear the residual chainName; the real
+      // chain is derived from the wallet when it is opened offline.
+      chainNameParsed = ChainNameEnum.noneChainName;
     }
     if (
       serverContext.uri === serverUriParsed &&
@@ -547,9 +737,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       chainNameParsed = customServerChainName;
     } else if (selectServer === SelectServerEnum.offline) {
       serverUriParsed = '';
-      chainNameParsed = ChainNameEnum.mainChainName;
+      // Offline = no server → no chain. Clear the residual chainName; the real
+      // chain is derived from the wallet when it is opened offline.
+      chainNameParsed = ChainNameEnum.noneChainName;
     }
-    const chainName = serverContext.chainName;
 
     if (
       serverContext.uri === serverUriParsed &&
@@ -625,10 +816,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     // first. We detect two distinct chain conditions:
     //   • newChainName ≠ chainNameParsed → user's toggle is lying about
     //     the chain. Abort the save, restore the previous server.
-    //   • newChainName ≠ current chainName → the new server is on a
-    //     different chain than the open wallet. We set
+    //   • newChainName ≠ walletChainName → the new server is on a
+    //     different chain than the OPEN WALLET (not the previous server —
+    //     that breaks for Offline, whose server chain is None). We set
     //     `sameServerChainName = false`, which makes `setServerOption`
     //     return `chain-changed` so we can navigate to recovery.
+    //   Going TO Offline yields newChainName undefined → both checks skip →
+    //   the wallet opens directly (Offline is compatible with any chain).
     // ───────────────────────────────────────────────────────────────
     const serverChanged =
       serverContext.uri !== serverUriParsed ||
@@ -649,37 +843,75 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setDisabled(true);
       if (serverUriParsed) {
         addLastSnackbar(translate('loadedapp.tryingnewserver') as string);
-      }
-      const { result, timeout, newChainName, errorDetail } =
-        await checkServerURI(serverUriParsed, serverContext.uri);
-      if (!result) {
-        // Native/JS error string kept out of the user snackbar but logged so
-        // it surfaces in `adb logcat` / Xcode console for diagnosis.
-        console.log('checkServerURI failed:', errorDetail);
-        if (timeout === true) {
+        // Wallet-less reachability pre-check (15s cap), same idea as the
+        // Settings server panel: a server that doesn't respond (e.g.
+        // https://pepe.com) fails fast HERE without touching the live
+        // connection, instead of hanging inside changeServer/restore.
+        const heightStr = await Promise.race([
+          getLatestBlockServerInfo(serverUriParsed),
+          new Promise<string>(resolve =>
+            setTimeout(() => resolve('Error: timeout'), 15 * 1000),
+          ),
+        ]);
+        if (!/^\d+$/.test(heightStr)) {
           addLastSnackbar(
             translate('loadedapp.tryingnewserver-error') as string,
           );
-        } else {
+          setDisabled(false);
+          return;
+        }
+
+        // Probe the new server and verify chain compatibility. This lives
+        // inside `if (serverUriParsed)` on purpose: going Offline (empty URI)
+        // has no server to reach and must NOT run `changeServer('')` (which
+        // fails natively with "bad uri: invalid scheme"). Offline just opens
+        // the wallet directly — it is compatible with any chain — so
+        // `sameServerChainName` stays true and we fall straight through.
+        const { result, timeout, newChainName, errorDetail } =
+          await checkServerURI(serverUriParsed, serverContext.uri);
+        if (!result) {
+          // Native/JS error string kept out of the user snackbar but logged so
+          // it surfaces in `adb logcat` / Xcode console for diagnosis.
+          console.log('checkServerURI failed:', errorDetail);
+          if (timeout === true) {
+            addLastSnackbar(
+              translate('loadedapp.tryingnewserver-error') as string,
+            );
+          } else {
+            addLastSnackbar(
+              (translate('loadedapp.changeservernew-error') as string) +
+                serverUriParsed,
+            );
+          }
+          // Restore the previous server so the sync state stays consistent.
+          await setServerOption(
+            serverContext,
+            selectServerContext,
+            false,
+            true,
+          );
+          setDisabled(false);
+          return;
+        }
+        if (newChainName && newChainName !== chainNameParsed) {
           addLastSnackbar(
-            (translate('loadedapp.changeservernew-error') as string) +
-              serverUriParsed,
+            translate('loadedapp.serverchain-mismatch') as string,
+          );
+          await setServerOption(
+            serverContext,
+            selectServerContext,
+            false,
+            true,
+          );
+          setDisabled(false);
+          return;
+        }
+        if (newChainName && newChainName !== walletChainName) {
+          sameServerChainName = false;
+          addLastSnackbar(
+            translate('loadedapp.differentchain-error') as string,
           );
         }
-        // Restore the previous server so the sync state stays consistent.
-        await setServerOption(serverContext, selectServerContext, false, true);
-        setDisabled(false);
-        return;
-      }
-      if (newChainName && newChainName !== chainNameParsed) {
-        addLastSnackbar(translate('loadedapp.serverchain-mismatch') as string);
-        await setServerOption(serverContext, selectServerContext, false, true);
-        setDisabled(false);
-        return;
-      }
-      if (newChainName && newChainName !== chainName) {
-        sameServerChainName = false;
-        addLastSnackbar(translate('loadedapp.differentchain-error') as string);
       }
     }
 
@@ -890,8 +1122,105 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     ));
   };
 
+  // Auto/List need a PUBLIC chain (main/test). Pressing them while on None or
+  // Regtest jumps to Mainnet (criterion 2).
+  const publicChainForSelection = (): ChainNameEnum =>
+    serverChain === ChainNameEnum.mainChainName ||
+    serverChain === ChainNameEnum.testChainName
+      ? serverChain
+      : ChainNameEnum.mainChainName;
+
+  // custom accepts any real chain (main/test/regtest). Only None needs a
+  // fallback: the active wallet's chain if real, else main.
+  const customChainForSelection = (): ChainNameEnum =>
+    serverChain !== ChainNameEnum.noneChainName
+      ? serverChain
+      : serverContext.chainName === ChainNameEnum.testChainName
+        ? ChainNameEnum.testChainName
+        : serverContext.chainName === ChainNameEnum.regtestChainName
+          ? ChainNameEnum.regtestChainName
+          : ChainNameEnum.mainChainName;
+
+  // Point auto/list at the BEST server for a chain: the first entry of the LIVE
+  // registry (already sorted best-first), falling back to the chain's static
+  // default only if the API is unreachable. The static default is shown
+  // immediately so there is no empty gap while the live list is fetched, then it
+  // is swapped for the live best as soon as the registry answers.
+  const applyBestServerForChain = (chain: ChainNameEnum): void => {
+    // Use the first (best) of the pre-fetched list for the chain; fall back to
+    // the chain's static default only if that list is empty.
+    const list =
+      chain === ChainNameEnum.testChainName ? testServerList : mainServerList;
+    const best =
+      list.length > 0 ? list[0].value : autoDefaultForChain(chain).uri;
+    setAutoServerUri(best);
+    setListServerUri(best);
+    updateSelectedInfo(best, chain);
+  };
+
+  // The top chain selector is the master control. Changing it couples the mode
+  // radios below:
+  //   • None      → Offline (no server, no chain).
+  //   • Regtest   → Custom (only reachable via a local URL).
+  //   • main/test → keep the current auto/list/custom mode (Auto if we were
+  //     Offline), re-pointed at the new chain. Auto/list take the first of the
+  //     live registry (the static default is only a fallback).
+  const onChangeServerChain = (chain: ChainNameEnum): void => {
+    setServerChain(chain);
+    // keep the custom toggle in sync with the master
+    if (chain !== ChainNameEnum.noneChainName) {
+      setCustomServerChainName(chain);
+    }
+    if (chain === ChainNameEnum.noneChainName) {
+      setOfflineIcon(faDotCircle);
+      setAutoIcon(farCircle);
+      setListIcon(farCircle);
+      setCustomIcon(farCircle);
+      setSelectServer(SelectServerEnum.offline);
+      updateSelectedInfo('', ChainNameEnum.noneChainName);
+      return;
+    }
+    if (chain === ChainNameEnum.regtestChainName) {
+      setOfflineIcon(farCircle);
+      setAutoIcon(farCircle);
+      setListIcon(farCircle);
+      setCustomIcon(faDotCircle);
+      setSelectServer(SelectServerEnum.custom);
+      setAutoServerChainName(chain);
+      setListServerChainName(chain);
+      checkCustomServer();
+      return;
+    }
+    // main / test — keep the current mode, or Auto if we were Offline.
+    setAutoServerChainName(chain);
+    setListServerChainName(chain);
+    if (selectServer === SelectServerEnum.custom) {
+      setOfflineIcon(farCircle);
+      setAutoIcon(farCircle);
+      setListIcon(farCircle);
+      setCustomIcon(faDotCircle);
+      checkCustomServer();
+    } else if (selectServer === SelectServerEnum.list) {
+      setOfflineIcon(farCircle);
+      setAutoIcon(farCircle);
+      setListIcon(faDotCircle);
+      setCustomIcon(farCircle);
+      applyBestServerForChain(chain);
+    } else {
+      // auto, or coming from Offline → default to Auto
+      setOfflineIcon(farCircle);
+      setAutoIcon(faDotCircle);
+      setListIcon(farCircle);
+      setCustomIcon(farCircle);
+      setSelectServer(SelectServerEnum.auto);
+      applyBestServerForChain(chain);
+    }
+  };
+
   const onPressServerChainName = (chain: ChainNameEnum) => {
     setCustomServerChainName(chain);
+    // keep the master selector in sync with the custom toggle
+    setServerChain(chain);
   };
 
   const securityBottomSheetRef = useRef<BottomSheetModal>(null);
@@ -899,6 +1228,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const languageSelectRef = useRef<BottomSheetModal>(null);
   const blockExplorerSelectRef = useRef<BottomSheetModal>(null);
   const listServerSelectRef = useRef<BottomSheetModal>(null);
+  const serverChainSelectRef = useRef<BottomSheetModal>(null);
   const settingsSheetRef = useRef<BottomSheet>(null);
   const sheetSlideStyle = useOptionsPanelSheetSlide();
   const keyboardHeight = useKeyboardHeight();
@@ -1256,6 +1586,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             enableDynamicSizing={false}
             enablePanDownToClose={false}
             enableContentPanningGesture={false}
+            keyboardBehavior={'interactive'}
+            keyboardBlurBehavior={'restore'}
+            android_keyboardInputMode={'adjustResize'}
             backgroundStyle={{
               backgroundColor: colors.bottomSheetBackground,
               borderTopLeftRadius: 40,
@@ -2009,6 +2342,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting a keyboard the sheet itself focuses later.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         handleComponent={renderSecurityHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
@@ -2091,6 +2432,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting the server field's own keyboard.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         handleComponent={renderServerHandle}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
@@ -2109,67 +2458,122 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
           }}
         >
+          {/* Master control: the chain the server selection operates on. It
+              drives which chain's servers are fetched and couples the mode
+              radios below (None→Offline, Regtest→Custom, main/test→auto/list). */}
           <View
             style={{
-              borderWidth: 1,
-              borderColor: colors.primary,
-              borderRadius: 10,
-              backgroundColor: '#031124',
-              paddingHorizontal: 12,
-              paddingVertical: 6,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
               marginBottom: 16,
             }}
           >
-            {[
-              {
-                label: translate('info.serverversion') as string,
-                value: info.version ? info.version : '-',
-              },
-              {
-                label: translate('info.zainod') as string,
-                value: info.serverUri ? info.serverUri : '-',
-              },
-              {
-                label: translate('info.network') as string,
-                value: !info.chainName
-                  ? '-'
-                  : info.chainName === ChainNameEnum.mainChainName
-                    ? 'Mainnet'
-                    : info.chainName === ChainNameEnum.testChainName
-                      ? 'Testnet'
-                      : info.chainName === ChainNameEnum.regtestChainName
-                        ? 'Regtest'
-                        : (translate('info.unknown') as string) +
-                          ' (' +
-                          info.chainName +
-                          ')',
-              },
-              {
-                label: translate('info.serverblock') as string,
-                value: info.latestBlock ? info.latestBlock.toString() : '-',
-              },
-            ].map(row => (
-              <View
-                key={row.label}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingVertical: 6,
-                  gap: 12,
-                }}
-              >
-                <FadeText>{row.label}</FadeText>
+            <BoldText>
+              {translate('settings.server-chain-title') as string}
+            </BoldText>
+            <TouchableOpacity
+              testID="settings.server-chain"
+              disabled={disabled}
+              onPress={() => serverChainSelectRef.current?.present()}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <RegText
-                  numberOfLines={1}
-                  ellipsizeMode="middle"
-                  style={{ flexShrink: 1, textAlign: 'right' }}
+                  style={{
+                    marginRight: 5,
+                    fontWeight: '400',
+                    color: colors.zingo,
+                  }}
                 >
-                  {row.value}
+                  {
+                    translate(
+                      `settings.value-chainname-${serverChain || 'none'}`,
+                    ) as string
+                  }
                 </RegText>
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  size={12}
+                  color={colors.zingo}
+                />
               </View>
-            ))}
+            </TouchableOpacity>
           </View>
+
+          {/* Offline has no server → hide the info header. */}
+          {selectServer !== SelectServerEnum.offline && (
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: colors.primary,
+                borderRadius: 10,
+                backgroundColor: '#031124',
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                marginBottom: 16,
+              }}
+            >
+              {[
+                // Reflects the server currently selected on this screen
+                // (`selectedInfo`), not the global one. Version is hidden when
+                // unknown (a not-yet-connected server).
+                ...(selectedInfo.version
+                  ? [
+                      {
+                        label: translate('info.serverversion') as string,
+                        value: selectedInfo.version,
+                      },
+                    ]
+                  : []),
+                {
+                  label: translate('info.zainod') as string,
+                  value: selectedInfo.serverUri ? selectedInfo.serverUri : '-',
+                },
+                {
+                  label: translate('info.network') as string,
+                  value: !selectedInfo.chainName
+                    ? '-'
+                    : selectedInfo.chainName === ChainNameEnum.mainChainName
+                      ? 'Mainnet'
+                      : selectedInfo.chainName === ChainNameEnum.testChainName
+                        ? 'Testnet'
+                        : selectedInfo.chainName ===
+                            ChainNameEnum.regtestChainName
+                          ? 'Regtest'
+                          : (translate('info.unknown') as string) +
+                            ' (' +
+                            selectedInfo.chainName +
+                            ')',
+                },
+                {
+                  label: translate('info.serverblock') as string,
+                  value: selectedInfo.latestBlock
+                    ? selectedInfo.latestBlock.toString()
+                    : '-',
+                },
+              ].map(row => (
+                <View
+                  key={row.label}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingVertical: 6,
+                    gap: 12,
+                  }}
+                >
+                  <FadeText>{row.label}</FadeText>
+                  <RegText
+                    numberOfLines={1}
+                    ellipsizeMode="middle"
+                    style={{ flexShrink: 1, textAlign: 'right' }}
+                  >
+                    {row.value}
+                  </RegText>
+                </View>
+              ))}
+            </View>
+          )}
 
           <View>
             <TouchableOpacity
@@ -2187,6 +2591,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 setListIcon(farCircle);
                 setCustomIcon(farCircle);
                 setSelectServer(SelectServerEnum.offline);
+                setServerChain(ChainNameEnum.noneChainName);
+                syncSelectableServersToActive();
+                updateSelectedInfo('', ChainNameEnum.noneChainName);
               }}
             >
               <View
@@ -2235,6 +2642,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 setListIcon(farCircle);
                 setCustomIcon(farCircle);
                 setSelectServer(SelectServerEnum.auto);
+                // Auto = the best available server for the SELECTED chain. Reuse
+                // the active server only if it is on that chain; otherwise take
+                // the first (best) of the loaded list, falling back to the chain
+                // default. Keep the master selector on a public chain.
+                const chain = publicChainForSelection();
+                setServerChain(chain);
+                const list =
+                  chain === ChainNameEnum.testChainName
+                    ? testServerList
+                    : mainServerList;
+                const best =
+                  (chain === serverContext.chainName && serverContext.uri) ||
+                  (list.length > 0
+                    ? list[0].value
+                    : autoDefaultForChain(chain).uri);
+                setAutoServerUri(best);
+                setAutoServerChainName(chain);
+                setListServerUri(best);
+                setListServerChainName(chain);
+                updateSelectedInfo(best, chain);
               }}
             >
               <View
@@ -2256,7 +2683,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   {translate('settings.server-auto') as string}
                 </RegText>
                 {autoIcon === faDotCircle && (
-                  <FadeText style={{ marginLeft: 10 }}>
+                  <FadeText
+                    style={{ marginLeft: 10, flexShrink: 1 }}
+                    numberOfLines={1}
+                    ellipsizeMode="middle"
+                  >
                     {autoServerUri}
                   </FadeText>
                 )}
@@ -2270,42 +2701,29 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           </View>
 
           <View>
-            {!disabled && itemsPicker.length > 0 ? (
-              <TouchableOpacity
-                onPress={() => listServerSelectRef.current?.present()}
-              >
-                <View
-                  style={{
-                    marginRight: 10,
-                    marginBottom: 5,
-                    maxHeight: 50,
-                    minHeight: 48,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}
-                >
-                  {listIcon && (
-                    <FontAwesomeIcon
-                      icon={listIcon}
-                      size={16}
-                      color={colors.border}
-                    />
-                  )}
-                  <RegText
-                    testID="settings.list-server"
-                    style={{ marginLeft: 10 }}
-                  >
-                    {translate('settings.server-list') as string}
-                  </RegText>
-                  {listIcon === faDotCircle && (
-                    <FadeText style={{ marginLeft: 10 }}>
-                      {listServerUri}
-                    </FadeText>
-                  )}
-                </View>
-              </TouchableOpacity>
-            ) : (
+            <TouchableOpacity
+              disabled={disabled}
+              onPress={() => {
+                // criterion 2: pressing List while on None/Regtest jumps to
+                // Mainnet (list mode + best server); on main/test just open the
+                // picker (the mode is set when an item is chosen).
+                const chain = publicChainForSelection();
+                if (chain !== serverChain) {
+                  setServerChain(chain);
+                  setCustomServerChainName(chain);
+                  setOfflineIcon(farCircle);
+                  setAutoIcon(farCircle);
+                  setListIcon(faDotCircle);
+                  setCustomIcon(farCircle);
+                  setSelectServer(SelectServerEnum.list);
+                  setListServerChainName(chain);
+                  setAutoServerChainName(chain);
+                  applyBestServerForChain(chain);
+                }
+                // the list was fetched once on open; just present it
+                listServerSelectRef.current?.present();
+              }}
+            >
               <View
                 style={{
                   marginRight: 10,
@@ -2324,16 +2742,23 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     color={colors.border}
                   />
                 )}
-                <RegText style={{ marginLeft: 10 }}>
+                <RegText
+                  testID="settings.list-server"
+                  style={{ marginLeft: 10 }}
+                >
                   {translate('settings.server-list') as string}
                 </RegText>
                 {listIcon === faDotCircle && (
-                  <FadeText style={{ marginLeft: 10 }}>
+                  <FadeText
+                    style={{ marginLeft: 10, flexShrink: 1 }}
+                    numberOfLines={1}
+                    ellipsizeMode="middle"
+                  >
                     {listServerUri}
                   </FadeText>
                 )}
               </View>
-            )}
+            </TouchableOpacity>
           </View>
           <View style={{ display: 'flex' }}>
             <FadeText>
@@ -2352,10 +2777,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 minHeight: 48,
               }}
               onPress={() => {
+                setOfflineIcon(farCircle);
                 setAutoIcon(farCircle);
                 setListIcon(farCircle);
                 setCustomIcon(faDotCircle);
                 setSelectServer(SelectServerEnum.custom);
+                // Custom keeps the selected chain (regtest included); coming
+                // from Offline it falls back to a real chain.
+                const chain = customChainForSelection();
+                setServerChain(chain);
+                setCustomServerChainName(chain);
+                checkCustomServer();
               }}
             >
               <View
@@ -2388,6 +2820,46 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
             {customIcon === faDotCircle && (
               <View>
+                {(checkingServer || selectedServerActive !== null) && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: checkingServer ? 'center' : 'flex-end',
+                      gap: 6,
+                      // match the field box (marginLeft 5, maxWidth 90%) so the
+                      // check aligns with the field's right edge, not the screen
+                      marginLeft: 5,
+                      width: '90%',
+                      // pull the row up into the space above; marginBottom nets
+                      // to a 5px gap to the field (which itself has marginTop -10)
+                      marginTop: -10,
+                      marginBottom: 15,
+                    }}
+                  >
+                    {checkingServer ? (
+                      <>
+                        <ActivityIndicator
+                          size="small"
+                          color={colors.primary}
+                        />
+                        <FadeText style={{ fontSize: 12 }}>
+                          {translate('settings.server-checking') as string}
+                        </FadeText>
+                      </>
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={selectedServerActive ? faCheck : faXmark}
+                        size={14}
+                        color={
+                          selectedServerActive
+                            ? colors.primary
+                            : colors.danger.text
+                        }
+                      />
+                    )}
+                  </View>
+                )}
                 <View
                   accessible={true}
                   accessibilityLabel={
@@ -2396,11 +2868,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   style={{
                     borderColor: colors.border,
                     borderWidth: 1,
-                    marginLeft: 5,
-                    width: 'auto',
-                    maxWidth: '90%',
-                    minWidth: '50%',
+                    borderRadius: 12,
+                    marginHorizontal: 5,
+                    marginTop: -10,
+                    // Fill the full available width (the parent centres its
+                    // children, so stretch to override that).
+                    alignSelf: 'stretch',
                     minHeight: 48,
+                    flexDirection: 'row',
+                    alignItems: 'center',
                   }}
                 >
                   <TextInput
@@ -2408,11 +2884,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     placeholder={GlobalConst.serverPlaceHolder}
                     placeholderTextColor={colors.placeholder}
                     style={{
-                      color: colors.text,
+                      // Coral when the check settled as unreachable/invalid.
+                      color:
+                        !checkingServer && selectedServerActive === false
+                          ? colors.danger.text
+                          : colors.text,
                       fontWeight: '600',
                       fontSize: 18,
-                      minWidth: '50%',
-                      maxWidth: '90%',
+                      flex: 1,
                       minHeight: 48,
                       marginLeft: 5,
                       backgroundColor: 'transparent',
@@ -2427,6 +2906,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     spellCheck={false}
                     textContentType="URL"
                   />
+                  {customServerUri && !disabled && (
+                    <TouchableOpacity onPress={() => setCustomServerUri('')}>
+                      <FontAwesomeIcon
+                        style={{ marginRight: 10 }}
+                        size={20}
+                        icon={faXmark}
+                        color={colors.primaryDisabled}
+                      />
+                    </TouchableOpacity>
+                  )}
                 </View>
                 <View
                   accessible={true}
@@ -2434,10 +2923,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     translate('settings.server-acc') as string
                   }
                   style={{
-                    marginLeft: 5,
-                    width: 'auto',
-                    maxWidth: '90%',
-                    minWidth: '50%',
+                    marginHorizontal: 5,
+                    alignSelf: 'stretch',
                     minHeight: 48,
                   }}
                 >
@@ -2485,6 +2972,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         onChange={v => setBlockExplorer(v as BlockExplorerEnum)}
       />
       <SelectBottomSheet
+        ref={serverChainSelectRef}
+        title={translate('settings.select-chain-placeholder') as string}
+        items={[
+          ChainNameEnum.noneChainName,
+          ChainNameEnum.mainChainName,
+          ChainNameEnum.testChainName,
+          ChainNameEnum.regtestChainName,
+        ].map(c => ({
+          label: translate(`settings.value-chainname-${c || 'none'}`) as string,
+          value: c,
+        }))}
+        value={serverChain}
+        onChange={v => onChangeServerChain(v as ChainNameEnum)}
+      />
+      <SelectBottomSheet
         ref={listServerSelectRef}
         title={translate('settings.select-placeholder') as string}
         items={itemsPicker}
@@ -2498,14 +3000,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             setSelectServer(SelectServerEnum.list);
             setListServerUri(itemValue);
             setAutoServerUri(itemValue);
-            const cnItem = serverUris(translate).find(
-              (s: ServerUrisType) => s.uri === itemValue && !s.obsolete,
-            );
-            if (cnItem) {
-              setListServerChainName(cnItem.chainName);
-            } else {
-              console.log('chain name not found');
-            }
+            // Every item in the picker is for the SELECTED chain (the list is
+            // fetched / filtered by serverChain), so the chosen server's chain
+            // is that one — no lookup needed.
+            setListServerChainName(serverChain);
+            setAutoServerChainName(serverChain);
+            updateSelectedInfo(itemValue, serverChain);
           }
         }}
       />

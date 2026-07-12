@@ -33,6 +33,7 @@ import {
   doSave,
   isWalletAddress,
   loadExistingWallet,
+  parseAddress,
   setConfigWalletToProd,
 } from '../walletBackend';
 import {
@@ -263,6 +264,12 @@ export default function LoadedApp(props: LoadedAppProps) {
     props.route.params.firstLaunchingMessage !== undefined
       ? props.route.params.firstLaunchingMessage
       : LaunchingModeEnum.opening;
+  // The opened wallet's own chain, resolved by LoadingApp at open time (reliable
+  // even Offline). Empty when unknown.
+  const walletChainName =
+    !!props.route.params && props.route.params.walletChainName !== undefined
+      ? props.route.params.walletChainName
+      : ChainNameEnum.noneChainName;
 
   useEffect(() => {
     (async () => {
@@ -332,7 +339,23 @@ export default function LoadedApp(props: LoadedAppProps) {
         );
       }
       if (settings.server) {
-        setServer(settings.server);
+        // Offline (empty uri) has no chain. Normalize any residual chainName to
+        // the empty sentinel so a stale value never reaches the wallet open (the
+        // real chain is derived from the wallet). Persist it only when we
+        // actually cleared a residual, so we don't rewrite on every boot.
+        const normalizedServer: ServerType = settings.server.uri
+          ? settings.server
+          : { uri: '', chainName: ChainNameEnum.noneChainName };
+        setServer(normalizedServer);
+        if (
+          !settings.server.uri &&
+          settings.server.chainName !== ChainNameEnum.noneChainName
+        ) {
+          await SettingsFileImpl.writeSettings(
+            SettingsNameEnum.server,
+            normalizedServer,
+          );
+        }
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
       }
@@ -420,7 +443,8 @@ export default function LoadedApp(props: LoadedAppProps) {
       if (
         settings.blockExplorer === BlockExplorerEnum.Cipherscan ||
         settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
-        settings.blockExplorer === BlockExplorerEnum.Zypherscan
+        settings.blockExplorer === BlockExplorerEnum.Zexplorer ||
+        settings.blockExplorer === BlockExplorerEnum.None
       ) {
         setBlockExplorer(settings.blockExplorer);
       } else {
@@ -528,6 +552,41 @@ export default function LoadedApp(props: LoadedAppProps) {
           sort = true;
         }
       }
+      // Multi-chain migration (first boot with the feature): stamp `swapChain`
+      // and `chain` on any entry that predates them. Existing contacts are all
+      // Zcash → swapChain 'ZEC'; the Zcash network is read from the address
+      // itself via parseAddress (main/test/regtest), defaulting to mainnet.
+      if (
+        ab.some(
+          (a: AddressBookFileClassObsolete) =>
+            !a.hasOwnProperty('swapChain') || !a.hasOwnProperty('chain'),
+        )
+      ) {
+        const migrated: AddressBookFileClass[] = [];
+        for (const a of ab as AddressBookFileClassObsolete[]) {
+          if (a.hasOwnProperty('swapChain') && a.hasOwnProperty('chain')) {
+            migrated.push(a as AddressBookFileClass);
+            continue;
+          }
+          let chain: ChainNameEnum = ChainNameEnum.mainChainName;
+          try {
+            const parsed = JSON.parse(await parseAddress(a.address));
+            if (parsed && parsed.chain_name) {
+              chain = parsed.chain_name as ChainNameEnum;
+            }
+          } catch {
+            // unparseable address → keep the mainnet default
+          }
+          migrated.push({
+            ...(a as AddressBookFileClass),
+            swapChain: GlobalConst.zecSwapChain,
+            chain,
+          });
+        }
+        ab = migrated;
+        sort = true;
+      }
+
       let abSorted = [] as AddressBookFileClass[];
       if (sort) {
         // this is a good place to sort properly these data
@@ -585,6 +644,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         addressBook={addressBook}
         security={security}
         selectServer={selectServer}
+        walletChainName={walletChainName}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         zenniesDonationAddress={zenniesDonationAddress}
@@ -647,6 +707,7 @@ type LoadedAppClassProps = {
   addressBook: AddressBookFileClass[];
   security: SecurityType;
   selectServer: SelectServerEnum;
+  walletChainName: ChainNameEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   zenniesDonationAddress: string;
@@ -740,6 +801,7 @@ export class LoadedAppClass extends Component<
       mode: props.mode,
       security: props.security,
       selectServer: props.selectServer,
+      walletChainName: props.walletChainName,
       rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
@@ -1852,8 +1914,6 @@ export class LoadedAppClass extends Component<
   };
 
   onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
-    const { server } = this.state;
-
     // Warn before destroying the current wallet if there are still in-flight
     // swap records. The user might walk away thinking a swap is still
     // tracked when in reality the wallet that owned it is about to vanish
@@ -1896,10 +1956,12 @@ export class LoadedAppClass extends Component<
       );
     }
 
-    // if the App is working with a test server
-    // no need to do backups of the wallets.
+    // Back up any MAINNET wallet being abandoned. The decision keys on the
+    // WALLET's own chain (walletChainName), not the server's — Offline has no
+    // server chain, yet a mainnet wallet must still be backed up when it is
+    // left. Testnet/regtest are never backed up.
     let resultStr = '';
-    if (server.chainName === ChainNameEnum.mainChainName) {
+    if (this.state.walletChainName === ChainNameEnum.mainChainName) {
       // backup
       resultStr = (await this.rpc.changeWallet()) as string;
     } else {
@@ -1948,8 +2010,6 @@ export class LoadedAppClass extends Component<
 
   onClickOKServerWallet = async () => {
     if (this.state.newServer && this.state.newSelectServer) {
-      const beforeServer = this.state.server;
-
       // No `await` here so Promise.race can actually enforce the 15s cap.
       // With `await` the RPC call resolves before the race starts and the
       // timer becomes a no-op (a failing server then blocks ~minutes).
@@ -1997,8 +2057,10 @@ export class LoadedAppClass extends Component<
       await this.rpc.fetchInfoAndServerHeight();
 
       let resultStr2 = '';
-      // if the server was testnet or regtest -> no need backup the wallet.
-      if (beforeServer.chainName === ChainNameEnum.mainChainName) {
+      // Back up any MAINNET wallet being abandoned — keyed on the WALLET's own
+      // chain (walletChainName), not the server's, so a mainnet wallet left
+      // while Offline still gets backed up. Testnet/regtest are not backed up.
+      if (this.state.walletChainName === ChainNameEnum.mainChainName) {
         // backup
         resultStr2 = (await this.rpc.changeWallet()) as string;
       } else {
@@ -2072,11 +2134,21 @@ export class LoadedAppClass extends Component<
   // Determines `own` via RPC, then opens the shared modal so the user can
   // attach a label without leaving their current screen. Used from AddressItem
   // anywhere an address is displayed with a tappable "+ contact" icon.
-  launchAddTagModal = async (address: string) => {
-    const own = await isWalletAddress(address);
-    this.setState({ addTagModalTarget: { address, own } }, () => {
-      this.addTagModalRef.current?.present();
-    });
+  launchAddTagModal = (
+    address: string,
+    swapChain: string = GlobalConst.zecSwapChain,
+  ) => {
+    // Every launcher (Send, Swap, address rows) saves a recipient/destination,
+    // i.e. a contact — never a label for one of the wallet's own addresses.
+    // Tagging an own address is the Receive flow, which renders NewAddressTag
+    // with own={true} directly. So this modal is always a contact (own=false),
+    // and Send matches Swap ("Add contact", not "Add tag").
+    this.setState(
+      { addTagModalTarget: { address, own: false, swapChain } },
+      () => {
+        this.addTagModalRef.current?.present();
+      },
+    );
   };
 
   setScrollToTop = (value: boolean) => {
@@ -2167,6 +2239,7 @@ export class LoadedAppClass extends Component<
       mode: this.state.mode,
       security: this.state.security,
       selectServer: this.state.selectServer,
+      walletChainName: this.state.walletChainName,
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
@@ -2208,6 +2281,9 @@ export class LoadedAppClass extends Component<
                               // Swap entry — a fresh basic-mode wallet with
                               // zero balance still needs an inbound path
                               // (BTC -> ZEC) discoverable from the tab bar.
+                              // Hidden for read-only wallets and Offline (the
+                              // swap feature needs connectivity); the swap
+                              // history still shows as rows in the History list.
                               (!readOnly &&
                                 selectServer !== SelectServerEnum.offline &&
                                 this.state.server.chainName ===

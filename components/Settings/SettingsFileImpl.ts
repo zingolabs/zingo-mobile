@@ -87,12 +87,15 @@ export default class SettingsFileImpl {
             } as ServerType;
           }
         } else {
-          if (!settings.server.uri || !settings.server.chainName) {
-            // if one or both field/s don't have valid value -> we assign offline mode.
-            // this is the most accurate decision since we have offline mode.
+          if (settings.server.uri && !settings.server.chainName) {
+            // Only repair a REAL server (non-empty uri) that is missing its
+            // chain. An offline server (uri '') legitimately has an empty
+            // chainName — Offline has no chain; the real one is derived from
+            // the wallet at open time. Forcing mainnet here broke testnet
+            // wallets going Offline.
             settings.server = {
-              uri: '',
-              chainName: ChainNameEnum.mainChainName, // for now this is correct, in some future this have to be ''.
+              uri: settings.server.uri,
+              chainName: ChainNameEnum.mainChainName,
             } as ServerType;
           }
         }
@@ -123,14 +126,15 @@ export default class SettingsFileImpl {
         };
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.selectServer)) {
-        // this is the first time the App have selection server
-        // here just exists 6 options:
+        // First launch with server selection. Inference is chain-aware: every
+        // match below compares BOTH uri and chainName (isEqual on ServerType),
+        // so a testnet server is evaluated against the testnet entries exactly
+        // like a mainnet one is against the mainnet entries. Cases:
         // - server empty -> offline
-        // - lightwalletd (obsolete) -> auto
-        // - zcash-infra (default) -> auto
-        // - custom server -> mainnet (new - not default)
-        // - custom server -> mainnet (not in the list)
-        // - custom server -> testnet or regtest
+        // - obsolete server (any chain) -> auto
+        // - default server (mainnet or testnet) -> auto
+        // - non-default listed server (any chain) -> list
+        // - server not in the list (any chain) -> custom
         if (!settings.server.uri) {
           settings.selectServer = SelectServerEnum.offline;
         } else if (
@@ -168,8 +172,7 @@ export default class SettingsFileImpl {
           // new servers (not default & not obsolete) -> in the list - the user changed the default server in some point
           settings.selectServer = SelectServerEnum.list;
         } else {
-          // new servers -> not in the list - the user changed the default server in some point to
-          // another totally unknown or the user is using a non mainnet server.
+          // not in the list (any chain) -> the user set some other server → custom.
           settings.selectServer = SelectServerEnum.custom;
         }
       } else {

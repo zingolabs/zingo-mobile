@@ -78,7 +78,10 @@ import {
   SwapKitNetworkError,
   classifySwapError,
 } from './errors';
-import { isValidChainAddress } from './addressValidators';
+import { isValidChainAddress, SWAP_ADDRESS_CHAINS } from './addressValidators';
+import { validateAddressForChain } from './validateAddressForChain';
+import { possibleChainsForAddress } from './possibleChainsForAddress';
+import { extractPlainAddress } from './extractPlainAddress';
 
 import {
   ExtractDepositInstructionsContext,
@@ -185,6 +188,10 @@ export {
 
   // Address validators
   isValidChainAddress,
+  SWAP_ADDRESS_CHAINS,
+  validateAddressForChain,
+  possibleChainsForAddress,
+  extractPlainAddress,
 
   // Provider executors
   ExtractDepositInstructionsContext,

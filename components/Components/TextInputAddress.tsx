@@ -14,8 +14,8 @@ import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import ErrorText from './ErrorText';
 import RegText from './RegText';
-import Utils from '../../app/utils';
-import { RouteEnum, ScreenEnum } from '../../app/AppState';
+import { validateAddressForChain } from '../../app/swap';
+import { GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';
 
 type TextInputAddressProps = {
   address: string;
@@ -25,6 +25,10 @@ type TextInputAddressProps = {
   showLabel: boolean;
   screenName: ScreenEnum;
   routeStack?: RouteEnum;
+  // SwapKit chain code the address is for ('ZEC' / 'BTC' / ...). Defaults to
+  // 'ZEC' → the existing zingolib validation (against `server.chainName`).
+  // Non-ZEC values validate by the format-only per-chain regex.
+  swapChain?: string;
   // When rendered inside a BottomSheetModal (or any portaled context where
   // useNavigation's context is lost), pass the navigation prop from the host
   // screen so the QR button can navigate to ScannerAddress reliably.
@@ -40,6 +44,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   // with all callers but are no longer consumed here — ScannerAddress lives
   // at a single Drawer-level route so a direct navigate works everywhere.
   navigation: navigationProp,
+  swapChain,
 }) => {
   const hookNavigation = useNavigation<NavigationProp<ParamListBase>>();
   const navigation = navigationProp ?? hookNavigation;
@@ -53,13 +58,14 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     let cancelled = false;
 
     if (address) {
-      Utils.isValidAddress(address, server.chainName).then(r => {
+      validateAddressForChain(
+        swapChain ?? GlobalConst.zecSwapChain,
+        address,
+        server.chainName,
+      ).then(valid => {
         if (!cancelled) {
-          //console.log(r);
-          setValidAddress(r.isValid ? 1 : -1);
-          setError(
-            r.isValid ? '' : (translate('send.invalidaddress') as string),
-          );
+          setValidAddress(valid ? 1 : -1);
+          setError(valid ? '' : (translate('send.invalidaddress') as string));
         }
       });
     } else {
@@ -70,15 +76,17 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [address, server.chainName, setError, translate]);
+  }, [address, server.chainName, swapChain, setError, translate]);
 
   const setQrcodeModalShow = () => {
-    // ScannerAddress is now a top-level Drawer screen, so a direct navigate
-    // works from any caller (Receive, AddressBook, etc.) regardless of which
-    // stack they live in.
+    // ScannerAddress is a top-level (root Stack) screen, so a direct navigate
+    // works from any caller (Receive, Send, etc.) regardless of which stack
+    // they live in.
     navigation.navigate(RouteEnum.ScannerAddress, {
       setAddress: (a: string) => setAddress(a),
       active: true,
+      // Non-ZEC chains take the scanned string verbatim (no `zcash:` prefix).
+      raw: (swapChain ?? GlobalConst.zecSwapChain) !== GlobalConst.zecSwapChain,
     });
   };
 
@@ -109,8 +117,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
         <View
           style={{
             borderWidth: 1,
-            borderRadius: 5,
-            borderColor: colors.text,
+            borderRadius: 12,
+            borderColor: colors.border,
             marginTop: 5,
           }}
         >

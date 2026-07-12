@@ -19,20 +19,30 @@ import {
   View,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
+  faAddressCard,
   faChevronDown,
-  faRotateRight,
+  faGear,
+  faQrcode,
+  faUserPlus,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { getNumberFormatSettings } from 'react-native-localize';
 
 import {
+  ButtonTypeEnum,
   ChainNameEnum,
   CurrencyEnum,
+  GlobalConst,
   RouteEnum,
   ScreenEnum,
   SnackbarDurationEnum,
@@ -43,9 +53,12 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import BoldText from '../Components/BoldText';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
+import Button from '../Components/Button';
 import Header from '../Header';
 import { SwapFilledIcon } from '../Components/Icons/SwapFilledIcon';
 import CurrencyAmount from '../Components/CurrencyAmount';
+import SelectBottomSheet from '../Components/SelectBottomSheet';
+import AddressItem from '../Components/AddressItem';
 import Utils from '../../app/utils';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
@@ -63,6 +76,7 @@ import {
   classifySwapError,
   formatAmountForDisplay,
   isValidChainAddress,
+  extractPlainAddress,
 } from '../../app/swap';
 import AssetPickerSheet from './components/AssetPickerSheet';
 import QuotesPickerSheet from './components/QuotesPickerSheet';
@@ -72,6 +86,8 @@ import { providerShortLabel } from './components/providerLabels';
 import SlippageSheet, {
   formatSlippagePercent,
 } from './components/SlippageSheet';
+import InsufficientFundsSheet from './components/InsufficientFundsSheet';
+import QuoteRefreshRing from './components/QuoteRefreshRing';
 import TokenLogo from './components/TokenLogo';
 
 /**
@@ -191,8 +207,15 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     totalBalance,
     zecPrice,
     privacy,
+    setPrivacyOption,
+    addressBook,
+    launchAddTagModal,
   } = context;
   const { colors } = useTheme() as ThemeType;
+  // A root-level navigator handle so the QR button reaches ScannerAddress (a
+  // top-level route) reliably from inside this portaled screen — same approach
+  // as TextInputAddress.
+  const rootNavigation = useNavigation<NavigationProp<ParamListBase>>();
 
   const t = (key: string, fallback: string): string =>
     (translate?.(key) as string) || fallback;
@@ -365,15 +388,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     assetPickerRef.current?.present();
   }, [displayedTokens]);
 
-  // Resolves a chain code (e.g. "BASE") to its badge logo URL via the
-  // catalog-derived map kept on `SwapService`. The function reference is
-  // stable across renders while `swapService` is stable.
-  const getChainLogoUri = useCallback(
-    (chain: string): string | undefined =>
-      swapService?.chainLogoUri(chain) ?? undefined,
-    [swapService],
-  );
-
   // Both directions ask the user for a non-ZEC address, but the role is
   // different:
   //   - Outbound (ZEC -> non-ZEC): destination — where the non-ZEC asset is
@@ -427,6 +441,60 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     activeAddressValue.trim().length > 0 &&
     !activeAddressValid;
 
+  // ── Address-book / QR / save mechanisms for the active (non-ZEC) address,
+  // mirroring the Send field. Contacts are filtered to the active chain by
+  // their stored `swapChain`. ──────────────────────────────────────────────
+  const setActiveAddress = isOutbound
+    ? setDestinationAddress
+    : setRefundAddress;
+  const setActiveAddressTouched = isOutbound
+    ? setDestinationAddressTouched
+    : setRefundAddressTouched;
+  const contactPickerRef = useRef<BottomSheetModal>(null);
+  const swapContacts = useMemo(
+    () =>
+      (addressBook ?? [])
+        .filter(c => c.swapChain === activeAddressChain)
+        .map(c => ({ label: c.label, value: c.address })),
+    [addressBook, activeAddressChain],
+  );
+  const activeAddressSaved = useMemo(
+    () => (addressBook ?? []).some(c => c.address === activeAddressValue),
+    [addressBook, activeAddressValue],
+  );
+  const onPickAddress = () => {
+    Keyboard.dismiss();
+    contactPickerRef.current?.present();
+  };
+  const onScanAddress = () => {
+    rootNavigation.navigate(RouteEnum.ScannerAddress, {
+      setAddress: (a: string) => {
+        // Unwrap a payment URI (BIP-21 / EIP-681 / cashaddr / `zcash:` …) from
+        // another app or website down to the bare address before it lands in
+        // the field.
+        setActiveAddress(extractPlainAddress(a));
+        setActiveAddressTouched(true);
+      },
+      active: true,
+      // Non-ZEC chains take the scanned string verbatim (no `zcash:` prefix).
+      raw: activeAddressChain !== GlobalConst.zecSwapChain,
+    });
+  };
+  const onSaveAddress = () => {
+    launchAddTagModal(activeAddressValue, activeAddressChain);
+  };
+  // Which icons to expose on the active address field.
+  const addressPick = swapContacts.length > 0 ? onPickAddress : undefined;
+  const addressScan = onScanAddress;
+  const addressSave =
+    activeAddressValid &&
+    activeAddressValue.trim().length > 0 &&
+    !activeAddressSaved
+      ? onSaveAddress
+      : undefined;
+  const addressShowContact =
+    activeAddressValid && activeAddressValue.trim().length > 0;
+
   // Source amount input. Locale-aware decimal separator: in Spanish the user
   // types `1,5`; in English `1.5`. We filter input to digits + the locale
   // separator, then parse for the live destination/rate computation.
@@ -442,6 +510,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     slippageSheetRef.current?.present();
   }, []);
   const reviewSheetRef = useRef<BottomSheetModal>(null);
+  const insufficientSheetRef = useRef<BottomSheetModal>(null);
   const openReviewSheet = useCallback(() => {
     // Refresh the addresses on the pinned `quoteInput` snapshot to whatever
     // the user has now typed. Auto-quoting fires while the address field is
@@ -573,19 +642,23 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   // purpose: providers advertise expiries of tens of minutes (NEAR 1 h,
   // Maya Streaming ~75 min), which give the user a false sense of price
   // stability — the rate at commit time can easily drift 5–10% from what
-  // was displayed 40 min earlier. Instead we re-quote every 30 s. Short
+  // was displayed 40 min earlier. Instead we re-quote every 20 s. Short
   // enough that the displayed price stays close to the current market,
-  // long enough not to hammer the API. Countdown pauses while the
+  // long enough not to hammer the API. Refresh pauses while the
   // ReviewSheet is open (the user is committing to the pinned snapshot).
-  const QUOTE_REFRESH_INTERVAL_MS = 30_000;
+  const QUOTE_REFRESH_INTERVAL_MS = 20_000;
+  // Debounce window shared by two effects below: (1) the auto-fire that
+  // requests a fresh quote after the amount settles, and (2) the delayed
+  // clear that drops a stale quote once the field is *left* empty. Using the
+  // same window means erasing the last digit of `0.02` to type `0.03` at a
+  // normal pace never blanks the panel — the transient zero is absorbed and
+  // the quote transitions in place — while a field genuinely left empty
+  // still clears (and stops the countdown) after the window elapses.
+  const QUOTE_DEBOUNCE_MS = 1000;
   const quoteNextRefreshAtMs = useMemo<number | null>(() => {
     if (!liveQuote) return null;
     return liveQuote.receivedAtMs + QUOTE_REFRESH_INTERVAL_MS;
   }, [liveQuote]);
-  const quoteSecondsLeft = useMemo<number | null>(() => {
-    if (!liveQuote || quoteNextRefreshAtMs === null) return null;
-    return Math.max(0, Math.ceil((quoteNextRefreshAtMs - nowMs) / 1000));
-  }, [liveQuote, quoteNextRefreshAtMs, nowMs]);
   useEffect(() => {
     if (!liveQuote || isReviewSheetOpen) return;
     const id = setInterval(() => setNowMs(Date.now()), 1000);
@@ -747,6 +820,24 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     setQuoteAttemptFailed(false);
   }, [sourceInput, slippageBps]);
 
+  // Emptying the amount (or typing a 0) means there is nothing to quote, but
+  // we must NOT blank the panel the instant `sourceNum` hits 0: erasing the
+  // last digit of `0.02` to retype `0.03` momentarily passes through `0.0`,
+  // and clearing there would make the quote jump to empty and back on every
+  // edit. Instead we debounce the clear with the same window as the auto-
+  // fire — if a positive amount returns first, the cleanup cancels this and
+  // the quote transitions in place; only a field *left* empty/zero clears.
+  // Dropping `liveQuote` also stops the countdown, since the tick interval
+  // and the auto-refresh effect both gate on `liveQuote`.
+  useEffect(() => {
+    if (sourceNum > 0) return;
+    const timer = setTimeout(() => {
+      setLiveQuote(null);
+      setQuoteAttemptFailed(false);
+    }, QUOTE_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [sourceNum]);
+
   // Our wallet-side ZEC address for the swap. We reserve a one-shot
   // ZIP-320 refund-scope (ephemeral) t-address so providers see a fresh
   // identifier per swap, refunds aren't linked to the user's persistent
@@ -774,19 +865,19 @@ const Swap: React.FunctionComponent<SwapProps> = ({
   // "Continue" button's disabled logic.
   const canFetchQuote = !isQuoting && sourceNum > 0 && !!selectedToken;
 
-  // Auto-fire the quote 500ms after the user stops changing the amount /
-  // asset / direction. Removes the manual "Get Quote" tap: the user types
-  // and the quote appears. `liveQuote` is already cleared on every input
-  // change by the effect further up, so between input changes the button
-  // reads as `!liveQuote` (disabled) and the debounced fetch produces a
-  // fresh quote for the new inputs. 500ms absorbs typing bursts without
-  // feeling laggy.
+  // Auto-fire the quote QUOTE_DEBOUNCE_MS after the user stops changing the
+  // amount / asset / direction. Removes the manual "Get Quote" tap: the user
+  // types and the quote appears. The `clearTimeout` cleanup restarts the
+  // timer on every keystroke, so a burst of edits fires exactly ONE request
+  // once typing settles — never one per key. The window is long enough that
+  // typing or erasing a decimal digit by digit (e.g. the "1" before ".5" in
+  // "1.5") does not fire an intermediate quote for the half-typed value.
   useEffect(() => {
     if (!canFetchQuote) return;
     // Do NOT re-fire when the last attempt for the CURRENT inputs already
     // failed (below-minimum amount, no-route, provider transient…).
     // Without this guard the debounce would keep hammering the API with
-    // the same failing request every 500ms. The flag clears when an
+    // the same failing request on every tick. The flag clears when an
     // input actually changes, so a legitimate new attempt can happen.
     if (quoteAttemptFailed) return;
     // If we already hold a live quote AND its pinned inputs match what
@@ -795,8 +886,8 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     // every successful fetch (canFetchQuote flips false→true, effect
     // re-runs). When `sourceInput` or `slippageBps` differ from the
     // pinned snapshot we DO fire, but crucially we DO NOT null out
-    // `liveQuote` first — the debounce takes 500 ms + the fetch, and
-    // during that window the panel keeps showing the previous values
+    // `liveQuote` first — the debounce takes QUOTE_DEBOUNCE_MS + the fetch,
+    // and during that window the panel keeps showing the previous values
     // instead of flickering to an empty state.
     if (liveQuote) {
       const sellForApi =
@@ -808,7 +899,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     }
     const timer = setTimeout(() => {
       onGetQuoteRef.current?.();
-    }, 500);
+    }, QUOTE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [
     canFetchQuote,
@@ -1232,6 +1323,13 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     swapSnapPoints.length,
   );
 
+  // Tapping the price fetch button reveals the header PriceRow (smallest snap).
+  // The auto-close timer armed by usePriceSnapAutoClose returns it afterwards.
+  const revealPrice = useCallback(() => {
+    if (priceSnapIndex === null) return;
+    safeSnapToIndex(swapSheetRef, priceSnapIndex, swapSnapPoints.length);
+  }, [priceSnapIndex, swapSnapPoints.length]);
+
   // Per-card derived values. SwapKit's `ticker` field is the clean
   // uppercase short form (`"USDC"`); `symbol` may include the contract
   // address suffix for ERC20s (`"USDC-0x8ac76a51..."`) which would break
@@ -1328,7 +1426,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
           title={''}
           screenName={ScreenEnum.Swap}
           toggleMenuDrawer={toggleMenuDrawer}
-          setPrivacyOption={undefined}
+          setPrivacyOption={setPrivacyOption}
           addLastSnackbar={(msg: string, duration?: SnackbarDurationEnum) =>
             addLastSnackbar?.(msg, duration)
           }
@@ -1339,6 +1437,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
           showMessagesIcon={true}
           onUsdRowLayout={setUsdRowH}
           onPriceRowLayout={setPriceRowH}
+          onManualFetchPrice={revealPrice}
         />
       </View>
       <Animated.View
@@ -1358,6 +1457,9 @@ const Swap: React.FunctionComponent<SwapProps> = ({
             enableDynamicSizing={false}
             enablePanDownToClose={false}
             enableContentPanningGesture={false}
+            keyboardBehavior={'interactive'}
+            keyboardBlurBehavior={'restore'}
+            android_keyboardInputMode={'adjustResize'}
             backgroundStyle={{
               backgroundColor: colors.bottomSheetBackground,
               borderTopLeftRadius: 40,
@@ -1445,7 +1547,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   onChangeAmount: onChangeSourceAmount,
                   decimalSeparator,
                   onSelectAsset: openAssetPicker,
-                  getChainLogoUri,
                   colors,
                   t,
                   currency,
@@ -1465,6 +1566,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                         invalid: activeAddressShowError,
                         errorText: invalidAddressMessage,
                         testID: 'swap.refund-address',
+                        onPick: addressPick,
+                        onScan: addressScan,
+                        onSave: addressSave,
+                        showContact: addressShowContact,
                       }
                     : undefined,
                 })}
@@ -1505,7 +1610,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   amount: destAmountStr,
                   editable: false,
                   onSelectAsset: openAssetPicker,
-                  getChainLogoUri,
                   colors,
                   t,
                   currency,
@@ -1525,6 +1629,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                         invalid: activeAddressShowError,
                         errorText: invalidAddressMessage,
                         testID: 'swap.destination-address',
+                        onPick: addressPick,
+                        onScan: addressScan,
+                        onSave: addressSave,
+                        showContact: addressShowContact,
                       }
                     : undefined,
                 })}
@@ -1547,6 +1655,38 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                       },
                     ]}
                   >
+                    {/* Manual re-quote — top-right corner of the fees card. The
+                        ring fills over the 20 s auto-refresh window and resets
+                        on each fresh quote; tapping forces a re-quote (locked
+                        5 s after each tap; dimmed while a fetch is in flight). */}
+                    {(() => {
+                      const manualDisabled =
+                        isQuoting || nowMs < manualRefreshCooldownUntilMs;
+                      return (
+                        <QuoteRefreshRing
+                          size={22}
+                          color={colors.primary}
+                          ringColor={'rgba(255,255,255,0.55)'}
+                          trackColor={'rgba(255,255,255,0.12)'}
+                          durationMs={QUOTE_REFRESH_INTERVAL_MS}
+                          resetKey={liveQuote.receivedAtMs}
+                          disabled={manualDisabled}
+                          onPress={() => {
+                            setManualRefreshCooldownUntilMs(
+                              Date.now() + MANUAL_REFRESH_COOLDOWN_MS,
+                            );
+                            onGetQuoteRef.current?.();
+                          }}
+                          style={{
+                            position: 'absolute',
+                            top: 4,
+                            right: 6,
+                            zIndex: 1,
+                          }}
+                          testID="swap.manual-refresh"
+                        />
+                      );
+                    })()}
                     {rateHeader && (
                       <FadeText style={styles.feesRateHeader}>
                         {rateHeader}
@@ -1608,159 +1748,82 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   </View>
                 )}
 
-                {/* Slippage row */}
-                <View style={styles.slippageRow}>
+                {/* Slippage — right-aligned; tap the value or the gear to
+                    adjust it (no separate "Change" text). */}
+                <Pressable
+                  onPress={openSlippageSheet}
+                  accessibilityRole="button"
+                  hitSlop={6}
+                  style={styles.slippageRow}
+                >
                   <FadeText>
                     {`${t('swap.slippage', 'Slippage')}: ${formatSlippagePercent(slippageBps, decimalSeparator)}%`}
                   </FadeText>
-                  <Pressable onPress={openSlippageSheet}>
-                    <RegText style={{ color: colors.primary }}>
-                      {t('swap.change', 'Change')}
-                    </RegText>
-                  </Pressable>
-                </View>
+                  <FontAwesomeIcon
+                    icon={faGear}
+                    size={16}
+                    color={colors.primary}
+                    style={{ marginLeft: 6 }}
+                  />
+                </Pressable>
 
-                {/* Quote refresh countdown. Visible only while a live quote
-                    exists. Ticks 15 → 0 seconds; at 0 the effect above
-                    clears `liveQuote`, the auto-fire debounce picks up,
-                    and a fresh quote lands. The label tells the user
-                    exactly what will happen, so the countdown reads as
-                    "we're keeping this fresh" rather than "you're
-                    running out of time to click something". */}
-                {liveQuote && quoteSecondsLeft !== null && (
-                  <View style={styles.countdownRow}>
-                    <FadeText style={{ color: colors.text }}>
-                      {isQuoting
-                        ? t('swap.quote-refreshing', 'Refreshing quote…')
-                        : `${t('swap.quote-refetch-in', 'Quote will re-fetch in')} ${quoteSecondsLeft} ${t('swap.seconds-abbrev', 'seconds')}.`}
-                    </FadeText>
-                    {/* Manual refresh. Fires a re-quote immediately and
-                        locks itself for 5 s after each tap so a spammed
-                        button never turns into a burst of HTTP calls.
-                        Also disabled while a fetch is already in flight
-                        (`isQuoting`) — the icon dims to communicate the
-                        wait state without a separate spinner. */}
-                    {(() => {
-                      const manualDisabled =
-                        isQuoting || nowMs < manualRefreshCooldownUntilMs;
-                      return (
-                        <Pressable
-                          onPress={() => {
-                            if (manualDisabled) return;
-                            setManualRefreshCooldownUntilMs(
-                              Date.now() + MANUAL_REFRESH_COOLDOWN_MS,
-                            );
-                            onGetQuoteRef.current?.();
-                          }}
-                          disabled={manualDisabled}
-                          accessibilityRole="button"
-                          hitSlop={8}
-                          style={{
-                            marginLeft: 8,
-                            padding: 4,
-                            opacity: manualDisabled ? 0.4 : 1,
-                          }}
-                          testID="swap.manual-refresh"
-                        >
-                          <FontAwesomeIcon
-                            icon={faRotateRight}
-                            size={14}
-                            color={colors.text}
-                          />
-                        </Pressable>
-                      );
-                    })()}
-                  </View>
-                )}
-
-                {/* Affordability hint. Rendered *above* the CTA so the
-                    "Reduce to X" tap-action stays visible regardless of
-                    bottom-tab/safe-area overlap. Only renders when the
-                    quote arrived and the math doesn't fit. */}
-                {liveQuote && insufficientForCommit && (
-                  <View style={styles.insufficientHint}>
-                    <FadeText
-                      style={{
-                        color: colors.warning.primary,
-                        textAlign: 'center',
-                      }}
-                    >
-                      {t(
-                        'swap.insufficient-for-commit',
-                        'Not enough ZEC to cover amount + network fee.',
-                      )}
-                    </FadeText>
-                    {maxSpendableForSwap > 0 && (
-                      <Pressable
-                        onPress={onReduceToMax}
-                        style={styles.reduceToMaxPress}
-                      >
-                        <RegText style={{ color: colors.primary }}>
-                          {`${t(
-                            'swap.reduce-to',
-                            'Reduce to',
-                          )} ${maxSpendableForSwap.toFixed(8)} ZEC`}
-                        </RegText>
-                      </Pressable>
-                    )}
-                  </View>
-                )}
-
-                {/* CTA — single-purpose "Continue" button. The quote is
-                    fetched automatically by the debounced effect on amount
-                    change, so there is no manual "Get Quote" step. The
-                    button is:
-                      - spinning while the auto-quote request is in flight,
-                      - disabled without a live quote (still typing /
-                        awaiting the debounce),
-                      - disabled when the address field is empty or
-                        invalid (validated in the input itself),
-                      - disabled on outbound when amount + ZEC fees exceed
-                        spendable balance (the "Reduce to X" hint above
-                        offers the fix).
-                    Otherwise it opens the review/commit sheet. */}
+                {/* CTA. The quote is fetched automatically by the debounced
+                    effect on amount change, so there is no manual "Get Quote"
+                    step. Uses the shared <Button> so it matches the other
+                    primary/secondary buttons in the app. Three states:
+                      - Quoting (isQuoting, first fetch or 20 s refresh):
+                        "Actualizando cotización…", disabled.
+                      - Insufficient funds: SECONDARY + tappable, opens the
+                        InsufficientFundsSheet (long copy + "reduce to max").
+                      - Otherwise "Continue": opens the review/commit sheet,
+                        disabled until a live quote + a valid address exist. */}
                 <View style={styles.ctaWrap}>
-                  <Pressable
-                    onPress={openReviewSheet}
-                    disabled={
-                      !liveQuote ||
-                      insufficientForCommit ||
-                      !activeAddressValid ||
-                      activeAddressValue.trim().length === 0
+                  {(() => {
+                    const addressReady =
+                      activeAddressValid &&
+                      activeAddressValue.trim().length > 0;
+                    if (isQuoting) {
+                      // Same label for the first fetch and every 20 s refresh;
+                      // `swap.quote-refreshing` already reads "Actualizando
+                      // cotización…" in es.
+                      return (
+                        <Button
+                          type={ButtonTypeEnum.Primary}
+                          disabled
+                          title={t(
+                            'swap.quote-refreshing',
+                            'Refreshing quote…',
+                          )}
+                          onPress={() => {}}
+                          testID="swap.continue"
+                        />
+                      );
                     }
-                    accessibilityRole="button"
-                    accessibilityState={{
-                      disabled:
-                        !liveQuote ||
-                        insufficientForCommit ||
-                        !activeAddressValid ||
-                        activeAddressValue.trim().length === 0,
-                      busy: isQuoting,
-                    }}
-                    style={[
-                      styles.cta,
-                      {
-                        backgroundColor:
-                          liveQuote &&
-                          !insufficientForCommit &&
-                          activeAddressValid &&
-                          activeAddressValue.trim().length > 0
-                            ? colors.primary
-                            : colors.primaryDisabled,
-                      },
-                    ]}
-                    testID="swap.continue"
-                  >
-                    {isQuoting ? (
-                      <ActivityIndicator color={colors.background} />
-                    ) : (
-                      <BoldText
-                        style={{ ...styles.ctaText, color: colors.background }}
-                      >
-                        {t('swap.continue', 'Continue')}
-                      </BoldText>
-                    )}
-                  </Pressable>
+                    if (liveQuote && insufficientForCommit) {
+                      return (
+                        <Button
+                          type={ButtonTypeEnum.Secondary}
+                          title={`${t(
+                            'swap.insufficient-title',
+                            'Insufficient funds',
+                          )} ⓘ`}
+                          onPress={() =>
+                            insufficientSheetRef.current?.present()
+                          }
+                          testID="swap.continue"
+                        />
+                      );
+                    }
+                    return (
+                      <Button
+                        type={ButtonTypeEnum.Primary}
+                        title={t('swap.continue', 'Continue')}
+                        disabled={!liveQuote || !addressReady}
+                        onPress={openReviewSheet}
+                        testID="swap.continue"
+                      />
+                    );
+                  })()}
                 </View>
               </ScrollView>
             </View>
@@ -1774,13 +1837,18 @@ const Swap: React.FunctionComponent<SwapProps> = ({
         selectedIdentifier={selectedToken?.identifier ?? null}
         onChange={setSelectedToken}
         translate={translate}
-        getChainLogoUri={getChainLogoUri}
         testID="swap.asset-picker"
       />
       <SlippageSheet
         ref={slippageSheetRef}
         slippageBps={slippageBps}
         onChange={setSlippageBps}
+        translate={translate}
+      />
+      <InsufficientFundsSheet
+        ref={insufficientSheetRef}
+        maxSpendable={maxSpendableForSwap}
+        onReduceToMax={onReduceToMax}
         translate={translate}
       />
       <ReviewSheet
@@ -1807,6 +1875,20 @@ const Swap: React.FunctionComponent<SwapProps> = ({
         receiveSymbol={isOutbound ? nonZecSymbol : 'ZEC'}
         isOutbound={isOutbound}
         translate={translate}
+      />
+      <SelectBottomSheet
+        ref={contactPickerRef}
+        title={translate('addressbook.select-placeholder') as string}
+        searchable={true}
+        searchPlaceholder={
+          translate('addressbook.search-placeholder') as string
+        }
+        items={swapContacts}
+        value={activeAddressValue}
+        onChange={a => {
+          setActiveAddress(a);
+          setActiveAddressTouched(true);
+        }}
       />
     </View>
   );
@@ -1843,11 +1925,6 @@ type AssetCardArgs = {
   decimalSeparator?: string;
   /** Invoked when the user taps the non-ZEC chip (ZEC's chip is non-tappable). */
   onSelectAsset: () => void;
-  /**
-   * Resolves a chain code to its badge logo URL. Provided by the caller so
-   * the helper does not need direct access to `swapService`.
-   */
-  getChainLogoUri: (chain: string) => string | undefined;
   colors: ThemeType['colors'];
   t: (key: string, fallback: string) => string;
   /** Active fiat currency from app context. Drives USD conversion display. */
@@ -1871,6 +1948,15 @@ type AssetCardArgs = {
     invalid?: boolean;
     errorText?: string;
     testID?: string;
+    // Send-style mechanisms. Each is undefined when its icon should be hidden
+    // (no contacts for the chain / already saved).
+    onPick?: () => void;
+    onScan?: () => void;
+    onSave?: () => void;
+    // Show the matching contact's name next to the label (only for a valid,
+    // non-empty address — same as Send). AddressItem renders nothing if the
+    // address isn't in the book.
+    showContact?: boolean;
   };
 };
 
@@ -1887,7 +1973,6 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
     onChangeAmount,
     decimalSeparator,
     onSelectAsset,
-    getChainLogoUri,
     colors,
     t,
     currency,
@@ -1922,7 +2007,6 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
         token={ZEC_TOKEN_ENTRY}
         size={22}
         surfaceColor={colors.bottomSheetBackground}
-        chainLogoUri={getChainLogoUri(ZEC_TOKEN_ENTRY.chain)}
       />
       <BoldText style={{ ...styles.assetSymbol, color: colors.primary }}>
         ZEC
@@ -1940,9 +2024,6 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
         token={nonZecToken}
         size={22}
         surfaceColor={colors.bottomSheetBackground}
-        chainLogoUri={
-          nonZecToken ? getChainLogoUri(nonZecToken.chain) : undefined
-        }
       />
       <BoldText style={{ ...styles.assetSymbol, color: colors.text }}>
         {nonZecSymbol}
@@ -2003,12 +2084,39 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
       </View>
       {address && (
         <View style={[styles.addressBlock, { borderTopColor: colors.border }]}>
-          <FadeText style={styles.addressLabel}>{address.label}</FadeText>
-          {/* The X-clear sits absolutely positioned inside the input so the
-              input's border stays a single visual unit (same pattern as
-              TextInputAddress in the rest of the app). When the field is
-              empty, the X is unmounted entirely — no faded ghost. */}
-          <View style={{ position: 'relative' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            <FadeText style={{ ...styles.addressLabel, marginRight: 10 }}>
+              {address.label}
+            </FadeText>
+            {address.showContact ? (
+              <AddressItem
+                address={address.value}
+                screenName={ScreenEnum.Swap}
+                oneLine={true}
+                onlyContact={true}
+                withIcon={false}
+              />
+            ) : null}
+          </View>
+          {/* Input + icon row (clear / pick-from-book / save / QR), mirroring
+              the Send address field. Each icon renders only when its handler
+              is provided. */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              borderWidth: 1,
+              borderRadius: 12,
+              borderColor: address.invalid ? colors.danger.text : colors.border,
+              backgroundColor: colors.bottomSheetBackground,
+            }}
+          >
             <TextInput
               value={address.value}
               onChangeText={address.onChange}
@@ -2018,38 +2126,66 @@ function renderAssetCard(args: AssetCardArgs): React.ReactElement {
               autoCapitalize="none"
               autoCorrect={false}
               spellCheck={false}
-              style={[
-                styles.addressInput,
-                {
-                  color: colors.text,
-                  backgroundColor: colors.bottomSheetBackground,
-                  borderColor: address.invalid
-                    ? colors.danger.text
-                    : colors.border,
-                  // Reserve room on the right so user text never slides
-                  // under the X icon.
-                  paddingRight: address.value.length > 0 ? 36 : 12,
-                },
-              ]}
+              style={{
+                flex: 1,
+                color: colors.text,
+                fontWeight: '600',
+                fontSize: 14,
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                backgroundColor: 'transparent',
+              }}
               testID={address.testID}
             />
             {address.value.length > 0 ? (
               <TouchableOpacity
                 onPress={() => address.onChange('')}
                 accessibilityRole="button"
-                hitSlop={8}
-                style={{
-                  position: 'absolute',
-                  right: 10,
-                  top: 0,
-                  bottom: 0,
-                  justifyContent: 'center',
-                }}
               >
                 <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
                   icon={faXmark}
-                  size={18}
+                  size={20}
                   color={colors.primaryDisabled}
+                />
+              </TouchableOpacity>
+            ) : null}
+            {address.onPick ? (
+              <TouchableOpacity
+                onPress={address.onPick}
+                testID="swap.pick-address"
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
+                  icon={faAddressCard}
+                  size={28}
+                  color={colors.primary}
+                />
+              </TouchableOpacity>
+            ) : null}
+            {address.onSave ? (
+              <TouchableOpacity
+                onPress={address.onSave}
+                testID="swap.save-address"
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
+                  icon={faUserPlus}
+                  size={28}
+                  color={colors.primary}
+                />
+              </TouchableOpacity>
+            ) : null}
+            {address.onScan ? (
+              <TouchableOpacity
+                onPress={address.onScan}
+                testID="swap.scan-address"
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
+                  icon={faQrcode}
+                  size={28}
+                  color={colors.border}
                 />
               </TouchableOpacity>
             ) : null}
@@ -2142,8 +2278,15 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   toggleWrap: {
+    // Pull the two asset cards together and let the 36px round button
+    // straddle the seam, overlapping the bottom of the source card and
+    // the top of the destination card. Gap between the cards = button
+    // height + 2 × margin = 36 + 2 × (-12) = 12px. `zIndex` keeps the
+    // button painted above both cards (the destination card renders after
+    // it in the tree and would otherwise cover its lower half).
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: -12,
+    zIndex: 1,
   },
   toggleBtn: {
     width: 36,
@@ -2199,34 +2342,18 @@ const styles = StyleSheet.create({
   slippageRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginTop: 16,
     paddingHorizontal: 4,
   },
-  countdownRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   ctaWrap: {
     marginTop: 8,
-  },
-  insufficientHint: {
-    marginTop: 12,
     alignItems: 'center',
-  },
-  reduceToMaxPress: {
-    marginTop: 6,
-    paddingVertical: 4,
-  },
-  cta: {
-    borderRadius: 32,
-    paddingVertical: 18,
-    alignItems: 'center',
-  },
-  ctaText: {
-    fontSize: 16,
+    // Cancel the scroll content's horizontal padding for the button row only,
+    // so the shared <Button>'s `width: '80%'` is measured against the full
+    // width — matching the primary buttons on the main screens instead of
+    // rendering ~32px narrower inside the padded sheet.
+    marginHorizontal: -16,
   },
 });
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   TextInput,
@@ -42,10 +42,21 @@ const Memo: React.FunctionComponent<MemoProps> = ({
 }) => {
   const { colors } = useTheme() as ThemeType;
 
+  const inputRef = useRef<TextInput>(null);
+
   // Local draft — initialised from `initialMemo` (parent passes the latest
   // value each time the sheet is presented). The X close discards the draft,
   // the Save button commits it via setMemoText.
   const [memo, setMemo] = useState<string>(initialMemo);
+
+  // The sheet is opened while the user is mid-typing in the inline memo field
+  // (keyboard already up). Focus this field on mount so the keyboard stays and
+  // the caret moves here — the user keeps writing without interruption. The
+  // parent remounts Memo on every present (via `key`), so this fires each open.
+  useEffect(() => {
+    const t = setTimeout(() => inputRef.current?.focus(), 100);
+    return () => clearTimeout(t);
+  }, []);
 
   const memoDisabled =
     Utils.countMemoBytes(memo, includeUAMemoBoolean, defaultUnifiedAddress) >
@@ -69,8 +80,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({
         style={{
           flexGrow: 1,
           borderWidth: 1,
-          borderRadius: 5,
-          borderColor: colors.text,
+          borderRadius: 12,
+          borderColor: colors.border,
           minWidth: 48,
           minHeight: 48,
           maxHeight: Dimensions.get('window').height * 0.4,
@@ -78,13 +89,16 @@ const Memo: React.FunctionComponent<MemoProps> = ({
         }}
       >
         <TextInput
+          ref={inputRef}
           testID="send.memo-field"
           multiline
+          placeholder={translate('send.memo-placeholder') as string}
+          placeholderTextColor={colors.placeholder}
           style={{
             flex: 1,
             color: colors.text,
             fontWeight: '600',
-            fontSize: 14,
+            fontSize: 15,
             minWidth: 48,
             minHeight: 48,
             margin: 5,

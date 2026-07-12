@@ -124,6 +124,9 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         enableContentPanningGesture={false}
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
           borderTopLeftRadius: 40,

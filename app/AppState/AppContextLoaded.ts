@@ -16,6 +16,7 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
@@ -106,7 +107,7 @@ export default interface AppContextLoaded {
   // Opens the shared "Add Tag / Add Contact" BottomSheet modal in-place,
   // pre-filled with the given address. Used from any screen that displays an
   // address (AddressItem's + icon).
-  launchAddTagModal: (address: string) => void;
+  launchAddTagModal: (address: string, swapChain?: string) => void;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;
@@ -139,6 +140,11 @@ export default interface AppContextLoaded {
   mode: ModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
+  // The loaded wallet's OWN chain (main/test/regtest). Reliable even Offline,
+  // unlike `server.chainName` which is empty in Offline mode. Empty when no
+  // wallet / unknown. Used to decide, on a server change, whether to open the
+  // wallet directly or launch a chain switch.
+  walletChainName: ChainNameEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;

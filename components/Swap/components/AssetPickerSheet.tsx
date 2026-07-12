@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -51,28 +51,11 @@ type AssetPickerSheetProps = {
   selectedIdentifier: string | null;
   onChange: (token: TokenEntryType) => void;
   translate: (key: string) => TranslateType;
-  /**
-   * Resolves a chain code (e.g. "ETH", "BASE") to the canonical chain badge
-   * logo URL. Passed through to each `<TokenLogo>` instance instead of
-   * synthesised inside the icon component.
-   */
-  getChainLogoUri: (chain: string) => string | undefined;
   testID?: string;
 };
 
 const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
-  (
-    {
-      title,
-      tokens,
-      selectedIdentifier,
-      onChange,
-      translate,
-      getChainLogoUri,
-      testID,
-    },
-    ref,
-  ) => {
+  ({ title, tokens, selectedIdentifier, onChange, translate, testID }, ref) => {
     const { colors } = useTheme() as ThemeType;
     const keyboardHeight = useKeyboardHeight();
 
@@ -110,28 +93,34 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
       if (index < 0) setQuery('');
     }, []);
 
-    // Filter by symbol, name, chain code, or chain display name (all
-    // case-insensitive). Searching `base` matches tokens whose chain is
-    // BASE even when the name does not include the word. Empty query
+    // Filter ONLY on the two strings each row actually renders: the top label
+    // (`ticker`, falling back to `name`/`symbol` exactly as the row does) and
+    // the chain display name. We deliberately do NOT search the raw `symbol`
+    // and `name` when a ticker exists: SwapKit fills those inconsistently
+    // ("Binance-Peg …", "Wrapped BNB", contract-suffixed symbols), so a query
+    // like `bnb` used to match rows whose visible ticker+chain had nothing to
+    // do with it — results the user couldn't correlate with what they saw.
+    // Matching the on-screen text keeps the filtered list and the query in
+    // sync. `bnb` still finds BNB Chain assets via the "BNB Chain" display
+    // name. We also keep the raw chain code searchable so abbreviations the
+    // display name hides still work (typing `bsc` finds BNB Chain, `arb`
+    // Arbitrum, etc.) — the code never contains the noise word "bnb", so it
+    // does not reintroduce the spurious matches we just removed. Empty query
     // returns the original list reference so React skips re-rendering
-    // unchanged item rows. Optional chaining on string fields guards
-    // against the occasional malformed catalog entry the providers ship.
+    // unchanged item rows.
     const filteredTokens = useMemo(() => {
       const q = query.trim().toLowerCase();
       if (q.length === 0) return tokens;
       return tokens.filter(token => {
-        const sym = (token.symbol ?? '').toLowerCase();
-        const name = (token.name ?? '').toLowerCase();
-        const ticker = (token.ticker ?? '').toLowerCase();
+        const label = (
+          token.ticker ||
+          token.name ||
+          token.symbol ||
+          ''
+        ).toLowerCase();
         const chain = (token.chain ?? '').toLowerCase();
         const chainDisp = chainDisplayName(token.chain).toLowerCase();
-        return (
-          sym.includes(q) ||
-          name.includes(q) ||
-          ticker.includes(q) ||
-          chain.includes(q) ||
-          chainDisp.includes(q)
-        );
+        return label.includes(q) || chain.includes(q) || chainDisp.includes(q);
       });
     }, [tokens, query]);
 
@@ -150,6 +139,14 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting the search field's own keyboard.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         onChange={onSheetChange}
         handleComponent={null}
         backgroundStyle={{
@@ -280,9 +277,18 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
                     token={token}
                     size={35}
                     surfaceColor={colors.bottomSheetBackground}
-                    chainLogoUri={getChainLogoUri(token.chain)}
                   />
                   <View style={{ flex: 1 }}>
+                    {/* SwapKit-demo convention: clean `ticker` on top, chain
+                        below. `name`/`symbol` are intentionally NOT shown —
+                        SwapKit ships `name` inconsistently ("Tether" vs "USDT"
+                        vs "L2 Standard Bridged USDT (Base)") and `symbol`
+                        contract-suffixed ("USDT-0xdac1…"). Within the buckets we
+                        keep (Maya/Near/Flashnet) ticker+chain is effectively
+                        unique: real variants carry distinct tickers (USDT vs
+                        nrUsdt vs USDT0), so no two rows collide. The chain text
+                        also fixes the ambiguous L2 badge (Base/ARB/OP all render
+                        the ETH diamond, since their gas token is ETH). */}
                     <RegText
                       style={{
                         fontSize: 16,
@@ -290,7 +296,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
                         fontWeight: selected ? '600' : '500',
                       }}
                     >
-                      {token.name}
+                      {token.ticker || token.name || token.symbol}
                     </RegText>
                     <FadeText style={{ fontSize: 12 }}>
                       {chainDisplayName(token.chain)}

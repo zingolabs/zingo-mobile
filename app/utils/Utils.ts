@@ -207,6 +207,12 @@ export default class Utils {
     chainName: ChainNameEnum,
     blockExplorer: BlockExplorerEnum,
   ): string {
+    // Regtest is a local dev chain no public explorer can index — never link,
+    // regardless of the selected explorer. Returning '' makes every caller
+    // hide the affordance.
+    if (chainName === ChainNameEnum.regtestChainName) {
+      return '';
+    }
     if (blockExplorer === BlockExplorerEnum.Zcashexplorer) {
       if (chainName === ChainNameEnum.testChainName) {
         return `https://testnet.zcashexplorer.app/transactions/${txid}`;
@@ -219,13 +225,14 @@ export default class Utils {
       } else {
         return `https://cipherscan.app/tx/${txid}`;
       }
-    } else if (blockExplorer === BlockExplorerEnum.Zypherscan) {
+    } else if (blockExplorer === BlockExplorerEnum.Zexplorer) {
       if (chainName === ChainNameEnum.testChainName) {
-        return `https://testnet.zypherscan.com/tx/${txid}`;
+        return `https://zexplorer.app/testnet/tx/${txid}`;
       } else {
-        return `https://www.zypherscan.com/tx/${txid}`;
+        return `https://zexplorer.app/mainnet/tx/${txid}`;
       }
     } else {
+      // BlockExplorerEnum.None (or any unknown value) → no explorer link.
       return '';
     }
   }
@@ -243,6 +250,19 @@ export default class Utils {
     }
 
     return colorList;
+  }
+
+  // Deterministic bright colour keyed by an arbitrary string (e.g. a token
+  // ticker). Same seed always yields the same colour, so a per-asset avatar
+  // keeps a stable identity across re-renders instead of flickering a new
+  // random colour each time. Mirrors `generateColorList`'s options; only the
+  // `seed` makes it reproducible.
+  static generateColorFromSeed(seed: string): string {
+    return randomColor({
+      seed,
+      luminosity: 'bright',
+      format: 'hex',
+    });
   }
 
   static getLabelColor(bgColor: string): string {

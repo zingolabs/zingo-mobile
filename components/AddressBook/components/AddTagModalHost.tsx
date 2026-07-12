@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
-import { Pressable, View } from 'react-native';
+import { Keyboard, Pressable, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -21,7 +21,7 @@ type AddTagModalHostProps = {
   // Latest target the host should render. Pass `null` while the modal is
   // hidden. Bump `key` (via the address/own pair) to force-remount the inner
   // form so its local state resets between presentations.
-  target: { address: string; own: boolean } | null;
+  target: { address: string; own: boolean; swapChain: string } | null;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   translate: (key: string) => TranslateType;
 };
@@ -119,6 +119,14 @@ const AddTagModalHost = forwardRef<
       keyboardBehavior={'interactive'}
       keyboardBlurBehavior={'restore'}
       android_keyboardInputMode={'adjustResize'}
+      onAnimate={(from, to) => {
+        // Opening (from === -1) dismisses a keyboard left open by the
+        // underlying screen so the sheet never renders behind it. Guard
+        // avoids fighting a keyboard the sheet itself focuses later.
+        if (from === -1 && to >= 0) {
+          Keyboard.dismiss();
+        }
+      }}
       handleComponent={renderHandle}
       backgroundStyle={{
         backgroundColor: colors.bottomSheetBackground,
@@ -138,6 +146,7 @@ const AddTagModalHost = forwardRef<
             key={`${target.address}-${target.own}`}
             address={target.address}
             own={target.own}
+            swapChain={target.swapChain}
             closeSheet={dismiss}
             setAddressBook={setAddressBook}
           />

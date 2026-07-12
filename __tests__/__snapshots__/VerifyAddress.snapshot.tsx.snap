@@ -28,8 +28,8 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
       <View
         style={
           {
-            "borderColor": "#c3c3c3",
-            "borderRadius": 5,
+            "borderColor": "#ffffff",
+            "borderRadius": 12,
             "borderWidth": 1,
             "marginTop": 5,
           }
@@ -160,6 +160,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
           "alignItems": "center",
           "flexDirection": "row",
           "flexGrow": 1,
+          "gap": 10,
           "justifyContent": "center",
           "marginTop": 15,
           "marginVertical": 5,
@@ -278,7 +279,6 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
             "borderRadius": 24,
             "borderWidth": 2,
             "justifyContent": "center",
-            "marginLeft": 10,
             "maxWidth": "90%",
             "minHeight": 48,
             "minWidth": "30%",

@@ -63,6 +63,8 @@
     "label": "Контакт",
     "label-placeholder": "Псевдоним/Метка/Тег",
     "add": "Добавить",
+    "add-confirm-title": "Добавить контакт?",
+    "add-confirm-message": "Проверьте адрес и определённую сеть перед сохранением.",
     "modify": "Модифицировать",
     "delete": "Удалить",
     "empty": "Вы пока не сохранили ни одного нового адреса.",
@@ -72,6 +74,9 @@
     "labelexists": "Такое название уже существует. ",
     "addressexists": "Такой адрес уже существует. ",
     "select-placeholder": "Выберите контакт...",
+    "search-placeholder": "Поиск",
+    "chain": "Сеть",
+    "select-chain-placeholder": "Выберите сеть...",
     "delete-title": "Удалить название",
     "delete-alert": "Вы действительно хотите удалить этот Контакт/Никнейм/Метку?",
     "likely": "Возможно: ",
@@ -176,7 +181,6 @@
     "readingwallet": "Успешное соединение с этим сервером:",
     "restorewallet-title": "Расширенные настройки",
     "restorewallet-alert": "Подтвердите, что вы хотите восстановить новый кошелек с помощью вашей начальной фразы.",
-    "selectingserver": "Определение ближайшего сервера (zainod).",
     "selectingserversame": "Ваш текущий сервер является ближайшим.",
     "selectingserverbest": "В этот момент его самый оптимизированный сервер:",
     "incoming-funds": "Входящие средства\n",
@@ -248,7 +252,7 @@
     "sendalls": [
       {
         "value": true,
-        "text": "Включить кнопку \"Оправить всё\" в интерфейсе создания транзакции."
+        "text": "Включить кнопку «МАКС», чтобы подставить весь баланс кошелька в поле суммы."
       },
       {
         "value": false,
@@ -333,8 +337,12 @@
         "text": "CipherScan.App"
       },
       {
-        "value": "Zypherscan",
-        "text": "ZypherScan.Com"
+        "value": "Zexplorer",
+        "text": "ZExplorer.App"
+      },
+      {
+        "value": "None",
+        "text": "None"
       }
     ],
     "nochanges": "Изменения не зарегистрированы.",
@@ -352,6 +360,7 @@
     "server-auto-text": "При следующем запуске приложения будет выбран и активирован ближайший сервер из этого списка.",
     "server-list-text": "Выберите сервер из списка.",
     "server-custom-text": "Укажите информацию о сервере, который вы хотите использовать.",
+    "server-checking": "Проверка сервера…",
     "server-offline-text": "Приложение продолжит работать без подключения к серверу.",
     "threshold-title": "Порог фильтра транзакций",
     "number": "Число...",
@@ -365,7 +374,7 @@
     "currency-title": "Цена Валюты",
     "language-title": "Язык",
     "islanguage": "Выберите язык для приложения.",
-    "sendall-title": "Кнопка 'Отправить все'",
+    "sendall-title": "Кнопка «МАКС»",
     "donation-title": "Поддержать ZingoLabs",
     "privacy-title": "High Privacy",
     "mode-title": "Переключение между основным или расширенным режимом",
@@ -391,6 +400,9 @@
     "value-chainname-main": "Основная сеть",
     "value-chainname-test": "Тестовая сеть",
     "value-chainname-regtest": "Регтест",
+    "value-chainname-none": "Нет",
+    "server-chain-title": "Сеть",
+    "select-chain-placeholder": "Выберите сеть...",
     "value-rescanmenu-true": "Включить",
     "value-rescanmenu-false": "Отключить",
     "value-recoverywalletinfoondevice-true": "Включить",
@@ -401,7 +413,8 @@
     "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-Cipherscan": "Cipherscan",
-    "value-blockexplorer-Zypherscan": "Zypherscan",
+    "value-blockexplorer-Zexplorer": "Zexplorer",
+    "value-blockexplorer-None": "Нет",
     "security-title": "Apply Device Security",
     "security-all": "Все",
     "security-some": "Некоторые",
@@ -443,7 +456,7 @@
   "info": {
     "version": "Версия",
     "serverversion": "Версия сервера",
-    "zainod": "URL-адрес Zainod",
+    "zainod": "URL-адрес сервера",
     "network": "Сеть",
     "serverblock": "Высота блока сервера",
     "zecprice": "Цена ZEC",
@@ -537,7 +550,9 @@
     "invalidnumber": "Некорректное значение!",
     "spendable": "Доступно: ",
     "somefunds": "Некоторые средства все ещё подтверждаются или синхронизируются",
-    "memo": "Заметка (Опционально)",
+    "memo": "Заметка",
+    "memo-placeholder": "Зашифрованное сообщение (необязательно)",
+    "max": "МАКС",
     "button": "Отправить",
     "button-all": "Отправить всё",
     "confirm-title": "Подтвердить транзакцию",
@@ -562,6 +577,8 @@
     "fetchpricetitle": "Загрузить цену в USD",
     "fetchpricebody": "Пожалуйста, подтвердите, что вы хотите получить цену в USD из Интернета.",
     "fetch-button": "Получить",
+    "refreshing-price": "Обновление цены…",
+    "calc-error": "Ошибка расчёта",
     "confirm-privacy-level": "Режим конфиденциальности",
     "private": "Приватный",
     "amountrevealed": "Раскрытая сумма",
@@ -639,7 +656,13 @@
     "seconds-abbrev": "секунд",
     "quote-refreshing": "Обновление котировки…",
     "insufficient-for-commit": "Недостаточно ZEC для покрытия суммы + сетевой комиссии.",
+    "insufficient-title": "Недостаточно средств",
+    "insufficient-desc": "Доступного ZEC не хватает на эту сумму плюс комиссию сети. Уменьшите сумму обмена или пополните кошелёк и попробуйте снова.",
     "reduce-to": "Уменьшить до",
+    "committing": "Обработка…",
+    "abandon-title": "Остановить обмен?",
+    "abandon-message": "Адрес для депозита готов. Если закрыть, не отправив точную сумму, обмен не завершится.",
+    "abandon-confirm": "Остановить",
     "edge-blocked-snackbar": "Сервис обмена заблокирован в вашей сети. Попробуйте VPN.",
     "edge-blocked-banner-title": "Сервис обмена недоступен в этой сети",
     "edge-blocked-banner-body": "Провайдер обмена блокирует запросы из вашей сети. Если ваша страна или провайдер ограничены, обычно помогает подключение через VPN.",
@@ -671,6 +694,7 @@
     "memo": "Memo",
     "memo-hex-label": "Memo (calldata hex)",
     "payment-uri-hint": "Отсканируйте из любого кошелька, поддерживающего платёжные URI, или нажмите ниже, чтобы открыть кошелёк на этом устройстве. Включает всё: адрес, сумму и memo.",
+    "address-qr-hint": "Отсканируйте, чтобы подставить адрес депозита в кошельке, затем введите точную сумму, указанную ниже.",
     "payment-uri-open": "Открыть в кошельке",
     "memo-required-warning": "Этот memo обязателен. Прикрепите его к транзакции депозита через механизм memo / data, доступный в вашем кошельке для этой сети; если провайдер его не увидит, средства застрянут до возврата.",
     "memo-required-warning-utxo": "Этот memo обязателен. Транзакция депозита должна включать его в выводе OP_RETURN, иначе провайдер не сможет провести обмен и средства застрянут до возврата.",

@@ -296,8 +296,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               margin: 10,
               padding: 10,
               borderWidth: 1,
-              borderRadius: 10,
-              borderColor: colors.text,
+              borderRadius: 12,
+              borderColor: colors.border,
               flexDirection: 'row',
               justifyContent: 'space-between',
             }}
@@ -307,9 +307,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               accessibilityLabel={translate('seed.seed-acc') as string}
               style={{
                 marginRight: 5,
-                borderWidth: 1,
-                borderRadius: 10,
-                borderColor: colors.text,
                 width: 'auto',
                 flex: 1,
                 justifyContent: 'center',
@@ -379,13 +376,15 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               style={{
                 margin: 10,
                 borderWidth: 1,
-                borderRadius: 10,
-                borderColor: colors.text,
+                borderRadius: 12,
+                borderColor: colors.border,
                 width: '30%',
                 maxWidth: '40%',
                 maxHeight: 48,
                 minWidth: '20%',
                 minHeight: 48,
+                flexDirection: 'row',
+                alignItems: 'center',
               }}
             >
               <TextInput
@@ -396,7 +395,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                   color: colors.text,
                   fontWeight: '600',
                   fontSize: 18,
-                  minWidth: '20%',
+                  flex: 1,
                   minHeight: 48,
                   marginLeft: 5,
                   backgroundColor: 'transparent',
@@ -426,6 +425,18 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 }
                 keyboardType="numeric"
               />
+              {!!birthday &&
+                (!!latestBlock ||
+                  selectServer === SelectServerEnum.offline) && (
+                  <TouchableOpacity onPress={() => setBirthday('')}>
+                    <FontAwesomeIcon
+                      style={{ marginRight: 5 }}
+                      size={20}
+                      icon={faXmark}
+                      color={colors.primaryDisabled}
+                    />
+                  </TouchableOpacity>
+                )}
             </View>
 
             <RegText style={{ margin: 20, marginBottom: 30 }}>

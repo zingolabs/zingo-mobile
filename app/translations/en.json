@@ -63,6 +63,8 @@
     "label": "Contact",
     "label-placeholder": "Nickname/Label/Tag",
     "add": "Add",
+    "add-confirm-title": "Add contact?",
+    "add-confirm-message": "Please check the address and its detected network before saving.",
     "modify": "Modify",
     "delete": "Delete",
     "empty": "You haven't saved any new addresses yet.",
@@ -72,6 +74,9 @@
     "labelexists": "This label already exists. ",
     "addressexists": "This address already exists. ",
     "select-placeholder": "Choose a Contact...",
+    "search-placeholder": "Search",
+    "chain": "Chain",
+    "select-chain-placeholder": "Choose a chain...",
     "delete-title": "Delete Label",
     "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?",
     "likely": "Likely: ",
@@ -176,7 +181,6 @@
     "readingwallet": "Reading successfully the wallet with the server:",
     "restorewallet-title": "Advanced Option",
     "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase.",
-    "selectingserver": "Determining the best zainod.",
     "selectingserversame": "Your actual server is the most optimized one already.",
     "selectingserverbest": "In this moment this is the most optimized server:",
     "incoming-funds": "Incoming funds\n",
@@ -248,7 +252,7 @@
     "sendalls": [
       {
         "value": true,
-        "text": "Enable the possibility of sending all the wallet amount with a button."
+        "text": "Enable the 'MAX' button to fill the amount with your entire wallet balance."
       },
       {
         "value": false,
@@ -333,8 +337,12 @@
         "text": "CipherScan.App"
       },
       {
-        "value": "Zypherscan",
-        "text": "ZypherScan.Com"
+        "value": "Zexplorer",
+        "text": "ZExplorer.App"
+      },
+      {
+        "value": "None",
+        "text": "None"
       }
     ],
     "nochanges": "No changes registered.",
@@ -352,6 +360,7 @@
     "server-auto-text": "The next time the application starts, it will calculate which is the best server in the list and make it active.",
     "server-list-text": "Select a server from the list.",
     "server-custom-text": "Fill in the information of the server you want to use.",
+    "server-checking": "Checking server…",
     "server-offline-text": "The App will work with no server connection.",
     "threshold-title": "Transaction Filter Threshold",
     "number": "Number...",
@@ -365,7 +374,7 @@
     "currency-title": "Currency Price",
     "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
-    "sendall-title": "The Button 'Send All'",
+    "sendall-title": "The 'MAX' Button",
     "donation-title": "Tip ZingoLabs",
     "privacy-title": "High Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
@@ -391,6 +400,9 @@
     "value-chainname-main": "Mainnet",
     "value-chainname-test": "Testnet",
     "value-chainname-regtest": "Regtest",
+    "value-chainname-none": "None",
+    "server-chain-title": "Network",
+    "select-chain-placeholder": "Select a Network...",
     "value-rescanmenu-true": "Enable",
     "value-rescanmenu-false": "Disable",
     "value-recoverywalletinfoondevice-true": "Enable",
@@ -401,7 +413,8 @@
     "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-Cipherscan": "Cipherscan",
-    "value-blockexplorer-Zypherscan": "Zypherscan",
+    "value-blockexplorer-Zexplorer": "Zexplorer",
+    "value-blockexplorer-None": "None",
     "security-title": "Apply Device Security",
     "security-all": "All",
     "security-some": "Some",
@@ -443,7 +456,7 @@
   "info": {
     "version": "Version",
     "serverversion": "Server Version",
-    "zainod": "Zainod URL",
+    "zainod": "Server URL",
     "network": "Network",
     "serverblock": "Server Block Height",
     "zecprice": "ZEC Price",
@@ -537,7 +550,9 @@
     "invalidnumber": "Invalid Number!",
     "spendable": "Spendable: ",
     "somefunds": "Some funds still confirming or syncing",
-    "memo": "Memo(s) (Optional)",
+    "memo": "Memo(s)",
+    "memo-placeholder": "Encrypted message (optional)",
+    "max": "MAX",
     "button": "Send",
     "button-all": "Send All",
     "confirm-title": "Confirm Transaction",
@@ -562,6 +577,8 @@
     "fetchpricetitle": "Fetch USD Price",
     "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
     "fetch-button": "Fetch",
+    "refreshing-price": "Refreshing price…",
+    "calc-error": "Calculation error",
     "confirm-privacy-level": "Privacy Level",
     "private": "Private",
     "amountrevealed": "Amount Revealed",
@@ -639,7 +656,13 @@
     "seconds-abbrev": "seconds",
     "quote-refreshing": "Refreshing quote…",
     "insufficient-for-commit": "Not enough ZEC to cover amount + network fee.",
+    "insufficient-title": "Insufficient funds",
+    "insufficient-desc": "Your available ZEC doesn't cover this amount plus the network fee. Lower the amount to swap, or add more ZEC to your wallet, and try again.",
     "reduce-to": "Reduce to",
+    "committing": "Processing…",
+    "abandon-title": "Stop the exchange?",
+    "abandon-message": "The deposit address is ready. If you close without sending the exact amount, the exchange will not complete.",
+    "abandon-confirm": "Stop",
     "edge-blocked-snackbar": "Swap service is blocked on your network. Try a VPN.",
     "edge-blocked-banner-title": "Swap service unavailable on this network",
     "edge-blocked-banner-body": "The swap provider is blocking requests from your network. If your country or ISP is restricted, connecting through a VPN usually resolves this.",
@@ -671,6 +694,7 @@
     "memo": "Memo",
     "memo-hex-label": "Memo (hex calldata)",
     "payment-uri-hint": "Scan this from any wallet that supports payment URIs, or tap below to open the wallet on this device. Everything (address, amount, memo) is included.",
+    "address-qr-hint": "Scan to fill the deposit address in your wallet, then enter the exact amount shown below.",
     "payment-uri-open": "Open in wallet",
     "memo-required-warning": "This memo is required. Attach it to the deposit transaction using whatever memo / data mechanism your wallet provides on this chain; if the provider does not see it, your funds will be stuck pending refund.",
     "memo-required-warning-utxo": "This memo is required. The deposit transaction must include it in an OP_RETURN output, or the provider cannot route the swap and your funds will be stuck pending refund.",

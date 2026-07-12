@@ -20,6 +20,7 @@ import {
 
 import {
   AddressBookFileClass,
+  BlockExplorerEnum,
   ChainNameEnum,
   SnackbarDurationEnum,
   ValueTransferType,
@@ -407,6 +408,9 @@ const ValueTransferDetail: React.FunctionComponent<
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         enableContentPanningGesture={false}
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
           backgroundColor: colors.bottomSheetBackground,
           borderTopLeftRadius: 40,
@@ -821,6 +825,7 @@ const ValueTransferDetail: React.FunctionComponent<
                       {valueTransfer.txid}
                     </RegText>
                     {server.chainName !== ChainNameEnum.regtestChainName &&
+                      blockExplorer !== BlockExplorerEnum.None &&
                       valueTransfer.status !==
                         RPCValueTransfersStatusEnum.failed && (
                         <TouchableOpacity

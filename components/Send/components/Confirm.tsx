@@ -497,6 +497,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           enableDynamicSizing={false}
           enablePanDownToClose={false}
           enableContentPanningGesture={false}
+          keyboardBehavior={'interactive'}
+          keyboardBlurBehavior={'restore'}
+          android_keyboardInputMode={'adjustResize'}
           backgroundStyle={{
             backgroundColor: colors.bottomSheetBackground,
             borderTopLeftRadius: 40,

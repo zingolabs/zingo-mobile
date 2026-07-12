@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -216,6 +216,14 @@ const SlippageSheet = forwardRef<BottomSheetModal, SlippageSheetProps>(
         keyboardBehavior={'interactive'}
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
+        onAnimate={(from, to) => {
+          // Opening (from === -1) dismisses a keyboard left open by the
+          // underlying screen so the sheet never renders behind it. Guard
+          // avoids fighting the slippage field's own keyboard.
+          if (from === -1 && to >= 0) {
+            Keyboard.dismiss();
+          }
+        }}
         onChange={onSheetChange}
         onDismiss={commitCustom}
         handleComponent={renderHandle}
@@ -292,6 +300,19 @@ const SlippageSheet = forwardRef<BottomSheetModal, SlippageSheetProps>(
               style={[styles.customInput, { color: colors.text }]}
               testID="swap.slippage.custom"
             />
+            {customStr ? (
+              <Pressable
+                onPress={() => onCustomChange('')}
+                hitSlop={8}
+                style={{ marginRight: 6 }}
+              >
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  size={16}
+                  color={colors.primaryDisabled}
+                />
+              </Pressable>
+            ) : null}
             <RegText style={{ color: colors.text }}>%</RegText>
           </View>
           {showWarning && (

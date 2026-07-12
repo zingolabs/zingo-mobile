@@ -10,6 +10,7 @@ import {
   defaultAppContextLoaded,
 } from '../app/context';
 
+import { ChainNameEnum } from '../app/AppState';
 import AlSummaryLine from '../components/AddressList/components/AlSummaryLine';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
@@ -60,6 +61,8 @@ describe('AlSummaryLine - snapshots', () => {
         address: mockAddresses[0].address,
         color: '#000',
         own: false,
+        chain: ChainNameEnum.mainChainName,
+        swapChain: 'ZEC',
       },
     ];
     expect(
