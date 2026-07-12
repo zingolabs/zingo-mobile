@@ -63,6 +63,8 @@
     "label": "Contact",
     "label-placeholder": "Nickname/Label/Tag",
     "add": "Add",
+    "add-confirm-title": "Add contact?",
+    "add-confirm-message": "Please check the address and its detected network before saving.",
     "modify": "Modify",
     "delete": "Delete",
     "empty": "You haven't saved any new addresses yet.",

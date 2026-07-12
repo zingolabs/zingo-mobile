@@ -124,8 +124,7 @@ const VALIDATORS: Readonly<Record<string, Validator>> = {
   LTC: isLtc,
   DOGE: isDoge,
   DASH: isDash,
-  // Account-model and account-prefix chains
-  SOL: isSol,
+  // Account-model and account-prefix chains.
   NEAR: isNear,
   TRX: isTrx,
   ATOM: isAtom,
@@ -135,6 +134,13 @@ const VALIDATORS: Readonly<Record<string, Validator>> = {
   DOT: isDot,
   SUI: isSui,
   TON: isTon,
+  // SOL is intentionally LAST. Its format ("any base58, 32–44 chars") is a
+  // superset of several prefix-specific chains — a TRON `T…` (34 chars), an XRP
+  // `r…`, a Byron `Ae2…`, etc. all also satisfy the SOL regex. Chain detection
+  // returns matches in this order and defaults to the first, so the distinctive
+  // prefixes must be checked before the catch-all, or e.g. every TRON address
+  // would be detected as Solana.
+  SOL: isSol,
 };
 
 /**

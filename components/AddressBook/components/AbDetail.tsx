@@ -23,7 +23,9 @@ import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import ErrorText from '../../Components/ErrorText';
 import { ContextAppLoaded } from '../../../app/context';
+import { showConfirm } from '../../../app/showConfirm';
 import ChainSelect from '../../Components/ChainSelect';
+import { chainDisplayName } from '../../Swap/components/chainDisplayName';
 import Utils from '../../../app/utils';
 import { parseZcashURI } from '../../../app/uris';
 import {
@@ -489,15 +491,38 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
                   ? server.chainName
                   : ChainNameEnum.mainChainName
                 : item.chain;
-            doAction(
-              action,
-              label.trim(),
-              address,
-              item.color ? item.color : '',
-              chain,
-              swapChain,
-            );
-            Keyboard.dismiss();
+            const commit = () => {
+              doAction(
+                action,
+                label.trim(),
+                address,
+                item.color ? item.color : '',
+                chain,
+                swapChain,
+              );
+              Keyboard.dismiss();
+            };
+            // Adding a contact: confirm first, surfacing the detected network so
+            // the user can catch a misdetection (chain formats overlap and are
+            // validated by shape only) before it is saved.
+            if (action === AddressBookActionEnum.Add) {
+              Keyboard.dismiss();
+              showConfirm({
+                title: translate('addressbook.add-confirm-title') as string,
+                message: `${translate('addressbook.add-confirm-message') as string}\n\n${chainDisplayName(
+                  swapChain,
+                )}\n${address}`,
+                buttons: [
+                  {
+                    text: translate('confirm') as string,
+                    onPress: commit,
+                  },
+                  { text: translate('cancel') as string, style: 'cancel' },
+                ],
+              });
+            } else {
+              commit();
+            }
           }}
           disabled={
             action === AddressBookActionEnum.Delete

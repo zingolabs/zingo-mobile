@@ -63,6 +63,8 @@
     "label": "Contato",
     "label-placeholder": "Apelido/Tag",
     "add": "Adicionar",
+    "add-confirm-title": "Adicionar contato?",
+    "add-confirm-message": "Verifique o endereço e a rede detectada antes de salvar.",
     "modify": "Modificar",
     "delete": "Excluir",
     "empty": "Você ainda não salvou nenhum endereço novo.",

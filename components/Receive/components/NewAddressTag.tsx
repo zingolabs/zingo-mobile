@@ -14,8 +14,10 @@ import {
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
+import { showConfirm } from '../../../app/showConfirm';
 import Button from '../../Components/Button';
 import ChainSelect from '../../Components/ChainSelect';
+import { chainDisplayName } from '../../Swap/components/chainDisplayName';
 import Utils from '../../../app/utils';
 import { AddressBookFileImpl } from '../../AddressBook';
 
@@ -45,7 +47,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   // option — same value used to persist the contact.
   const effectiveSwapChain = swapChain ?? GlobalConst.zecSwapChain;
 
-  const createAddressTag = async () => {
+  const writeContact = async () => {
     try {
       if (!label) {
         return;
@@ -74,6 +76,30 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
     setTimeout(() => {
       closeSheet();
     }, 100);
+  };
+
+  const createAddressTag = () => {
+    if (!label) {
+      return;
+    }
+    // Own-address tags (Receive) save directly; contacts saved from Send/Swap
+    // confirm the detected network first — same safety step as the address-book
+    // add flow, so an overlapping chain format can't be saved unnoticed.
+    if (own) {
+      writeContact();
+      return;
+    }
+    Keyboard.dismiss();
+    showConfirm({
+      title: translate('addressbook.add-confirm-title') as string,
+      message: `${translate('addressbook.add-confirm-message') as string}\n\n${chainDisplayName(
+        effectiveSwapChain,
+      )}\n${address}`,
+      buttons: [
+        { text: translate('confirm') as string, onPress: writeContact },
+        { text: translate('cancel') as string, style: 'cancel' },
+      ],
+    });
   };
 
   return (

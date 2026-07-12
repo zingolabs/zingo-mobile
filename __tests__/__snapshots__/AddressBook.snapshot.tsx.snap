@@ -2864,96 +2864,6 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
               resizeMode="contain"
               source={
                 {
-                  "testUri": "../../../assets/chains/sol.png",
-                }
-              }
-              style={
-                {
-                  "borderRadius": 17.5,
-                  "height": 35,
-                  "width": 35,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "flex": 1,
-                }
-              }
-            >
-              <Text
-                style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 16,
-                    "fontWeight": "500",
-                    "opacity": 1,
-                  }
-                }
-              >
-                Solana
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 12,
-                    "opacity": 0.65,
-                  }
-                }
-              >
-                SOL
-              </Text>
-            </View>
-          </View>
-          <View
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": undefined,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              {
-                "alignItems": "center",
-                "borderBottomColor": "#122033",
-                "borderBottomWidth": 1.5,
-                "columnGap": 12,
-                "flexDirection": "row",
-                "opacity": 1,
-                "paddingHorizontal": 20,
-                "paddingVertical": 12,
-              }
-            }
-          >
-            <Image
-              resizeMode="contain"
-              source={
-                {
                   "testUri": "../../../assets/chains/near.png",
                 }
               }
@@ -3714,6 +3624,96 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 }
               >
                 TON
+              </Text>
+            </View>
+          </View>
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#122033",
+                "borderBottomWidth": 1.5,
+                "columnGap": 12,
+                "flexDirection": "row",
+                "opacity": 1,
+                "paddingHorizontal": 20,
+                "paddingVertical": 12,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                {
+                  "testUri": "../../../assets/chains/sol.png",
+                }
+              }
+              style={
+                {
+                  "borderRadius": 17.5,
+                  "height": 35,
+                  "width": 35,
+                }
+              }
+            />
+            <View
+              style={
+                {
+                  "flex": 1,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 16,
+                    "fontWeight": "500",
+                    "opacity": 1,
+                  }
+                }
+              >
+                Solana
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 12,
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                SOL
               </Text>
             </View>
           </View>

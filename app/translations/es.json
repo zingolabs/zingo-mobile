@@ -63,6 +63,8 @@
     "label": "Contacto",
     "label-placeholder": "Apodo/Etiqueta",
     "add": "Añadir",
+    "add-confirm-title": "¿Agregar contacto?",
+    "add-confirm-message": "Comprueba la dirección y la red detectada antes de guardar.",
     "modify": "Modificar",
     "delete": "Borrar",
     "empty": "Todavía no has guardado nuevas direcciones.",

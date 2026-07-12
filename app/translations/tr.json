@@ -63,6 +63,8 @@
     "label": "Kişi",
     "label-placeholder": "Kullanıcı adı/Etiket/Tag",
     "add": "Ekle",
+    "add-confirm-title": "Kişi eklensin mi?",
+    "add-confirm-message": "Kaydetmeden önce adresi ve algılanan ağı kontrol edin.",
     "modify": "Düzenle",
     "delete": "Sil",
     "empty": "Henüz yeni adres kaydetmediniz.",
