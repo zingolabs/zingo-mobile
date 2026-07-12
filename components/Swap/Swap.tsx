@@ -207,6 +207,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     totalBalance,
     zecPrice,
     privacy,
+    setPrivacyOption,
     addressBook,
     launchAddTagModal,
   } = context;
@@ -1322,6 +1323,13 @@ const Swap: React.FunctionComponent<SwapProps> = ({
     swapSnapPoints.length,
   );
 
+  // Tapping the price fetch button reveals the header PriceRow (smallest snap).
+  // The auto-close timer armed by usePriceSnapAutoClose returns it afterwards.
+  const revealPrice = useCallback(() => {
+    if (priceSnapIndex === null) return;
+    safeSnapToIndex(swapSheetRef, priceSnapIndex, swapSnapPoints.length);
+  }, [priceSnapIndex, swapSnapPoints.length]);
+
   // Per-card derived values. SwapKit's `ticker` field is the clean
   // uppercase short form (`"USDC"`); `symbol` may include the contract
   // address suffix for ERC20s (`"USDC-0x8ac76a51..."`) which would break
@@ -1418,7 +1426,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
           title={''}
           screenName={ScreenEnum.Swap}
           toggleMenuDrawer={toggleMenuDrawer}
-          setPrivacyOption={undefined}
+          setPrivacyOption={setPrivacyOption}
           addLastSnackbar={(msg: string, duration?: SnackbarDurationEnum) =>
             addLastSnackbar?.(msg, duration)
           }
@@ -1429,6 +1437,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
           showMessagesIcon={true}
           onUsdRowLayout={setUsdRowH}
           onPriceRowLayout={setPriceRowH}
+          onManualFetchPrice={revealPrice}
         />
       </View>
       <Animated.View

@@ -24,12 +24,17 @@ type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
   textBefore?: string;
   backgroundColor?: string;
+  // Fired on a manual (user) tap only — not on the 60 s auto-refresh. Lets the
+  // host screen reveal the header PriceRow (snap the bottom sheet down) so the
+  // freshly-fetched price is actually visible.
+  onManualFetch?: () => void;
 };
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   setZecPrice,
   textBefore,
   backgroundColor,
+  onManualFetch,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, zecPrice, addLastSnackbar, mode } = context;
@@ -61,6 +66,9 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   };
 
   const onManualPress = () => {
+    // Reveal the header PriceRow so the (soon-to-refresh) price is on screen.
+    // No-ops on screens that don't wire a reveal callback.
+    onManualFetch?.();
     // Confirm only on the very first request in advanced mode; afterwards a tap
     // fetches straight away. Basic mode never confirms. The store swallows the
     // tap while loading / within the 5 s cooldown, so this can't be spammed.

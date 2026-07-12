@@ -56,6 +56,7 @@ type BalanceRowProps = {
   onPressShieldFunds: () => void;
   receivedLegend: boolean | undefined;
   onUsdRowLayout?: (height: number) => void;
+  onManualFetchPrice?: () => void;
 };
 
 const BalanceRow: React.FC<BalanceRowProps> = React.memo(
@@ -82,6 +83,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     onPressShieldFunds,
     receivedLegend,
     onUsdRowLayout,
+    onManualFetchPrice,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme() as ThemeType;
@@ -210,7 +212,10 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 privacy={privacy}
               />
               <View style={{ marginLeft: 5 }}>
-                <PriceFetcher setZecPrice={setZecPrice} />
+                <PriceFetcher
+                  setZecPrice={setZecPrice}
+                  onManualFetch={onManualFetchPrice}
+                />
               </View>
             </View>
           )}
