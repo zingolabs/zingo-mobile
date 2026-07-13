@@ -471,12 +471,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun createNewWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
+    fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         try {
             uniffi.zingo.initLogging()
 
-            // Create a seed
-            val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            // Create a seed. Offline (empty serveruri) uses `birthday` in place
+            // of the chain tip; online it is ignored (pass "0").
+            val resp = uniffi.zingo.initNew(serveruri, birthday.toUInt(), chainhint, performancelevel, minconfirmations.toUInt())
             // Log.i("MAIN-Seed", resp)
 
             if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -580,9 +581,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 writeEncryptedFile(WalletBackupFileName.value, wallet)      // (3) backup = original main
                 deleteFile(WalletTempSwapFileName.value)                    // (4) cleanup
             } else {
-                // No wallet exists: restore backup as wallet and delete backup
+                // No wallet exists: restore backup as wallet, but KEEP the
+                // backup file. Deleting it here left the user with no backup
+                // right after a restore, so if they then created/restored a
+                // different wallet the just-restored one was gone. Keeping a
+                // duplicate copy as backup is far safer than none.
                 writeEncryptedFile(WalletFileName.value, backup)
-                deleteFile(WalletBackupFileName.value)
             }
             promise.resolve(true)
         } catch (e: FileNotFoundException) {

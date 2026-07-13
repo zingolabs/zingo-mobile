@@ -324,12 +324,15 @@ class RPCModule: NSObject {
   }
 
   func fnCreateNewWallet(
-    serveruri: String, 
-    chainhint: String, 
-    performancelevel: String, 
+    serveruri: String,
+    birthday: String,
+    chainhint: String,
+    performancelevel: String,
     minconfirmations: String
   ) throws -> String {
-    let seed = try initNew(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    // Offline (empty serveruri) uses `birthday` in place of the chain tip;
+    // online it is ignored (pass "0").
+    let seed = try initNew(serveruri: serveruri, birthday: UInt32(birthday) ?? 0, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -337,17 +340,18 @@ class RPCModule: NSObject {
     return seedStr
   }
 
-  @objc(createNewWallet:chainhint:performancelevel:minconfirmations:resolve:reject:)
+  @objc(createNewWallet:birthday:chainhint:performancelevel:minconfirmations:resolve:reject:)
   func createNewWallet(
-    _ serveruri: String, 
-    chainhint: String, 
-    performancelevel: String, 
-    minconfirmations: String, 
-    resolve: @escaping RCTPromiseResolveBlock, 
+    _ serveruri: String,
+    birthday: String,
+    chainhint: String,
+    performancelevel: String,
+    minconfirmations: String,
+    resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
     do {
-      let seedStr = try self.fnCreateNewWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+      let seedStr = try self.fnCreateNewWallet(serveruri: serveruri, birthday: birthday, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
       DispatchQueue.main.async {
         resolve(seedStr)
       }
@@ -505,9 +509,12 @@ class RPCModule: NSObject {
           try fm.moveItem(atPath: backupPath, toPath: mainPath)   // (2) backup → main
           try fm.moveItem(atPath: tempPath,   toPath: backupPath) // (3) temp → backup
         } else {
-          // No wallet exists: restore backup as wallet and delete backup
+          // No wallet exists: restore backup as wallet, but KEEP the backup
+          // file. Deleting it here left the user with no backup right after a
+          // restore, so if they then created/restored a different wallet the
+          // just-restored one was gone. Keeping a duplicate copy as backup is
+          // far safer than none.
           try self.saveWalletFile(backupEncodedData)
-          try self.deleteFile(Constants.WalletBackupFileName.rawValue)
         }
         DispatchQueue.main.async {
           resolve("true")

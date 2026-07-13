@@ -120,7 +120,7 @@
     "emptyseedufvk-error": " Tohum İfadesi  / Görüntüleme Anahtarı boş bırakıldı. Lütfen değeri kontrol edin ve düzeltin.",
     "custom": "Özel Sunucu...",
     "nointernet-message": "İnternet bağlantısı kurulamadı. Lütfen bu sorunu giderin.",
-    "offline-message": "Aktif cüzdan bulunmamaktadır. Çevrimdışı modda cüzdan oluşturamaz veya geri yükleyemezsiniz. Devam etmek için bir sunucu seçin.",
+    "offline-message": "Çevrimdışı modda yeni bir cüzdan oluşturabilir veya bir tohum ya da görüntüleme anahtarından geri yükleyebilirsiniz. Bir sunucu seçene kadar senkronize olmaz ve bakiyeleri göstermez.",
     "advancedmode": "Gelişmiş moda geç",
     "noopenwallet-message": "Uygulama aktif cüzdanı açmaya çalışırken bir hata oluştu.",
     "alert-newwallet-title": "YENİ BİR CÜZDAN YARAT",

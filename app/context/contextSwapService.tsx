@@ -55,30 +55,37 @@ export function SwapServiceProvider({
   apiKey,
   children,
 }: SwapServiceProviderProps): React.JSX.Element {
-  // The service is gated on two async preconditions:
-  //   1. The wallet must be loaded so `RPCModule.getUfvkInfo()` returns a
-  //      UFVK we can derive a per-wallet fingerprint from. SwapServiceProvider
-  //      lives inside LoadedApp so the wallet is already in memory by the
-  //      time we mount; the call resolves in milliseconds.
-  //   2. `SwapStore.bindToWallet(fp)` must complete so any subsequent
-  //      record read/write lands in the namespaced bucket — never in the
-  //      legacy global key that pre-namespacing builds wrote to.
-  // Until both succeed we publish `null` so callers (the Swap screen and
-  // poller-aware consumers) gate themselves the same way they already gate
-  // on testnet/regtest. Failures (missing UFVK, bind crash) also resolve to
-  // `null`; the swap entry point hides itself and the rest of the app
-  // proceeds normally.
+  // Two concerns are deliberately decoupled here:
+  //
+  //   A. Binding the SwapStore to the wallet. Swap history is LOCAL data
+  //      (records keyed by the UFVK-derived fingerprint), so it must be
+  //      readable in every mode — Offline included, and on any chain. This
+  //      only needs `RPCModule.getUfvkInfo()` (available without a server)
+  //      and always runs. Without it the store stays unbound and the History
+  //      screen shows no swap rows, which previously only happened to work
+  //      Offline if an online session had bound the store earlier (the bind
+  //      is sticky at module scope) — a flaky, session-order-dependent bug.
+  //
+  //   B. Creating the SwapService (quotes + polling). This talks to a
+  //      mainnet-only provider and needs connectivity, so it is gated on
+  //      `chainName === mainnet`. On any other chain (or Offline, where the
+  //      chain normalizes away) the service stays `null` and the swap entry
+  //      point hides itself — the History rows still render from the bound
+  //      store.
+  //
+  // The service `null` is published until B succeeds; missing UFVK / bind
+  // failure also resolve to `null` and the app proceeds normally.
   const [service, setService] = useState<SwapService | null>(null);
 
   useEffect(() => {
-    if (chainName !== ChainNameEnum.mainChainName) {
-      setService(null);
-      return;
-    }
     let cancelled = false;
     let created: SwapService | null = null;
     (async () => {
       try {
+        // (A) Bind the store to the wallet unconditionally — regardless of
+        // chain or connectivity — so swap history is available in every mode,
+        // Offline included. The fingerprint comes from the loaded wallet's
+        // UFVK, which needs no server.
         const raw = await RPCModule.getUfvkInfo();
         if (cancelled) return;
         if (raw.startsWith('error')) {
@@ -94,6 +101,15 @@ export function SwapServiceProvider({
         }
         await SwapStore.bindToWallet(fingerprint);
         if (cancelled) return;
+
+        // (B) The SwapService (quotes + polling) is mainnet-only and needs
+        // connectivity. On any other chain — or Offline, where the chain
+        // normalizes away — leave the service null; the store stays bound so
+        // History still renders its rows.
+        if (chainName !== ChainNameEnum.mainChainName) {
+          setService(null);
+          return;
+        }
         created = createSwapService({
           apiKey: apiKey ?? SWAPKIT_API_KEY,
           chainName,

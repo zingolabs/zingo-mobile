@@ -293,14 +293,28 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             </>
           )}
           {selectServer === SelectServerEnum.offline && (
-            <View style={{ flexDirection: 'row' }}>
-              <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                {translate('loadingapp.actualserver') as string}
+            <>
+              <View style={{ flexDirection: 'row' }}>
+                <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
+                  {translate('loadingapp.actualserver') as string}
+                </BoldText>
+                <BoldText
+                  style={{ fontSize: 15, marginBottom: 3, color: 'red' }}
+                >
+                  {' ' + (translate('settings.server-offline') as string)}
+                </BoldText>
+              </View>
+              {/* Offline has no server URI, but the chain is still configured
+                  (create/restore derive keys chain-specifically). Show the same
+                  [Network] label the other modes display. */}
+              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>
+                {`[${
+                  translate(
+                    `settings.value-chainname-${server.chainName}`,
+                  ) as string
+                }]`}
               </BoldText>
-              <BoldText style={{ fontSize: 15, marginBottom: 3, color: 'red' }}>
-                {' ' + (translate('settings.server-offline') as string)}
-              </BoldText>
-            </View>
+            </>
           )}
 
           {(!netInfo.isConnected ||
@@ -387,7 +401,13 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             </>
           )}
 
-          {netInfo.isConnected && selectServer !== SelectServerEnum.offline && (
+          {/* Create works Offline too: the seed is generated locally and its
+              birthday falls back to the chain's activation height (the wallet
+              just won't sync until a server is chosen). Show it both online and
+              in Offline mode. */}
+          {((netInfo.isConnected &&
+            selectServer !== SelectServerEnum.offline) ||
+            selectServer === SelectServerEnum.offline) && (
             <Button
               testID="loadingapp.createnewwallet"
               type={ButtonTypeEnum.Primary}
@@ -419,7 +439,12 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             />
           )}
 
-          {netInfo.isConnected && selectServer !== SelectServerEnum.offline && (
+          {/* Restore works Offline: seed/UFVK derivation needs no Indexer
+              (the wallet just won't sync until a server is chosen). Show it
+              both online and in Offline mode. */}
+          {((netInfo.isConnected &&
+            selectServer !== SelectServerEnum.offline) ||
+            selectServer === SelectServerEnum.offline) && (
             <View
               style={{
                 marginTop: 10,

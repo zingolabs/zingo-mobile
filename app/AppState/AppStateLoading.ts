@@ -16,6 +16,7 @@ export default interface AppStateLoading {
   customServerChainName: ChainNameEnum;
   customServerOffline: boolean;
   customServerAuto: boolean;
+  customServerCustom: boolean;
   biometricsFailed: boolean;
   startingApp: boolean;
   serverErrorTries: number;

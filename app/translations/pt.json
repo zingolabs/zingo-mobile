@@ -120,7 +120,7 @@
     "emptyseedufvk-error": "As Frases de Recuperação / Chave de Visualização estavam vazias. Revise o valor e corrija-o.",
     "custom": "Servidor Personalizado...",
     "nointernet-message": "Não há conexão com a Internet estabelecida. Por favor, corrija esse problema.",
-    "offline-message": "Não há carteira ativa. No modo offline, não é possível criar ou restaurar uma carteira. Escolha um servidor para continuar.",
+    "offline-message": "No modo offline você pode criar uma nova carteira ou restaurar uma a partir da semente ou da chave de visualização. Ela não será sincronizada nem mostrará saldos até você escolher um servidor.",
     "advancedmode": "Alterar para o Modo Avançado",
     "noopenwallet-message": "Ocorreu um erro enquanto o aplicativo tentava abrir a carteira atual.",
     "alert-newwallet-title": "CRIAR UMA NOVA CARTEIRA",
