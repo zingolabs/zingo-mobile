@@ -216,4 +216,7 @@ namespace zingo {
 
   [Throws=ZingolibError]
   string confirm();
+
+  [Throws=ZingolibError]
+  string drain_orchard_to_ironwood();
 };

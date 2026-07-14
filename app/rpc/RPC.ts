@@ -35,6 +35,7 @@ import { RPCWalletSaveRequiredType } from './types/RPCWalletSaveRequiredType';
 import { RPCConfigWalletPerformanceType } from './types/RPCConfigWalletPerformanceType';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from './types/RPCWalletVersionType';
+import { RPCIronwoodDrainType } from './types/RPCIronwoodDrainType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -203,6 +204,26 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error shield ${error}`);
       return `Error: ${error}`;
+    }
+  }
+
+  static async rpcDrainOrchardToIronwood(): Promise<{ result: RPCIronwoodDrainType | null; error: string }> {
+    try {
+      const resultStr: string = await RPCModule.drainOrchardToIronwoodProcess();
+      if (resultStr) {
+        if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error drain orchard to ironwood ${resultStr}`);
+          return { result: null, error: resultStr };
+        }
+        const resultJSON: RPCIronwoodDrainType = await JSON.parse(resultStr);
+        return { result: resultJSON, error: '' };
+      } else {
+        console.log('Internal Error drain orchard to ironwood');
+        return { result: null, error: 'Error: Internal RPC Error: drain orchard to ironwood' };
+      }
+    } catch (error) {
+      console.log(`Critical Error drain orchard to ironwood ${error}`);
+      return { result: null, error: `Error: ${error}` };
     }
   }
 

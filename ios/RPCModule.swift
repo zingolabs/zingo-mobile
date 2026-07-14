@@ -1920,4 +1920,35 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
+  func fnDrainOrchardToIronwoodProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try drainOrchardToIronwood()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] drain orchard to ironwood. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] drain orchard to ironwood. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  @objc(drainOrchardToIronwoodProcess:reject:)
+  func drainOrchardToIronwoodProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnDrainOrchardToIronwoodProcess(dict)
+        }
+      }
+  }
+
 }
