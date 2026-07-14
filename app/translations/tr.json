@@ -62,6 +62,7 @@
     "loadmore": "Daha fazla yükle",
     "label": "Kişi",
     "label-placeholder": "Kullanıcı adı/Etiket/Tag",
+    "address-placeholder": "Adresi buraya girin",
     "add": "Ekle",
     "add-confirm-title": "Kişi eklensin mi?",
     "add-confirm-message": "Kaydetmeden önce adresi ve algılanan ağı kontrol edin.",

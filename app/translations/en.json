@@ -62,6 +62,7 @@
     "loadmore": "Load More",
     "label": "Contact",
     "label-placeholder": "Nickname/Label/Tag",
+    "address-placeholder": "Add the address here",
     "add": "Add",
     "add-confirm-title": "Add contact?",
     "add-confirm-message": "Please check the address and its detected network before saving.",

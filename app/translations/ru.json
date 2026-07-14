@@ -62,6 +62,7 @@
     "loadmore": "Загрузить ещё",
     "label": "Контакт",
     "label-placeholder": "Псевдоним/Метка/Тег",
+    "address-placeholder": "Введите адрес здесь",
     "add": "Добавить",
     "add-confirm-title": "Добавить контакт?",
     "add-confirm-message": "Проверьте адрес и определённую сеть перед сохранением.",

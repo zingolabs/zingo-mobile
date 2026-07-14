@@ -62,6 +62,7 @@
     "loadmore": "Carregar Mais",
     "label": "Contato",
     "label-placeholder": "Apelido/Tag",
+    "address-placeholder": "Adicione o endereço aqui",
     "add": "Adicionar",
     "add-confirm-title": "Adicionar contato?",
     "add-confirm-message": "Verifique o endereço e a rede detectada antes de salvar.",
