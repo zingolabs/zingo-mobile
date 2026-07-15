@@ -14,6 +14,8 @@
     "prettier:check": "prettier --check './**/*.{js,jsx,ts,tsx}'",
     "typecheck": "tsc --noEmit",
     "cpd:check": "jscpd app components android/app/src/main/java ios -c .jscpd.json",
+    "cpd:check:kotlin": "jscpd android/app/src/main/java --format kotlin --exit-code",
+    "cpd:check:swift": "jscpd ios --format swift --ignore '**/Pods/**,**/build/**,**/DerivedData/**' --threshold 8.5",
     "coverage": "jest --coverage",
     "postinstall": "patch-package",
     "build:prod:release": "cd android && ./gradlew assembleProdRelease && cd ..",
