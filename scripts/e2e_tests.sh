@@ -47,10 +47,15 @@ function wait_for() {
     fi
 }
 
-while getopts 'a:e:sx:h' OPTION; do
+while getopts 'a:Ae:sx:h' OPTION; do
     case "$OPTION" in
         a)
             arch="$OPTARG"
+            ;;
+        A)
+            # Accepted for compatibility with the Rust test harness, which
+            # passes -A on ARM hosts; the host architecture is now detected
+            # automatically.
             ;;
         e)
             test_name="$OPTARG"
