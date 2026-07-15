@@ -13,10 +13,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      # Evaluated once, before the bootstrap step can create the file —
+      # hashFiles in a step condition re-evaluates at each step, so the
+      # upload step below must not test the file's existence itself.
+      - name: Detect a committed baseline
+        id: baseline
+        run: echo "exists=$([ -f ios/swiftlint-baseline.json ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
       # Findings that predate adoption live in ios/swiftlint-baseline.json,
       # so only new or changed Swift is enforced (zingo-mobile#1166).
       - name: SwiftLint (strict, baselined)
-        if: ${{ hashFiles('ios/swiftlint-baseline.json') != '' }}
+        if: ${{ steps.baseline.outputs.exists == 'true' }}
         working-directory: ios
         run: swiftlint lint --strict --baseline swiftlint-baseline.json
 
@@ -25,12 +32,12 @@ jobs:
       # lint's own exit code is ignored here because every finding predates
       # adoption by definition.
       - name: Bootstrap the baseline
-        if: ${{ hashFiles('ios/swiftlint-baseline.json') == '' }}
+        if: ${{ steps.baseline.outputs.exists == 'false' }}
         working-directory: ios
         run: swiftlint lint --write-baseline swiftlint-baseline.json || true
 
       - name: Upload the bootstrapped baseline
-        if: ${{ hashFiles('ios/swiftlint-baseline.json') == '' }}
+        if: ${{ steps.baseline.outputs.exists == 'false' }}
         uses: actions/upload-artifact@v7
         with:
           name: swiftlint-baseline
