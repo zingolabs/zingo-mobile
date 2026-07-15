@@ -524,12 +524,7 @@ export async function getLatestBlockServerInfo(
   try {
     const heightStr: string =
       await RPCModule.getLatestBlockServerInfo(serverUri);
-    if (heightStr) {
-      if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error server height ${heightStr}`);
-        return heightStr;
-      }
-    } else {
+    if (!heightStr) {
       console.log('Internal Error server height');
       return 'Error: Internal RPC Error: server height';
     }

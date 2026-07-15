@@ -146,6 +146,7 @@ describe('read getter rejections are contained and reported, never sniffed', () 
       onError,
       onAddressesChanged: jest.fn(),
       onZingolibVersionChanged: jest.fn(),
+      server: { uri: 'https://server.example' },
     } as unknown as ConstructorParameters<typeof DataService>[0];
     return { dataService: new DataService(config), onError };
   }
@@ -177,6 +178,23 @@ describe('read getter rejections are contained and reported, never sniffed', () 
       ds => ds.getConfigWalletPerformance(),
     ],
     ['get_wallet_version', 'getWalletVersionInfo', ds => ds.getWalletVersion()],
+    ['get_balance', 'getBalanceInfo', ds => ds.fetchTotalBalance()],
+    [
+      'get_spendable_balance_total',
+      'getSpendableBalanceTotalInfo',
+      ds => ds.fetchTotalBalance(),
+    ],
+    [
+      'get_value_transfers',
+      'getValueTransfersList',
+      ds => ds.fetchTandZandOValueTransfers(),
+    ],
+    ['get_messages', 'getMessagesInfo', ds => ds.fetchTandZandOMessages()],
+    [
+      'get_latest_block_server',
+      'getLatestBlockServerInfo',
+      ds => ds.fetchTandZandOValueTransfers(),
+    ],
   ];
 
   it.each(fetches)('%s', async (_ffi, bridgeMethod, call) => {

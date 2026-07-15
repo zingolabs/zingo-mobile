@@ -80,12 +80,7 @@ export class DataService {
       let spendableJSON: RPCSpendablebalanceType =
         {} as RPCSpendablebalanceType;
       if (spendableStr) {
-        if (spendableStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error spendable balance ${spendableStr}`);
-          this.config.onError(`Error spendable balance: ${spendableStr}`);
-        } else {
-          spendableJSON = await JSON.parse(spendableStr);
-        }
+        spendableJSON = await JSON.parse(spendableStr);
       } else {
         console.log('Internal Error spendable balance');
       }
@@ -98,13 +93,7 @@ export class DataService {
           Date.now() - start2,
         );
       }
-      if (balanceStr) {
-        if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error balance ${balanceStr}`);
-          this.config.onError(`Error balance: ${balanceStr}`);
-          return;
-        }
-      } else {
+      if (!balanceStr) {
         console.log('Internal Error balance');
         return;
       }
@@ -372,12 +361,7 @@ export class DataService {
         );
       }
       if (heightStr) {
-        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error server height ${heightStr}`);
-          this.config.onError(`Error server height: ${heightStr}`);
-        } else {
-          this.lastServerBlockHeight = Number(heightStr);
-        }
+        this.lastServerBlockHeight = Number(heightStr);
       } else {
         console.log('Internal Error server height');
       }
@@ -390,13 +374,7 @@ export class DataService {
           Date.now() - start2,
         );
       }
-      if (valueTransfersStr) {
-        if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error value transfers ${valueTransfersStr}`);
-          this.config.onError(`Error value transfers: ${valueTransfersStr}`);
-          return;
-        }
-      } else {
+      if (!valueTransfersStr) {
         console.log('Internal Error value transfers');
         return;
       }
@@ -444,13 +422,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (messagesStr) {
-        if (messagesStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error value transfers messages ${messagesStr}`);
-          this.config.onError(`Error value transfers messages: ${messagesStr}`);
-          return;
-        }
-      } else {
+      if (!messagesStr) {
         console.log('Internal Error value transfers messages');
         return;
       }
