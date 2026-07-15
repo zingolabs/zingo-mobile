@@ -288,28 +288,28 @@ class RPCModule: NSObject {
     }
   }
 
+  // The wallet export is classified by its structure alone, never by
+  // sniffing its content for an error sentinel (zingo-mobile#1151; audit
+  // Issue Q): a valid base64 wallet export may begin with "error", while
+  // genuine failure arrives as a thrown error — and failure prose can
+  // never validate as base64, because it always contains characters
+  // outside the base64 alphabet.
   func saveWalletInternal() throws {
     do {
       let walletEncodedString = try saveToB64()
-      if !walletEncodedString.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-        let size = (walletEncodedString.count * 3) / 4
-        NSLog("[Native] file size: \(size) bytes")
-        if size > 0 {
-          // check if the content is correct. Stored Encoded.
-          if isValidBase64(walletEncodedString) {
-            try self.saveWalletFile(walletEncodedString)
-          } else {
-            let err = "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect. Size: \(walletEncodedString.count)"
-            NSLog(err)
-            throw FileError.saveFileError(err)
-          }
+      let size = (walletEncodedString.count * 3) / 4
+      NSLog("[Native] file size: \(size) bytes")
+      if size > 0 {
+        // check if the content is correct. Stored Encoded.
+        if isValidBase64(walletEncodedString) {
+          try self.saveWalletFile(walletEncodedString)
         } else {
-          NSLog("[Native] No need to save the wallet.")
+          let err = "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect. Size: \(walletEncodedString.count)"
+          NSLog(err)
+          throw FileError.saveFileError(err)
         }
       } else {
-        let err = "Error: [Native] Couldn't save the wallet. \(walletEncodedString)"
-        NSLog(err)
-        throw FileError.saveFileError(err)
+        NSLog("[Native] No need to save the wallet.")
       }
     } catch {
       let err = "Error: [Native] Couldn't save the wallet. \(error.localizedDescription)"
