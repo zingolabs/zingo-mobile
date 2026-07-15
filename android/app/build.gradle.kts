@@ -366,6 +366,9 @@ dependencies {
     // JSON parsing
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
 
+    // JVM unit tests for pure logic (no device or emulator)
+    testImplementation("junit:junit:4.13.2")
+
     // JUnit test runners
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
 

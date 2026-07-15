@@ -393,57 +393,28 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(fileExists(WalletBackupFileName.value))
     }
 
-    // Quick local Base64 well-formedness check. Used as a defensive guard so we
-    // never overwrite the wallet file with arbitrary text the Rust side might
-    // accidentally return (e.g. "the library is broken") that doesn't start with
-    // the `error:` prefix. We do this in Kotlin rather than re-sending the whole
-    // Base64 payload back to Rust because the round-trip allocates two extra
-    // full-size copies of the string (Java→native via RustBuffer + native→Java
-    // again for the result), which OOM-crashes on low-RAM 32-bit devices when
-    // wallets are large.
-    private fun isValidBase64(s: String): Boolean {
-        if (s.isEmpty() || s.length % 4 != 0) return false
-        var sawPadding = false
-        for (c in s) {
-            when {
-                c == '=' -> sawPadding = true
-                sawPadding -> return false
-                c in 'A'..'Z' -> {}
-                c in 'a'..'z' -> {}
-                c in '0'..'9' -> {}
-                c == '+' || c == '/' -> {}
-                else -> return false
-            }
-        }
-        return true
-    }
-
     fun saveWalletFile(): Boolean {
-        try {
+        return try {
             uniffi.zingo.initLogging()
 
-            val b64encoded: String = uniffi.zingo.saveToB64()
-            if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
-                Log.e("MAIN", "Error: [Native] Couldn't save the wallet. $b64encoded")
-                return false
+            when (val export = WalletExport.classify(uniffi.zingo.saveToB64())) {
+                is WalletExportClassification.NoSaveNeeded -> {
+                    Log.e("MAIN", "[Native] No need to save the wallet.")
+                    true
+                }
+                is WalletExportClassification.Invalid -> {
+                    Log.e("MAIN", "Error: [Native] Couldn't save the wallet. ${export.reason}")
+                    false
+                }
+                is WalletExportClassification.ValidExport -> {
+                    Log.i("MAIN", "[Native] file size: ${export.base64.length} chars (Base64)")
+                    writeEncryptedFileDurably(WalletFileName.value, export.base64)
+                    true
+                }
             }
-
-            if (b64encoded.isEmpty()) {
-                Log.e("MAIN", "[Native] No need to save the wallet.")
-                return true
-            }
-
-            if (!isValidBase64(b64encoded)) {
-                Log.e("MAIN", "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect.")
-                return false
-            }
-
-            Log.i("MAIN", "[Native] file size: ${b64encoded.length} chars (Base64)")
-            writeEncryptedFileDurably(WalletFileName.value, b64encoded)
-            return true
         } catch (e: Exception) {
             Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the wallet. $e")
-            return false
+            false
         }
     }
 
