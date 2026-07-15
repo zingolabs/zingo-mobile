@@ -837,6 +837,13 @@ class FfiOutcomeTests: XCTestCase {
         // success is the only value their data channel carries.
         ("save_wallet_bytes", ZingolibError.Save(message: "boom")),
         ("save_wallet_backup", ZingolibError.Save(message: "boom")),
+        // The wallet-read getters whose domain failures are the typed
+        // Read variant.
+        ("get_balance", ZingolibError.Read(message: "boom")),
+        ("get_spendable_balance_total", ZingolibError.Read(message: "boom")),
+        ("get_value_transfers", ZingolibError.Read(message: "boom")),
+        ("get_messages", ZingolibError.Read(message: "boom")),
+        ("get_latest_block_server", ZingolibError.Read(message: "boom")),
     ]
 
     func testResolvedValuesPassThroughUnclassified() {

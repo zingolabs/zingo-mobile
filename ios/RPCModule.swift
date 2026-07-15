@@ -553,40 +553,12 @@ class RPCModule: NSObject {
     }
   }
 
-  func fnGetLatestBlockServerInfo(_ dict: [AnyHashable: Any]) {
-    if let serveruri = dict["serveruri"] as? String,
-       let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-      do {
-        let resp = try getLatestBlockServer(serveruri: serveruri)
-        let respStr = String(resp)
-        DispatchQueue.main.async {
-          resolve(respStr)
-        }
-      } catch {
-        let err = "Error: [Native] Get server latest block. \(error.localizedDescription)"
-        NSLog(err)
-        DispatchQueue.main.async {
-          resolve(err)
-        }
-      }
-    } else {
-      let err = "Error: [Native] Get server latest block. Argument problem."
-      NSLog(err)
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-      }
-    }
-  }
-  
   @objc(getLatestBlockServerInfo:resolve:reject:)
   func getLatestBlockServerInfo(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["serveruri": serveruri, "resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fnGetLatestBlockServerInfo(dict)
-          }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_latest_block_server") {
+          try getLatestBlockServer(serveruri: serveruri)
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
@@ -661,34 +633,12 @@ class RPCModule: NSObject {
       }
   }
 
-  func fnGetValueTransfersList(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getValueTransfers()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] Get value transfers. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }          
-          }
-      } else {
-          let err = "Error: [Native] Get value transfers. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
   @objc(getValueTransfersList:reject:)
   func getValueTransfersList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fnGetValueTransfersList(dict)
-          }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_value_transfers") {
+          try getValueTransfers()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
@@ -1017,71 +967,21 @@ class RPCModule: NSObject {
       }
   }
 
-  func fnGetMessagesInfo(_ dict: [AnyHashable: Any]) {
-      if let address = dict["address"] as? String,
-          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getMessages(address: address)
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] messages. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }          
-          }
-      } else {
-          let err = "Error: [Native] messages. Command arguments problem."
-          NSLog(err)
-          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      }
-  }
-
   @objc(getMessagesInfo:resolve:reject:)
   func getMessagesInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["address": address, "resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetMessagesInfo(dict)
-        }
-      }
-  }
-
-func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getBalance()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] balance. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }          
-          }
-      } else {
-          let err = "Error: [Native] balance. Command arguments problem."
-          NSLog(err)
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_messages") {
+          try getMessages(address: address)
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(getBalanceInfo:reject:)
   func getBalanceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetBalanceInfo(dict)
-        }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_balance") {
+          try getBalance()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
@@ -1284,34 +1184,12 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  func fnGetSpendableBalanceTotalInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getSpendableBalanceTotal()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] spendable balance total. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      } else {
-          let err = "Error: [Native] spendable balance total. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
   @objc(getSpendableBalanceTotalInfo:reject:)
   func getSpendableBalanceTotalInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetSpendableBalanceTotalInfo(dict)
-        }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_spendable_balance_total") {
+          try getSpendableBalanceTotal()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
