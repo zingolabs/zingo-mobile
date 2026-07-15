@@ -824,6 +824,19 @@ class FfiOutcomeTests: XCTestCase {
         ("status_sync", ZingolibError.Sync(message: "boom")),
         ("poll_sync", ZingolibError.Sync(message: "boom")),
         ("run_rescan", ZingolibError.Rescan(message: "boom")),
+        // The read getters' Rust sides are prose-free; their one typed
+        // failure family is the uninitialized client.
+        ("get_latest_block_wallet", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_version", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_unified_addresses", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_transparent_addresses", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_wallet_save_required", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_config_wallet_performance", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_wallet_version", ZingolibError.LightclientNotInitialized(message: "boom")),
+        // The save shells run the save internals, whose failures throw;
+        // success is the only value their data channel carries.
+        ("save_wallet_bytes", ZingolibError.Save(message: "boom")),
+        ("save_wallet_backup", ZingolibError.Save(message: "boom")),
     ]
 
     func testResolvedValuesPassThroughUnclassified() {
