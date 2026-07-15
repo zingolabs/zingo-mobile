@@ -414,17 +414,13 @@ class ExecuteSendFromOrchard {
         println("\nConfirm Txid:")
         println(confirmJson)
 
-        // Under the typed-error contract (zingo-mobile#1151) a second sync
-        // request while one is already draining surfaces as the thrown Sync
-        // variant rather than in-band prose. Either way a sync is running,
-        // and the polling loop below observes it to completion.
-        try {
-            syncJson = uniffi.zingo.runSync()
-            println("\nSync:")
-            println(syncJson)
-        } catch (e: uniffi.zingo.ZingolibException.Sync) {
-            println("\nSync already running: ${e.message}")
-        }
+        // A second launch while the first sync still runs is idempotent:
+        // the bridge answers with status on the data channel ("Sync task
+        // already running."), and the polling loop below observes the sync
+        // to completion either way.
+        syncJson = uniffi.zingo.runSync()
+        println("\nSync:")
+        println(syncJson)
 
         var syncStatus: SyncStatus
         while (true) {
