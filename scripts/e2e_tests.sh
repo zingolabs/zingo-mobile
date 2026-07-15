@@ -47,10 +47,15 @@ function wait_for() {
     fi
 }
 
-while getopts 'a:e:sx:h' OPTION; do
+while getopts 'a:Ae:sx:h' OPTION; do
     case "$OPTION" in
         a)
             arch="$OPTARG"
+            ;;
+        A)
+            # Accepted for compatibility with the Rust test harness, which
+            # passes -A on ARM hosts; the host architecture is now detected
+            # automatically.
             ;;
         e)
             test_name="$OPTARG"
@@ -67,6 +72,8 @@ while getopts 'a:e:sx:h' OPTION; do
         h)
             echo -e "\nRun end-to-end tests. Requires Android SDK Command-line Tools."
             echo -e "\n  -a\t\tSet ABI/architecture (optional, default: x86_64)"
+            echo -e "      \t\t  armeabi-v7a runs on an arm64-v8a emulator image"
+            echo -e "      \t\t  ARM images require an ARM host, x86 images an x86_64 host"
             echo -e "\n  -e\t\tSelect test name"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
             echo -e "      \t\t  Default: 1800"
@@ -78,11 +85,38 @@ while getopts 'a:e:sx:h' OPTION; do
             ;;
     esac
 done
-if [[ $set_test_name == false ]]; then 
+if [[ $set_test_name == false ]]; then
     echo "Error: Test not specified" >&2
     echo "Try '$(basename $0) -h' for more information." >&2
     exit 1
 fi
+
+# Google publishes no armeabi-v7a system images for this API level, so 32-bit
+# ARM app code runs on a 64-bit ARM image, as it does in CI.
+if [ "${arch}" = "armeabi-v7a" ]; then
+    avd_arch="arm64-v8a"
+else
+    avd_arch="${arch}"
+fi
+
+# The emulator can only virtualize its host's own architecture family.
+host_arch=$(uname -m)
+case "${avd_arch}" in
+    arm64-v8a)
+        if [ "${host_arch}" != "aarch64" ] && [ "${host_arch}" != "arm64" ]; then
+            echo "Error: ABI ${arch} needs an ${avd_arch} AVD, which this host (${host_arch}) cannot emulate." >&2
+            echo "ARM end-to-end tests run in CI; on this host use '-a x86_64' or '-a x86'." >&2
+            exit 1
+        fi
+        ;;
+    x86|x86_64)
+        if [ "${host_arch}" != "x86_64" ]; then
+            echo "Error: ABI ${arch} needs an ${avd_arch} AVD, which this host (${host_arch}) cannot emulate." >&2
+            echo "On this host use '-a arm64-v8a' or '-a armeabi-v7a'." >&2
+            exit 1
+        fi
+        ;;
+esac
 
 # Setup working directory
 cd $(git rev-parse --show-toplevel)
@@ -100,8 +134,8 @@ echo "Installing latest emulator..."
 sdkmanager --install emulator --channel=0
 
 echo "Installing system image..."
-avd_name="${device}_api-${api_level}_${api_target}_${arch}"
-sdk="system-images;android-${api_level};${api_target};${arch}"
+avd_name="${device}_api-${api_level}_${api_target}_${avd_arch}"
+sdk="system-images;android-${api_level};${api_target};${avd_arch}"
 sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
 

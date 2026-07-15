@@ -5,7 +5,15 @@ set_abi=false
 set_test_name=false
 set_api_level=false
 set_api_target=false
-intel_host_os=true
+# The emulator can only virtualize its host's own architecture family, so the
+# host determines whether ABIs map to x86 or ARM system images. '-A' remains
+# as an explicit override.
+host_arch=$(uname -m)
+if [ "${host_arch}" = "aarch64" ] || [ "${host_arch}" = "arm64" ]; then
+    intel_host_os=false
+else
+    intel_host_os=true
+fi
 create_snapshot=false
 test_name_default="ExecuteVersionFromSeed"
 valid_api_levels=("26" "27" "28" "29" "30" "31" "32" "33" "34" "35" "36")
@@ -111,7 +119,7 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             echo -e "      \t\t  'arm64-v8a' - default system image: API 30 google_apis_playstore x86_64"
             echo -e "      \t\t  'armeabi-v7a' - default system image: API 30 google_apis_playstore x86"
             echo -e "\n  -A\t\tSets default system image of arm abis to arm instead of x86 (optional)"
-            echo -e "      \t\t  Use this option if the host OS is arm"
+            echo -e "      \t\t  ARM hosts are auto-detected; this flag forces the ARM mapping"
             echo -e "\n  -e\t\tSelect test name or test suite (optional)"
             echo -e "      \t\t  Default: ExecuteVersionFromSeed"
             echo -e "\n  -l\t\tSelect API level (optional)"
@@ -189,6 +197,24 @@ case "$abi" in
         echo "Error: Invalid ABI" >&2
         echo "Try '$(basename $0) -h' for more information." >&2
         exit 1
+        ;;
+esac
+
+# Fail fast on an impossible emulation request instead of installing an image
+# the emulator cannot boot and hanging until the launch timeout.
+case "${arch}" in
+    arm64-v8a)
+        if [ "${host_arch}" != "aarch64" ] && [ "${host_arch}" != "arm64" ]; then
+            echo "Error: ABI ${abi} was mapped to an ${arch} system image, which this host (${host_arch}) cannot emulate." >&2
+            echo "On Intel hosts, omit '-A': ARM ABIs run on x86 images through ARM translation." >&2
+            exit 1
+        fi
+        ;;
+    x86|x86_64)
+        if [ "${host_arch}" != "x86_64" ]; then
+            echo "Error: ABI ${abi} was mapped to an ${arch} system image, which this host (${host_arch}) cannot emulate." >&2
+            exit 1
+        fi
         ;;
 esac
 
