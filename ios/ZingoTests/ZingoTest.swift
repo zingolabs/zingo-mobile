@@ -187,7 +187,14 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
 /// callers can guard on it.
 private func initWalletFromSeed(serveruri: String, seed: String = Seeds.HOSPITAL) -> Bool {
     do {
-        let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
+        let initJson = try initFromSeed(
+            seed: seed,
+            birthday: UInt32(1),
+            serveruri: serveruri,
+            chainhint: "regtest",
+            performancelevel: "Medium",
+            minconfirmations: UInt32(1)
+        )
         print("\nInit from seed:\n\(initJson)")
         let initRes: InitFromSeed = try decodeJSON(initJson)
         XCTAssertEqual(initRes.seed_phrase, seed)
@@ -236,7 +243,10 @@ private func assertHospitalAddresses() {
         let addrsJson = try getUnifiedAddresses()
         print("\nAddresses:\n\(addrsJson)")
         let addrs: [UnifiedAddress] = try decodeJSON(addrsJson)
-        XCTAssertEqual(addrs[0].encoded_address, "u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
+        XCTAssertEqual(
+            addrs[0].encoded_address,
+            "u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd"
+        )
         XCTAssertEqual(addrs[0].has_orchard, true)
         XCTAssertEqual(addrs[0].has_sapling, false)
         XCTAssertEqual(addrs[0].has_transparent, false)
@@ -352,6 +362,48 @@ final class ExecuteSyncFromSeed: XCTestCase {
     }
 }
 
+/// Resolves the wallet's first transparent address, failing the test and
+/// returning nil when there is none.
+private func firstTransparentAddressOrFail() -> String? {
+    do {
+        let tAddrsJson = try getTransparentAddresses()
+        print("\nT Addresses:\n\(tAddrsJson)")
+        let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
+        guard let addr = tAddrs.first?.encoded_address, !addr.isEmpty else {
+            XCTFail("No transparent address")
+            return nil
+        }
+        return addr
+    } catch {
+        XCTFail("\nT Addresses error:\n\(error.localizedDescription)")
+        return nil
+    }
+}
+
+/// Proposes and confirms a send of `amount` zatoshis to `address`, failing
+/// the test and returning false on either step's error.
+private func sendAndConfirmOrFail(to address: String, amount: Int64) -> Bool {
+    do {
+        let sendJson = SendResult(address: address, amount: amount, memo: nil)
+        let sendBodyData = try JSONEncoder().encode([sendJson])
+        let sendBody = String(data: sendBodyData, encoding: .utf8)!
+        let proposeJson = try send(sendJson: sendBody)
+        print("\nPropose:\n\(proposeJson)")
+    } catch {
+        XCTFail("\nPropose error:\n\(error.localizedDescription)")
+        return false
+    }
+
+    do {
+        let confirmJson = try confirm()
+        print("\nConfirm Txid:\n\(confirmJson)")
+        return true
+    } catch {
+        XCTFail("\nConfirm error:\n\(error.localizedDescription)")
+        return false
+    }
+}
+
 final class ExecuteSendFromOrchard: XCTestCase {
     func testExecuteSendFromOrchard() throws {
         setCryptoProvider()
@@ -372,43 +424,9 @@ final class ExecuteSendFromOrchard: XCTestCase {
           return
         }
 
-        var taddr: String? = nil
-        do {
-            let tAddrsJson = try getTransparentAddresses()
-            print("\nT Addresses:\n\(tAddrsJson)")
-            let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
-            guard let addr = tAddrs.first?.encoded_address else {
-                XCTFail("No transparent address")
-                return
-            }
-            taddr = addr
-        } catch {
-          XCTFail("\nT Addresses error:\n\(error.localizedDescription)")
-          return
-        }
+        guard let taddr = firstTransparentAddressOrFail() else { return }
+        guard sendAndConfirmOrFail(to: taddr, amount: 100_000) else { return }
 
-        let ta = try XCTUnwrap(taddr, "T address is nil")
-        XCTAssertFalse(ta.isEmpty, "T address is empty")
-      
-        do {
-          let sendJson = SendResult(address: ta, amount: 100_000, memo: nil)
-          let sendBodyData = try JSONEncoder().encode([sendJson])
-          let sendBody = String(data: sendBodyData, encoding: .utf8)!
-          let proposeJson = try send(sendJson: sendBody)
-          print("\nPropose:\n\(proposeJson)")
-        } catch {
-          XCTFail("\nPropose error:\n\(error.localizedDescription)")
-          return
-        }
-        
-        do {
-          let confirmJson = try confirm()
-          print("\nConfirm Txid:\n\(confirmJson)")
-        } catch {
-          XCTFail("\nConfirm error:\n\(error.localizedDescription)")
-          return
-        }
-        
         syncAndWait()
 
         do {
