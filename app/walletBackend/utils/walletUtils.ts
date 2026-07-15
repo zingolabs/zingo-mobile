@@ -196,7 +196,7 @@ export async function restoreExistingWalletBackup(): Promise<string> {
  * other value — including error prose — is a failure.
  */
 export function nativeSaveSucceeded(result: boolean | string): boolean {
-  return Boolean(result) && result !== GlobalConst.false;
+  return result === true || result === GlobalConst.true;
 }
 
 // Flushes the in-memory wallet state to disk. Resolves with the native
