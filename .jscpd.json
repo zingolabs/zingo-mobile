@@ -1,0 +1,6 @@
+{
+  "format": ["typescript", "tsx", "kotlin", "swift"],
+  "ignore": ["**/Pods/**", "**/build/**", "**/DerivedData/**"],
+  "threshold": 10,
+  "reporters": ["console"]
+}

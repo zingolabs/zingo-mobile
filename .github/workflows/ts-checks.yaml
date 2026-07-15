@@ -35,3 +35,9 @@ jobs:
 
       - name: Check formatting
         run: yarn prettier:check
+
+      # Cross-file duplication gate over the TS, Kotlin, and Swift sources.
+      # Measured 9.53% at adoption; the 10% threshold in .jscpd.json only
+      # ratchets down from here.
+      - name: Copy-paste detection
+        run: yarn cpd:check
