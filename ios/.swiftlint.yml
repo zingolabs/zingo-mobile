@@ -7,6 +7,17 @@ excluded:
   - build
   - DerivedData
 
+# The size limits sit just above the migration-era measurements of the two
+# oversized files (RPCModule.swift at 1576 lines, its class body at 1317;
+# ZingoTest.swift at 871). The baseline cannot hold these rules — their
+# violation anchors to the file's last line, so any edit to an over-limit
+# file resurfaces it. Ratchet the numbers down as the typed-error migration
+# (zingo-mobile#1151) shrinks the bridge; never raise them.
+file_length:
+  warning: 1600
+type_body_length:
+  warning: 1350
+
 opt_in_rules:
   # DRY and functional-shape rules beyond the default set
   - closure_body_length
