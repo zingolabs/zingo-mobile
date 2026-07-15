@@ -188,9 +188,22 @@ export async function restoreExistingWalletBackup(): Promise<string> {
   }
 }
 
-// Flushes the in-memory wallet state to disk. Returns "true"/"false" or
-// an "error: ..." prefix.
-export async function doSave(): Promise<string> {
+/**
+ * Whether a native save/backup resolution reports success. The bridges are
+ * trimodal (zingo-mobile#1151): Android resolves boolean true/false, iOS
+ * resolves "true"/"false", and both resolve "Error: ..." prose from their
+ * catch blocks. Success is knowable only from the two success shapes; any
+ * other value — including error prose — is a failure.
+ */
+export function nativeSaveSucceeded(result: boolean | string): boolean {
+  return Boolean(result) && result !== GlobalConst.false;
+}
+
+// Flushes the in-memory wallet state to disk. Resolves with the native
+// bridge's trimodal result (see nativeSaveSucceeded); a rejected native
+// promise is contained here and returned as "Error: ..." prose until the
+// zingo-mobile#1151 migration rejects end to end.
+export async function doSave(): Promise<boolean | string> {
   try {
     return await RPCModule.doSave();
   } catch (error) {
