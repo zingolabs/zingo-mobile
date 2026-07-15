@@ -1457,17 +1457,14 @@ export class LoadingAppClass extends Component<
       return;
     }
     this.setState({ actionButtonsDisabled: true });
-    // Offline has no Indexer to ask for the chain tip, so the FFI needs an
-    // explicit birthday. We fall back to the chosen chain's Sapling activation
-    // height: undershooting is safe for a brand-new wallet (it only makes the
-    // first sync scan a bit more — a new wallet has no history to miss). Online
-    // passes "0", which the Indexer ignores.
-    // (Follow-up: max() this with a persisted last-known server/wallet block
-    // once that is stored across sessions, to shorten the first sync.)
+    // Pass "0" in both modes. Online, the Indexer supplies the chain tip.
+    // Offline (Indexerless), the FFI falls back to zingolib's Library Birthday
+    // — a per-chain height already mined when the linked zingolib release was
+    // cut, so a brand-new wallet starts its first sync from that recent floor
+    // instead of scanning the whole chain from Sapling activation (zingolib
+    // ADR 0007). A non-zero value here would act as an explicit override.
     const serverUri = offline ? '' : this.state.server.uri;
-    const birthday = offline
-      ? String(activationHeight[this.state.server.chainName] ?? 1)
-      : '0';
+    const birthday = '0';
     let seed: string = await createNewWallet(
       serverUri,
       birthday,
