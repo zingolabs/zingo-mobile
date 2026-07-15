@@ -843,7 +843,7 @@ class FfiOutcomeTests: XCTestCase {
         ("get_spendable_balance_total", ZingolibError.Read(message: "boom")),
         ("get_value_transfers", ZingolibError.Read(message: "boom")),
         ("get_messages", ZingolibError.Read(message: "boom")),
-        ("get_latest_block_server", ZingolibError.Read(message: "boom")),
+        ("get_latest_block_server", ZingolibError.Read(message: "boom"))
     ]
 
     func testResolvedValuesPassThroughUnclassified() {
