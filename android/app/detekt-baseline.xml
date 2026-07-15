@@ -1,0 +1,139 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ArgumentListWrapping:BackgroundSyncWorker.kt$BSCompanion.Companion$( TASKID)</ID>
+    <ID>ArgumentListWrapping:BackgroundSyncWorker.kt$BSCompanion.Companion$(BackgroundSyncWorker::class.java, SYNC_PERIOD.toJavaDuration())</ID>
+    <ID>ArgumentListWrapping:BackgroundSyncWorker.kt$BackgroundSyncWorker$(context, workerParams)</ID>
+    <ID>ArgumentListWrapping:RPCModule.kt$RPCModule$(reactContext)</ID>
+    <ID>ArgumentListWrapping:RPCModule.kt$RPCModule$(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())</ID>
+    <ID>ArgumentListWrapping:RPCModule.kt$RPCModule$(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())</ID>
+    <ID>CommentSpacing:BackgroundSyncWorker.kt$BSCompanion.Companion$//private fun calculateInFiveMinutes(): Duration = 1.minutes</ID>
+    <ID>CommentSpacing:BackgroundSyncWorker.kt$BSCompanion.Companion$//val targetTimeDiff = calculateInFiveMinutes()</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$ScanRanges$val end_block : String = ""</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$ScanRanges$val start_block : String = ""</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val percentage_session_blocks_scanned : Double = 0.0</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val percentage_session_outputs_scanned : Double = 0.0</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val percentage_total_blocks_scanned : Double = 0.0</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val percentage_total_outputs_scanned : Double = 0.0</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val scan_ranges : List&lt;ScanRanges&gt; = emptyList()</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val session_blocks_scanned : Long = 0L</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val session_orchard_outputs_scanned : Long = 0L</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val session_sapling_outputs_scanned : Long = 0L</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val sync_start_height : Long = 0L</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val total_blocks_scanned : Long = 0L</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val total_orchard_outputs_scanned : Long = 0L</ID>
+    <ID>ConstructorParameterNaming:BackgroundSyncWorker.kt$SyncStatus$val total_sapling_outputs_scanned : Long = 0L</ID>
+    <ID>CyclomaticComplexMethod:BackgroundSyncWorker.kt$BackgroundSyncWorker$@RequiresApi(Build.VERSION_CODES.O) override fun doWork(): Result</ID>
+    <ID>CyclomaticComplexMethod:RPCModule.kt$RPCModule$fun migrateFileIfNeeded(fileName: String)</ID>
+    <ID>FinalNewline:BackgroundSyncWorker.kt$org.ZingoLabs.Zingo.BackgroundSyncWorker.kt</ID>
+    <ID>FinalNewline:Constants.kt$org.ZingoLabs.Zingo.Constants.kt</ID>
+    <ID>FinalNewline:MainActivity.kt$org.ZingoLabs.Zingo.MainActivity.kt</ID>
+    <ID>FinalNewline:RPCPackage.kt$org.ZingoLabs.Zingo.RPCPackage.kt</ID>
+    <ID>FunctionParameterNaming:RPCModule.kt$RPCModule$send_json: String</ID>
+    <ID>ImportOrdering:BackgroundSyncWorker.kt$import android.content.Context import android.app.ActivityManager import android.os.Build import androidx.work.Worker import androidx.work.WorkerParameters import android.util.Log import androidx.annotation.RequiresApi import androidx.work.Constraints import androidx.work.ExistingPeriodicWorkPolicy import androidx.work.NetworkType import androidx.work.PeriodicWorkRequest import androidx.work.WorkManager import java.util.* import org.json.JSONObject import kotlinx.datetime.Clock import kotlinx.datetime.DateTimeUnit import kotlinx.datetime.Instant import kotlinx.datetime.TimeZone import kotlinx.datetime.atTime import kotlinx.datetime.toInstant import kotlinx.datetime.toLocalDateTime import kotlinx.datetime.until import kotlin.random.Random import kotlin.time.Duration import kotlin.time.Duration.Companion.days import kotlin.time.Duration.Companion.hours import kotlin.time.Duration.Companion.minutes import kotlin.time.DurationUnit import kotlin.time.toDuration import kotlin.time.toJavaDuration import org.ZingoLabs.Zingo.Constants.* import java.io.FileInputStream import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper import com.fasterxml.jackson.module.kotlin.readValue</ID>
+    <ID>ImportOrdering:MainApplication.kt$import android.annotation.SuppressLint import android.app.Application import android.content.Context import com.facebook.react.PackageList import com.facebook.react.ReactApplication import com.facebook.react.ReactHost import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative import com.facebook.react.ReactInstanceManager import com.facebook.react.ReactNativeHost import com.facebook.react.ReactPackage import com.facebook.react.bridge.ReactApplicationContext import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost import com.facebook.react.defaults.DefaultReactNativeHost import java.lang.ref.WeakReference</ID>
+    <ID>ImportOrdering:RPCModule.kt$import android.content.Context import android.util.Log import android.util.Base64 import androidx.security.crypto.EncryptedFile import androidx.security.crypto.MasterKeys import com.facebook.react.bridge.ReactApplicationContext import com.facebook.react.bridge.ReactContextBaseJavaModule import com.facebook.react.bridge.ReactMethod import com.facebook.react.bridge.Promise import java.io.File import java.io.FileNotFoundException import java.io.IOException import org.ZingoLabs.Zingo.Constants.* import kotlinx.coroutines.*</ID>
+    <ID>Indentation:BackgroundSyncWorker.kt$BackgroundSyncWorker$ </ID>
+    <ID>Indentation:RPCModule.kt$RPCModule$ </ID>
+    <ID>Indentation:RPCPackage.kt$RPCPackage$ </ID>
+    <ID>Indentation:WalletExportClassificationTest.kt$WalletExportClassificationTest$ </ID>
+    <ID>LargeClass:RPCModule.kt$RPCModule : ReactContextBaseJavaModule</ID>
+    <ID>LongMethod:BackgroundSyncWorker.kt$BackgroundSyncWorker$@RequiresApi(Build.VERSION_CODES.O) override fun doWork(): Result</ID>
+    <ID>LongParameterList:RPCModule.kt$RPCModule$(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
+    <ID>LongParameterList:RPCModule.kt$RPCModule$(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
+    <ID>LoopWithTooManyJumpStatements:BackgroundSyncWorker.kt$BackgroundSyncWorker$while</ID>
+    <ID>MagicNumber:BackgroundSyncWorker.kt$BackgroundSyncWorker$100.0</ID>
+    <ID>MagicNumber:BackgroundSyncWorker.kt$BackgroundSyncWorker$1000</ID>
+    <ID>MagicNumber:BackgroundSyncWorker.kt$BackgroundSyncWorker$5000</ID>
+    <ID>MagicNumber:BackgroundSyncWorker.kt$BackgroundSyncWorker$60</ID>
+    <ID>MagicNumber:RPCModule.kt$RPCModule$0xFFL</ID>
+    <ID>MagicNumber:RPCModule.kt$RPCModule$1000</ID>
+    <ID>MagicNumber:RPCModule.kt$RPCModule$7</ID>
+    <ID>MagicNumber:RPCModule.kt$RPCModule$8</ID>
+    <ID>MagicNumber:WalletExport.kt$WalletExport$4</ID>
+    <ID>MaxLineLength:BackgroundSyncWorker.kt$BSCompanion.Companion$val</ID>
+    <ID>MaxLineLength:BackgroundSyncWorker.kt$BackgroundSyncWorker$class</ID>
+    <ID>MaxLineLength:BackgroundSyncWorker.kt$BackgroundSyncWorker$val jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrEnd\"}"</ID>
+    <ID>MaxLineLength:BackgroundSyncWorker.kt$BackgroundSyncWorker$val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrError\"}"</ID>
+    <ID>MaxLineLength:BackgroundSyncWorker.kt$BackgroundSyncWorker$val jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"0\"}"</ID>
+    <ID>MaxLineLength:RPCModule.kt$RPCModule$"[$fileName] encrypted read failed AND raw bytes are not a plain wallet — Keystore key likely lost: $encryptedReadError"</ID>
+    <ID>MaxLineLength:RPCModule.kt$RPCModule$class</ID>
+    <ID>MaxLineLength:RPCModule.kt$RPCModule$fun</ID>
+    <ID>MaxLineLength:RPCModule.kt$RPCModule$val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())</ID>
+    <ID>MaxLineLength:RPCModule.kt$RPCModule$val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())</ID>
+    <ID>MaximumLineLength:BackgroundSyncWorker.kt$BSCompanion.Companion$ </ID>
+    <ID>MaximumLineLength:BackgroundSyncWorker.kt$BackgroundSyncWorker$ </ID>
+    <ID>MaximumLineLength:BackgroundSyncWorker.kt$BackgroundSyncWorker$class</ID>
+    <ID>MaximumLineLength:RPCModule.kt$RPCModule$ </ID>
+    <ID>MaximumLineLength:RPCModule.kt$RPCModule$class</ID>
+    <ID>NestedBlockDepth:BackgroundSyncWorker.kt$BackgroundSyncWorker$@RequiresApi(Build.VERSION_CODES.O) override fun doWork(): Result</ID>
+    <ID>NestedBlockDepth:RPCModule.kt$RPCModule$fun completePendingSwap()</ID>
+    <ID>NewLineAtEndOfFile:BackgroundSyncWorker.kt$org.ZingoLabs.Zingo.BackgroundSyncWorker.kt</ID>
+    <ID>NewLineAtEndOfFile:Constants.kt$org.ZingoLabs.Zingo.Constants.kt</ID>
+    <ID>NewLineAtEndOfFile:MainActivity.kt$org.ZingoLabs.Zingo.MainActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:RPCPackage.kt$org.ZingoLabs.Zingo.RPCPackage.kt</ID>
+    <ID>NoBlankLineBeforeRbrace:BackgroundSyncWorker.kt$BSCompanion.Companion$ </ID>
+    <ID>NoBlankLineBeforeRbrace:BackgroundSyncWorker.kt$BackgroundSyncWorker$ </ID>
+    <ID>NoBlankLineBeforeRbrace:MainActivity.kt$MainActivity$ </ID>
+    <ID>NoBlankLineBeforeRbrace:RPCModule.kt$RPCModule$ </ID>
+    <ID>NoEmptyFirstLineInMethodBlock:BackgroundSyncWorker.kt$BackgroundSyncWorker$ </ID>
+    <ID>NoMultipleSpaces:MainActivity.kt$MainActivity$ </ID>
+    <ID>NoMultipleSpaces:RPCModule.kt$RPCModule$ </ID>
+    <ID>NoTrailingSpaces:RPCModule.kt$RPCModule$ </ID>
+    <ID>NoWildcardImports:BackgroundSyncWorker.kt$import org.ZingoLabs.Zingo.Constants.*</ID>
+    <ID>NoWildcardImports:RPCModule.kt$import kotlinx.coroutines.*</ID>
+    <ID>NoWildcardImports:RPCModule.kt$import org.ZingoLabs.Zingo.Constants.*</ID>
+    <ID>PackageName:BackgroundSyncWorker.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:Constants.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:FfiOutcome.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:FfiOutcomeTest.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:MainActivity.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:MainApplication.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:RPCModule.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:RPCPackage.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:WalletExport.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:WalletExportClassificationTest.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:BackgroundSyncWorker.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:Constants.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:FfiOutcome.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:FfiOutcomeTest.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:MainActivity.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:MainApplication.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:RPCModule.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:RPCPackage.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:WalletExport.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:WalletExportClassificationTest.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
+    <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String)</ID>
+    <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
+    <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
+    <ID>ParameterListWrapping:RPCPackage.kt$RPCPackage$( reactContext: ReactApplicationContext)</ID>
+    <ID>ReturnCount:BackgroundSyncWorker.kt$BackgroundSyncWorker$@RequiresApi(Build.VERSION_CODES.O) override fun doWork(): Result</ID>
+    <ID>ReturnCount:BackgroundSyncWorker.kt$BackgroundSyncWorker$fun isAppInForeground(context: Context): Boolean</ID>
+    <ID>ReturnCount:RPCModule.kt$RPCModule$fun migrateFileIfNeeded(fileName: String)</ID>
+    <ID>ReturnCount:WalletExport.kt$WalletExport$fun isValidBase64(s: String): Boolean</ID>
+    <ID>SpacingAroundColon:BackgroundSyncWorker.kt$ScanRanges$:</ID>
+    <ID>SpacingAroundColon:BackgroundSyncWorker.kt$SyncStatus$:</ID>
+    <ID>SpacingAroundParens:BackgroundSyncWorker.kt$ScanRanges$(</ID>
+    <ID>SpacingAroundParens:BackgroundSyncWorker.kt$SyncStatus$(</ID>
+    <ID>SpacingBetweenDeclarationsWithAnnotations:BackgroundSyncWorker.kt$BSCompanion.Companion$@RequiresApi(Build.VERSION_CODES.O) fun scheduleBackgroundTask()</ID>
+    <ID>SpacingBetweenDeclarationsWithComments:Constants.kt$Constants.WalletTempSwapFileName$// Marker file for Audit Issue P (b) — only present mid-swap during</ID>
+    <ID>TooGenericExceptionCaught:BackgroundSyncWorker.kt$BackgroundSyncWorker$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BackgroundSyncWorker.kt$BackgroundSyncWorker$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:FfiOutcome.kt$FfiOutcome.Companion$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RPCModule.kt$RPCModule$binaryReadError: Exception</ID>
+    <ID>TooGenericExceptionCaught:RPCModule.kt$RPCModule$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RPCModule.kt$RPCModule$encryptedReadError: Exception</ID>
+    <ID>TooManyFunctions:RPCModule.kt$RPCModule : ReactContextBaseJavaModule</ID>
+    <ID>UnusedPrivateMember:RPCModule.kt$RPCModule$private fun getDocumentDirectory(): String</ID>
+    <ID>UnusedPrivateMember:RPCModule.kt$RPCModule$private fun readFile(fileName: String): ByteArray</ID>
+    <ID>UtilityClassWithPublicConstructor:BackgroundSyncWorker.kt$BSCompanion</ID>
+    <ID>WildcardImport:BackgroundSyncWorker.kt$import org.ZingoLabs.Zingo.Constants.*</ID>
+    <ID>WildcardImport:RPCModule.kt$import kotlinx.coroutines.*</ID>
+    <ID>WildcardImport:RPCModule.kt$import org.ZingoLabs.Zingo.Constants.*</ID>
+    <ID>Wrapping:BackgroundSyncWorker.kt$BSCompanion.Companion$(</ID>
+    <ID>Wrapping:BackgroundSyncWorker.kt$BSCompanion.Companion$("SCHEDULING_TASK", "Task info ${WorkManager.getInstance(context).getWorkInfosForUniqueWork( TASKID).get()}")</ID>
+    <ID>Wrapping:RPCPackage.kt$RPCPackage$(</ID>
+  </CurrentIssues>
+</SmellBaseline>

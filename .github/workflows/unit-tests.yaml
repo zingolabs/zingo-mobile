@@ -86,3 +86,9 @@ jobs:
       - name: Run Kotlin unit tests
         working-directory: ./android
         run: ./gradlew :app:testBetaDebugUnitTest
+
+      # Findings that predate adoption live in app/detekt-baseline.xml;
+      # only new or changed Kotlin is enforced (zingo-mobile#1166).
+      - name: Detekt
+        working-directory: ./android
+        run: ./gradlew :app:detekt
