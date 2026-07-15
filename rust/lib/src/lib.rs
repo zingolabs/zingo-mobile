@@ -650,6 +650,23 @@ mod init_error_channel_tests {
     }
 
     #[test]
+    fn ufvk_restore_failure_travels_on_the_error_channel() {
+        let error = init_from_ufvk(
+            "unvalidated at this point".to_string(),
+            1,
+            String::new(),
+            "main".to_string(),
+            "NotALevel".to_string(),
+            1,
+        )
+        .expect_err("an invalid performance level must be typed, not prose in the data channel");
+        assert!(
+            matches!(error, ZingolibError::Init(_)),
+            "the failure must be the typed Init variant: {error}"
+        );
+    }
+
+    #[test]
     fn undecodable_wallet_base64_travels_on_the_error_channel() {
         let error = init_from_b64(
             "!!!not-base64!!!".to_string(),
@@ -667,6 +684,50 @@ mod init_error_channel_tests {
             !error.to_string().contains("!!!not-base64!!!"),
             "the failure must not embed the payload it could not decode: {error}"
         );
+    }
+}
+
+/// The sync/rescan data/error channel contract (zingo-mobile#1151): with no
+/// initialized client, every call fails typed — never as prose in the data
+/// channel. The domain arms (Sync, Rescan) need a live wallet and server, so
+/// they are covered by the platform tests; these pin the one failure
+/// reachable host-side. nextest runs each test in its own process, so the
+/// LIGHTCLIENT global is reliably uninitialized.
+#[cfg(test)]
+mod sync_error_channel_tests {
+    use super::*;
+
+    fn assert_uninitialized(result: Result<String, ZingolibError>, ffi: &str) {
+        let error = result.expect_err("an uninitialized client must fail typed");
+        assert!(
+            matches!(error, ZingolibError::LightclientNotInitialized),
+            "{ffi} must fail with the typed uninitialized variant: {error}"
+        );
+    }
+
+    #[test]
+    fn run_sync_fails_typed_without_a_client() {
+        assert_uninitialized(run_sync(), "run_sync");
+    }
+
+    #[test]
+    fn pause_sync_fails_typed_without_a_client() {
+        assert_uninitialized(pause_sync(), "pause_sync");
+    }
+
+    #[test]
+    fn status_sync_fails_typed_without_a_client() {
+        assert_uninitialized(status_sync(), "status_sync");
+    }
+
+    #[test]
+    fn poll_sync_fails_typed_without_a_client() {
+        assert_uninitialized(poll_sync(), "poll_sync");
+    }
+
+    #[test]
+    fn run_rescan_fails_typed_without_a_client() {
+        assert_uninitialized(run_rescan(), "run_rescan");
     }
 }
 
