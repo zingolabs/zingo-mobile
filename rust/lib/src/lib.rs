@@ -563,42 +563,40 @@ pub fn init_from_b64(
     })
 }
 
-/// Maps a wallet-save result onto the FFI channels: wallet bytes become
-/// base64 data, an absent buffer means no save was needed and crosses as
-/// the empty string, and failure travels on the error channel — never as
-/// prose in the data channel (zingolabs/zingo-mobile#1151; audit Issue Q).
-fn encode_wallet_save(
+/// Maps a wallet-save result onto the FFI channels structurally: bytes are
+/// the wallet export, an absent buffer means no save was needed and crosses
+/// as null, and failure travels on the error channel. No shape of success
+/// can resemble failure, so no boundary ever classifies content
+/// (zingolabs/zingo-mobile#1151; audit Issue Q).
+fn map_wallet_save(
     save_result: std::io::Result<Option<Vec<u8>>>,
-) -> Result<String, ZingolibError> {
-    match save_result {
-        // we need to use STANDARD because swift is expecting the encoded String with padding
-        // I tried with STANDARD_NO_PAD and the decoding return `nil`.
-        Ok(Some(wallet_bytes)) => Ok(STANDARD.encode(wallet_bytes)),
-        Ok(None) => Ok("".to_string()),
-        Err(e) => Err(ZingolibError::Save(e.to_string())),
-    }
+) -> Result<Option<Vec<u8>>, ZingolibError> {
+    save_result.map_err(|e| ZingolibError::Save(e.to_string()))
 }
 
-pub fn save_to_b64() -> Result<String, ZingolibError> {
-    // Return the wallet as a base64 encoded string
+pub fn save_wallet_bytes() -> Result<Option<Vec<u8>>, ZingolibError> {
+    // Return the wallet as raw bytes; the platforms own the file format and
+    // encode base64 at their write sites.
     with_initialized_lightclient(|lightclient| {
         RT.block_on(async move {
             let mut wallet = lightclient.wallet().write().await;
-            encode_wallet_save(wallet.save())
+            map_wallet_save(wallet.save())
         })
     })
 }
 
-/// The save-path data/error channel contract (zingolabs/zingo-mobile#1151;
-/// audit Issue Q): whether a save succeeded is knowable from the channel of
-/// its result, never from its content.
+/// The save-path contract (zingolabs/zingo-mobile#1151; audit Issue Q), now
+/// structural at the boundary: bytes are the export, null means no save was
+/// needed, and failure is typed. The historical attack string — a base64
+/// wallet export beginning with "error" — is no longer representable,
+/// because no string crosses this boundary at all.
 #[cfg(test)]
 mod wallet_export_tests {
     use super::*;
 
     #[test]
     fn save_failure_travels_on_the_error_channel() {
-        let error = encode_wallet_save(Err(std::io::Error::other("disk full")))
+        let error = map_wallet_save(Err(std::io::Error::other("disk full")))
             .expect_err("a failed save must be typed, not prose in the data channel");
         assert!(
             matches!(error, ZingolibError::Save(_)),
@@ -606,22 +604,18 @@ mod wallet_export_tests {
         );
     }
 
-    /// The attack string: wallet bytes whose base64 encoding begins with
-    /// "error". Legitimate data must cross the data channel untouched.
     #[test]
-    fn wallet_export_resembling_an_error_is_data() {
-        let wallet_bytes = STANDARD
-            .decode("errorAAA")
-            .expect("the attack string is valid base64");
-        let encoded = encode_wallet_save(Ok(Some(wallet_bytes)))
+    fn wallet_bytes_cross_the_data_channel_verbatim() {
+        let wallet_bytes = vec![0xde, 0xad, 0xbe, 0xef];
+        let crossed = map_wallet_save(Ok(Some(wallet_bytes.clone())))
             .expect("wallet bytes travel on the data channel");
-        assert_eq!(encoded, "errorAAA");
+        assert_eq!(crossed, Some(wallet_bytes));
     }
 
     #[test]
-    fn no_save_needed_crosses_as_the_empty_marker() {
-        let encoded = encode_wallet_save(Ok(None)).expect("no-save is not a failure");
-        assert_eq!(encoded, "");
+    fn no_save_needed_crosses_as_null() {
+        let crossed = map_wallet_save(Ok(None)).expect("no-save is not a failure");
+        assert_eq!(crossed, None);
     }
 }
 

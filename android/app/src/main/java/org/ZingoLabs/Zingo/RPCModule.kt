@@ -393,25 +393,24 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(fileExists(WalletBackupFileName.value))
     }
 
+    // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
+    // null means no save was needed, bytes are the wallet export, and
+    // failure throws. Nothing here classifies content — a malformed export
+    // is unrepresentable, so no validator exists to disagree with the file
+    // format, which stays base64 and is encoded only at this write site.
     fun saveWalletFile(): Boolean {
         return try {
             uniffi.zingo.initLogging()
 
-            when (val export = WalletExport.classify(uniffi.zingo.saveToB64())) {
-                is WalletExportClassification.NoSaveNeeded -> {
-                    Log.i("MAIN", "[Native] No need to save the wallet.")
-                    true
-                }
-                is WalletExportClassification.Invalid -> {
-                    Log.e("MAIN", "Error: [Native] Couldn't save the wallet. ${export.reason}")
-                    false
-                }
-                is WalletExportClassification.ValidExport -> {
-                    Log.i("MAIN", "[Native] file size: ${export.base64.length} chars (Base64)")
-                    writeEncryptedFileDurably(WalletFileName.value, export.base64)
-                    true
-                }
+            val walletBytes = uniffi.zingo.saveWalletBytes()
+            if (walletBytes == null) {
+                Log.i("MAIN", "[Native] No need to save the wallet.")
+            } else {
+                val b64encoded = Base64.encodeToString(walletBytes, Base64.NO_WRAP)
+                Log.i("MAIN", "[Native] file size: ${b64encoded.length} chars (Base64)")
+                writeEncryptedFileDurably(WalletFileName.value, b64encoded)
             }
+            true
         } catch (e: Exception) {
             Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the wallet. $e")
             false

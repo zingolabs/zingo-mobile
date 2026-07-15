@@ -8,40 +8,14 @@
 import Foundation
 import React
 
-/// The outcome of classifying the string the `saveToB64` FFI returns on its
-/// success channel. Whether a save succeeded must be knowable from this type,
-/// never from re-inspecting the string's content downstream
-/// (zingo-mobile#1151; audit Issue Q).
-enum WalletExportClassification: Equatable {
-  /// The wallet reported that nothing needs saving; not a failure.
-  case noSaveNeeded
-  /// A well-formed base64 wallet export, safe to persist.
-  case validExport(base64: String)
-  /// Content that cannot be a wallet export; persisting it would corrupt the wallet file.
-  case invalid(reason: String)
-}
-
-/// Pure classification of wallet-export strings: no I/O, no logging, no
-/// platform dependencies, so it runs under plain XCTest unit tests.
+/// A pure base64 well-formedness check — no I/O, no logging, no platform
+/// dependencies — so it runs under plain XCTest unit tests.
+///
+/// The FFI no longer returns base64 (the save path crosses as bytes, so a
+/// malformed export is unrepresentable). This guard's one remaining role is
+/// validating wallet-file content read back from disk before
+/// `restoreExistingWalletBackup` swaps it into place.
 enum WalletExport {
-  static func classify(_ b64encoded: String) -> WalletExportClassification {
-    if b64encoded.isEmpty {
-      return .noSaveNeeded
-    }
-    if !isValidBase64(b64encoded) {
-      return .invalid(reason: "The Encoded content is incorrect.")
-    }
-    return .validExport(base64: b64encoded)
-  }
-
-  // Quick local Base64 well-formedness check. Used as a defensive guard so we
-  // never overwrite the wallet file with arbitrary text the Rust side might
-  // accidentally return (e.g. "the library is broken"). We do this in Swift
-  // rather than re-sending the whole Base64 payload back to Rust via
-  // `checkB64`, because that round-trip allocates two extra full-size copies
-  // of the string (Swift→Rust via RustBuffer + Rust→Swift again for the
-  // result) and has OOM-crashed on low-RAM 32-bit Android devices with large
-  // wallets. Symmetric guard for iOS.
   static func isValidBase64(_ s: String) -> Bool {
     let bytes = s.utf8
     if bytes.isEmpty || bytes.count % 4 != 0 { return false }
@@ -349,12 +323,11 @@ class RPCModule: NSObject {
     }
   }
 
-  // The wallet export is classified by its structure alone, never by
-  // sniffing its content for an error sentinel (zingo-mobile#1151; audit
-  // Issue Q): a valid base64 wallet export may begin with "error", while
-  // genuine failure arrives as a thrown error — and failure prose can
-  // never validate as base64, because it always contains characters
-  // outside the base64 alphabet.
+  // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
+  // nil means no save was needed, bytes are the wallet export, and failure
+  // throws. Nothing here classifies content — a malformed export is
+  // unrepresentable, so no validator exists to disagree with the file
+  // format, which stays base64 and is encoded only at this write site.
   func saveWalletInternal() throws {
     // Each failure is logged and wrapped exactly once. FileError does not
     // conform to LocalizedError, so re-catching our own throw would replace
@@ -365,25 +338,23 @@ class RPCModule: NSObject {
       return FileError.saveFileError(err)
     }
 
-    let export: WalletExportClassification
+    let walletBytes: Data?
     do {
-      export = WalletExport.classify(try saveToB64())
+      walletBytes = try saveWalletBytes()
     } catch {
-      throw saveFailure(error.localizedDescription)
+      throw saveFailure(String(describing: error))
     }
 
-    switch export {
-    case .noSaveNeeded:
+    guard let walletBytes = walletBytes else {
       NSLog("[Native] No need to save the wallet.")
-    case .invalid(let reason):
-      throw saveFailure(reason)
-    case .validExport(let base64):
-      NSLog("[Native] file size: \((base64.count * 3) / 4) bytes")
-      do {
-        try self.saveWalletFile(base64)
-      } catch {
-        throw saveFailure(error.localizedDescription)
-      }
+      return
+    }
+
+    NSLog("[Native] file size: \(walletBytes.count) bytes")
+    do {
+      try self.saveWalletFile(walletBytes.base64EncodedString())
+    } catch {
+      throw saveFailure(error.localizedDescription)
     }
   }
 
