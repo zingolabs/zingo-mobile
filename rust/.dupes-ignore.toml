@@ -1,0 +1,53 @@
+# cargo-dupes adoption baseline (see the unit-tests workflow). The fifteen
+# fingerprints below are the duplicate groups that predate adoption: the
+# per-FFI wrapper shims in lib.rs, whose one-per-exported-function shape
+# the uniffi boundary requires, and the deliberate Android/iOS platform
+# test mirrors. Shrink this file as refactors remove duplication; never
+# grow it. Fingerprints hash the normalized AST, so a refactor that edits
+# a baselined group shifts its fingerprint and resurfaces it — refresh
+# with 'cargo dupes report', and prune stale entries with
+# 'cargo dupes cleanup'.
+[[ignore]]
+fingerprint = "24dea1b91bbf8677"
+
+[[ignore]]
+fingerprint = "47e5ae53b67309fb"
+
+[[ignore]]
+fingerprint = "68e036d6bd634d69"
+
+[[ignore]]
+fingerprint = "77a616f815915e08"
+
+[[ignore]]
+fingerprint = "819c6d9f96dccd80"
+
+[[ignore]]
+fingerprint = "897bc8d3d31689df"
+
+[[ignore]]
+fingerprint = "8d3fef0aa32f078f"
+
+[[ignore]]
+fingerprint = "8fb31f33b741e22d"
+
+[[ignore]]
+fingerprint = "ac103d44d0e73431"
+
+[[ignore]]
+fingerprint = "b2d53fc34acfcf18"
+
+[[ignore]]
+fingerprint = "b8ecaaec87bbab9d"
+
+[[ignore]]
+fingerprint = "c42e5bd026539bed"
+
+[[ignore]]
+fingerprint = "ccf2fc14991deb22"
+
+[[ignore]]
+fingerprint = "f4a309b32b0ff1c0"
+
+[[ignore]]
+fingerprint = "fae7b2b8ad12ea67"

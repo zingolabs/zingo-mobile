@@ -48,6 +48,17 @@ jobs:
         working-directory: ./rust
         run: cargo clippy -p zingo --all-targets -- -D warnings
 
+      - name: Install cargo-dupes
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-dupes@0.2.1
+
+      # Any exact or near duplicate code block outside the adoption
+      # baseline (rust/.dupes-ignore.toml) fails the build.
+      - name: cargo-dupes
+        working-directory: ./rust
+        run: cargo dupes check --max-exact 0 --max-near 0
+
       # The Kotlin JVM unit tests compile the whole app module, which
       # references the generated uniffi bindings; generate them for the
       # debug build type the unit-test task compiles against. The dev
