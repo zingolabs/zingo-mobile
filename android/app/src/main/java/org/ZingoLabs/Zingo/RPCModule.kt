@@ -399,7 +399,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
             when (val export = WalletExport.classify(uniffi.zingo.saveToB64())) {
                 is WalletExportClassification.NoSaveNeeded -> {
-                    Log.e("MAIN", "[Native] No need to save the wallet.")
+                    Log.i("MAIN", "[Native] No need to save the wallet.")
                     true
                 }
                 is WalletExportClassification.Invalid -> {

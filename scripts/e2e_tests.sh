@@ -66,8 +66,12 @@ while getopts 'a:e:sx:h' OPTION; do
             ;;
         h)
             echo -e "\nRun end-to-end tests. Requires Android SDK Command-line Tools."
-            echo -e "\n  -a\t\tSet ABI/architecture (optional, default: x86_64)"
-            echo -e "      \t\t  armeabi-v7a runs on an arm64-v8a emulator image"
+            echo -e "\n  -a\t\tSet emulator architecture (optional, default: x86_64)"
+            echo -e "      \t\t  Selects the AVD system image only; the app build is not"
+            echo -e "      \t\t  pinned to an ABI, so the emulator loads the app's native"
+            echo -e "      \t\t  libraries for the image's own architecture. In particular"
+            echo -e "      \t\t  armeabi-v7a maps to an arm64-v8a image and exercises the"
+            echo -e "      \t\t  same 64-bit app code as '-a arm64-v8a'."
             echo -e "      \t\t  ARM images require an ARM host, x86 images an x86_64 host"
             echo -e "\n  -e\t\tSelect test name"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
@@ -86,8 +90,11 @@ if [[ $set_test_name == false ]]; then
     exit 1
 fi
 
-# Google publishes no armeabi-v7a system images for this API level, so 32-bit
-# ARM app code runs on a 64-bit ARM image, as it does in CI.
+# Google publishes no armeabi-v7a system images for this API level, so the
+# armeabi-v7a option runs on a 64-bit ARM image. Note the detox build below is
+# not pinned to an ABI, so on that image the app's 64-bit libraries load and
+# 32-bit app code is NOT exercised; true 32-bit coverage comes from the
+# armeabi-v7a integration tests in CI.
 if [ "${arch}" = "armeabi-v7a" ]; then
     avd_arch="arm64-v8a"
 else

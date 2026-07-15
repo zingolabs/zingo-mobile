@@ -821,4 +821,11 @@ class WalletExportClassificationTests: XCTestCase {
         }
         XCTAssertEqual(WalletExport.classify("ABCD"), .validExport(base64: "ABCD"))
     }
+
+    func testPaddingIsAtMostTwoCharacters() {
+        guard case .invalid = WalletExport.classify("A===") else {
+            return XCTFail("three padding characters must classify as invalid")
+        }
+        XCTAssertEqual(WalletExport.classify("AB=="), .validExport(base64: "AB=="))
+    }
 }

@@ -45,11 +45,12 @@ enum WalletExport {
   static func isValidBase64(_ s: String) -> Bool {
     let bytes = s.utf8
     if bytes.isEmpty || bytes.count % 4 != 0 { return false }
-    var sawPadding = false
+    var padCount = 0
     for b in bytes {
       if b == 0x3D { // '='
-        sawPadding = true
-      } else if sawPadding {
+        padCount += 1
+        if padCount > 2 { return false }
+      } else if padCount > 0 {
         return false
       } else if !((0x41...0x5A).contains(b) ||  // 'A'-'Z'
                   (0x61...0x7A).contains(b) ||  // 'a'-'z'
@@ -322,22 +323,34 @@ class RPCModule: NSObject {
   // never validate as base64, because it always contains characters
   // outside the base64 alphabet.
   func saveWalletInternal() throws {
-    do {
-      switch WalletExport.classify(try saveToB64()) {
-      case .noSaveNeeded:
-        NSLog("[Native] No need to save the wallet.")
-      case .invalid(let reason):
-        let err = "Error: [Native] Couldn't save the wallet. \(reason)"
-        NSLog(err)
-        throw FileError.saveFileError(err)
-      case .validExport(let base64):
-        NSLog("[Native] file size: \((base64.count * 3) / 4) bytes")
-        try self.saveWalletFile(base64)
-      }
-    } catch {
-      let err = "Error: [Native] Couldn't save the wallet. \(error.localizedDescription)"
+    // Each failure is logged and wrapped exactly once. FileError does not
+    // conform to LocalizedError, so re-catching our own throw would replace
+    // the message with the generic localizedDescription.
+    func saveFailure(_ detail: String) -> FileError {
+      let err = "Error: [Native] Couldn't save the wallet. \(detail)"
       NSLog(err)
-      throw FileError.saveFileError(err)
+      return FileError.saveFileError(err)
+    }
+
+    let export: WalletExportClassification
+    do {
+      export = WalletExport.classify(try saveToB64())
+    } catch {
+      throw saveFailure(error.localizedDescription)
+    }
+
+    switch export {
+    case .noSaveNeeded:
+      NSLog("[Native] No need to save the wallet.")
+    case .invalid(let reason):
+      throw saveFailure(reason)
+    case .validExport(let base64):
+      NSLog("[Native] file size: \((base64.count * 3) / 4) bytes")
+      do {
+        try self.saveWalletFile(base64)
+      } catch {
+        throw saveFailure(error.localizedDescription)
+      }
     }
   }
 
