@@ -36,11 +36,24 @@ by matching a sentinel inside it. Deterministic where the formats are
 disjoint: wallet-export base64 can never contain a colon or space, so
 failure prose can never be mistaken for it.
 
+## Structural contract
+
+The stronger form of structural classification: the boundary's type
+makes invalid values unrepresentable, so nothing remains to classify.
+Where a structural classifier validates a value after it crosses, a
+structural contract prevents the questionable value from existing at
+all — the wallet export crosses as bytes or as an absent value, and no
+string exists to resemble anything. The save path adopted this contract
+in the change known as R5.
+
 ## Attack string
 
 A vuln-reproducing input used in a red-to-green test: a value that is
-legitimate data yet matches a sniff's sentinel — for example, a valid
-base64 wallet export that begins with `error`.
+legitimate data yet matches a sniff's sentinel. The canonical example
+was a valid base64 wallet export beginning with `error`; the save
+path's structural contract has since made that string unrepresentable,
+and the tests that once pinned its correct classification now pin the
+contract that retired it.
 
 ## Out-of-band (typed) error
 
