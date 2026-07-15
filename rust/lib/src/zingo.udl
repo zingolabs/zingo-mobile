@@ -6,7 +6,8 @@ enum ZingolibError {
     "Save",
     "Init",
     "Sync",
-    "Rescan"
+    "Rescan",
+    "Read"
 };
 
 namespace zingo {
