@@ -69,6 +69,12 @@ pub enum ZingolibError {
     Panic(String),
     #[error("Error: saving wallet: {0}")]
     Save(String),
+    #[error("Error: initializing wallet: {0}")]
+    Init(String),
+    #[error("Error: sync: {0}")]
+    Sync(String),
+    #[error("Error: rescan: {0}")]
+    Rescan(String),
 }
 
 pub fn with_panic_guard<T, F>(f: F) -> Result<T, ZingolibError>
@@ -599,6 +605,67 @@ mod wallet_export_tests {
     fn no_save_needed_crosses_as_the_empty_marker() {
         let encoded = encode_wallet_save(Ok(None)).expect("no-save is not a failure");
         assert_eq!(encoded, "");
+    }
+}
+
+/// The init-path data/error channel contract (zingo-mobile#1151): domain
+/// failures travel on the error channel as the typed `Init` variant, never
+/// as prose in the data channel. Every case here fails before any network
+/// dial, so the tests run host-side with no infrastructure.
+#[cfg(test)]
+mod init_error_channel_tests {
+    use super::*;
+
+    #[test]
+    fn invalid_server_uri_travels_on_the_error_channel() {
+        let error = init_new(
+            "http://an invalid uri with spaces".to_string(),
+            "main".to_string(),
+            "Medium".to_string(),
+            1,
+        )
+        .expect_err("an invalid lightwalletd uri must be typed, not prose in the data channel");
+        assert!(
+            matches!(error, ZingolibError::Init(_)),
+            "the failure must be the typed Init variant: {error}"
+        );
+    }
+
+    #[test]
+    fn invalid_performance_level_travels_on_the_error_channel() {
+        let error = init_from_seed(
+            "unvalidated at this point".to_string(),
+            1,
+            String::new(),
+            "main".to_string(),
+            "NotALevel".to_string(),
+            1,
+        )
+        .expect_err("an invalid performance level must be typed, not prose in the data channel");
+        assert!(
+            matches!(error, ZingolibError::Init(_)),
+            "the failure must be the typed Init variant: {error}"
+        );
+    }
+
+    #[test]
+    fn undecodable_wallet_base64_travels_on_the_error_channel() {
+        let error = init_from_b64(
+            "!!!not-base64!!!".to_string(),
+            String::new(),
+            "main".to_string(),
+            "Medium".to_string(),
+            1,
+        )
+        .expect_err("undecodable wallet bytes must be typed, not prose in the data channel");
+        assert!(
+            matches!(error, ZingolibError::Init(_)),
+            "the failure must be the typed Init variant: {error}"
+        );
+        assert!(
+            !error.to_string().contains("!!!not-base64!!!"),
+            "the failure must not embed the payload it could not decode: {error}"
+        );
     }
 }
 
