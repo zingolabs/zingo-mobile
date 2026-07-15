@@ -14,6 +14,7 @@ export {
   createNewUnifiedAddress,
   createNewWallet,
   doSave,
+  doSaveBackup,
   fetchWallet,
   getBalanceInfo,
   getDonationAddress,

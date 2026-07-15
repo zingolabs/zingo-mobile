@@ -10,7 +10,7 @@ import RPCModule from '../../RPCModule';
 import { SwapStore, deriveWalletFingerprint } from '../../swap';
 import { WalletBackendConfig } from '../config/WalletBackendConfig';
 import { SyncCoordinator } from './SyncCoordinator';
-import { nativeSaveSucceeded } from '../utils/walletUtils';
+import { doSaveBackup } from '../utils/walletUtils';
 
 /**
  * Fetch the UFVK of the wallet that is about to be deleted and return its
@@ -46,8 +46,10 @@ export class WalletLifecycleService {
     if (exists && exists !== GlobalConst.false) {
       await this.syncCoordinator.pauseSyncProcess();
 
-      const backupResult = await RPCModule.doSaveBackup();
-      if (!nativeSaveSucceeded(backupResult)) {
+      // doSaveBackup classifies the trimodal native resolution and contains
+      // rejections, so failure — including a rejected bridge promise — always
+      // lands on this branch instead of escaping changeWallet.
+      if (!(await doSaveBackup())) {
         return this.config.translate('rpc.backupwallet-error');
       }
 
