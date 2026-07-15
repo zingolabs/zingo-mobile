@@ -13,6 +13,10 @@ jobs:
   unit-tests:
     uses: ./.github/workflows/unit-tests.yaml
 
+  ts-checks:
+    uses: ./.github/workflows/ts-checks.yaml
+    secrets: inherit
+
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
 

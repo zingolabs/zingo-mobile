@@ -36,9 +36,17 @@ jobs:
         with:
           tool: nextest
 
+      - name: Check Rust formatting
+        working-directory: ./rust
+        run: cargo fmt --check
+
       - name: Run Rust unit tests
         working-directory: ./rust
         run: cargo nextest run -p zingo
+
+      - name: Clippy
+        working-directory: ./rust
+        run: cargo clippy -p zingo --all-targets -- -D warnings
 
       # The Kotlin JVM unit tests compile the whole app module, which
       # references the generated uniffi bindings; generate them for the

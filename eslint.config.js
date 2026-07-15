@@ -13,6 +13,9 @@ module.exports = [
       'coverage/**',
       'rust/**',
       'scripts/release/**',
+      // Build outputs (gradle test reports carry generated .js)
+      'android/**/build/**',
+      'ios/build/**',
     ],
   },
   ...compat.extends('@react-native'),
