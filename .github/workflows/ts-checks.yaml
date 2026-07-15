@@ -47,8 +47,7 @@ jobs:
       - name: Copy-paste detection (Kotlin, zero tolerance)
         run: yarn cpd:check:kotlin
 
-      # Swift's remaining duplication is the per-test init/sync ritual in
-      # ZingoTests, refactorable only with a Swift compiler for feedback;
-      # measured 8.21% at adoption, gated at 8.5%. Ratchet toward zero.
-      - name: Copy-paste detection (Swift, ratchet)
+      # Swift also holds zero clones (the per-test init/sync ritual in
+      # ZingoTests was hoisted into shared helpers), so any clone fails.
+      - name: Copy-paste detection (Swift, zero tolerance)
         run: yarn cpd:check:swift
