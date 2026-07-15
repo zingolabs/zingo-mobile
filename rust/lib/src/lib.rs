@@ -545,7 +545,7 @@ fn encode_wallet_save(
         // I tried with STANDARD_NO_PAD and the decoding return `nil`.
         Ok(Some(wallet_bytes)) => Ok(STANDARD.encode(wallet_bytes)),
         Ok(None) => Ok("".to_string()),
-        Err(e) => Ok(format!("Error: {e}")),
+        Err(e) => Err(ZingolibError::Save(e.to_string())),
     }
 }
 
