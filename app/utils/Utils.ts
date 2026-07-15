@@ -114,21 +114,33 @@ export default class Utils {
     return chunks;
   }
 
-  // DONATION TO ZINGOLABS
-  static async getDonationAddress(chainName: ChainNameEnum): Promise<string> {
-    // donations only for mainnet.
+  // Donation addresses exist only on mainnet; any other chain gets ''.
+  private static async mainnetOnlyAddress(
+    chainName: ChainNameEnum,
+    fetchAddress: () => Promise<string>,
+  ): Promise<string> {
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      const ua: string = await getDonationAddress();
-      return ua;
+      return fetchAddress();
     }
     return '';
   }
 
-  static getDonationAmount(): string {
+  // DONATION TO ZINGOLABS
+  static async getDonationAddress(chainName: ChainNameEnum): Promise<string> {
+    return Utils.mainnetOnlyAddress(chainName, getDonationAddress);
+  }
+
+  // Both donation flows suggest the same default: one hundredth of a ZEC,
+  // rendered with the device's decimal separator.
+  private static centDonationAmount(): string {
     const { decimalSeparator } = getNumberFormatSettings();
 
     return '0' + decimalSeparator + '01';
+  }
+
+  static getDonationAmount(): string {
+    return Utils.centDonationAmount();
   }
 
   static getDonationMemo(translate: (key: string) => TranslateType): string {
@@ -139,19 +151,11 @@ export default class Utils {
   static async getZenniesDonationAddress(
     chainName: ChainNameEnum,
   ): Promise<string> {
-    // donations only for mainnet.
-    if (chainName === ChainNameEnum.mainChainName) {
-      // UA -> we need a fresh one.
-      const ua: string = await getZenniesDonationAddress();
-      return ua;
-    }
-    return '';
+    return Utils.mainnetOnlyAddress(chainName, getZenniesDonationAddress);
   }
 
   static getZenniesDonationAmount(): string {
-    const { decimalSeparator } = getNumberFormatSettings();
-
-    return '0' + decimalSeparator + '01';
+    return Utils.centDonationAmount();
   }
 
   // NYM

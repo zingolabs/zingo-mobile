@@ -400,7 +400,6 @@ export default function LoadingApp(props: LoadingAppProps) {
           settings.selectServer === SelectServerEnum.custom ||
           settings.selectServer === SelectServerEnum.list
         ) {
-          setServer(server);
           await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
         }
       }
@@ -1110,11 +1109,7 @@ export class LoadingAppClass extends Component<
       obsolete: false,
     } as ServerUrisType;
     const serverChecked = await selectingServer([s]);
-    if (serverChecked && serverChecked.latency) {
-      return true;
-    } else {
-      return false;
-    }
+    return Boolean(serverChecked && serverChecked.latency);
   };
 
   walletErrorHandle = async (
