@@ -28,6 +28,9 @@ jobs:
   swiftlint:
     uses: ./.github/workflows/swiftlint.yaml
 
+  meta-lint:
+    uses: ./.github/workflows/meta-lint.yaml
+
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
 
