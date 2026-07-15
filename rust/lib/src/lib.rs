@@ -224,7 +224,7 @@ where
             g
         }
     };
-    f(&mut *guard)
+    f(&mut guard)
 }
 
 fn reset_lightclient() {
@@ -288,7 +288,7 @@ fn build_connection_params(
             performance_level: performancetype,
         },
         min_confirmations: NonZeroU32::try_from(min_confirmations)
-                .map_err(|_| "min_confirmations must be greater than 0".to_string())?,
+            .map_err(|_| "min_confirmations must be greater than 0".to_string())?,
     };
 
     Ok(ConnectionParams {
@@ -298,10 +298,7 @@ fn build_connection_params(
     })
 }
 
-fn build_client_config(
-    params: &ConnectionParams,
-    wallet_config: WalletConfig,
-) -> ClientConfig {
+fn build_client_config(params: &ConnectionParams, wallet_config: WalletConfig) -> ClientConfig {
     ClientConfig::builder()
         .set_indexer_uri(params.lightwalletd_uri.clone())
         .set_chain_type(params.chain_type)
@@ -949,8 +946,8 @@ pub fn get_seed() -> Result<String, ZingolibError> {
                     Some(recovery_info) => {
                         // Surface the wallet's own chain alongside the recovery
                         // info so the JS layer can track it even Offline.
-                        let mut val = serde_json::to_value(&recovery_info)
-                            .unwrap_or(serde_json::Value::Null);
+                        let mut val =
+                            serde_json::to_value(&recovery_info).unwrap_or(serde_json::Value::Null);
                         if let Some(obj) = val.as_object_mut() {
                             obj.insert(
                                 "chain_name".to_string(),
@@ -959,9 +956,8 @@ pub fn get_seed() -> Result<String, ZingolibError> {
                                 ),
                             );
                         }
-                        serde_json::to_string_pretty(&val).unwrap_or_else(|_| {
-                            "Error: get seed. failed to serialize".to_string()
-                        })
+                        serde_json::to_string_pretty(&val)
+                            .unwrap_or_else(|_| "Error: get seed. failed to serialize".to_string())
                     }
                     None => {
                         "Error: get seed. no mnemonic found. wallet loaded from key.".to_string()
@@ -1540,7 +1536,9 @@ pub fn reserve_ephemeral_address() -> Result<String, ZingolibError> {
                             "encoded_address" => transparent::encode_address(&network, address),
                         }
                         .pretty(2),
-                        None => "Error: generate_refund_addresses returned an empty vector".to_string(),
+                        None => {
+                            "Error: generate_refund_addresses returned an empty vector".to_string()
+                        }
                     },
                     Err(e) => format!("Error: {e}"),
                 }
@@ -1683,7 +1681,7 @@ pub fn set_config_wallet_to_prod(
                     match NonZeroU32::try_from(min_confirmations) {
                         Ok(v) => v,
                         Err(_) => {
-                            return "Error: min_confirmations must be greater than 0".to_string()
+                            return "Error: min_confirmations must be greater than 0".to_string();
                         }
                     };
                 wallet.wallet_settings.sync_config.performance_level = performancetype;
