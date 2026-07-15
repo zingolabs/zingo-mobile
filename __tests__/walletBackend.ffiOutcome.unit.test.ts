@@ -28,6 +28,7 @@ import {
   restoreWalletFromUfvk,
 } from '../app/walletBackend/utils/walletUtils';
 import { SyncCoordinator } from '../app/walletBackend/modules/SyncCoordinator';
+import { DataService } from '../app/walletBackend/modules/DataService';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 
@@ -135,5 +136,83 @@ describe('sync family rejections are contained and reported, never sniffed', () 
     expect(onError).toHaveBeenCalledWith(
       expect.stringContaining('Error sync poll'),
     );
+  });
+});
+
+describe('read getter rejections are contained and reported, never sniffed', () => {
+  function makeDataService() {
+    const onError = jest.fn();
+    const config = {
+      onError,
+      onAddressesChanged: jest.fn(),
+      onZingolibVersionChanged: jest.fn(),
+    } as unknown as ConstructorParameters<typeof DataService>[0];
+    return { dataService: new DataService(config), onError };
+  }
+
+  const rejection = () => Promise.reject(new Error('bridge exploded'));
+
+  const fetches: Array<
+    [string, string, (dataService: DataService) => Promise<unknown>]
+  > = [
+    [
+      'get_latest_block_wallet',
+      'getLatestBlockWalletInfo',
+      ds => ds.fetchWalletHeight(),
+    ],
+    ['get_version', 'getVersionInfo', ds => ds.fetchZingolibVersion()],
+    [
+      'get_unified_addresses',
+      'getUnifiedAddressesInfo',
+      ds => ds.fetchAddresses(),
+    ],
+    [
+      'get_wallet_save_required',
+      'getWalletSaveRequiredInfo',
+      ds => ds.getWalletSaveRequired(),
+    ],
+    [
+      'get_config_wallet_performance',
+      'getConfigWalletPerformanceInfo',
+      ds => ds.getConfigWalletPerformance(),
+    ],
+    ['get_wallet_version', 'getWalletVersionInfo', ds => ds.getWalletVersion()],
+  ];
+
+  it.each(fetches)('%s', async (_ffi, bridgeMethod, call) => {
+    const { dataService, onError } = makeDataService();
+    bridge[bridgeMethod].mockImplementationOnce(rejection);
+
+    await call(dataService);
+
+    expect(onError).toHaveBeenCalledWith(expect.stringContaining('Error'));
+  });
+
+  it('get_transparent_addresses', async () => {
+    // fetchAddresses awaits the unified getter first; resolve it so the
+    // rejection under test is the transparent one.
+    const { dataService, onError } = makeDataService();
+    bridge.getUnifiedAddressesInfo.mockResolvedValueOnce('[]');
+    bridge.getTransparentAddressesInfo.mockImplementationOnce(rejection);
+
+    await dataService.fetchAddresses();
+
+    expect(onError).toHaveBeenCalledWith(expect.stringContaining('Error'));
+  });
+
+  it('a resolved value wearing the error sentinel is data, not a failure', async () => {
+    // The attack case for the read path: after the sniff deletion the
+    // value goes to JSON.parse, and this valid JSON must land in the
+    // changed-callback, not in onError.
+    const { dataService, onError } = makeDataService();
+    const config = dataService.config as unknown as {
+      onZingolibVersionChanged: jest.Mock;
+    };
+    bridge.getVersionInfo.mockResolvedValueOnce('error-1.2.3');
+
+    await dataService.fetchZingolibVersion();
+
+    expect(onError).not.toHaveBeenCalled();
+    expect(config.onZingolibVersionChanged).toHaveBeenCalledWith('error-1.2.3');
   });
 });
