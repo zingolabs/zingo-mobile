@@ -443,90 +443,60 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun createNewWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        try {
+        FfiOutcome.of("init_new") {
             uniffi.zingo.initLogging()
 
-            // Create a seed
+            // Create a seed. initNew throws on failure, so reaching the save
+            // implies the wallet exists.
             val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt())
-            // Log.i("MAIN-Seed", resp)
-
-            if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-                saveWalletFile()
-            }
-
-            promise.resolve(resp)
-        } catch (e: Exception) {
-            val errorMessage = "Error: [Native] create new wallet: ${e.localizedMessage}"
-            Log.e("MAIN", errorMessage, e)
-            promise.resolve(errorMessage)
-        }
+            saveWalletFile()
+            resp
+        }.settle(promise)
     }
 
     @ReactMethod
     fun restoreWalletFromSeed(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        try {
+        FfiOutcome.of("init_from_seed") {
             uniffi.zingo.initLogging()
 
             val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
-            // Log.i("MAIN", resp)
-
-            if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-                saveWalletFile()
-            }
-
-            promise.resolve(resp)
-        } catch (e: Exception) {
-            val errorMessage = "Error: [Native] restore wallet from seed: ${e.localizedMessage}"
-            Log.e("MAIN", errorMessage, e)
-            promise.resolve(errorMessage)
-        }
+            saveWalletFile()
+            resp
+        }.settle(promise)
     }
 
     @ReactMethod
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        try {
+        FfiOutcome.of("init_from_ufvk") {
             uniffi.zingo.initLogging()
 
             val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
-            // Log.i("MAIN", resp)
-
-            if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-                saveWalletFile()
-            }
-
-            promise.resolve(resp)
-        } catch (e: Exception) {
-            val errorMessage = "Error: [Native] restore wallet from ufvk: ${e.localizedMessage}"
-            Log.e("MAIN", errorMessage, e)
-            promise.resolve(errorMessage)
-        }
+            saveWalletFile()
+            resp
+        }.settle(promise)
 }
 
     @ReactMethod
     fun loadExistingWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        promise.resolve(loadExistingWalletNative(serveruri, chainhint, performancelevel, minconfirmations))
+        FfiOutcome.of("init_from_b64") {
+            loadExistingWalletNative(serveruri, chainhint, performancelevel, minconfirmations)
+        }.settle(promise)
     }
 
+    // Throws on failure; callers own the error channel (a rejected promise
+    // here, the worker's catch in BackgroundSyncWorker).
     fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
-        try {
-            // Migrate both files from old binary format to encrypted Base64 if needed.
-            // Safe to call even if files don't exist or are already migrated.
-            migrateFileIfNeeded(WalletFileName.value)
-            migrateFileIfNeeded(WalletBackupFileName.value)
+        // Migrate both files from old binary format to encrypted Base64 if needed.
+        // Safe to call even if files don't exist or are already migrated.
+        migrateFileIfNeeded(WalletFileName.value)
+        migrateFileIfNeeded(WalletBackupFileName.value)
 
-            uniffi.zingo.initLogging()
+        uniffi.zingo.initLogging()
 
-            val fileb64 = readFileAsB64(WalletFileName.value)
-            Log.i("MAIN", "file size: ${fileb64.length} chars (Base64)")
+        val fileb64 = readFileAsB64(WalletFileName.value)
+        Log.i("MAIN", "file size: ${fileb64.length} chars (Base64)")
 
-            val resp = uniffi.zingo.initFromB64(fileb64, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
-
-            return resp
-        } catch (e: Exception) {
-            val errorMessage = "Error: [Native] load existing wallet: ${e.localizedMessage}"
-            Log.e("MAIN", errorMessage, e)
-            return errorMessage
-        }
+        return uniffi.zingo.initFromB64(fileb64, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
     }
 
     @ReactMethod
@@ -756,20 +726,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun pollSyncInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
+            val outcome = FfiOutcome.of("poll_sync") {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.pollSync()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] sync poll info: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+                uniffi.zingo.pollSync()
+            }
+            withContext(Dispatchers.Main) {
+                outcome.settle(promise)
             }
         }
     }
@@ -777,9 +739,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun runSyncProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
+            val outcome = FfiOutcome.of("run_sync") {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.runSync()
 
                 // Persistence is owned by JS (SyncCoordinator → doSave when
                 // getWalletSaveRequired returns true). Auto-saving here was
@@ -787,17 +748,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 // Dispatchers.IO threads writing in parallel produced the
                 // EncryptedFile "output file already exists" crashes in the
                 // logs. Single source of truth for save decisions = JS.
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] sync run process: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+                uniffi.zingo.runSync()
+            }
+            withContext(Dispatchers.Main) {
+                outcome.settle(promise)
             }
         }
     }
@@ -805,20 +759,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun pauseSyncProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
+            val outcome = FfiOutcome.of("pause_sync") {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.pauseSync()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] sync pause process: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+                uniffi.zingo.pauseSync()
+            }
+            withContext(Dispatchers.Main) {
+                outcome.settle(promise)
             }
         }
     }
@@ -826,20 +772,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun statusSyncInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
+            val outcome = FfiOutcome.of("status_sync") {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.statusSync()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] sync status info: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+                uniffi.zingo.statusSync()
+            }
+            withContext(Dispatchers.Main) {
+                outcome.settle(promise)
             }
         }
     }
@@ -847,20 +785,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun runRescanProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
+            val outcome = FfiOutcome.of("run_rescan") {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.runRescan()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] rescan run process: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+                uniffi.zingo.runRescan()
+            }
+            withContext(Dispatchers.Main) {
+                outcome.settle(promise)
             }
         }
     }
