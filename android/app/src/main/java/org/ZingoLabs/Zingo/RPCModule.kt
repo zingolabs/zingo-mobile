@@ -1097,18 +1097,21 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }.settle(promise)
     }
 
-    @ReactMethod
-    fun createNewUnifiedAddressProcess(receivers: String, promise: Promise) {
+    // Pre-migration ReactMethod shell: resolves the FFI result, or resolves
+    // "Error: ..." prose from the catch. Each caller dies into an
+    // FfiOutcome rejection as its TS consumer migrates (zingo-mobile#1151);
+    // until then the shell lives once instead of once per method.
+    private fun resolveProseOnError(promise: Promise, label: String, call: () -> String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.createNewUnifiedAddress(receivers)
+                val resp = call()
 
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: [Native] create new unified address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] $label: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1119,23 +1122,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun createNewUnifiedAddressProcess(receivers: String, promise: Promise) {
+        resolveProseOnError(promise, "create new unified address") {
+            uniffi.zingo.createNewUnifiedAddress(receivers)
+        }
+    }
+
+    @ReactMethod
     fun createNewTransparentAddressProcess(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.createNewTransparentAddress()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] create new transparent address: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
+        resolveProseOnError(promise, "create new transparent address") {
+            uniffi.zingo.createNewTransparentAddress()
         }
     }
 
@@ -1162,22 +1158,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun checkMyAddressInfo(address: String, promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.checkMyAddress(address)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] create new unified address: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
+        // The label used to say "create new unified address" — copy-paste
+        // rot from the method this shell was cloned from.
+        resolveProseOnError(promise, "check my address") {
+            uniffi.zingo.checkMyAddress(address)
         }
     }
 

@@ -74,6 +74,24 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         return false
     }
 
+    // Records a failed stage of the background sync to the background JSON
+    // file, which the UI reads on next launch, and fails the worker.
+    private fun failStage(stage: String, timeStampStrStart: String, error: Throwable): Result {
+        val timeStampStrError = (Date().time / 1000).toString()
+        val msg = error.message ?: "Error: Unknown"
+        val payload = JSONObject().apply {
+            put("batches", "0")
+            put("message", stage)
+            put("date", timeStampStrStart)
+            put("dateEnd", timeStampStrError)
+            put("error", "$stage $msg")
+        }
+        val jsonBackgroundError = payload.toString()
+        rpcModule.saveBackgroundFile(jsonBackgroundError)
+        Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+        return Result.failure()
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun doWork(): Result {
 
@@ -111,21 +129,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             Log.i("SCHEDULED_TASK_RUN", "crypto provider default: $setCrytoProvider")
         } catch (t: Throwable) {
             Log.i("SCHEDULED_TASK_RUN", "crypto provider default error: $t")
-            // save the background JSON file
-            val timeStampError = Date().time / 1000
-            val timeStampStrError = timeStampError.toString()
-            val msg = (t.message ?: "Error: Unknown")
-            val payload = JSONObject().apply {
-                put("batches", "0")
-                put("message", "Crypto Provider Default KO.")
-                put("date", "$timeStampStrStart")
-                put("dateEnd", "$timeStampStrError")
-                put("error", "Crypto Provider Default KO. $msg")
-            }
-            val jsonBackgroundError = payload.toString()
-            rpcModule.saveBackgroundFile(jsonBackgroundError)
-            Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
-            return Result.failure()
+            return failStage("Crypto Provider Default KO.", timeStampStrStart, t)
         }
 
         // checking if the wallet file exists
@@ -160,21 +164,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
             } catch (t: Throwable) {
                 Log.i("SCHEDULED_TASK_RUN", "Run Sync unknown error: $t")
-                // save the background JSON file
-                val timeStampError = Date().time / 1000
-                val timeStampStrError = timeStampError.toString()
-                val msg = (t.message ?: "Error: Unknown")
-                val payload = JSONObject().apply {
-                    put("batches", "0")
-                    put("message", "Run sync process KO.")
-                    put("date", "$timeStampStrStart")
-                    put("dateEnd", "$timeStampStrError")
-                    put("error", "Run sync process KO. $msg")
-                }
-                val jsonBackgroundError = payload.toString()
-                rpcModule.saveBackgroundFile(jsonBackgroundError)
-                Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
-                return Result.failure()
+                return failStage("Run sync process KO.", timeStampStrStart, t)
             }
 
             val startTime = System.currentTimeMillis()
@@ -196,21 +186,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                     syncStatusJson = uniffi.zingo.statusSync()
                 } catch (t: Throwable) {
                     Log.i("SCHEDULED_TASK_RUN", "Sync STATUS unknown error: $t")
-                    // save the background JSON file
-                    val timeStampError = Date().time / 1000
-                    val timeStampStrError = timeStampError.toString()
-                    val msg = (t.message ?: "Error: Unknown")
-                    val payload = JSONObject().apply {
-                        put("batches", "0")
-                        put("message", "Status sync process KO.")
-                        put("date", "$timeStampStrStart")
-                        put("dateEnd", "$timeStampStrError")
-                        put("error", "Status sync process KO. $msg")
-                    }
-                    val jsonBackgroundError = payload.toString()
-                    rpcModule.saveBackgroundFile(jsonBackgroundError)
-                    Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
-                    return Result.failure()
+                    return failStage("Status sync process KO.", timeStampStrStart, t)
                 }
 
                 try {
