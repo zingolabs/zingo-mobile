@@ -35,6 +35,13 @@ class FfiOutcomeTest {
         // rejects is an escaping exception, FFI-typed or platform I/O.
         "save_wallet_bytes" to ZingolibException.Save("boom"),
         "save_wallet_backup" to java.io.IOException("boom"),
+        // The wallet-read getters whose domain failures are the typed
+        // Read variant.
+        "get_balance" to ZingolibException.Read("boom"),
+        "get_spendable_balance_total" to ZingolibException.Read("boom"),
+        "get_value_transfers" to ZingolibException.Read("boom"),
+        "get_messages" to ZingolibException.Read("boom"),
+        "get_latest_block_server" to ZingolibException.Read("boom"),
     )
 
     @Test
