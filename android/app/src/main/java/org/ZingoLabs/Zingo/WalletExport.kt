@@ -23,8 +23,6 @@ sealed class WalletExportClassification {
  */
 object WalletExport {
     fun classify(b64encoded: String): WalletExportClassification = when {
-        b64encoded.lowercase().startsWith(Constants.ErrorPrefix.value) ->
-            WalletExportClassification.Invalid(b64encoded)
         b64encoded.isEmpty() ->
             WalletExportClassification.NoSaveNeeded
         !isValidBase64(b64encoded) ->
