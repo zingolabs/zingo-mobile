@@ -17,6 +17,9 @@ jobs:
     uses: ./.github/workflows/ts-checks.yaml
     secrets: inherit
 
+  swiftlint:
+    uses: ./.github/workflows/swiftlint.yaml
+
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
 

@@ -1,0 +1,37 @@
+name: SwiftLint
+
+on:
+  workflow_call:
+
+jobs:
+  swiftlint:
+    name: SwiftLint
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/realm/swiftlint:0.65.0
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Findings that predate adoption live in ios/swiftlint-baseline.json,
+      # so only new or changed Swift is enforced (zingo-mobile#1166).
+      - name: SwiftLint (strict, baselined)
+        if: ${{ hashFiles('ios/swiftlint-baseline.json') != '' }}
+        working-directory: ios
+        run: swiftlint lint --strict --baseline swiftlint-baseline.json
+
+      # Bootstrap path, used only until the baseline is committed: generate
+      # it and publish it as an artifact for a maintainer to commit. The
+      # lint's own exit code is ignored here because every finding predates
+      # adoption by definition.
+      - name: Bootstrap the baseline
+        if: ${{ hashFiles('ios/swiftlint-baseline.json') == '' }}
+        working-directory: ios
+        run: swiftlint lint --write-baseline swiftlint-baseline.json || true
+
+      - name: Upload the bootstrapped baseline
+        if: ${{ hashFiles('ios/swiftlint-baseline.json') == '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: swiftlint-baseline
+          path: ios/swiftlint-baseline.json
