@@ -40,15 +40,15 @@ const ZCASH_LOGO = require('../../assets/img/zcash-yellow.png');
 /**
  * Fixed snap point kept at module scope so the array identity is stable across
  * renders (gorhom re-measures when `snapPoints` changes identity). A fixed tall
- * sheet — like the swap AssetPickerSheet — keeps the list from collapsing to
- * one row when a search query narrows it.
+ * sheet keeps the list from collapsing to one row when a search query narrows
+ * it.
  */
 const SNAP_POINTS: string[] = ['95%'];
 
 /**
  * The chain's logo: the app Zcash mark for ZEC, the bundled per-chain icon
  * otherwise, and a coloured letter avatar (chain siglas) when we ship no icon —
- * so the slot is never empty. Same convention the swap `TokenLogo` uses.
+ * so the slot is never empty.
  */
 export const ChainLogo: React.FunctionComponent<{
   chain: string;
@@ -206,7 +206,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
         ref={sheetRef}
         accessible={false}
         // Fixed tall snap point so the sheet doesn't shrink to "1 row" when the
-        // search query narrows the list — matches the swap AssetPickerSheet.
+        // search query narrows the list.
         enableDynamicSizing={false}
         snapPoints={SNAP_POINTS}
         enablePanDownToClose
@@ -289,7 +289,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
               <TextInput
                 value={query}
                 onChangeText={setQuery}
-                placeholder={t('swap.search-asset', 'Search')}
+                placeholder={t('addressbook.search-placeholder', 'Search')}
                 placeholderTextColor={colors.placeholder}
                 autoCapitalize="none"
                 autoCorrect={false}

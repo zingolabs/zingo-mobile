@@ -204,11 +204,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Generate SwapKit secrets module
-        env:
-          SWAPKIT_API_KEY: ${{ secrets.SWAPKIT_API_KEY }}
-        run: ./scripts/ci/generate-swapkit-secrets.sh
-
       - name: Free up disk space
         run: |
           set -eux

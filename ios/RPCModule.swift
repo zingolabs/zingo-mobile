@@ -1703,37 +1703,6 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  func fnReserveEphemeralAddressProcess(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try reserveEphemeralAddress()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] reserve ephemeral address. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] reserve ephemeral address. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
-  @objc(reserveEphemeralAddressProcess:reject:)
-  func reserveEphemeralAddressProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnReserveEphemeralAddressProcess(dict)
-        }
-      }
-  }
-
   func fnCheckMyAddressInfo(_ dict: [AnyHashable: Any]) {
       if let address = dict["address"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {

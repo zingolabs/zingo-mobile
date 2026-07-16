@@ -12,8 +12,7 @@ import { getZecPrice } from '../../app/walletBackend';
  *   - ONE auto-refresh timer (fires while at least one fetcher is mounted and
  *     the user has fetched at least once).
  *   - Shared `loading` + a 5 s post-fetch `cooldown` so rapid taps across ANY
- *     instance can't spam the price backend (mirrors the swap manual-refresh
- *     cooldown).
+ *     instance can't spam the price backend.
  *   - Shared `started` flag so all instances flip from the idle icon to the
  *     countdown ring together, after the first successful fetch.
  *

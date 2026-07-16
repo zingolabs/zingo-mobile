@@ -33,11 +33,6 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Generate SwapKit secrets module
-        env:
-          SWAPKIT_API_KEY: ${{ secrets.SWAPKIT_API_KEY }}
-        run: ./scripts/ci/generate-swapkit-secrets.sh
-
       - name: Restore iOS xcframework cache
         uses: actions/cache/restore@v6
         with:

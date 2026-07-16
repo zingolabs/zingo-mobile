@@ -251,7 +251,7 @@ const ServerSelector: React.FunctionComponent<ServerSelectorProps> = ({
     updateSelectedInfo(parsed, customServerChainName);
   };
 
-  // Debounced custom-server check — same mechanism as the Swap amount → quote.
+  // Debounced custom-server check.
   useEffect(() => {
     if (selectServer !== SelectServerEnum.custom) {
       return;

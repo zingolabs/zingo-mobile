@@ -422,20 +422,6 @@ export async function createNewTransparentAddress(): Promise<string> {
   }
 }
 
-// Reserves a fresh ZIP-320 refund-scope (ephemeral) transparent address. The
-// wallet persists the new index so subsequent sync ticks scan it and any
-// incoming UTXOs surface as normal wallet transactions. Returns raw JSON:
-// `{ account, address_index, scope, encoded_address }`. Callers (swap flow)
-// must use one per swap intent — reuse would defeat the privacy property.
-export async function reserveEphemeralAddress(): Promise<string> {
-  try {
-    return await RPCModule.reserveEphemeralAddressProcess();
-  } catch (error) {
-    console.log(`Critical Error reserveEphemeralAddress ${error}`);
-    return `Error: ${error}`;
-  }
-}
-
 // Requests zingolib to forget about a transaction. Returns the raw response
 // from the bridge — either an "error: ..." prefix on failure or a
 // human-readable status message on success, which the caller is expected to

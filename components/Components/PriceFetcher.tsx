@@ -13,7 +13,7 @@ import RegText from './RegText';
 import { ThemeType } from '../../app/types';
 import { ModeEnum } from '../../app/AppState';
 import { showConfirm, ConfirmButton } from '../../app/showConfirm';
-import QuoteRefreshRing from '../Swap/components/QuoteRefreshRing';
+import QuoteRefreshRing from './QuoteRefreshRing';
 import {
   PRICE_AUTO_REFRESH_MS,
   priceFetcherStore,

@@ -78,8 +78,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   const [errorAddress, setErrorAddress] = useState<string>('');
   // 1 - OK, 0 - Empty, -1 - KO (mirrors the standalone TextInputAddress).
   const [validAddress, setValidAddress] = useState<number>(0);
-  // SwapKit chain code of the contact ('ZEC' by default; 'BTC'/'ETH'/... when
-  // the multi-chain UI is active). Editable only when adding + swaps enabled.
+  // Chain code of the contact ('ZEC' by default; 'BTC'/'ETH'/... when
+  // the multi-chain UI is active). Editable only when adding.
   const [swapChain, setSwapChain] = useState<string>(
     item.swapChain || GlobalConst.zecSwapChain,
   );
@@ -90,10 +90,9 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   const [possibleChains, setPossibleChains] = useState<string[]>([
     ...SWAP_ADDRESS_CHAINS,
   ]);
-  // The chain picker only shows when swaps are enabled and we're adding a new
-  // contact; otherwise the book stays Zcash-only / the chain is fixed.
-  const showSwapChain =
-    GlobalConst.swapEnabled && action === AddressBookActionEnum.Add;
+  // The chain picker is only editable while adding a new contact; otherwise
+  // the chain is fixed.
+  const showSwapChain = action === AddressBookActionEnum.Add;
 
   useEffect(() => {
     if (currentAddress) {
@@ -416,20 +415,18 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           )}
         </View>
       </View>
-      {GlobalConst.swapEnabled && (
-        <View style={{ paddingHorizontal: 10, marginTop: 18 }}>
-          {/* Editable picker while adding; a read-only field on modify/delete so
-              the user can still see the contact's chain. */}
-          <ChainSelect
-            label={translate('addressbook.chain') as string}
-            value={swapChain}
-            options={showSwapChain ? possibleChains : [swapChain]}
-            onChange={setSwapChain}
-            translate={translate}
-            disabled={!showSwapChain}
-          />
-        </View>
-      )}
+      <View style={{ paddingHorizontal: 10, marginTop: 18 }}>
+        {/* Editable picker while adding; a read-only field on modify/delete so
+            the user can still see the contact's chain. */}
+        <ChainSelect
+          label={translate('addressbook.chain') as string}
+          value={swapChain}
+          options={showSwapChain ? possibleChains : [swapChain]}
+          onChange={setSwapChain}
+          translate={translate}
+          disabled={!showSwapChain}
+        />
+      </View>
       {(!!error || !!errorAddress) && (
         <View
           style={{

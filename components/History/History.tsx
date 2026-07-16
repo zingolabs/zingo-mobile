@@ -48,7 +48,6 @@ import { ContextAppLoaded } from '../../app/context';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
-import { swapRecordToValueTransfer } from '../../app/swap';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import Header from '../Header';
 import Utils from '../../app/utils';
@@ -118,7 +117,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const {
     translate,
     valueTransfers,
-    swapRecords,
     language,
     setBackgroundError,
     addLastSnackbar,
@@ -376,18 +374,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
     );
   }, [priceRowH, historySnapPoints]);
 
-  // Merge zingolib-reported value transfers with swap rows projected from the
-  // app-level `swapRecords` mirror. We do NOT dedup against the underlying
-  // outbound Sent VT — by design (see Phase 5 decision in swap-backlog): the
-  // user sees the Swap row alongside the underlying Sent so the chronology
-  // stays explicit. Sorted by `time` descending so the merged stream still
-  // looks chronological to the list.
   const mergedValueTransfers = useMemo(() => {
-    const swapRows = (swapRecords ?? []).map(swapRecordToValueTransfer);
-    const base = valueTransfers ?? [];
-    if (swapRows.length === 0) return base;
-    return [...base, ...swapRows].sort((a, b) => b.time - a.time);
-  }, [valueTransfers, swapRecords]);
+    return valueTransfers ?? [];
+  }, [valueTransfers]);
 
   const fetchValueTransfersFiltered = useMemo(() => {
     if (mergedValueTransfers.length === 0 && valueTransfers === null) {
@@ -419,11 +408,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
         } else if (
           filterKind === FilterEnum.shielded &&
           vt.kind === ValueTransferKindEnum.Shield
-        ) {
-          selectedKind = true;
-        } else if (
-          filterKind === FilterEnum.swap &&
-          vt.kind === ValueTransferKindEnum.Swap
         ) {
           selectedKind = true;
         }
@@ -553,51 +537,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const setValueTransferDetailModalShow = useCallback(
     (_index: number, vt: ValueTransferType) => {
-      // VTD and SwapDetail each navigate ONLY through rows of their own
-      // kind so the up/down chevrons never land on a record the screen
-      // cannot render. We derive the per-kind slice + new index here at
-      // tap time from the same `valueTransfersSliced` the list is
-      // showing — no separate state, just two filtered projections of
-      // the same source array. `totalLength` reflects the matching kind
-      // in the broader filtered set (so "3 of 12" reads coherently).
-      if (
-        vt.kind === ValueTransferKindEnum.Swap &&
-        vt.swapRecordId !== undefined
-      ) {
-        const swapSlice = valueTransfersSliced.filter(
-          item =>
-            item.kind === ValueTransferKindEnum.Swap &&
-            item.swapRecordId !== undefined,
-        );
-        const recordIds = swapSlice.map(item => item.swapRecordId!);
-        const targetIndex = recordIds.indexOf(vt.swapRecordId);
-        const totalLength =
-          valueTransfersFiltered !== null
-            ? valueTransfersFiltered.filter(
-                item => item.kind === ValueTransferKindEnum.Swap,
-              ).length
-            : recordIds.length;
-        navigation.navigate(RouteEnum.SwapDetail, {
-          index: targetIndex >= 0 ? targetIndex : 0,
-          recordIds,
-          totalLength,
-        });
-        return;
-      }
-      const vtSlice = valueTransfersSliced.filter(
-        item => item.kind !== ValueTransferKindEnum.Swap,
-      );
-      const targetIndex = vtSlice.indexOf(vt);
+      const targetIndex = valueTransfersSliced.indexOf(vt);
       const totalLength =
         valueTransfersFiltered !== null
-          ? valueTransfersFiltered.filter(
-              item => item.kind !== ValueTransferKindEnum.Swap,
-            ).length
-          : vtSlice.length;
+          ? valueTransfersFiltered.length
+          : valueTransfersSliced.length;
       navigation.navigate(RouteEnum.ValueTransferDetail, {
         index: targetIndex >= 0 ? targetIndex : 0,
         vt: vt,
-        valueTransfersSliced: vtSlice,
+        valueTransfersSliced: valueTransfersSliced,
         totalLength,
       });
     },

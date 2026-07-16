@@ -30,7 +30,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   addresses: null,
   valueTransfers: null,
   valueTransfersTotal: null,
-  swapRecords: null,
   messages: null,
   messagesTotal: null,
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),

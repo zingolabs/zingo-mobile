@@ -25,7 +25,6 @@ import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
-import { SwapRecordType } from '../swap';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -39,13 +38,6 @@ export default interface AppContextLoaded {
   // List of all T and Z and O value transfers
   valueTransfers: ValueTransferType[] | null;
   valueTransfersTotal: number | null;
-
-  // Live mirror of `SwapStore` — every persistent swap record this wallet
-  // has created. Populated on app load and kept in sync with the on-disk
-  // store via `SwapStore.subscribe`. The history screen merges these with
-  // `valueTransfers` to render swap rows alongside the zingolib-reported
-  // transactions. May be `null` before the initial fetch resolves.
-  swapRecords: SwapRecordType[] | null;
 
   // List of messages
   messages: ValueTransferType[] | null;
