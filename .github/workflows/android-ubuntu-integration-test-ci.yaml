@@ -383,9 +383,18 @@ jobs:
           if [[ "${{ github.repository }}" == *zingolib* ]]; then
             REV="${GITHUB_SHA}"
           else
-            REV="$(grep -E '^zingolib[[:space:]]*=' rust/Cargo.toml \
+            line="$(grep -E '^zingolib[[:space:]]*=' rust/Cargo.toml)"
+            # Prefer an explicit rev pin if present.
+            REV="$(echo "$line" \
                    | grep -oE 'rev[[:space:]]*=[[:space:]]*"[0-9a-f]+"' \
-                   | grep -oE '[0-9a-f]{7,40}' | head -1)"
+                   | grep -oE '[0-9a-f]{7,40}' | head -1 || true)"
+            # Otherwise the dep is pinned by branch/tag: resolve it to a SHA.
+            if [[ -z "$REV" ]]; then
+              url="$(echo "$line" | grep -oE 'git[[:space:]]*=[[:space:]]*"[^"]+"' | sed -E 's/.*"([^"]+)".*/\1/')"
+              ref="$(echo "$line" | grep -oE '(branch|tag)[[:space:]]*=[[:space:]]*"[^"]+"' | sed -E 's/.*"([^"]+)".*/\1/')"
+              echo "Resolving zingolib ${ref} from ${url} via git ls-remote"
+              REV="$(git ls-remote "$url" "$ref" | awk 'NR==1{print $1}')"
+            fi
           fi
           test -n "$REV"
           echo "ZINGOLIB_REV=$REV" >> "$GITHUB_ENV"
