@@ -1482,21 +1482,30 @@ export class LoadedAppClass extends Component<
 
   setInfo = (newInfo: InfoType) => {
     if (!isEqual(this.state.info, newInfo)) {
+      // Offline (or any info-fetch failure) leaves chainName/currencyName empty.
+      // Derive them from the WALLET's own chain (walletChainName) — reliable
+      // even Offline — rather than the server's chain, which in Offline mode is
+      // only the user's onboarding pick and may not match the wallet (e.g. a
+      // mainnet wallet opened while Testnet was left selected showed TAZ).
+      // noneChainName is '' (falsy), so `|| server.chainName` covers the
+      // unknown-wallet-chain case without an explicit noneChainName check.
+      const fallbackChain =
+        this.state.walletChainName || this.state.server.chainName;
       // if currencyName is empty,
       // I need to rescue the last value from the state,
-      // or rescue the value from server.chainName.
+      // or rescue the value from the wallet/server chain.
       if (!newInfo.currencyName) {
         if (this.state.info.currencyName) {
           newInfo.currencyName = this.state.info.currencyName;
         } else {
           newInfo.currencyName =
-            this.state.server.chainName === ChainNameEnum.mainChainName
+            fallbackChain === ChainNameEnum.mainChainName
               ? CurrencyNameEnum.ZEC
               : CurrencyNameEnum.TAZ;
         }
       }
       if (!newInfo.chainName) {
-        newInfo.chainName = this.state.server.chainName;
+        newInfo.chainName = fallbackChain;
       }
       if (!newInfo.serverUri) {
         newInfo.serverUri = this.state.server.uri;

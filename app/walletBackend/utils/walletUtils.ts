@@ -90,8 +90,12 @@ export async function walletExists(): Promise<boolean> {
 
 // Bootstraps a brand-new wallet for the given server/chain. Returns the raw
 // JSON (parseable as RPCWalletInfoType) or an "error: ..." prefix.
+//
+// `birthday` is only used in Offline mode (empty serverUri), where there is no
+// Indexer to ask for the chain tip; online it is ignored (pass "0").
 export async function createNewWallet(
   serverUri: string,
+  birthday: string,
   chainHint: string,
   performanceLevel: string,
   minConfirmations: string,
@@ -99,6 +103,7 @@ export async function createNewWallet(
   try {
     return await RPCModule.createNewWallet(
       serverUri,
+      birthday,
       chainHint,
       performanceLevel,
       minConfirmations,

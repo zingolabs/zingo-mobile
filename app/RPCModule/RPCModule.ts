@@ -13,6 +13,7 @@ interface RPCModuleAPI {
   walletBackupExists(): Promise<string>;
   createNewWallet(
     serverUri: string,
+    birthday: string,
     chainHint: string,
     performanceLevel: string,
     minConfirmations: string,

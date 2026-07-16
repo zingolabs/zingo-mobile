@@ -134,7 +134,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   }, [seedufvkText]);
 
   const okButton = async () => {
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    // Offline mode is a deliberate no-server flow: exactly like creating a
+    // wallet, a seed/UFVK can be restored locally and will simply sync once a
+    // server is chosen. So only block when the device is genuinely offline AND
+    // the user is NOT in explicit Offline mode — mirroring createNewWallet.
+    // (Previously this also blocked whenever Offline mode was selected, which
+    // rejected restores even with a working internet connection.)
+    if (!netInfo.isConnected && selectServer !== SelectServerEnum.offline) {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }

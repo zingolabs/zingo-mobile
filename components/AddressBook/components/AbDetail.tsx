@@ -306,7 +306,9 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           >
             <TextInput
               testID="addressbook.address-field"
-              placeholder={translate('send.addressplaceholder') as string}
+              placeholder={
+                translate('addressbook.address-placeholder') as string
+              }
               placeholderTextColor={colors.placeholder}
               style={{
                 flex: 1,

@@ -286,18 +286,19 @@ export default function LoadingApp(props: LoadingAppProps) {
         );
       }
       if (settings.server) {
-        // Offline (empty uri) has no chain. Normalize any residual chainName to
-        // the empty sentinel so a stale value never reaches the wallet open (the
-        // real chain is derived from the wallet). Persist it only when we
-        // actually cleared a residual, so we don't rewrite on every boot.
-        const normalizedServer: ServerType = settings.server.uri
-          ? settings.server
-          : { uri: '', chainName: ChainNameEnum.noneChainName };
+        // Offline (empty uri) still carries the user's chosen chain: create and
+        // restore derive keys chain-specifically, so onboarding must never face
+        // an empty chain. The wallet-open path ignores this value anyway — it
+        // tries every chain and adopts the one the wallet deserializes under.
+        // Only fall back to mainnet when a chain is genuinely absent (e.g. an
+        // old config persisted before offline carried a chain), and persist
+        // that migration once.
+        const normalizedServer: ServerType =
+          settings.server.uri || settings.server.chainName
+            ? settings.server
+            : { uri: '', chainName: ChainNameEnum.mainChainName };
         setServer(normalizedServer);
-        if (
-          !settings.server.uri &&
-          settings.server.chainName !== ChainNameEnum.noneChainName
-        ) {
+        if (!settings.server.uri && !settings.server.chainName) {
           await SettingsFileImpl.writeSettings(
             SettingsNameEnum.server,
             normalizedServer,
@@ -540,6 +541,7 @@ export class LoadingAppClass extends Component<
       customServerChainName: ChainNameEnum.mainChainName,
       customServerOffline: false,
       customServerAuto: false,
+      customServerCustom: false,
       biometricsFailed:
         !!props.route.params &&
         props.route.params.biometricsFailed !== undefined
@@ -877,15 +879,10 @@ export class LoadingAppClass extends Component<
             if (!state.isConnected) {
               this.customServerModalRef.current?.dismiss();
             } else {
-              // if it is offline & there is no wallet file
-              // the screen is going to be empty
-              // show the custom server component
-              if (
-                this.state.selectServer === SelectServerEnum.offline &&
-                !this.state.walletExists
-              ) {
-                this.customServerModalRef.current?.present();
-              }
+              // Offline onboarding is no longer an empty dead-end (create /
+              // restore are available), so we do not force the server modal
+              // open on reconnect. The user opens it from the gear when they
+              // want to change server/chain.
               if (screen !== RouteEnum.Launching) {
                 this.setState({
                   screen:
@@ -900,16 +897,9 @@ export class LoadingAppClass extends Component<
       },
     );
 
-    // if it is offline & there is no wallet file
-    // the screen is going to be empty
-    // show the custom server component
-    if (
-      netInfoState.isConnected &&
-      this.state.selectServer === SelectServerEnum.offline &&
-      !this.state.walletExists
-    ) {
-      this.customServerModalRef.current?.present();
-    }
+    // The server modal is no longer auto-presented for offline + no-wallet:
+    // that onboarding state now offers create / restore directly, so it is not
+    // an empty screen. The modal opens on demand from the gear button.
   };
 
   componentWillUnmount = () => {
@@ -1307,11 +1297,15 @@ export class LoadingAppClass extends Component<
     }
     this.setState({ actionButtonsDisabled: true });
     if (this.state.customServerAuto) {
-      // Automatic: enter `auto` mode on mainnet, then let the standard boot-time
-      // picker choose the best live server (falling back to the static default
-      // when offline / the registry is unreachable). Same result the app's
-      // default first-run experience gives.
-      const fallback = this.defaultServerForChain(ChainNameEnum.mainChainName);
+      // Automatic: enter `auto` mode on the user's chosen chain, then let the
+      // standard boot-time picker fetch the live server list for that chain
+      // (falling back to the static latency probe when the registry is
+      // unreachable, and to the chain's static default when offline).
+      // `selectServerOnBoot` reads `server.chainName`, so seed it with the
+      // chosen chain's default; the best live server replaces it and shows in
+      // the UI.
+      const autoChainName = this.state.customServerChainName;
+      const fallback = this.defaultServerForChain(autoChainName);
       await new Promise<void>(resolve =>
         this.setState(
           {
@@ -1335,11 +1329,16 @@ export class LoadingAppClass extends Component<
       return;
     }
     if (this.state.customServerOffline) {
-      // Offline = no server → no chain. Clear the residual chainName; the real
-      // chain is derived from the wallet when it is opened offline.
+      // Offline = no server, but the chain is still the user's choice. Create
+      // and restore derive keys chain-specifically, so we always persist a
+      // concrete chain — never an empty one — and onboarding never faces an
+      // empty field. The wallet-open path ignores this value (it tries every
+      // chain and adopts the wallet's real one), so a mismatch self-corrects on
+      // open.
+      const offlineChainName = this.state.customServerChainName;
       await SettingsFileImpl.writeSettings(SettingsNameEnum.server, {
         uri: '',
-        chainName: ChainNameEnum.noneChainName,
+        chainName: offlineChainName,
       });
       await SettingsFileImpl.writeSettings(
         SettingsNameEnum.selectServer,
@@ -1347,7 +1346,7 @@ export class LoadingAppClass extends Component<
       );
       this.setState({
         selectServer: SelectServerEnum.offline,
-        server: { uri: '', chainName: ChainNameEnum.noneChainName },
+        server: { uri: '', chainName: offlineChainName },
         customServerUri: '',
         customServerChainName: this.state.server.chainName,
         customServerOffline: false,
@@ -1447,18 +1446,28 @@ export class LoadingAppClass extends Component<
   };
 
   createNewWallet = async (goSeedScreen: boolean = true): Promise<void> => {
-    if (
-      !this.state.netInfo.isConnected ||
-      this.state.selectServer === SelectServerEnum.offline
-    ) {
+    const offline = this.state.selectServer === SelectServerEnum.offline;
+    // Block only when the device is genuinely offline AND not in explicit
+    // Offline mode. Offline mode is a deliberate no-server flow: the wallet is
+    // created locally and simply won't sync until a server is chosen.
+    if (!this.state.netInfo.isConnected && !offline) {
       this.addLastSnackbar(
         this.state.translate('loadedapp.connection-error') as string,
       );
       return;
     }
     this.setState({ actionButtonsDisabled: true });
+    // Pass "0" in both modes. Online, the Indexer supplies the chain tip.
+    // Offline (Indexerless), the FFI falls back to zingolib's Library Birthday
+    // — a per-chain height already mined when the linked zingolib release was
+    // cut, so a brand-new wallet starts its first sync from that recent floor
+    // instead of scanning the whole chain from Sapling activation (zingolib
+    // ADR 0007). A non-zero value here would act as an explicit override.
+    const serverUri = offline ? '' : this.state.server.uri;
+    const birthday = '0';
     let seed: string = await createNewWallet(
-      this.state.server.uri,
+      serverUri,
+      birthday,
       this.state.server.chainName,
       this.state.performanceLevel,
       GlobalConst.minConfirmations.toString(),
@@ -1750,18 +1759,49 @@ export class LoadingAppClass extends Component<
   };
 
   customServer = () => {
-    this.customServerModalRef.current?.present();
+    // Reflect the current persisted mode in the modal's chips when it opens:
+    // offline / auto / custom light the matching chip; `list` (which has no
+    // chip here) opens with none selected so the user picks explicitly. The
+    // active server itself is shown on the StartMenu behind the modal.
+    const s = this.state.selectServer;
+    this.setState(
+      {
+        customServerOffline: s === SelectServerEnum.offline,
+        customServerAuto: s === SelectServerEnum.auto,
+        customServerCustom: s === SelectServerEnum.custom,
+        customServerChainName:
+          this.state.server.chainName || ChainNameEnum.mainChainName,
+        customServerUri:
+          s === SelectServerEnum.custom ? this.state.server.uri : '',
+      },
+      () => {
+        this.customServerModalRef.current?.present();
+      },
+    );
   };
 
   onPressServerChainName = (chain: ChainNameEnum) => {
-    this.setState({ customServerChainName: chain });
+    // Regtest has no public auto/offline server — it only works against a
+    // locally-run node reachable via a custom URI, so selecting it forces the
+    // Custom mode. Main/test keep the freedom to pick any of the three modes.
+    if (chain === ChainNameEnum.regtestChainName) {
+      this.setState({
+        customServerChainName: chain,
+        customServerOffline: false,
+        customServerAuto: false,
+        customServerCustom: true,
+      });
+    } else {
+      this.setState({ customServerChainName: chain });
+    }
   };
 
   onPressServerOffline = (value: boolean) => {
-    // The three modes are mutually exclusive; turning one on clears the other.
+    // The three chips are mutually exclusive; turning one on clears the others.
     this.setState({
       customServerOffline: value,
       customServerAuto: value ? false : this.state.customServerAuto,
+      customServerCustom: value ? false : this.state.customServerCustom,
     });
   };
 
@@ -1769,6 +1809,15 @@ export class LoadingAppClass extends Component<
     this.setState({
       customServerAuto: value,
       customServerOffline: value ? false : this.state.customServerOffline,
+      customServerCustom: value ? false : this.state.customServerCustom,
+    });
+  };
+
+  onPressServerCustom = (value: boolean) => {
+    this.setState({
+      customServerCustom: value,
+      customServerOffline: value ? false : this.state.customServerOffline,
+      customServerAuto: value ? false : this.state.customServerAuto,
     });
   };
 

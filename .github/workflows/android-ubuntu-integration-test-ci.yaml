@@ -370,20 +370,62 @@ jobs:
           name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
           path: android/app/build/outputs
 
-      #- name: Pull ci-build image
-      #  run: podman pull zingodevops/regchest:013
+      # Resolve the zingolib commit the same way android-build does: the
+      # GITHUB_SHA under zingolib CI, otherwise the pinned rev in
+      # rust/Cargo.toml. The ci-build image tag is content-addressed from
+      # that commit's .env.testing-artifacts + rust-toolchain.toml +
+      # docker-ci/, so deriving it here keeps the zainod/zebrad binaries in
+      # lockstep with the zingolib we build against (a fixed tag like 011
+      # drifts out of sync).
+      - name: Resolve zingolib rev
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.repository }}" == *zingolib* ]]; then
+            REV="${GITHUB_SHA}"
+          else
+            line="$(grep -E '^zingolib[[:space:]]*=' rust/Cargo.toml)"
+            # Prefer an explicit rev pin if present.
+            REV="$(echo "$line" \
+                   | grep -oE 'rev[[:space:]]*=[[:space:]]*"[0-9a-f]+"' \
+                   | grep -oE '[0-9a-f]{7,40}' | head -1 || true)"
+            # Otherwise the dep is pinned by branch/tag: resolve it to a SHA.
+            if [[ -z "$REV" ]]; then
+              url="$(echo "$line" | grep -oE 'git[[:space:]]*=[[:space:]]*"[^"]+"' | sed -E 's/.*"([^"]+)".*/\1/')"
+              ref="$(echo "$line" | grep -oE '(branch|tag)[[:space:]]*=[[:space:]]*"[^"]+"' | sed -E 's/.*"([^"]+)".*/\1/')"
+              echo "Resolving zingolib ${ref} from ${url} via git ls-remote"
+              REV="$(git ls-remote "$url" "$ref" | awk 'NR==1{print $1}')"
+            fi
+          fi
+          test -n "$REV"
+          echo "ZINGOLIB_REV=$REV" >> "$GITHUB_ENV"
+          echo "Resolved zingolib rev: $REV"
+
+      - name: Install cargo-make
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-make
+
+      - name: Compute ci-build image tag from that zingolib commit
+        run: |
+          set -euo pipefail
+          git clone --filter=blob:none https://github.com/zingolabs/zingolib zingolib-src
+          git -C zingolib-src checkout "$ZINGOLIB_REV"
+          TAG="$(cd zingolib-src && cargo make compute-image-tag | grep -E '^[0-9a-f]{14}$')"
+          test -n "$TAG"
+          echo "CI_BUILD_TAG=$TAG" >> "$GITHUB_ENV"
+          echo "Computed ci-build tag: $TAG"
 
       - name: Pull ci-build image
-        run: podman pull docker.io/zingodevops/ci-build:011
+        run: podman pull docker.io/zingodevops/ci-build:${CI_BUILD_TAG}
 
       - name: Extract binaries & params from image
         run: |
           set -euxo pipefail
-          cid=$(podman create docker.io/zingodevops/ci-build:011)
+          cid=$(podman create docker.io/zingodevops/ci-build:${CI_BUILD_TAG})
           mkdir -p rust/test_binaries/bins
           podman cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
-          podman cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
-          podman cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
+          podman cp "$cid":/usr/bin/zainod       rust/test_binaries/bins/
+          podman cp "$cid":/usr/bin/zebrad       rust/test_binaries/bins/
           podman rm "$cid"
 
       - name: binaries env var
