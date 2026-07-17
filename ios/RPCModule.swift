@@ -75,7 +75,12 @@ class RPCModule: NSObject {
     case deleteFileError(String)
   }
   
+  // This override exists solely for the unit tests, which point the
+  // module at a temporary directory. Production code never sets it.
+  static var documentsDirectoryForTesting: String?
+
   func getDocumentsDirectory() throws -> String {
+    if let injected = RPCModule.documentsDirectoryForTesting { return injected }
     let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
     guard let pathsFirst = paths.first else {
       throw FileError.documentsDirectoryNotFoundError("Error: [Native] Documents directory could not be located.")
@@ -135,37 +140,50 @@ class RPCModule: NSObject {
     try FileManager.default.removeItem(atPath: getFileName(fileName))
   }
 
-  // Audit Issue P (b) — wallet ↔ backup swap recovery.
-  //
-  // `restoreExistingWalletBackup` does its swap as three atomic renames:
-  //   (1) main → temp
-  //   (2) backup → main
-  //   (3) temp → backup
-  // A crash between (1)–(2) or (2)–(3) leaves the temp file on disk.
-  // Calling this helper at startup detects that and finishes the swap.
-  //
-  // Possible interrupted states (temp exists, by construction):
-  //   between (1)–(2): main does NOT exist, backup exists → complete (2) then (3)
-  //   between (2)–(3): main exists,         backup does NOT → complete (3)
-  // Both branches end at the intended final state. Idempotent — when no
-  // temp file is present this is a near-zero-cost no-op.
+  // Audit Issue P (b) — wallet ↔ backup swap recovery. The restore swaps
+  // by three atomic renames: (1) main to temp, (2) backup to main, and
+  // (3) temp to backup. A crash strands the temp, and a concurrent save
+  // or a wallet created before recovery runs can recreate main or backup
+  // meanwhile, so every {main, backup} combination is reachable alongside
+  // the temp, which by construction holds the original main wallet. The
+  // decision table mirrors Kotlin's completePendingSwap (RPCModule.kt):
+  // content decides the ambiguous states, the temp always leaves the
+  // disk, and no branch deletes the only surviving copy of wallet data.
+  //   Neither exists: the temp is the only copy, so it becomes main.
+  //   Only backup exists (crash between 1 and 2): finish renames 2 and 3.
+  //   Only main exists (crash between 2 and 3): finish rename 3.
+  //   Both exist and main equals temp: main was recreated with the
+  //     original content, so drop that duplicate and finish 2 and 3.
+  //   Both exist and backup equals temp: the swap completed; drop the temp.
+  //   Both exist and neither equals temp: main has moved past the swap,
+  //     so the original main replaces backup, as Kotlin writes it.
+  // A crash inside any branch lands the rerun in another row, so the
+  // recovery converges. A missing temp makes this a no-op.
   func completePendingSwap() {
-    let fm = FileManager.default
+    let files = FileManager.default
     guard let tempPath = try? getFileName(Constants.WalletTempSwapFileName.rawValue),
-          fm.fileExists(atPath: tempPath) else { return }
-    guard let mainPath = try? getFileName(Constants.WalletFileName.rawValue),
-          let backupPath = try? getFileName(Constants.WalletBackupFileName.rawValue) else {
-      NSLog("Error: [Native] completePendingSwap: could not resolve wallet paths")
-      return
-    }
+          let mainPath = try? getFileName(Constants.WalletFileName.rawValue),
+          let backupPath = try? getFileName(Constants.WalletBackupFileName.rawValue),
+          files.fileExists(atPath: tempPath) else { return }
     do {
-      if fm.fileExists(atPath: backupPath) {
-        // Crash between (1) and (2): backup still in original position.
-        try fm.moveItem(atPath: backupPath, toPath: mainPath)
+      switch (files.fileExists(atPath: mainPath), files.fileExists(atPath: backupPath)) {
+      case (false, false):
+        try files.moveItem(atPath: tempPath, toPath: mainPath)
+      case (false, true):
+        try files.moveItem(atPath: backupPath, toPath: mainPath)
+        try files.moveItem(atPath: tempPath, toPath: backupPath)
+      case (true, false):
+        try files.moveItem(atPath: tempPath, toPath: backupPath)
+      case (true, true) where files.contentsEqual(atPath: mainPath, andPath: tempPath):
+        try files.removeItem(atPath: mainPath)
+        try files.moveItem(atPath: backupPath, toPath: mainPath)
+        try files.moveItem(atPath: tempPath, toPath: backupPath)
+      case (true, true) where files.contentsEqual(atPath: backupPath, andPath: tempPath):
+        try files.removeItem(atPath: tempPath)
+      case (true, true):
+        try files.removeItem(atPath: backupPath)
+        try files.moveItem(atPath: tempPath, toPath: backupPath)
       }
-      // Crash between (2) and (3): main now holds the former backup;
-      // only (3) is left.
-      try fm.moveItem(atPath: tempPath, toPath: backupPath)
       NSLog("[Native] completePendingSwap: interrupted swap recovered")
     } catch {
       NSLog("Error: [Native] completePendingSwap failed: \(error.localizedDescription)")
@@ -352,6 +370,18 @@ class RPCModule: NSObject {
     try self.saveWalletBackupFile(walletString)
   }
 
+  // A failed post-init save must not fail the init: the live client holds
+  // the only copy of the new secret, and a rejection invites a retry that
+  // mints a second seed. Android's doSave comment names the shared contract:
+  // "the init flows depend on a save failure not failing the whole init".
+  func saveWalletContainingFailure() {
+    do {
+      try self.saveWalletInternal()
+    } catch {
+      NSLog("Error: [Native] Post-init save failed; the init result stands. \(String(describing: error))")
+    }
+  }
+
   func fnCreateNewWallet(
     serveruri: String,
     birthday: String,
@@ -370,7 +400,7 @@ class RPCModule: NSObject {
       minconfirmations: UInt32(minconfirmations) ?? 0
     )
     let seedStr = String(seed)
-    try self.saveWalletInternal()
+    self.saveWalletContainingFailure()
     return seedStr
   }
 
@@ -409,7 +439,7 @@ class RPCModule: NSObject {
     // initFromSeed throws on failure, so reaching the save implies the wallet exists.
     let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
-    try self.saveWalletInternal()
+    self.saveWalletContainingFailure()
     return seedStr
   }
 
@@ -440,7 +470,7 @@ class RPCModule: NSObject {
     // initFromUfvk throws on failure, so reaching the save implies the wallet exists.
     let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let ufvkStr = String(ufvk)
-    try self.saveWalletInternal()
+    self.saveWalletContainingFailure()
     return ufvkStr
   }
 
