@@ -2,7 +2,10 @@ package org.ZingoLabs.Zingo
 
 import com.facebook.react.bridge.Promise
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * The outcome of an FFI call, classified by channel alone
@@ -44,14 +47,18 @@ sealed class FfiOutcome {
          * one thread, so a slow FFI — a wallet save, a server dial — must
          * not stall every other bridge call behind it.
          */
-        @Suppress("UNUSED_PARAMETER")
         fun settling(
             promise: Promise,
             code: String,
             main: CoroutineDispatcher = Dispatchers.Main,
             call: () -> Any?,
         ) {
-            of(code, call).settle(promise)
+            CoroutineScope(Dispatchers.IO).launch {
+                val outcome = of(code, call)
+                withContext(main) {
+                    outcome.settle(promise)
+                }
+            }
         }
     }
 }
