@@ -22,10 +22,12 @@ jest.mock('../app/RPCModule', () => {
 import RPCModule from '../app/RPCModule';
 import {
   doSave,
+  doSaveBackup,
   nativeSaveSucceeded,
 } from '../app/walletBackend/utils/walletUtils';
 
 const mockedDoSave = RPCModule.doSave as jest.Mock;
+const mockedDoSaveBackup = RPCModule.doSaveBackup as jest.Mock;
 
 describe('nativeSaveSucceeded', () => {
   it('accepts the Android success shape (boolean true)', () => {
@@ -54,17 +56,49 @@ describe('nativeSaveSucceeded', () => {
   });
 });
 
-describe('doSave', () => {
-  it('passes the native resolution through without inspecting it', async () => {
-    mockedDoSave.mockResolvedValueOnce(true);
+/**
+ * The wrappers classify the trimodal native resolution at the single seam
+ * and answer with a boolean; failure — the failure shapes, error prose, or
+ * a rejected bridge promise — is always false, never re-encoded as prose
+ * and never an escaping exception.
+ */
+describe.each([
+  ['doSave', doSave, () => mockedDoSave],
+  ['doSaveBackup', doSaveBackup, () => mockedDoSaveBackup],
+])('%s', (_name, wrapper, mocked) => {
+  it('reports the Android success shape (boolean true) as true', async () => {
+    mocked().mockResolvedValueOnce(true);
 
-    await expect(doSave()).resolves.toBe(true);
+    await expect(wrapper()).resolves.toBe(true);
   });
 
-  it('contains a native rejection instead of throwing', async () => {
-    mockedDoSave.mockRejectedValueOnce(new Error('bridge exploded'));
+  it('reports the iOS success shape (the string "true") as true', async () => {
+    mocked().mockResolvedValueOnce('true');
 
-    const result = await doSave();
-    expect(nativeSaveSucceeded(result)).toBe(false);
+    await expect(wrapper()).resolves.toBe(true);
+  });
+
+  it('reports the failure shapes as false', async () => {
+    mocked().mockResolvedValueOnce(false);
+    await expect(wrapper()).resolves.toBe(false);
+
+    mocked().mockResolvedValueOnce('false');
+    await expect(wrapper()).resolves.toBe(false);
+  });
+
+  it('never mistakes resolved error prose for success', async () => {
+    // The attack case: both bridges' catch blocks still resolve prose
+    // instead of rejecting. That prose must classify as failure.
+    mocked().mockResolvedValueOnce(
+      'Error: [Native] saving wallet: disk full',
+    );
+
+    await expect(wrapper()).resolves.toBe(false);
+  });
+
+  it('contains a native rejection as false instead of throwing', async () => {
+    mocked().mockRejectedValueOnce(new Error('bridge exploded'));
+
+    await expect(wrapper()).resolves.toBe(false);
   });
 });
