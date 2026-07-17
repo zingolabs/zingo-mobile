@@ -20,13 +20,22 @@ sniff content, and valid data that resembles the sentinel is
 misclassified. The project is eliminating this pattern (issue #1151;
 audit Issues Q and R).
 
+## Ironwood
+
+The NU6.3 network upgrade of the Zcash chain. Ironwood carries its own
+consensus branch ID, but it is not a new blockchain: the chain remains
+Zcash, and "ironwood-activated" describes that same chain once the
+upgrade's activation height has passed. The upgrade introduces the
+Ironwood pool.
+
 ## Ironwood pool
 
-The newest shielded value pool, active on the ironwood chain. Once it
-activates, funds sent to a unified address settle in the Ironwood pool
-rather than Orchard, and change from shielded spends returns there.
-Balances and value transfers report per pool, so anything that assumes
-shielded funds live in Orchard is stale on this chain.
+The newest shielded value pool, activated on the Ironwood network
+upgrade (NU6.3). Once the upgrade activates, funds sent to a unified
+address settle in the Ironwood pool rather than Orchard, and change
+from shielded spends returns there. Balances and value transfers
+report per pool, so anything that assumes shielded funds live in
+Orchard is stale wherever Ironwood is active.
 
 ## Sniff
 
