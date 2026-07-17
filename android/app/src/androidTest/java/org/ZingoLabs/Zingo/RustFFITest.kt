@@ -402,9 +402,10 @@ class ExecuteSendFromOrchard {
         println("\nBalance pre-send:")
         println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
-        // On the ironwood-activated chain the funding send lands in the
-        // Ironwood pool (CI logcat 2026-07-17, run 29603362971): the orchard
-        // balance staying zero is the regression guard for that placement.
+        // With the Ironwood network upgrade (NU6.3) active on the chain, the
+        // funding send lands in the Ironwood pool (CI logcat 2026-07-17, run
+        // 29603362971): the orchard balance staying zero is the regression
+        // guard for that placement.
         assertThat(balancePreSend.confirmed_ironwood_balance).isEqualTo(1000000)
         assertThat(balancePreSend.confirmed_orchard_balance).isEqualTo(0)
         assertThat(balancePreSend.confirmed_transparent_balance).isEqualTo(0)
@@ -613,8 +614,8 @@ class ExecuteSaplingBalanceFromSeed {
         println("\nValue Transfers:")
         println(valueTranfersJson)
 
-        // Value Transfers (on the ironwood-activated chain, unified-address
-        // receives and change land in the Ironwood pool)
+        // Value Transfers (with the Ironwood network upgrade active,
+        // unified-address receives and change land in the Ironwood pool)
         // 1. Received in ironwood pool =    +500_000
         // 2. Received in sapling pool =     +250_000
         // 3. Received in transparent pool = +250_000

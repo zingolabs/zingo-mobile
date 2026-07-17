@@ -202,8 +202,8 @@ describe('transformValueTransfer — optional fields', () => {
   });
 });
 
-// The fixtures below reproduce value transfers observed on the
-// ironwood-activated regtest chain (CI run 29603362971 logcat): zingolib
+// The fixtures below reproduce value transfers observed on a regtest chain
+// with the Ironwood network upgrade active (CI run 29603362971 logcat): zingolib
 // feat/ironwood reports per-direction pool lists, and unified-address
 // receives land in the Ironwood pool. These pin the plural schema so the
 // retired singular `pool_received` cannot silently return.
