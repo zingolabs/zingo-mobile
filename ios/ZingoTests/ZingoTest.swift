@@ -91,6 +91,9 @@ struct SyncStatus: Codable {
 }
 
 struct Balance: Codable {
+    let total_ironwood_balance: Int64
+    let confirmed_ironwood_balance: Int64
+    let unconfirmed_ironwood_balance: Int64
     let total_sapling_balance: Int64
     let confirmed_sapling_balance: Int64
     let unconfirmed_sapling_balance: Int64
@@ -118,7 +121,10 @@ struct ValueTransfer: Codable, Equatable {
     let kind: String
     let value: Int64
     let recipient_address: String?
-    let pool_received: String?
+    // zingolib feat/ironwood replaced the singular `pool_received` with
+    // per-direction pool lists.
+    let pools_sent_from: [String]?
+    let pools_received: [String]?
     let memos: [String]?
 }
 
@@ -417,7 +423,11 @@ final class ExecuteSendFromOrchard: XCTestCase {
             let balJson = try getBalance()
             print("\nBalance pre-send:\n\(balJson)")
             let bal: Balance = try decodeJSON(balJson)
-            XCTAssertEqual(bal.confirmed_orchard_balance, 1_000_000)
+            // On the ironwood-activated chain the funding send lands in the
+            // Ironwood pool; the orchard balance staying zero guards that
+            // placement.
+            XCTAssertEqual(bal.confirmed_ironwood_balance, 1_000_000)
+            XCTAssertEqual(bal.confirmed_orchard_balance, 0)
             XCTAssertEqual(bal.confirmed_transparent_balance, 0)
         } catch {
           XCTFail("\nBalance pre-send error:\n\(error.localizedDescription)")
@@ -433,7 +443,7 @@ final class ExecuteSendFromOrchard: XCTestCase {
             let balJson = try getBalance()
             print("\nBalance post-send:\n\(balJson)")
             let bal: Balance = try decodeJSON(balJson)
-            XCTAssertEqual(bal.total_orchard_balance, 885_000)
+            XCTAssertEqual(bal.total_ironwood_balance, 885_000)
             XCTAssertEqual(bal.confirmed_transparent_balance, 0)
             XCTAssertEqual(bal.unconfirmed_transparent_balance, 100_000)
         } catch {
@@ -473,6 +483,9 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
             XCTAssertEqual(vts.value_transfers[0].status, "confirmed")
             XCTAssertEqual(vts.value_transfers[0].value, 0)
             XCTAssertEqual(vts.value_transfers[0].transaction_fee, 20_000)
+            // Multi-pool entry pins the plural schema: a memo-to-self
+            // settles change across Sapling and Ironwood.
+            XCTAssertEqual(vts.value_transfers[0].pools_received, ["Sapling", "Ironwood"])
 
             XCTAssertEqual(vts.value_transfers[1].kind, "sent")
             XCTAssertEqual(vts.value_transfers[1].recipient_address, recipientAddress)
@@ -481,7 +494,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
             XCTAssertEqual(vts.value_transfers[1].transaction_fee, 10_000)
 
             XCTAssertEqual(vts.value_transfers[2].kind, "received")
-            XCTAssertEqual(vts.value_transfers[2].pool_received, "Orchard")
+            XCTAssertEqual(vts.value_transfers[2].pools_received, ["Ironwood"])
             XCTAssertEqual(vts.value_transfers[2].status, "confirmed")
             XCTAssertEqual(vts.value_transfers[2].value, 1_000_000)
         } catch {
@@ -512,8 +525,9 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
           let balJson = try getBalance()
           print("\nBalance:\n\(balJson)")
           let bal: Balance = try decodeJSON(balJson)
-          XCTAssertEqual(bal.total_orchard_balance, 710_000)
-          XCTAssertEqual(bal.confirmed_orchard_balance, 710_000)
+          XCTAssertEqual(bal.total_ironwood_balance, 710_000)
+          XCTAssertEqual(bal.confirmed_ironwood_balance, 710_000)
+          XCTAssertEqual(bal.confirmed_orchard_balance, 0)
           XCTAssertEqual(bal.total_sapling_balance, 125_000)
           XCTAssertEqual(bal.confirmed_sapling_balance, 125_000)
           XCTAssertEqual(bal.confirmed_transparent_balance, 0)

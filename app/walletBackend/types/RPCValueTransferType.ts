@@ -12,6 +12,9 @@ export type RPCValueTransferType = {
   kind: RPCValueTransfersKindEnum;
   value: number;
   recipient_address?: string;
-  pool_received?: PoolEnum;
+  // zingolib feat/ironwood replaced the singular `pool_received` with
+  // per-direction pool lists.
+  pools_sent_from?: PoolEnum[];
+  pools_received?: PoolEnum[];
   memos?: string[];
 };

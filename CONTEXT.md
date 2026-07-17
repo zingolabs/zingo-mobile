@@ -20,6 +20,14 @@ sniff content, and valid data that resembles the sentinel is
 misclassified. The project is eliminating this pattern (issue #1151;
 audit Issues Q and R).
 
+## Ironwood pool
+
+The newest shielded value pool, active on the ironwood chain. Once it
+activates, funds sent to a unified address settle in the Ironwood pool
+rather than Orchard, and change from shielded spends returns there.
+Balances and value transfers report per pool, so anything that assumes
+shielded funds live in Orchard is stale on this chain.
+
 ## Sniff
 
 A check that classifies a value by inspecting its content — for

@@ -68,7 +68,13 @@ export function transformValueTransfer(
     !vt.memos || vt.memos.length === 0 || !vt.memos.join('')
       ? undefined
       : vt.memos;
-  result.poolType = !vt.pool_received ? undefined : vt.pool_received;
+  // `pools_received` lists every pool the transfer settled value into,
+  // oldest pool first. The UI's poolType is a single badge, so it shows the
+  // newest pool — the one a fresh receive actually lands in; a multi-pool
+  // entry (a memo-to-self settling change across pools) keeps that rule.
+  result.poolType = vt.pools_received?.length
+    ? vt.pools_received[vt.pools_received.length - 1]
+    : undefined;
 
   if (result.status === RPCValueTransfersStatusEnum.failed) {
     console.log('[RPC] failed value transfer (transformed):', result);

@@ -96,6 +96,9 @@ data class SyncStatus (
 )
 
 data class Balance (
+    var total_ironwood_balance : Long = 0L,
+    var confirmed_ironwood_balance : Long = 0L,
+    var unconfirmed_ironwood_balance : Long = 0L,
     var total_sapling_balance : Long = 0L,
     var confirmed_sapling_balance : Long = 0L,
     var unconfirmed_sapling_balance : Long = 0L,
@@ -123,7 +126,10 @@ data class ValueTransfer (
     var kind : String = "",
     var value : Long = 0L,
     var recipient_address : String? = null,
-    var pool_received : String? = null,
+    // zingolib feat/ironwood replaced the singular `pool_received` with
+    // per-direction pool lists.
+    var pools_sent_from : List<String>? = null,
+    var pools_received : List<String>? = null,
     var memos : List<String>? = null,
 )
 
@@ -396,7 +402,11 @@ class ExecuteSendFromOrchard {
         println("\nBalance pre-send:")
         println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.confirmed_orchard_balance).isEqualTo(1000000)
+        // On the ironwood-activated chain the funding send lands in the
+        // Ironwood pool (CI logcat 2026-07-17, run 29603362971): the orchard
+        // balance staying zero is the regression guard for that placement.
+        assertThat(balancePreSend.confirmed_ironwood_balance).isEqualTo(1000000)
+        assertThat(balancePreSend.confirmed_orchard_balance).isEqualTo(0)
         assertThat(balancePreSend.confirmed_transparent_balance).isEqualTo(0)
 
         val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
@@ -448,7 +458,7 @@ class ExecuteSendFromOrchard {
         println("\nBalance post-send:")
         println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePostSend.total_orchard_balance).isEqualTo(885000)
+        assertThat(balancePostSend.total_ironwood_balance).isEqualTo(885000)
         // the transparent funds are unconfirmed...
         assertThat(balancePostSend.confirmed_transparent_balance).isEqualTo(0)
         assertThat(balancePostSend.unconfirmed_transparent_balance).isEqualTo(100000)
@@ -527,6 +537,10 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers.value_transfers[0].status).isEqualTo("confirmed")
         assertThat(valueTranfers.value_transfers[0].value).isEqualTo(0)
         assertThat(valueTranfers.value_transfers[0].transaction_fee).isEqualTo(20000)
+        // Multi-pool entry pins the plural schema: a memo-to-self settles
+        // change across Sapling and Ironwood (CI logcat, run 29603362971).
+        assertThat(valueTranfers.value_transfers[0].pools_received)
+            .isEqualTo(listOf("Sapling", "Ironwood"))
         // second item have to be a `Sent`
         assertThat(valueTranfers.value_transfers[1].kind).isEqualTo("sent")
         assertThat(valueTranfers.value_transfers[1].recipient_address).isEqualTo(recipientAddress)
@@ -535,7 +549,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
         // first item have to be a `Received`
         assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("received")
-        assertThat(valueTranfers.value_transfers[2].pool_received).isEqualTo("Orchard")
+        assertThat(valueTranfers.value_transfers[2].pools_received).isEqualTo(listOf("Ironwood"))
         assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
         assertThat(valueTranfers.value_transfers[2].value).isEqualTo(1000000)
     }
@@ -599,17 +613,18 @@ class ExecuteSaplingBalanceFromSeed {
         println("\nValue Transfers:")
         println(valueTranfersJson)
 
-        // Value Transfers
-        // 1. Received in orchard pool =     +500_000
+        // Value Transfers (on the ironwood-activated chain, unified-address
+        // receives and change land in the Ironwood pool)
+        // 1. Received in ironwood pool =    +500_000
         // 2. Received in sapling pool =     +250_000
         // 3. Received in transparent pool = +250_000
         // 4. Send - 100_000 + 20_000fee =   -110_000
-        // 5. MemoToSelf orchard pool =       -10_000 (send-to-self)
+        // 5. MemoToSelf ironwood pool =      -10_000 (send-to-self)
         // 6. MemoToSelf sapling pool =       -10_000 (send-to-self)
         // 7. MemoToSelf transparent pool =   -15_000 (send-to-self)
         // 8. Upgrading sapling pool =        -20_000 (shield)
         //
-        // orchard pool     = 710_000
+        // ironwood pool    = 710_000
         // sapling pool     = 125_000
         // transparent pool = 0
 
@@ -618,8 +633,9 @@ class ExecuteSaplingBalanceFromSeed {
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balance.total_orchard_balance).isEqualTo(710000)
-        assertThat(balance.confirmed_orchard_balance).isEqualTo(710000)
+        assertThat(balance.total_ironwood_balance).isEqualTo(710000)
+        assertThat(balance.confirmed_ironwood_balance).isEqualTo(710000)
+        assertThat(balance.confirmed_orchard_balance).isEqualTo(0)
         assertThat(balance.total_sapling_balance).isEqualTo(125000)
         assertThat(balance.confirmed_sapling_balance).isEqualTo(125000)
         assertThat(balance.confirmed_transparent_balance).isEqualTo(0)
