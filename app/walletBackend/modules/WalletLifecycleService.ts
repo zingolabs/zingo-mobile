@@ -9,7 +9,7 @@ import { GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { WalletBackendConfig } from '../config/WalletBackendConfig';
 import { SyncCoordinator } from './SyncCoordinator';
-import { doSaveBackup } from '../utils/walletUtils';
+import { doSaveBackup, nativeSaveSucceeded } from '../utils/walletUtils';
 
 export class WalletLifecycleService {
   config: WalletBackendConfig;
@@ -67,7 +67,18 @@ export class WalletLifecycleService {
 
       if (existsWallet && existsWallet !== GlobalConst.false) {
         await this.syncCoordinator.pauseSyncProcess();
-        await RPCModule.restoreExistingWalletBackup();
+
+        // Both bridges resolve the failure shape — Android boolean false,
+        // iOS the string "false" — when the restore fails, including when
+        // the backup content fails validation before the swap. The seam
+        // that classifies the save shapes classifies this resolution too,
+        // so a failed restore reaches the caller as an error instead of
+        // wearing the success value.
+        if (
+          !nativeSaveSucceeded(await RPCModule.restoreExistingWalletBackup())
+        ) {
+          return this.config.translate('rpc.restorebackupwallet-error');
+        }
       } else {
         return this.config.translate('rpc.walletnotfound-error');
       }

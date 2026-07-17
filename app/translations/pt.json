@@ -194,7 +194,8 @@
     "walletnotfound-error": "Error: não foi possível encontrar nenhuma carteira.",
     "backupnotfound-error": "Error: não foi possível encontrar nenhum backup de nenhuma carteira.",
     "deletewallet-error": "Error: não foi possível excluir a carteira atual.",
-    "backupwallet-error": "Error: não foi possível salvar o backup da carteira."
+    "backupwallet-error": "Error: não foi possível salvar o backup da carteira.",
+    "restorebackupwallet-error": "Error: não foi possível restaurar o backup da carteira."
   },
   "settings": {
     "section-preferences": "Preferências",
