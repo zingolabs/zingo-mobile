@@ -19,6 +19,7 @@ import { RPCSyncPollType } from '../types/RPCSyncPollType';
 import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
 import { WalletBackendConfig } from '../config/WalletBackendConfig';
 import { DataService } from './DataService';
+import { doSave } from '../utils/walletUtils';
 
 export class SyncCoordinator {
   config: WalletBackendConfig;
@@ -81,7 +82,10 @@ export class SyncCoordinator {
         ) {
           this.config.onError(`Set wallet to prod error: ${setConfigWallet}`);
         }
-        await RPCModule.doSave();
+        // The seam classifies the trimodal native resolution and contains
+        // a rejection as false; this tick has no rejection handler of its
+        // own (audit Issue P).
+        await doSave();
         const performanceChanged =
           await this.dataService.getConfigWalletPerformance();
         this.walletConfigPerformanceLevel = performanceChanged;
@@ -124,7 +128,7 @@ export class SyncCoordinator {
         taskPromises.push(
           (async () => {
             const start = Date.now();
-            await RPCModule.doSave();
+            await doSave();
             if (Date.now() - start > 4000) {
               console.log(
                 '=========================================== > save wallet - ',
