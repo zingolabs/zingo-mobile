@@ -8,17 +8,9 @@
  * These are the TS twins of the Rust init_error_channel_tests, the
  * Kotlin FfiOutcomeTest, and the Swift FfiOutcomeTests.
  */
-// Every member of the mocked bridge is a lazily created jest.fn, so a future
-// import-time touch of some other RPCModule member cannot break this suite.
-jest.mock('../app/RPCModule', () => {
-  const members: Record<PropertyKey, jest.Mock> = {};
-  return {
-    __esModule: true,
-    default: new Proxy(members, {
-      get: (target, prop) => (target[prop] ??= jest.fn()),
-    }),
-  };
-});
+jest.mock('../app/RPCModule', () =>
+  require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
+);
 
 import RPCModule from '../app/RPCModule';
 import {
