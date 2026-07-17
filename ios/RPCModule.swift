@@ -45,11 +45,12 @@ enum WalletExport {
   static func isValidBase64(_ s: String) -> Bool {
     let bytes = s.utf8
     if bytes.isEmpty || bytes.count % 4 != 0 { return false }
-    var sawPadding = false
+    var padCount = 0
     for b in bytes {
       if b == 0x3D { // '='
-        sawPadding = true
-      } else if sawPadding {
+        padCount += 1
+        if padCount > 2 { return false }
+      } else if padCount > 0 {
         return false
       } else if !((0x41...0x5A).contains(b) ||  // 'A'-'Z'
                   (0x61...0x7A).contains(b) ||  // 'a'-'z'
@@ -59,6 +60,39 @@ enum WalletExport {
       }
     }
     return true
+  }
+}
+
+/// The outcome of an FFI call, classified by channel alone
+/// (zingo-mobile#1151): the value a call returns is resolved verbatim —
+/// never inspected for an error sentinel — and a thrown error is rejected
+/// under the FFI's name. Classification (`of`) is pure — no I/O, no
+/// logging, no platform dependencies — so it runs under plain XCTest unit
+/// tests. Settling touches only the promise blocks.
+enum FfiOutcome {
+  case resolved(String)
+  case rejected(code: String, error: Error)
+
+  static func of(_ code: String, _ call: () throws -> String) -> FfiOutcome {
+    do {
+      return .resolved(try call())
+    } catch {
+      return .rejected(code: code, error: error)
+    }
+  }
+
+  func settle(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    switch self {
+    case .resolved(let value):
+      DispatchQueue.main.async {
+        resolve(value)
+      }
+    case .rejected(let code, let error):
+      NSLog("Error: [Native] \(code). \(String(describing: error))")
+      DispatchQueue.main.async {
+        reject(code, String(describing: error), error)
+      }
+    }
   }
 }
 
@@ -322,22 +356,34 @@ class RPCModule: NSObject {
   // never validate as base64, because it always contains characters
   // outside the base64 alphabet.
   func saveWalletInternal() throws {
-    do {
-      switch WalletExport.classify(try saveToB64()) {
-      case .noSaveNeeded:
-        NSLog("[Native] No need to save the wallet.")
-      case .invalid(let reason):
-        let err = "Error: [Native] Couldn't save the wallet. \(reason)"
-        NSLog(err)
-        throw FileError.saveFileError(err)
-      case .validExport(let base64):
-        NSLog("[Native] file size: \((base64.count * 3) / 4) bytes")
-        try self.saveWalletFile(base64)
-      }
-    } catch {
-      let err = "Error: [Native] Couldn't save the wallet. \(error.localizedDescription)"
+    // Each failure is logged and wrapped exactly once. FileError does not
+    // conform to LocalizedError, so re-catching our own throw would replace
+    // the message with the generic localizedDescription.
+    func saveFailure(_ detail: String) -> FileError {
+      let err = "Error: [Native] Couldn't save the wallet. \(detail)"
       NSLog(err)
-      throw FileError.saveFileError(err)
+      return FileError.saveFileError(err)
+    }
+
+    let export: WalletExportClassification
+    do {
+      export = WalletExport.classify(try saveToB64())
+    } catch {
+      throw saveFailure(error.localizedDescription)
+    }
+
+    switch export {
+    case .noSaveNeeded:
+      NSLog("[Native] No need to save the wallet.")
+    case .invalid(let reason):
+      throw saveFailure(reason)
+    case .validExport(let base64):
+      NSLog("[Native] file size: \((base64.count * 3) / 4) bytes")
+      do {
+        try self.saveWalletFile(base64)
+      } catch {
+        throw saveFailure(error.localizedDescription)
+      }
     }
   }
 
@@ -353,13 +399,12 @@ class RPCModule: NSObject {
     performancelevel: String,
     minconfirmations: String
   ) throws -> String {
-    // Offline (empty serveruri) uses `birthday` in place of the chain tip;
-    // online it is ignored (pass "0").
+    // initNew throws on failure, so reaching the save implies the wallet
+    // exists. Offline (empty serveruri) uses `birthday` in place of the
+    // chain tip; online it is ignored (pass "0").
     let seed = try initNew(serveruri: serveruri, birthday: UInt32(birthday) ?? 0, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
-    if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-      try self.saveWalletInternal()
-    }
+    try self.saveWalletInternal()
     return seedStr
   }
 
@@ -373,18 +418,9 @@ class RPCModule: NSObject {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
-    do {
-      let seedStr = try self.fnCreateNewWallet(serveruri: serveruri, birthday: birthday, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
-      DispatchQueue.main.async {
-        resolve(seedStr)
-      }
-    } catch {
-      let err = "Error: [Native] Creating a new wallet. \(error.localizedDescription)"
-      NSLog(err)
-      DispatchQueue.main.async {
-        resolve(err)
-      }
-    }
+    FfiOutcome.of("init_new") {
+      try self.fnCreateNewWallet(serveruri: serveruri, birthday: birthday, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+    }.settle(resolve: resolve, reject: reject)
   }
   
   func fnRestoreWalletFromSeed(
@@ -395,11 +431,10 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String
   ) throws -> String {
+    // initFromSeed throws on failure, so reaching the save implies the wallet exists.
     let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
-    if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-      try self.saveWalletInternal()
-    }
+    try self.saveWalletInternal()
     return seedStr
   }
 
@@ -414,18 +449,9 @@ class RPCModule: NSObject {
     resolve: @escaping RCTPromiseResolveBlock, 
     reject: @escaping RCTPromiseRejectBlock
   ) {
-    do {
-      let seedStr = try self.fnRestoreWalletFromSeed(restoreSeed: restoreSeed, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
-      DispatchQueue.main.async {
-        resolve(seedStr)
-      }
-    } catch {
-      let err = "Error: [Native] Restoring a wallet with seed. \(error.localizedDescription)"
-      NSLog(err)
-      DispatchQueue.main.async {
-        resolve(err)
-      }
-    }
+    FfiOutcome.of("init_from_seed") {
+      try self.fnRestoreWalletFromSeed(restoreSeed: restoreSeed, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+    }.settle(resolve: resolve, reject: reject)
   }
   
   func fnRestoreWalletFromUfvk(
@@ -436,11 +462,10 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String
   ) throws -> String {
+    // initFromUfvk throws on failure, so reaching the save implies the wallet exists.
     let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let ufvkStr = String(ufvk)
-    if !ufvkStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-      try self.saveWalletInternal()
-    }
+    try self.saveWalletInternal()
     return ufvkStr
   }
 
@@ -455,18 +480,9 @@ class RPCModule: NSObject {
     resolve: @escaping RCTPromiseResolveBlock, 
     reject: @escaping RCTPromiseRejectBlock
   ) {
-    do {
-      let ufvkStr = try self.fnRestoreWalletFromUfvk(restoreUfvk: restoreUfvk, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
-      DispatchQueue.main.async {
-        resolve(ufvkStr)
-      }
-    } catch {
-      let err = "Error: [Native] Restoring a wallet with ufvk. \(error.localizedDescription)"
-      NSLog(err)
-      DispatchQueue.main.async {
-        resolve(err)
-      }
-    }
+    FfiOutcome.of("init_from_ufvk") {
+      try self.fnRestoreWalletFromUfvk(restoreUfvk: restoreUfvk, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+    }.settle(resolve: resolve, reject: reject)
   }
 
   func fnLoadExistingWallet(
@@ -489,18 +505,9 @@ class RPCModule: NSObject {
     resolve: @escaping RCTPromiseResolveBlock, 
     reject: @escaping RCTPromiseRejectBlock
   ) {
-    do {
-      let seedStr = try self.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
-      DispatchQueue.main.async {
-        resolve(seedStr)
-      }
-    } catch {
-      let err = "Error: [Native] Loading existing wallet. \(error.localizedDescription)"
-      NSLog(err)
-      DispatchQueue.main.async {
-        resolve(err)
-      }
-    }
+    FfiOutcome.of("init_from_b64") {
+      try self.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+    }.settle(resolve: resolve, reject: reject)
   }
 
   @objc(restoreExistingWalletBackup:reject:)
@@ -808,165 +815,53 @@ class RPCModule: NSObject {
       }
   }
 
-  func fnPollSyncInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try pollSync()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] Sync poll info. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] Sync poll info. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
   @objc(pollSyncInfo:reject:)
   func pollSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnPollSyncInfo(dict)
-        }
-      }
-  }
-
-  func fnRunSyncProcess(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        var respStr: String = ""
-        do {
-          let resp = try runSync()
-          respStr = String(resp)
-          // Persistence is owned by JS (SyncCoordinator → doSave when
-          // getWalletSaveRequired returns true). Auto-saving here was
-          // racing against that doSave on the same wallet.dat — two
-          // background queues writing in parallel. Single source of truth
-          // for save decisions = JS, matching the Android side.
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] Sync run process. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] Sync run process. Command arguments problem."
-          NSLog(err)
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("poll_sync") {
+          try pollSync()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(runSyncProcess:reject:)
   func runSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnRunSyncProcess(dict)
-        }
-      }
-  }
-
-  func fnPauseSyncProcess(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try pauseSync()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] Sync pause process. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      } else {
-          let err = "Error: [Native] Sync pause process. Command arguments problem."
-          NSLog(err)
+      DispatchQueue.global(qos: .userInitiated).async {
+        // Persistence is owned by JS (SyncCoordinator → doSave when
+        // getWalletSaveRequired returns true). Auto-saving here was
+        // racing against that doSave on the same wallet.dat — two
+        // background queues writing in parallel. Single source of truth
+        // for save decisions = JS, matching the Android side.
+        FfiOutcome.of("run_sync") {
+          try runSync()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(pauseSyncProcess:reject:)
   func pauseSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnPauseSyncProcess(dict)
-        }
-      }
-  }
-
-  func fnStatusSyncInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        var respStr: String = ""
-        do {
-          let resp = try statusSync()
-          respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] Sync Status info. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] Sync status info. Command arguments problem."
-          NSLog(err)
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("pause_sync") {
+          try pauseSync()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(statusSyncInfo:reject:)
   func statusSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnStatusSyncInfo(dict)
-        }
-      }
-  }
-
-  func fnRunRescanProcess(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try runRescan()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] Rescan run process. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      } else {
-          let err = "Error: [Native] Rescan run process. Command arguments problem."
-          NSLog(err)
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("status_sync") {
+          try statusSync()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(runRescanProcess:reject:)
   func runRescanProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnRunRescanProcess(dict)
-        }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("run_rescan") {
+          try runRescan()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 

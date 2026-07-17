@@ -40,11 +40,14 @@ object WalletExport {
     // OOM-crashes on low-RAM 32-bit devices when wallets are large.
     fun isValidBase64(s: String): Boolean {
         if (s.isEmpty() || s.length % 4 != 0) return false
-        var sawPadding = false
+        var padCount = 0
         for (c in s) {
             when {
-                c == '=' -> sawPadding = true
-                sawPadding -> return false
+                c == '=' -> {
+                    padCount++
+                    if (padCount > 2) return false
+                }
+                padCount > 0 -> return false
                 c in 'A'..'Z' -> {}
                 c in 'a'..'z' -> {}
                 c in '0'..'9' -> {}
