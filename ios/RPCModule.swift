@@ -8,40 +8,14 @@
 import Foundation
 import React
 
-/// The outcome of classifying the string the `saveToB64` FFI returns on its
-/// success channel. Whether a save succeeded must be knowable from this type,
-/// never from re-inspecting the string's content downstream
-/// (zingo-mobile#1151; audit Issue Q).
-enum WalletExportClassification: Equatable {
-  /// The wallet reported that nothing needs saving; not a failure.
-  case noSaveNeeded
-  /// A well-formed base64 wallet export, safe to persist.
-  case validExport(base64: String)
-  /// Content that cannot be a wallet export; persisting it would corrupt the wallet file.
-  case invalid(reason: String)
-}
-
-/// Pure classification of wallet-export strings: no I/O, no logging, no
-/// platform dependencies, so it runs under plain XCTest unit tests.
+/// A pure base64 well-formedness check — no I/O, no logging, no platform
+/// dependencies — so it runs under plain XCTest unit tests.
+///
+/// The FFI no longer returns base64 (the save path crosses as bytes, so a
+/// malformed export is unrepresentable). This guard's one remaining role is
+/// validating wallet-file content read back from disk before
+/// `restoreExistingWalletBackup` swaps it into place.
 enum WalletExport {
-  static func classify(_ b64encoded: String) -> WalletExportClassification {
-    if b64encoded.isEmpty {
-      return .noSaveNeeded
-    }
-    if !isValidBase64(b64encoded) {
-      return .invalid(reason: "The Encoded content is incorrect.")
-    }
-    return .validExport(base64: b64encoded)
-  }
-
-  // Quick local Base64 well-formedness check. Used as a defensive guard so we
-  // never overwrite the wallet file with arbitrary text the Rust side might
-  // accidentally return (e.g. "the library is broken"). We do this in Swift
-  // rather than re-sending the whole Base64 payload back to Rust via
-  // `checkB64`, because that round-trip allocates two extra full-size copies
-  // of the string (Swift→Rust via RustBuffer + Rust→Swift again for the
-  // result) and has OOM-crashed on low-RAM 32-bit Android devices with large
-  // wallets. Symmetric guard for iOS.
   static func isValidBase64(_ s: String) -> Bool {
     let bytes = s.utf8
     if bytes.isEmpty || bytes.count % 4 != 0 { return false }
@@ -349,12 +323,11 @@ class RPCModule: NSObject {
     }
   }
 
-  // The wallet export is classified by its structure alone, never by
-  // sniffing its content for an error sentinel (zingo-mobile#1151; audit
-  // Issue Q): a valid base64 wallet export may begin with "error", while
-  // genuine failure arrives as a thrown error — and failure prose can
-  // never validate as base64, because it always contains characters
-  // outside the base64 alphabet.
+  // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
+  // nil means no save was needed, bytes are the wallet export, and failure
+  // throws. Nothing here classifies content — a malformed export is
+  // unrepresentable, so no validator exists to disagree with the file
+  // format, which stays base64 and is encoded only at this write site.
   func saveWalletInternal() throws {
     // Each failure is logged and wrapped exactly once. FileError does not
     // conform to LocalizedError, so re-catching our own throw would replace
@@ -365,25 +338,23 @@ class RPCModule: NSObject {
       return FileError.saveFileError(err)
     }
 
-    let export: WalletExportClassification
+    let walletBytes: Data?
     do {
-      export = WalletExport.classify(try saveToB64())
+      walletBytes = try saveWalletBytes()
     } catch {
-      throw saveFailure(error.localizedDescription)
+      throw saveFailure(String(describing: error))
     }
 
-    switch export {
-    case .noSaveNeeded:
+    guard let walletBytes = walletBytes else {
       NSLog("[Native] No need to save the wallet.")
-    case .invalid(let reason):
-      throw saveFailure(reason)
-    case .validExport(let base64):
-      NSLog("[Native] file size: \((base64.count * 3) / 4) bytes")
-      do {
-        try self.saveWalletFile(base64)
-      } catch {
-        throw saveFailure(error.localizedDescription)
-      }
+      return
+    }
+
+    NSLog("[Native] file size: \(walletBytes.count) bytes")
+    do {
+      try self.saveWalletFile(walletBytes.base64EncodedString())
+    } catch {
+      throw saveFailure(error.localizedDescription)
     }
   }
 
@@ -565,129 +536,45 @@ class RPCModule: NSObject {
     }
   }
 
-  func fnDoSave(_ dict: [AnyHashable: Any]) {
-    if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-      do {
-        try self.saveWalletInternal()
-        DispatchQueue.main.async {
-          resolve("true")
-        }
-      } catch {
-        NSLog("Error: [Native] Saving wallet error: \(error.localizedDescription)")
-        DispatchQueue.main.async {
-          resolve("false")
-        }
-      }
-    } else {
-      let err = "Error: [Native] Save wallet. Argument problem."
-      NSLog(err)
-    }
-  }
-
+  // The save internals throw on failure, so success is the only value the
+  // data channel carries ("true", kept for the JS seam's shape matrix);
+  // failure rejects with the thrown error — never as prose or a sentinel
+  // "false" in the success channel (zingo-mobile#1151 ask 4).
   @objc(doSave:reject:)
   func doSave(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    let dict: [String: Any] = ["resolve": resolve]
-    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-            self.fnDoSave(dict)
-        }
-    }
-  }
-
-  func fndoSaveBackup(_ dict: [AnyHashable: Any]) {
-    if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-      do {
-        try self.saveWalletBackupInternal()
-        DispatchQueue.main.async {
-          resolve("true")
-        }
-      } catch {
-        NSLog("Error: [Native] Saving wallet backup error: \(error.localizedDescription)")
-        DispatchQueue.main.async {
-          resolve("false")
-        }
-      }
-    } else {
-      let err = "Error: [Native] Save wallet backup. Argument problem."
-      NSLog(err)
+    DispatchQueue.global(qos: .userInitiated).async {
+      FfiOutcome.of("save_wallet_bytes") {
+        try self.saveWalletInternal()
+        return "true"
+      }.settle(resolve: resolve, reject: reject)
     }
   }
 
   @objc(doSaveBackup:reject:)
   func doSaveBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    let dict: [String: Any] = ["resolve": resolve]
-    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-            self.fndoSaveBackup(dict)
-        }
+    DispatchQueue.global(qos: .userInitiated).async {
+      FfiOutcome.of("save_wallet_backup") {
+        try self.saveWalletBackupInternal()
+        return "true"
+      }.settle(resolve: resolve, reject: reject)
     }
   }
 
-  func fnGetLatestBlockServerInfo(_ dict: [AnyHashable: Any]) {
-    if let serveruri = dict["serveruri"] as? String,
-       let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-      do {
-        let resp = try getLatestBlockServer(serveruri: serveruri)
-        let respStr = String(resp)
-        DispatchQueue.main.async {
-          resolve(respStr)
-        }
-      } catch {
-        let err = "Error: [Native] Get server latest block. \(error.localizedDescription)"
-        NSLog(err)
-        DispatchQueue.main.async {
-          resolve(err)
-        }
-      }
-    } else {
-      let err = "Error: [Native] Get server latest block. Argument problem."
-      NSLog(err)
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-      }
-    }
-  }
-  
   @objc(getLatestBlockServerInfo:resolve:reject:)
   func getLatestBlockServerInfo(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["serveruri": serveruri, "resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fnGetLatestBlockServerInfo(dict)
-          }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_latest_block_server") {
+          try getLatestBlockServer(serveruri: serveruri)
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
-  func fnGetLatestBlockWalletInfo(_ dict: [AnyHashable: Any]) {
-    if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try getLatestBlockWallet()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] Get wallet latest block. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-    } else {
-      let err = "Error: [Native] Get wallet latest block. Argument problem."
-      NSLog(err)
-    }
-  }
-  
   @objc(getLatestBlockWalletInfo:reject:)
   func getLatestBlockWalletInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fnGetLatestBlockWalletInfo(dict)
-          }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_latest_block_wallet") {
+          try getLatestBlockWallet()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
@@ -753,34 +640,12 @@ class RPCModule: NSObject {
       }
   }
 
-  func fnGetValueTransfersList(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getValueTransfers()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] Get value transfers. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }          
-          }
-      } else {
-          let err = "Error: [Native] Get value transfers. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
   @objc(getValueTransfersList:reject:)
   func getValueTransfersList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fnGetValueTransfersList(dict)
-          }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_value_transfers") {
+          try getValueTransfers()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
@@ -1100,102 +965,30 @@ class RPCModule: NSObject {
       }
   }
 
-  func fnGetVersionInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getVersion()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] version. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }          
-          }
-      } else {
-          let err = "Error: [Native] version. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
   @objc(getVersionInfo:reject:)
   func getVersionInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetVersionInfo(dict)
-        }
-      }
-  }
-
-  func fnGetMessagesInfo(_ dict: [AnyHashable: Any]) {
-      if let address = dict["address"] as? String,
-          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getMessages(address: address)
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] messages. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }          
-          }
-      } else {
-          let err = "Error: [Native] messages. Command arguments problem."
-          NSLog(err)
-          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_version") {
+          try getVersion()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(getMessagesInfo:resolve:reject:)
   func getMessagesInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["address": address, "resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetMessagesInfo(dict)
-        }
-      }
-  }
-
-func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getBalance()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] balance. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }          
-          }
-      } else {
-          let err = "Error: [Native] balance. Command arguments problem."
-          NSLog(err)
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_messages") {
+          try getMessages(address: address)
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(getBalanceInfo:reject:)
   func getBalanceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetBalanceInfo(dict)
-        }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_balance") {
+          try getBalance()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
@@ -1398,34 +1191,12 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  func fnGetSpendableBalanceTotalInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getSpendableBalanceTotal()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] spendable balance total. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      } else {
-          let err = "Error: [Native] spendable balance total. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
   @objc(getSpendableBalanceTotalInfo:reject:)
   func getSpendableBalanceTotalInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetSpendableBalanceTotalInfo(dict)
-        }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_spendable_balance_total") {
+          try getSpendableBalanceTotal()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
@@ -1491,65 +1262,21 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  func fnGetUnifiedAddressesInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getUnifiedAddresses()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] unified addresses. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }          
-          }
-      } else {
-          let err = "Error: [Native] unified addresses. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
   @objc(getUnifiedAddressesInfo:reject:)
   func getUnifiedAddressesInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetUnifiedAddressesInfo(dict)
-        }
-      }
-  }
-
-  func fnGetTransparentAddressesInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getTransparentAddresses()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] transparent addresses. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      } else {
-          let err = "Error: [Native] transparent addresses. Command arguments problem."
-          NSLog(err)
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_unified_addresses") {
+          try getUnifiedAddresses()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(getTransparentAddressesInfo:reject:)
   func getTransparentAddressesInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetTransparentAddressesInfo(dict)
-        }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_transparent_addresses") {
+          try getTransparentAddresses()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
@@ -1658,34 +1385,12 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  func fnGetWalletSaveRequiredInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try getWalletSaveRequired()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] get wallet save required. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }          
-        }
-      } else {
-          let err = "Error: [Native] get wallet save required. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
   @objc(getWalletSaveRequiredInfo:reject:)
   func getWalletSaveRequiredInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetWalletSaveRequiredInfo(dict)
-        }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_wallet_save_required") {
+          try getWalletSaveRequired()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
@@ -1727,65 +1432,21 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  func fnGetConfigWalletPerformanceInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getConfigWalletPerformance()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] get wallet config performance level. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }          
-          }
-      } else {
-          let err = "Error: [Native] get wallet config performance level. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
   @objc(getConfigWalletPerformanceInfo:reject:)
   func getConfigWalletPerformanceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetConfigWalletPerformanceInfo(dict)
-        }
-      }
-  }
-
-  func fnGetWalletVersionInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          do {
-            let resp = try getWalletVersion()
-            let respStr = String(resp)
-            DispatchQueue.main.async {
-              resolve(respStr)
-            }
-          } catch {
-            let err = "Error: [Native] get wallet version. \(error.localizedDescription)"
-            NSLog(err)
-            DispatchQueue.main.async {
-              resolve(err)
-            }          
-          }
-      } else {
-          let err = "Error: [Native] get wallet version. Command arguments problem."
-          NSLog(err)
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_config_wallet_performance") {
+          try getConfigWalletPerformance()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(getWalletVersionInfo:reject:)
   func getWalletVersionInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetWalletVersionInfo(dict)
-        }
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("get_wallet_version") {
+          try getWalletVersion()
+        }.settle(resolve: resolve, reject: reject)
       }
   }
 

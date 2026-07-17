@@ -393,25 +393,24 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(fileExists(WalletBackupFileName.value))
     }
 
+    // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
+    // null means no save was needed, bytes are the wallet export, and
+    // failure throws. Nothing here classifies content — a malformed export
+    // is unrepresentable, so no validator exists to disagree with the file
+    // format, which stays base64 and is encoded only at this write site.
     fun saveWalletFile(): Boolean {
         return try {
             uniffi.zingo.initLogging()
 
-            when (val export = WalletExport.classify(uniffi.zingo.saveToB64())) {
-                is WalletExportClassification.NoSaveNeeded -> {
-                    Log.i("MAIN", "[Native] No need to save the wallet.")
-                    true
-                }
-                is WalletExportClassification.Invalid -> {
-                    Log.e("MAIN", "Error: [Native] Couldn't save the wallet. ${export.reason}")
-                    false
-                }
-                is WalletExportClassification.ValidExport -> {
-                    Log.i("MAIN", "[Native] file size: ${export.base64.length} chars (Base64)")
-                    writeEncryptedFileDurably(WalletFileName.value, export.base64)
-                    true
-                }
+            val walletBytes = uniffi.zingo.saveWalletBytes()
+            if (walletBytes == null) {
+                Log.i("MAIN", "[Native] No need to save the wallet.")
+            } else {
+                val b64encoded = Base64.encodeToString(walletBytes, Base64.NO_WRAP)
+                Log.i("MAIN", "[Native] file size: ${b64encoded.length} chars (Base64)")
+                writeEncryptedFileDurably(WalletFileName.value, b64encoded)
             }
+            true
         } catch (e: Exception) {
             Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the wallet. $e")
             false
@@ -560,88 +559,41 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // saveWalletFile/saveWalletBackupFile still contain their own failures
+    // as a resolved false (the init flows depend on a save failure not
+    // failing the whole init), so these shells resolve that boolean
+    // verbatim; only an escaping exception rejects. No outcome is ever
+    // re-encoded as prose in the success channel (zingo-mobile#1151).
     @ReactMethod
     fun doSave(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = saveWalletFile()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] saving wallet: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("save_wallet_bytes") {
+            uniffi.zingo.initLogging()
+            saveWalletFile()
+        }.settle(promise)
     }
 
     @ReactMethod
     fun doSaveBackup(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = saveWalletBackupFile()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] saving wallet backup: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("save_wallet_backup") {
+            uniffi.zingo.initLogging()
+            saveWalletBackupFile()
+        }.settle(promise)
     }
 
     @ReactMethod
     fun getLatestBlockServerInfo(serveruri: String, promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getLatestBlockServer(serveruri)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] get latest block serveruri: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_latest_block_server") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getLatestBlockServer(serveruri)
+        }.settle(promise)
     }
 
     @ReactMethod
     fun getLatestBlockWalletInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getLatestBlockWallet()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] get latest block wallet: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_latest_block_wallet") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getLatestBlockWallet()
+        }.settle(promise)
     }
 
     @ReactMethod
@@ -688,23 +640,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getValueTransfersList(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getValueTransfers()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] get value transfers list: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_value_transfers") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getValueTransfers()
+        }.settle(promise)
     }
 
     @ReactMethod
@@ -949,65 +888,26 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getVersionInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getVersion()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] version: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_version") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getVersion()
+        }.settle(promise)
     }
 
     @ReactMethod
     fun getMessagesInfo(address: String, promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getMessages(address)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] messages: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_messages") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getMessages(address)
+        }.settle(promise)
     }
 
     @ReactMethod
     fun getBalanceInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getBalance()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] balance: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_balance") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getBalance()
+        }.settle(promise)
     }
 
     @ReactMethod
@@ -1138,23 +1038,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getSpendableBalanceTotalInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getSpendableBalanceTotal()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] spendable balance total: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_spendable_balance_total") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getSpendableBalanceTotal()
+        }.settle(promise)
     }
 
     @ReactMethod
@@ -1201,44 +1088,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getUnifiedAddressesInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getUnifiedAddresses()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] unified addresses: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_unified_addresses") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getUnifiedAddresses()
+        }.settle(promise)
     }
 
     @ReactMethod
     fun getTransparentAddressesInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getTransparentAddresses()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] transparent addresses: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_transparent_addresses") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getTransparentAddresses()
+        }.settle(promise)
     }
 
     @ReactMethod
@@ -1307,23 +1168,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getWalletSaveRequiredInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getWalletSaveRequired()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] get wallet save required: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_wallet_save_required") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getWalletSaveRequired()
+        }.settle(promise)
     }
 
     @ReactMethod
@@ -1349,44 +1197,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     
     @ReactMethod
     fun getConfigWalletPerformanceInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getConfigWalletPerformance()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] get wallet config performance level: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_config_wallet_performance") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getConfigWalletPerformance()
+        }.settle(promise)
     }
 
     @ReactMethod
     fun getWalletVersionInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getWalletVersion()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] get wallet version: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
+        FfiOutcome.of("get_wallet_version") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.getWalletVersion()
+        }.settle(promise)
     }
 
     @ReactMethod
