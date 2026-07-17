@@ -1,6 +1,11 @@
 package org.ZingoLabs.Zingo
 
 import com.facebook.react.bridge.Promise
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * The outcome of an FFI call, classified by channel alone
@@ -30,6 +35,30 @@ sealed class FfiOutcome {
             Resolved(call())
         } catch (e: Exception) {
             Rejected(code, e)
+        }
+
+        /**
+         * Classifies `call` and settles `promise` with its outcome — the
+         * one dispatch seam for every bridge method with no dispatch needs
+         * of its own. The contract: `call` runs on the IO dispatcher, never
+         * on the calling (React Native native-modules) thread, and the
+         * promise settles on `main` — the pattern the sync family
+         * established. React Native serializes all native-module calls onto
+         * one thread, so a slow FFI — a wallet save, a server dial — must
+         * not stall every other bridge call behind it.
+         */
+        fun settling(
+            promise: Promise,
+            code: String,
+            main: CoroutineDispatcher = Dispatchers.Main,
+            call: () -> Any?,
+        ) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val outcome = of(code, call)
+                withContext(main) {
+                    outcome.settle(promise)
+                }
+            }
         }
     }
 }
