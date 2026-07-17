@@ -664,73 +664,48 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun pollSyncInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val outcome = FfiOutcome.of("poll_sync") {
-                uniffi.zingo.initLogging()
-                uniffi.zingo.pollSync()
-            }
-            withContext(Dispatchers.Main) {
-                outcome.settle(promise)
-            }
+        FfiOutcome.settling(promise, "poll_sync") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.pollSync()
         }
     }
 
     @ReactMethod
     fun runSyncProcess(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val outcome = FfiOutcome.of("run_sync") {
-                uniffi.zingo.initLogging()
+        FfiOutcome.settling(promise, "run_sync") {
+            uniffi.zingo.initLogging()
 
-                // Persistence is owned by JS (SyncCoordinator → doSave when
-                // getWalletSaveRequired returns true). Auto-saving here was
-                // racing against that doSave on the same wallet.dat — two
-                // Dispatchers.IO threads writing in parallel produced the
-                // EncryptedFile "output file already exists" crashes in the
-                // logs. Single source of truth for save decisions = JS.
-                uniffi.zingo.runSync()
-            }
-            withContext(Dispatchers.Main) {
-                outcome.settle(promise)
-            }
+            // Persistence is owned by JS (SyncCoordinator → doSave when
+            // getWalletSaveRequired returns true). Auto-saving here was
+            // racing against that doSave on the same wallet.dat — two
+            // Dispatchers.IO threads writing in parallel produced the
+            // EncryptedFile "output file already exists" crashes in the
+            // logs. Single source of truth for save decisions = JS.
+            uniffi.zingo.runSync()
         }
     }
 
     @ReactMethod
     fun pauseSyncProcess(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val outcome = FfiOutcome.of("pause_sync") {
-                uniffi.zingo.initLogging()
-                uniffi.zingo.pauseSync()
-            }
-            withContext(Dispatchers.Main) {
-                outcome.settle(promise)
-            }
+        FfiOutcome.settling(promise, "pause_sync") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.pauseSync()
         }
     }
 
     @ReactMethod
     fun statusSyncInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val outcome = FfiOutcome.of("status_sync") {
-                uniffi.zingo.initLogging()
-                uniffi.zingo.statusSync()
-            }
-            withContext(Dispatchers.Main) {
-                outcome.settle(promise)
-            }
+        FfiOutcome.settling(promise, "status_sync") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.statusSync()
         }
     }
 
     @ReactMethod
     fun runRescanProcess(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val outcome = FfiOutcome.of("run_rescan") {
-                uniffi.zingo.initLogging()
-                uniffi.zingo.runRescan()
-            }
-            withContext(Dispatchers.Main) {
-                outcome.settle(promise)
-            }
+        FfiOutcome.settling(promise, "run_rescan") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.runRescan()
         }
     }
 
