@@ -37,7 +37,6 @@
     <ID>Indentation:BackgroundSyncWorker.kt$BackgroundSyncWorker$ </ID>
     <ID>Indentation:RPCModule.kt$RPCModule$ </ID>
     <ID>Indentation:RPCPackage.kt$RPCPackage$ </ID>
-    <ID>Indentation:WalletExportClassificationTest.kt$WalletExportClassificationTest$ </ID>
     <ID>LargeClass:RPCModule.kt$RPCModule : ReactContextBaseJavaModule</ID>
     <ID>LongMethod:BackgroundSyncWorker.kt$BackgroundSyncWorker$@RequiresApi(Build.VERSION_CODES.O) override fun doWork(): Result</ID>
     <ID>LongParameterList:RPCModule.kt$RPCModule$(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
@@ -51,7 +50,6 @@
     <ID>MagicNumber:RPCModule.kt$RPCModule$1000</ID>
     <ID>MagicNumber:RPCModule.kt$RPCModule$7</ID>
     <ID>MagicNumber:RPCModule.kt$RPCModule$8</ID>
-    <ID>MagicNumber:WalletExport.kt$WalletExport$4</ID>
     <ID>MaxLineLength:BackgroundSyncWorker.kt$BSCompanion.Companion$val</ID>
     <ID>MaxLineLength:BackgroundSyncWorker.kt$BackgroundSyncWorker$class</ID>
     <ID>MaxLineLength:BackgroundSyncWorker.kt$BackgroundSyncWorker$val jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrEnd\"}"</ID>
@@ -93,8 +91,6 @@
     <ID>PackageName:MainApplication.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageName:RPCModule.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageName:RPCPackage.kt$package org.ZingoLabs.Zingo</ID>
-    <ID>PackageName:WalletExport.kt$package org.ZingoLabs.Zingo</ID>
-    <ID>PackageName:WalletExportClassificationTest.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:BackgroundSyncWorker.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:Constants.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:FfiDispatchTest.kt$package org.ZingoLabs.Zingo</ID>
@@ -104,8 +100,6 @@
     <ID>PackageNaming:MainApplication.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:RPCModule.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:RPCPackage.kt$package org.ZingoLabs.Zingo</ID>
-    <ID>PackageNaming:WalletExport.kt$package org.ZingoLabs.Zingo</ID>
-    <ID>PackageNaming:WalletExportClassificationTest.kt$package org.ZingoLabs.Zingo</ID>
     <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
     <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String)</ID>
     <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
@@ -114,7 +108,6 @@
     <ID>ReturnCount:BackgroundSyncWorker.kt$BackgroundSyncWorker$@RequiresApi(Build.VERSION_CODES.O) override fun doWork(): Result</ID>
     <ID>ReturnCount:BackgroundSyncWorker.kt$BackgroundSyncWorker$fun isAppInForeground(context: Context): Boolean</ID>
     <ID>ReturnCount:RPCModule.kt$RPCModule$fun migrateFileIfNeeded(fileName: String)</ID>
-    <ID>ReturnCount:WalletExport.kt$WalletExport$fun isValidBase64(s: String): Boolean</ID>
     <ID>SpacingAroundColon:BackgroundSyncWorker.kt$ScanRanges$:</ID>
     <ID>SpacingAroundColon:BackgroundSyncWorker.kt$SyncStatus$:</ID>
     <ID>SpacingAroundParens:BackgroundSyncWorker.kt$ScanRanges$(</ID>
