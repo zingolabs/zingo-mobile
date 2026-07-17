@@ -37,6 +37,7 @@ import { RPCWalletVersionType } from '../types/RPCWalletVersionType';
 import { WalletBackendConfig } from '../config/WalletBackendConfig';
 import { transformValueTransfer } from '../transforms/valueTransferTransform';
 import { fetchWallet } from '../utils/walletUtils';
+import { isBrokenClientRejection } from '../utils/zingolibRejection';
 
 export class DataService {
   config: WalletBackendConfig;
@@ -55,7 +56,11 @@ export class DataService {
   fetchZingolibVersionLock: boolean = false;
   getWalletSaveRequiredLock: boolean = false;
 
-  // Set by WalletBackend after SyncCoordinator is created, to restart sync on critical errors.
+  // Set by WalletBackend after SyncCoordinator is created, to restart sync
+  // on broken-client errors. Every escalation site gates on
+  // isBrokenClientRejection: a transient rejection — an offline device on
+  // the five-second polling cadence — retries on the next tick instead of
+  // tearing the coordinator down.
   onSyncError: () => Promise<void> = async () => {};
 
   constructor(config: WalletBackendConfig) {
@@ -116,7 +121,9 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error balances ${error}`);
       this.config.onError(`Error balance: ${error}`);
-      await this.onSyncError();
+      if (isBrokenClientRejection(error)) {
+        await this.onSyncError();
+      }
     } finally {
       this.fetchTotalBalanceLock = false;
     }
@@ -196,7 +203,9 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error addresses ${error}`);
       this.config.onError(`Error addresses: ${error}`);
-      await this.onSyncError();
+      if (isBrokenClientRejection(error)) {
+        await this.onSyncError();
+      }
     } finally {
       this.fetchAddressesLock = false;
     }
@@ -225,7 +234,9 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
       this.config.onError(`Error wallet height: ${error}`);
-      await this.onSyncError();
+      if (isBrokenClientRejection(error)) {
+        await this.onSyncError();
+      }
     } finally {
       this.fetchWalletHeightLock = false;
     }
@@ -287,7 +298,9 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error info & server block height ${error}`);
       this.config.onError(`Error info: ${error}`);
-      await this.onSyncError();
+      if (isBrokenClientRejection(error)) {
+        await this.onSyncError();
+      }
     } finally {
       this.fetchInfoAndServerHeightLock = false;
     }
@@ -338,7 +351,9 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error wallet birthday ${error}`);
       this.config.onError(`Error wallet birthday: ${error}`);
-      await this.onSyncError();
+      if (isBrokenClientRejection(error)) {
+        await this.onSyncError();
+      }
     } finally {
       this.fetchWalletBirthdaySeedUfvkLock = false;
     }
@@ -351,9 +366,22 @@ export class DataService {
     this.fetchTandZandOValueTransfersLock = true;
     try {
       const start = Date.now();
-      const heightStr: string = await RPCModule.getLatestBlockServerInfo(
-        this.config.server.uri,
-      );
+      // The server dial rejects whenever the device is offline. The local
+      // value-transfer list must still render without a server, so a
+      // transient rejection is reported and contained here; only a
+      // broken-client rejection escapes to the owning catch below.
+      let heightStr: string = '';
+      try {
+        heightStr = await RPCModule.getLatestBlockServerInfo(
+          this.config.server.uri,
+        );
+      } catch (error) {
+        if (isBrokenClientRejection(error)) {
+          throw error;
+        }
+        console.log(`Transient Error server height ${error}`);
+        this.config.onError(`Error server height: ${error}`);
+      }
       if (Date.now() - start > 4000) {
         console.log(
           '=========================================== > server height - ',
@@ -362,8 +390,6 @@ export class DataService {
       }
       if (heightStr) {
         this.lastServerBlockHeight = Number(heightStr);
-      } else {
-        console.log('Internal Error server height');
       }
 
       const start2 = Date.now();
@@ -402,7 +428,9 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error value transfers ${error}`);
       this.config.onError(`Error value transfers: ${error}`);
-      await this.onSyncError();
+      if (isBrokenClientRejection(error)) {
+        await this.onSyncError();
+      }
     } finally {
       this.fetchTandZandOValueTransfersLock = false;
     }
@@ -447,7 +475,9 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error value transfers messages ${error}`);
       this.config.onError(`Error value transfers messages: ${error}`);
-      await this.onSyncError();
+      if (isBrokenClientRejection(error)) {
+        await this.onSyncError();
+      }
     } finally {
       this.fetchTandZandOMessagesLock = false;
     }
