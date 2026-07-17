@@ -30,7 +30,7 @@ Ironwood pool.
 
 ## Ironwood pool
 
-The newest shielded value pool, activated on the Ironwood network
+The newest shielded value pool, introduced by the Ironwood network
 upgrade (NU6.3). Once the upgrade activates, funds sent to a unified
 address settle in the Ironwood pool rather than Orchard, and change
 from shielded spends returns there. Balances and value transfers
