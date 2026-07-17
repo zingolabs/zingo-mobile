@@ -2,7 +2,7 @@
  * @format
  */
 
-import { ValueTransferKindEnum } from '../app/AppState';
+import { PoolEnum, ValueTransferKindEnum } from '../app/AppState';
 import { RPCValueTransfersKindEnum } from '../app/walletBackend/enums/RPCValueTransfersKindEnum';
 import { RPCValueTransfersStatusEnum } from '../app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { transformValueTransfer } from '../app/walletBackend/transforms/valueTransferTransform';
@@ -187,8 +187,54 @@ describe('transformValueTransfer — optional fields', () => {
     expect(result.memos).toEqual(['hello', '']);
   });
 
-  test('poolType is undefined when pool_received is absent', () => {
+  test('poolType is undefined when pools_received is absent', () => {
     const result = transformValueTransfer(makeVt(), 1100, 1100);
     expect(result.poolType).toBeUndefined();
+  });
+
+  test('poolType is undefined when pools_received is empty', () => {
+    const result = transformValueTransfer(
+      makeVt({ pools_received: [] }),
+      1100,
+      1100,
+    );
+    expect(result.poolType).toBeUndefined();
+  });
+});
+
+// The fixtures below reproduce value transfers observed on the
+// ironwood-activated regtest chain (CI run 29603362971 logcat): zingolib
+// feat/ironwood reports per-direction pool lists, and unified-address
+// receives land in the Ironwood pool. These pin the plural schema so the
+// retired singular `pool_received` cannot silently return.
+describe('transformValueTransfer — ironwood pool lists', () => {
+  test('a single-pool receive shows its pool', () => {
+    const result = transformValueTransfer(
+      makeVt({
+        kind: RPCValueTransfersKindEnum.received,
+        value: 1_000_000,
+        pools_sent_from: [],
+        pools_received: [PoolEnum.IronwoodPool],
+      }),
+      1100,
+      1100,
+    );
+    expect(result.poolType).toBe(PoolEnum.IronwoodPool);
+  });
+
+  test('a multi-pool memo-to-self shows the newest pool', () => {
+    const result = transformValueTransfer(
+      makeVt({
+        kind: RPCValueTransfersKindEnum.memoToSelf,
+        value: 0,
+        transaction_fee: 20_000,
+        pools_sent_from: [PoolEnum.IronwoodPool],
+        pools_received: [PoolEnum.SaplingPool, PoolEnum.IronwoodPool],
+        memos: ['note-to-self test memo'],
+      }),
+      1100,
+      1100,
+    );
+    expect(result.poolType).toBe(PoolEnum.IronwoodPool);
   });
 });
