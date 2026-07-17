@@ -767,3 +767,58 @@ final class ExecuteParseAddressInvalid: XCTestCase {
         }
     }
 }
+
+/// The save-path classification contract (zingo-mobile#1151; audit Issue Q):
+/// a wallet export is classified by its structure, never by whether its
+/// content resembles an error sentinel. These are the Swift twins of the
+/// Rust wallet_export_tests, the Kotlin WalletExportClassificationTest, and
+/// the TypeScript walletBackend.saveClassification tests.
+class WalletExportClassificationTests: XCTestCase {
+    func testWalletExportResemblingAnErrorIsData() {
+        // Audit Issue Q's one-in-33-million collision, made deterministic:
+        // a well-formed base64 wallet export that begins with "error".
+        let attackString = "errorAAA"
+
+        XCTAssertEqual(
+            WalletExport.classify(attackString),
+            .validExport(base64: attackString)
+        )
+    }
+
+    func testUppercaseCollisionIsAlsoData() {
+        // The historical sniff matched case-insensitively, so every case
+        // variant of the prefix was misclassified.
+        let attackString = "ERRORAAA"
+
+        XCTAssertEqual(
+            WalletExport.classify(attackString),
+            .validExport(base64: attackString)
+        )
+    }
+
+    func testFailureProseIsNeverAValidExport() {
+        // Failure prose always contains ':' and ' ', both outside the base64
+        // alphabet, so structural validation alone rejects it —
+        // deterministically, with no sentinel matching.
+        guard case .invalid = WalletExport.classify("Error: disk full") else {
+            return XCTFail("failure prose must classify as invalid")
+        }
+    }
+
+    func testEmptyExportMeansNoSaveNeeded() {
+        XCTAssertEqual(WalletExport.classify(""), .noSaveNeeded)
+    }
+
+    func testMalformedBase64IsInvalid() {
+        guard case .invalid = WalletExport.classify("not base64 at all") else {
+            return XCTFail("malformed base64 must classify as invalid")
+        }
+    }
+
+    func testPaddingMayOnlyTrail() {
+        guard case .invalid = WalletExport.classify("AB=A") else {
+            return XCTFail("interior padding must classify as invalid")
+        }
+        XCTAssertEqual(WalletExport.classify("ABCD"), .validExport(base64: "ABCD"))
+    }
+}
