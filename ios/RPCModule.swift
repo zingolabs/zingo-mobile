@@ -8,7 +8,7 @@
 import Foundation
 import React
 
-/// A pure base64 well-formedness check — no I/O, no logging, no platform
+/// A pure canonical-base64 check — no I/O, no logging, no platform
 /// dependencies — so it runs under plain XCTest unit tests.
 ///
 /// The FFI no longer returns base64 (the save path crosses as bytes, so a
@@ -16,24 +16,13 @@ import React
 /// validating wallet-file content read back from disk before
 /// `restoreExistingWalletBackup` swaps it into place.
 enum WalletExport {
+  // Canonical: exactly the strings the encoder emits and the Rust
+  // STANDARD engine accepts, checked by decode/re-encode round-trip.
+  // (Foundation's decoder alone tolerates non-zero trailing padding
+  // bits, which Rust rejects at init_from_b64.)
   static func isValidBase64(_ s: String) -> Bool {
-    let bytes = s.utf8
-    if bytes.isEmpty || bytes.count % 4 != 0 { return false }
-    var padCount = 0
-    for b in bytes {
-      if b == 0x3D { // '='
-        padCount += 1
-        if padCount > 2 { return false }
-      } else if padCount > 0 {
-        return false
-      } else if !((0x41...0x5A).contains(b) ||  // 'A'-'Z'
-                  (0x61...0x7A).contains(b) ||  // 'a'-'z'
-                  (0x30...0x39).contains(b) ||  // '0'-'9'
-                  b == 0x2B || b == 0x2F) {     // '+', '/'
-        return false
-      }
-    }
-    return true
+    guard !s.isEmpty, let decoded = Data(base64Encoded: s) else { return false }
+    return decoded.base64EncodedString() == s
   }
 }
 
