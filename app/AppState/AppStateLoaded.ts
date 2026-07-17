@@ -2,10 +2,8 @@ import ServerType from './types/ServerType';
 
 import { AppStateStatus } from 'react-native';
 import { SelectServerEnum } from './enums/SelectServerEnum';
-import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
 export default interface AppStateLoaded {
-  navigationHome: DrawerContentComponentProps['navigation'] | null;
   appStateStatus: AppStateStatus;
 
   // change server helper
@@ -21,5 +19,11 @@ export default interface AppStateLoaded {
   // to know if the modal is open or not
   isSeedViewModalOpen: boolean;
 
-   
+  // Address+ownership pair for the shared "Add Tag/Contact" BottomSheetModal
+  // hosted at LoadedApp level. `null` while hidden.
+  addTagModalTarget: {
+    address: string;
+    own: boolean;
+    swapChain: string;
+  } | null;
 }

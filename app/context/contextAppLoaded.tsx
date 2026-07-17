@@ -1,14 +1,13 @@
 import React, { ReactNode } from 'react';
+import { useShallowMemo } from './useShallowMemo';
 
 import {
   InfoType,
-  WalletType,
   ZecPriceType,
   BackgroundType,
   SendPageStateClass,
   ToAddrClass,
   NetInfoType,
-  BackgroundErrorType,
   ServerType,
   AddressBookFileClass,
   SecurityType,
@@ -16,13 +15,13 @@ import {
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
-  SnackbarType,
+  ChainNameEnum,
   AppContextLoaded,
   BlockExplorerEnum,
 } from '../AppState';
 
-import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
+import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
@@ -36,7 +35,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
   setSendPageState: () => {},
   info: {} as InfoType,
-  wallet: {} as WalletType,
+  birthday: 0,
   defaultUnifiedAddress: '',
   server: {} as ServerType,
   currency: CurrencyEnum.USDCurrency,
@@ -57,7 +56,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
     dateEnd: 0,
   } as BackgroundType,
   setBackgroundSyncErrorInfo: () => {},
-  backgroundError: {} as BackgroundErrorType,
+  backgroundError: { title: '', error: '' },
   setBackgroundError: () => {},
   lastError: '',
   setLastError: () => {},
@@ -65,15 +64,14 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   saplingPool: true,
   transparentPool: true,
   mode: ModeEnum.advanced,
-  snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
-  removeFirstSnackbar: () => {},
   restartApp: () => {},
   somePending: false,
   addressBook: [] as AddressBookFileClass[],
-  launchAddressBook: () => {},
+  launchAddTagModal: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
+  walletChainName: ChainNameEnum.noneChainName,
   rescanMenu: false,
   recoveryWalletInfoOnDevice: false,
   shieldingAmount: 0,
@@ -85,6 +83,11 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
+  nym: false,
+  setNymOption: async () => {},
+  setModeOption: async () => {},
+  setCurrencyOption: async () => {},
+  foregroundEpoch: 0,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);
@@ -94,6 +97,14 @@ type ContextProviderProps = {
   value: AppContextLoaded;
 };
 
-export const ContextAppLoadedProvider = ({ children, value }: ContextProviderProps) => {
-  return <ContextAppLoaded.Provider value={value}>{children}</ContextAppLoaded.Provider>;
+export const ContextAppLoadedProvider = ({
+  children,
+  value,
+}: ContextProviderProps) => {
+  const stableValue = useShallowMemo(value);
+  return (
+    <ContextAppLoaded.Provider value={stableValue}>
+      {children}
+    </ContextAppLoaded.Provider>
+  );
 };

@@ -13,10 +13,11 @@ use std::any::Any;
 use std::backtrace::Backtrace;
 use std::num::NonZeroU32;
 use std::panic::{self, PanicHookInfo, UnwindSafe};
-use std::str::FromStr;
+use std::path::PathBuf;
 use std::sync::Mutex;
 use std::sync::Once;
 use std::sync::RwLock;
+use std::time::Duration;
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
@@ -37,20 +38,26 @@ use tokio::runtime::Runtime;
 use zcash_address::ZcashAddress;
 use zcash_protocol::memo::MemoBytes;
 use zcash_protocol::value::Zatoshis;
-use zingo_netutils::{GrpcIndexer, Indexer as _};
-use zingolib::ActivationHeights;
-use zingolib::config::{ChainType, ClientConfig, WalletConfig, construct_lightwalletd_uri};
+use zingo_netutils::{GrpcIndexer, Indexer};
+use zingolib::config::{
+    ChainType, ClientConfig, DEFAULT_INDEXER_URI, DEFAULT_INDEXER_URI_TESTNET, WalletConfig,
+    construct_indexer_uri, lib_birthday,
+};
 use zingolib::data::PollReport;
 use zingolib::data::proposal::total_fee;
 use zingolib::data::receivers::Receivers;
 use zingolib::data::receivers::transaction_request_from_receivers;
-use zingolib::lightclient::{DEFAULT_REQUEST_TIMEOUT, LightClient};
+use zingolib::lightclient::LightClient;
 use zingolib::utils::{conversion::address_from_str, conversion::txid_from_hex_encoded_str};
 use zingolib::wallet::WalletSettings;
 use zingolib::wallet::keys::{
     WalletAddressRef,
     unified::{ReceiverSelection, UnifiedKeyStore},
 };
+
+use zingo_common_components::protocol::ActivationHeights;
+
+const INDEXER_REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
 
 #[derive(Debug, thiserror::Error)]
 pub enum ZingolibError {
@@ -225,55 +232,77 @@ fn store_client(lightclient: LightClient) -> Result<(), ZingolibError> {
     Ok(())
 }
 
-fn chain_type_from_hint(chain_hint: &str) -> Result<ChainType, String> {
-    match chain_hint {
-        "main" => Ok(ChainType::Mainnet),
-        "test" => Ok(ChainType::Testnet),
-        "regtest" => Ok(ChainType::Regtest(ActivationHeights::default())),
-        _ => Err("Error: Not a valid chain hint!".to_string()),
-    }
+struct ConnectionParams {
+    chain_type: ChainType,
+    wallet_settings: WalletSettings,
+    /// `None` in Offline mode: no Indexer is ever configured and the client
+    /// stays Indexerless (zingolib ADR 0001). `Some(uri)` when a real server
+    /// was selected.
+    lightwalletd_uri: Option<http::Uri>,
 }
 
-fn performance_level_from_str(performance_level: &str) -> Result<PerformanceLevel, String> {
-    match performance_level {
-        "Maximum" => Ok(PerformanceLevel::Maximum),
-        "High" => Ok(PerformanceLevel::High),
-        "Medium" => Ok(PerformanceLevel::Medium),
-        "Low" => Ok(PerformanceLevel::Low),
-        _ => Err("Error: Not a valid performance level!".to_string()),
-    }
-}
-
-fn wallet_settings(
+fn build_connection_params(
+    uri: String,
+    chain_hint: String,
     performance_level: String,
     min_confirmations: u32,
-) -> Result<WalletSettings, String> {
-    Ok(WalletSettings {
+) -> Result<ConnectionParams, String> {
+    let chain_type = match chain_hint.as_str() {
+        "main" => ChainType::Mainnet,
+        "test" => ChainType::Testnet,
+        "regtest" => ChainType::Regtest(ActivationHeights::default()),
+        _ => return Err("Error: Not a valid chain hint!".to_string()),
+    };
+
+    // Offline Mode = empty uri → no Indexer is ever configured; the client
+    // stays Indexerless (zingolib ADR 0001), and `require_indexer()` gates
+    // sync/send with `Offline`. A real server yields `Some(uri)`.
+    let lightwalletd_uri = if uri.is_empty() {
+        None
+    } else {
+        Some(
+            construct_indexer_uri(Some(uri))
+                .map_err(|e| format!("Error: Invalid lightwalletd uri: {e}"))?,
+        )
+    };
+    let performancetype = match performance_level.as_str() {
+        "Maximum" => PerformanceLevel::Maximum,
+        "High" => PerformanceLevel::High,
+        "Medium" => PerformanceLevel::Medium,
+        "Low" => PerformanceLevel::Low,
+        _ => return Err("Error: Not a valid performance level!".to_string()),
+    };
+    let wallet_settings = WalletSettings {
         sync_config: SyncConfig {
             transparent_address_discovery: TransparentAddressDiscovery::minimal(),
-            performance_level: performance_level_from_str(&performance_level)?,
+            performance_level: performancetype,
         },
         min_confirmations: NonZeroU32::try_from(min_confirmations)
-            .map_err(|_| "Error: min confirmations must be non-zero!".to_string())?,
-        allow_v6_transactions: false,
+                .map_err(|_| "Error: min_confirmations must be greater than 0".to_string())?,
+    };
+
+    Ok(ConnectionParams {
+        chain_type,
+        wallet_settings,
+        lightwalletd_uri,
     })
 }
 
-fn client_config(
-    server_uri: String,
-    chain_hint: String,
+fn build_client_config(
+    params: &ConnectionParams,
     wallet_config: WalletConfig,
-) -> Result<ClientConfig, String> {
-    // if uri is empty -> Offline Mode.
-    let lightwalletd_uri = construct_lightwalletd_uri(Some(server_uri))
-        .map_err(|e| format!("Error: failed to parse uri. {e}"))?;
-    let chain_type = chain_type_from_hint(&chain_hint)?;
-
-    Ok(ClientConfig::builder()
-        .set_indexer_uri(lightwalletd_uri)
-        .set_chain_type(chain_type)
-        .set_wallet_config(wallet_config)
-        .build())
+) -> ClientConfig {
+    let builder = ClientConfig::builder()
+        .set_chain_type(params.chain_type)
+        .set_wallet_dir(PathBuf::new())
+        .set_wallet_config(wallet_config);
+    // Offline (no uri) → leave the client Indexerless. Only configure the
+    // Indexer when a real server was selected. Mirrors zingo-cli.
+    let builder = match params.lightwalletd_uri.clone() {
+        Some(uri) => builder.set_indexer_uri(uri),
+        None => builder,
+    };
+    builder.build()
 }
 
 pub fn init_logging() -> Result<String, ZingolibError> {
@@ -293,45 +322,59 @@ pub fn init_logging() -> Result<String, ZingolibError> {
 
 pub fn init_new(
     server_uri: String,
+    birthday: u32,
     chain_hint: String,
     performance_level: String,
     min_confirmations: u32,
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        let wallet_settings = match wallet_settings(performance_level, min_confirmations) {
-            Ok(s) => s,
-            Err(e) => return Ok(e),
-        };
-        let lightwalletd_uri = match construct_lightwalletd_uri(Some(server_uri.clone())) {
-            Ok(uri) => uri,
-            Err(e) => return Ok(format!("Error: failed to parse uri. {e}")),
-        };
-        let chain_height = match RT.block_on(async move {
-            let mut indexer = GrpcIndexer::new(lightwalletd_uri)
-                .await
-                .map_err(|e| format!("{e}"))?;
-            indexer
-                .get_latest_block(DEFAULT_REQUEST_TIMEOUT)
-                .await
-                .map_err(|e| format!("{e}"))
-        }) {
-            Ok(block_id) => block_id.height as u32,
-            Err(e) => return Ok(format!("Error: {e}")),
-        };
-        let config = match client_config(
+        let params = match build_connection_params(
             server_uri,
             chain_hint,
-            WalletConfig::NewSeed {
-                no_of_accounts: NonZeroU32::try_from(1).expect("hard-coded integer"),
-                chain_height,
-                wallet_settings,
-            },
+            performance_level,
+            min_confirmations,
         ) {
-            Ok(c) => c,
-            Err(e) => return Ok(e),
+            Ok(p) => p,
+            Err(e) => return Ok(format!("Error: {e}")),
         };
-        let lightclient = match RT.block_on(LightClient::new(config, true)) {
+        // Online: ask the Indexer for the chain tip. Offline (Indexerless):
+        // there is no server to query, so fall back to zingolib's Library
+        // Birthday — a per-chain height already mined when the linked zingolib
+        // release was cut, hence always a safe floor for a newly-generated seed
+        // (see zingolib ADR 0007). A caller-supplied `birthday > 0` still wins
+        // as an explicit override. Mirrors zingo-cli's offline new-wallet path.
+        let chain_height = match &params.lightwalletd_uri {
+            Some(uri) => {
+                let uri = uri.clone();
+                match RT.block_on(async move {
+                    let mut indexer = GrpcIndexer::new(uri)
+                        .await
+                        .map_err(|e| e.to_string())?;
+                    indexer
+                        .get_latest_block(INDEXER_REQUEST_TIMEOUT)
+                        .await
+                        .map_err(|e| e.to_string())
+                }) {
+                    Ok(block_id) => block_id.height as u32,
+                    Err(e) => return Ok(format!("Error: {e}")),
+                }
+            }
+            None => {
+                if birthday > 0 {
+                    birthday
+                } else {
+                    lib_birthday(params.chain_type)
+                }
+            }
+        };
+        let wallet_config = WalletConfig::NewSeed {
+            no_of_accounts: NonZeroU32::try_from(1).expect("hard-coded integer"),
+            chain_height,
+            wallet_settings: params.wallet_settings.clone(),
+        };
+        let config = build_client_config(&params, wallet_config);
+        let lightclient = match RT.block_on(LightClient::new(config, false)) {
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
@@ -352,24 +395,23 @@ pub fn init_from_seed(
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        let wallet_settings = match wallet_settings(performance_level, min_confirmations) {
-            Ok(s) => s,
-            Err(e) => return Ok(e),
-        };
-        let config = match client_config(
+        let params = match build_connection_params(
             server_uri,
             chain_hint,
-            WalletConfig::MnemonicPhrase {
-                mnemonic_phrase: seed,
-                no_of_accounts: NonZeroU32::try_from(1).expect("hard-coded integer"),
-                birthday,
-                wallet_settings,
-            },
+            performance_level,
+            min_confirmations,
         ) {
-            Ok(c) => c,
-            Err(e) => return Ok(e),
+            Ok(p) => p,
+            Err(e) => return Ok(format!("Error: {e}")),
         };
-        let lightclient = match RT.block_on(LightClient::new(config, true)) {
+        let wallet_config = WalletConfig::MnemonicPhrase {
+            mnemonic_phrase: seed,
+            no_of_accounts: NonZeroU32::try_from(1).expect("hard-coded integer"),
+            birthday,
+            wallet_settings: params.wallet_settings.clone(),
+        };
+        let config = build_client_config(&params, wallet_config);
+        let lightclient = match RT.block_on(LightClient::new(config, false)) {
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
@@ -389,23 +431,22 @@ pub fn init_from_ufvk(
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        let wallet_settings = match wallet_settings(performance_level, min_confirmations) {
-            Ok(s) => s,
-            Err(e) => return Ok(e),
-        };
-        let config = match client_config(
+        let params = match build_connection_params(
             server_uri,
             chain_hint,
-            WalletConfig::Ufvk {
-                ufvk,
-                birthday,
-                wallet_settings,
-            },
+            performance_level,
+            min_confirmations,
         ) {
-            Ok(c) => c,
-            Err(e) => return Ok(e),
+            Ok(p) => p,
+            Err(e) => return Ok(format!("Error: {e}")),
         };
-        let lightclient = match RT.block_on(LightClient::new(config, true)) {
+        let wallet_config = WalletConfig::Ufvk {
+            ufvk,
+            birthday,
+            wallet_settings: params.wallet_settings.clone(),
+        };
+        let config = build_client_config(&params, wallet_config);
+        let lightclient = match RT.block_on(LightClient::new(config, false)) {
             Ok(l) => l,
             Err(e) => return Ok(format!("Error: {e}")),
         };
@@ -424,15 +465,7 @@ pub fn init_from_b64(
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-        // wallet settings are read from the wallet bytes; parsed here only to
-        // keep rejecting invalid arguments like the previous implementation.
-        if let Err(e) = wallet_settings(performance_level, min_confirmations) {
-            return Ok(e);
-        }
-        let config = match client_config(server_uri, chain_hint, WalletConfig::Read) {
-            Ok(c) => c,
-            Err(e) => return Ok(e),
-        };
+
         let decoded_bytes = match STANDARD.decode(&base64_data) {
             Ok(b) => b,
             Err(e) => {
@@ -445,11 +478,75 @@ pub fn init_from_b64(
             }
         };
 
-        let lightclient = match RT.block_on(LightClient::from_bytes(decoded_bytes, config)) {
-            Ok(l) => l,
-            Err(e) => return Ok(format!("Error: {e}")),
+        // Offline (empty server uri) has no server, so the caller-supplied
+        // `chain_hint` is meaningless — and the wallet already stores its own
+        // chain. Try each chain and keep the one the wallet deserializes under,
+        // so an Offline open works regardless of any residual chain value (a
+        // mainnet wallet opened while settings still say "test", and vice
+        // versa). Online we honor the hint strictly: a chain that disagrees
+        // with the selected server is a genuine mismatch and must error.
+        let chain_hints: Vec<String> = if server_uri.is_empty() {
+            vec![
+                "main".to_string(),
+                "test".to_string(),
+                "regtest".to_string(),
+            ]
+        } else {
+            vec![chain_hint]
         };
-        let has_seed = lightclient.mnemonic_phrase().is_some();
+
+        // `LightClient::from_bytes` deserializes the wallet straight from memory.
+        // The native layer (Kotlin/Swift) owns all wallet persistence and ships
+        // the bytes across the FFI; nothing here touches the filesystem. It reads
+        // (and chain-validates) the wallet BEFORE building the indexer, so a chain
+        // mismatch fails fast and cheaply — no network is ever dialed, which is
+        // what makes trying several chains offline essentially free.
+        //
+        // (This whole path replaced the previous staging-to-`std::env::temp_dir()`
+        // workaround that satisfied v5's `WalletConfig::Read` variant, which failed
+        // with `Permission denied (os error 13)` on Android where `TMPDIR` is unset
+        // and the app UID cannot write to `/tmp`.)
+        let mut built: Option<(LightClient, ConnectionParams)> = None;
+        let mut last_error = String::from("could not read the wallet with any chain");
+        for hint in chain_hints {
+            let params = match build_connection_params(
+                server_uri.clone(),
+                hint,
+                performance_level.clone(),
+                min_confirmations,
+            ) {
+                Ok(p) => p,
+                Err(e) => {
+                    last_error = e;
+                    continue;
+                }
+            };
+            let config = build_client_config(&params, WalletConfig::Read);
+            match RT.block_on(LightClient::from_bytes(decoded_bytes.clone(), config)) {
+                Ok(l) => {
+                    built = Some((l, params));
+                    break;
+                }
+                Err(e) => {
+                    last_error = format!("{e}");
+                    continue;
+                }
+            }
+        }
+
+        let (lightclient, params) = match built {
+            Some(v) => v,
+            None => return Ok(format!("Error: {last_error}")),
+        };
+
+        // Override the wallet's settings with the caller-supplied ones, since the
+        // serialized wallet carries whatever settings it was last saved with.
+        let has_seed = RT.block_on(async {
+            let mut wallet = lightclient.wallet().write().await;
+            wallet.wallet_settings = params.wallet_settings.clone();
+            wallet.mnemonic_phrase().is_some()
+        });
+
         let _ = store_client(lightclient);
 
         if has_seed { get_seed() } else { get_ufvk() }
@@ -478,13 +575,6 @@ pub fn save_to_b64() -> Result<String, ZingolibError> {
             Err(ZingolibError::LightclientNotInitialized)
         }
     })
-}
-
-pub fn check_b64(base64_data: String) -> String {
-    match STANDARD.decode(&base64_data) {
-        Ok(_) => "true".to_string(),
-        Err(_) => "false".to_string(),
-    }
 }
 
 pub fn get_developer_donation_address() -> Result<String, ZingolibError> {
@@ -517,10 +607,10 @@ pub fn get_latest_block_server(server_uri: String) -> Result<String, ZingolibErr
         };
         Ok(RT.block_on(async move {
             let mut indexer = match GrpcIndexer::new(lightwalletd_uri).await {
-                Ok(indexer) => indexer,
+                Ok(i) => i,
                 Err(e) => return format!("Error: {e}"),
             };
-            match indexer.get_latest_block(DEFAULT_REQUEST_TIMEOUT).await {
+            match indexer.get_latest_block(INDEXER_REQUEST_TIMEOUT).await {
                 Ok(block_id) => block_id.height.to_string(),
                 Err(e) => format!("Error: {e}"),
             }
@@ -551,7 +641,8 @@ pub fn get_value_transfers() -> Result<String, ZingolibError> {
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
-                match lightclient.value_transfers(true).await {
+                let wallet = lightclient.wallet().read().await;
+                match wallet.value_transfers(true).await {
                     Ok(value_transfers) => json::JsonValue::from(value_transfers).pretty(2),
                     Err(e) => format!("Error: {e}"),
                 }
@@ -592,8 +683,13 @@ fn run_sync() -> Result<String, ZingolibError> {
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
             if lightclient.sync_mode() == SyncMode::Paused {
-                lightclient.resume_sync().expect("sync should be paused");
-                Ok("Resuming sync task...".to_string())
+                // resume_sync can race: sync_mode() was Paused a moment ago but the
+                // task may have advanced before we got here. Return the error as a
+                // string instead of `expect` — panicking would poison LIGHTCLIENT.
+                Ok(match lightclient.resume_sync() {
+                    Ok(_) => "Resuming sync task...".to_string(),
+                    Err(e) => format!("Error: {e}"),
+                })
             } else {
                 Ok(RT.block_on(async {
                     match lightclient.sync().await {
@@ -667,11 +763,27 @@ pub fn info_server() -> Result<String, ZingolibError> {
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            Ok(RT.block_on(async move { lightclient.do_info().await }))
+            Ok(RT.block_on(async move {
+                match lightclient.info().await {
+                    Ok(info) => json::JsonValue::from(info).pretty(2),
+                    Err(e) => format!("Error: {e}"),
+                }
+            }))
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
     })
+}
+
+/// The loaded wallet's chain as the short token the JS layer uses
+/// (`ChainNameEnum`: "main" / "test" / "regtest"). Read straight from the
+/// wallet, so it is reliable even Offline (no server).
+fn chain_name_short(chain: ChainType) -> &'static str {
+    match chain {
+        ChainType::Mainnet => "main",
+        ChainType::Testnet => "test",
+        ChainType::Regtest(_) => "regtest",
+    }
 }
 
 // TODO: rename "get_seed_phrase" or "get_mnemonic_phrase"
@@ -685,8 +797,23 @@ pub fn get_seed() -> Result<String, ZingolibError> {
             Ok(RT.block_on(async move {
                 let wallet = lightclient.wallet().read().await;
                 match wallet.recovery_info() {
-                    Some(recovery_info) => serde_json::to_string_pretty(&recovery_info)
-                        .unwrap_or_else(|_| "Error: get seed. failed to serialize".to_string()),
+                    Some(recovery_info) => {
+                        // Surface the wallet's own chain alongside the recovery
+                        // info so the JS layer can track it even Offline.
+                        let mut val = serde_json::to_value(&recovery_info)
+                            .unwrap_or(serde_json::Value::Null);
+                        if let Some(obj) = val.as_object_mut() {
+                            obj.insert(
+                                "chain_name".to_string(),
+                                serde_json::Value::String(
+                                    chain_name_short(wallet.chain_type()).to_string(),
+                                ),
+                            );
+                        }
+                        serde_json::to_string_pretty(&val).unwrap_or_else(|_| {
+                            "Error: get seed. failed to serialize".to_string()
+                        })
+                    }
                     None => {
                         "Error: get seed. no mnemonic found. wallet loaded from key.".to_string()
                     }
@@ -704,7 +831,6 @@ pub fn get_ufvk() -> Result<String, ZingolibError> {
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            let birthday = lightclient.birthday();
             Ok(RT.block_on(async move {
                 let wallet = lightclient.wallet().read().await;
                 let ufvk: UnifiedFullViewingKey = match wallet
@@ -718,7 +844,8 @@ pub fn get_ufvk() -> Result<String, ZingolibError> {
                 };
                 object! {
                     "ufvk" => ufvk.encode(&wallet.chain_type()),
-                    "birthday" => birthday
+                    "birthday" => u32::from(wallet.birthday()),
+                    "chain_name" => chain_name_short(wallet.chain_type())
                 }
                 .pretty(2)
             }))
@@ -734,22 +861,32 @@ pub fn change_server(server_uri: String) -> Result<String, ZingolibError> {
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            RT.block_on(async move {
-                if server_uri.is_empty() {
-                    match lightclient.set_indexer_uri(http::Uri::default()).await {
-                        Ok(_) => Ok("server set (default)".to_string()),
-                        Err(e) => Ok(format!("Error: {e}")),
-                    }
-                } else {
-                    match http::Uri::from_str(&server_uri) {
-                        Ok(uri) => match lightclient.set_indexer_uri(uri).await {
-                            Ok(_) => Ok("server set".to_string()),
-                            Err(e) => Ok(format!("Error: {e}")),
-                        },
-                        Err(_) => Ok("Error: invalid server uri".to_string()),
-                    }
+            let uri = if server_uri.is_empty() {
+                // Offline: no server. `http::Uri::default()` is scheme-less and
+                // `set_indexer_uri` rejects it ("bad uri: invalid scheme"), so
+                // hand it the chain's default indexer URI instead —
+                // syntactically valid, and never actually dialed while offline.
+                let default = match lightclient.chain_type() {
+                    ChainType::Mainnet => DEFAULT_INDEXER_URI,
+                    ChainType::Testnet => DEFAULT_INDEXER_URI_TESTNET,
+                    ChainType::Regtest(_) => DEFAULT_INDEXER_URI,
+                };
+                match construct_indexer_uri(Some(default.to_string())) {
+                    Ok(u) => u,
+                    Err(_) => return Ok("Error: invalid server uri".to_string()),
                 }
-            })
+            } else {
+                match construct_indexer_uri(Some(server_uri)) {
+                    Ok(u) => u,
+                    Err(_) => return Ok("Error: invalid server uri".to_string()),
+                }
+            };
+            Ok(RT.block_on(async move {
+                match lightclient.set_indexer_uri(uri).await {
+                    Ok(_) => "server set".to_string(),
+                    Err(e) => format!("Error: {e}"),
+                }
+            }))
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
@@ -765,7 +902,7 @@ pub fn wallet_kind() -> Result<String, ZingolibError> {
             Ok(RT.block_on(async move {
                 let wallet = lightclient.wallet().read().await;
                 if wallet.mnemonic_phrase().is_some() {
-                    object! {"kind" => "Loaded from seed or mnemonic phrase)",
+                    object! {"kind" => "Loaded from seed or mnemonic phrase",
                             "transparent" => true,
                             "sapling" => true,
                             "orchard" => true,
@@ -1036,19 +1173,13 @@ pub fn get_total_spends_to_address() -> Result<String, ZingolibError> {
     })
 }
 
-pub fn zec_price(tor: String) -> Result<String, ZingolibError> {
+pub fn zec_price() -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
-                // tor support was removed from zingolib on the ironwood branch;
-                // the argument is kept for FFI compatibility and validated only.
-                let Ok(_tor_bool) = tor.parse::<bool>() else {
-                    return "Error: failed to parse tor setting.".to_string();
-                };
-
                 let mut wallet = lightclient.wallet().write().await;
                 match wallet.update_current_price().await {
                     Ok(price) => object! { "current_price" => price }.pretty(2),
@@ -1147,18 +1278,6 @@ pub fn get_option_wallet() -> Result<String, ZingolibError> {
     with_panic_guard(|| Ok("Error: unimplemented".to_string()))
 }
 
-pub fn create_tor_client(_data_dir: String) -> Result<String, ZingolibError> {
-    // tor support was removed from zingolib on the ironwood branch;
-    // this function is kept so the native modules and JS API stay unchanged.
-    with_panic_guard(|| Ok("Error: tor is not supported by this build.".to_string()))
-}
-
-pub fn remove_tor_client() -> Result<String, ZingolibError> {
-    // tor support was removed from zingolib on the ironwood branch;
-    // this function is kept so the native modules and JS API stay unchanged.
-    with_panic_guard(|| Ok("Tor client is not active.".to_string()))
-}
-
 pub fn get_unified_addresses() -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
@@ -1195,9 +1314,9 @@ pub fn create_new_unified_address(receivers: String) -> Result<String, ZingolibE
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            let network = lightclient.chain_type();
             Ok(RT.block_on(async move {
                 let mut wallet = lightclient.wallet().write().await;
+                let network = wallet.chain_type();
                 let receivers_available = ReceiverSelection {
                     orchard: receivers.contains('o'),
                     sapling: receivers.contains('z'),
@@ -1227,9 +1346,9 @@ pub fn create_new_transparent_address() -> Result<String, ZingolibError> {
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
-            let network = lightclient.chain_type();
             Ok(RT.block_on(async move {
                 let mut wallet = lightclient.wallet().write().await;
+                let network = wallet.chain_type();
                 match wallet.generate_transparent_address(AccountId::ZERO, true) {
                     Ok((id, transparent_address)) => {
                         json::object! {
@@ -1330,8 +1449,8 @@ pub fn get_wallet_save_required() -> Result<String, ZingolibError> {
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
-                let wallet = lightclient.wallet().read().await;
-                object! { "save_required" => wallet.save_required }.pretty(2)
+                let save_required = lightclient.is_save_required().await;
+                object! { "save_required" => save_required }.pretty(2)
             }))
         } else {
             Err(ZingolibError::LightclientNotInitialized)
@@ -1349,7 +1468,7 @@ pub fn set_config_wallet_to_test() -> Result<String, ZingolibError> {
                 let mut wallet = lightclient.wallet().write().await;
                 wallet.wallet_settings.min_confirmations = NonZeroU32::try_from(1).unwrap();
                 wallet.wallet_settings.sync_config.performance_level = PerformanceLevel::Medium;
-                wallet.save_required = true;
+                wallet.mark_dirty();
                 "Successfully set config wallet to test. (1 - Medium)".to_string()
             }))
         } else {
@@ -1368,15 +1487,23 @@ pub fn set_config_wallet_to_prod(
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
-                let performancetype = match performance_level_from_str(&performance_level) {
-                    Ok(p) => p,
-                    Err(e) => return e,
+                let performancetype = match performance_level.as_str() {
+                    "Maximum" => PerformanceLevel::Maximum,
+                    "High" => PerformanceLevel::High,
+                    "Medium" => PerformanceLevel::Medium,
+                    "Low" => PerformanceLevel::Low,
+                    _ => return "Error: Not a valid performance level!".to_string(),
                 };
                 let mut wallet = lightclient.wallet().write().await;
                 wallet.wallet_settings.min_confirmations =
-                    NonZeroU32::try_from(min_confirmations).unwrap();
+                    match NonZeroU32::try_from(min_confirmations) {
+                        Ok(v) => v,
+                        Err(_) => {
+                            return "Error: min_confirmations must be greater than 0".to_string()
+                        }
+                    };
                 wallet.wallet_settings.sync_config.performance_level = performancetype;
-                wallet.save_required = true;
+                wallet.mark_dirty();
                 "Successfully set config wallet to prod.".to_string()
             }))
         } else {

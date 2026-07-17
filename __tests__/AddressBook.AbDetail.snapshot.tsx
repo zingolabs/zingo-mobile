@@ -6,16 +6,24 @@ import 'react-native';
 import React from 'react';
 
 import { render, RenderResult } from '@testing-library/react-native';
-import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
+import {
+  ContextAppLoadedProvider,
+  defaultAppContextLoaded,
+} from '../app/context';
 import AbDetail from '../components/AddressBook/components/AbDetail';
-import { AddressBookActionEnum, AddressBookFileClass, RouteEnum, ScreenEnum } from '../app/AppState';
+import {
+  AddressBookActionEnum,
+  AddressBookFileClass,
+  RouteEnum,
+  ScreenEnum,
+} from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 
 // test suite
 describe('Component Address Book Details - test', () => {
   //snapshot test
-  const state = defaultAppContextLoaded;
+  const state = { ...defaultAppContextLoaded };
   state.addressBook = mockAddressBook;
   state.translate = mockTranslate;
   const onCancel = jest.fn();
@@ -30,7 +38,8 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Add}
           doAction={onAction}
           screenName={ScreenEnum.AddressBook}
-          routeStack={RouteEnum.AddressBookStack}
+          routeStack={RouteEnum.AddressBook}
+          navigation={{ navigate: onCancel } as never}
         />
       </ContextAppLoadedProvider>,
     );
@@ -46,7 +55,8 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Modify}
           doAction={onAction}
           screenName={ScreenEnum.AddressBook}
-          routeStack={RouteEnum.ConfirmStack}
+          routeStack={RouteEnum.AddressBook}
+          navigation={{ navigate: onCancel } as never}
         />
       </ContextAppLoadedProvider>,
     );
@@ -62,7 +72,8 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Delete}
           doAction={onAction}
           screenName={ScreenEnum.AddressBook}
-          routeStack={RouteEnum.ValueTransferDetailStack}
+          routeStack={RouteEnum.AddressBook}
+          navigation={{ navigate: onCancel } as never}
         />
       </ContextAppLoadedProvider>,
     );

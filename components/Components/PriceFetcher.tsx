@@ -1,168 +1,142 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, View, ActivityIndicator, Alert, AlertButton } from 'react-native';
+import React, { useContext, useEffect } from 'react';
+import {
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  ViewStyle,
+} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-import FadeText from './FadeText';
+import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 import { ContextAppLoaded } from '../../app/context';
-import moment from 'moment';
-import RPC from '../../app/rpc';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
-import { CurrencyEnum, ModeEnum, ScreenEnum } from '../../app/AppState';
-import Utils from '../../app/utils';
+import { ModeEnum } from '../../app/AppState';
+import { showConfirm, ConfirmButton } from '../../app/showConfirm';
+import QuoteRefreshRing from './QuoteRefreshRing';
+import {
+  PRICE_AUTO_REFRESH_MS,
+  priceFetcherStore,
+  usePriceFetcherStore,
+} from './priceFetcherStore';
 
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
-  screenName: ScreenEnum;
   textBefore?: string;
+  backgroundColor?: string;
+  // Fired on a manual (user) tap only — not on the 60 s auto-refresh. Lets the
+  // host screen reveal the header PriceRow (snap the bottom sheet down) so the
+  // freshly-fetched price is actually visible.
+  onManualFetch?: () => void;
 };
 
-const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, screenName, textBefore }) => {
+const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
+  setZecPrice,
+  textBefore,
+  backgroundColor,
+  onManualFetch,
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode, language, currency } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { translate, zecPrice, addLastSnackbar, mode } = context;
+  const { colors } = useTheme() as ThemeType;
+  const bg = backgroundColor ?? colors.card;
 
-  const [refreshMinutes, setRefreshMinutes] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
+  // Shared state across every mounted PriceFetcher.
+  const { started, loading, coolingDown } = usePriceFetcherStore();
 
+  // Feed the shared store the latest context-bound callbacks (identical across
+  // instances, so the last writer wins harmlessly).
   useEffect(() => {
-    Utils.setMomentLocale(language);
-  }, [language]);
-
-  useEffect(() => {
-    const fn = () => {
-      if (zecPrice.date > 0) {
-        const date1 = moment();
-        const date2 = moment(zecPrice.date);
-        setRefreshMinutes(date1.diff(date2, 'minutes'));
-      }
-    };
-
-    fn();
-    const inter: NodeJS.Timeout = setInterval(fn, 1000);
-
-    return () => clearInterval(inter);
-  }, [zecPrice.date]);
-
-  const formatMinutes = (min: number) => {
-    if (min < 60) {
-      return min.toString();
-    } else {
-      return (min / 60).toFixed(0).toString() + ':' + (min % 60).toFixed(0).toString().padStart(2, '0');
-    }
-  };
-
-  const onPressFetch = async (withTor: boolean) => {
-    setLoading(true);
-    let price: number;
-    let error: string;
-    // first attempt
-    ({price, error} = await RPC.rpcGetZecPrice(withTor));
-    //console.log('first price fetching', price, error);
-    // values:
-    // 0   - initial/default value
-    // -1  - error in Gemini/zingolib.
-    // -2  - error in RPCModule, likely.
-    // > 0 - real value
-    if (price <= 0) {
-      // second attempt
-      ({price, error} = await RPC.rpcGetZecPrice(withTor));
-      //console.log('second price fetching', price, error);
-    }
-
-    if (price === -1) {
-      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: [screenName] });
-      setLoading(false);
-      return;
-    }
-    if (price === -2) {
-      addLastSnackbar({ message: `${translate('info.errorrpcmodule')} - ${error}`, screenName: [screenName] });
-      setLoading(false);
-      return;
-    }
-    if (price <= 0) {
-      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: [screenName] });
-      setZecPrice(price, 0);
-    } else {
-      setZecPrice(price, Date.now());
-    }
-    setRefreshMinutes(0);
-    // the app needs time to recover the price from the context.
-    setTimeout(() => {
-      setLoading(false);
-    }, 1 * 1000);
-  };
+    priceFetcherStore.setDeps({ setZecPrice, translate, addLastSnackbar });
+  });
 
   const onPressFetchAlert = () => {
-    const buttons: AlertButton[] = [
-      ...[currency === CurrencyEnum.USDCurrency
-        ? { text: translate('send.fetch-button') as string, onPress: () => onPressFetch(false) } : {}],
-      ...[currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency
-        ? { text: translate('send.fetchwithtor-button') as string, onPress: () => onPressFetch(true) } : {}],
+    const buttons: ConfirmButton[] = [
+      {
+        text: translate('send.fetch-button') as string,
+        onPress: () => priceFetcherStore.fetch(),
+      },
       { text: translate('cancel') as string, style: 'cancel' },
     ];
-    Alert.alert(
-      translate('send.fetchpricetitle') as string,
-      translate('send.fetchpricebody') as string,
-      buttons.filter((b: AlertButton) => !!b.text),
-      { cancelable: false },
-    );
+    showConfirm({
+      title: translate('send.fetchpricetitle') as string,
+      message: translate('send.fetchpricebody') as string,
+      buttons,
+    });
   };
 
+  const onManualPress = () => {
+    // Reveal the header PriceRow so the (soon-to-refresh) price is on screen.
+    // No-ops on screens that don't wire a reveal callback.
+    onManualFetch?.();
+    // Confirm only on the very first request in advanced mode; afterwards a tap
+    // fetches straight away. Basic mode never confirms. The store swallows the
+    // tap while loading / within the 5 s cooldown, so this can't be spammed.
+    if (!started && mode === ModeEnum.advanced) {
+      onPressFetchAlert();
+    } else {
+      priceFetcherStore.fetch();
+    }
+  };
+
+  const containerStyle: ViewStyle = {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: bg,
+    margin: 0,
+    marginTop: 10,
+    padding: 5,
+    minWidth: 40,
+    minHeight: 40,
+    rowGap: 5,
+    columnGap: 10,
+  };
+
+  // First fetch in flight (no ring yet): show the spinner.
+  if (loading && !started) {
+    return (
+      <View style={containerStyle}>
+        {textBefore && (
+          <RegText style={{ color: colors.text }}>{textBefore}</RegText>
+        )}
+        <ActivityIndicator size="small" color={colors.primary} />
+      </View>
+    );
+  }
+
   return (
-    <>
-      {loading && (
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: colors.card,
-            margin: 0,
-            marginTop: 10,
-            padding: 5,
-            minWidth: 40,
-            minHeight: 40,
-            rowGap: 5,
-            columnGap: 10,
-          }}>
-          {textBefore && <RegText style={{ color: colors.text }}>{textBefore}</RegText>}
-          <ActivityIndicator size="small" color={colors.primary} />
-        </View>
+    <View style={containerStyle}>
+      {textBefore && (
+        <RegText style={{ color: colors.text }}>{textBefore}</RegText>
       )}
-      {!loading && (
+      {started ? (
+        <QuoteRefreshRing
+          size={22}
+          color={colors.primary}
+          ringColor={'rgba(255,255,255,0.55)'}
+          trackColor={'rgba(255,255,255,0.12)'}
+          durationMs={PRICE_AUTO_REFRESH_MS}
+          resetKey={zecPrice.date}
+          onPress={onManualPress}
+          disabled={loading || coolingDown}
+          testID="pricefetcher.ring"
+        />
+      ) : (
         <TouchableOpacity
           disabled={loading}
-          onPress={() => (mode === ModeEnum.basic ? onPressFetch(false) : onPressFetchAlert())}>
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.card,
-              margin: 0,
-              marginTop: 10,
-              padding: 5,
-              minWidth: 40,
-              minHeight: 40,
-              rowGap: 5,
-              columnGap: 10,
-            }}>
-            {textBefore && <RegText style={{ color: colors.text }}>{textBefore}</RegText>}
-            <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
-            {refreshMinutes > 0 && (
-              <FadeText>
-                {formatMinutes(refreshMinutes) + translate('history.minago')}
-              </FadeText>
-            )}
-          </View>
+          onPress={onManualPress}
+          testID="pricefetcher.fetch"
+        >
+          <FontAwesomeIcon
+            icon={faRotateRight}
+            size={16}
+            color={colors.primary}
+          />
         </TouchableOpacity>
       )}
-    </>
+    </View>
   );
 };
 

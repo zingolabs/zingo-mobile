@@ -15,12 +15,11 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundType from './types/BackgroundType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
-import SnackbarType from './types/SnackbarType';
 import ZecPriceType from './types/ZecPriceType';
 import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
+import { SetServerResult } from './types/SetServerResult';
 import ValueTransferType from './types/ValueTransferType';
-import ContactType from './types/ContactType';
 import TransactionType from './types/TransactionType';
 import TxDetailType from './types/TxDetailType';
 
@@ -86,11 +85,10 @@ export {
   TranslateType,
   NetInfoType,
   ServerType,
-  SnackbarType,
   SecurityType,
   ServerUrisType,
+  SetServerResult,
   ValueTransferType,
-  ContactType,
   TransactionType,
   TxDetailType,
   AddressBookActionEnum,

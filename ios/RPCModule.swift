@@ -38,6 +38,33 @@ class RPCModule: NSObject {
     return fileName
   }
   
+  // Quick local Base64 well-formedness check. Used as a defensive guard so we
+  // never overwrite the wallet file with arbitrary text the Rust side might
+  // accidentally return (e.g. "the library is broken") that doesn't start with
+  // the `error:` prefix. We do this in Swift rather than re-sending the whole
+  // Base64 payload back to Rust via `checkB64`, because that round-trip
+  // allocates two extra full-size copies of the string (Swift→Rust via
+  // RustBuffer + Rust→Swift again for the result) and has OOM-crashed on
+  // low-RAM 32-bit Android devices with large wallets. Symmetric guard for iOS.
+  private func isValidBase64(_ s: String) -> Bool {
+    let bytes = s.utf8
+    if bytes.isEmpty || bytes.count % 4 != 0 { return false }
+    var sawPadding = false
+    for b in bytes {
+      if b == 0x3D { // '='
+        sawPadding = true
+      } else if sawPadding {
+        return false
+      } else if !((0x41...0x5A).contains(b) ||  // 'A'-'Z'
+                  (0x61...0x7A).contains(b) ||  // 'a'-'z'
+                  (0x30...0x39).contains(b) ||  // '0'-'9'
+                  b == 0x2B || b == 0x2F) {     // '+', '/'
+        return false
+      }
+    }
+    return true
+  }
+
   func fileExists(_ fileName: String) throws -> String {
     let fileExists = try FileManager.default.fileExists(atPath: getFileName(fileName))
     if fileExists {
@@ -53,16 +80,77 @@ class RPCModule: NSObject {
     return try String(contentsOfFile: getFileName(fileName), encoding: .utf8)
   }
 
+  // Audit Issue N — wallet files at rest. We write with the `complete`
+  // file-protection class and exclude the file from iCloud / device
+  // backups. The per-file encryption key is derived from the user's
+  // passcode and held in the Secure Enclave (the same hardware that
+  // backs Keychain Services), so the file is unreadable while the
+  // device is locked and cannot be lifted from a backup. This is the
+  // iOS counterpart to Android's Jetpack Security `EncryptedFile`
+  // envelope used in `RPCModule.kt`: different mechanism, equivalent
+  // guarantee. The audit's recommendation ("encrypted with a key
+  // stored in the device's keychain") is satisfied because the Secure
+  // Enclave IS keychain-tier custody.
+  //
+  // `saveBackgroundFile` deliberately does NOT route through this
+  // helper — see its own comment for the BGAppRefreshTask rationale.
   func writeFile(_ fileName: String, fileBase64EncodedString: String) throws {
-    try fileBase64EncodedString.write(toFile: getFileName(fileName), atomically: true, encoding: .utf8)
+    let filePath = try getFileName(fileName)
+    try fileBase64EncodedString.write(toFile: filePath, atomically: true, encoding: .utf8)
+    var fileURL = URL(fileURLWithPath: filePath)
+    var resourceValues = URLResourceValues()
+    resourceValues.isExcludedFromBackup = true
+    try? fileURL.setResourceValues(resourceValues)
+    try? FileManager.default.setAttributes(
+      [.protectionKey: FileProtectionType.complete],
+      ofItemAtPath: filePath
+    )
   }
 
   func deleteFile(_ fileName: String) throws {
     try FileManager.default.removeItem(atPath: getFileName(fileName))
   }
+
+  // Audit Issue P (b) — wallet ↔ backup swap recovery.
+  //
+  // `restoreExistingWalletBackup` does its swap as three atomic renames:
+  //   (1) main → temp
+  //   (2) backup → main
+  //   (3) temp → backup
+  // A crash between (1)–(2) or (2)–(3) leaves the temp file on disk.
+  // Calling this helper at startup detects that and finishes the swap.
+  //
+  // Possible interrupted states (temp exists, by construction):
+  //   between (1)–(2): main does NOT exist, backup exists → complete (2) then (3)
+  //   between (2)–(3): main exists,         backup does NOT → complete (3)
+  // Both branches end at the intended final state. Idempotent — when no
+  // temp file is present this is a near-zero-cost no-op.
+  func completePendingSwap() {
+    let fm = FileManager.default
+    guard let tempPath = try? getFileName(Constants.WalletTempSwapFileName.rawValue),
+          fm.fileExists(atPath: tempPath) else { return }
+    guard let mainPath = try? getFileName(Constants.WalletFileName.rawValue),
+          let backupPath = try? getFileName(Constants.WalletBackupFileName.rawValue) else {
+      NSLog("Error: [Native] completePendingSwap: could not resolve wallet paths")
+      return
+    }
+    do {
+      if fm.fileExists(atPath: backupPath) {
+        // Crash between (1) and (2): backup still in original position.
+        try fm.moveItem(atPath: backupPath, toPath: mainPath)
+      }
+      // Crash between (2) and (3): main now holds the former backup;
+      // only (3) is left.
+      try fm.moveItem(atPath: tempPath, toPath: backupPath)
+      NSLog("[Native] completePendingSwap: interrupted swap recovered")
+    } catch {
+      NSLog("Error: [Native] completePendingSwap failed: \(error.localizedDescription)")
+    }
+  }
   
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    completePendingSwap()
     do {
       let result = try fileExists(Constants.WalletFileName.rawValue)
       DispatchQueue.main.async {
@@ -78,6 +166,7 @@ class RPCModule: NSObject {
 
   @objc(walletBackupExists:reject:)
   func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    completePendingSwap()
     do {
       let result = try fileExists(Constants.WalletBackupFileName.rawValue)
       DispatchQueue.main.async {
@@ -107,6 +196,15 @@ class RPCModule: NSObject {
     }
   }
 
+  // The background sync state is written from BGAppRefreshTask paths in
+  // AppDelegate while the device may be locked. The wallet `writeFile`
+  // helper sets `FileProtectionType.complete`, which would make the
+  // file inaccessible in that locked state and break background sync.
+  // So this path stays at the iOS default protection class
+  // (`completeUntilFirstUserAuthentication` since iOS 7): still
+  // encrypted at rest, key available after the first post-boot unlock,
+  // accessible to background tasks afterwards. The sync metadata
+  // stored here is not wallet-recovery material.
   func saveBackgroundFile(_ jsonString: String) throws {
     do {
       // the content of this JSON can be represented safely in utf8.
@@ -198,11 +296,10 @@ class RPCModule: NSObject {
         NSLog("[Native] file size: \(size) bytes")
         if size > 0 {
           // check if the content is correct. Stored Encoded.
-          let correct = checkB64(datab64: walletEncodedString)
-          if correct == "true" {
+          if isValidBase64(walletEncodedString) {
             try self.saveWalletFile(walletEncodedString)
           } else {
-            let err = "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect: \(walletEncodedString)"
+            let err = "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect. Size: \(walletEncodedString.count)"
             NSLog(err)
             throw FileError.saveFileError(err)
           }
@@ -227,12 +324,15 @@ class RPCModule: NSObject {
   }
 
   func fnCreateNewWallet(
-    serveruri: String, 
-    chainhint: String, 
-    performancelevel: String, 
+    serveruri: String,
+    birthday: String,
+    chainhint: String,
+    performancelevel: String,
     minconfirmations: String
   ) throws -> String {
-    let seed = try initNew(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    // Offline (empty serveruri) uses `birthday` in place of the chain tip;
+    // online it is ignored (pass "0").
+    let seed = try initNew(serveruri: serveruri, birthday: UInt32(birthday) ?? 0, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -240,17 +340,18 @@ class RPCModule: NSObject {
     return seedStr
   }
 
-  @objc(createNewWallet:chainhint:performancelevel:minconfirmations:resolve:reject:)
+  @objc(createNewWallet:birthday:chainhint:performancelevel:minconfirmations:resolve:reject:)
   func createNewWallet(
-    _ serveruri: String, 
-    chainhint: String, 
-    performancelevel: String, 
-    minconfirmations: String, 
-    resolve: @escaping RCTPromiseResolveBlock, 
+    _ serveruri: String,
+    birthday: String,
+    chainhint: String,
+    performancelevel: String,
+    minconfirmations: String,
+    resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
     do {
-      let seedStr = try self.fnCreateNewWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+      let seedStr = try self.fnCreateNewWallet(serveruri: serveruri, birthday: birthday, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
       DispatchQueue.main.async {
         resolve(seedStr)
       }
@@ -383,17 +484,45 @@ class RPCModule: NSObject {
   func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
       let backupEncodedData = try self.readWalletBackup()
-      let walletEncodedData = try self.readWalletUtf8String()
       // check if the content is correct. Stored Encoded.
-      let correct = checkB64(datab64: backupEncodedData)
-      if correct == "true" {
-        try self.saveWalletFile(backupEncodedData)
-        try self.saveWalletBackupFile(walletEncodedData)
+      if isValidBase64(backupEncodedData) {
+        if try fileExists(Constants.WalletFileName.rawValue) == "true" {
+          // Audit Issue P (b) — atomic swap via three renames. APFS
+          // rename is atomic AND preserves the file's protection class
+          // and isExcludedFromBackup attribute, so this is strictly
+          // safer than the previous read-into-memory + two writes
+          // pattern, which lost the original main wallet on a crash
+          // between writes. `completePendingSwap` (called early on
+          // walletExists/walletBackupExists) finishes the swap if a
+          // crash interrupts these three steps.
+          // Belt-and-braces: if a previous swap left a temp behind and
+          // `completePendingSwap` was never called (e.g. JS jumped
+          // straight into restore without checking walletExists first),
+          // recover it before starting a new swap — deleting the temp
+          // would lose the orphaned original-main content.
+          self.completePendingSwap()
+          let fm = FileManager.default
+          let mainPath   = try getFileName(Constants.WalletFileName.rawValue)
+          let backupPath = try getFileName(Constants.WalletBackupFileName.rawValue)
+          let tempPath   = try getFileName(Constants.WalletTempSwapFileName.rawValue)
+          try fm.moveItem(atPath: mainPath,   toPath: tempPath)   // (1) main → temp
+          try fm.moveItem(atPath: backupPath, toPath: mainPath)   // (2) backup → main
+          try fm.moveItem(atPath: tempPath,   toPath: backupPath) // (3) temp → backup
+        } else {
+          // No wallet exists: restore backup as wallet, but KEEP the backup
+          // file. Deleting it here left the user with no backup right after a
+          // restore, so if they then created/restored a different wallet the
+          // just-restored one was gone. Keeping a duplicate copy as backup is
+          // far safer than none.
+          try self.saveWalletFile(backupEncodedData)
+        }
         DispatchQueue.main.async {
           resolve("true")
         }
       } else {
-        NSLog("Error: [Native] Couldn't save the wallet backup. The Encoded content is incorrect: \(backupEncodedData)")
+        // Audit Issue A — redact the payload. Mirrors the saveExistingWallet
+        // path at L240: log only the size, never the encoded wallet bytes.
+        NSLog("Error: [Native] Couldn't save the wallet backup. The Encoded content is incorrect. Size: \(backupEncodedData.count)")
         DispatchQueue.main.async {
           resolve("false")
         }
@@ -693,10 +822,11 @@ class RPCModule: NSObject {
         do {
           let resp = try runSync()
           respStr = String(resp)
-          if !respStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-            // Also save the wallet after sync
-            try self.saveWalletInternal()
-          }
+          // Persistence is owned by JS (SyncCoordinator → doSave when
+          // getWalletSaveRequired returns true). Auto-saving here was
+          // racing against that doSave on the same wallet.dat — two
+          // background queues writing in parallel. Single source of truth
+          // for save decisions = JS, matching the Android side.
           DispatchQueue.main.async {
             resolve(respStr)
           }
@@ -1245,10 +1375,9 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnZecPriceInfo(_ dict: [AnyHashable: Any]) {
-      if let tor = dict["tor"] as? String,
-          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {
-          let resp = try zecPrice(tor: tor)
+          let resp = try zecPrice()
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -1263,17 +1392,12 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       } else {
           let err = "Error: [Native] zec price. Command arguments problem."
           NSLog(err)
-          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
       }
   }
 
-  @objc(zecPriceInfo:resolve:reject:)
-  func zecPriceInfo(_ tor: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["tor": tor, "resolve": resolve]
+  @objc(zecPriceInfo:reject:)
+  func zecPriceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnZecPriceInfo(dict)
@@ -1445,80 +1569,6 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnSetOptionWalletProcess(dict)
-        }
-      }
-  }
-
-  func fnCreateTorClientProcess(_ dict: [AnyHashable: Any]) throws {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try createTorClient(datadir: try getDocumentsDirectory())
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] create tor client. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] create tor client. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
-  @objc(createTorClientProcess:reject:)
-  func createTorClientProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          do {
-            try self.fnCreateTorClientProcess(dict)
-          } catch {
-            let err = "Error: [Native] create tor client. Document dir."
-            NSLog(err)
-            resolve(err)
-          }
-        }
-      }
-  }
-
-  func fnRemoveTorClientProcess(_ dict: [AnyHashable: Any]) throws {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        do {
-          let resp = try removeTorClient()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-        } catch {
-          let err = "Error: [Native] remove tor client. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-        }
-      } else {
-          let err = "Error: [Native] remove tor client. Command arguments problem."
-          NSLog(err)
-      }
-  }
-
-  @objc(removeTorClientProcess:reject:)
-  func removeTorClientProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          do {
-            try self.fnRemoveTorClientProcess(dict)
-          } catch {
-            let err = "Error: [Native] remove tor client. Document dir."
-            NSLog(err)
-            resolve(err)
-          }
         }
       }
   }

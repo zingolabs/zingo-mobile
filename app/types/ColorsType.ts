@@ -12,6 +12,8 @@ export type ColorsType = {
   syncing: string;
   notification: string;
   sideMenuBackground: string;
+  bottomSheetBackground: string;
+  bottomSheetBorder: string;
   warning: {
     background: string;
     border: string;

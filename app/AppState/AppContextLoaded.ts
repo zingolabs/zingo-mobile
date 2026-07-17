@@ -4,26 +4,26 @@ import SendPageStateClass from './classes/SendPageStateClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 
 import InfoType from './types/InfoType';
-import WalletType from './types/WalletType';
 import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
-import SnackbarType from './types/SnackbarType';
 import SecurityType from './types/SecurityType';
 
 import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import { ChainNameEnum } from './enums/ChainNameEnum';
+import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
-import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
+import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
 export default interface AppContextLoaded {
@@ -53,8 +53,8 @@ export default interface AppContextLoaded {
   // syncing Info about the status of the process
   syncingStatus: RPCSyncStatusType;
 
-  // wallet recovery info
-  wallet: WalletType;
+  // wallet birthday block height
+  birthday: number;
 
   // active UA in the wallet
   defaultUnifiedAddress: string;
@@ -85,10 +85,7 @@ export default interface AppContextLoaded {
   saplingPool: boolean;
   transparentPool: boolean;
 
-  // snackbar queue
-  snackbars: SnackbarType[];
-  addLastSnackbar: (snackbar: SnackbarType) => void;
-  removeFirstSnackbar: (s: ScreenEnum) => void;
+  addLastSnackbar: (message: string, duration?: SnackbarDurationEnum) => void;
 
   // if the App is stalled - restart is fired
   restartApp: (s: LoadedAppNavigationState) => void;
@@ -99,8 +96,10 @@ export default interface AppContextLoaded {
   // List of our contacts - Address book
   addressBook: AddressBookFileClass[];
 
-  // helpers to open the address book modal from different places in the App
-  launchAddressBook: (add: string, s: ScreenEnum) => void;
+  // Opens the shared "Add Tag / Add Contact" BottomSheet modal in-place,
+  // pre-filled with the given address. Used from any screen that displays an
+  // address (AddressItem's + icon).
+  launchAddTagModal: (address: string, swapChain?: string) => void;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;
@@ -133,8 +132,25 @@ export default interface AppContextLoaded {
   mode: ModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
+  // The loaded wallet's OWN chain (main/test/regtest). Reliable even Offline,
+  // unlike `server.chainName` which is empty in Offline mode. Empty when no
+  // wallet / unknown. Used to decide, on a server change, whether to open the
+  // wallet directly or launch a chain switch.
+  walletChainName: ChainNameEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
+  nym: boolean;
+  setNymOption: (value: boolean) => Promise<void>;
+  setModeOption: (value: string) => Promise<void>;
+  setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
+
+  // Monotonically increasing counter incremented every time the app
+  // returns from background/inactive to active. Protected screens
+  // (Seed, ShowUfvk, Settings, Rescan, Confirm) watch it to re-fire
+  // their on-mount biometric gate when security.foregroundApp is OFF
+  // and the screen is still mounted on resume — closing the gap where
+  // a sensitive screen could be revealed without a fresh auth.
+  foregroundEpoch: number;
 }

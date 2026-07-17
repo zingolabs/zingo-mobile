@@ -7,16 +7,22 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import About from '../components/About';
-import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
+import {
+  ContextAppLoadedProvider,
+  defaultAppContextLoaded,
+} from '../app/context';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import { RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.About> {
+function makeDrawerProps(): NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.About
+> {
   return {
     navigation: mockNavigation,
     route: {
@@ -30,7 +36,7 @@ function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Abou
 describe('Component About - test', () => {
   //snapshot test
   test('About - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.translate = mockTranslate;
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;

@@ -3,6 +3,8 @@ package org.ZingoLabs.Zingo
 import android.content.Context
 import android.util.Log
 import android.util.Base64
+import androidx.security.crypto.EncryptedFile
+import androidx.security.crypto.MasterKeys
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -22,6 +24,104 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     private fun getDocumentDirectory(): String {
         return applicationContext.filesDir.absolutePath
+    }
+
+    private fun buildEncryptedFile(fileName: String): EncryptedFile {
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        return EncryptedFile.Builder(
+            File(applicationContext.filesDir, fileName),
+            applicationContext,
+            masterKeyAlias,
+            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB,
+        ).build()
+    }
+
+    // Migrates a wallet file from the old format (raw binary) to the new format
+    // (encrypted Base64 text). Safe to call even if the file does not exist or
+    // is already in the new format.
+    //
+    // EncryptedFile stores its keyset in SharedPreferences keyed by file path, so
+    // we cannot use a temp-file-then-rename approach (the renamed file would be
+    // decrypted with the wrong keyset). Instead we keep a plain binary .migrating
+    // backup until the encrypted write is confirmed, then delete it.
+    fun migrateFileIfNeeded(fileName: String) {
+        val file = File(applicationContext.filesDir, fileName)
+        val backupFile = File(applicationContext.filesDir, "$fileName.migrating")
+
+        // Resume an interrupted migration: the original was deleted but the plain
+        // binary backup still exists — restore it so the normal path can retry.
+        if (!file.exists() && backupFile.exists()) {
+            Log.i("MAIN", "[$fileName] resuming interrupted migration: restoring binary backup")
+            if (!backupFile.renameTo(file)) {
+                Log.e("MAIN", "[$fileName] migration: could not restore backup, giving up")
+                return
+            }
+        }
+
+        if (!file.exists()) return
+
+        // Check if already encrypted — try reading it as EncryptedFile.
+        val alreadyEncrypted = try {
+            buildEncryptedFile(fileName).openFileInput().use { it.readBytes() }
+            true
+        } catch (_: Exception) {
+            false
+        }
+
+        if (alreadyEncrypted) {
+            Log.i("MAIN", "[$fileName] already encrypted, skipping migration")
+            backupFile.delete() // clean up any stale backup from a previous run
+            return
+        }
+
+        Log.i("MAIN", "[$fileName] not yet encrypted, starting migration")
+
+        // Read the old binary content.
+        val oldBytes = try {
+            applicationContext.openFileInput(fileName).use { it.readBytes() }
+        } catch (e: Exception) {
+            Log.e("MAIN", "[$fileName] migration: could not read old file, aborting: $e")
+            return
+        }
+
+        val base64Content = Base64.encodeToString(oldBytes, Base64.NO_WRAP)
+
+        // Save a plain binary backup before touching the original.
+        // If the process dies after we delete the original, the next startup
+        // will find this backup and restore it before retrying.
+        try {
+            file.copyTo(backupFile, overwrite = true)
+        } catch (e: Exception) {
+            Log.e("MAIN", "[$fileName] migration: could not create backup, aborting: $e")
+            return
+        }
+
+        // Delete original and write encrypted version using the correct file name.
+        // EncryptedFile keys its keyset by file path, so writing with the final
+        // name here ensures readEncryptedFile() later uses the matching keyset.
+        file.delete()
+        try {
+            buildEncryptedFile(fileName).openFileOutput().use { out ->
+                out.write(base64Content.toByteArray(Charsets.UTF_8))
+            }
+        } catch (e: Exception) {
+            Log.e("MAIN", "[$fileName] migration: encrypted write failed, restoring backup: $e")
+            backupFile.renameTo(file)
+            return
+        }
+
+        // Verify the encrypted file is readable before discarding the backup.
+        try {
+            buildEncryptedFile(fileName).openFileInput().use { it.readBytes() }
+        } catch (e: Exception) {
+            Log.e("MAIN", "[$fileName] migration: verification failed, restoring backup: $e")
+            file.delete()
+            backupFile.renameTo(file)
+            return
+        }
+
+        backupFile.delete()
+        Log.i("MAIN", "[$fileName] migration complete")
     }
 
     fun fileExists(fileName: String): Boolean {
@@ -52,48 +152,295 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return file!!.delete()
     }
 
+    private fun readEncryptedFile(fileName: String): String {
+        return buildEncryptedFile(fileName).openFileInput().use { input ->
+            input.bufferedReader(Charsets.UTF_8).readText()
+        }
+    }
+
+    // A legitimate plain-binary wallet (pre-encryption format) starts with a
+    // u64-LE serialization version. zingolib currently writes 41; we accept
+    // up to 1_000 to leave generous headroom for future formats without
+    // risking misdetection of an encrypted envelope's header bytes as a
+    // version number. The actual encrypted envelope header (Tink) is
+    // essentially random from this check's perspective and reliably falls
+    // outside the range — observed in the wild as e.g. 11506714174589491496
+    // (0x9FA09A1F94EA5E68) on a Tecno AC8 after Keystore key loss.
+    private fun looksLikeLegacyPlainWallet(bytes: ByteArray): Boolean {
+        if (bytes.size < 8) return false
+        var version = 0L
+        for (i in 7 downTo 0) {
+            version = (version shl 8) or (bytes[i].toLong() and 0xFFL)
+        }
+        return version in 0..1000
+    }
+
+    // Reads a wallet file as a Base64 string.
+    //
+    // Primary path: EncryptedFile (Jetpack Security) — the format introduced
+    // in Zingo Beta 2.0.21 (313). Fallback path covers the legacy plain-
+    // binary format (Zingo Beta ≤ 2.0.21 (312); Zingo ≤ 2.0.20 (309) once
+    // the next prod release ships and runs this code for the first time),
+    // and is also valid mid-migration when the plain `.migrating` backup has
+    // been restored: base64-encode the raw bytes so zingolib sees what it
+    // expects.
+    //
+    // The fallback is ONLY safe when the raw bytes actually ARE a plain
+    // wallet. If the file is in the encrypted format but the decryption key
+    // is gone (Keystore reset/invalidated, or app data restored from a backup
+    // of an old wallet — observed on Tecno HiOS and other devices with
+    // quirky AndroidKeystore implementations), the raw bytes are the
+    // encrypted envelope. Feeding those to zingolib produced the useless
+    // "File error. Failed to read wallet version <huge garbage number>"
+    // error reported by users. Distinguish the two via the plain-wallet
+    // version-header check; if it fails, surface a clear, actionable error
+    // instead of returning corrupted bytes.
+    //
+    // The IOException message is prefixed with "Error:" so callers that
+    // forward `e.localizedMessage` to JS (and the JS-side check that strings
+    // starting with "error" are errors) keep working without special-casing.
+    private fun readFileAsB64(fileName: String): String {
+        try {
+            return readEncryptedFile(fileName)
+        } catch (encryptedReadError: Exception) {
+            val rawBytes = try {
+                applicationContext.openFileInput(fileName).use { it.readBytes() }
+            } catch (binaryReadError: Exception) {
+                throw IOException(
+                    "Error: could not read $fileName as encrypted nor as binary: $binaryReadError",
+                    encryptedReadError
+                )
+            }
+            if (looksLikeLegacyPlainWallet(rawBytes)) {
+                Log.w(
+                    "MAIN",
+                    "[$fileName] encrypted read failed, using legacy plain fallback: $encryptedReadError"
+                )
+                return Base64.encodeToString(rawBytes, Base64.NO_WRAP)
+            }
+            Log.e(
+                "MAIN",
+                "[$fileName] encrypted read failed AND raw bytes are not a plain wallet — Keystore key likely lost: $encryptedReadError"
+            )
+            throw IOException(
+                "Error: wallet decryption failed and the file is not a legacy plain wallet. " +
+                "This usually means the device Keystore was reset, a backup of an old " +
+                "wallet was restored, or the OEM Keystore lost its keys. Please restore " +
+                "the wallet from your seed phrase or from your Viewing Key (UFVK).",
+                encryptedReadError
+            )
+        }
+    }
+
+    private fun writeEncryptedFile(fileName: String, content: String) {
+        // EncryptedFile keys its keyset in SharedPreferences by file path, so
+        // temp-file-then-rename would decrypt with the wrong key. We delete the
+        // existing file first (required by openFileOutput) and write directly to
+        // the final name — the same keyset is reused on every write to that path.
+        val file = File(applicationContext.filesDir, fileName)
+        file.delete()
+        buildEncryptedFile(fileName).openFileOutput().use { out ->
+            out.write(content.toByteArray(Charsets.UTF_8))
+        }
+    }
+
+    // Audit Issue P (a) — durable wrapper around writeEncryptedFile.
+    //
+    // The raw `writeEncryptedFile` deletes the target file before writing
+    // (forced by EncryptedFile.openFileOutput which won't overwrite). A
+    // crash between the delete and the write leaves the user with no
+    // file at the target path — the entire wallet is lost.
+    //
+    // This wrapper preserves a copy of the previous content at
+    // "$fileName.write.tmp" (own keyset, written via a separate
+    // writeEncryptedFile call) BEFORE the destructive delete. If a crash
+    // lands in the racy window of the inner write, `completePendingWrite`
+    // at the next launch detects the temp and restores the original.
+    //
+    // Cost: one extra read + one extra write per save (≈3× I/O vs the
+    // raw call). Saves happen on sync milestones, not on the hot path,
+    // so the cost is acceptable. iOS doesn't need this — its `writeFile`
+    // uses `String.write(toFile: atomically: true)` which is OS-atomic.
+    private fun writeEncryptedFileDurably(fileName: String, content: String) {
+        val tempName = "$fileName.write.tmp"
+        if (fileExists(fileName)) {
+            try {
+                val previous = readFileAsB64(fileName)
+                writeEncryptedFile(tempName, previous)
+            } catch (e: Exception) {
+                // Original is unreadable already — saving new content over
+                // it can't make things worse. Proceed without temp protection
+                // for this single write.
+                Log.w("MAIN", "[$fileName] could not stash original to temp; durable write degraded to raw: $e")
+            }
+        }
+        writeEncryptedFile(fileName, content)
+        // Best-effort cleanup. If we crash before reaching here,
+        // completePendingWrite will see the orphan temp and clean it up
+        // (the target file is now valid).
+        try {
+            File(applicationContext.filesDir, tempName).delete()
+        } catch (e: Exception) {
+            Log.w("MAIN", "[$tempName] orphan temp cleanup failed: $e")
+        }
+    }
+
+    // Audit Issue P (a) — durable-write recovery.
+    //
+    // If `writeEncryptedFileDurably` crashed between the inner delete and
+    // the inner write, the target file is missing and a temp file with
+    // the original content sits at "$fileName.write.tmp". Restore from
+    // the temp. If the target file is already valid, the temp is just a
+    // post-write cleanup orphan and gets deleted.
+    //
+    // Idempotent — no-op when no temp files are present.
+    fun completePendingWrite() {
+        for (fileName in listOf(WalletFileName.value, WalletBackupFileName.value)) {
+            val tempName = "$fileName.write.tmp"
+            if (!fileExists(tempName)) continue
+            try {
+                val targetReadable = fileExists(fileName) && try {
+                    readFileAsB64(fileName)
+                    true
+                } catch (_: Exception) {
+                    false
+                }
+                if (!targetReadable) {
+                    // Crash during the inner write — restore original from temp.
+                    val tempContent = readFileAsB64(tempName)
+                    writeEncryptedFile(fileName, tempContent)
+                    Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
+                }
+                deleteFile(tempName)
+            } catch (e: Exception) {
+                Log.e("MAIN", "Error: [Native] completePendingWrite for $fileName failed: $e", e)
+                // Leave temp in place for diagnosis / next attempt.
+            }
+        }
+    }
+
+    // Audit Issue P (b) — wallet ↔ backup swap recovery.
+    //
+    // `restoreExistingWalletBackup` does its swap as:
+    //   (1) write temp(originalMain)   — preserves the wallet that would
+    //                                    otherwise only live in memory
+    //   (2) write main(originalBackup)
+    //   (3) write backup(originalMain)
+    //   (4) delete temp
+    // Jetpack Security `EncryptedFile` binds its keyset to the file path,
+    // so the iOS atomic-rename pattern doesn't apply on Android: we need
+    // to re-encrypt at each new path and recover by content comparison.
+    //
+    // Possible interrupted states (temp exists with originalMain):
+    //   between (1)–(2): main == temp  → write main(backup), write backup(temp)
+    //   between (2)–(3): main != temp AND backup != temp → write backup(temp)
+    //   between (3)–(4): main != temp AND backup == temp → nothing to write
+    // Idempotent — no-op when no temp file is present.
+    fun completePendingSwap() {
+        val tempFile = java.io.File(applicationContext.filesDir, WalletTempSwapFileName.value)
+        if (!tempFile.exists()) return
+        try {
+            val tempContent = readFileAsB64(WalletTempSwapFileName.value)
+            if (fileExists(WalletFileName.value)) {
+                val mainContent = readFileAsB64(WalletFileName.value)
+                if (mainContent == tempContent) {
+                    // (1)–(2) window: main not yet overwritten.
+                    if (fileExists(WalletBackupFileName.value)) {
+                        val backupContent = readFileAsB64(WalletBackupFileName.value)
+                        writeEncryptedFile(WalletFileName.value, backupContent)
+                    }
+                    writeEncryptedFile(WalletBackupFileName.value, tempContent)
+                } else {
+                    // (2)–(3) or post-(3) window: main already holds the new content.
+                    val backupExists = fileExists(WalletBackupFileName.value)
+                    val backupContent = if (backupExists) readFileAsB64(WalletBackupFileName.value) else null
+                    if (backupContent != tempContent) {
+                        // (2)–(3) window or backup missing — write the lost content.
+                        writeEncryptedFile(WalletBackupFileName.value, tempContent)
+                    }
+                    // else: post-(3), backup already correct.
+                }
+            } else {
+                // Main missing — restore from temp.
+                writeEncryptedFile(WalletFileName.value, tempContent)
+            }
+            deleteFile(WalletTempSwapFileName.value)
+            Log.i("MAIN", "[Native] completePendingSwap: interrupted swap recovered")
+        } catch (e: Exception) {
+            // Leave temp in place for diagnosis / the next attempt — deleting
+            // it here would lose the only copy of the original main wallet
+            // if we couldn't write it back into position.
+            Log.e("MAIN", "Error: [Native] completePendingSwap failed: $e", e)
+        }
+    }
+
     @ReactMethod
     fun walletExists(promise: Promise) {
-        // Check if a wallet already exists
+        // Check if a wallet already exists.
+        // Write recovery runs first: a half-written save can leave main
+        // missing, which would make a pending swap unable to read main.
+        completePendingWrite()
+        completePendingSwap()
         promise.resolve(fileExists(WalletFileName.value))
     }
 
     @ReactMethod
     fun walletBackupExists(promise: Promise) {
-        // Check if a wallet backup already exists
+        // Check if a wallet backup already exists. See walletExists for
+        // why write recovery runs before swap recovery.
+        completePendingWrite()
+        completePendingSwap()
         promise.resolve(fileExists(WalletBackupFileName.value))
+    }
+
+    // Quick local Base64 well-formedness check. Used as a defensive guard so we
+    // never overwrite the wallet file with arbitrary text the Rust side might
+    // accidentally return (e.g. "the library is broken") that doesn't start with
+    // the `error:` prefix. We do this in Kotlin rather than re-sending the whole
+    // Base64 payload back to Rust because the round-trip allocates two extra
+    // full-size copies of the string (Java→native via RustBuffer + native→Java
+    // again for the result), which OOM-crashes on low-RAM 32-bit devices when
+    // wallets are large.
+    private fun isValidBase64(s: String): Boolean {
+        if (s.isEmpty() || s.length % 4 != 0) return false
+        var sawPadding = false
+        for (c in s) {
+            when {
+                c == '=' -> sawPadding = true
+                sawPadding -> return false
+                c in 'A'..'Z' -> {}
+                c in 'a'..'z' -> {}
+                c in '0'..'9' -> {}
+                c == '+' || c == '/' -> {}
+                else -> return false
+            }
+        }
+        return true
     }
 
     fun saveWalletFile(): Boolean {
         try {
             uniffi.zingo.initLogging()
 
-            // Get the encoded wallet file
             val b64encoded: String = uniffi.zingo.saveToB64()
             if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
-                // with error don't save the file. Obviously.
                 Log.e("MAIN", "Error: [Native] Couldn't save the wallet. $b64encoded")
                 return false
             }
-            // Log.i("MAIN", b64encoded)
 
-            val correct = uniffi.zingo.checkB64(b64encoded)
-            if (correct == "false") {
-                Log.e("MAIN", "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect: $b64encoded")
-                return false
-            }
-
-            // check if the content is correct. Stored Decoded.
-            val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            Log.i("MAIN", "[Native] file size: ${fileBytes.size} bytes")
-
-            if (fileBytes.size > 0) {
-                writeFile(WalletFileName.value, fileBytes)
-                return true
-            } else {
+            if (b64encoded.isEmpty()) {
                 Log.e("MAIN", "[Native] No need to save the wallet.")
                 return true
             }
+
+            if (!isValidBase64(b64encoded)) {
+                Log.e("MAIN", "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect.")
+                return false
+            }
+
+            Log.i("MAIN", "[Native] file size: ${b64encoded.length} chars (Base64)")
+            writeEncryptedFileDurably(WalletFileName.value, b64encoded)
+            return true
         } catch (e: Exception) {
             Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the wallet. $e")
             return false
@@ -101,30 +448,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     private fun saveWalletBackupFile(): Boolean {
-        // Get the encoded wallet file
-        val fileBytes: ByteArray
-        try {
-            // Intentar leer el archivo
-            fileBytes = readFile(WalletFileName.value)
-        } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "Error: [Native] Wallet file not found", e)
-            return false
-        } catch (e: IOException) {
-            Log.e("MAIN", "Error: [Native] Couldn't read the wallet file", e)
-            return false
+        return try {
+            val content = readFileAsB64(WalletFileName.value)
+            writeEncryptedFileDurably(WalletBackupFileName.value, content)
+            true
         } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't read the wallet file", e)
-            return false
+            Log.e("MAIN", "Error: [Native] Couldn't save the wallet backup: $e")
+            false
         }
-
-        try {
-            // Save file to disk
-            writeFile(WalletBackupFileName.value, fileBytes)
-        } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the wallet backup")
-            return false
-        }
-        return true
     }
 
     fun saveBackgroundFile(json: String) {
@@ -140,12 +471,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun createNewWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
+    fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         try {
             uniffi.zingo.initLogging()
 
-            // Create a seed
-            val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            // Create a seed. Offline (empty serveruri) uses `birthday` in place
+            // of the chain tip; online it is ignored (pass "0").
+            val resp = uniffi.zingo.initNew(serveruri, birthday.toUInt(), chainhint, performancelevel, minconfirmations.toUInt())
             // Log.i("MAIN-Seed", resp)
 
             if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -207,167 +539,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
         try {
-            // Read the file
-            val fileBytes = readFile(WalletFileName.value)
-
-            val middle0w = 0
-            val middle1w = 6000000 // 6_000_000 - 8 pieces
-            val middle2w = 12000000
-            val middle3w = 18000000
-            val middle4w = 24000000
-            val middle5w = 30000000
-            val middle6w = 36000000
-            val middle7w = 42000000
-            val middle8w: Int = fileBytes.size
-
-            var fileb64 = StringBuilder("")
-            if (middle8w <= middle1w) {
-                fileb64 = fileb64.append(
-                    Base64.encodeToString(
-                        fileBytes,
-                        middle0w,
-                        middle8w - middle0w,
-                        Base64.NO_WRAP
-                    )
-                )
-            } else {
-                fileb64 = fileb64.append(
-                    Base64.encodeToString(
-                        fileBytes,
-                        middle0w,
-                        middle1w - middle0w,
-                        Base64.NO_WRAP
-                    )
-                )
-                if (middle8w <= middle2w) {
-                    fileb64 = fileb64.append(
-                        Base64.encodeToString(
-                            fileBytes,
-                            middle1w,
-                            middle8w - middle1w,
-                            Base64.NO_WRAP
-                        )
-                    )
-                } else {
-                    fileb64 = fileb64.append(
-                        Base64.encodeToString(
-                            fileBytes,
-                            middle1w,
-                            middle2w - middle1w,
-                            Base64.NO_WRAP
-                        )
-                    )
-                    if (middle8w <= middle3w) {
-                        fileb64 = fileb64.append(
-                            Base64.encodeToString(
-                                fileBytes,
-                                middle2w,
-                                middle8w - middle2w,
-                                Base64.NO_WRAP
-                            )
-                        )
-                    } else {
-                        fileb64 = fileb64.append(
-                            Base64.encodeToString(
-                                fileBytes,
-                                middle2w,
-                                middle3w - middle2w,
-                                Base64.NO_WRAP
-                            )
-                        )
-                        if (middle8w <= middle4w) {
-                            fileb64 = fileb64.append(
-                                Base64.encodeToString(
-                                    fileBytes,
-                                    middle3w,
-                                    middle8w - middle3w,
-                                    Base64.NO_WRAP
-                                )
-                            )
-                        } else {
-                            fileb64 = fileb64.append(
-                                Base64.encodeToString(
-                                    fileBytes,
-                                    middle3w,
-                                    middle4w - middle3w,
-                                    Base64.NO_WRAP
-                                )
-                            )
-                            if (middle8w <= middle5w) {
-                                fileb64 = fileb64.append(
-                                    Base64.encodeToString(
-                                        fileBytes,
-                                        middle4w,
-                                        middle8w - middle4w,
-                                        Base64.NO_WRAP
-                                    )
-                                )
-                            } else {
-                                fileb64 = fileb64.append(
-                                    Base64.encodeToString(
-                                        fileBytes,
-                                        middle4w,
-                                        middle5w - middle4w,
-                                        Base64.NO_WRAP
-                                    )
-                                )
-                                if (middle8w <= middle6w) {
-                                    fileb64 = fileb64.append(
-                                        Base64.encodeToString(
-                                            fileBytes,
-                                            middle5w,
-                                            middle8w - middle5w,
-                                            Base64.NO_WRAP
-                                        )
-                                    )
-                                } else {
-                                    fileb64 = fileb64.append(
-                                        Base64.encodeToString(
-                                            fileBytes,
-                                            middle5w,
-                                            middle6w - middle5w,
-                                            Base64.NO_WRAP
-                                        )
-                                    )
-                                    if (middle8w <= middle7w) {
-                                        fileb64 = fileb64.append(
-                                            Base64.encodeToString(
-                                                fileBytes,
-                                                middle6w,
-                                                middle8w - middle6w,
-                                                Base64.NO_WRAP
-                                            )
-                                        )
-                                    } else {
-                                        fileb64 = fileb64.append(
-                                            Base64.encodeToString(
-                                                fileBytes,
-                                                middle6w,
-                                                middle7w - middle6w,
-                                                Base64.NO_WRAP
-                                            )
-                                        )
-                                        fileb64 = fileb64.append(
-                                            Base64.encodeToString(
-                                                fileBytes,
-                                                middle7w,
-                                                middle8w - middle7w,
-                                                Base64.NO_WRAP
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            // Migrate both files from old binary format to encrypted Base64 if needed.
+            // Safe to call even if files don't exist or are already migrated.
+            migrateFileIfNeeded(WalletFileName.value)
+            migrateFileIfNeeded(WalletBackupFileName.value)
 
             uniffi.zingo.initLogging()
 
-            Log.i("MAIN", "file size: $middle8w")
+            val fileb64 = readFileAsB64(WalletFileName.value)
+            Log.i("MAIN", "file size: ${fileb64.length} chars (Base64)")
 
-            val resp = uniffi.zingo.initFromB64(fileb64.toString(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromB64(fileb64, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
 
             return resp
         } catch (e: Exception) {
@@ -379,62 +561,41 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
-        val fileBytesBackup: ByteArray
-        val fileBytesWallet: ByteArray
-
-        // Read the file backup
         try {
-            fileBytesBackup = readFile(WalletBackupFileName.value)
+            val backup = readFileAsB64(WalletBackupFileName.value)
+            if (fileExists(WalletFileName.value)) {
+                // Audit Issue P (b) — durable swap via temp file. The original
+                // main wallet only lives in memory while we overwrite main
+                // with backup; a crash before step (3) would lose it. By
+                // writing it to temp FIRST (step 1), any later crash leaves a
+                // recoverable on-disk copy that `completePendingSwap` can
+                // restore on the next launch.
+                //
+                // Belt-and-braces: recover any orphan temp from a prior crash
+                // before starting a new swap — deleting the temp blindly
+                // would destroy the only copy of that crash's original main.
+                completePendingSwap()
+                val wallet = readFileAsB64(WalletFileName.value)
+                writeEncryptedFile(WalletTempSwapFileName.value, wallet)   // (1) temp = original main
+                writeEncryptedFile(WalletFileName.value, backup)            // (2) main = backup
+                writeEncryptedFile(WalletBackupFileName.value, wallet)      // (3) backup = original main
+                deleteFile(WalletTempSwapFileName.value)                    // (4) cleanup
+            } else {
+                // No wallet exists: restore backup as wallet, but KEEP the
+                // backup file. Deleting it here left the user with no backup
+                // right after a restore, so if they then created/restored a
+                // different wallet the just-restored one was gone. Keeping a
+                // duplicate copy as backup is far safer than none.
+                writeEncryptedFile(WalletFileName.value, backup)
+            }
+            promise.resolve(true)
         } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "Error: [Native] Backup file not found", e)
+            Log.e("MAIN", "Error: [Native] file not found during backup restore", e)
             promise.resolve(false)
-            return
-        } catch (e: IOException) {
-            Log.e("MAIN", "Error: [Native] reading the backup file", e)
-            promise.resolve(false)
-            return
         } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error, reading the backup file", e)
+            Log.e("MAIN", "Error: [Native] Unexpected error during backup restore: $e")
             promise.resolve(false)
-            return
         }
-
-        // Read the file wallet
-        try {
-            fileBytesWallet = readFile(WalletFileName.value)
-        } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "Error: [Native] Wallet file not found", e)
-            promise.resolve(false)
-            return
-        } catch (e: IOException) {
-            Log.e("MAIN", "Error: [Native] reading the wallet file", e)
-            promise.resolve(false)
-            return
-        } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error, reading the wallet file", e)
-            promise.resolve(false)
-            return
-        }
-
-        try {
-            // Save file to disk wallet (with the backup)
-            writeFile(WalletFileName.value, fileBytesBackup)
-        } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error, Couldn't save the wallet with the backup")
-            promise.resolve(false)
-            return
-        }
-
-        try {
-            // Save file to disk backup (with the wallet)
-            writeFile(WalletBackupFileName.value, fileBytesWallet)
-        } catch (e: Exception) {
-            Log.e("MAIN", "Error: [Native] Unexpected error, Couldn't save the backup with the wallet")
-            promise.resolve(false)
-            return
-        }
-
-        promise.resolve(true)
     }
 
     @ReactMethod
@@ -653,17 +814,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.runSync()
 
-                if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-                    val save = saveWalletFile()
-                    if (!save) {
-                        val errorMessage = "Error: [Native] sync run process: Couldn't save the wallet."
-                        Log.e("MAIN", errorMessage)
-
-                        withContext(Dispatchers.Main) {
-                            promise.resolve(errorMessage)
-                        }
-                    }
-                }
+                // Persistence is owned by JS (SyncCoordinator → doSave when
+                // getWalletSaveRequired returns true). Auto-saving here was
+                // racing against that doSave on the same wallet.dat — two
+                // Dispatchers.IO threads writing in parallel produced the
+                // EncryptedFile "output file already exists" crashes in the
+                // logs. Single source of truth for save decisions = JS.
 
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)
@@ -1016,11 +1172,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun zecPriceInfo(tor: String, promise: Promise) {
+    fun zecPriceInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.zecPrice(tor)
+                val resp = uniffi.zingo.zecPrice()
 
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)
@@ -1142,48 +1298,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun createTorClientProcess(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.createTorClient(getDocumentDirectory())
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] create tor client: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
-    }
-
-    @ReactMethod
-    fun removeTorClientProcess(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.removeTorClient()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] remove tor client: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
-    }
-
-    @ReactMethod
     fun getUnifiedAddressesInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -1266,6 +1380,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
         }
     }
+
 
     @ReactMethod
     fun checkMyAddressInfo(address: String, promise: Promise) {

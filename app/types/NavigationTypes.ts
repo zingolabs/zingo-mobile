@@ -1,5 +1,14 @@
-import { AddressKindEnum, LaunchingModeEnum, RouteEnum, SeedActionEnum, SelectServerEnum, SendPageStateClass, ServerType, UfvkActionEnum, ValueTransferType } from '../AppState';
-import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
+import {
+  AddressKindEnum,
+  ChainNameEnum,
+  LaunchingModeEnum,
+  RouteEnum,
+  SeedActionEnum,
+  SendPageStateClass,
+  UfvkActionEnum,
+  ValueTransferType,
+} from '../AppState';
+import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
 
 /**
  * Root navigation parameter list for the main stack navigator
@@ -9,6 +18,11 @@ export type AppStackParamList = {
   // Stack
   [RouteEnum.LoadingApp]: LoadingAppNavigationState | undefined;
   [RouteEnum.LoadedApp]: LoadedAppNavigationState | undefined;
+  // ScannerAddress / ScannerUfvk are presented as transparent modals at the
+  // root Stack so they overlay everything (LoadedApp, LoadingApp, and any
+  // open BottomSheet portals).
+  [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
+  [RouteEnum.ScannerUfvk]: ScannerUfvkNavigationState | undefined;
 };
 
 /**
@@ -16,7 +30,7 @@ export type AppStackParamList = {
  * Used for methods like navigateToLoadingApp and onClickOKChangeWallet
  */
 export type LoadingAppNavigationState = {
-  screen?: number;
+  screen?: RouteEnum;
   startingApp?: boolean;
   biometricsFailed?: boolean;
   newWallet?: boolean;
@@ -32,6 +46,9 @@ export type LoadedAppNavigationState = {
   transparentPool: boolean;
   newWallet: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
+  // The opened wallet's own chain, resolved at open time (reliable even
+  // Offline). Threaded to LoadedApp so its context can hold it.
+  walletChainName: ChainNameEnum;
 };
 
 /**
@@ -45,28 +62,20 @@ export type AppDrawerParamList = {
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Messages]: undefined;
-  [RouteEnum.AddressBookStack]: undefined;
-  [RouteEnum.ValueTransferDetailStack]: undefined;
-  [RouteEnum.ConfirmStack]: undefined;
-  [RouteEnum.InsightStack]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.Rescan]: undefined;
-  [RouteEnum.Info]: undefined;
   [RouteEnum.Insight]: undefined;
-  [RouteEnum.Computing]: undefined;
+  [RouteEnum.Computing]:
+    { phase?: 'created' | 'failed'; errorMessage?: string } | undefined;
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
-  [RouteEnum.ContactList]: undefined;
 
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
   [RouteEnum.AddressList]: AddressListNavigationState | undefined;
-  [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
-  [RouteEnum.ValueTransferDetail]: ValueTransferDetailNavigationState | undefined;
-  [RouteEnum.MessagesAddress]: MessagesAddressNavigationState | undefined;
-  [RouteEnum.MessagesAll]: MessagesAllNavigationState | undefined;
-  [RouteEnum.Memo]: MemoNavigationState | undefined;
+  [RouteEnum.ValueTransferDetail]:
+    ValueTransferDetailNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
   [RouteEnum.Seed]: SeedNavigationState | undefined;
@@ -85,6 +94,15 @@ export type AddressListNavigationState = {
 export type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
   active: boolean;
+  // When true the scanner returns the scanned string verbatim — no `zcash:`
+  // prefixing — for non-Zcash address fields (address book). The caller
+  // validates it per its own chain.
+  raw?: boolean;
+};
+
+export type ScannerUfvkNavigationState = {
+  setUfvkText: (k: string) => void;
+  active: boolean;
 };
 
 export type ValueTransferDetailNavigationState = {
@@ -92,12 +110,6 @@ export type ValueTransferDetailNavigationState = {
   vt: ValueTransferType;
   valueTransfersSliced: ValueTransferType[];
   totalLength: number;
-};
-
-export type MemoNavigationState = {
-  message: string;
-  includeUAMessage: boolean;
-  setMessage: (m: string) => void;
 };
 
 export type ConfirmNavigationState = {
@@ -113,24 +125,7 @@ export type ConfirmNavigationState = {
     includeUAMemo: boolean,
   ) => Promise<void>;
   sendPageState: SendPageStateClass;
-};
-
-export type MessagesAddressNavigationState = {
-  setScrollToBottom: (value: boolean) => void;
-  scrollToBottom: boolean;
-  address: string;
-  sendTransaction: (s: SendPageStateClass) => Promise<String>;
-  setServerOption: (
-    value: ServerType,
-    selectServer: SelectServerEnum,
-    toast: boolean,
-    sameServerChainName: boolean,
-  ) => Promise<void>;
-};
-
-export type MessagesAllNavigationState = {
-  setScrollToBottom: (value: boolean) => void;
-  scrollToBottom: boolean;
+  nym: boolean;
 };
 
 export type UfvkNavigationState = {

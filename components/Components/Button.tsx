@@ -42,33 +42,42 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           width: twoButtons ? '40%' : '80%',
         }
       : type === ButtonTypeEnum.Secondary
-      ? {
-          backgroundColor: disabled ? colors.secondaryDisabled : colors.background,
-          borderColor: disabled ? colors.primaryDisabled : colors.primary,
-          borderWidth: 2,
-          width: twoButtons ? '40%' : '80%',
-        }
-      : type === ButtonTypeEnum.Tertiary
-      ? {
-          backgroundColor: colors.tertiary,
-          width: twoButtons ? '40%' : '80%',
-        }
-      : type === ButtonTypeEnum.Ghost
-      ? {
-          backgroundColor: 'transparent',
-          color: colors.money,
-        }
-      : {
-          // error
-          backgroundColor: colors.primary,
-          width: twoButtons ? '40%' : '80%',
-        };
+        ? {
+            backgroundColor: disabled
+              ? colors.secondaryDisabled
+              : colors.bottomSheetBackground,
+            borderColor: disabled ? colors.primaryDisabled : colors.primary,
+            borderWidth: 2,
+            width: twoButtons ? '40%' : '80%',
+          }
+        : type === ButtonTypeEnum.Tertiary
+          ? {
+              backgroundColor: colors.tertiary,
+              width: twoButtons ? '40%' : '80%',
+            }
+          : type === ButtonTypeEnum.Ghost
+            ? {
+                backgroundColor: 'transparent',
+                color: colors.money,
+              }
+            : type === ButtonTypeEnum.Nym
+              ? {
+                  backgroundColor: disabled ? '#4DAF7C' : '#07FF94',
+                  borderColor: disabled ? '#4DAF7C' : '#07FF94',
+                  borderWidth: 2,
+                  width: twoButtons ? '40%' : '80%',
+                }
+              : {
+                  // error
+                  backgroundColor: colors.primary,
+                  width: twoButtons ? '40%' : '80%',
+                };
 
   const styleButtonCommon: TextStyle = {
     padding: 0,
     paddingLeft: 20,
     paddingRight: 20,
-    borderRadius: 10,
+    borderRadius: 24,
     maxWidth: '90%',
     minWidth: '30%',
     minHeight: 48,
@@ -82,25 +91,29 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           color: colors.background,
         }
       : type === ButtonTypeEnum.Secondary
-      ? {
-          color: disabled ? colors.primaryDisabled : colors.primary,
-        }
-      : type === ButtonTypeEnum.Tertiary
-      ? {
-          color: colors.text,
-        }
-      : type === ButtonTypeEnum.Ghost
-      ? {
-          color: colors.text,
-          textTransform: 'lowercase',
-        }
-      : {
-          // error
-          color: colors.background,
-        };
+        ? {
+            color: disabled ? colors.primaryDisabled : colors.primary,
+          }
+        : type === ButtonTypeEnum.Tertiary
+          ? {
+              color: colors.text,
+            }
+          : type === ButtonTypeEnum.Ghost
+            ? {
+                color: colors.text,
+                textTransform: 'none',
+              }
+            : type === ButtonTypeEnum.Nym
+              ? {
+                  color: colors.background,
+                }
+              : {
+                  // error
+                  color: colors.background,
+                };
   const styleTextCommon: TextStyle = {
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
+    fontWeight: '600',
+    textTransform: 'none',
     fontSize: 16,
     textAlign: 'center',
   };
@@ -120,7 +133,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         ...style,
       }}
       disabled={disabled}
-      onPress={() => onPress()}>
+      onPress={() => onPress()}
+    >
       <View
         style={{
           display: 'flex',
@@ -131,13 +145,15 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           padding: 0,
           minWidth: 48,
           minHeight: 48,
-        }}>
+        }}
+      >
         <Text
           style={{
             ...styleTextCommon,
             ...styleText,
             ...textStyle,
-          }}>
+          }}
+        >
           {title}
         </Text>
       </View>

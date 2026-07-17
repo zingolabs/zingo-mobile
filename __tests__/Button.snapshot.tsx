@@ -15,7 +15,13 @@ describe('Component Button - test', () => {
   const onPress = jest.fn();
   test('Button Primary - snapshot', () => {
     const button = render(
-      <Button type={ButtonTypeEnum.Primary} title={'Primary button'} disabled={false} onPress={onPress} style={{}} />,
+      <Button
+        type={ButtonTypeEnum.Primary}
+        title={'Primary button'}
+        disabled={false}
+        onPress={onPress}
+        style={{}}
+      />,
     );
     expect(button.toJSON()).toMatchSnapshot();
   });

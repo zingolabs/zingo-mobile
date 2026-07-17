@@ -1,38 +1,44 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, TouchableOpacity, Keyboard } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { View, Keyboard } from 'react-native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useTheme,
+} from '@react-navigation/native';
 
-import { ButtonTypeEnum, GlobalConst, ScreenEnum, SnackbarDurationEnum } from '../../../app/AppState';
+import {
+  ButtonTypeEnum,
+  GlobalConst,
+  ScreenEnum,
+  SnackbarDurationEnum,
+} from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import { useToast } from 'react-native-toastier';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import RPCModule from '../../../app/RPCModule';
+import { checkMyAddress } from '../../../app/walletBackend';
 import { parseZcashURI } from '../../../app/uris';
 import TextInputAddress from '../../Components/TextInputAddress';
 import FadeText from '../../Components/FadeText';
-import RegText from '../../Components/RegText';
-import { RPCCheckAddressType } from '../../../app/rpc/types/RPCCheckAddressType';
+import { RPCCheckAddressType } from '../../../app/walletBackend/types/RPCCheckAddressType';
 import { VerifyCheckIcon } from '../../Components/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '../../Components/Icons/VerifyXIcon';
 
 type VerifyAddressProps = {
   closeSheet: () => void;
   screenName: ScreenEnum;
-  setHeightLayout: (h: number) => void;
+  // VerifyAddress lives inside a portaled BottomSheetModal; pass navigation
+  // from the host (Receive) so the QR button can navigate to ScannerAddress.
+  navigation: NavigationProp<ParamListBase>;
 };
-const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ 
-  closeSheet, 
+const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
+  closeSheet,
   screenName,
-  setHeightLayout,
+  navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, server } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
 
   const [address, setAddress] = useState<string>('');
   const [errorAddress, setErrorAddress] = useState<string>('');
@@ -40,23 +46,20 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
 
   const verifyAddress = async () => {
     try {
-      const verifyAddressStr = await RPCModule.checkMyAddressInfo(address);
+      const verifyAddressStr = await checkMyAddress(address);
       //console.log(verifyAddressStr);
       if (verifyAddressStr) {
         if (verifyAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error new address ${verifyAddressStr}`);
-          addLastSnackbar({
-            message: verifyAddressStr,
-            duration: SnackbarDurationEnum.short,
-            screenName: [screenName],
-          });
+          addLastSnackbar(verifyAddressStr, SnackbarDurationEnum.short);
           setErrorAddress(verifyAddressStr);
         }
       } else {
         console.log('Internal Error new address ');
       }
 
-      const verifyAddressJSON: RPCCheckAddressType = await JSON.parse(verifyAddressStr);
+      const verifyAddressJSON: RPCCheckAddressType =
+        await JSON.parse(verifyAddressStr);
       setVerifyOK(verifyAddressJSON.is_wallet_address);
 
       //return newAddressStr;
@@ -66,7 +69,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
     }
 
     Keyboard.dismiss();
-    clear();
   };
 
   const updateAddress = async (addr: string) => {
@@ -75,9 +77,20 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       return;
     }
     // Attempt to parse as URI if it starts with zcash
-    if (addr.toLowerCase().startsWith(GlobalConst.zcash) || addr.toLowerCase().includes(':')) {
+    if (
+      addr.toLowerCase().startsWith(GlobalConst.zcash) ||
+      addr.toLowerCase().includes(':')
+    ) {
       const { error, target } = await parseZcashURI(addr, translate, server);
-      //console.log(targets);
+
+      // Audit Issue H — surface the parser error and abort before any
+      // address-state mutation. parseZcashURI returns an empty target
+      // when error is non-empty, but the explicit guard keeps intent
+      // obvious here and protects against future contract changes.
+      if (error) {
+        addLastSnackbar(error);
+        return;
+      }
 
       if (target) {
         // redo the to addresses
@@ -87,11 +100,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           }
         });
       }
-      if (error) {
-        // Show the error message as a toast
-        addLastSnackbar({ message: error, screenName: [screenName] });
-        //return;
-      }
     } else {
       setAddress(addr.replace(/[ \t\n\r]+/g, '')); // Remove spaces
     }
@@ -99,33 +107,10 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
 
   return (
     <View
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        //console.log('LAYOUTTT', height);
-        setHeightLayout(height + 70);
-      }}
       style={{
-        backgroundColor: colors.background,
-      }}>
-      <TouchableOpacity
-        onPress={() => {
-          setAddress('');
-          Keyboard.dismiss();
-          clear();
-          setTimeout(() => {
-            closeSheet();
-          }, 100);
-        }}>
-        <FontAwesomeIcon
-          size={30}
-          icon={faXmark}
-          color={colors.text}
-          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
-        />
-      </TouchableOpacity>
-      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
-        {translate('receive.verify') as string}
-      </RegText>
+        backgroundColor: colors.bottomSheetBackground,
+      }}
+    >
       <TextInputAddress
         address={address}
         setAddress={updateAddress}
@@ -133,6 +118,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         disabled={false}
         showLabel={false}
         screenName={screenName}
+        navigation={navigation}
       />
       {!!errorAddress && (
         <View
@@ -142,7 +128,8 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-          }}>
+          }}
+        >
           <FadeText style={{ color: colors.primary }}>{errorAddress}</FadeText>
         </View>
       )}
@@ -154,16 +141,41 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-          }}>
+          }}
+        >
           {verifyOK ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '90%' }}>
-              <VerifyCheckIcon color={colors.primary} style={{ marginRight: 10 }} />
-              <FadeText style={{ color: colors.text }}>{translate('receive.verification-success') as string}</FadeText>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                width: '90%',
+              }}
+            >
+              <VerifyCheckIcon
+                color={colors.primary}
+                style={{ marginRight: 10 }}
+              />
+              <FadeText style={{ color: colors.text }}>
+                {translate('receive.verification-success') as string}
+              </FadeText>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '90%' }}>
-              <VerifyXIcon color={colors.danger.primary} style={{ marginRight: 10 }} />
-              <FadeText style={{ color: colors.text }}>{translate('receive.verification-failure') as string}</FadeText>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                width: '90%',
+              }}
+            >
+              <VerifyXIcon
+                color={colors.danger.primary}
+                style={{ marginRight: 10 }}
+              />
+              <FadeText style={{ color: colors.text }}>
+                {translate('receive.verification-failure') as string}
+              </FadeText>
             </View>
           )}
         </View>
@@ -175,16 +187,17 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
+            gap: 10,
             marginVertical: 5,
-            marginTop: 30,
-          }}>
+            marginTop: 15,
+          }}
+        >
           <Button
             type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             onPress={() => {
               setAddress('');
               Keyboard.dismiss();
-              clear();
               setTimeout(() => {
                 closeSheet();
               }, 100);
@@ -194,7 +207,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           <Button
             type={ButtonTypeEnum.Primary}
             title={translate('verify') as string}
-            style={{ marginLeft: 10 }}
             onPress={() => {
               verifyAddress();
             }}

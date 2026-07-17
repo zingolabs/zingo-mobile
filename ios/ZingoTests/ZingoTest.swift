@@ -527,7 +527,6 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
-        let tor = "false"
 
         do {
           let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
@@ -553,7 +552,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
         }
 
         do {
-          let price = try zecPrice(tor: tor)
+          let price = try zecPrice()
           print("\nPrice:\n\(price)")
         } catch {
           XCTFail("\nInit from seed error:\n\(error.localizedDescription)")

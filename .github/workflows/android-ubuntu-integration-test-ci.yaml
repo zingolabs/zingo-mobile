@@ -38,7 +38,7 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
@@ -69,20 +69,20 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: Gradle setup cache (write-only)
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
           cache-write-only: true
           cache-read-only: false
 
       - name: Check AVD cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         id: avd-cache
         with:
           path: |
@@ -99,13 +99,13 @@ jobs:
           arch: ${{ env.AVD-ARCH }}
           target: ${{ env.TARGET }}
           force-avd-creation: true
-          emulator-options: -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
       - name: Save AVD cache
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         id: avd-cache-saving
         with:
           path: |
@@ -126,31 +126,31 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: Gradle setup cache (read/write)
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
           cache-read-only: false
 
       - name: Native rust cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: android/app/src/main/jniLibs/${{ env.ABI }}
           key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
       - name: Kotlin uniffi cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
           key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
@@ -182,21 +182,27 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
 
-          sudo docker image prune --all --force || true
-          sudo docker builder prune -a || true
+          podman image prune --all --force || true
+          podman system prune --all --force || true
 
           echo "Disk space after cleanup:"
           df -h
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
 
       - name: Yarn install
         run: yarn
 
       - name: Run Build
         working-directory: android
-        run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
+        run: ./gradlew assembleProdRelease assembleProdReleaseAndroidTest -DtestBuildType=release -PsplitApk=true
 
       - name: Upload Android build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
           path: |
@@ -231,7 +237,7 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
@@ -261,7 +267,6 @@ jobs:
 
       - name: Grant permissions
         run: |
-          sudo chmod 777 /var/run/docker.sock
           sudo chmod 777 ./scripts/ci/android_integration_tests_ci.sh
 
       - name: Enable KVM
@@ -287,20 +292,20 @@ jobs:
           tool: nextest
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: Gradle setup cache (read-only)
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
           cache-write-only: false
           cache-read-only: true
 
       - name: Restore AVD cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             ~/.android/avd/*
@@ -334,11 +339,17 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
 
-          sudo docker image prune --all --force || true
-          sudo docker builder prune -a || true
+          podman image prune --all --force || true
+          podman system prune --all --force || true
 
           echo "Disk space after cleanup:"
           df -h
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
 
       - name: Yarn install
         run: yarn
@@ -349,21 +360,63 @@ jobs:
           name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
           path: android/app/build/outputs
 
-      #- name: Pull docker image
-      #  run: docker pull zingodevops/regchest:013
+      # Resolve the zingolib commit the same way android-build does: the
+      # GITHUB_SHA under zingolib CI, otherwise the pinned rev in
+      # rust/Cargo.toml. The ci-build image tag is content-addressed from
+      # that commit's .env.testing-artifacts + rust-toolchain.toml +
+      # docker-ci/, so deriving it here keeps the zainod/zebrad binaries in
+      # lockstep with the zingolib we build against (a fixed tag like 011
+      # drifts out of sync).
+      - name: Resolve zingolib rev
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.repository }}" == *zingolib* ]]; then
+            REV="${GITHUB_SHA}"
+          else
+            line="$(grep -E '^zingolib[[:space:]]*=' rust/Cargo.toml)"
+            # Prefer an explicit rev pin if present.
+            REV="$(echo "$line" \
+                   | grep -oE 'rev[[:space:]]*=[[:space:]]*"[0-9a-f]+"' \
+                   | grep -oE '[0-9a-f]{7,40}' | head -1 || true)"
+            # Otherwise the dep is pinned by branch/tag: resolve it to a SHA.
+            if [[ -z "$REV" ]]; then
+              url="$(echo "$line" | grep -oE 'git[[:space:]]*=[[:space:]]*"[^"]+"' | sed -E 's/.*"([^"]+)".*/\1/')"
+              ref="$(echo "$line" | grep -oE '(branch|tag)[[:space:]]*=[[:space:]]*"[^"]+"' | sed -E 's/.*"([^"]+)".*/\1/')"
+              echo "Resolving zingolib ${ref} from ${url} via git ls-remote"
+              REV="$(git ls-remote "$url" "$ref" | awk 'NR==1{print $1}')"
+            fi
+          fi
+          test -n "$REV"
+          echo "ZINGOLIB_REV=$REV" >> "$GITHUB_ENV"
+          echo "Resolved zingolib rev: $REV"
 
-      - name: Pull ci-build docker image
-        run: docker pull zingodevops/ci-build:011
+      - name: Install cargo-make
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-make
+
+      - name: Compute ci-build image tag from that zingolib commit
+        run: |
+          set -euo pipefail
+          git clone --filter=blob:none https://github.com/zingolabs/zingolib zingolib-src
+          git -C zingolib-src checkout "$ZINGOLIB_REV"
+          TAG="$(cd zingolib-src && cargo make compute-image-tag | grep -E '^[0-9a-f]{14}$')"
+          test -n "$TAG"
+          echo "CI_BUILD_TAG=$TAG" >> "$GITHUB_ENV"
+          echo "Computed ci-build tag: $TAG"
+
+      - name: Pull ci-build image
+        run: podman pull docker.io/zingodevops/ci-build:${CI_BUILD_TAG}
 
       - name: Extract binaries & params from image
         run: |
           set -euxo pipefail
-          cid=$(docker create zingodevops/ci-build:011)
+          cid=$(podman create docker.io/zingodevops/ci-build:${CI_BUILD_TAG})
           mkdir -p rust/test_binaries/bins
-          docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
-          docker rm "$cid"
+          podman cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
+          podman cp "$cid":/usr/bin/zainod       rust/test_binaries/bins/
+          podman cp "$cid":/usr/bin/zebrad       rust/test_binaries/bins/
+          podman rm "$cid"
 
       - name: binaries env var
         run: |
@@ -377,7 +430,7 @@ jobs:
           arch: ${{ env.AVD-ARCH }}
           target: ${{ env.TARGET }}
           force-avd-creation: true
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: true
           script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
           working-directory: ./rust
@@ -386,7 +439,7 @@ jobs:
 
       - name: Upload test reports
         if: ${{ always() && !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-android-integration-reports-${{ env.ABI }}-${{ matrix.test }}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/integration_test_reports

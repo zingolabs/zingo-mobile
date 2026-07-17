@@ -26,10 +26,11 @@ ios/vendor/
 # Exclude compiled libs
 android/app/src/main/jniLibs
 android/app/release/
-ios/libuniffi_zingo.a
+android/app/beta/release/
+*.aab
+*.apk
+ios/Zingolib.xcframework/
 ios/zingo.swift
-ios/zingoFFI.h
-ios/zingoFFI.modulemap
 rust/lib/Generated/zingo.swift
 rust/lib/Generated/zingoFFI.h
 rust/lib/Generated/zingoFFI.modulemap
@@ -54,7 +55,6 @@ local.properties
 node_modules/
 npm-debug.log
 yarn-error.log
-yarn.lock
 
 nohup.out
 
@@ -96,3 +96,8 @@ buck-out/
 # Keystore
 /android/app/Zingo.jks
 /android/local.zingo.jks.properties
+
+# Claude Code
+.claude/
+# Jest coverage output
+coverage/

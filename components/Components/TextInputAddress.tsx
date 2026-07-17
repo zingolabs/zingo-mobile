@@ -1,7 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -9,8 +14,8 @@ import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import ErrorText from './ErrorText';
 import RegText from './RegText';
-import Utils from '../../app/utils';
-import { RouteEnum, ScreenEnum } from '../../app/AppState';
+import { validateAddressForChain } from '../../app/swap';
+import { GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';
 
 type TextInputAddressProps = {
   address: string;
@@ -20,6 +25,14 @@ type TextInputAddressProps = {
   showLabel: boolean;
   screenName: ScreenEnum;
   routeStack?: RouteEnum;
+  // SwapKit chain code the address is for ('ZEC' / 'BTC' / ...). Defaults to
+  // 'ZEC' → the existing zingolib validation (against `server.chainName`).
+  // Non-ZEC values validate by the format-only per-chain regex.
+  swapChain?: string;
+  // When rendered inside a BottomSheetModal (or any portaled context where
+  // useNavigation's context is lost), pass the navigation prop from the host
+  // screen so the QR button can navigate to ScannerAddress reliably.
+  navigation?: NavigationProp<ParamListBase>;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -27,48 +40,54 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   setError,
   disabled,
   showLabel,
-  screenName,
-  routeStack,
+  // screenName + routeStack are kept in the prop type for backward compat
+  // with all callers but are no longer consumed here — ScannerAddress lives
+  // at a single Drawer-level route so a direct navigate works everywhere.
+  navigation: navigationProp,
+  swapChain,
 }) => {
-  const navigation: any = useNavigation();
+  const hookNavigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = navigationProp ?? hookNavigation;
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 
   useEffect(() => {
-    const parseAddress = async (addr: string): Promise<{ isValid: boolean; onlyOrchardUA: string }> => {
-      return await Utils.isValidAddress(addr, server.chainName);
-    };
+    let cancelled = false;
 
     if (address) {
-      parseAddress(address).then(r => {
-        //console.log(r);
-        setValidAddress(r.isValid ? 1 : -1);
-        setError(r.isValid ? '' : (translate('send.invalidaddress') as string));
+      validateAddressForChain(
+        swapChain ?? GlobalConst.zecSwapChain,
+        address,
+        server.chainName,
+      ).then(valid => {
+        if (!cancelled) {
+          setValidAddress(valid ? 1 : -1);
+          setError(valid ? '' : (translate('send.invalidaddress') as string));
+        }
       });
     } else {
       setValidAddress(0);
       setError('');
     }
-  }, [address, server.chainName, setError, translate]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [address, server.chainName, swapChain, setError, translate]);
 
   const setQrcodeModalShow = () => {
-    if (screenName === ScreenEnum.AddressBook) {
-      navigation.navigate(routeStack, {
-        screen: RouteEnum.ScannerAddress,
-        params: { 
-          setAddress: (a: string) => setAddress(a),
-          active: true,
-        }
-      });
-    } else if (screenName === ScreenEnum.Receive) {
-      navigation.navigate(RouteEnum.ScannerAddress, {
-        setAddress: (a: string) => setAddress(a),
-        active: true,
-      });
-    }
+    // ScannerAddress is a top-level (root Stack) screen, so a direct navigate
+    // works from any caller (Receive, Send, etc.) regardless of which stack
+    // they live in.
+    navigation.navigate(RouteEnum.ScannerAddress, {
+      setAddress: (a: string) => setAddress(a),
+      active: true,
+      // Non-ZEC chains take the scanned string verbatim (no `zcash:` prefix).
+      raw: (swapChain ?? GlobalConst.zecSwapChain) !== GlobalConst.zecSwapChain,
+    });
   };
 
   //console.log('render input text address');
@@ -77,19 +96,32 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     <View style={{ display: 'flex', flexDirection: 'column' }}>
       <View style={{ display: 'flex', padding: 10, marginTop: 10 }}>
         {showLabel && (
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
             <RegText>{translate('send.toaddress') as string}</RegText>
-            {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
-            {validAddress === -1 && <ErrorText>{translate('send.invalidaddress') as string}</ErrorText>}
+            {validAddress === 1 && (
+              <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+            )}
+            {validAddress === -1 && (
+              <ErrorText>
+                {translate('send.invalidaddress') as string}
+              </ErrorText>
+            )}
           </View>
         )}
         <View
           style={{
             borderWidth: 1,
-            borderRadius: 5,
-            borderColor: colors.text,
+            borderRadius: 12,
+            borderColor: colors.border,
             marginTop: 5,
-          }}>
+          }}
+        >
           <View style={{ flexDirection: 'row' }}>
             <View
               accessible={true}
@@ -97,7 +129,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
               style={{
                 flex: 1,
                 justifyContent: 'center',
-              }}>
+              }}
+            >
               <TextInput
                 testID="send.addressplaceholder"
                 placeholder={translate('send.addressplaceholder') as string}
@@ -106,7 +139,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                   color: colors.text,
                   fontWeight: '600',
                   fontSize: 14,
-                  marginLeft: 5,
+                  padding: 10,
                   backgroundColor: 'transparent',
                 }}
                 value={address}
@@ -120,13 +153,20 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}>
+              }}
+            >
               {address && !disabled && (
                 <TouchableOpacity
                   onPress={() => {
                     setAddress('');
-                  }}>
-                  <FontAwesomeIcon style={{ marginRight: 5 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{ marginRight: 5 }}
+                    size={20}
+                    icon={faXmark}
+                    color={colors.primaryDisabled}
+                  />
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -134,10 +174,17 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 disabled={disabled}
                 accessible={true}
                 accessibilityLabel={translate('send.scan-acc') as string}
+                hitSlop={8}
                 onPress={() => {
                   setQrcodeModalShow();
-                }}>
-                <FontAwesomeIcon style={{ marginRight: 5 }} size={35} icon={faQrcode} color={colors.border} />
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
+                  size={28}
+                  icon={faQrcode}
+                  color={colors.border}
+                />
               </TouchableOpacity>
             </View>
           </View>

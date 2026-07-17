@@ -32,4 +32,8 @@ export const GlobalConst = {
   keyStore: 'KeyStore',
   utf8: 'utf8',
   minConfirmations: 3,
+  // Chain code for Zcash — the stable 'ZEC' ticker used as the default
+  // `swapChain` on address-book contacts and to branch the ZEC vs non-ZEC
+  // address validation/scan paths. Single source so it never drifts.
+  zecSwapChain: 'ZEC',
 };

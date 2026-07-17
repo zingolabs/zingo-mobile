@@ -33,7 +33,28 @@ struct SyncStatus: Decodable {
     let percentage_total_outputs_scanned: Double?
 }
 
-@UIApplicationMain
+private struct BackgroundTaskResult: Encodable {
+    let batches: String
+    let message: String
+    let date: String
+    let dateEnd: String
+    let error: String?
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(batches, forKey: .batches)
+        try container.encode(message, forKey: .message)
+        try container.encode(date, forKey: .date)
+        try container.encode(dateEnd, forKey: .dateEnd)
+        try container.encodeIfPresent(error, forKey: .error)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case batches, message, date, dateEnd, error
+    }
+}
+
+@main
 class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
   var reactNativeDelegate: ReactNativeDelegate?
@@ -58,14 +79,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
  
     reactNativeDelegate = delegate
     reactNativeFactory = factory
- 
-    window = UIWindow(frame: UIScreen.main.bounds)
- 
-    factory.startReactNative(
-      withModuleName: "Zingo",
-      in: window,
-      launchOptions: launchOptions
-    )
 
     if #available(iOS 13.0, *) {
       NSLog("BGTask registerTasks")
@@ -76,8 +89,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func application(
-    _ application: UIApplication, 
-    open url: URL, 
+    _ application: UIApplication,
+    configurationForConnecting connectingSceneSession: UISceneSession,
+    options: UIScene.ConnectionOptions
+  ) -> UISceneConfiguration {
+    UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+  }
+
+  func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {}
+
+  func application(
+    _ application: UIApplication,
+    open url: URL,
     options: [UIApplication.OpenURLOptionsKey : Any] = [:]
   ) -> Bool {
     return RCTLinkingManager.application(application, open: url, options: options)
@@ -95,7 +118,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
   }
 
-  func applicationWillEnterForeground(_ application: UIApplication) {
+  func handleForeground() {
     if #available(iOS 13.0, *) {
       NSLog("BGTask foreground")
       self.cancelExecutingTask()
@@ -107,7 +130,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   }
 
-  func applicationDidEnterBackground(_ application: UIApplication) {
+  func handleBackground() {
     if #available(iOS 13.0, *) {
       NSLog("BGTask background")
 
@@ -205,7 +228,7 @@ extension AppDelegate {
             // save the background file
             let timeStamp = Date().timeIntervalSince1970
             let timeStampStr = String(format: "%.0f", timeStamp)
-            let jsonBackground = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStr)\"}"
+            let jsonBackground = self.buildBackgroundJSON(message: "Finished OK.", dateEnd: timeStampStr)
             do {
               try rpcmodule.saveBackgroundFile(jsonBackground)
               NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground)")
@@ -322,7 +345,7 @@ extension AppDelegate {
         // save the background file
         let timeStampStart = Date().timeIntervalSince1970
         self.timeStampStrStart = String(format: "%.0f", timeStampStart)
-        let jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"0\"}"
+        let jsonBackgroundStart = self.buildBackgroundJSON(message: "Starting OK.", dateEnd: "0")
         do {
           try rpcmodule.saveBackgroundFile(jsonBackgroundStart)
           NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart)")
@@ -336,7 +359,7 @@ extension AppDelegate {
           // save the background file
           let timeStampError = Date().timeIntervalSince1970
           let timeStampStrError = String(format: "%.0f", timeStampError)
-          let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"App in Foreground, Background task KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
+          let jsonBackgroundError = self.buildBackgroundJSON(message: "App in Foreground, Background task KO.", dateEnd: timeStampStrError)
           do {
             try rpcmodule.saveBackgroundFile(jsonBackgroundError)
             NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -360,9 +383,7 @@ extension AppDelegate {
           // save the background file
           let timeStampError = Date().timeIntervalSince1970
           let timeStampStrError = String(format: "%.0f", timeStampError)
-          let e = error.localizedDescription
-          let clean = e.replacingOccurrences(of: "\"", with: "")
-          let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Crypto provider default KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"Crypto provider default KO. \(clean)\"}"
+          let jsonBackgroundError = self.buildBackgroundJSON(message: "Crypto provider default KO.", dateEnd: timeStampStrError, error: "Crypto provider default KO. \(error.localizedDescription)")
           do {
             try rpcmodule.saveBackgroundFile(jsonBackgroundError)
             NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -386,8 +407,26 @@ extension AppDelegate {
       
         if exists == "true" {
             // load the wallet file
-            self.loadWalletFile()
-          
+            let shouldSync = self.loadWalletFile()
+
+            if !shouldSync {
+                NSLog("BGTask syncingProcessBackgroundTask - Offline mode, sync skipped")
+                let timeStampOffline = Date().timeIntervalSince1970
+                let timeStampStrOffline = String(format: "%.0f", timeStampOffline)
+                let jsonBackgroundOffline = self.buildBackgroundJSON(message: "Sync skipped - Offline mode.", dateEnd: timeStampStrOffline)
+                do {
+                  try rpcmodule.saveBackgroundFile(jsonBackgroundOffline)
+                  NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundOffline)")
+                } catch {
+                  NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundOffline) error: \(error.localizedDescription)")
+                }
+                if let task = self.bgTask {
+                  task.setTaskCompleted(success: true)
+                }
+                bgTask = nil
+                return
+            }
+
             // run the sync process.
             do {
               let syncing = try runSync()
@@ -399,9 +438,7 @@ extension AppDelegate {
               // save the background file
               let timeStampError = Date().timeIntervalSince1970
               let timeStampStrError = String(format: "%.0f", timeStampError)
-              let e = error.localizedDescription
-              let clean = e.replacingOccurrences(of: "\"", with: "")
-              let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"Run sync process KO. \(clean)\"}"
+              let jsonBackgroundError = self.buildBackgroundJSON(message: "Run sync process KO.", dateEnd: timeStampStrError, error: "Run sync process KO. \(error.localizedDescription)")
               do {
                 try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                 NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -431,7 +468,7 @@ extension AppDelegate {
                     // save the background file
                     let timeStampError = Date().timeIntervalSince1970
                     let timeStampStrError = String(format: "%.0f", timeStampError)
-                    let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"Status sync process KO. \(syncStatusJson)\"}"
+                    let jsonBackgroundError = self.buildBackgroundJSON(message: "Status sync process KO.", dateEnd: timeStampStrError, error: "Status sync process KO. \(syncStatusJson)")
                     do {
                       try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                       NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -451,9 +488,7 @@ extension AppDelegate {
                   // save the background file
                   let timeStampError = Date().timeIntervalSince1970
                   let timeStampStrError = String(format: "%.0f", timeStampError)
-                  let e = error.localizedDescription
-                  let clean = e.replacingOccurrences(of: "\"", with: "")
-                  let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"Status sync process KO. \(clean)\"}"
+                  let jsonBackgroundError = self.buildBackgroundJSON(message: "Status sync process KO.", dateEnd: timeStampStrError, error: "Status sync process KO. \(error.localizedDescription)")
                   do {
                     try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                     NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -469,7 +504,14 @@ extension AppDelegate {
                 }
 
                 do {
-                  let data = syncStatusJson.data(using: .utf8)!
+                  guard let data = syncStatusJson.data(using: .utf8) else {
+                    NSLog("BGTask syncingProcessBackgroundTask - failed to encode syncStatusJson")
+                    if let task = self.bgTask {
+                      task.setTaskCompleted(success: false)
+                    }
+                    bgTask = nil
+                    return
+                  }
                   syncStatus = try JSONDecoder().decode(SyncStatus.self, from: data)
 
                   let percent =
@@ -488,9 +530,7 @@ extension AppDelegate {
                   // save the background file
                   let timeStampError = Date().timeIntervalSince1970
                   let timeStampStrError = String(format: "%.0f", timeStampError)
-                  let e = error.localizedDescription
-                  let clean = e.replacingOccurrences(of: "\"", with: "")
-                  let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync parsing process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"Status sync parsing process KO. \(clean)\"}"
+                  let jsonBackgroundError = self.buildBackgroundJSON(message: "Status sync parsing process KO.", dateEnd: timeStampStrError, error: "Status sync parsing process KO. \(error.localizedDescription)")
                   do {
                     try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                     NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -516,7 +556,7 @@ extension AppDelegate {
             // save the background file
             let timeStampError = Date().timeIntervalSince1970
             let timeStampStrError = String(format: "%.0f", timeStampError)
-            let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
+            let jsonBackgroundError = self.buildBackgroundJSON(message: "No active wallet KO.", dateEnd: timeStampStrError)
             do {
               try rpcmodule.saveBackgroundFile(jsonBackgroundError)
               NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -544,7 +584,7 @@ extension AppDelegate {
         // save the background file
         let timeStampEnd = Date().timeIntervalSince1970
         let timeStampStrEnd = String(format: "%.0f", timeStampEnd)
-        let jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrEnd)\"}"
+        let jsonBackgroundEnd = self.buildBackgroundJSON(message: "Finished OK.", dateEnd: timeStampStrEnd)
         do {
           try rpcmodule.saveBackgroundFile(jsonBackgroundEnd)
           NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundEnd)")
@@ -558,17 +598,38 @@ extension AppDelegate {
         bgTask = nil
     }
 
-    func loadWalletFile() {
+    private func buildBackgroundJSON(message: String, dateEnd: String, error: String? = nil) -> String {
+        let result = BackgroundTaskResult(
+            batches: "0",
+            message: message,
+            date: timeStampStrStart ?? "0",
+            dateEnd: dateEnd,
+            error: error
+        )
+        guard let data = try? JSONEncoder().encode(result),
+              let json = String(data: data, encoding: .utf8) else {
+            return "{\"message\": \"\(message)\"}"
+        }
+        return json
+    }
+
+    /// Reads settings.json and loads the wallet file when a server URI is
+    /// configured. Returns `true` to signal the caller may proceed with sync, or
+    /// `false` only when the user is explicitly in offline mode (empty server
+    /// URI) and sync must be skipped. On any other unexpected condition the
+    /// function returns `true` so the downstream sync path surfaces its own
+    /// error rather than masquerading as offline mode.
+    func loadWalletFile() -> Bool {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         guard let documentsDirectory = paths.first else {
             NSLog("Error: Unable to find documents directory")
-            return
+            return true
         }
 
         let fileName = "\(documentsDirectory)/settings.json"
         guard let content = try? String(contentsOfFile: fileName, encoding: .utf8) else {
             NSLog("Error: Unable to read file at path \(fileName)")
-            return
+            return true
         }
 
         guard let contentData = content.data(using: .utf8),
@@ -577,7 +638,12 @@ extension AppDelegate {
               let serveruri = server["uri"] as? String,
               let chainhint = server["chainName"] as? String else {
             NSLog("Error: Unable to parse JSON object from file at path \(fileName)")
-            return
+            return true
+        }
+
+        if serveruri.isEmpty {
+            NSLog("Offline mode detected (empty serveruri) - skipping wallet load")
+            return false
         }
 
         NSLog("Opening the wallet file - No App active - serveruri: \(serveruri) chain: \(chainhint)")
@@ -587,6 +653,7 @@ extension AppDelegate {
         } catch {
           NSLog("Error: Unable to load the wallet. error: \(error.localizedDescription)")
         }
+        return true
     }
 
     func cancelExecutingTask() {

@@ -1,5 +1,5 @@
 const mMoment = {
-  format: (p) => {
+  format: p => {
     if (p === 'MMM YYYY') {
       return 'Dec 2022';
     } else if (p === 'YYYY MMM D h:mm a') {

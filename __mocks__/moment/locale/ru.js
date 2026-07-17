@@ -1,3 +1,3 @@
 export default () => () => ({
-    defineLocale: jest.fn(),
+  defineLocale: jest.fn(),
 });

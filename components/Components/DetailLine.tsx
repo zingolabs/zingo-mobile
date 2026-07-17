@@ -8,18 +8,22 @@ import FadeText from './FadeText';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
+import { SnackbarDurationEnum } from '../../app/AppState';
 
 type DetailLineProps = {
   label: string;
   value?: string;
   children?: ReactNode;
   testID?: string;
-  screenName: ScreenEnum;
 };
 
-const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID, screenName }) => {
-  const { colors } = useTheme()  as ThemeType;
+const DetailLine: React.FunctionComponent<DetailLineProps> = ({
+  label,
+  value,
+  children,
+  testID,
+}) => {
+  const { colors } = useTheme() as ThemeType;
   const context = useContext(ContextAppLoaded);
   const { addLastSnackbar, translate } = context;
 
@@ -30,12 +34,12 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, ch
         <TouchableOpacity
           onPress={() => {
             Clipboard.setString(value);
-            addLastSnackbar({
-              message: translate('txtcopied') as string,
-              duration: SnackbarDurationEnum.short,
-              screenName: [screenName],
-            });
-          }}>
+            addLastSnackbar(
+              translate('txtcopied') as string,
+              SnackbarDurationEnum.short,
+            );
+          }}
+        >
           <RegText testID={testID} color={colors.text}>
             {value}
           </RegText>
