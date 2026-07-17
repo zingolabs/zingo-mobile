@@ -86,6 +86,7 @@
     <ID>NoWildcardImports:RPCModule.kt$import org.ZingoLabs.Zingo.Constants.*</ID>
     <ID>PackageName:BackgroundSyncWorker.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageName:Constants.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:FfiDispatchTest.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageName:FfiOutcome.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageName:FfiOutcomeTest.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageName:MainActivity.kt$package org.ZingoLabs.Zingo</ID>
@@ -96,6 +97,7 @@
     <ID>PackageName:WalletExportClassificationTest.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:BackgroundSyncWorker.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:Constants.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:FfiDispatchTest.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:FfiOutcome.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:FfiOutcomeTest.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:MainActivity.kt$package org.ZingoLabs.Zingo</ID>

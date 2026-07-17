@@ -442,7 +442,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun createNewWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        FfiOutcome.of("init_new") {
+        FfiOutcome.settling(promise, "init_new") {
             uniffi.zingo.initLogging()
 
             // Create a seed. initNew throws on failure, so reaching the save
@@ -450,36 +450,36 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt())
             saveWalletFile()
             resp
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
     fun restoreWalletFromSeed(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        FfiOutcome.of("init_from_seed") {
+        FfiOutcome.settling(promise, "init_from_seed") {
             uniffi.zingo.initLogging()
 
             val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
             saveWalletFile()
             resp
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        FfiOutcome.of("init_from_ufvk") {
+        FfiOutcome.settling(promise, "init_from_ufvk") {
             uniffi.zingo.initLogging()
 
             val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
             saveWalletFile()
             resp
-        }.settle(promise)
+        }
 }
 
     @ReactMethod
     fun loadExistingWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        FfiOutcome.of("init_from_b64") {
+        FfiOutcome.settling(promise, "init_from_b64") {
             loadExistingWalletNative(serveruri, chainhint, performancelevel, minconfirmations)
-        }.settle(promise)
+        }
     }
 
     // Throws on failure; callers own the error channel (a rejected promise
@@ -561,34 +561,34 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // re-encoded as prose in the success channel (zingo-mobile#1151).
     @ReactMethod
     fun doSave(promise: Promise) {
-        FfiOutcome.of("save_wallet_bytes") {
+        FfiOutcome.settling(promise, "save_wallet_bytes") {
             uniffi.zingo.initLogging()
             saveWalletFile()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
     fun doSaveBackup(promise: Promise) {
-        FfiOutcome.of("save_wallet_backup") {
+        FfiOutcome.settling(promise, "save_wallet_backup") {
             uniffi.zingo.initLogging()
             saveWalletBackupFile()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
     fun getLatestBlockServerInfo(serveruri: String, promise: Promise) {
-        FfiOutcome.of("get_latest_block_server") {
+        FfiOutcome.settling(promise, "get_latest_block_server") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getLatestBlockServer(serveruri)
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
     fun getLatestBlockWalletInfo(promise: Promise) {
-        FfiOutcome.of("get_latest_block_wallet") {
+        FfiOutcome.settling(promise, "get_latest_block_wallet") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getLatestBlockWallet()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
@@ -635,10 +635,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getValueTransfersList(promise: Promise) {
-        FfiOutcome.of("get_value_transfers") {
+        FfiOutcome.settling(promise, "get_value_transfers") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getValueTransfers()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
@@ -883,26 +883,26 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getVersionInfo(promise: Promise) {
-        FfiOutcome.of("get_version") {
+        FfiOutcome.settling(promise, "get_version") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getVersion()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
     fun getMessagesInfo(address: String, promise: Promise) {
-        FfiOutcome.of("get_messages") {
+        FfiOutcome.settling(promise, "get_messages") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getMessages(address)
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
     fun getBalanceInfo(promise: Promise) {
-        FfiOutcome.of("get_balance") {
+        FfiOutcome.settling(promise, "get_balance") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getBalance()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
@@ -1033,10 +1033,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getSpendableBalanceTotalInfo(promise: Promise) {
-        FfiOutcome.of("get_spendable_balance_total") {
+        FfiOutcome.settling(promise, "get_spendable_balance_total") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getSpendableBalanceTotal()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
@@ -1083,18 +1083,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getUnifiedAddressesInfo(promise: Promise) {
-        FfiOutcome.of("get_unified_addresses") {
+        FfiOutcome.settling(promise, "get_unified_addresses") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getUnifiedAddresses()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
     fun getTransparentAddressesInfo(promise: Promise) {
-        FfiOutcome.of("get_transparent_addresses") {
+        FfiOutcome.settling(promise, "get_transparent_addresses") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getTransparentAddresses()
-        }.settle(promise)
+        }
     }
 
     // Pre-migration ReactMethod shell: resolves the FFI result, or resolves
@@ -1167,10 +1167,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getWalletSaveRequiredInfo(promise: Promise) {
-        FfiOutcome.of("get_wallet_save_required") {
+        FfiOutcome.settling(promise, "get_wallet_save_required") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getWalletSaveRequired()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
@@ -1196,18 +1196,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     
     @ReactMethod
     fun getConfigWalletPerformanceInfo(promise: Promise) {
-        FfiOutcome.of("get_config_wallet_performance") {
+        FfiOutcome.settling(promise, "get_config_wallet_performance") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getConfigWalletPerformance()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
     fun getWalletVersionInfo(promise: Promise) {
-        FfiOutcome.of("get_wallet_version") {
+        FfiOutcome.settling(promise, "get_wallet_version") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getWalletVersion()
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
