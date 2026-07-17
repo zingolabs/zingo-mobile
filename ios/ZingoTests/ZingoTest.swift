@@ -91,18 +91,36 @@ struct SyncStatus: Codable {
 }
 
 struct Balance: Codable {
-    let total_ironwood_balance: Int64
-    let confirmed_ironwood_balance: Int64
-    let unconfirmed_ironwood_balance: Int64
-    let total_sapling_balance: Int64
-    let confirmed_sapling_balance: Int64
-    let unconfirmed_sapling_balance: Int64
-    let total_orchard_balance: Int64
-    let confirmed_orchard_balance: Int64
-    let unconfirmed_orchard_balance: Int64
-    let total_transparent_balance: Int64
-    let confirmed_transparent_balance: Int64
-    let unconfirmed_transparent_balance: Int64
+    let totalIronwoodBalance: Int64
+    let confirmedIronwoodBalance: Int64
+    let unconfirmedIronwoodBalance: Int64
+    let totalSaplingBalance: Int64
+    let confirmedSaplingBalance: Int64
+    let unconfirmedSaplingBalance: Int64
+    let totalOrchardBalance: Int64
+    let confirmedOrchardBalance: Int64
+    let unconfirmedOrchardBalance: Int64
+    let totalTransparentBalance: Int64
+    let confirmedTransparentBalance: Int64
+    let unconfirmedTransparentBalance: Int64
+
+    // The FFI JSON speaks snake_case; the coding keys carry that contract so
+    // the properties can follow the Swift naming the identifier_name lint
+    // enforces.
+    enum CodingKeys: String, CodingKey {
+        case totalIronwoodBalance = "total_ironwood_balance"
+        case confirmedIronwoodBalance = "confirmed_ironwood_balance"
+        case unconfirmedIronwoodBalance = "unconfirmed_ironwood_balance"
+        case totalSaplingBalance = "total_sapling_balance"
+        case confirmedSaplingBalance = "confirmed_sapling_balance"
+        case unconfirmedSaplingBalance = "unconfirmed_sapling_balance"
+        case totalOrchardBalance = "total_orchard_balance"
+        case confirmedOrchardBalance = "confirmed_orchard_balance"
+        case unconfirmedOrchardBalance = "unconfirmed_orchard_balance"
+        case totalTransparentBalance = "total_transparent_balance"
+        case confirmedTransparentBalance = "confirmed_transparent_balance"
+        case unconfirmedTransparentBalance = "unconfirmed_transparent_balance"
+    }
 }
 
 struct SendResult: Codable {
@@ -116,16 +134,28 @@ struct ValueTransfer: Codable, Equatable {
     let datetime: Int64
     let status: String
     let blockheight: Int64
-    let transaction_fee: Int64?
-    let zec_price: Int64?
+    let transactionFee: Int64?
+    let zecPrice: Int64?
     let kind: String
     let value: Int64
-    let recipient_address: String?
+    let recipientAddress: String?
     // zingolib feat/ironwood replaced the singular `pool_received` with
     // per-direction pool lists.
-    let pools_sent_from: [String]?
-    let pools_received: [String]?
+    let poolsSentFrom: [String]?
+    let poolsReceived: [String]?
     let memos: [String]?
+
+    // The FFI JSON speaks snake_case; the coding keys carry that contract so
+    // the properties can follow the Swift naming the identifier_name lint
+    // enforces.
+    enum CodingKeys: String, CodingKey {
+        case txid, datetime, status, blockheight, kind, value, memos
+        case transactionFee = "transaction_fee"
+        case zecPrice = "zec_price"
+        case recipientAddress = "recipient_address"
+        case poolsSentFrom = "pools_sent_from"
+        case poolsReceived = "pools_received"
+    }
 }
 
 struct ValueTransfers: Codable {
@@ -423,12 +453,12 @@ final class ExecuteSendFromOrchard: XCTestCase {
             let balJson = try getBalance()
             print("\nBalance pre-send:\n\(balJson)")
             let bal: Balance = try decodeJSON(balJson)
-            // On the ironwood-activated chain the funding send lands in the
-            // Ironwood pool; the orchard balance staying zero guards that
-            // placement.
-            XCTAssertEqual(bal.confirmed_ironwood_balance, 1_000_000)
-            XCTAssertEqual(bal.confirmed_orchard_balance, 0)
-            XCTAssertEqual(bal.confirmed_transparent_balance, 0)
+            // With the Ironwood network upgrade (NU6.3) active on the chain,
+            // the funding send lands in the Ironwood pool; the orchard
+            // balance staying zero guards that placement.
+            XCTAssertEqual(bal.confirmedIronwoodBalance, 1_000_000)
+            XCTAssertEqual(bal.confirmedOrchardBalance, 0)
+            XCTAssertEqual(bal.confirmedTransparentBalance, 0)
         } catch {
           XCTFail("\nBalance pre-send error:\n\(error.localizedDescription)")
           return
@@ -443,9 +473,9 @@ final class ExecuteSendFromOrchard: XCTestCase {
             let balJson = try getBalance()
             print("\nBalance post-send:\n\(balJson)")
             let bal: Balance = try decodeJSON(balJson)
-            XCTAssertEqual(bal.total_ironwood_balance, 885_000)
-            XCTAssertEqual(bal.confirmed_transparent_balance, 0)
-            XCTAssertEqual(bal.unconfirmed_transparent_balance, 100_000)
+            XCTAssertEqual(bal.totalIronwoodBalance, 885_000)
+            XCTAssertEqual(bal.confirmedTransparentBalance, 0)
+            XCTAssertEqual(bal.unconfirmedTransparentBalance, 100_000)
         } catch {
           XCTFail("\nBalance post-send error:\n\(error.localizedDescription)")
           return
@@ -482,19 +512,19 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
             XCTAssertEqual(vts.value_transfers[0].kind, "memo-to-self")
             XCTAssertEqual(vts.value_transfers[0].status, "confirmed")
             XCTAssertEqual(vts.value_transfers[0].value, 0)
-            XCTAssertEqual(vts.value_transfers[0].transaction_fee, 20_000)
+            XCTAssertEqual(vts.value_transfers[0].transactionFee, 20_000)
             // Multi-pool entry pins the plural schema: a memo-to-self
             // settles change across Sapling and Ironwood.
-            XCTAssertEqual(vts.value_transfers[0].pools_received, ["Sapling", "Ironwood"])
+            XCTAssertEqual(vts.value_transfers[0].poolsReceived, ["Sapling", "Ironwood"])
 
             XCTAssertEqual(vts.value_transfers[1].kind, "sent")
-            XCTAssertEqual(vts.value_transfers[1].recipient_address, recipientAddress)
+            XCTAssertEqual(vts.value_transfers[1].recipientAddress, recipientAddress)
             XCTAssertEqual(vts.value_transfers[1].status, "confirmed")
             XCTAssertEqual(vts.value_transfers[1].value, 100_000)
-            XCTAssertEqual(vts.value_transfers[1].transaction_fee, 10_000)
+            XCTAssertEqual(vts.value_transfers[1].transactionFee, 10_000)
 
             XCTAssertEqual(vts.value_transfers[2].kind, "received")
-            XCTAssertEqual(vts.value_transfers[2].pools_received, ["Ironwood"])
+            XCTAssertEqual(vts.value_transfers[2].poolsReceived, ["Ironwood"])
             XCTAssertEqual(vts.value_transfers[2].status, "confirmed")
             XCTAssertEqual(vts.value_transfers[2].value, 1_000_000)
         } catch {
@@ -525,12 +555,12 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
           let balJson = try getBalance()
           print("\nBalance:\n\(balJson)")
           let bal: Balance = try decodeJSON(balJson)
-          XCTAssertEqual(bal.total_ironwood_balance, 710_000)
-          XCTAssertEqual(bal.confirmed_ironwood_balance, 710_000)
-          XCTAssertEqual(bal.confirmed_orchard_balance, 0)
-          XCTAssertEqual(bal.total_sapling_balance, 125_000)
-          XCTAssertEqual(bal.confirmed_sapling_balance, 125_000)
-          XCTAssertEqual(bal.confirmed_transparent_balance, 0)
+          XCTAssertEqual(bal.totalIronwoodBalance, 710_000)
+          XCTAssertEqual(bal.confirmedIronwoodBalance, 710_000)
+          XCTAssertEqual(bal.confirmedOrchardBalance, 0)
+          XCTAssertEqual(bal.totalSaplingBalance, 125_000)
+          XCTAssertEqual(bal.confirmedSaplingBalance, 125_000)
+          XCTAssertEqual(bal.confirmedTransparentBalance, 0)
         } catch {
           XCTFail("\nBalance error:\n\(error.localizedDescription)")
           return
@@ -705,5 +735,232 @@ class FfiOutcomeTests: XCTestCase {
             XCTAssertEqual(rejectedCode, code)
             XCTAssertTrue(error is ZingolibError, "FFI \(code) must reject with its typed error")
         }
+    }
+}
+
+/// The shared plumbing for tests that drive RPCModule against a disposable
+/// documents directory through the documentsDirectoryForTesting seam.
+/// RPCModule.swift compiles directly into this test target, so its internal
+/// members are reachable without a testable import. XCTest runs the classes
+/// of a target serially, so the static override cannot leak into a test
+/// running elsewhere, and tearDown always clears it. This base class
+/// declares no tests of its own.
+class InjectedDocumentsDirectoryTestCase: XCTestCase {
+    var testDirectory: String = ""
+
+    override func setUpWithError() throws {
+        testDirectory = NSTemporaryDirectory() + "rpc-module-" + UUID().uuidString
+        try FileManager.default.createDirectory(atPath: testDirectory, withIntermediateDirectories: true)
+        RPCModule.documentsDirectoryForTesting = testDirectory
+    }
+
+    override func tearDownWithError() throws {
+        // The seam resets first so a failed cleanup can never leave a later
+        // test pointed at this directory. The permissions reset undoes the
+        // read-only trick of the save-containment test before removal.
+        RPCModule.documentsDirectoryForTesting = nil
+        try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: testDirectory)
+        try? FileManager.default.removeItem(atPath: testDirectory)
+    }
+
+    func walletPath(_ file: Constants) -> String {
+        return testDirectory + "/" + file.rawValue
+    }
+
+    func writeWalletFile(_ file: Constants, content: String) throws {
+        try content.write(toFile: walletPath(file), atomically: true, encoding: .utf8)
+    }
+
+    func readWalletFile(_ file: Constants) throws -> String {
+        return try String(contentsOfFile: walletPath(file), encoding: .utf8)
+    }
+
+    func walletFileExists(_ file: Constants) -> Bool {
+        return FileManager.default.fileExists(atPath: walletPath(file))
+    }
+}
+
+/// Audit Issue P (b) — the completePendingSwap decision table, exercised on
+/// disk. The file contents are plain distinguishable strings because the
+/// recovery compares bytes and never validates wallet content.
+///
+/// Documented red state: before the decision-table rework, any state with
+/// both main and backup present wedged permanently, because the old
+/// recovery's first rename (backup onto the existing main) always threw,
+/// the catch swallowed the error, and the temp file lingered on every
+/// launch. In the wedge test the temp-is-gone and backup-content assertions
+/// failed against that implementation; in the backup-equals-temp test the
+/// temp-is-gone assertion failed; and in the temp-only test the old code
+/// moved the temp to backup and left no main wallet at all, so reading the
+/// main wallet failed the test.
+final class CompletePendingSwapRecoveryTests: InjectedDocumentsDirectoryTestCase {
+    private let rpc = RPCModule()
+
+    func testTheWedgeStateOfAllThreeFilesWithDistinctContentRecovers() throws {
+        try writeWalletFile(.WalletTempSwapFileName, content: "original-main")
+        try writeWalletFile(.WalletFileName, content: "fresh-main")
+        try writeWalletFile(.WalletBackupFileName, content: "original-backup")
+
+        rpc.completePendingSwap()
+
+        // Main has moved past the swap, so it survives untouched while the
+        // original main content becomes the backup.
+        XCTAssertFalse(walletFileExists(.WalletTempSwapFileName), "The temp file must always leave the disk.")
+        XCTAssertEqual(try readWalletFile(.WalletFileName), "fresh-main")
+        XCTAssertEqual(try readWalletFile(.WalletBackupFileName), "original-main")
+
+        // Recovery converged, so a second run must change nothing.
+        rpc.completePendingSwap()
+        XCTAssertFalse(walletFileExists(.WalletTempSwapFileName))
+        XCTAssertEqual(try readWalletFile(.WalletFileName), "fresh-main")
+        XCTAssertEqual(try readWalletFile(.WalletBackupFileName), "original-main")
+    }
+
+    func testAllThreeFilesWithMainEqualToTempCompleteTheSwap() throws {
+        try writeWalletFile(.WalletTempSwapFileName, content: "original-main")
+        try writeWalletFile(.WalletFileName, content: "original-main")
+        try writeWalletFile(.WalletBackupFileName, content: "original-backup")
+
+        rpc.completePendingSwap()
+
+        // Main was recreated with the original content, so the recovery
+        // drops that duplicate and finishes the swap.
+        XCTAssertFalse(walletFileExists(.WalletTempSwapFileName))
+        XCTAssertEqual(try readWalletFile(.WalletFileName), "original-backup")
+        XCTAssertEqual(try readWalletFile(.WalletBackupFileName), "original-main")
+    }
+
+    func testAllThreeFilesWithBackupEqualToTempOnlyDropTheTemp() throws {
+        try writeWalletFile(.WalletTempSwapFileName, content: "original-main")
+        try writeWalletFile(.WalletFileName, content: "original-backup")
+        try writeWalletFile(.WalletBackupFileName, content: "original-main")
+
+        rpc.completePendingSwap()
+
+        // The swap already completed; only the lingering temp goes away.
+        XCTAssertFalse(walletFileExists(.WalletTempSwapFileName))
+        XCTAssertEqual(try readWalletFile(.WalletFileName), "original-backup")
+        XCTAssertEqual(try readWalletFile(.WalletBackupFileName), "original-main")
+    }
+
+    func testOnlyTheTempFileExistsRestoresItAsMain() throws {
+        try writeWalletFile(.WalletTempSwapFileName, content: "original-main")
+
+        rpc.completePendingSwap()
+
+        // The temp is the only surviving copy of wallet data, so it must
+        // become the main wallet rather than a backup of nothing.
+        XCTAssertFalse(walletFileExists(.WalletTempSwapFileName))
+        XCTAssertEqual(try readWalletFile(.WalletFileName), "original-main")
+        XCTAssertFalse(walletFileExists(.WalletBackupFileName))
+    }
+
+    func testTempAndBackupFinishTheInterruptedSwap() throws {
+        try writeWalletFile(.WalletTempSwapFileName, content: "original-main")
+        try writeWalletFile(.WalletBackupFileName, content: "original-backup")
+
+        rpc.completePendingSwap()
+
+        // The crash fell between renames 1 and 2; renames 2 and 3 finish.
+        XCTAssertFalse(walletFileExists(.WalletTempSwapFileName))
+        XCTAssertEqual(try readWalletFile(.WalletFileName), "original-backup")
+        XCTAssertEqual(try readWalletFile(.WalletBackupFileName), "original-main")
+    }
+
+    func testTempAndMainFinishTheLastRename() throws {
+        try writeWalletFile(.WalletTempSwapFileName, content: "original-main")
+        try writeWalletFile(.WalletFileName, content: "original-backup")
+
+        rpc.completePendingSwap()
+
+        // The crash fell between renames 2 and 3; rename 3 finishes.
+        XCTAssertFalse(walletFileExists(.WalletTempSwapFileName))
+        XCTAssertEqual(try readWalletFile(.WalletFileName), "original-backup")
+        XCTAssertEqual(try readWalletFile(.WalletBackupFileName), "original-main")
+    }
+
+    func testWithoutATempFileNothingChanges() throws {
+        try writeWalletFile(.WalletFileName, content: "fresh-main")
+        try writeWalletFile(.WalletBackupFileName, content: "original-backup")
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try readWalletFile(.WalletFileName), "fresh-main")
+        XCTAssertEqual(try readWalletFile(.WalletBackupFileName), "original-backup")
+        XCTAssertFalse(walletFileExists(.WalletTempSwapFileName))
+    }
+}
+
+/// The post-init save-containment contract: a disk failure after a
+/// successful FFI init must not reject the whole wallet creation — the iOS
+/// twin of the Android contract "the init flows depend on a save failure
+/// not failing the whole init" (RPCModule.kt doSave). An empty server uri
+/// leaves the client Indexerless, so the init succeeds offline, and the
+/// injected documents directory is made read-only so only the post-init
+/// save fails.
+///
+/// Documented red state: before containment, fnCreateNewWallet rethrew the
+/// save failure, FfiOutcome classified it as rejected, and the reject
+/// closure below fired its XCTFail against the pre-fix implementation.
+final class CreateNewWalletSaveContainmentTests: InjectedDocumentsDirectoryTestCase {
+    func testCreateNewWalletResolvesWhenOnlyThePostInitSaveFails() throws {
+        setCryptoProvider()
+        // A read-only directory makes every wallet write fail after the
+        // FFI init has already succeeded in memory.
+        try FileManager.default.setAttributes([.posixPermissions: 0o555], ofItemAtPath: testDirectory)
+
+        let rpc = RPCModule()
+        let settled = expectation(description: "createNewWallet settles")
+        var resolvedValue: String?
+        rpc.createNewWallet(
+            "",
+            birthday: "1",
+            chainhint: "regtest",
+            performancelevel: "Medium",
+            minconfirmations: "1",
+            resolve: { value in
+                resolvedValue = value as? String
+                settled.fulfill()
+            },
+            reject: { code, message, _ in
+                XCTFail("A failed post-init save must not reject the init: \(code ?? "") \(message ?? "")")
+                settled.fulfill()
+            }
+        )
+        wait(for: [settled], timeout: 120)
+
+        // The init result reaches the resolve channel even though the save
+        // failed, and the absent wallet file proves the save really failed.
+        XCTAssertNotNil(resolvedValue)
+        XCTAssertFalse(resolvedValue?.isEmpty ?? true)
+        XCTAssertFalse(walletFileExists(.WalletFileName), "The save must actually fail to pin containment.")
+    }
+}
+
+/// The restore-failure classification contract at the native layer: a
+/// backup whose content fails the structural base64 guard settles the
+/// promise as the resolved string "false" — never a rejection and never a
+/// success value — matching Android's restoreExistingWalletBackup and the
+/// TypeScript seam that consumes the resolved value.
+final class RestoreBackupClassificationTests: InjectedDocumentsDirectoryTestCase {
+    func testAnInvalidBackupResolvesFalseWithoutRejecting() throws {
+        try writeWalletFile(.WalletBackupFileName, content: "Error: not base64 at all")
+
+        let rpc = RPCModule()
+        let settled = expectation(description: "restoreExistingWalletBackup settles")
+        var resolvedValue: String?
+        rpc.restoreExistingWalletBackup(
+            { value in
+                resolvedValue = value as? String
+                settled.fulfill()
+            },
+            reject: { code, message, _ in
+                XCTFail("An invalid backup must resolve, not reject: \(code ?? "") \(message ?? "")")
+                settled.fulfill()
+            }
+        )
+        wait(for: [settled], timeout: 30)
+
+        XCTAssertEqual(resolvedValue, "false")
     }
 }
