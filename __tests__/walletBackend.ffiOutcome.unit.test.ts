@@ -16,6 +16,7 @@ import RPCModule from '../app/RPCModule';
 import {
   createNewWallet,
   drainOrchardToIronwood,
+  fetchWallet,
   loadExistingWallet,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
@@ -28,6 +29,13 @@ const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 // A resolution that wears the historical error sentinel: it must pass
 // through every wrapper verbatim, never classified as a failure.
 const proseLikeData = 'Error: looks like prose but is legitimate data';
+
+// A rejection shaped as the native FfiOutcome settling produces it: React
+// Native surfaces promise.reject(code, error) to JS as an Error whose code
+// property carries the FFI's name.
+function typedRejection(code: string): Error {
+  return Object.assign(new Error(`${code}: bridge exploded`), { code });
+}
 
 describe('init family wrappers pass resolutions through and contain rejections', () => {
   const wrappers: Array<[string, string, () => Promise<string>]> = [
@@ -66,11 +74,17 @@ describe('init family wrappers pass resolutions through and contain rejections',
 describe('sync family rejections are contained and reported, never sniffed', () => {
   function makeCoordinator() {
     const onError = jest.fn();
+    // The rescan path resets every changed-callback before it reaches the
+    // bridge, so the stub must supply them all: a missing one would throw
+    // first, and that TypeError would satisfy the onError assertion without
+    // the bridge ever being called.
     const config = {
       onError,
       keepAwake: jest.fn(),
       onSyncStatusChanged: jest.fn(),
       onBalanceChanged: jest.fn(),
+      onValueTransfersChanged: jest.fn(),
+      onMessagesChanged: jest.fn(),
     } as unknown as ConstructorParameters<typeof SyncCoordinator>[0];
     const dataService = {} as ConstructorParameters<typeof SyncCoordinator>[1];
     return { coordinator: new SyncCoordinator(config, dataService), onError };
@@ -89,10 +103,13 @@ describe('sync family rejections are contained and reported, never sniffed', () 
 
   it('run_rescan', async () => {
     const { coordinator, onError } = makeCoordinator();
-    bridge.runRescanProcess.mockRejectedValueOnce(new Error('bridge exploded'));
+    bridge.runRescanProcess.mockRejectedValueOnce(typedRejection('run_rescan'));
 
     await coordinator.refreshSync(true);
 
+    // Both halves of the contract: the call reached the bridge, and its
+    // rejection was contained and reported instead of escaping.
+    expect(bridge.runRescanProcess).toHaveBeenCalledTimes(1);
     expect(onError).toHaveBeenCalledWith(
       expect.stringContaining('Error sync/rescan run'),
     );
@@ -225,6 +242,26 @@ describe('read getter rejections are contained and reported, never sniffed', () 
 
     expect(onError).not.toHaveBeenCalled();
     expect(config.onZingolibVersionChanged).toHaveBeenCalledWith('error-1.2.3');
+  });
+});
+
+describe('secret-material getter rejections surface as failure, never as data', () => {
+  // The Rust failure arms of get_seed and get_ufvk (a view-only wallet, a
+  // serialize failure, a UFVK-conversion failure) reject typed on the error
+  // channel. fetchWallet must classify such a rejection as its failure
+  // value (null) for the consumer, never let it escape or wear data.
+  it('get_seed', async () => {
+    bridge.getSeedInfo.mockRejectedValueOnce(typedRejection('get_seed'));
+
+    await expect(fetchWallet(false)).resolves.toBeNull();
+    expect(bridge.getSeedInfo).toHaveBeenCalledTimes(1);
+  });
+
+  it('get_ufvk', async () => {
+    bridge.getUfvkInfo.mockRejectedValueOnce(typedRejection('get_ufvk'));
+
+    await expect(fetchWallet(true)).resolves.toBeNull();
+    expect(bridge.getUfvkInfo).toHaveBeenCalledTimes(1);
   });
 });
 
