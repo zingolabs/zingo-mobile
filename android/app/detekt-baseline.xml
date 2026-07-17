@@ -7,6 +7,7 @@
     <ID>ArgumentListWrapping:BackgroundSyncWorker.kt$BackgroundSyncWorker$(context, workerParams)</ID>
     <ID>ArgumentListWrapping:RPCModule.kt$RPCModule$(reactContext)</ID>
     <ID>ArgumentListWrapping:RPCModule.kt$RPCModule$(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())</ID>
+    <ID>ArgumentListWrapping:RPCModule.kt$RPCModule$(serveruri, birthday.toUInt(), chainhint, performancelevel, minconfirmations.toUInt())</ID>
     <ID>ArgumentListWrapping:RPCModule.kt$RPCModule$(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())</ID>
     <ID>CommentSpacing:BackgroundSyncWorker.kt$BSCompanion.Companion$//private fun calculateInFiveMinutes(): Duration = 1.minutes</ID>
     <ID>CommentSpacing:BackgroundSyncWorker.kt$BSCompanion.Companion$//val targetTimeDiff = calculateInFiveMinutes()</ID>
@@ -40,6 +41,7 @@
     <ID>LargeClass:RPCModule.kt$RPCModule : ReactContextBaseJavaModule</ID>
     <ID>LongMethod:BackgroundSyncWorker.kt$BackgroundSyncWorker$@RequiresApi(Build.VERSION_CODES.O) override fun doWork(): Result</ID>
     <ID>LongParameterList:RPCModule.kt$RPCModule$(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
+    <ID>LongParameterList:RPCModule.kt$RPCModule$(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
     <ID>LongParameterList:RPCModule.kt$RPCModule$(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
     <ID>LoopWithTooManyJumpStatements:BackgroundSyncWorker.kt$BackgroundSyncWorker$while</ID>
     <ID>MagicNumber:BackgroundSyncWorker.kt$BackgroundSyncWorker$100.0</ID>
@@ -58,6 +60,7 @@
     <ID>MaxLineLength:RPCModule.kt$RPCModule$"[$fileName] encrypted read failed AND raw bytes are not a plain wallet — Keystore key likely lost: $encryptedReadError"</ID>
     <ID>MaxLineLength:RPCModule.kt$RPCModule$class</ID>
     <ID>MaxLineLength:RPCModule.kt$RPCModule$fun</ID>
+    <ID>MaxLineLength:RPCModule.kt$RPCModule$val resp = uniffi.zingo.initNew(serveruri, birthday.toUInt(), chainhint, performancelevel, minconfirmations.toUInt())</ID>
     <ID>MaxLineLength:RPCModule.kt$RPCModule$val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())</ID>
     <ID>MaxLineLength:RPCModule.kt$RPCModule$val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())</ID>
     <ID>MaximumLineLength:BackgroundSyncWorker.kt$BSCompanion.Companion$ </ID>
@@ -105,6 +108,7 @@
     <ID>PackageNaming:WalletBackup.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:WalletBackupRestorableTest.kt$package org.ZingoLabs.Zingo</ID>
     <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
+    <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
     <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String)</ID>
     <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
     <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>

@@ -1122,7 +1122,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-
     @ReactMethod
     fun checkMyAddressInfo(address: String, promise: Promise) {
         // The label used to say "create new unified address" — copy-paste

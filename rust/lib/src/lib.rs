@@ -416,8 +416,7 @@ pub fn init_new(
                 Some(uri) => {
                     let uri = uri.clone();
                     RT.block_on(async move {
-                        let mut indexer =
-                            GrpcIndexer::new(uri).await.map_err(|e| e.to_string())?;
+                        let mut indexer = GrpcIndexer::new(uri).await.map_err(|e| e.to_string())?;
                         indexer
                             .get_latest_block(INDEXER_REQUEST_TIMEOUT)
                             .await
