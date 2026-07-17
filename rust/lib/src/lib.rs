@@ -659,6 +659,7 @@ mod init_error_channel_tests {
     fn invalid_server_uri_travels_on_the_error_channel() {
         let error = init_new(
             "http://an invalid uri with spaces".to_string(),
+            0,
             "main".to_string(),
             "Medium".to_string(),
             1,
