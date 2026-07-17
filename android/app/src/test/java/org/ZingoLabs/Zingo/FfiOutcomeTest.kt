@@ -1,6 +1,7 @@
 package org.ZingoLabs.Zingo
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import uniffi.zingo.ZingolibException
 
@@ -60,6 +61,36 @@ class FfiOutcomeTest {
                 FfiOutcome.of(code) { proseLikeData },
             )
         }
+    }
+
+    @Test
+    fun aContainedSaveFailureDoesNotFailTheInit() {
+        // The init flows save the new wallet inside their settling block
+        // and depend on a save failure not failing the whole init: the
+        // save helper contains every failure as a returned false, which
+        // the block discards, so the promise still resolves with the
+        // init result (see RPCModule.createNewWallet). The real block is
+        // not drivable here — its init and save FFIs need the native
+        // library — so this pins the composition at the FfiOutcome seam,
+        // with a stand-in save that reports failure the same way.
+        val initResponse = """{"seed": "abandon"}"""
+        val failingSave = { false }
+        var saveReportedFailure = false
+
+        val outcome = FfiOutcome.of("init_new") {
+            saveReportedFailure = !failingSave()
+            initResponse
+        }
+
+        assertTrue(
+            "the save step must have reported its contained failure",
+            saveReportedFailure,
+        )
+        assertEquals(
+            "a contained save failure must not reject the init",
+            FfiOutcome.Resolved(initResponse),
+            outcome,
+        )
     }
 
     @Test
