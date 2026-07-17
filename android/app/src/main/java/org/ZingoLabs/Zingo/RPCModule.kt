@@ -502,6 +502,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreExistingWalletBackup(promise: Promise) {
         try {
             val backup = readFileAsB64(WalletBackupFileName.value)
+            // Check the content is correct before swapping it into place.
+            // Stored encoded, so the guard is structural (zingo-mobile#1151).
+            if (!WalletBackup.isRestorable(backup)) {
+                Log.e("MAIN", "Error: [Native] backup restore: content failed validation")
+                promise.resolve(false)
+                return
+            }
             if (fileExists(WalletFileName.value)) {
                 // Audit Issue P (b) — durable swap via temp file. The original
                 // main wallet only lives in memory while we overwrite main

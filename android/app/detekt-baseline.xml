@@ -91,6 +91,8 @@
     <ID>PackageName:MainApplication.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageName:RPCModule.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageName:RPCPackage.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:WalletBackup.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageName:WalletBackupRestorableTest.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:BackgroundSyncWorker.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:Constants.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:FfiDispatchTest.kt$package org.ZingoLabs.Zingo</ID>
@@ -100,6 +102,8 @@
     <ID>PackageNaming:MainApplication.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:RPCModule.kt$package org.ZingoLabs.Zingo</ID>
     <ID>PackageNaming:RPCPackage.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:WalletBackup.kt$package org.ZingoLabs.Zingo</ID>
+    <ID>PackageNaming:WalletBackupRestorableTest.kt$package org.ZingoLabs.Zingo</ID>
     <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
     <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String)</ID>
     <ID>ParameterListWrapping:RPCModule.kt$RPCModule$(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise)</ID>
