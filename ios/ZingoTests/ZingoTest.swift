@@ -616,7 +616,15 @@ class WalletFileBase64Tests: XCTestCase {
 
     func testPaddingIsAtMostTwoCharacters() {
         XCTAssertFalse(WalletExport.isValidBase64("A==="))
-        XCTAssertTrue(WalletExport.isValidBase64("AB=="))
+    }
+
+    func testTrailingBitsMustBeZero() {
+        // Non-canonical padding decodes downstream-dependently: the Rust
+        // STANDARD engine rejects it, so the guard must too.
+        XCTAssertFalse(WalletExport.isValidBase64("AB=="))
+        XCTAssertFalse(WalletExport.isValidBase64("AAB="))
+        XCTAssertTrue(WalletExport.isValidBase64("AA=="))
+        XCTAssertTrue(WalletExport.isValidBase64("AAA="))
     }
 }
 
