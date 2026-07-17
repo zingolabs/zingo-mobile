@@ -368,9 +368,11 @@ jobs:
       # lockstep with the zingolib we build against (a fixed tag like 011
       # drifts out of sync).
       - name: Resolve zingolib rev
+        env:
+          GH_REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
-          if [[ "${{ github.repository }}" == *zingolib* ]]; then
+          if [[ "$GH_REPOSITORY" == *zingolib* ]]; then
             REV="${GITHUB_SHA}"
           else
             line="$(grep -E '^zingolib[[:space:]]*=' rust/Cargo.toml)"

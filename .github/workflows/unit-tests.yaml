@@ -1,0 +1,105 @@
+name: Unit tests
+
+on:
+  workflow_call:
+
+jobs:
+  rust-kotlin-unit-tests:
+    name: Rust & Kotlin unit tests
+    runs-on: ubuntu-24.04
+    env:
+      RUSTFLAGS: -D warnings
+      REPO-OWNER: ${{ github.repository_owner }}
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Install protoc
+        run: |
+          sudo apt update
+          sudo apt install -y protobuf-compiler
+
+      - name: Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache-workspaces: rust -> rust/target
+
+      - name: Install nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: nextest
+
+      - name: Check Rust formatting
+        working-directory: ./rust
+        run: cargo fmt --check
+
+      - name: Run Rust unit tests
+        working-directory: ./rust
+        run: cargo nextest run -p zingo
+
+      - name: Clippy
+        working-directory: ./rust
+        run: cargo clippy -p zingo --all-targets -- -D warnings
+
+      - name: Install cargo-dupes
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-dupes@0.2.1
+
+      # Any exact or near duplicate code block outside the adoption
+      # baseline (rust/.dupes-ignore.toml) fails the build.
+      - name: cargo-dupes
+        working-directory: ./rust
+        run: cargo dupes check --max-exact 0 --max-near 0
+
+      # The Kotlin JVM unit tests compile the whole app module, which
+      # references the generated uniffi bindings; generate them for the
+      # debug build type the unit-test task compiles against. The dev
+      # profile reuses the dependency artifacts nextest just built.
+      - name: Generate Kotlin uniffi bindings
+        working-directory: ./rust/lib
+        run: |
+          cargo run --features=uniffi/cli --bin uniffi-bindgen -- \
+            generate ./src/zingo.udl --language kotlin \
+            --out-dir ../../android/app/build/generated/source/uniffi/debug/java
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      # The react-native gradle plugin resolves through node_modules, so
+      # gradle cannot configure the project without an install.
+      - name: Install node modules
+        run: yarn
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Gradle setup
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: wrapper
+
+      # The unit tests are flavor-independent pure-JVM tests; one flavor's
+      # debug variant covers them.
+      - name: Run Kotlin unit tests
+        working-directory: ./android
+        run: ./gradlew :app:testBetaDebugUnitTest
+
+      # Findings that predate adoption live in app/detekt-baseline.xml;
+      # only new or changed Kotlin is enforced (zingo-mobile#1166).
+      - name: Detekt
+        working-directory: ./android
+        run: ./gradlew :app:detekt

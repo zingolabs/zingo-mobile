@@ -83,9 +83,7 @@ describe.each([
   it('never mistakes resolved error prose for success', async () => {
     // The attack case: both bridges' catch blocks still resolve prose
     // instead of rejecting. That prose must classify as failure.
-    mocked().mockResolvedValueOnce(
-      'Error: [Native] saving wallet: disk full',
-    );
+    mocked().mockResolvedValueOnce('Error: [Native] saving wallet: disk full');
 
     await expect(wrapper()).resolves.toBe(false);
   });

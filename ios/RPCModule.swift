@@ -362,13 +362,22 @@ class RPCModule: NSObject {
     // initNew throws on failure, so reaching the save implies the wallet
     // exists. Offline (empty serveruri) uses `birthday` in place of the
     // chain tip; online it is ignored (pass "0").
-    let seed = try initNew(serveruri: serveruri, birthday: UInt32(birthday) ?? 0, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initNew(
+      serveruri: serveruri,
+      birthday: UInt32(birthday) ?? 0,
+      chainhint: chainhint,
+      performancelevel: performancelevel,
+      minconfirmations: UInt32(minconfirmations) ?? 0
+    )
     let seedStr = String(seed)
     try self.saveWalletInternal()
     return seedStr
   }
 
   @objc(createNewWallet:birthday:chainhint:performancelevel:minconfirmations:resolve:reject:)
+  // The parameter list is fixed by the React Native bridge selector;
+  // seven parameters is the contract, not a style choice.
+  // swiftlint:disable:next function_parameter_count
   func createNewWallet(
     _ serveruri: String,
     birthday: String,
@@ -379,7 +388,13 @@ class RPCModule: NSObject {
     reject: @escaping RCTPromiseRejectBlock
   ) {
     FfiOutcome.of("init_new") {
-      try self.fnCreateNewWallet(serveruri: serveruri, birthday: birthday, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+      try self.fnCreateNewWallet(
+        serveruri: serveruri,
+        birthday: birthday,
+        chainhint: chainhint,
+        performancelevel: performancelevel,
+        minconfirmations: minconfirmations
+      )
     }.settle(resolve: resolve, reject: reject)
   }
   
@@ -1539,7 +1554,10 @@ class RPCModule: NSObject {
   }
 
   @objc(drainOrchardToIronwoodProcess:reject:)
-  func drainOrchardToIronwoodProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func drainOrchardToIronwoodProcess(
+    _ resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of("drain_orchard_to_ironwood") {
           try drainOrchardToIronwood()

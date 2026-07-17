@@ -89,7 +89,7 @@ while getopts 'a:l:t:sx:h' OPTION; do
 
             # Check API level is valid
             # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
-            if [[ $(echo ${valid_api_levels[@]} | tr -d '-' | grep -ow "$(echo ${api_level} | tr -d '-')" | wc -w) != 1 ]]; then
+            if [[ $(echo "${valid_api_levels[@]}" | tr -d '-' | grep -ow "$(echo ${api_level} | tr -d '-')" | wc -w) != 1 ]]; then
                 echo "Error: Invalid API level" >&2
                 echo "Try '$(basename $0) -h' for more information." >&2
                 exit 1
@@ -102,7 +102,7 @@ while getopts 'a:l:t:sx:h' OPTION; do
 
             # Check API target is valid
             # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
-            if [[ $(echo ${valid_api_targets[@]} | tr -d '-' | grep -ow "$(echo ${api_target} | tr -d '-')" | wc -w) != 1 ]]; then
+            if [[ $(echo "${valid_api_targets[@]}" | tr -d '-' | grep -ow "$(echo ${api_target} | tr -d '-')" | wc -w) != 1 ]]; then
                 echo "Error: Invalid API target" >&2
                 echo "Try '$(basename $0) -h' for more information." >&2
                 exit 1

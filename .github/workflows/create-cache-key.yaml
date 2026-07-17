@@ -44,7 +44,7 @@ jobs:
           echo "$first_line" | grep -vqE '\b(branch|tag)[[:space:]]*='
 
       - name: Store Cargo version
-        run: echo $(cargo --version) >> rust/cargo_version.txt
+        run: cargo --version >> rust/cargo_version.txt
 
       - name: Create cache key
         id: create-cache-key
