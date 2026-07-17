@@ -42,6 +42,9 @@ class FfiOutcomeTest {
         "get_value_transfers" to ZingolibException.Read("boom"),
         "get_messages" to ZingolibException.Read("boom"),
         "get_latest_block_server" to ZingolibException.Read("boom"),
+        // The Ironwood drain, whose domain failures are the typed Drain
+        // variant.
+        "drain_orchard_to_ironwood" to ZingolibException.Drain("boom"),
     )
 
     @Test

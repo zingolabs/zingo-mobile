@@ -15,6 +15,7 @@ export {
   createNewWallet,
   doSave,
   doSaveBackup,
+  drainOrchardToIronwood,
   fetchWallet,
   getBalanceInfo,
   getDonationAddress,

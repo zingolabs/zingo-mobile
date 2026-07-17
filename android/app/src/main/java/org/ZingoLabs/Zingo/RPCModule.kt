@@ -1126,7 +1126,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-
     @ReactMethod
     fun checkMyAddressInfo(address: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -1253,6 +1252,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(errorMessage)
                 }
             }
+        }
+    }
+
+    @ReactMethod
+    fun drainOrchardToIronwoodProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "drain_orchard_to_ironwood") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.drainOrchardToIronwood()
         }
     }
 

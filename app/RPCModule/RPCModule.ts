@@ -103,6 +103,7 @@ interface RPCModuleAPI {
   sendProcess(sendJson: string): Promise<string>;
   shieldProcess(): Promise<string>;
   confirmProcess(): Promise<string>;
+  drainOrchardToIronwoodProcess(): Promise<string>;
 
   // Wallet options / configuration
   getOptionWalletInfo(): Promise<string>;

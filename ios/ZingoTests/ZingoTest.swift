@@ -852,6 +852,9 @@ class FfiOutcomeTests: XCTestCase {
         ("get_value_transfers", ZingolibError.Read(message: "boom")),
         ("get_messages", ZingolibError.Read(message: "boom")),
         ("get_latest_block_server", ZingolibError.Read(message: "boom")),
+        // The Ironwood drain, whose domain failures are the typed Drain
+        // variant.
+        ("drain_orchard_to_ironwood", ZingolibError.Drain(message: "boom"))
     ]
 
     func testResolvedValuesPassThroughUnclassified() {

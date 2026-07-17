@@ -50,6 +50,7 @@ use zingolib::data::receivers::Receivers;
 use zingolib::data::receivers::transaction_request_from_receivers;
 use zingolib::lightclient::LightClient;
 use zingolib::lightclient::error::LightClientError;
+use zingolib::lightclient::migrate::DrainSummary;
 use zingolib::utils::{conversion::address_from_str, conversion::txid_from_hex_encoded_str};
 use zingolib::wallet::WalletSettings;
 use zingolib::wallet::keys::{
@@ -79,6 +80,8 @@ pub enum ZingolibError {
     Rescan(String),
     #[error("Error: read: {0}")]
     Read(String),
+    #[error("Error: draining orchard to ironwood: {0}")]
+    Drain(String),
 }
 
 impl ZingolibError {
@@ -662,6 +665,7 @@ mod init_error_channel_tests {
     fn invalid_server_uri_travels_on_the_error_channel() {
         let error = init_new(
             "http://an invalid uri with spaces".to_string(),
+            0,
             "main".to_string(),
             "Medium".to_string(),
             1,
@@ -1887,4 +1891,84 @@ pub fn confirm() -> Result<String, ZingolibError> {
             Err(ZingolibError::LightclientNotInitialized)
         }
     })
+}
+
+/// Maps a drain result onto the FFI channels structurally: the summary
+/// crosses the data channel as JSON, and failure travels on the error
+/// channel as the typed Drain variant. No shape of success can resemble
+/// failure, so no boundary ever classifies content
+/// (zingolabs/zingo-mobile#1151). Pure — no lock, no runtime — so it runs
+/// under plain unit tests.
+fn encode_drain_summary(
+    drain_result: Result<DrainSummary, impl std::fmt::Display>,
+) -> Result<String, ZingolibError> {
+    match drain_result {
+        Ok(summary) => Ok(object! {
+            "txids" => summary.txids.iter().map(ToString::to_string).collect::<Vec<_>>(),
+            "migrated" => summary.migrated,
+            "fee" => summary.fee,
+            "dust" => summary.stranded,
+        }
+        .pretty(2)),
+        Err(e) => Err(ZingolibError::Drain(e.to_string())),
+    }
+}
+
+/// Sends every spendable Orchard note into the Ironwood pool in one round of
+/// independent transactions (the immediate migration ZIP 318 permits).
+/// All the transfers are broadcast at once, so they correlate with each other
+/// and with the wallet's activity. Notes worth
+/// less than the cost of spending them are left behind and reported as
+/// `dust`.
+pub fn drain_orchard_to_ironwood() -> Result<String, ZingolibError> {
+    with_initialized_lightclient(|lightclient| {
+        RT.block_on(async move {
+            encode_drain_summary(lightclient.drain_orchard_to_ironwood(AccountId::ZERO).await)
+        })
+    })
+}
+
+#[cfg(test)]
+mod drain_channel_tests {
+    use super::*;
+
+    fn summary() -> DrainSummary {
+        DrainSummary {
+            txids: vec![],
+            migrated: 5_000,
+            fee: 20_000,
+            stranded: 54,
+        }
+    }
+
+    #[test]
+    fn a_summary_crosses_the_data_channel_as_json() {
+        let encoded = encode_drain_summary(Ok::<_, String>(summary()))
+            .expect("a drain summary is data, never failure");
+        let parsed = json::parse(&encoded).expect("the data channel carries JSON");
+        assert_eq!(parsed["migrated"].as_u64(), Some(5_000));
+        assert_eq!(parsed["fee"].as_u64(), Some(20_000));
+        assert_eq!(parsed["dust"].as_u64(), Some(54));
+        assert!(parsed["txids"].is_array());
+    }
+
+    #[test]
+    fn a_drain_failure_travels_on_the_error_channel() {
+        let error = encode_drain_summary(Err::<DrainSummary, _>("insufficient funds"))
+            .expect_err("a drain failure must be typed, not prose in the data channel");
+        assert!(
+            matches!(error, ZingolibError::Drain(_)),
+            "the failure must be the typed Drain variant: {error}"
+        );
+    }
+
+    #[test]
+    fn drain_fails_typed_without_a_client() {
+        let error = drain_orchard_to_ironwood()
+            .expect_err("no client is initialized in a unit-test process");
+        assert!(
+            matches!(error, ZingolibError::LightclientNotInitialized),
+            "the failure must be the typed uninitialized variant: {error}"
+        );
+    }
 }
