@@ -9,6 +9,7 @@ import { WalletType, GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { RPCZecPriceType } from '../types/RPCZecPriceType';
 import { RPCSeedType } from '../types/RPCSeedType';
+import { RPCIronwoodDrainType } from '../types/RPCIronwoodDrainType';
 
 /**
  * Fetches the current ZEC/USD price from the zingolib price oracle.
@@ -568,6 +569,27 @@ export async function shieldConfirm(): Promise<string> {
   } catch (error) {
     console.log(`Critical Error shield ${error}`);
     return `Error: ${error}`;
+  }
+}
+
+// Sends every spendable Orchard note into the Ironwood pool in one round of
+// independent transactions (the immediate migration ZIP 318 permits). Notes
+// worth less than the cost of spending them are left behind and reported as
+// `dust` in the parsed summary.
+export async function drainOrchardToIronwood(): Promise<{
+  result: RPCIronwoodDrainType | null;
+  error: string;
+}> {
+  // The bridge rejects on failure (typed FFI errors) and resolves the
+  // summary JSON; the parse is the structural check and the catch owns
+  // the error path, so the resolution is never sniffed for a sentinel.
+  try {
+    const resultStr: string = await RPCModule.drainOrchardToIronwoodProcess();
+    const resultJSON: RPCIronwoodDrainType = JSON.parse(resultStr);
+    return { result: resultJSON, error: '' };
+  } catch (error) {
+    console.log(`Error drain orchard to ironwood ${error}`);
+    return { result: null, error: `Error: ${error}` };
   }
 }
 

@@ -1538,4 +1538,13 @@ class RPCModule: NSObject {
       }
   }
 
+  @objc(drainOrchardToIronwoodProcess:reject:)
+  func drainOrchardToIronwoodProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of("drain_orchard_to_ironwood") {
+          try drainOrchardToIronwood()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
 }

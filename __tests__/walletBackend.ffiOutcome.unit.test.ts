@@ -8,21 +8,14 @@
  * These are the TS twins of the Rust init_error_channel_tests, the
  * Kotlin FfiOutcomeTest, and the Swift FfiOutcomeTests.
  */
-// Every member of the mocked bridge is a lazily created jest.fn, so a future
-// import-time touch of some other RPCModule member cannot break this suite.
-jest.mock('../app/RPCModule', () => {
-  const members: Record<PropertyKey, jest.Mock> = {};
-  return {
-    __esModule: true,
-    default: new Proxy(members, {
-      get: (target, prop) => (target[prop] ??= jest.fn()),
-    }),
-  };
-});
+jest.mock('../app/RPCModule', () =>
+  require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
+);
 
 import RPCModule from '../app/RPCModule';
 import {
   createNewWallet,
+  drainOrchardToIronwood,
   loadExistingWallet,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
@@ -236,5 +229,29 @@ describe('read getter rejections are contained and reported, never sniffed', () 
 
     expect(onError).not.toHaveBeenCalled();
     expect(config.onZingolibVersionChanged).toHaveBeenCalledWith('error-1.2.3');
+  });
+});
+
+describe('drain_orchard_to_ironwood wrapper learns outcomes from the promise channel', () => {
+  it('parses a resolved summary structurally', async () => {
+    bridge.drainOrchardToIronwoodProcess.mockResolvedValueOnce(
+      '{"txids":["aa"],"migrated":5000,"fee":20000,"dust":54}',
+    );
+
+    await expect(drainOrchardToIronwood()).resolves.toEqual({
+      result: { txids: ['aa'], migrated: 5000, fee: 20000, dust: 54 },
+      error: '',
+    });
+  });
+
+  it('contains a rejection as an error result, never an escaping exception', async () => {
+    bridge.drainOrchardToIronwoodProcess.mockRejectedValueOnce(
+      new Error('bridge exploded'),
+    );
+
+    const outcome = await drainOrchardToIronwood();
+
+    expect(outcome.result).toBeNull();
+    expect(outcome.error).toMatch(/^Error: /);
   });
 });
