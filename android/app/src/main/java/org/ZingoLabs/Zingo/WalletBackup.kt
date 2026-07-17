@@ -1,5 +1,7 @@
 package org.ZingoLabs.Zingo
 
+import java.util.Base64
+
 /**
  * Classifies wallet-file content read back from disk before
  * restoreExistingWalletBackup swaps it into place — the same guard the
@@ -10,9 +12,17 @@ package org.ZingoLabs.Zingo
  * dependencies — so it runs under plain JVM unit tests.
  */
 object WalletBackup {
-    // The red half of a red-to-green pair: today the restore path
-    // validates nothing, so everything is restorable. The green half
-    // replaces this with the structural check the tests pin.
-    @Suppress("UNUSED_PARAMETER", "FunctionOnlyReturningConstant")
-    fun isRestorable(content: String): Boolean = true
+    // Canonical: exactly the strings the encoder emits and the Rust
+    // STANDARD engine accepts, checked by decode/re-encode round-trip.
+    // (The JDK decoder alone tolerates non-zero trailing padding bits,
+    // which Rust rejects.)
+    fun isRestorable(content: String): Boolean {
+        val decoded = try {
+            Base64.getDecoder().decode(content)
+        } catch (_: IllegalArgumentException) {
+            return false
+        }
+        return content.isNotEmpty() &&
+            Base64.getEncoder().encodeToString(decoded) == content
+    }
 }
