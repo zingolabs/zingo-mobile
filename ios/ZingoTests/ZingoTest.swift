@@ -821,4 +821,54 @@ class WalletExportClassificationTests: XCTestCase {
         }
         XCTAssertEqual(WalletExport.classify("ABCD"), .validExport(base64: "ABCD"))
     }
+
+    func testPaddingIsAtMostTwoCharacters() {
+        guard case .invalid = WalletExport.classify("A===") else {
+            return XCTFail("three padding characters must classify as invalid")
+        }
+        XCTAssertEqual(WalletExport.classify("AB=="), .validExport(base64: "AB=="))
+    }
+}
+
+/// The bridge-outcome contract for every migrated FFI (zingo-mobile#1151):
+/// whether a call succeeded is knowable from the channel of its result —
+/// resolved versus rejected — never from its content. One case per FFI,
+/// exercising the typed error family the Rust side now throws for it.
+/// These are the Swift twins of the Rust init_error_channel_tests, the
+/// Kotlin FfiOutcomeTest, and the TypeScript ffiOutcome tests.
+class FfiOutcomeTests: XCTestCase {
+    private let ffiFailures: [(code: String, error: ZingolibError)] = [
+        ("init_new", ZingolibError.Init(message: "boom")),
+        ("init_from_seed", ZingolibError.Init(message: "boom")),
+        ("init_from_ufvk", ZingolibError.Init(message: "boom")),
+        ("init_from_b64", ZingolibError.Init(message: "boom")),
+        ("run_sync", ZingolibError.Sync(message: "boom")),
+        ("pause_sync", ZingolibError.Sync(message: "boom")),
+        ("status_sync", ZingolibError.Sync(message: "boom")),
+        ("poll_sync", ZingolibError.Sync(message: "boom")),
+        ("run_rescan", ZingolibError.Rescan(message: "boom")),
+    ]
+
+    func testResolvedValuesPassThroughUnclassified() {
+        // The value deliberately wears the historical error sentinel:
+        // classification must be by channel, never by content.
+        let proseLikeData = "Error: looks like prose but is legitimate data"
+
+        for (code, _) in ffiFailures {
+            guard case .resolved(let value) = FfiOutcome.of(code, { proseLikeData }) else {
+                return XCTFail("FFI \(code) must resolve")
+            }
+            XCTAssertEqual(value, proseLikeData, "FFI \(code) must resolve its value verbatim")
+        }
+    }
+
+    func testThrownFfiErrorsRejectUnderTheFfiName() {
+        for (code, failure) in ffiFailures {
+            guard case .rejected(let rejectedCode, let error) = FfiOutcome.of(code, { throw failure }) else {
+                return XCTFail("FFI \(code) must reject on a thrown error")
+            }
+            XCTAssertEqual(rejectedCode, code)
+            XCTAssertTrue(error is ZingolibError, "FFI \(code) must reject with its typed error")
+        }
+    }
 }

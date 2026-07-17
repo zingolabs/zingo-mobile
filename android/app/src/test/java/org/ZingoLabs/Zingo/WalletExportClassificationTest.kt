@@ -72,4 +72,16 @@ class WalletExportClassificationTest {
             WalletExport.classify("ABCD"),
         )
     }
+
+    @Test
+    fun paddingIsAtMostTwoCharacters() {
+        assertTrue(
+            WalletExport.classify("A===")
+                is WalletExportClassification.Invalid,
+        )
+        assertEquals(
+            WalletExportClassification.ValidExport("AB=="),
+            WalletExport.classify("AB=="),
+        )
+    }
 }

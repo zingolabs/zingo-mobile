@@ -461,27 +461,10 @@ extension AppDelegate {
                 }
                 var syncStatusJson: String = ""
                 do {
+                  // statusSync throws on failure (typed FFI errors); the
+                  // catch below owns the error path, so the status JSON is
+                  // never inspected for an error sentinel.
                   syncStatusJson = try statusSync()
-                  if syncStatusJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-                    NSLog("BGTask syncingProcessBackgroundTask - sync STATUS error: \(syncStatusJson)")
-                    
-                    // save the background file
-                    let timeStampError = Date().timeIntervalSince1970
-                    let timeStampStrError = String(format: "%.0f", timeStampError)
-                    let jsonBackgroundError = self.buildBackgroundJSON(message: "Status sync process KO.", dateEnd: timeStampStrError, error: "Status sync process KO. \(syncStatusJson)")
-                    do {
-                      try rpcmodule.saveBackgroundFile(jsonBackgroundError)
-                      NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-                    } catch {
-                      NSLog("BGTask syncingProcessBackgroundTask - Save background JSON error: \(error.localizedDescription)")
-                    }
-                    
-                    if let task = self.bgTask {
-                      task.setTaskCompleted(success: false)
-                    }
-                    bgTask = nil
-                    return
-                  }
                 } catch {
                   NSLog("BGTask syncingProcessBackgroundTask - sync STATUS error: \(error.localizedDescription)")
 
