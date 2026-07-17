@@ -6,10 +6,30 @@ on:
     branches: [main, dev, stable]
   workflow_dispatch:
 
+# A new push to a PR supersedes the run already in flight; halt it and free
+# its runners. Pushes to the long-lived branches still run to completion so
+# they finish populating the build caches.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
     secrets: inherit
+
+  unit-tests:
+    uses: ./.github/workflows/unit-tests.yaml
+
+  ts-checks:
+    uses: ./.github/workflows/ts-checks.yaml
+    secrets: inherit
+
+  swiftlint:
+    uses: ./.github/workflows/swiftlint.yaml
+
+  meta-lint:
+    uses: ./.github/workflows/meta-lint.yaml
 
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml

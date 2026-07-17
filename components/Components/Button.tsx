@@ -103,14 +103,10 @@ const Button: React.FunctionComponent<ButtonProps> = ({
                 color: colors.text,
                 textTransform: 'none',
               }
-            : type === ButtonTypeEnum.Nym
-              ? {
-                  color: colors.background,
-                }
-              : {
-                  // error
-                  color: colors.background,
-                };
+            : {
+                // Nym, and the fallback for an unknown type
+                color: colors.background,
+              };
   const styleTextCommon: TextStyle = {
     fontWeight: '600',
     textTransform: 'none',

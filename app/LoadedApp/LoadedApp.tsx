@@ -1495,22 +1495,18 @@ export class LoadedAppClass extends Component<
   sendTransaction = async (
     sendPageState: SendPageStateClass,
   ): Promise<String> => {
-    try {
-      // Construct a sendJson from the sendPage state
-      const { server, donation, defaultUnifiedAddress } = this.state;
-      const sendJson = await Utils.getSendManyJSON(
-        sendPageState,
-        defaultUnifiedAddress,
-        server,
-        donation,
-      );
-      //const start = Date.now();
-      const txid = await this.rpc.sendTransaction(sendJson);
+    // Construct a sendJson from the sendPage state
+    const { server, donation, defaultUnifiedAddress } = this.state;
+    const sendJson = await Utils.getSendManyJSON(
+      sendPageState,
+      defaultUnifiedAddress,
+      server,
+      donation,
+    );
+    //const start = Date.now();
+    const txid = await this.rpc.sendTransaction(sendJson);
 
-      return txid;
-    } catch (err) {
-      throw err;
-    }
+    return txid;
   };
 
   doRefresh = (screen: ScreenEnum) => {

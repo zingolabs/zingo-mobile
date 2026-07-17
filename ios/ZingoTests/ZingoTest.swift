@@ -182,60 +182,98 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
     XCTFail("Sync timeout after \(timeoutSeconds) seconds")
 }
 
+/// Initializes the test wallet from a seed on regtest and pins the init
+/// echo. Fails the test and returns false when init does not succeed, so
+/// callers can guard on it.
+private func initWalletFromSeed(serveruri: String, seed: String = Seeds.HOSPITAL) -> Bool {
+    do {
+        let initJson = try initFromSeed(
+            seed: seed,
+            birthday: UInt32(1),
+            serveruri: serveruri,
+            chainhint: "regtest",
+            performancelevel: "Medium",
+            minconfirmations: UInt32(1)
+        )
+        print("\nInit from seed:\n\(initJson)")
+        let initRes: InitFromSeed = try decodeJSON(initJson)
+        XCTAssertEqual(initRes.seed_phrase, seed)
+        XCTAssertEqual(initRes.birthday, 1)
+        return true
+    } catch {
+        XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+        return false
+    }
+}
+
+/// Fetches the connected lightwalletd's info and returns its latest block
+/// height, which must be positive. Fails the test and returns nil on error,
+/// so callers can guard on it.
+private func latestBlockHeightOrFail() -> UInt64? {
+    do {
+        let infoJson = try infoServer()
+        print("\nInfo:\n\(infoJson)")
+        let info: Info = try decodeJSON(infoJson)
+        XCTAssertGreaterThan(info.latest_block_height, UInt64.zero)
+        return info.latest_block_height
+    } catch {
+        XCTFail("\nInfo error:\n\(error.localizedDescription)")
+        return nil
+    }
+}
+
+/// Launches a sync and waits for it to complete. A failed launch prints and
+/// falls through to the wait, preserving the tests' historical tolerance: a
+/// concurrent launch reports as status, and the poll below fails the test if
+/// no sync is actually running.
+private func syncAndWait() {
+    do {
+        let syncJson = try runSync()
+        print("\nSync:\n\(syncJson)")
+    } catch {
+        print("\nSync error:\n\(error.localizedDescription)")
+    }
+    waitForSyncOrFail()
+}
+
+/// Pins the wallet's first unified and transparent addresses to the values
+/// the HOSPITAL seed derives on regtest.
+private func assertHospitalAddresses() {
+    do {
+        let addrsJson = try getUnifiedAddresses()
+        print("\nAddresses:\n\(addrsJson)")
+        let addrs: [UnifiedAddress] = try decodeJSON(addrsJson)
+        XCTAssertEqual(
+            addrs[0].encoded_address,
+            "u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd"
+        )
+        XCTAssertEqual(addrs[0].has_orchard, true)
+        XCTAssertEqual(addrs[0].has_sapling, false)
+        XCTAssertEqual(addrs[0].has_transparent, false)
+    } catch {
+        XCTFail("\nAddresses error:\n\(error.localizedDescription)")
+        return
+    }
+
+    do {
+        let tAddrsJson = try getTransparentAddresses()
+        print("\nT Addresses:\n\(tAddrsJson)")
+        let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
+        XCTAssertEqual(tAddrs[0].encoded_address, "t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        XCTAssertEqual(tAddrs[0].scope, "external")
+    } catch {
+        XCTFail("\nT Addresses error:\n\(error.localizedDescription)")
+    }
+}
+
 final class ExecuteAddressesFromSeed: XCTestCase {
     func testExecuteAddressesFromSeed() throws {
         setCryptoProvider()
 
-        let serveruri = "http://127.0.0.1:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
+        guard initWalletFromSeed(serveruri: "http://127.0.0.1:20000") else { return }
+        guard latestBlockHeightOrFail() != nil else { return }
 
-        do {
-            let initJson = try initFromSeed(seed: seed, birthday:UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-            print("\nInit from seed:\n\(initJson)")
-            let initRes: InitFromSeed = try decodeJSON(initJson)
-            XCTAssertEqual(initRes.seed_phrase, seed)
-            XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
-
-        do {
-            let addrsJson = try getUnifiedAddresses()
-            print("\nAddresses:\n\(addrsJson)")
-            let addrs: [UnifiedAddress] = try decodeJSON(addrsJson)
-            XCTAssertEqual(addrs[0].encoded_address, "u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
-            XCTAssertEqual(addrs[0].has_orchard, true)
-            XCTAssertEqual(addrs[0].has_sapling, false)
-            XCTAssertEqual(addrs[0].has_transparent, false)
-        } catch {
-          XCTFail("\nAddresses error:\n\(error.localizedDescription)")
-          return
-        }
-
-        do {
-            let tAddrsJson = try getTransparentAddresses()
-            print("\nT Addresses:\n\(tAddrsJson)")
-            let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
-            XCTAssertEqual(tAddrs[0].encoded_address, "t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
-            XCTAssertEqual(tAddrs[0].scope, "external")
-        } catch {
-          XCTFail("\nT Addresses error:\n\(error.localizedDescription)")
-          return
-        }
+        assertHospitalAddresses()
     }
 }
 
@@ -258,17 +296,7 @@ final class ExecuteAddressFromUfvk: XCTestCase {
           return
         }
 
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
+        guard latestBlockHeightOrFail() != nil else { return }
 
         do {
           let exportJson = try getUfvk()
@@ -281,62 +309,16 @@ final class ExecuteAddressFromUfvk: XCTestCase {
           return
         }
 
-        do {
-            let addrsJson = try getUnifiedAddresses()
-            print("\nAddresses:\n\(addrsJson)")
-            let addrs: [UnifiedAddress] = try decodeJSON(addrsJson)
-            XCTAssertEqual(addrs[0].encoded_address, "u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
-            XCTAssertEqual(addrs[0].has_orchard, true)
-            XCTAssertEqual(addrs[0].has_sapling, false)
-            XCTAssertEqual(addrs[0].has_transparent, false)
-        } catch {
-          XCTFail("\nAddresses error:\n\(error.localizedDescription)")
-          return
-        }
-
-        do {
-            let tAddrsJson = try getTransparentAddresses()
-            print("\nT Addresses:\n\(tAddrsJson)")
-            let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
-            XCTAssertEqual(tAddrs[0].encoded_address, "t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
-            XCTAssertEqual(tAddrs[0].scope, "external")
-        } catch {
-          XCTFail("\nT Addresses error:\n\(error.localizedDescription)")
-          return
-        }
-
+        assertHospitalAddresses()
     }
 }
 
 final class ExecuteVersionFromSeed: XCTestCase {
     func testExecuteVersionFromSeed() throws {
         setCryptoProvider()
-        let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
 
-        do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-          print("\nInit from seed:\n\(initJson)")
-          let initRes: InitFromSeed = try decodeJSON(initJson)
-          XCTAssertEqual(initRes.seed_phrase, seed)
-          XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
+        guard initWalletFromSeed(serveruri: "http://10.0.2.2:20000") else { return }
+        guard latestBlockHeightOrFail() != nil else { return }
 
         do {
             let version = try getVersion()
@@ -352,32 +334,9 @@ final class ExecuteVersionFromSeed: XCTestCase {
 final class ExecuteSyncFromSeed: XCTestCase {
     func testExecuteSyncFromSeed() throws {
         setCryptoProvider()
-        let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
 
-        do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-          print("\nInit from seed:\n\(initJson)")
-          let initRes: InitFromSeed = try decodeJSON(initJson)
-          XCTAssertEqual(initRes.seed_phrase, seed)
-          XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-        
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
+        guard initWalletFromSeed(serveruri: "http://10.0.2.2:20000") else { return }
+        guard let latestBlockHeight = latestBlockHeightOrFail() else { return }
 
         do {
             let hPreJson = try getLatestBlockWallet()
@@ -389,20 +348,13 @@ final class ExecuteSyncFromSeed: XCTestCase {
           return
         }
 
-        do {
-            let syncJson = try runSync()
-            print("\nSync:\n\(syncJson)")
-        } catch {
-          print("\nSync error:\n\(error.localizedDescription)")
-        }
-
-        waitForSyncOrFail()
+        syncAndWait()
 
         do {
             let hPostJson = try getLatestBlockWallet()
             print("\nHeight post-sync:\n\(hPostJson)")
             let hPost: Height = try decodeJSON(hPostJson)
-            XCTAssertEqual(hPost.height, latest_block_height)
+            XCTAssertEqual(hPost.height, latestBlockHeight)
         } catch {
           XCTFail("\nHeight post-sync error:\n\(error.localizedDescription)")
           return
@@ -410,44 +362,56 @@ final class ExecuteSyncFromSeed: XCTestCase {
     }
 }
 
+/// Resolves the wallet's first transparent address, failing the test and
+/// returning nil when there is none.
+private func firstTransparentAddressOrFail() -> String? {
+    do {
+        let tAddrsJson = try getTransparentAddresses()
+        print("\nT Addresses:\n\(tAddrsJson)")
+        let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
+        guard let addr = tAddrs.first?.encoded_address, !addr.isEmpty else {
+            XCTFail("No transparent address")
+            return nil
+        }
+        return addr
+    } catch {
+        XCTFail("\nT Addresses error:\n\(error.localizedDescription)")
+        return nil
+    }
+}
+
+/// Proposes and confirms a send of `amount` zatoshis to `address`, failing
+/// the test and returning false on either step's error.
+private func sendAndConfirmOrFail(to address: String, amount: Int64) -> Bool {
+    do {
+        let sendJson = SendResult(address: address, amount: amount, memo: nil)
+        let sendBodyData = try JSONEncoder().encode([sendJson])
+        let sendBody = String(data: sendBodyData, encoding: .utf8)!
+        let proposeJson = try send(sendJson: sendBody)
+        print("\nPropose:\n\(proposeJson)")
+    } catch {
+        XCTFail("\nPropose error:\n\(error.localizedDescription)")
+        return false
+    }
+
+    do {
+        let confirmJson = try confirm()
+        print("\nConfirm Txid:\n\(confirmJson)")
+        return true
+    } catch {
+        XCTFail("\nConfirm error:\n\(error.localizedDescription)")
+        return false
+    }
+}
+
 final class ExecuteSendFromOrchard: XCTestCase {
     func testExecuteSendFromOrchard() throws {
         setCryptoProvider()
-        let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
 
-        do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-          print("\nInit from seed:\n\(initJson)")
-          let initRes: InitFromSeed = try decodeJSON(initJson)
-          XCTAssertEqual(initRes.seed_phrase, seed)
-          XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
+        guard initWalletFromSeed(serveruri: "http://10.0.2.2:20000") else { return }
+        guard latestBlockHeightOrFail() != nil else { return }
 
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
-
-        do {
-            let syncJson = try runSync()
-            print("\nSync:\n\(syncJson)")
-        } catch {
-            print("\nSync error:\n\(error.localizedDescription)")
-        }
-
-        waitForSyncOrFail()
+        syncAndWait()
 
         do {
             let balJson = try getBalance()
@@ -460,51 +424,10 @@ final class ExecuteSendFromOrchard: XCTestCase {
           return
         }
 
-        var taddr: String? = nil
-        do {
-            let tAddrsJson = try getTransparentAddresses()
-            print("\nT Addresses:\n\(tAddrsJson)")
-            let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
-            guard let addr = tAddrs.first?.encoded_address else {
-                XCTFail("No transparent address")
-                return
-            }
-            taddr = addr
-        } catch {
-          XCTFail("\nT Addresses error:\n\(error.localizedDescription)")
-          return
-        }
+        guard let taddr = firstTransparentAddressOrFail() else { return }
+        guard sendAndConfirmOrFail(to: taddr, amount: 100_000) else { return }
 
-        let ta = try XCTUnwrap(taddr, "T address is nil")
-        XCTAssertFalse(ta.isEmpty, "T address is empty")
-      
-        do {
-          let sendJson = SendResult(address: ta, amount: 100_000, memo: nil)
-          let sendBodyData = try JSONEncoder().encode([sendJson])
-          let sendBody = String(data: sendBodyData, encoding: .utf8)!
-          let proposeJson = try send(sendJson: sendBody)
-          print("\nPropose:\n\(proposeJson)")
-        } catch {
-          XCTFail("\nPropose error:\n\(error.localizedDescription)")
-          return
-        }
-        
-        do {
-          let confirmJson = try confirm()
-          print("\nConfirm Txid:\n\(confirmJson)")
-        } catch {
-          XCTFail("\nConfirm error:\n\(error.localizedDescription)")
-          return
-        }
-        
-        do {
-            let syncJson2 = try runSync()
-            print("\nSync:\n\(syncJson2)")
-        } catch {
-            print("\nSync error:\n\(error.localizedDescription)")
-        }
-
-        waitForSyncOrFail()
+        syncAndWait()
 
         do {
             let balJson = try getBalance()
@@ -524,49 +447,18 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
     func testUpdateCurrentPriceAndValueTransfersFromSeed() throws {
         setCryptoProvider()
 
-        let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
-
-        do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-          print("\nInit from seed:\n\(initJson)")
-          let initRes: InitFromSeed = try decodeJSON(initJson)
-          XCTAssertEqual(initRes.seed_phrase, seed)
-          XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
+        guard initWalletFromSeed(serveruri: "http://10.0.2.2:20000") else { return }
+        guard latestBlockHeightOrFail() != nil else { return }
 
         do {
           let price = try zecPrice()
           print("\nPrice:\n\(price)")
         } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          XCTFail("\nPrice error:\n\(error.localizedDescription)")
           return
         }
-        
-        do {
-            let syncJson = try runSync()
-            print("\nSync:\n\(syncJson)")
-        } catch {
-            print("\nSync error:\n\(error.localizedDescription)")
-        }
 
-        waitForSyncOrFail()
+        syncAndWait()
 
         let recipientAddress = "uregtest1az7w9w3tdegf0srnsgqyqfhyfrpx2h6u4pkc2yq3ja552vzhwkjqgy4fu6a6kcu9280ppajamj2gcq9lx9x0zxdrsns94ml3e443a7t2dm50382mhtkleydrq74q5xlh6sel5u0qlrvflf20qgljzszd2ht9jmerwwahct9rtuc3nqdk"
 
@@ -603,41 +495,10 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
     func testExecuteSaplingBalanceFromSeed() throws {
         setCryptoProvider()
 
-        let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
+        guard initWalletFromSeed(serveruri: "http://10.0.2.2:20000") else { return }
+        guard latestBlockHeightOrFail() != nil else { return }
 
-        do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-          print("\nInit from seed:\n\(initJson)")
-          let initRes: InitFromSeed = try decodeJSON(initJson)
-          XCTAssertEqual(initRes.seed_phrase, seed)
-          XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
-
-        do {
-            let syncJson = try runSync()
-            print("\nSync:\n\(syncJson)")
-        } catch {
-            print("\nSync error:\n\(error.localizedDescription)")
-        }
-
-        waitForSyncOrFail()
+        syncAndWait()
 
         do {
             let vtJson = try getValueTransfers()
@@ -682,32 +543,8 @@ final class ExecuteParseAddressForTex: XCTestCase {
     func testExecuteParseAddressForTex() throws {
         setCryptoProvider()
 
-        let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
-
-        do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-          print("\nInit from seed:\n\(initJson)")
-          let initRes: InitFromSeed = try decodeJSON(initJson)
-          XCTAssertEqual(initRes.seed_phrase, seed)
-          XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
+        guard initWalletFromSeed(serveruri: "http://10.0.2.2:20000") else { return }
+        guard latestBlockHeightOrFail() != nil else { return }
 
         do {
           let resJson = try parseAddress(address: "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
@@ -727,32 +564,8 @@ final class ExecuteParseAddressInvalid: XCTestCase {
     func testExecuteParseAddressInvalid() throws {
         setCryptoProvider()
 
-        let serveruri = "http://127.0.0.1:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
-
-        do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-          print("\nInit from seed:\n\(initJson)")
-          let initRes: InitFromSeed = try decodeJSON(initJson)
-          XCTAssertEqual(initRes.seed_phrase, seed)
-          XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
+        guard initWalletFromSeed(serveruri: "http://127.0.0.1:20000") else { return }
+        guard latestBlockHeightOrFail() != nil else { return }
 
         do {
           let wrongJson = try parseAddress(address: "thiswontwork")
@@ -764,6 +577,116 @@ final class ExecuteParseAddressInvalid: XCTestCase {
         } catch {
           XCTFail("\nWrong address error:\n\(error.localizedDescription)")
           return
+        }
+    }
+}
+
+/// The wallet-file base64 guard (zingo-mobile#1151; audit Issue Q). The FFI
+/// save path now crosses as bytes, so the historical attack string — a valid
+/// base64 export beginning with "error" — is unrepresentable there; this
+/// validator's one remaining consumer is restoreExistingWalletBackup, which
+/// checks file content read back from disk. Its acceptance rules are pinned
+/// here: base64 is recognized by structure alone, never by sentinel.
+class WalletFileBase64Tests: XCTestCase {
+    func testContentResemblingAnErrorSentinelIsValid() {
+        // Every case variant of the historical sentinel is well-formed
+        // base64 and must validate.
+        XCTAssertTrue(WalletExport.isValidBase64("errorAAA"))
+        XCTAssertTrue(WalletExport.isValidBase64("ERRORAAA"))
+    }
+
+    func testFailureProseNeverValidates() {
+        // Prose always contains ':' and ' ', both outside the base64
+        // alphabet.
+        XCTAssertFalse(WalletExport.isValidBase64("Error: disk full"))
+    }
+
+    func testEmptyContentNeverValidates() {
+        XCTAssertFalse(WalletExport.isValidBase64(""))
+    }
+
+    func testMalformedContentNeverValidates() {
+        XCTAssertFalse(WalletExport.isValidBase64("not base64 at all"))
+    }
+
+    func testPaddingMayOnlyTrail() {
+        XCTAssertFalse(WalletExport.isValidBase64("AB=A"))
+        XCTAssertTrue(WalletExport.isValidBase64("ABCD"))
+    }
+
+    func testPaddingIsAtMostTwoCharacters() {
+        XCTAssertFalse(WalletExport.isValidBase64("A==="))
+    }
+
+    func testTrailingBitsMustBeZero() {
+        // Non-canonical padding decodes downstream-dependently: the Rust
+        // STANDARD engine rejects it, so the guard must too.
+        XCTAssertFalse(WalletExport.isValidBase64("AB=="))
+        XCTAssertFalse(WalletExport.isValidBase64("AAB="))
+        XCTAssertTrue(WalletExport.isValidBase64("AA=="))
+        XCTAssertTrue(WalletExport.isValidBase64("AAA="))
+    }
+}
+
+/// The bridge-outcome contract for every migrated FFI (zingo-mobile#1151):
+/// whether a call succeeded is knowable from the channel of its result —
+/// resolved versus rejected — never from its content. One case per FFI,
+/// exercising the typed error family the Rust side now throws for it.
+/// These are the Swift twins of the Rust init_error_channel_tests, the
+/// Kotlin FfiOutcomeTest, and the TypeScript ffiOutcome tests.
+class FfiOutcomeTests: XCTestCase {
+    private let ffiFailures: [(code: String, error: ZingolibError)] = [
+        ("init_new", ZingolibError.Init(message: "boom")),
+        ("init_from_seed", ZingolibError.Init(message: "boom")),
+        ("init_from_ufvk", ZingolibError.Init(message: "boom")),
+        ("init_from_b64", ZingolibError.Init(message: "boom")),
+        ("run_sync", ZingolibError.Sync(message: "boom")),
+        ("pause_sync", ZingolibError.Sync(message: "boom")),
+        ("status_sync", ZingolibError.Sync(message: "boom")),
+        ("poll_sync", ZingolibError.Sync(message: "boom")),
+        ("run_rescan", ZingolibError.Rescan(message: "boom")),
+        // The read getters' Rust sides are prose-free; their one typed
+        // failure family is the uninitialized client.
+        ("get_latest_block_wallet", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_version", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_unified_addresses", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_transparent_addresses", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_wallet_save_required", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_config_wallet_performance", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_wallet_version", ZingolibError.LightclientNotInitialized(message: "boom")),
+        // The save shells run the save internals, whose failures throw;
+        // success is the only value their data channel carries.
+        ("save_wallet_bytes", ZingolibError.Save(message: "boom")),
+        ("save_wallet_backup", ZingolibError.Save(message: "boom")),
+        // The wallet-read getters whose domain failures are the typed
+        // Read variant.
+        ("get_balance", ZingolibError.Read(message: "boom")),
+        ("get_spendable_balance_total", ZingolibError.Read(message: "boom")),
+        ("get_value_transfers", ZingolibError.Read(message: "boom")),
+        ("get_messages", ZingolibError.Read(message: "boom")),
+        ("get_latest_block_server", ZingolibError.Read(message: "boom"))
+    ]
+
+    func testResolvedValuesPassThroughUnclassified() {
+        // The value deliberately wears the historical error sentinel:
+        // classification must be by channel, never by content.
+        let proseLikeData = "Error: looks like prose but is legitimate data"
+
+        for (code, _) in ffiFailures {
+            guard case .resolved(let value) = FfiOutcome.of(code, { proseLikeData }) else {
+                return XCTFail("FFI \(code) must resolve")
+            }
+            XCTAssertEqual(value, proseLikeData, "FFI \(code) must resolve its value verbatim")
+        }
+    }
+
+    func testThrownFfiErrorsRejectUnderTheFfiName() {
+        for (code, failure) in ffiFailures {
+            guard case .rejected(let rejectedCode, let error) = FfiOutcome.of(code, { throw failure }) else {
+                return XCTFail("FFI \(code) must reject on a thrown error")
+            }
+            XCTAssertEqual(rejectedCode, code)
+            XCTAssertTrue(error is ZingolibError, "FFI \(code) must reject with its typed error")
         }
     }
 }

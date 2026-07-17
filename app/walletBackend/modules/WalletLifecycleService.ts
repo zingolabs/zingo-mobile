@@ -9,6 +9,7 @@ import { GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { WalletBackendConfig } from '../config/WalletBackendConfig';
 import { SyncCoordinator } from './SyncCoordinator';
+import { doSaveBackup } from '../utils/walletUtils';
 
 export class WalletLifecycleService {
   config: WalletBackendConfig;
@@ -25,8 +26,10 @@ export class WalletLifecycleService {
     if (exists && exists !== GlobalConst.false) {
       await this.syncCoordinator.pauseSyncProcess();
 
-      const backupResult = await RPCModule.doSaveBackup();
-      if (!backupResult || backupResult === GlobalConst.false) {
+      // doSaveBackup classifies the trimodal native resolution and contains
+      // rejections, so failure — including a rejected bridge promise — always
+      // lands on this branch instead of escaping changeWallet.
+      if (!(await doSaveBackup())) {
         return this.config.translate('rpc.backupwallet-error');
       }
 

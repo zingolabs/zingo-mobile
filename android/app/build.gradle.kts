@@ -5,6 +5,16 @@ plugins {
     id("com.android.application")
     id("com.facebook.react")
     id("org.jetbrains.kotlin.android")
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
+}
+
+// Static analysis for Kotlin (zingo-mobile#1166). The baseline suppresses
+// findings that predate adoption, so only new or changed code is enforced;
+// shrink it over time, never grow it. The plain `detekt` task needs no type
+// resolution, so it runs on the JVM without building the app.
+detekt {
+    buildUponDefaultConfig = true
+    baseline = file("detekt-baseline.xml")
 }
 
 /**
@@ -365,6 +375,12 @@ dependencies {
 
     // JSON parsing
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+
+    // JVM unit tests for pure logic (no device or emulator)
+    testImplementation("junit:junit:4.13.2")
+
+    // ktlint formatting rules surfaced through detekt
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
 
     // JUnit test runners
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
