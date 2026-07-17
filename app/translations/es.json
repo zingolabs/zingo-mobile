@@ -194,7 +194,8 @@
     "walletnotfound-error": "Error: No se encuentra ningún monedero.",
     "backupnotfound-error": "Error: No se encuentra ninguna copia de seguridad de ningún monedero.",
     "deletewallet-error": "Error: No se pudo borrar el monedero actual.",
-    "backupwallet-error": "Error: No se pudo guardar la copia de seguridad del monedero."
+    "backupwallet-error": "Error: No se pudo guardar la copia de seguridad del monedero.",
+    "restorebackupwallet-error": "Error: No se pudo restaurar la copia de seguridad del monedero."
   },
   "settings": {
     "section-preferences": "Preferencias",

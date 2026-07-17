@@ -194,7 +194,8 @@
     "walletnotfound-error": "Error: Herhangi bir cüzdan bulunamadı.",
     "backupnotfound-error": "Error: Herhangi bir cüzdan yedeği bulunamadı.",
     "deletewallet-error": "Error: Mevcut cüzdan silinemedi.",
-    "backupwallet-error": "Error: Cüzdan yedeği kaydedilemedi."
+    "backupwallet-error": "Error: Cüzdan yedeği kaydedilemedi.",
+    "restorebackupwallet-error": "Error: Cüzdan yedeği geri yüklenemedi."
   },
   "settings": {
     "section-preferences": "Tercihler",

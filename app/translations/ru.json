@@ -194,7 +194,8 @@
     "walletnotfound-error": "Error: Не удалось найти кошелёк.",
     "backupnotfound-error": "Error: Резервная копия кошелька не найдена.",
     "deletewallet-error": "Error: Не удалось удалить текущий кошелёк.",
-    "backupwallet-error": "Error: Не удалось сохранить резервную копию кошелька."
+    "backupwallet-error": "Error: Не удалось сохранить резервную копию кошелька.",
+    "restorebackupwallet-error": "Error: Не удалось восстановить резервную копию кошелька."
   },
   "settings": {
     "section-preferences": "Настройки",

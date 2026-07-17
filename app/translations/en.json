@@ -194,7 +194,8 @@
     "walletnotfound-error": "Error: Couldn't find any wallet.",
     "backupnotfound-error": "Error: Couldn't find any backup of any wallet.",
     "deletewallet-error": "Error: Couldn't delete the current wallet.",
-    "backupwallet-error": "Error: Couldn't save the wallet backup."
+    "backupwallet-error": "Error: Couldn't save the wallet backup.",
+    "restorebackupwallet-error": "Error: Couldn't restore the wallet backup."
   },
   "settings": {
     "section-preferences": "Preferences",
