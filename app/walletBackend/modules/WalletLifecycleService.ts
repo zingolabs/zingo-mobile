@@ -9,6 +9,7 @@ import { GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { WalletBackendConfig } from '../config/WalletBackendConfig';
 import { SyncCoordinator } from './SyncCoordinator';
+import { nativeSaveSucceeded } from '../utils/walletUtils';
 
 export class WalletLifecycleService {
   config: WalletBackendConfig;
@@ -26,7 +27,7 @@ export class WalletLifecycleService {
       await this.syncCoordinator.pauseSyncProcess();
 
       const backupResult = await RPCModule.doSaveBackup();
-      if (!backupResult || backupResult === GlobalConst.false) {
+      if (!nativeSaveSucceeded(backupResult)) {
         return this.config.translate('rpc.backupwallet-error');
       }
 
