@@ -94,7 +94,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               alignItems: 'center',
             }}
           >
-            {netInfo.isConnected && !(percentageOutputsScanned === 0) ? (
+            {netInfo.isConnected && percentageOutputsScanned !== 0 ? (
               <>
                 {!syncInProgress && (
                   <View

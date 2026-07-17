@@ -11,14 +11,13 @@ const MAC_SOCKET: Option<&str> = Some("unix:///Users/runner/.colima/default/dock
 
 async fn execute_version_from_seed() {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let docker = match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_mobileclient")).await
+    {
+        Ok(d) => d,
+        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+    };
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
@@ -42,14 +41,13 @@ async fn execute_version_from_seed() {
 
 async fn execute_addresses_from_ufvk() {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let docker = match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_mobileclient")).await
+    {
+        Ok(d) => d,
+        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+    };
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
@@ -73,14 +71,13 @@ async fn execute_addresses_from_ufvk() {
 
 async fn execute_addresses_from_seed() {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let docker = match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_mobileclient")).await
+    {
+        Ok(d) => d,
+        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+    };
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
@@ -104,14 +101,13 @@ async fn execute_addresses_from_seed() {
 
 async fn execute_sync_from_seed() {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let docker = match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_mobileclient")).await
+    {
+        Ok(d) => d,
+        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+    };
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
@@ -135,14 +131,13 @@ async fn execute_sync_from_seed() {
 
 async fn execute_send_from_orchard() {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let docker = match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_mobileclient")).await
+    {
+        Ok(d) => d,
+        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+    };
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
@@ -166,8 +161,7 @@ async fn execute_send_from_orchard() {
 
 async fn execute_currentprice_and_value_transfers_from_seed() {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(MAC_SOCKET, Some("funded_orchard_with_3_txs_mobileclient"))

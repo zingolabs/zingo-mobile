@@ -1,0 +1,45 @@
+name: TypeScript checks
+
+on:
+  workflow_call:
+
+jobs:
+  ts-checks:
+    name: TypeScript checks
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      - run: yarn
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Lint
+        run: yarn lint:check
+
+      - name: Check formatting
+        run: yarn prettier:check
+
+      # Cross-file duplication gate over the TS, Kotlin, and Swift sources.
+      # Measured 9.53% at adoption; the 10% threshold in .jscpd.json only
+      # ratchets down from here.
+      - name: Copy-paste detection
+        run: yarn cpd:check
+
+      # Kotlin holds zero clones (its pre-existing duplication was
+      # refactored away at adoption), so any clone fails.
+      - name: Copy-paste detection (Kotlin, zero tolerance)
+        run: yarn cpd:check:kotlin
+
+      # Swift also holds zero clones (the per-test init/sync ritual in
+      # ZingoTests was hoisted into shared helpers), so any clone fails.
+      - name: Copy-paste detection (Swift, zero tolerance)
+        run: yarn cpd:check:swift

@@ -1,0 +1,35 @@
+name: Meta lint
+
+on:
+  workflow_call:
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Error severity only: the warning-level findings predate adoption.
+      # Tighten to --severity=warning once those are fixed.
+      - name: ShellCheck (error severity)
+        run: shellcheck --severity=error scripts/*.sh scripts/ci/*.sh
+
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Download actionlint
+        run: bash <(curl -s https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7
+
+      # The embedded shellcheck runs at info level, which flags the
+      # universal ">> $GITHUB_ENV" idiom; ignore info and style, keep
+      # warnings, errors, and every native actionlint check.
+      - name: actionlint
+        run: >-
+          ./actionlint -ignore
+          'shellcheck reported issue in this script: SC[0-9]+:(info|style):'
