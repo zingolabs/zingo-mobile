@@ -7,17 +7,23 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Receive from '../components/Receive';
-import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
+import {
+  ContextAppLoadedProvider,
+  defaultAppContextLoaded,
+} from '../app/context';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import { RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> {
+function makeDrawerProps(): NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Receive
+> {
   return {
     navigation: mockNavigation,
     route: {
@@ -31,7 +37,7 @@ function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Rece
 describe('Component Receive - test', () => {
   //snapshot test
   test('Receive - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     state.info = mockInfo;
@@ -40,10 +46,11 @@ describe('Component Receive - test', () => {
     const props = makeDrawerProps();
     const receive = render(
       <ContextAppLoadedProvider value={state}>
-        <Receive {...props}
-          toggleMenuDrawer={onFunction} 
-          alone={false} 
-          setSecurityOption={onFunction} 
+        <Receive
+          {...props}
+          toggleMenuDrawer={onFunction}
+          alone={false}
+          setSecurityOption={onFunction}
           setAddressBook={onFunction}
         />
       </ContextAppLoadedProvider>,

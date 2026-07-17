@@ -1,32 +1,37 @@
 import { getNumberFormatSettings } from 'react-native-localize';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
+import { format as dateFnsFormat, differenceInMinutes } from 'date-fns';
+import type { Locale } from 'date-fns';
+import {
+  enUS,
+  es as esLocale,
+  pt as ptLocale,
+  ru as ruLocale,
+  tr as trLocale,
+} from 'date-fns/locale';
 
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
-  ContactType,
   GlobalConst,
   LanguageEnum,
   SendJsonToTypeType,
   SendPageStateClass,
   ServerType,
-  ToAddrClass,
   TranslateType,
-  ValueTransferType,
   BlockExplorerEnum,
 } from '../AppState';
 
 import randomColor from 'randomcolor';
-import RPCModule from '../RPCModule';
+import {
+  getDonationAddress,
+  getZenniesDonationAddress,
+  parseAddress,
+} from '../walletBackend';
 import { Buffer } from 'buffer';
-import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
-import { RPCParseAddressStatusEnum } from '../rpc/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../rpc/enums/RPCReceiversEnum';
+import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
+import { RPCParseAddressStatusEnum } from '../walletBackend/enums/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '../walletBackend/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '../walletBackend/enums/RPCReceiversEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -44,16 +49,22 @@ export default class Utils {
 
     const { decimalSeparator } = getNumberFormatSettings();
 
-    const intPart = parseInt(Utils.parseNumberFloatToStringLocale(zecValue, 8), 10);
+    const intPart = parseInt(
+      Utils.parseNumberFloatToStringLocale(zecValue, 8),
+      10,
+    );
     let bigPart = Utils.parseNumberFloatToStringLocale(zecValue, 8);
     let smallPart = '';
     let decimalPart = '';
 
     if (bigPart.indexOf(`${decimalSeparator}`) >= 0) {
-      decimalPart = bigPart.substr(bigPart.indexOf(`${decimalSeparator}`) + 1);
+      decimalPart = bigPart.slice(bigPart.indexOf(`${decimalSeparator}`) + 1);
       if (decimalPart.length > 4) {
-        smallPart = decimalPart.substr(4);
-        decimalPart = decimalPart.substr(0, decimalPart.length - smallPart.length);
+        smallPart = decimalPart.slice(4);
+        decimalPart = decimalPart.slice(
+          0,
+          decimalPart.length - smallPart.length,
+        );
 
         // Pad the small part with trailing 0s
         while (smallPart.length < 4) {
@@ -70,6 +81,17 @@ export default class Utils {
       smallPart = '0000';
     }
 
+    // Trim trailing zeros from decimalPart only when smallPart has no significant digits.
+    // When smallPart is non-zero we preserve all four positions for visual alignment.
+    if (smallPart === '0000') {
+      decimalPart = decimalPart.replace(/0+$/, '') || '0';
+    }
+
+    // Drop the "0." suffix entirely when the value is exactly zero — show plain "0".
+    if (intPart === 0 && smallPart === '0000' && decimalPart === '0') {
+      return { bigPart: '0', smallPart };
+    }
+
     return { bigPart: intPart + decimalSeparator + decimalPart, smallPart };
   }
 
@@ -84,10 +106,10 @@ export default class Utils {
     const chunkSize = Math.round(s.length / numChunks);
     const chunks = [];
     for (let i = 0; i < numChunks - 1; i++) {
-      chunks.push(s.substr(i * chunkSize, chunkSize));
+      chunks.push(s.slice(i * chunkSize, i * chunkSize + chunkSize));
     }
     // Last chunk might contain un-even length
-    chunks.push(s.substr((numChunks - 1) * chunkSize));
+    chunks.push(s.slice((numChunks - 1) * chunkSize));
 
     return chunks;
   }
@@ -97,9 +119,7 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      //const start = Date.now();
-      const ua: string = await RPCModule.getDonationAddress();
-      //console.log('=========================================== > get donation address - ', Date.now() - start);
+      const ua: string = await getDonationAddress();
       return ua;
     }
     return '';
@@ -116,13 +136,13 @@ export default class Utils {
   }
 
   // ZENNIES FOR ZINGO
-  static async getZenniesDonationAddress(chainName: ChainNameEnum): Promise<string> {
+  static async getZenniesDonationAddress(
+    chainName: ChainNameEnum,
+  ): Promise<string> {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      //const start = Date.now();
-      const ua: string = await RPCModule.getZenniesDonationAddress();
-      //console.log('=========================================== > get zennies donation address - ', Date.now() - start);
+      const ua: string = await getZenniesDonationAddress();
       return ua;
     }
     return '';
@@ -135,28 +155,6 @@ export default class Utils {
   }
 
   // NYM
-  static async getNymDonationAddress(chainName: ChainNameEnum): Promise<string> {
-    // donations only for mainnet.
-    if (chainName === ChainNameEnum.mainChainName) {
-      // UA -> we need a fresh one.
-      //const start = Date.now();
-      const ua: string = await RPCModule.getDonationAddress();
-      //console.log('=========================================== > get nym donation address - ', Date.now() - start);
-      return ua;
-    }
-    return '';
-  }
-
-  static getNymDonationAmount(): string {
-    const { decimalSeparator } = getNumberFormatSettings();
-
-    return '0' + decimalSeparator + '01';
-  }
-
-  static getNymDonationMemo(translate: (key: string) => TranslateType): string {
-    return translate('nym-donation') as string;
-  }
-
   static utf16Split(s: string, chunksize: number): string[] {
     const ans = [];
 
@@ -188,10 +186,15 @@ export default class Utils {
   static parseStringLocaleToNumberFloat(stringValue: string): number {
     const { decimalSeparator } = getNumberFormatSettings();
 
-    return Number(stringValue.replace(new RegExp(`\\${decimalSeparator}`), '.'));
+    return Number(
+      stringValue.replace(new RegExp(`\\${decimalSeparator}`), '.'),
+    );
   }
 
-  static parseNumberFloatToStringLocale(numberValue: number, toFixed: number): string {
+  static parseNumberFloatToStringLocale(
+    numberValue: number,
+    toFixed: number,
+  ): string {
     const { decimalSeparator } = getNumberFormatSettings();
 
     let stringValue = numberValue.toFixed(toFixed);
@@ -199,7 +202,17 @@ export default class Utils {
     return stringValue.replace(new RegExp('\\.'), `${decimalSeparator}`);
   }
 
-  static getBlockExplorerTxIDURL(txid: string, chainName: ChainNameEnum, blockExplorer: BlockExplorerEnum): string {
+  static getBlockExplorerTxIDURL(
+    txid: string,
+    chainName: ChainNameEnum,
+    blockExplorer: BlockExplorerEnum,
+  ): string {
+    // Regtest is a local dev chain no public explorer can index — never link,
+    // regardless of the selected explorer. Returning '' makes every caller
+    // hide the affordance.
+    if (chainName === ChainNameEnum.regtestChainName) {
+      return '';
+    }
     if (blockExplorer === BlockExplorerEnum.Zcashexplorer) {
       if (chainName === ChainNameEnum.testChainName) {
         return `https://testnet.zcashexplorer.app/transactions/${txid}`;
@@ -212,13 +225,14 @@ export default class Utils {
       } else {
         return `https://cipherscan.app/tx/${txid}`;
       }
-    } else if (blockExplorer === BlockExplorerEnum.Zypherscan) {
+    } else if (blockExplorer === BlockExplorerEnum.Zexplorer) {
       if (chainName === ChainNameEnum.testChainName) {
-        return `https://testnet.zypherscan.com/tx/${txid}`;
+        return `https://zexplorer.app/testnet/tx/${txid}`;
       } else {
-        return `https://www.zypherscan.com/tx/${txid}`;
+        return `https://zexplorer.app/mainnet/tx/${txid}`;
       }
     } else {
+      // BlockExplorerEnum.None (or any unknown value) → no explorer link.
       return '';
     }
   }
@@ -236,6 +250,19 @@ export default class Utils {
     }
 
     return colorList;
+  }
+
+  // Deterministic bright colour keyed by an arbitrary string (e.g. a token
+  // ticker). Same seed always yields the same colour, so a per-asset avatar
+  // keeps a stable identity across re-renders instead of flickering a new
+  // random colour each time. Mirrors `generateColorList`'s options; only the
+  // `seed` makes it reproducible.
+  static generateColorFromSeed(seed: string): string {
+    return randomColor({
+      seed,
+      luminosity: 'bright',
+      format: 'hex',
+    });
   }
 
   static getLabelColor(bgColor: string): string {
@@ -262,65 +289,71 @@ export default class Utils {
     server: ServerType,
     donation: boolean,
   ): Promise<SendJsonToTypeType[]> {
-    let donationAddress: boolean = false;
-    const json: Promise<SendJsonToTypeType[][]> = Promise.all(
-      [sendPageState.toaddr].map(async (to: ToAddrClass) => {
-        const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
-        const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
+    const to = sendPageState.toaddr;
+    const donationAddress: boolean =
+      to.to === (await Utils.getDonationAddress(server.chainName)) ||
+      to.to === (await Utils.getZenniesDonationAddress(server.chainName));
 
-        donationAddress =
-          to.to === (await Utils.getDonationAddress(server.chainName)) ||
-          to.to === (await Utils.getZenniesDonationAddress(server.chainName)) ||
-          to.to === (await Utils.getNymDonationAddress(server.chainName));
-
-        if (memo === '') {
-          return [{ address: to.to, amount } as SendJsonToTypeType];
-        } else if (Buffer.byteLength(memo, GlobalConst.utf8 as BufferEncoding) <= GlobalConst.memoMaxLength) {
-          return [{ address: to.to, amount, memo } as SendJsonToTypeType];
-        } else {
-          // If the memo is more than 511 bytes, then we split it into multiple transactions.
-          // Each memo will be `(xx/yy)memo part`. The prefix "(xx/yy)" is 7 bytes long, so
-          // we'll split the memo into 511-7 = 505 bytes length
-          // this make sense if we make long memos... in the future.
-          const splits = Utils.utf16Split(memo, GlobalConst.memoMaxLength - 7);
-          const tos = [];
-
-          // The first one contains all the tx value
-          tos.push({ address: to.to, amount, memo: `(1/${splits.length})${splits[0]}` } as SendJsonToTypeType);
-
-          for (let i = 1; i < splits.length; i++) {
-            tos.push({
-              address: to.to,
-              amount: 0,
-              memo: `(${i + 1}/${splits.length})${splits[i]}`,
-            } as SendJsonToTypeType);
-          }
-
-          return tos;
-        }
-      }),
+    const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
+    const amount = parseInt(
+      (Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0),
+      10,
     );
-    const jsonFlat: SendJsonToTypeType[] = (await json).flat();
+
+    let jsonFlat: SendJsonToTypeType[];
+    if (memo === '') {
+      jsonFlat = [{ address: to.to, amount } as SendJsonToTypeType];
+    } else if (
+      Buffer.byteLength(memo, GlobalConst.utf8 as BufferEncoding) <=
+      GlobalConst.memoMaxLength
+    ) {
+      jsonFlat = [{ address: to.to, amount, memo } as SendJsonToTypeType];
+    } else {
+      // If the memo is more than 511 bytes, then we split it into multiple transactions.
+      // Each memo will be `(xx/yy)memo part`. The prefix "(xx/yy)" is 7 bytes long, so
+      // we'll split the memo into 511-7 = 505 bytes length
+      // this make sense if we make long memos... in the future.
+      const splits = Utils.utf16Split(memo, GlobalConst.memoMaxLength - 7);
+      jsonFlat = [
+        {
+          address: to.to,
+          amount,
+          memo: `(1/${splits.length})${splits[0]}`,
+        } as SendJsonToTypeType,
+      ];
+      for (let i = 1; i < splits.length; i++) {
+        jsonFlat.push({
+          address: to.to,
+          amount: 0,
+          memo: `(${i + 1}/${splits.length})${splits[i]}`,
+        } as SendJsonToTypeType);
+      }
+    }
 
     const donationTransaction: SendJsonToTypeType[] = [];
 
     // we need to exclude 2 use cases:
     // 2. send to one of our donation UA's
     // (make no sense to do a double donation)
-    if (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress) {
+    if (
+      donation &&
+      server.chainName === ChainNameEnum.mainChainName &&
+      !donationAddress
+    ) {
       donationTransaction.push({
         address: await Utils.getZenniesDonationAddress(server.chainName),
         amount: parseInt(
-          (Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount()) * 10 ** 8).toFixed(0),
+          (
+            Utils.parseStringLocaleToNumberFloat(
+              Utils.getZenniesDonationAmount(),
+            ) *
+            10 ** 8
+          ).toFixed(0),
           10,
         ),
         memo: '', // zancas decision to not leak info with no reason.
       });
     }
-
-    console.log('Sending:');
-    console.log(jsonFlat);
-    console.log(donationTransaction);
 
     return [...jsonFlat, ...donationTransaction];
   }
@@ -329,10 +362,7 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
-    //const start = Date.now();
-    const result: string = await RPCModule.parseAddressInfo(address);
-    //console.log('=========================================== > parse address - ', Date.now() - start);
-    //console.log(result);
+    const result: string = await parseAddress(address);
     let isValid: boolean = false;
     let isFullUA: boolean = false;
     let onlyOrchardUA: string = '';
@@ -352,28 +382,37 @@ export default class Utils {
     }
 
     isValid =
-      resultJSON.status === RPCParseAddressStatusEnum.successAddressParse && resultJSON.chain_name === serverChainName;
+      resultJSON.status === RPCParseAddressStatusEnum.successAddressParse &&
+      resultJSON.chain_name === serverChainName;
     if (isValid) {
       isFullUA =
         resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
         !!resultJSON.receivers_available &&
-        resultJSON.receivers_available.includes(RPCReceiversEnum.orchardRPCReceiver) &&
-        resultJSON.receivers_available.includes(RPCReceiversEnum.saplingRPCReceiver) &&
-        resultJSON.receivers_available.includes(RPCReceiversEnum.transparentRPCReceiver);
+        resultJSON.receivers_available.includes(
+          RPCReceiversEnum.orchardRPCReceiver,
+        ) &&
+        resultJSON.receivers_available.includes(
+          RPCReceiversEnum.saplingRPCReceiver,
+        ) &&
+        resultJSON.receivers_available.includes(
+          RPCReceiversEnum.transparentRPCReceiver,
+        );
       if (isFullUA) {
         // the only use case for this is: if the UA is full (3 receivers)
-        onlyOrchardUA = resultJSON.only_orchard_ua ? resultJSON.only_orchard_ua : '';
+        onlyOrchardUA = resultJSON.only_orchard_ua
+          ? resultJSON.only_orchard_ua
+          : '';
       }
     }
 
     return { isValid, onlyOrchardUA };
   }
 
-  static async isValidOrchardOrSaplingAddress(address: string, serverChainName: string): Promise<boolean> {
-    //const start = Date.now();
-    const result: string = await RPCModule.parseAddressInfo(address);
-    //console.log('=========================================== > parse address - ', Date.now() - start);
-    //console.log(result);
+  static async isValidOrchardOrSaplingAddress(
+    address: string,
+    serverChainName: string,
+  ): Promise<boolean> {
+    const result: string = await parseAddress(address);
     if (result) {
       if (result.toLowerCase().startsWith(GlobalConst.error)) {
         return false;
@@ -388,8 +427,6 @@ export default class Utils {
       return false;
     }
 
-    //console.log('parse-memo', address, resultJSON);
-
     return (
       resultJSON.status === RPCParseAddressStatusEnum.successAddressParse &&
       resultJSON.address_kind !== RPCAddressKindEnum.transparentAddressKind &&
@@ -398,37 +435,9 @@ export default class Utils {
     );
   }
 
-  static isMessagesAddress(vt: ValueTransferType | ContactType): boolean {
-    // we can't check here in this VT if the memo is empty
-    // because this address/contact could have memos in another
-    // VT in the list.
-    // only for orchard or sapling
-    if (vt.address) {
-      // the performance in the list is really bad if here I asked properly
-      // to zingolib (parse_address command) about the type of the address.
-      return !vt.address.startsWith('t');
-    } else {
-      const { memoUA } = Utils.splitMemo(vt.memos);
-      return !!memoUA;
-    }
-  }
-
-  static messagesAddress = (vt: ValueTransferType | ContactType): string => {
-    // we can't check here in this VT if the memo is empty
-    // because this address/contact could have memos in another
-    // VT in the list.
-    // only for orchard or sapling
-    if (vt.address) {
-      // the performance in the list is really bad if here I asked properly
-      // to zingolib (parse_address command) about the type of the address.
-      return !vt.address.startsWith('t') ? vt.address : '';
-    } else {
-      const { memoUA } = Utils.splitMemo(vt.memos);
-      return memoUA ? memoUA : '';
-    }
-  };
-
-  static splitMemo = (memos: string[] | undefined): { memo: string; memoUA: string } => {
+  static splitMemo = (
+    memos: string[] | undefined,
+  ): { memo: string; memoUA: string } => {
     const memoTotal = memos && memos.length > 0 ? memos.join('\n') : '';
     if (memoTotal.includes(GlobalConst.replyTo)) {
       let memoArray = memoTotal.split(GlobalConst.replyTo);
@@ -439,17 +448,69 @@ export default class Utils {
     return { memo: memoTotal, memoUA: '' };
   };
 
-  static buildMemo = (memo: string | undefined, includeUAMemo: boolean, uAddress: string): string => {
+  static buildMemo = (
+    memo: string | undefined,
+    includeUAMemo: boolean,
+    uAddress: string,
+  ): string => {
     return `${memo || ''}${includeUAMemo ? GlobalConst.replyTo + uAddress : ''}`;
   };
 
-  static countMemoBytes = (memo: string | undefined, includeUAMemo: boolean, uAddress: string): number => {
+  static countMemoBytes = (
+    memo: string | undefined,
+    includeUAMemo: boolean,
+    uAddress: string,
+  ): number => {
     const memoTotal = Utils.buildMemo(memo, includeUAMemo, uAddress);
-    const len = Buffer.byteLength(memoTotal, GlobalConst.utf8 as BufferEncoding);
+    const len = Buffer.byteLength(
+      memoTotal,
+      GlobalConst.utf8 as BufferEncoding,
+    );
     return len;
   };
 
-  static setMomentLocale = async (language: LanguageEnum) => {
-    moment.locale(language);
-  };
+  private static getDateFnsLocale(language: LanguageEnum) {
+    const locales = {
+      [LanguageEnum.es]: esLocale,
+      [LanguageEnum.pt]: ptLocale,
+      [LanguageEnum.ru]: ruLocale,
+      [LanguageEnum.tr]: trLocale,
+    } as Partial<Record<LanguageEnum, Locale>>;
+    return locales[language] ?? enUS;
+  }
+
+  static formatDate(
+    timestamp: number,
+    pattern: string,
+    language: LanguageEnum,
+  ): string {
+    return dateFnsFormat(new Date(timestamp), pattern, {
+      locale: Utils.getDateFnsLocale(language),
+    });
+  }
+
+  static diffInMinutes(from: Date, to: Date): number {
+    return differenceInMinutes(from, to);
+  }
+
+  /**
+   * zingolib surfaces chain-mismatch errors with the raw `ChainNameEnum`
+   * values ("main" / "test" / "regtest") embedded in the message (e.g.
+   * "Wallet chain name main doesn't match expected test"). This helper
+   * rewrites any standalone occurrence of those tokens with the matching
+   * `settings.value-chainname-*` translation (Mainnet / Testnet / Regtest)
+   * so error alerts and snackbars read naturally to the user.
+   *
+   * The match is word-bounded, so the substitution is safe for messages
+   * that don't contain a chain reference at all.
+   */
+  static humanizeChainTokens(
+    text: string,
+    translate: (key: string) => TranslateType,
+  ): string {
+    return text.replace(
+      /\b(main|test|regtest)\b/g,
+      token => translate(`settings.value-chainname-${token}`) as string,
+    );
+  }
 }

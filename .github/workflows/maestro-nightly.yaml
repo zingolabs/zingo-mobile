@@ -1,0 +1,294 @@
+name: Maestro E2E (Nightly)
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  create-cache-key:
+    uses: ./.github/workflows/create-cache-key.yaml
+
+  android-build:
+    uses: ./.github/workflows/android-build.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      # x86_64 so the artifact runs on GitHub Actions' Linux Android emulator
+      # (the Linux runners are x86_64; an arm64-v8a APK would not install).
+      arch: x86_64
+
+  ios-build:
+    strategy:
+      fail-fast: false
+    uses: ./.github/workflows/ios-build.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+
+  maestro-android:
+    name: Maestro — Android
+    runs-on: ubuntu-24.04
+    needs: [create-cache-key, android-build]
+    env:
+      ABI: x86_64
+      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Gradle setup cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: wrapper
+          cache-read-only: true
+
+      - name: Native rust cache
+        uses: actions/cache/restore@v6
+        with:
+          path: android/app/src/main/jniLibs/${{ env.ABI }}
+          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Kotlin uniffi cache
+        uses: actions/cache/restore@v6
+        with:
+          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      - name: Yarn install
+        run: yarn
+
+      - name: Build APK
+        working-directory: android
+        run: ./gradlew assembleProdRelease -PsplitApk=true
+
+      - name: Install Maestro CLI
+        # Pin to 2.5.1 — Maestro 2.6.0 (released the week between our last
+        # green nightly on May 26 and the first red on May 27) broke the
+        # iOS driver startup; pinning here on Android too so both jobs
+        # always run on the same known-good CLI release.
+        env:
+          MAESTRO_VERSION: '2.5.1'
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Enable KVM (Linux Android emulator acceleration)
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run Maestro tests on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install -r android/app/build/outputs/apk/prod/release/app-prod-x86_64-release.apk
+            # Start a background logcat capture so we have device-side logs in
+            # case Maestro times out waiting on a UI element. The maestro run
+            # itself decides exit code.
+            adb logcat -c
+            adb logcat > /tmp/maestro-logcat.log 2>&1 &
+            LOGCAT_PID=$!
+            set +e
+            maestro test .maestro/
+            EXIT=$?
+            kill $LOGCAT_PID 2>/dev/null || true
+            exit $EXIT
+
+      - name: Upload Maestro report on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: maestro-android-report
+          path: |
+            ~/.maestro/tests/**
+            /tmp/maestro-logcat.log
+
+  maestro-ios:
+    name: Maestro — iOS
+    runs-on: macos-15
+    needs: [create-cache-key, ios-build]
+    env:
+      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
+
+    steps:
+      - name: Xcode 16.4
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Restore the xcframework produced by .github/workflows/ios-build.yaml.
+      # That reusable workflow saves both artefacts directly under `ios/` so the
+      # xcodebuild step below can reference them without any copying.
+      - name: Native iOS xcframework cache
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            ios/Zingolib.xcframework
+            ios/zingo.swift
+          key: native-ios-xcframework-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      - name: Yarn install
+        run: yarn
+
+      - name: Pod install
+        uses: nick-fields/retry@v4
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 15
+          command: cd ios && pod install
+
+      - name: Inspect Hermes dSYM tree
+        run: find ios/vendor/hermes-dsyms -maxdepth 6 2>/dev/null || echo "ios/vendor/hermes-dsyms not found"
+
+      # Build in Release configuration. Maestro exercises the running RN app on
+      # the simulator — Debug builds expect a Metro packager on localhost:8081
+      # to load the JS bundle at runtime, which CI does not run; Release
+      # embeds the bundle in the app. The Hermes dSYM swap that previously
+      # failed here is now satisfied: Podfile.lock is pinned to hermes-engine
+      # matching the react-native version in package.json, so pod install's
+      # post_install hook downloads the matching dSYMs.
+      - name: Build app
+        # OS=latest lets xcodebuild pick whatever iOS runtime is paired with
+        # the active Xcode — pinning OS=18.5 broke when macos-15 started
+        # shipping multiple runtimes (18.5/18.6/26.x) that aren't all
+        # registered as xcodebuild destinations.
+        working-directory: ios
+        run: |
+          set -euxo pipefail
+          mkdir -p build/DerivedData
+          xcodebuild build \
+            -workspace Zingo.xcworkspace \
+            -scheme Zingo \
+            -sdk iphonesimulator \
+            -configuration Release \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -derivedDataPath "build/DerivedData" \
+            -quiet
+
+      - name: Debug — Xcode + simulator inventory
+        # Started failing on May 27, 2026 with the same IOSDriverTimeout
+        # across Maestro 2.5.1 and 2.6.0 — strongly points to a GitHub
+        # macos-15 runner image change (Xcode/simulator catalog) that
+        # leaves us booting something other than what we built for. Dump
+        # the actual state so we can see what changed.
+        run: |
+          echo "--- Xcode version ---"
+          xcodebuild -version
+          echo "--- Available iOS runtimes ---"
+          xcrun simctl list runtimes | grep -i ios || true
+          echo "--- iPhone 16 devices ---"
+          xcrun simctl list devices "iPhone 16" || true
+          echo "--- Devicetypes containing 'iPhone' ---"
+          xcrun simctl list devicetypes | grep -i iphone | head -20 || true
+
+      - name: Boot iOS simulator
+        run: |
+          # macos-15 now ships 5 iPhone 16 devices (one per iOS runtime:
+          # 18.5, 18.6, 26.0, 26.1, 26.2). `simctl boot "iPhone 16"`
+          # selects the highest-iOS match (iOS 26.2), which mismatches the
+          # iOS 18.5 build target above. Pick the iPhone 16 from iOS 18.5
+          # explicitly by UDID. Also shutdown anything else booted on the
+          # runner first so Maestro can't accidentally pick a stale device.
+          xcrun simctl shutdown all || true
+          UDID=$(xcrun simctl list devices "iPhone 16" --json | \
+            jq -r '.devices["com.apple.CoreSimulator.SimRuntime.iOS-18-5"][] | select(.name=="iPhone 16") | .udid')
+          if [ -z "$UDID" ]; then
+            echo "::error::No iPhone 16 device found for iOS 18.5 runtime"
+            exit 1
+          fi
+          echo "Booting iPhone 16 (iOS 18.5) — UDID=$UDID"
+          echo "SIM_UDID=$UDID" >> $GITHUB_ENV
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          echo "--- Booted devices after our boot ---"
+          xcrun simctl list devices booted
+
+      - name: Install Maestro CLI
+        # Pinned — see comment in maestro-android job. 2.6.0 broke iOS.
+        env:
+          MAESTRO_VERSION: '2.5.1'
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Install app on simulator
+        run: |
+          # Use the explicit UDID exported above instead of "booted" —
+          # there may be other iPhone 16 devices on the runner (across
+          # different iOS runtimes) and we want this app on exactly the
+          # iOS 18.5 one it was built for.
+          APP=ios/build/DerivedData/Build/Products/Release-iphonesimulator/Zingo.app
+          xcrun simctl install "$SIM_UDID" "$APP"
+
+          # Verify FrontBoard has registered the bundle before handing off
+          # to Maestro. Without this, the first launch after install can
+          # race FrontBoard and fail with FBSOpenApplicationServiceErrorDomain
+          # ("unknown to FrontBoard"). Poll listapps until the bundle ID
+          # shows up, max ~30s.
+          BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
+          echo "Waiting for $BUNDLE_ID to register with FrontBoard…"
+          for i in $(seq 1 30); do
+            if xcrun simctl listapps "$SIM_UDID" | grep -q "\"$BUNDLE_ID\""; then
+              echo "App registered (after ${i}s)."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::App $BUNDLE_ID never registered with FrontBoard"
+          xcrun simctl listapps "$SIM_UDID" | head -40
+          exit 1
+
+      - name: Run Maestro tests
+        # GitHub macOS-15 runners now ship many extra iOS runtimes; first-time
+        # boot of the iOS 18.5 sim runs data migration plugins (~55s) and the
+        # XCTest driver install often eats the rest of the 3 min budget.
+        # Bumping to 5 min absorbs the worst-case cold-runner timing.
+        # Pass --device explicitly so Maestro never auto-picks the wrong
+        # simulator when the runner has any other booted device.
+        env:
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: '300000'
+        run: |
+          echo "--- Devices booted right before maestro test ---"
+          xcrun simctl list devices booted
+          maestro --device "$SIM_UDID" test .maestro/
+
+      - name: Upload Maestro report on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: maestro-ios-report
+          path: ~/.maestro/tests/**

@@ -1,26 +1,23 @@
 import React, { ReactNode } from 'react';
+import { useShallowMemo } from './useShallowMemo';
 
 import {
   AppContextLoading,
-  WalletType,
   ZecPriceType,
   BackgroundType,
   NetInfoType,
-  BackgroundErrorType,
   ServerType,
   SecurityType,
   LanguageEnum,
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
-  SnackbarType,
   BlockExplorerEnum,
 } from '../AppState';
-import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
-  wallet: {} as WalletType,
   server: {} as ServerType,
   currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
@@ -37,7 +34,7 @@ export const defaultAppContextLoading: AppContextLoading = {
     dateEnd: 0,
   } as BackgroundType,
   translate: () => '',
-  backgroundError: {} as BackgroundErrorType,
+  backgroundError: { title: '', error: '' },
   setBackgroundError: () => {},
   privacy: false,
   readOnly: false,
@@ -45,9 +42,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   saplingPool: true,
   transparentPool: true,
   mode: ModeEnum.advanced,
-  snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
-  removeFirstSnackbar: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,
@@ -65,6 +60,14 @@ type ContextProviderProps = {
   value: AppContextLoading;
 };
 
-export const ContextAppLoadingProvider = ({ children, value }: ContextProviderProps) => {
-  return <ContextAppLoading.Provider value={value}>{children}</ContextAppLoading.Provider>;
+export const ContextAppLoadingProvider = ({
+  children,
+  value,
+}: ContextProviderProps) => {
+  const stableValue = useShallowMemo(value);
+  return (
+    <ContextAppLoading.Provider value={stableValue}>
+      {children}
+    </ContextAppLoading.Provider>
+  );
 };

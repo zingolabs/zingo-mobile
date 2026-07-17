@@ -1,8 +1,10 @@
 import { ServerUrisType, TranslateType, ChainNameEnum } from '../AppState';
 
-const serverUris = (translate: (key: string) => TranslateType | void): ServerUrisType[] => {
+const serverUris = (
+  translate: (key: string) => TranslateType | void,
+): ServerUrisType[] => {
   return [
-    // default servers (2)
+    // default server
     {
       uri: 'https://zec.rocks:443', // this will be the default server.
       region: translate('settings.usa') as string,
@@ -11,15 +13,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       latency: null,
       obsolete: false,
     },
-    {
-      uri: 'https://lwd1.zcash-infra.com:9067',
-      region: translate('settings.usa') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: true,
-      latency: null,
-      obsolete: false,
-    },
-    // new servers (not default) (11)
+    // new servers (not default)
     {
       uri: 'https://na.zec.rocks:443',
       region: translate('settings.na') as string,
@@ -44,6 +38,15 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       latency: null,
       obsolete: false,
     },
+    // obsolete servers
+    {
+      uri: 'https://lwd1.zcash-infra.com:9067',
+      region: translate('settings.usa') as string,
+      chainName: ChainNameEnum.mainChainName,
+      default: false,
+      latency: null,
+      obsolete: true,
+    },
     {
       uri: 'https://ap.zec.rocks:443',
       region: translate('settings.ao') as string,
@@ -58,7 +61,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
-      obsolete: false,
+      obsolete: true,
     },
     {
       uri: 'https://lwd3.zcash-infra.com:9067',
@@ -66,7 +69,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
-      obsolete: false,
+      obsolete: true,
     },
     {
       uri: 'https://lwd4.zcash-infra.com:9067',
@@ -74,7 +77,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
-      obsolete: false,
+      obsolete: true,
     },
     {
       uri: 'https://lwd5.zcash-infra.com:9067',
@@ -82,7 +85,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
-      obsolete: false,
+      obsolete: true,
     },
     {
       uri: 'https://lwd6.zcash-infra.com:9067',
@@ -90,7 +93,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
-      obsolete: false,
+      obsolete: true,
     },
     {
       uri: 'https://lwd7.zcash-infra.com:9067',
@@ -98,7 +101,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
-      obsolete: false,
+      obsolete: true,
     },
     {
       uri: 'https://lwd8.zcash-infra.com:9067',
@@ -106,14 +109,13 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
-      obsolete: false,
+      obsolete: true,
     },
-    // obsolete servers (5)
     {
       uri: 'https://mainnet.lightwalletd.com:9067',
       region: translate('settings.na') as string,
       chainName: ChainNameEnum.mainChainName,
-      default: true,
+      default: false,
       latency: null,
       obsolete: true,
     },
@@ -148,6 +150,15 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       default: false,
       latency: null,
       obsolete: true,
+    },
+    // testnet default (1)
+    {
+      uri: 'https://testnet.zec.rocks',
+      region: '',
+      chainName: ChainNameEnum.testChainName,
+      default: true,
+      latency: null,
+      obsolete: false,
     },
   ];
 };

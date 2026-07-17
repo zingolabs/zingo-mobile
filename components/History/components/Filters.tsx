@@ -3,22 +3,14 @@ import React, { useContext, useState } from 'react';
 import { View, TouchableOpacity, ScrollView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import {
-  ButtonTypeEnum,
-  FilterEnum,
-} from '../../../app/AppState';
+import { ButtonTypeEnum, FilterEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
-import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import { useToast } from 'react-native-toastier';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import FadeText from '../../Components/FadeText';
 
 type FiltersProps = {
   closeSheet: () => void;
-  setHeightLayout: (h: number) => void;
   filterKind: FilterEnum | null;
   setFilterKind: (f: FilterEnum | null) => void;
   filterFailed: boolean;
@@ -28,9 +20,8 @@ type FiltersProps = {
   filterWithFunds: boolean;
   setFilterWithFunds: (f: boolean) => void;
 };
-const Filters: React.FunctionComponent<FiltersProps> = ({ 
-  closeSheet, 
-  setHeightLayout,
+const Filters: React.FunctionComponent<FiltersProps> = ({
+  closeSheet,
   filterKind,
   setFilterKind,
   filterFailed,
@@ -43,58 +34,40 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
 
-  const [filterWithFundsLocal, setFilterWithFundsLocal] = useState<boolean>(filterWithFunds);
-  const [filterKindLocal, setFilterKindLocal] = useState<FilterEnum | null>(filterKind);
-  const [filterFailedLocal, setFilterFailedLocal] = useState<boolean>(filterFailed); 
-  const [filterMemosLocal, setFilterMemosLocal] = useState<boolean>(filterMemos); 
+  const [filterWithFundsLocal, setFilterWithFundsLocal] =
+    useState<boolean>(filterWithFunds);
+  const [filterKindLocal, setFilterKindLocal] = useState<FilterEnum | null>(
+    filterKind,
+  );
+  const [filterFailedLocal, setFilterFailedLocal] =
+    useState<boolean>(filterFailed);
+  const [filterMemosLocal, setFilterMemosLocal] =
+    useState<boolean>(filterMemos);
 
   const clearLocal = () => {
     setFilterWithFundsLocal(false);
     setFilterKindLocal(null);
     setFilterFailedLocal(false);
     setFilterMemosLocal(false);
-  }
+  };
 
   console.log('Filters render');
-  
+
   return (
     <View
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        //console.log('LAYOUTTT', height);
-        setHeightLayout(height + 80);
+      style={{
+        backgroundColor: colors.bottomSheetBackground,
       }}
-      style={{ 
-        backgroundColor: colors.background 
-      }}>
-      <TouchableOpacity
-        onPress={() => {
-          clearLocal();
-          clear();
-          setTimeout(() => {
-            closeSheet();
-          }, 100);
-        }}>
-        <FontAwesomeIcon
-          size={30}
-          icon={faXmark}
-          color={colors.text}
-          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
-        />
-      </TouchableOpacity>
-      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
-        {translate('history.filters') as string}
-      </RegText>
-      <View
-        style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
-        <ScrollView 
+    >
+      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
+        <ScrollView
           contentContainerStyle={{
-              width: '100%',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-            }}>
+            width: '100%',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+          }}
+        >
           <View
             style={{
               width: '90%',
@@ -104,72 +77,119 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               alignItems: 'center',
               justifyContent: 'flex-start',
               rowGap: 10,
-            }}>
+            }}
+          >
             <TouchableOpacity
               onPress={() => {
-                setFilterKindLocal(filterKindLocal === FilterEnum.sent ? null : FilterEnum.sent);
-              }}>
+                setFilterKindLocal(
+                  filterKindLocal === FilterEnum.sent ? null : FilterEnum.sent,
+                );
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filterKindLocal === FilterEnum.sent ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor:
+                    filterKindLocal === FilterEnum.sent
+                      ? colors.primary
+                      : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filterKindLocal === FilterEnum.sent ? colors.primary : colors.zingo,
+                  borderColor:
+                    filterKindLocal === FilterEnum.sent
+                      ? colors.primary
+                      : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginRight: 10,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filterKindLocal === FilterEnum.sent ? colors.sideMenuBackground : colors.zingo,
+                    color:
+                      filterKindLocal === FilterEnum.sent
+                        ? colors.sideMenuBackground
+                        : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('history.sent') as string}
                 </FadeText>
               </View>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                setFilterKindLocal(filterKindLocal === FilterEnum.received ? null : FilterEnum.received);
-              }}>
+                setFilterKindLocal(
+                  filterKindLocal === FilterEnum.received
+                    ? null
+                    : FilterEnum.received,
+                );
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filterKindLocal === FilterEnum.received ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor:
+                    filterKindLocal === FilterEnum.received
+                      ? colors.primary
+                      : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filterKindLocal === FilterEnum.received ? colors.primary : colors.zingo,
+                  borderColor:
+                    filterKindLocal === FilterEnum.received
+                      ? colors.primary
+                      : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginRight: 10,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filterKindLocal === FilterEnum.received ? colors.sideMenuBackground : colors.zingo,
+                    color:
+                      filterKindLocal === FilterEnum.received
+                        ? colors.sideMenuBackground
+                        : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('history.received') as string}
                 </FadeText>
               </View>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                setFilterKindLocal(filterKindLocal === FilterEnum.shielded ? null : FilterEnum.shielded);
-              }}>
+                setFilterKindLocal(
+                  filterKindLocal === FilterEnum.shielded
+                    ? null
+                    : FilterEnum.shielded,
+                );
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filterKindLocal === FilterEnum.shielded ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor:
+                    filterKindLocal === FilterEnum.shielded
+                      ? colors.primary
+                      : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filterKindLocal === FilterEnum.shielded ? colors.primary : colors.zingo,
+                  borderColor:
+                    filterKindLocal === FilterEnum.shielded
+                      ? colors.primary
+                      : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginRight: 10,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filterKindLocal === FilterEnum.shielded ? colors.sideMenuBackground : colors.zingo,
+                    color:
+                      filterKindLocal === FilterEnum.shielded
+                        ? colors.sideMenuBackground
+                        : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('history.shield') as string}
                 </FadeText>
               </View>
@@ -177,22 +197,31 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
             <TouchableOpacity
               onPress={() => {
                 setFilterFailedLocal(!filterFailedLocal);
-              }}>
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filterFailedLocal ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor: filterFailedLocal
+                    ? colors.primary
+                    : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filterFailedLocal ? colors.primary : colors.zingo,
+                  borderColor: filterFailedLocal
+                    ? colors.primary
+                    : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginRight: 10,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filterFailedLocal ? colors.sideMenuBackground : colors.zingo,
+                    color: filterFailedLocal
+                      ? colors.sideMenuBackground
+                      : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('history.failed') as string}
                 </FadeText>
               </View>
@@ -200,22 +229,29 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
             <TouchableOpacity
               onPress={() => {
                 setFilterMemosLocal(!filterMemosLocal);
-              }}>
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filterMemosLocal ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor: filterMemosLocal
+                    ? colors.primary
+                    : colors.sideMenuBackground,
                   borderRadius: 15,
                   borderColor: filterMemosLocal ? colors.primary : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginRight: 10,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filterMemosLocal ? colors.sideMenuBackground : colors.zingo,
+                    color: filterMemosLocal
+                      ? colors.sideMenuBackground
+                      : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('history.memo') as string}
                 </FadeText>
               </View>
@@ -223,21 +259,30 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
             <TouchableOpacity
               onPress={() => {
                 setFilterWithFundsLocal(!filterWithFundsLocal);
-              }}>
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: filterWithFundsLocal ? colors.primary : colors.sideMenuBackground,
+                  backgroundColor: filterWithFundsLocal
+                    ? colors.primary
+                    : colors.sideMenuBackground,
                   borderRadius: 15,
-                  borderColor: filterWithFundsLocal ? colors.primary : colors.zingo,
+                  borderColor: filterWithFundsLocal
+                    ? colors.primary
+                    : colors.zingo,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
-                }}>
+                }}
+              >
                 <FadeText
                   style={{
-                    color: filterWithFundsLocal ? colors.sideMenuBackground : colors.zingo,
+                    color: filterWithFundsLocal
+                      ? colors.sideMenuBackground
+                      : colors.zingo,
                     fontWeight: 'bold',
-                  }}>
+                  }}
+                >
                   {translate('history.filter-withfunds') as string}
                 </FadeText>
               </View>
@@ -252,7 +297,8 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
             alignItems: 'center',
             marginVertical: 5,
             marginTop: 30,
-          }}>
+          }}
+        >
           <Button
             type={ButtonTypeEnum.Secondary}
             title={translate('clear') as string}
@@ -262,7 +308,6 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               setFilterFailed(false);
               setFilterMemos(false);
               clearLocal();
-              clear();
               closeSheet();
             }}
             twoButtons={true}
@@ -277,7 +322,6 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               setFilterFailed(filterFailedLocal);
               setFilterMemos(filterMemosLocal);
               clearLocal();
-              clear();
               closeSheet();
             }}
             twoButtons={true}

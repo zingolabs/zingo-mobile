@@ -7,18 +7,24 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
 import { CurrencyEnum, ModeEnum, RouteEnum } from '../app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.History> {
+function makeDrawerProps(): NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.History
+> {
   return {
     navigation: mockNavigation,
     route: {
@@ -31,7 +37,7 @@ function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Hist
 // test suite
 describe('Component History - test', () => {
   //snapshot test
-  const state = defaultAppContextLoaded;
+  const state = { ...defaultAppContextLoaded };
   state.valueTransfers = mockValueTransfers;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
@@ -49,7 +55,8 @@ describe('Component History - test', () => {
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History {...props}
+        <History
+          {...props}
           toggleMenuDrawer={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
@@ -71,7 +78,8 @@ describe('Component History - test', () => {
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History {...props}
+        <History
+          {...props}
           toggleMenuDrawer={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}

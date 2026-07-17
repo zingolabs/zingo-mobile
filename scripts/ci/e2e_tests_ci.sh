@@ -76,7 +76,7 @@ i=0
 step_complete=false
 until [[ $step_complete == true ]]; do
     if adb -s emulator-5554 install -r -t -d \
-            "app/build/outputs/apk/androidTest/release/app-release-androidTest.apk" &> "${test_report_dir}/apk_installation.txt"; then
+            "app/build/outputs/apk/androidTest/prod/release/app-prod-release-androidTest.apk" &> "${test_report_dir}/apk_installation.txt"; then
         step_complete=true
         echo "Successfully installed Test APK"
     fi              
@@ -94,7 +94,7 @@ i=0
 step_complete=false
 until [[ $step_complete == true ]]; do
     if adb -s emulator-5554 install -r -t -d --abi "${abi}" \
-            "app/build/outputs/apk/release/app-${abi}-release.apk" &> "${test_report_dir}/apk_installation.txt"; then
+            "app/build/outputs/apk/prod/release/app-prod-${abi}-release.apk" &> "${test_report_dir}/apk_installation.txt"; then
         step_complete=true
         echo "Successfully installed ABI APK"
     fi              

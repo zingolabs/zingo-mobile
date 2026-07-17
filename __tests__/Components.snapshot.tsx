@@ -30,18 +30,6 @@ describe('Component Components - test', () => {
     expect(currencyAmount).toMatchSnapshot();
   });
 
-  test('CurrencyAmount Normal Privacy with TOR - snapshot', () => {
-    const currencyAmount = render(
-      <CurrencyAmount
-        price={1.12345678}
-        amtZec={39.99}
-        style={{ backgroundColor: 'red' }}
-        currency={CurrencyEnum.USDTORCurrency}
-      />,
-    );
-    expect(currencyAmount).toMatchSnapshot();
-  });
-
   test('ZecAmount High Privacy - snapshot', () => {
     const zecAmount = render(
       <ZecAmount
@@ -70,24 +58,38 @@ describe('Component Components - test', () => {
   });
 
   test('BoldText - snapshot', () => {
-    const boldText = render(<BoldText style={{ backgroundColor: 'red' }} children={'bold text'} />);
+    const boldText = render(
+      <BoldText style={{ backgroundColor: 'red' }} children={'bold text'} />,
+    );
     expect(boldText).toMatchSnapshot();
   });
 
   test('FadeText - snapshot', () => {
-    const fadeText = render(<FadeText style={{ backgroundColor: 'red' }} children={'fade text'} />);
+    const fadeText = render(
+      <FadeText style={{ backgroundColor: 'red' }} children={'fade text'} />,
+    );
     expect(fadeText).toMatchSnapshot();
   });
 
   test('ErrorText - snapshot', () => {
-    const errorText = render(<ErrorText style={{ backgroundColor: 'white' }} children={'error text'} />);
+    const errorText = render(
+      <ErrorText
+        style={{ backgroundColor: 'white' }}
+        children={'error text'}
+      />,
+    );
     expect(errorText).toMatchSnapshot();
   });
 
   test('RegText - snapshot', () => {
     const onPress = jest.fn();
     const regText = render(
-      <RegText style={{ backgroundColor: 'white' }} color={'red'} onPress={onPress} children={'reg text'} />,
+      <RegText
+        style={{ backgroundColor: 'white' }}
+        color={'red'}
+        onPress={onPress}
+        children={'reg text'}
+      />,
     );
     expect(regText).toMatchSnapshot();
   });

@@ -9,18 +9,21 @@ import { render } from '@testing-library/react-native';
 import { LoadedApp } from '../app/LoadedApp';
 import { StackScreenProps } from '@react-navigation/stack';
 import { AppStackParamList } from '../app/types';
-import { LaunchingModeEnum, RouteEnum } from '../app/AppState';
+import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('react-native-localize', () => ({
-  findBestLanguageTag: jest.fn().mockImplementation((supportedLocales) => {
+  findBestLanguageTag: jest.fn().mockImplementation(supportedLocales => {
     return { languageTag: supportedLocales?.[0] || 'en', isRTL: false };
   }),
 }));
 
 jest.mock('i18n-js');
 
-function makeDrawerProps(): StackScreenProps<AppStackParamList, RouteEnum.LoadedApp> {
+function makeDrawerProps(): StackScreenProps<
+  AppStackParamList,
+  RouteEnum.LoadedApp
+> {
   return {
     navigation: mockNavigation,
     route: {
@@ -33,6 +36,7 @@ function makeDrawerProps(): StackScreenProps<AppStackParamList, RouteEnum.Loaded
         transparentPool: true,
         newWallet: false,
         firstLaunchingMessage: LaunchingModeEnum.opening,
+        walletChainName: ChainNameEnum.mainChainName,
       },
     },
   };

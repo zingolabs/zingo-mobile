@@ -20,4 +20,5 @@ export default {
   preload: jest.fn(),
   navigateDeprecated: jest.fn(),
   replaceParams: jest.fn(),
+  // as any: mock is shared across all screen types; no single NavigationProp type satisfies all
 } as any;

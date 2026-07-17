@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
 import { ModeEnum, CurrencyEnum, RouteEnum } from '../app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
@@ -16,11 +19,14 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> {
+function makeDrawerProps(): NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Send
+> {
   return {
     navigation: mockNavigation,
     route: {
@@ -33,7 +39,7 @@ function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Send
 // test suite
 describe('Component Send - test', () => {
   //snapshot test
-  const state = defaultAppContextLoaded;
+  const state = { ...defaultAppContextLoaded };
   state.valueTransfers = mockValueTransfers;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
@@ -53,7 +59,8 @@ describe('Component Send - test', () => {
     const props = makeDrawerProps();
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send {...props}
+        <Send
+          {...props}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
           toggleMenuDrawer={onFunction}
@@ -78,7 +85,8 @@ describe('Component Send - test', () => {
     const props = makeDrawerProps();
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send {...props}
+        <Send
+          {...props}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
           toggleMenuDrawer={onFunction}

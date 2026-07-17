@@ -22,7 +22,8 @@ RCT_EXTERN_METHOD(deleteExistingWalletBackup:
     (RCTPromiseResolveBlock)resolve 
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(createNewWallet:
-    (NSString)serveruri 
+    (NSString)serveruri
+                  birthday:(NSString)birthday
                   chainhint:(NSString)chainhint
                   performancelevel:(NSString)performancelevel
                   minconfirmations:(NSString)minconfirmations
@@ -140,8 +141,7 @@ RCT_EXTERN_METHOD(getTotalSpendsToAddressInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(zecPriceInfo:
-    (NSString)tor 
-                  resolve:(RCTPromiseResolveBlock)resolve
+    (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(removeTransactionProcess:
     (NSString)txid 
@@ -159,12 +159,6 @@ RCT_EXTERN_METHOD(getOptionWalletInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(setOptionWalletProcess:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(createTorClientProcess:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(removeTorClientProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getUnifiedAddressesInfo:
@@ -206,6 +200,9 @@ RCT_EXTERN_METHOD(shieldProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(confirmProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(drainOrchardToIronwoodProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 

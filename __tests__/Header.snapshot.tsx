@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Header from '../components/Header';
-import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
+import {
+  ContextAppLoadedProvider,
+  defaultAppContextLoaded,
+} from '../app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -17,7 +20,7 @@ import { ScreenEnum } from '../app/AppState';
 describe('Component Header - test', () => {
   //snapshot test
   test('Header Simple - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.translate = mockTranslate;
     const close = jest.fn();
     const about = render(
@@ -37,7 +40,7 @@ describe('Component Header - test', () => {
     expect(about.toJSON()).toMatchSnapshot();
   });
   test('Header Complex - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.translate = mockTranslate;
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;

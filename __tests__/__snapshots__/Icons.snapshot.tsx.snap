@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Icon components - snapshots BiohazardIcon 1`] = `null`;
+
+exports[`Icon components - snapshots ChevronDown 1`] = `null`;
+
+exports[`Icon components - snapshots ChevronUp 1`] = `null`;
+
+exports[`Icon components - snapshots CopyIcon 1`] = `null`;
+
+exports[`Icon components - snapshots EyeIcon 1`] = `null`;
+
+exports[`Icon components - snapshots FiltersIcon 1`] = `null`;
+
+exports[`Icon components - snapshots ListIcon 1`] = `null`;
+
+exports[`Icon components - snapshots ShieldIcon 1`] = `null`;
+
+exports[`Icon components - snapshots SkullIcon 1`] = `null`;
+
+exports[`Icon components - snapshots TriangleAlert 1`] = `null`;
+
+exports[`Icon components - snapshots VerifyCheckIcon 1`] = `null`;
+
+exports[`Icon components - snapshots VerifyXIcon 1`] = `null`;
+
+exports[`Icon components - snapshots XIcon 1`] = `null`;

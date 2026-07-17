@@ -15,7 +15,12 @@ import {
   SelectServerEnum,
   ScreenEnum,
 } from '../../app/AppState';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -33,7 +38,9 @@ type AddressItemProps = {
 
 const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   address,
-  screenName,
+  // screenName is still in the type for backward compat with all callers but
+  // no longer consumed here — launchAddTagModal works the same regardless of
+  // where it's invoked from.
   oneLine,
   onlyContact,
   withIcon,
@@ -41,13 +48,13 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   addressProtected,
   ufvk,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
     addLastSnackbar,
     addressBook,
-    launchAddressBook,
+    launchAddTagModal,
     privacy,
     readOnly,
     mode,
@@ -65,7 +72,11 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const numLinesAdd = address ? (address.length < 50 ? 2 : address.length / 30) : 0;
+    const numLinesAdd = address
+      ? address.length < 50
+        ? 2
+        : address.length / 30
+      : 0;
     let cont: string = addressBook
       .filter((ab: AddressBookFileClass) => ab.address === address)
       .map((ab: AddressBookFileClass) => ab.label)
@@ -94,14 +105,21 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       {loading ? (
         <ActivityIndicator size="small" color={colors.primary} />
       ) : (
-        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+          }}
+        >
           <View
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
               marginRight: onlyContact ? 0 : 10,
-            }}>
+            }}
+          >
             {contact && (
               <TouchableOpacity
                 onPress={() => {
@@ -111,14 +129,28 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                       setExpandContact(false);
                     }, 5 * 1000);
                   }
-                }}>
-                <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-                  {!expandContact && numLinesContact > 1 && <RegText>{Utils.trimToSmall(contact, 7)}</RegText>}
-                  {!expandContact && numLinesContact === 1 && <RegText>{contact}</RegText>}
+                }}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  {!expandContact && numLinesContact > 1 && (
+                    <RegText>{Utils.trimToSmall(contact, 7)}</RegText>
+                  )}
+                  {!expandContact && numLinesContact === 1 && (
+                    <RegText>{contact}</RegText>
+                  )}
                   {expandContact &&
-                    Utils.splitStringIntoChunks(contact, Number(numLinesContact.toFixed(0))).map(
-                      (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                    )}
+                    Utils.splitStringIntoChunks(
+                      contact,
+                      Number(numLinesContact.toFixed(0)),
+                    ).map((c: string, idx: number) => (
+                      <RegText key={idx}>{c}</RegText>
+                    ))}
                 </View>
               </TouchableOpacity>
             )}
@@ -127,13 +159,12 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 onPress={() => {
                   if (address && !oneLine && !addressProtected) {
                     Clipboard.setString(address);
-                    addLastSnackbar({
-                      message: ufvk
+                    addLastSnackbar(
+                      ufvk
                         ? (translate('seed.tapcopy-ufvk-message') as string)
                         : (translate('history.addresscopied') as string),
-                      duration: SnackbarDurationEnum.short,
-                      screenName: [screenName],
-                    });
+                      SnackbarDurationEnum.short,
+                    );
                     setExpandAddress(true);
                     if (privacy) {
                       setTimeout(() => {
@@ -141,21 +172,41 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                       }, 5 * 1000);
                     }
                   }
-                }}>
-                <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                }}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexWrap: 'wrap',
+                  }}
+                >
                   {!address && <RegText>{'Unknown'}</RegText>}
-                  {!expandAddress && !!address && <RegText>{Utils.trimToSmall(address, 7)}</RegText>}
+                  {!expandAddress && !!address && (
+                    <RegText>
+                      {privacy
+                        ? // Privacy on: even the partial address leaks too many
+                          // clues in the list/detail — show only the first 2
+                          // characters followed by 5 dots. Tapping still reveals
+                          // the full address for 5 s (handled above).
+                          `${address.slice(0, 2)}.....`
+                        : Utils.trimToSmall(address, 7)}
+                    </RegText>
+                  )}
                   {expandAddress &&
                     !!address &&
-                    Utils.splitStringIntoChunks(address, Number(numLinesAddress.toFixed(0))).map(
-                      (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                    )}
+                    Utils.splitStringIntoChunks(
+                      address,
+                      Number(numLinesAddress.toFixed(0)),
+                    ).map((c: string, idx: number) => (
+                      <RegText key={idx}>{c}</RegText>
+                    ))}
                 </View>
               </TouchableOpacity>
             )}
           </View>
           {withIcon && !contact && oneLine && (
-            <TouchableOpacity onPress={() => launchAddressBook(address, screenName)}>
+            <TouchableOpacity onPress={() => launchAddTagModal(address)}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -163,14 +214,25 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                   alignItems: 'center',
                   paddingHorizontal: 4,
                   paddingBottom: 2,
-                }}>
-                <FontAwesomeIcon style={{ marginTop: 3 }} size={25} icon={faUserPlus} color={colors.primary} />
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ marginTop: 3 }}
+                  size={20}
+                  icon={faUserPlus}
+                  color={colors.primary}
+                />
               </View>
             </TouchableOpacity>
           )}
           {withIcon && !contact && !oneLine && (
-            <TouchableOpacity onPress={() => launchAddressBook(address, screenName)}>
-              <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faUserPlus} color={colors.primary} />
+            <TouchableOpacity onPress={() => launchAddTagModal(address)}>
+              <FontAwesomeIcon
+                style={{ marginTop: 3 }}
+                size={24}
+                icon={faUserPlus}
+                color={colors.primary}
+              />
             </TouchableOpacity>
           )}
           {withSendIcon &&
@@ -188,14 +250,22 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 style={{ marginLeft: 10 }}
                 onPress={() => {
                   // enviar
-                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                  const sendPageState = new SendPageStateClass(
+                    new ToAddrClass(0),
+                  );
                   sendPageState.toaddr.to = address;
                   setSendPageState(sendPageState);
                   navigation.navigate(RouteEnum.HomeStack, {
                     screen: RouteEnum.Send,
                   });
-                }}>
-                <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ marginTop: 3 }}
+                  size={24}
+                  icon={faPaperPlane}
+                  color={colors.primary}
+                />
               </TouchableOpacity>
             )}
         </View>

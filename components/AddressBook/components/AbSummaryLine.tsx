@@ -1,14 +1,29 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { View, TouchableOpacity } from 'react-native';
+import { showConfirm } from '../../../app/showConfirm';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAddressCard, faQrcode, faTrashCan, faPencil, faPaperPlane, faWallet } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAddressCard,
+  faQrcode,
+  faTrashCan,
+  faPencil,
+  faPaperPlane,
+  faWallet,
+} from '@fortawesome/free-solid-svg-icons';
 
 import FadeText from '../../Components/FadeText';
 import {
   AddressBookActionEnum,
   AddressBookFileClass,
+  ChainNameEnum,
+  GlobalConst,
   SendPageStateClass,
   ToAddrClass,
   ModeEnum,
@@ -18,47 +33,63 @@ import {
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
+import { ChainLogo } from '../../Components/ChainSelect';
 
 type AbSummaryLineProps = {
   index: number;
   item: AddressBookFileClass;
-  setCurrentItem: (b: number) => void;
-  setAction: (action: AddressBookActionEnum) => void;
+  openAbDetail: (index: number, action: AddressBookActionEnum) => void;
   handleScrollToTop: () => void;
   doAction: (
     action: AddressBookActionEnum,
     label: string,
     address: string,
     color: string,
+    chain: ChainNameEnum,
+    swapChain: string,
   ) => void;
   addressProtected?: boolean;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   index,
   item,
-  setCurrentItem,
-  setAction,
+  openAbDetail,
   handleScrollToTop,
   doAction,
   addressProtected,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, totalBalance, selectServer, setSendPageState } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const {
+    translate,
+    readOnly,
+    mode,
+    totalBalance,
+    selectServer,
+    setSendPageState,
+  } = context;
+  const { colors } = useTheme() as ThemeType;
 
-  const displayAddress: string = item.address ? Utils.trimToSmall(item.address, 7) : (translate('info.unknown') as string);
+  const displayAddress: string = item.address
+    ? Utils.trimToSmall(item.address, 7)
+    : (translate('info.unknown') as string);
   const displayContact: string = item.label
     ? item.label.length > 20
       ? Utils.trimToSmall(item.label, 8)
       : item.label
     : (translate('info.unknown') as string);
 
+  // Every contact carries a chain badge — the Zcash mark for external ZEC
+  // contacts, the chain logo for non-ZEC ones. The wallet's own addresses
+  // (tags) and protected internal entries (e.g. the Zennies tip address) show
+  // the bare icon with nothing beside it.
+  const showChainBadge = !item.own && !addressProtected;
+
   const onPressDelete = () => {
-    Alert.alert(
-      translate('addressbook.delete-title') as string,
-      translate('addressbook.delete-alert') as string,
-      [
+    showConfirm({
+      title: translate('addressbook.delete-title') as string,
+      message: translate('addressbook.delete-alert') as string,
+      buttons: [
         {
           text: translate('confirm') as string,
           onPress: () =>
@@ -67,44 +98,97 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
               item.label,
               item.address,
               item.color ? item.color : '',
+              item.chain,
+              item.swapChain,
             ),
         },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: false },
-    );
+    });
   };
 
   //console.log('render Ab SummaryLine - 5', index);
 
   return (
-    <View testID={`addressbooklist.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
+    <View
+      testID={`addressbooklist.${index + 1}`}
+      style={{ display: 'flex', flexDirection: 'column' }}
+    >
       <View
         style={{
           display: 'flex',
           flexDirection: 'row',
           marginTop: 15,
           paddingBottom: 15,
-          borderBottomWidth: addressProtected ? 3 : 1,
-          borderBottomColor: addressProtected ? colors.zingo : colors.border,
-          opacity: addressProtected ? 0.5 : 1,
-        }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
+          borderBottomWidth: 1.5,
+          borderBottomColor: '#122033',
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+          }}
+        >
           <TouchableOpacity
             onPress={() => {
               if (!addressProtected) {
-                setCurrentItem(index);
-                setAction(AddressBookActionEnum.Modify);
+                openAbDetail(index, AddressBookActionEnum.Modify);
                 handleScrollToTop();
               }
-            }}>
-            <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-              <FontAwesomeIcon
-                style={{ marginHorizontal: 10 }}
-                size={24}
-                icon={item.own ? faWallet : faAddressCard}
-                color={addressProtected || item.own ? colors.zingo : item.color ? item.color : colors.primarydisabled}
-              />
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: 5,
+              }}
+            >
+              <View
+                style={{
+                  width: 28,
+                  height: 28,
+                  marginHorizontal: 10,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <FontAwesomeIcon
+                  size={28}
+                  icon={item.own ? faWallet : faAddressCard}
+                  color={
+                    addressProtected || item.own
+                      ? colors.zingo
+                      : item.color
+                        ? item.color
+                        : colors.primarydisabled
+                  }
+                />
+                {/* Chain badge: a small circle pinned to the bottom-right
+                    corner of the contact icon, overlapping it, with a
+                    background-coloured ring so it reads as "on top". Zcash mark
+                    for ZEC contacts, chain logo for the rest. */}
+                {showChainBadge && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      right: -8,
+                      bottom: -4,
+                      borderRadius: 10,
+                      borderWidth: 1.5,
+                      borderColor: colors.background,
+                      backgroundColor: colors.background,
+                    }}
+                  >
+                    <ChainLogo
+                      chain={item.swapChain || GlobalConst.zecSwapChain}
+                      size={17}
+                    />
+                  </View>
+                )}
+              </View>
               <FadeText
                 style={{
                   fontSize: 18,
@@ -112,60 +196,114 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   color: addressProtected ? colors.zingo : colors.primary,
                   opacity: 1,
                   fontWeight: 'bold',
-                }}>
+                }}
+              >
                 {displayContact}
               </FadeText>
             </View>
             <View style={{ flexDirection: 'row' }}>
-              <FontAwesomeIcon style={{ marginHorizontal: 10 }} size={24} icon={faQrcode} color={colors.zingo} />
-              <FadeText style={{ fontSize: 18, marginHorizontal: 10, opacity: 1, fontWeight: 'bold' }}>
+              <FontAwesomeIcon
+                style={{ marginHorizontal: 10 }}
+                size={20}
+                icon={faQrcode}
+                color={colors.zingo}
+              />
+              <FadeText
+                style={{
+                  fontSize: 18,
+                  marginHorizontal: 10,
+                  opacity: 1,
+                  fontWeight: 'bold',
+                }}
+              >
                 {displayAddress}
               </FadeText>
             </View>
           </TouchableOpacity>
         </View>
         {!addressProtected && (
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+          <View
+            style={{
+              width: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
             <TouchableOpacity
               style={{ zIndex: 999, padding: 10 }}
               onPress={() => {
-                setCurrentItem(index);
-                setAction(AddressBookActionEnum.Modify);
+                openAbDetail(index, AddressBookActionEnum.Modify);
                 handleScrollToTop();
-              }}>
-              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faPencil} color={colors.money} />
+              }}
+            >
+              <FontAwesomeIcon
+                style={{ opacity: 0.8 }}
+                size={20}
+                icon={faPencil}
+                color={colors.money}
+              />
             </TouchableOpacity>
           </View>
         )}
         {!readOnly &&
           selectServer !== SelectServerEnum.offline &&
           !addressProtected &&
+          // The wallet can only send to Zcash addresses — hide the send action
+          // for non-ZEC (swap) contacts.
+          item.swapChain === GlobalConst.zecSwapChain &&
           !(
             mode === ModeEnum.basic &&
             totalBalance &&
             // because the action is related with `send`.
             totalBalance.totalSpendableBalance <= 0
           ) && (
-            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                width: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
               <TouchableOpacity
                 style={{ zIndex: 999, padding: 10 }}
                 onPress={() => {
                   // enviar
-                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                  const sendPageState = new SendPageStateClass(
+                    new ToAddrClass(0),
+                  );
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
                   navigation.navigate(RouteEnum.HomeStack, {
                     screen: RouteEnum.Send,
                   });
-                }}>
-                <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
+                }}
+              >
+                <FontAwesomeIcon
+                  size={24}
+                  icon={faPaperPlane}
+                  color={colors.primary}
+                />
               </TouchableOpacity>
             </View>
           )}
         {!addressProtected && (
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableOpacity style={{ zIndex: 999, padding: 10 }} onPress={() => onPressDelete()}>
-              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faTrashCan} color={colors.money} />
+          <View
+            style={{
+              width: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <TouchableOpacity
+              style={{ zIndex: 999, padding: 10 }}
+              onPress={() => onPressDelete()}
+            >
+              <FontAwesomeIcon
+                style={{ opacity: 0.8 }}
+                size={20}
+                icon={faTrashCan}
+                color={colors.money}
+              />
             </TouchableOpacity>
           </View>
         )}

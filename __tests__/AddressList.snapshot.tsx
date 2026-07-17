@@ -6,16 +6,21 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
+import {
+  ContextAppLoadedProvider,
+  defaultAppContextLoaded,
+} from '../app/context';
 import { AddressList } from '../components/AddressList';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { AddressKindEnum, RouteEnum } from '../app/AppState';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(ak: AddressKindEnum): DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressList> {
+function makeDrawerProps(
+  ak: AddressKindEnum,
+): NativeStackScreenProps<AppDrawerParamList, RouteEnum.AddressList> {
   return {
     navigation: mockNavigation,
     route: {
@@ -32,11 +37,11 @@ function makeDrawerProps(ak: AddressKindEnum): DrawerScreenProps<AppDrawerParamL
 describe('Component Unified Address List - test', () => {
   //snapshot test
   test('Address Unified List - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     const props = makeDrawerProps(AddressKindEnum.u);
-    const al: any = render(
+    const al = render(
       <ContextAppLoadedProvider value={state}>
         <AddressList {...props} />
       </ContextAppLoadedProvider>,
@@ -45,11 +50,11 @@ describe('Component Unified Address List - test', () => {
   });
 
   test('Address Transparent List - snapshot', () => {
-    const state = defaultAppContextLoaded;
+    const state = { ...defaultAppContextLoaded };
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     const props = makeDrawerProps(AddressKindEnum.t);
-    const al: any = render(
+    const al = render(
       <ContextAppLoadedProvider value={state}>
         <AddressList {...props} />
       </ContextAppLoadedProvider>,

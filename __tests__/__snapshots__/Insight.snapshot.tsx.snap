@@ -2,284 +2,25 @@
 
 exports[`Component Insight - test Insight - snapshot 1`] = `
 <View
+  onLayout={[Function]}
   style={
-    [
-      {
-        "flex": 1,
-      },
-      undefined,
-    ]
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+    }
   }
 >
-  <View />
+  <View
+    onLayout={[Function]}
+  />
   <View
     style={
       {
-        "backgroundColor": "#011401",
+        "backgroundColor": "#031124",
         "flex": 1,
       }
     }
   >
-    <View>
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#011401",
-            "display": "flex",
-            "minHeight": 25,
-            "paddingBottom": 0,
-            "paddingTop": 10,
-          }
-        }
-        testID="header"
-      >
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "display": "flex",
-              "flexDirection": "row",
-              "flexWrap": "wrap",
-              "justifyContent": "center",
-              "marginHorizontal": 5,
-              "marginTop": 12,
-            }
-          }
-        >
-          <View
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": undefined,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              {
-                "marginHorizontal": 5,
-                "opacity": 1,
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "#011401",
-                    "display": "flex",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                    "margin": 0,
-                    "marginHorizontal": 2.5,
-                    "minHeight": 25,
-                    "minWidth": 25,
-                    "padding": 0,
-                  }
-                }
-              >
-                <
-                  color="#5a8c5a"
-                  icon={
-                    {
-                      "icon": [
-                        576,
-                        512,
-                        [],
-                        "f3c1",
-                        "M384 96c0-35.3 28.7-64 64-64s64 28.7 64 64l0 32c0 17.7 14.3 32 32 32s32-14.3 32-32l0-32c0-70.7-57.3-128-128-128S320 25.3 320 96l0 64-160 0c-35.3 0-64 28.7-64 64l0 224c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-224c0-35.3-28.7-64-64-64l-32 0 0-64z",
-                      ],
-                      "iconName": "lock-open",
-                      "prefix": "fas",
-                    }
-                  }
-                  size={25}
-                />
-              </View>
-            </View>
-          </View>
-        </View>
-      </View>
-      <View
-        style={
-          {
-            "left": 0,
-            "padding": 11.5,
-            "position": "absolute",
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "height": 40,
-            }
-          }
-        />
-      </View>
-      <View
-        style={
-          {
-            "padding": 13,
-            "position": "absolute",
-            "right": 0,
-          }
-        }
-      >
-        <Image
-          source={
-            {
-              "testUri": "../../../assets/img/logobig-zingo.png",
-            }
-          }
-          style={
-            {
-              "borderRadius": 10,
-              "height": 38,
-              "resizeMode": "contain",
-              "width": 38,
-            }
-          }
-        />
-      </View>
-    </View>
-    <View>
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "row",
-            "flexWrap": "wrap",
-            "justifyContent": "space-between",
-            "marginVertical": 5,
-            "width": "100%",
-          }
-        }
-      >
-        <View
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "opacity": 1,
-            }
-          }
-        >
-          <
-            color="#18bd18"
-            icon={
-              {
-                "icon": [
-                  320,
-                  512,
-                  [
-                    9001,
-                  ],
-                  "f053",
-                  "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
-                ],
-                "iconName": "chevron-left",
-                "prefix": "fas",
-              }
-            }
-            size={30}
-            style={
-              {
-                "marginHorizontal": 10,
-              }
-            }
-          />
-        </View>
-        <Text
-          style={
-            {
-              "color": "#ffffff",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-              "paddingHorizontal": 5,
-            }
-          }
-        >
-          text translated
-        </Text>
-        <View
-          style={
-            {
-              "height": 30,
-              "marginHorizontal": 10,
-              "width": 30,
-            }
-          }
-        />
-      </View>
-      <View
-        style={
-          {
-            "backgroundColor": "#18bd18",
-            "height": 1,
-            "width": "100%",
-          }
-        }
-      />
-    </View>
     <View
       style={
         {
@@ -351,7 +92,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               {
                 "color": "#18bd18",
                 "fontSize": 11,
-                "fontWeight": "600",
+                "fontWeight": "400",
                 "opacity": 1,
               }
             }
@@ -424,7 +165,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 11,
-                "fontWeight": "600",
+                "fontWeight": "400",
                 "opacity": 1,
               }
             }
@@ -497,7 +238,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 11,
-                "fontWeight": "600",
+                "fontWeight": "400",
                 "opacity": 1,
               }
             }
@@ -509,56 +250,42 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         </View>
       </View>
     </View>
-    <RCTScrollView
-      contentContainerStyle={{}}
-      indicatorStyle="white"
-      persistentScrollbar={true}
-      showsVerticalScrollIndicator={true}
+    <View
       style={
         {
-          "maxHeight": "90%",
+          "display": "flex",
+          "margin": 20,
         }
       }
     >
-      <View>
-        <View
-          style={
-            {
-              "display": "flex",
-              "margin": 20,
-            }
+      <ActivityIndicator
+        color="#18bd18"
+        size="large"
+        style={
+          {
+            "marginTop": 100,
           }
-        >
-          <ActivityIndicator
-            color="#18bd18"
-            size="large"
-            style={
-              {
-                "marginTop": 100,
-              }
-            }
-          />
-        </View>
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "display": "flex",
-              "marginHorizontal": 5,
-              "padding": 0,
-            }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "display": "flex",
+          "marginHorizontal": 5,
+          "padding": 0,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "width": "100%",
           }
-        >
-          <View
-            style={
-              {
-                "width": "100%",
-              }
-            }
-          />
-        </View>
-      </View>
-    </RCTScrollView>
+        }
+      />
+    </View>
   </View>
 </View>
 `;

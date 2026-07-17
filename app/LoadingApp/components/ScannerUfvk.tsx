@@ -1,25 +1,43 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
-import { ContextAppLoading } from '../../context';
-import Scanner from '../../../components/Scanner';
-import Header from '../../../components/Header';
-
+import React, { useEffect, useState } from 'react';
+import { Pressable, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../types';
-import { View } from 'react-native';
-import Snackbars from '../../../components/Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
-import { ScreenEnum } from '../../AppState';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type ScannerUfvkProps = {
-  setUfvkText: (k: string) => void;
-  closeModal: () => void;
-};
-const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, closeModal }) => {
-  const context = useContext(ContextAppLoading);
-  const { translate, snackbars, removeFirstSnackbar } = context;
-  const { colors } = useTheme()  as ThemeType;
-  const screenName = ScreenEnum.ScannerUfvk;
+import Scanner from '../../../components/Scanner';
+import { RouteEnum } from '../../AppState';
+import { AppStackParamList, ThemeType } from '../../types';
+
+type ScannerUfvkProps = NativeStackScreenProps<
+  AppStackParamList,
+  RouteEnum.ScannerUfvk
+>;
+
+const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({
+  navigation,
+  route,
+}) => {
+  const setUfvkText =
+    !!route.params && route.params.setUfvkText !== undefined
+      ? route.params.setUfvkText
+      : () => {};
+  const { colors } = useTheme() as ThemeType;
+
+  const [active, setActive] = useState<boolean>(
+    !!route.params && route.params.active !== undefined
+      ? route.params.active
+      : false,
+  );
+
+  useEffect(() => {
+    const _active =
+      !!route.params && route.params.active !== undefined
+        ? route.params.active
+        : false;
+    setActive(_active);
+  }, [route, route.params, route.params?.active]);
 
   const onRead = async (scandata: string) => {
     if (!scandata) {
@@ -28,32 +46,41 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
     setUfvkText(scandata);
   };
 
-  return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
+  const onCloseScreen = () => {
+    setActive(false);
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  };
 
-      <View
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <Scanner active={active} onRead={onRead} onClose={onCloseScreen} />
+      <Pressable
+        onPress={onCloseScreen}
+        hitSlop={12}
         style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}>
-        <Header
-          title={translate('scanner.text') as string}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-          closeScreen={closeModal}
-        />
-        <Scanner onRead={onRead} onClose={() => closeModal()} active={true} />
-      </View>
-    </ToastProvider>
+          position: 'absolute',
+          top: 32,
+          right: 32,
+          width: 44,
+          height: 44,
+          borderRadius: 22,
+          backgroundColor: 'rgba(0,0,0,0.55)',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        accessibilityLabel="Close scanner"
+        accessibilityRole="button"
+      >
+        <FontAwesomeIcon icon={faXmark} size={22} color={'#FFFFFF'} />
+      </Pressable>
+    </View>
   );
 };
 

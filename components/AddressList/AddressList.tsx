@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   View,
   ScrollView,
@@ -7,73 +14,169 @@ import {
   NativeSyntheticEvent,
   ActivityIndicator,
   Pressable,
+  TouchableOpacity,
 } from 'react-native';
 
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressKindEnum, ButtonTypeEnum, RouteEnum, ScreenEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
+import {
+  AddressKindEnum,
+  ButtonTypeEnum,
+  RouteEnum,
+  ScreenEnum,
+  TransparentAddressClass,
+  UnifiedAddressClass,
+} from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
+import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
-import Snackbars from '../Components/Snackbars';
-import { ToastProvider, useToast } from 'react-native-toastier';
-import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { faAngleUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import BottomSheet from '@gorhom/bottom-sheet';
+import { RPCAddressScopeEnum } from '../../app/walletBackend/enums/RPCAddressScopeEnum';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 
-type AddressListProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressList>;
+type AddressListProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.AddressList
+>;
 
 const AddressList: React.FunctionComponent<AddressListProps> = ({
   navigation,
   route,
 }) => {
-  const setIndex = !!route.params && route.params.setIndex !== undefined ? route.params.setIndex : () => {};
+  const setIndex =
+    !!route.params && route.params.setIndex !== undefined
+      ? route.params.setIndex
+      : () => {};
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    addresses,
-    snackbars,
-    removeFirstSnackbar,
-  } = context;
-  const { colors } = useTheme()  as ThemeType;
-  const { clear } = useToast();
+  const { translate, addresses } = context;
+  const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.AddressList;
 
   const [numAl, setNumAl] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
-  const [addressesSliced, setAddressesSliced] = useState<(UnifiedAddressClass | TransparentAddressClass)[]>([]);
+  const [addressesSliced, setAddressesSliced] = useState<
+    (UnifiedAddressClass | TransparentAddressClass)[]
+  >([]);
 
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [addressKind, setAddressKind] = useState<AddressKindEnum>(!!route.params && route.params.addressKind !== undefined ? route.params.addressKind : AddressKindEnum.u);
+  const [addressKind, setAddressKind] = useState<AddressKindEnum>(
+    !!route.params && route.params.addressKind !== undefined
+      ? route.params.addressKind
+      : AddressKindEnum.u,
+  );
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
+  const addressListSheetRef = useRef<BottomSheet>(null);
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
+  const closeScreen = useCallback(() => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  }, [navigation]);
+
+  const addressListSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  const handleTitle = useMemo(
+    () =>
+      `${translate('addresslist.title')} - ${
+        addressKind === AddressKindEnum.u
+          ? translate('addresslist.unified')
+          : translate('addresslist.transparent')
+      }`,
+    [addressKind, translate],
+  );
+
+  const renderAddressListHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 12,
+          paddingBottom: 8,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 0.5,
+          borderRightWidth: 0.5,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <TouchableOpacity
+            onPress={closeScreen}
+            hitSlop={8}
+            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronLeft}
+              size={20}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
+            {handleTitle}
+          </BoldText>
+          <View style={{ width: 28 }} />
+        </View>
+      </View>
+    ),
+    [colors, closeScreen, handleTitle],
+  );
+
   useEffect(() => {
-    const _addressKind = !!route.params && route.params.addressKind !== undefined ? route.params.addressKind : AddressKindEnum.u;
+    const _addressKind =
+      !!route.params && route.params.addressKind !== undefined
+        ? route.params.addressKind
+        : AddressKindEnum.u;
     setAddressKind(_addressKind);
-  }, [
-    route, 
-    route.params, 
-    route.params?.addressKind
-  ]);
-  
+  }, [route, route.params, route.params?.addressKind]);
+
   const fetchAddressBookFiltered = useMemo(async () => {
     if (!addresses) {
       return [];
     }
     if (addressKind === AddressKindEnum.u) {
-      return addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === addressKind);
+      return addresses.filter(
+        (a: UnifiedAddressClass | TransparentAddressClass) =>
+          a.addressKind === addressKind,
+      );
     } else {
-      return addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === addressKind && a.scope === RPCAddressScopeEnum.external);
+      return addresses.filter(
+        (a: UnifiedAddressClass | TransparentAddressClass) =>
+          a.addressKind === addressKind &&
+          a.scope === RPCAddressScopeEnum.external,
+      );
     }
   }, [addressKind, addresses]);
 
@@ -116,67 +219,82 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     }
   }, [isScrollingToTop]);
 
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y <= 100;
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset } = event.nativeEvent;
+      const isTop = contentOffset.y <= 100;
 
-    // If we're scrolling to top and we've reached the top, stop the scrolling state
-    if (isScrollingToTop && isTop) {
-      setIsScrollingToTop(false);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = null;
+      // If we're scrolling to top and we've reached the top, stop the scrolling state
+      if (isScrollingToTop && isTop) {
+        setIsScrollingToTop(false);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = null;
+        }
       }
-    }
 
-    // Always update isAtTop for manual scrolling
-    setIsAtTop(isTop);
-  }, [isScrollingToTop]);
+      // Always update isAtTop for manual scrolling
+      setIsAtTop(isTop);
+    },
+    [isScrollingToTop],
+  );
 
   //console.log('render Address Book - 4', currentItem, action, addressBook);
 
   return (
-    <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
-
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
+    >
+      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
-          title={`${translate('addresslist.title')} - ${addressKind === AddressKindEnum.u
-            ? translate('addresslist.unified')
-            : translate('addresslist.transparent')}`}
+          title={''}
           screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
           noUfvkIcon={true}
-          closeScreen={() => {
-            clear();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
         />
+      </View>
+      <BottomSheet
+        ref={addressListSheetRef}
+        snapPoints={addressListSnapPoints}
+        index={0}
+        enableDynamicSizing={false}
+        enablePanDownToClose={false}
+        enableContentPanningGesture={false}
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        handleComponent={renderAddressListHandle}
+      >
         <ScrollView
           ref={scrollViewRef}
           onScroll={handleScroll}
           scrollEventThrottle={100}
           testID="addressbook.scroll-view"
           keyboardShouldPersistTaps="handled"
-          style={{ height: '80%', maxHeight: '80%' }}
+          bounces={false}
+          alwaysBounceVertical={false}
+          style={{
+            flex: 1,
+            backgroundColor: colors.bottomSheetBackground,
+          }}
           contentContainerStyle={{
             flexDirection: 'column',
             alignItems: 'stretch',
             justifyContent: 'flex-start',
-          }}>
+          }}
+        >
           {addressesSliced.length === 0 && !loading && (
             <View
               style={{
@@ -185,12 +303,19 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                 alignItems: 'center',
                 justifyContent: 'flex-start',
                 marginTop: 30,
-              }}>
-              <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
+              }}
+            >
+              <FadeText style={{ color: colors.primary }}>
+                {translate('addressbook.empty') as string}
+              </FadeText>
             </View>
           )}
           {loading ? (
-            <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
+            <ActivityIndicator
+              style={{ marginTop: 7, marginRight: 7 }}
+              size={20}
+              color={colors.primaryDisabled}
+            />
           ) : (
             <>
               {addressesSliced.map((alItem, index) => {
@@ -202,12 +327,10 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                       setIndex={setIndex}
                       item={alItem}
                       closeScreen={() => {
-                        clear();
                         if (navigation.canGoBack()) {
                           navigation.goBack();
                         }
                       }}
-                      screenName={screenName}
                     />
                   </View>
                 );
@@ -223,7 +346,8 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                 justifyContent: 'flex-start',
                 marginTop: 5,
                 marginBottom: 30,
-              }}>
+              }}
+            >
               <Button
                 type={ButtonTypeEnum.Secondary}
                 title={translate('addressbook.loadmore') as string}
@@ -241,40 +365,44 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                     justifyContent: 'flex-start',
                     marginTop: 5,
                     marginBottom: 30,
-                  }}>
-                  <FadeText style={{ color: colors.primary }}>{translate('addressbook.end') as string}</FadeText>
+                  }}
+                >
+                  <FadeText style={{ color: colors.primary }}>
+                    {translate('addressbook.end') as string}
+                  </FadeText>
                 </View>
               )}
             </>
           )}
         </ScrollView>
-        {!isAtTop && (
-          <Pressable
-            onPress={handleScrollToTop}
-            disabled={isScrollingToTop}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              bottom: 105,
-              right: 10,
-              paddingHorizontal: 5,
-              paddingVertical: 10,
-              backgroundColor: colors.sideMenuBackground,
-              borderRadius: 50,
-              transform: [{ scale: pressed ? 0.9 : 1 }],
-              borderWidth: 1,
-              borderColor: colors.zingo,
-              opacity: isScrollingToTop ? 0.5 : 1,
-            })}>
-            <FontAwesomeIcon
-              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-              size={20}
-              icon={faAngleUp}
-              color={colors.zingo}
-            />
-          </Pressable>
-        )}
-      </View>
-    </ToastProvider>
+      </BottomSheet>
+      {!isAtTop && (
+        <Pressable
+          onPress={handleScrollToTop}
+          disabled={isScrollingToTop}
+          style={({ pressed }) => ({
+            position: 'absolute',
+            bottom: 105,
+            right: 10,
+            paddingHorizontal: 5,
+            paddingVertical: 10,
+            backgroundColor: colors.sideMenuBackground,
+            borderRadius: 50,
+            transform: [{ scale: pressed ? 0.9 : 1 }],
+            borderWidth: 1,
+            borderColor: colors.zingo,
+            opacity: isScrollingToTop ? 0.5 : 1,
+          })}
+        >
+          <FontAwesomeIcon
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+            size={16}
+            icon={faAngleUp}
+            color={colors.zingo}
+          />
+        </Pressable>
+      )}
+    </View>
   );
 };
 

@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`TransparentWarning - snapshot TransparentWarning renders correctly 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#031124",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignSelf": "center",
+        "backgroundColor": "#031124",
+        "borderRadius": 8,
+        "padding": 16,
+        "width": "90%",
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          {
+            "color": "#ffffff",
+            "fontSize": 16,
+            "marginBottom": 12,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#888888",
+            "fontSize": 16,
+            "marginBottom": 16,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#262527",
+            "borderColor": "#65491C",
+            "borderRadius": 8,
+            "borderWidth": 2,
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "opacity": 1,
+            "padding": 12,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#E1AA1B",
+              "fontSize": 12,
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;

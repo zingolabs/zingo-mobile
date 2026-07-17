@@ -7,17 +7,22 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { ShowUfvk } from '../components/Ufvk';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
 import { RouteEnum, UfvkActionEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(a: UfvkActionEnum): DrawerScreenProps<AppDrawerParamList, RouteEnum.Ufvk> {
+function makeDrawerProps(
+  a: UfvkActionEnum,
+): NativeStackScreenProps<AppDrawerParamList, RouteEnum.Ufvk> {
   return {
     navigation: mockNavigation,
     route: {
@@ -32,11 +37,11 @@ function makeDrawerProps(a: UfvkActionEnum): DrawerScreenProps<AppDrawerParamLis
 // test suite
 describe('Component ShowUfvk - test', () => {
   //snapshot test
-  const state = defaultAppContextLoaded;
+  const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
-  state.wallet = mockWallet;
+  state.birthday = mockWallet.birthday || 0;
   const onClose = jest.fn();
   const onOK = jest.fn();
   const props_view = makeDrawerProps(UfvkActionEnum.view);

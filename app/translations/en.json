@@ -1,16 +1,11 @@
 {
-  "zingo": "Zingo",
-  "version": "zingo-2.0.20 (309)",
-  "loading": "loading...",
-  "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
-  "workingonit": "We are working on this feature.",
-  "updating" : {
-    "firstlaunchingmessage-title": "Optimizing Zingo",
+  "updating": {
+    "firstlaunchingmessage-title": "Optimizing {name}",
     "firstlaunchingmessage-body": "This may take a while, depending on the transaction history. Please keep the app open until the process finishes.",
     "firstlaunchingmessage-footer": "Thanks."
   },
-  "installing" : {
+  "installing": {
     "firstlaunchingmessage-title": "Creating a new wallet",
     "firstlaunchingmessage-body": "Please keep the app open until the process finishes.",
     "firstlaunchingmessage-footer": "Thanks."
@@ -19,7 +14,6 @@
   "biometricsfailed-body": "For security, the application is locked.",
   "biometricsfailed-footer": "Use the authentication method to unlock.",
   "biometricsfailed-button": "Unlock",
-  "biometrics-title": "Authentication",
   "biometrics-message": "Please authenticate",
   "biometrics-message-ios": "Please authenticate with your passcode",
   "biometrics-error": "For security you need to authenticate again to perform this action. You Always can change this in Settings",
@@ -29,22 +23,17 @@
   "verify": "Verify",
   "save": "Save",
   "copy": "Copy",
-  "share": "Share",
   "confirm": "Confirm",
   "support": "Send Email",
   "view-error": "View/Report Error",
   "menudrawer-acc": "Open Menu Drawer",
-  "menu-acc": "Open Menu",
   "donation": "Donation to Zingo!\nThanks for supporting ZingoLabs!",
   "zenny-tips-ab": "Zenny Tips",
-  "nym-donation": "I need Nym network security!",
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
-  "warning-binance": "WARNING: Binance is collecting and holding user funds without timely recourse. Do NOT deposit into Binance from this Wallet.",
   "email": "support@zingolabs.org",
-  "subject": "Zingo Support...",
+  "subject": "{name} Support...",
   "body": "I need help with...",
-  "connecting": "Connecting",
   "syncing": "Syncing",
   "synced": "Synced",
   "messages": {
@@ -59,8 +48,7 @@
     "filter-no-contacts": "No contacts",
     "clear-filter": "Clear:",
     "contacts-empty": "No Contacts or Addresses.",
-    "link-all": "Global",
-    "link-anonymous": "Anonymous"
+    "link-all": "Global"
   },
   "addresslist": {
     "title": "Address List",
@@ -74,7 +62,10 @@
     "loadmore": "Load More",
     "label": "Contact",
     "label-placeholder": "Nickname/Label/Tag",
+    "address-placeholder": "Add the address here",
     "add": "Add",
+    "add-confirm-title": "Add contact?",
+    "add-confirm-message": "Please check the address and its detected network before saving.",
     "modify": "Modify",
     "delete": "Delete",
     "empty": "You haven't saved any new addresses yet.",
@@ -84,15 +75,24 @@
     "labelexists": "This label already exists. ",
     "addressexists": "This address already exists. ",
     "select-placeholder": "Choose a Contact...",
+    "search-placeholder": "Search",
+    "chain": "Chain",
+    "select-chain-placeholder": "Choose a chain...",
     "delete-title": "Delete Label",
     "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?",
     "likely": "Likely: ",
     "thiswalletaddress": "This Wallet's Address",
     "addto": "Add to ",
-    "filter-wallet": "Wallet"
+    "filter-wallet": "Wallet",
+    "add-tag": "Add Tag",
+    "add-contact": "Add Contact",
+    "tag": "Tag",
+    "contact": "Contact",
+    "address": "Address"
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
+  "linkcopied": "Link copied to Clipboard",
   "insight": {
     "title": "Financial Insight",
     "no-data": "There is no data in your Wallet that fits the graph selected.",
@@ -106,8 +106,8 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
+    "welcome": "Welcome",
     "actualserver": "Actual server:",
-    "changeserver": "Change the Server",
     "createnewwallet": "Create New Wallet",
     "opencurrentwallet": "Open Current Wallet",
     "restorewalletseedufvk": "Restore wallet",
@@ -121,11 +121,9 @@
     "emptyseedufvk-error": "The Seed Phrase / Viewing Key was empty. Review the value and fix it.",
     "custom": "Custom Server...",
     "nointernet-message": "There is no established internet connection. Please fix this issue.",
-    "offline-message": "There is no active wallet. In offline mode, you cannot create or restore a wallet. Choose a server to continue.",
-    "basicmode": "Change to Basic Mode",
+    "offline-message": "In offline mode you can create a new wallet or restore one from seed or viewing key. It won't sync or show balances until you choose a server.",
     "advancedmode": "Change to Advanced Mode",
     "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
-    "changeserver-basic": "Change the Server and\nOpen Current Wallet",
     "alert-newwallet-title": "CREATE A NEW WALLET",
     "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet.",
     "serverfirsttry": "An error occurred while trying to connect to the above server, currently checking the servers on the list.",
@@ -134,13 +132,13 @@
     "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel.",
     "recoverkeys": "Recover last Keys used",
     "recoverkeysinstall": "Recovered the last Keys used in this device:",
+    "customserver-unreachable": "Your custom server didn't respond and the wallet returned an error. Open Settings to choose a different one or retry later.",
     "noservers": "None of the servers on the list are available, it is probably a connection error."
   },
   "loadedapp": {
-    "about": "About Zingo",
+    "about": "About {name}",
     "info": "Server Info",
     "options": "Options",
-    "settings": "Settings",
     "walletseed": "Wallet Seed",
     "walletseed-basic": "Wallet Backup Seed Phrase",
     "walletufvk": "Wallet Viewing Key",
@@ -149,61 +147,61 @@
     "report": "Sync / Rescan Report",
     "changewallet": "Change to another Wallet",
     "restorebackupwallet": "Restore Last Wallet Backup",
+    "alert-restorebackupwallet-body": "Confirm that you want to restore the last wallet backup.",
     "fundpools": "Fund Pools",
     "insight": "Financial Insight",
     "loadwalletfromseed-basic": "Restore another wallet",
     "addressbook": "Address Book",
     "tipzingolabs-basic": "Tip ZingoLabs",
-    "votefornym": "Vote for Nym",
-    "support": "Zingo support email",
-    "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
+    "support": "{name} support email",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
-    "changeserverold-error": "Error trying to change the server to the old one: ",
     "differentchain-error": "You are changing to a server with a different chain, you will no longer have access to this wallet without the seed phrase.",
+    "serverchain-mismatch": "The server reports a different chain than the one you selected. Check the chain selector and try again.",
     "changingwallet-label": "Error changing Wallet",
     "restoringwallet-label": "Error restoring Wallet",
-    "computingtx": "Computing Transaction",
-    "step": "Step",
+    "computingtx": "Computing Transaction...",
+    "computingtx-hangon": "Hang on tight,\nthis will just take a moment...",
+    "transactioncreated-title": "Transaction created",
+    "transactioncreated-body": "You can find all the details in\nyour transaction history.",
+    "transactionfailed-title": "Transaction failed",
+    "transactionfailed-body": "Don't worry, your funds are safe and\nhave not been deducted.",
+    "transactionfailed-details": "Error details",
+    "continue": "Continue",
     "of": "of",
-    "eta": "ETA",
-    "sec": "sec",
-    "history-menu": "HISTORY",
-    "send-menu": "SEND",
-    "receive-menu": "RECEIVE",
-    "messages-menu": "MESSAGES",
+    "history-menu": "History",
+    "send-menu": "Send",
+    "receive-menu": "Receive",
+    "messages-menu": "Messages",
     "syncing": "Stopping the Synchronization to be able to reset the wallet... Can take a few seconds.",
-    "zcash-url": "You already have an address in the send screen",
     "connection-error": "This option requires an internet connection to be executed.",
     "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",
     "tryingnewserver-error": "After 15 seconds the new server doesn't respond.",
     "readingwallet": "Reading successfully the wallet with the server:",
     "restorewallet-title": "Advanced Option",
     "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase.",
-    "selectingserver": "Determining the best zainod.",
     "selectingserversame": "Your actual server is the most optimized one already.",
     "selectingserverbest": "In this moment this is the most optimized server:",
     "incoming-funds": "Incoming funds\n",
     "valuetransfer-confirmed": "Transaction confirmed\n",
     "payment-made": "Payment made\n",
-    "valuetransfer-reverted": "The transaction was never confirmed by a validator.",
     "email-error-title": "Error opening email client",
     "email-error-body": "Go to your device's Settings and set a default email application to send the report.",
     "migration-title": "Wallet migration",
     "migration-body": "We are migrating your wallet to the new synchronization system. Keep your device connected to power and WiFi.\n\nYour balance will change as the migration progresses. Don't worry, your funds are safe!"
   },
   "rpc": {
-    "parsebirthday-error": "Error: Couldn't parse as a number:",
-    "syncstart-message": "Sync process started.",
-    "syncend-message": "The sync process finished successfully.",
-    "walletstored-message": "Stored the wallet because a batch is finished:",
-    "sixtyseconds-message": "Stored the wallet every 60 seconds, batch:",
     "walletnotfound-error": "Error: Couldn't find any wallet.",
     "backupnotfound-error": "Error: Couldn't find any backup of any wallet.",
-    "of": "of",
-    "deletewallet-error": "Error: Couldn't delete the current wallet."
+    "deletewallet-error": "Error: Couldn't delete the current wallet.",
+    "backupwallet-error": "Error: Couldn't save the wallet backup."
   },
   "settings": {
+    "section-preferences": "Preferences",
+    "section-privacysecurity": "Privacy & Security",
+    "section-networkadvanced": "Network & Advanced",
+    "section-other": "Other",
+    "section-developer": "Developer",
     "memos": [
       {
         "value": "none",
@@ -226,10 +224,6 @@
       {
         "value": "USD",
         "text": "You can fetch the price for US Dollars from internet."
-      },
-      {
-        "value": "USDTOR",
-        "text": "You can fetch the price for US Dollars from internet using Tor.\nTor is used to protect the user's IP address but may be unlawful in some countries. Use at your own discretion."
       }
     ],
     "languages": [
@@ -257,7 +251,7 @@
     "sendalls": [
       {
         "value": true,
-        "text": "Enable the possibility of sending all the wallet amount with a button."
+        "text": "Enable the 'MAX' button to fill the amount with your entire wallet balance."
       },
       {
         "value": false,
@@ -287,7 +281,7 @@
     "modes": [
       {
         "value": "basic",
-        "text": "Basic Mode, the most simple way to use Zingo."
+        "text": "Basic Mode, the most simple way to use {name}."
       },
       {
         "value": "advanced",
@@ -342,17 +336,22 @@
         "text": "CipherScan.App"
       },
       {
-        "value": "Zypherscan",
-        "text": "ZypherScan.Com"
+        "value": "Zexplorer",
+        "text": "ZExplorer.App"
+      },
+      {
+        "value": "None",
+        "text": "None"
       }
     ],
     "nochanges": "No changes registered.",
+    "save-error": "Couldn't save settings",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
     "isserver": "You need to choose one Server of the list or fill out a valid Server URI.",
     "isuri": "You need to fill out a valid Server URI.",
     "title": "Settings",
-    "server-title": "SERVER",
+    "server-title": "Server",
     "server-auto": "Automatic",
     "server-list": "List",
     "server-custom": "Custom",
@@ -360,30 +359,30 @@
     "server-auto-text": "The next time the application starts, it will calculate which is the best server in the list and make it active.",
     "server-list-text": "Select a server from the list.",
     "server-custom-text": "Fill in the information of the server you want to use.",
+    "server-checking": "Checking server…",
     "server-offline-text": "The App will work with no server connection.",
-    "threshold-title": "TRANSACTION FILTER THRESHOLD",
+    "threshold-title": "Transaction Filter Threshold",
     "number": "Number...",
-    "memo-title": "MEMO DOWNLOAD",
+    "memo-title": "Memo Download",
     "save": "Save",
     "server-acc": "Server URI Field",
     "threshold-acc": "Threshold Field",
     "value-memo-none": "none",
     "value-memo-wallet": "wallet",
     "value-memo-all": "all",
-    "currency-title": "CURRENCY",
-    "language-title": "LANGUAGE",
+    "currency-title": "Currency Price",
+    "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
-    "sendall-title": "THE BUTTON 'Send All' (Amount)",
+    "sendall-title": "The 'MAX' Button",
     "donation-title": "Tip ZingoLabs",
-    "privacy-title": "Switch between High or Normal Privacy",
+    "privacy-title": "High Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
-    "rescanmenu-title": "THE RESCAN MENU OPTION",
-    "recoverywalletinfoondevice-title": "Store Wallet Recovery Info in the Device",
+    "rescanmenu-title": "The Rescan Menu Option",
+    "recoverywalletinfoondevice-title": "Store Wallet Recovery Info",
     "performancelevel-title": "Zingolib Performance Level",
-    "blockexplorer-title": "Switch between Block Explorers",
+    "blockexplorer-title": "Block Explorer",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
-    "value-currency-USDTOR": "US Dollar with Tor",
     "value-language-en": "English",
     "value-language-es": "Spanish",
     "value-language-pt": "Portuguese",
@@ -400,6 +399,9 @@
     "value-chainname-main": "Mainnet",
     "value-chainname-test": "Testnet",
     "value-chainname-regtest": "Regtest",
+    "value-chainname-none": "None",
+    "server-chain-title": "Network",
+    "select-chain-placeholder": "Select a Network...",
     "value-rescanmenu-true": "Enable",
     "value-rescanmenu-false": "Disable",
     "value-recoverywalletinfoondevice-true": "Enable",
@@ -410,8 +412,13 @@
     "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-Cipherscan": "Cipherscan",
-    "value-blockexplorer-Zypherscan": "Zypherscan",
-    "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
+    "value-blockexplorer-Zexplorer": "Zexplorer",
+    "value-blockexplorer-None": "None",
+    "security-title": "Apply Device Security",
+    "security-all": "All",
+    "security-some": "Some",
+    "security-none": "None",
+    "security-device-locked-hint": "No biometrics on this device. Security options will use the device passcode if configured; otherwise they have no effect.",
     "security-startapp": "When the App starts",
     "security-foregroundapp": "When the App go to the Foreground",
     "security-sendconfirm": "Confirm Transaction",
@@ -432,24 +439,28 @@
     "netherlands": "Netherlands",
     "uk": "UK",
     "select-placeholder": "Choose a Server...",
+    "select-language-placeholder": "Select a Language...",
+    "select-blockexplorer-placeholder": "Select a Block Explorer...",
     "value-language-ru": "Russian",
     "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
     "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
-    "value-language-tr": "Turkish"
+    "value-language-tr": "Turkish",
+    "nym-privacy-network": "Privacy Network",
+    "nym-network": "NYM Network",
+    "nym-enhanced-privacy": "Enhanced Privacy"
+  },
+  "header": {
+    "lastupdate": "Last update:"
   },
   "info": {
     "version": "Version",
     "serverversion": "Server Version",
-    "zainod": "Zainod URL",
+    "zainod": "Server URL",
     "network": "Network",
     "serverblock": "Server Block Height",
     "zecprice": "ZEC Price",
-    "zecpricetor": "ZEC Price with Tor",
     "unknown": "Unknown",
     "title": "Server Info",
-    "resolution": "Device Screen",
-    "tablet": "Tablet",
-    "phone": "Phone",
     "errorgemini": "Error fetching the price from the Internet.",
     "errorrpcmodule": "Internal Error fetching the price from the Internet",
     "zingolib": "Zingolib Version"
@@ -462,9 +473,7 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "I have saved \n the seed"
-      ],
+      "new": ["I have saved \n the seed"],
       "change": [
         "",
         "Open New",
@@ -477,12 +486,8 @@
         "You really want \n to change your \n actual server",
         "Are you certain?"
       ],
-      "view": [
-        "I have saved \n the seed"
-      ],
-      "restore": [
-        "Restore Wallet"
-      ],
+      "view": ["I have saved \n the seed"],
+      "restore": ["Restore Wallet"],
       "backup": [
         "",
         "Restore",
@@ -503,7 +508,11 @@
     "text-readonly-server": "Before changing another server, carefully write down this seed phrase. It is the only way you can restore/access your current wallet.",
     "text-no-readonly": "Enter your seed phrase (24 words)",
     "tapcopy": "Tap to copy",
-    "tapcopy-seed-message": "Seed copied to Clipboard",
+    "tapcopy-seed-message": "Seed copied to Clipboard (clears in 60s)",
+    "clipboard-cleared": "Clipboard cleared for security",
+    "clipboard-confirm-title": "Copy to clipboard?",
+    "clipboard-confirm-message-ios": "This is sensitive recovery data. Copying it to the clipboard exposes it to other apps on this device and, if Universal Clipboard is enabled, can sync it to your other Apple devices on the same iCloud account. The clipboard will be cleared automatically after 60 seconds. Continue?",
+    "clipboard-confirm-message-android": "This is sensitive recovery data. Copying it to the clipboard exposes it to any other app on this device with clipboard access. If you use a keyboard with cloud-clipboard sync (Gboard, SwiftKey, etc.) this data may also be uploaded. The clipboard will be cleared automatically after 60 seconds. Continue?",
     "tapcopy-birthday-message": "Birthday copied to Clipboard",
     "birthday-readonly": "Wallet Birthday",
     "birthday-no-readonly": "Block height of first transaction. (It's OK, if you don't know)\nValue range between ",
@@ -517,13 +526,16 @@
     "tapreveal": "Tap to reveal",
     "showtransactions": "Show Transactions",
     "youreceived": "You received",
-    "tapcopy-ufvk-message": "Viewing Key copied to Clipboard"
+    "tapcopy-ufvk-message": "Viewing Key copied to Clipboard (clears in 60s)",
+    "recovering-from-keychain": "Recovering seed from secure storage...",
+    "recovering-from-wallet": "Loading seed from wallet...",
+    "from-keychain": "from secure storage",
+    "from-wallet": "from wallet"
   },
   "send": {
     "Broadcast": "Broadcasted and awaiting confirmation Tx:",
     "sending-error": "Error sending transaction",
     "title": "Send",
-    "more": "more...",
     "toaddress": "To Address",
     "invalidaddress": "Invalid Address!",
     "addressplaceholder": "Unified, Z-Sapling or Transparent",
@@ -531,10 +543,11 @@
     "invalidnumber": "Invalid Number!",
     "spendable": "Spendable: ",
     "somefunds": "Some funds still confirming or syncing",
-    "memo": "Memo(s) (Optional)",
+    "memo": "Memo(s)",
+    "memo-placeholder": "Encrypted message (optional)",
+    "max": "MAX",
     "button": "Send",
     "button-all": "Send All",
-    "clear": "Clear",
     "confirm-title": "Confirm Transaction",
     "sending-title": "Processing",
     "confirm-amount": "Amount",
@@ -548,20 +561,17 @@
     "zec-acc": "ZEC Amount Field",
     "usd-acc": "USD Amount Field",
     "memo-acc": "Memo Field",
-    "amountplaceholder": "number",
-    "nofetchprice": "Fetch Price in USD",
     "sendall": "Send All",
     "sendall-message": "Your are about to send the entire amount in your wallet",
-    "includeua": "Include your return address:",
     "confirm-memo": "Memo(s)",
     "duplicate-nullifier-error": "Your funds are still confirming and probably syncing. You can wait until the funds are confirmed or you can try to send now with a lower amount. The Transaction build failed!",
     "dust-error": "The amount that you are trying to send to a Transparent address is really tiny. The Transaction build failed!",
     "needtoshield": "You have funds to shield",
-    "needtoupgrade": "You have funds to upgrade",
     "fetchpricetitle": "Fetch USD Price",
     "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
     "fetch-button": "Fetch",
-    "fetchwithtor-button": "Fetch with Tor",
+    "refreshing-price": "Refreshing price…",
+    "calc-error": "Calculation error",
     "confirm-privacy-level": "Privacy Level",
     "private": "Private",
     "amountrevealed": "Amount Revealed",
@@ -569,37 +579,30 @@
     "lose-address-title": "SELECT A NEW ADDRESS",
     "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
     "confirm-donation": "Donation",
-    "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks."
+    "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks.",
+    "nym-processing-title": "Processing via NYM",
+    "nym-enhanced": "NYM Enhanced",
+    "nym-warning": "This transaction will be routed through the NYM mixnet for enhanced privacy. This may take slightly longer than standard transactions."
   },
   "receive": {
     "u-title": "Shielded",
-    "z-title": "Z-Sapling",
     "t-title": "Exposed transparent",
+    "scope-shielded": "Shielded Address",
+    "scope-transparent": "Transparent Address",
+    "select-scope-placeholder": "Select address kind",
+    "transparent-expose-warning": "Transparent addresses expose your details.",
     "noaddress": "No Address",
-    "unoprivkey": "No Unified address to import the Spending Key",
-    "unoviewkey": "No Unified address to import the Full Viewing Key",
     "title-address": "My Address",
-    "title-ufvk": "My Vewing Key",
     "title-basic-alone": "My Receiving Address",
     "newu-option": "Get new address",
     "danger-zone": "DANGER ZONE",
     "go-to-transparent": "Exposed transparent address",
-    "more": "View more...",
-    "privkey-option": "Export Spending Key",
-    "viewkey-option": "Export Full Viewing Key",
-    "import-option": "Import Key...",
     "title-acc": "Receive Screen",
-    "of": " of ",
-    "prev": "Prev",
-    "next": "Next",
     "shielded-orchard": "Orchard",
     "shielded-sapling": "Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
-    "shielded-full": "Full",
-    "showtip": "Tap to select another address.",
     "verify": "Verify Addresses",
     "copy-address-button": "Copy address",
-    "copy-ufvk-button": "Copy viewing key",
     "modal-transparent": {
       "title": "Privacy Warning",
       "message": "Transparent addresses expose your transaction details on the public blockchain. This disintegrates your privacy and is not recommended for most transactions.",
@@ -607,7 +610,6 @@
       "button": "I understand the risks, show tranparent addresses"
     },
     "transparent": {
-      "address-title": "Exposed transparent",
       "newt-option": "New transparent address",
       "warning": {
         "title": "Privacy Warning",
@@ -680,7 +682,7 @@
     "details": "Transaction Details",
     "pool": "Pool",
     "contactcopied": "Copied Contact to Clipboard",
-    "address-http": "Zingo has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
+    "address-http": "{name} has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
     "address-https": "Zingo-Authenticated Address",
     "type": "Type",
     "not-confirmed": "Transaction not yet confirmed",
@@ -705,21 +707,9 @@
     "title": "Sync / Rescan Report",
     "running": "Syncing...",
     "finished": "Fully Synced",
-    "paused": "Waiting to start syncing...",
     "server-title": "SERVER: ",
     "blocks": " Blocks. ",
     "wallet": "Wallet: ",
-    "syncedbefore": "Synced before: ",
-    "syncednow": "Synced now: ",
-    "notyetsynced": "Not yet Synced: ",
-    "batches": "BATCHES",
-    "processingbatch": "Processing Batch: ",
-    "totalbatches": " of a TOTAL of Batches: ",
-    "blocksperbatch": "Blocks per Batch",
-    "secondsperbatch": "Current Batch (seconds)",
-    "blocks-title": "BLOCKS: ",
-    "processingblock": "Processing Block: ",
-    "totalblocks": " of a TOTAL of Blocks: ",
     "lastbackgroundsync": "LAST BACKGROUND SYNCING",
     "batches-date": " Batches at: ",
     "networkstatus": "Network Status (Internet)",
@@ -741,14 +731,13 @@
     "birthday": "Birthday",
     "text": "Restoring from Seed Phrase or Viewing Key requires a rescan, and may take a long time to complete.",
     "button": "Restore Wallet",
-    "key-acc": "Seed-Key Field",
     "birthday-acc": "Birthday Field"
   },
   "about": {
     "copyright": [
-      "Copyright (c) 2025, ZingoLabs.",
+      "Copyright (c) 2026, ZingoLabs.",
       "Built with React Native.",
-      "The MIT License (MIT) Copyright (c) 2025 Zingo",
+      "The MIT License (MIT) Copyright (c) 2026 Zingo",
       "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:",
       "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
       "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
@@ -756,16 +745,11 @@
   },
   "scanner": {
     "text": "Scan a Unified Full Viewing Key",
-    "uri-error": "URI Error:",
-    "nozcash-error": "It is not a valid Zcash Address",
-    "scanaddress": "Scan a Zcash Address",
-    "noviewkey-error": "It is not a valid Unified Full Viewing Key"
+    "scanaddress": "Scan a Zcash Address"
   },
   "ufvk": {
     "buttontexts": {
-      "new": [
-        "I have saved \n the Viewing Key"
-      ],
+      "view": ["I have saved \n the viewing key"],
       "change": [
         "",
         "Open New",
@@ -778,12 +762,6 @@
         "You really want \n to change your \n actual server",
         "Are you certain?"
       ],
-      "view": [
-        "I have saved \n the Viewing Key"
-      ],
-      "restore": [
-        "Restore Wallet"
-      ],
       "backup": [
         "",
         "Restore",
@@ -791,12 +769,8 @@
         "Are you certain?"
       ]
     },
-    "privkey": "Spending/Private ",
     "viewkey": "Viewing Key ",
-    "nokey": "No Key",
     "tapcopy-message": "Key copied to Clipboard",
-    "title": "Key",
-    "address": "Address",
     "text-readonly": "Before closing this screen, carefully write down this viewing key. It is the only way you can restore/access your current wallet.",
     "text-readonly-backup": "Before restoring the backup of the previous wallet, carefully write down this viewing key. It is the only way you can restore/access your current wallet.",
     "text-readonly-change": "Before accessing another wallet, carefully write down this viewing key. It is the only way you can restore/access your current wallet.",
@@ -804,7 +778,11 @@
     "change-warning": "If you change to another wallet, you will no longer have access to this wallet without the seed phrase.",
     "backup-warning": "If you change to your backup wallet, you will no longer have access to this wallet without the seed phrase.",
     "server-warning": "If you change to a server with different chain, you will no longer have access to this wallet without the seed phrase.",
-    "mainnet-warning": "No backup of this wallet, only available in 'MAINNET'."
+    "mainnet-warning": "No backup of this wallet, only available in 'MAINNET'.",
+    "recovering-from-keychain": "Recovering viewing key from secure storage...",
+    "recovering-from-wallet": "Loading viewing key from wallet...",
+    "from-keychain": "from secure storage",
+    "from-wallet": "from wallet"
   },
   "pools": {
     "title": "Fund Pools",
@@ -829,10 +807,10 @@
     "base64": "Couldn't parse (base64)",
     "amount": "Couldn't parse (amount)",
     "noparameter": "Unknown parameter",
-    "noamount": "Didn't have an amount",
     "noaddress": "Didn't have an address",
     "oneentry": "URI Should have at least 1 entry",
-    "parseerror": "Right now it is not possible to verify the address with the server"
+    "memo-too-long": "Memo too long in parameter",
+    "error-http-not-allowed": "Error: Plain HTTP is only allowed for localhost. Use HTTPS for remote servers."
   },
   "donation-button": "Donate To ZingoLabs ",
   "donation-legend": "You are donating to ZingoLabs activately, Thanks"

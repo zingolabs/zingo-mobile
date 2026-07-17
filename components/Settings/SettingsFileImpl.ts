@@ -2,6 +2,7 @@ import * as RNFS from 'react-native-fs';
 
 import {
   ChainNameEnum,
+  CurrencyEnum,
   GlobalConst,
   SecurityType,
   SecurityTypeEnum,
@@ -14,7 +15,7 @@ import {
 } from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
-import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export default class SettingsFileImpl {
   static async getFileName() {
@@ -22,18 +23,19 @@ export default class SettingsFileImpl {
   }
 
   // Write the server setting
-  static async writeSettings(name: SettingsNameEnum, value: string | boolean | ServerType | SecurityType) {
+  static async writeSettings(
+    name: SettingsNameEnum,
+    value: string | boolean | ServerType | SecurityType,
+  ) {
     const fileName = await this.getFileName();
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
-
-    //console.log(' settings write', newSettings);
 
     RNFS.writeFile(fileName, JSON.stringify(newSettings), GlobalConst.utf8)
       .then(() => {
         //console.log('FILE WRITTEN!')
       })
-      .catch((err) => {
+      .catch(err => {
         console.log('settings write file:', err.message);
       });
   }
@@ -45,11 +47,16 @@ export default class SettingsFileImpl {
       const fileExits: boolean = await RNFS.exists(fileName);
       if (!fileExits) {
         console.log('settings read file: The file does not exists');
-        const settings: SettingsFileClass = { firstInstall: true, version: null } as SettingsFileClass;
+        const settings: SettingsFileClass = {
+          firstInstall: true,
+          version: null,
+        } as SettingsFileClass;
         return settings;
       }
 
-      const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8)).toString());
+      const settings: SettingsFileClass = await JSON.parse(
+        (await RNFS.readFile(fileName, GlobalConst.utf8)).toString(),
+      );
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {
@@ -59,9 +66,15 @@ export default class SettingsFileImpl {
         } as ServerType;
       } else {
         if (typeof settings.server === 'string') {
-          const ss: ServerType = { uri: settings.server, chainName: ChainNameEnum.mainChainName };
+          const ss: ServerType = {
+            uri: settings.server,
+            chainName: ChainNameEnum.mainChainName,
+          };
           const standard = serverUris(() => {}).find((s: ServerUrisType) =>
-            isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, ss as ServerType),
+            isEqual(
+              { uri: s.uri, chainName: s.chainName } as ServerType,
+              ss as ServerType,
+            ),
           );
           if (standard) {
             settings.server = ss as ServerType;
@@ -74,12 +87,15 @@ export default class SettingsFileImpl {
             } as ServerType;
           }
         } else {
-          if (!settings.server.uri || !settings.server.chainName) {
-            // if one or both field/s don't have valid value -> we assign offline mode.
-            // this is the most accurate decision since we have offline mode.
+          if (settings.server.uri && !settings.server.chainName) {
+            // Only repair a REAL server (non-empty uri) that is missing its
+            // chain. An offline server (uri '') legitimately has an empty
+            // chainName — Offline has no chain; the real one is derived from
+            // the wallet at open time. Forcing mainnet here broke testnet
+            // wallets going Offline.
             settings.server = {
-              uri: '',
-              chainName: ChainNameEnum.mainChainName, // for now this is correct, in some future this have to be ''.
+              uri: settings.server.uri,
+              chainName: ChainNameEnum.mainChainName,
             } as ServerType;
           }
         }
@@ -110,21 +126,25 @@ export default class SettingsFileImpl {
         };
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.selectServer)) {
-        // this is the first time the App have selection server
-        // here just exists 6 options:
+        // First launch with server selection. Inference is chain-aware: every
+        // match below compares BOTH uri and chainName (isEqual on ServerType),
+        // so a testnet server is evaluated against the testnet entries exactly
+        // like a mainnet one is against the mainnet entries. Cases:
         // - server empty -> offline
-        // - lightwalletd (obsolete) -> auto
-        // - zcash-infra (default) -> auto
-        // - custom server -> mainnet (new - not default)
-        // - custom server -> mainnet (not in the list)
-        // - custom server -> testnet or regtest
+        // - obsolete server (any chain) -> auto
+        // - default server (mainnet or testnet) -> auto
+        // - non-default listed server (any chain) -> list
+        // - server not in the list (any chain) -> custom
         if (!settings.server.uri) {
           settings.selectServer = SelectServerEnum.offline;
         } else if (
           serverUris(() => {})
             .filter((s: ServerUrisType) => s.obsolete)
             .find((s: ServerUrisType) =>
-              isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
+              isEqual(
+                { uri: s.uri, chainName: s.chainName } as ServerType,
+                settings.server as ServerType,
+              ),
             )
         ) {
           // obsolete servers -> auto - to make easier and faster UX to the user
@@ -133,21 +153,26 @@ export default class SettingsFileImpl {
           serverUris(() => {})
             .filter((s: ServerUrisType) => s.default)
             .find((s: ServerUrisType) =>
-              isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
+              isEqual(
+                { uri: s.uri, chainName: s.chainName } as ServerType,
+                settings.server as ServerType,
+              ),
             )
         ) {
           // default servers -> auto - to make easier and faster UX to the user
           settings.selectServer = SelectServerEnum.auto;
         } else if (
           serverUris(() => {}).find((s: ServerUrisType) =>
-            isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
+            isEqual(
+              { uri: s.uri, chainName: s.chainName } as ServerType,
+              settings.server as ServerType,
+            ),
           )
         ) {
           // new servers (not default & not obsolete) -> in the list - the user changed the default server in some point
           settings.selectServer = SelectServerEnum.list;
         } else {
-          // new servers -> not in the list - the user changed the default server in some point to
-          // another totally unknown or the user is using a non mainnet server.
+          // not in the list (any chain) -> the user set some other server → custom.
           settings.selectServer = SelectServerEnum.custom;
         }
       } else {
@@ -157,7 +182,10 @@ export default class SettingsFileImpl {
           serverUris(() => {})
             .filter((s: ServerUrisType) => s.obsolete)
             .find((s: ServerUrisType) =>
-              isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
+              isEqual(
+                { uri: s.uri, chainName: s.chainName } as ServerType,
+                settings.server as ServerType,
+              ),
             ) &&
           settings.selectServer !== SelectServerEnum.custom
         ) {
@@ -195,7 +223,9 @@ export default class SettingsFileImpl {
           settings.security = sec;
         }
       }
-      if (!settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)) {
+      if (
+        !settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)
+      ) {
         // doing backup of seed & birthday in the device -> false by default.
         settings.recoveryWalletInfoOnDevice = false;
       }
@@ -207,12 +237,23 @@ export default class SettingsFileImpl {
         // by default medium
         settings.blockExplorer = BlockExplorerEnum.Zcashexplorer;
       }
+      if (!settings.hasOwnProperty(SettingsNameEnum.nym)) {
+        settings.nym = false;
+      }
+      // Silent migration: legacy "USDTOR" currency is dropped in favor of "USD".
+      // Tor support has been removed; users on an older settings.json get rewritten transparently.
+      if ((settings.currency as string) === 'USDTOR') {
+        settings.currency = CurrencyEnum.USDCurrency;
+      }
       return settings;
     } catch (err) {
       // The File doesn't exist, so return nothing
       // Here I know 100% it is a fresh install or the user cleaned the device staorage
       console.log('settings read file:', err);
-      const settings: SettingsFileClass = { firstInstall: true, version: null } as SettingsFileClass;
+      const settings: SettingsFileClass = {
+        firstInstall: true,
+        version: null,
+      } as SettingsFileClass;
       return settings;
     }
   }

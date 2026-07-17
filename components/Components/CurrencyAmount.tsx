@@ -27,7 +27,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
 }) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
   const [currencyString, setCurrencyString] = useState<string>('');
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { decimalSeparator } = getNumberFormatSettings();
 
   useEffect(() => {
@@ -44,7 +44,11 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
     const zeroString = '0' + decimalSeparator + '00';
     var currencyStr;
 
-    if (typeof price === 'undefined' || typeof amtZec === 'undefined' || price <= 0) {
+    if (
+      typeof price === 'undefined' ||
+      typeof amtZec === 'undefined' ||
+      price <= 0
+    ) {
       currencyStr = '-' + decimalSeparator + '--';
     } else {
       const currencyAmo = price * amtZec;
@@ -61,17 +65,32 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
     setTimeout(() => setPrivacyHigh(true), 5 * 1000);
   };
 
-  if (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) {
+  if (currency === CurrencyEnum.USDCurrency) {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
         <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
           <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
             {privacyHigh ? (
-              <Text style={{ color: colors.money, fontSize: 20, fontWeight: '700', ...style }}>
+              <Text
+                style={{
+                  color: colors.money,
+                  fontSize: 20,
+                  fontWeight: '700',
+                  ...style,
+                }}
+              >
                 {'$ -' + decimalSeparator + '--'}
               </Text>
             ) : (
-              <Text style={{ color: colors.money, fontSize: 20, fontWeight: '700', ...style }} selectable={selectable}>
+              <Text
+                style={{
+                  color: colors.money,
+                  fontSize: 20,
+                  fontWeight: '700',
+                  ...style,
+                }}
+                selectable={selectable}
+              >
                 {'$ ' + currencyString}
               </Text>
             )}

@@ -1,50 +1,71 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, TextInput, TouchableOpacity, Keyboard } from 'react-native';
+import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
   AddressBookFileClass,
   ButtonTypeEnum,
+  ChainNameEnum,
+  GlobalConst,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
+import { showConfirm } from '../../../app/showConfirm';
 import Button from '../../Components/Button';
-import { useToast } from 'react-native-toastier';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import ChainSelect from '../../Components/ChainSelect';
+import { chainDisplayName } from '../../Swap/components/chainDisplayName';
 import Utils from '../../../app/utils';
 import { AddressBookFileImpl } from '../../AddressBook';
 
 type NewAddressTagProps = {
   address: string;
+  own: boolean;
+  // SwapKit chain code of the address ('ZEC' by default). Non-ZEC contacts are
+  // saved with chain = mainnet (swaps live in mainnet context).
+  swapChain?: string;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
-  setHeightLayout: (h: number) => void;
 };
-const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({ 
-  address, 
-  closeSheet, 
+const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
+  address,
+  own,
+  swapChain,
+  closeSheet,
   setAddressBook,
-  setHeightLayout,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { translate, server } = context;
   const { colors } = useTheme() as ThemeType;
-  const { clear } = useToast();
 
   const [label, setLabel] = useState<string>('');
+  // The chain is fixed to whatever triggered the save (Send → ZEC; Swap → the
+  // selected token's chain), so the selector shows a single, non-editable
+  // option — same value used to persist the contact.
+  const effectiveSwapChain = swapChain ?? GlobalConst.zecSwapChain;
 
-  const createAddressTag = async () => {
+  const writeContact = async () => {
     try {
       if (!label) {
         return;
       }
-      //console.log(label, address);
       const randomColors = Utils.generateColorList(1);
-      const ab = await AddressBookFileImpl.writeAddressBookItem(label, address, randomColors[0], true);
-      //console.log(ab);
+      // ZEC → the wallet's network; non-ZEC swap contacts → mainnet.
+      const chain =
+        effectiveSwapChain === GlobalConst.zecSwapChain
+          ? server.chainName
+          : ChainNameEnum.mainChainName;
+      const ab = await AddressBookFileImpl.writeAddressBookItem(
+        label,
+        address,
+        randomColors[0],
+        own,
+        chain,
+        effectiveSwapChain,
+      );
       setAddressBook(ab);
     } catch (error) {
       console.log(`Critical Error new address ${error}`);
@@ -52,44 +73,61 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
 
     setLabel('');
     Keyboard.dismiss();
-    clear();
     setTimeout(() => {
       closeSheet();
     }, 100);
   };
 
+  const createAddressTag = () => {
+    if (!label) {
+      return;
+    }
+    // Own-address tags (Receive) save directly; contacts saved from Send/Swap
+    // confirm the detected network first — same safety step as the address-book
+    // add flow, so an overlapping chain format can't be saved unnoticed.
+    if (own) {
+      writeContact();
+      return;
+    }
+    Keyboard.dismiss();
+    showConfirm({
+      title: translate('addressbook.add-confirm-title') as string,
+      message: `${translate('addressbook.add-confirm-message') as string}\n\n${chainDisplayName(
+        effectiveSwapChain,
+      )}\n${address}`,
+      buttons: [
+        { text: translate('confirm') as string, onPress: writeContact },
+        { text: translate('cancel') as string, style: 'cancel' },
+      ],
+    });
+  };
+
   return (
-    <View 
-      onLayout={e => {
-        const { height } = e.nativeEvent.layout;
-        //console.log('LAYOUTTT', height);
-        setHeightLayout(height + 70);
+    <View
+      style={{
+        backgroundColor: colors.bottomSheetBackground,
       }}
-      style={{ 
-        backgroundColor: colors.background 
-      }}>
-      <TouchableOpacity
-        onPress={() => {
-          setLabel('');
-          Keyboard.dismiss();
-          clear();
-          setTimeout(() => {
-            closeSheet();
-          }, 100);
-        }}>
-        <FontAwesomeIcon
-          size={30}
-          icon={faXmark}
-          color={colors.text}
-          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
-        />
-      </TouchableOpacity>
-      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
-        {translate('receive.add-tag') as string}
-      </RegText>
-      <View
-        style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
-        <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{'Tag'}</RegText>
+    >
+      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
+        <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
+          {translate('addressbook.address') as string}
+        </RegText>
+        <View
+          style={{
+            paddingHorizontal: 10,
+            marginTop: 6,
+          }}
+        >
+          <RegText>{Utils.trimToSmall(address, 10)}</RegText>
+        </View>
+
+        <RegText style={{ marginTop: 18, paddingHorizontal: 10 }}>
+          {
+            (own
+              ? translate('addressbook.tag')
+              : translate('addressbook.contact')) as string
+          }
+        </RegText>
         <View
           style={{
             display: 'flex',
@@ -97,26 +135,30 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             justifyContent: 'flex-start',
             paddingHorizontal: 10,
             marginTop: 10,
-          }}>
+          }}
+        >
           <View
             accessible={true}
             style={{
               flexGrow: 1,
               borderWidth: 1,
-              borderRadius: 5,
-              borderColor: colors.text,
+              borderRadius: 12,
+              borderColor: colors.border,
               minWidth: 48,
               minHeight: 48,
               maxHeight: 150,
-            }}>
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+          >
             <TextInput
               style={{
                 color: colors.text,
                 fontWeight: '600',
                 fontSize: 14,
-                minWidth: 48,
+                flex: 1,
                 minHeight: 48,
-                marginLeft: 5,
+                padding: 10,
                 backgroundColor: 'transparent',
               }}
               placeholder={translate('addressbook.label-placeholder') as string}
@@ -125,7 +167,27 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
               onChangeText={(text: string) => setLabel(text)}
               maxLength={50}
             />
+            {label && (
+              <TouchableOpacity onPress={() => setLabel('')}>
+                <FontAwesomeIcon
+                  style={{ marginRight: 10 }}
+                  size={20}
+                  icon={faXmark}
+                  color={colors.primaryDisabled}
+                />
+              </TouchableOpacity>
+            )}
           </View>
+        </View>
+
+        <View style={{ paddingHorizontal: 10, marginTop: 18 }}>
+          <ChainSelect
+            label={translate('addressbook.chain') as string}
+            value={effectiveSwapChain}
+            options={[effectiveSwapChain]}
+            onChange={() => {}}
+            translate={translate}
+          />
         </View>
 
         <View
@@ -134,16 +196,17 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
+            gap: 10,
             marginVertical: 5,
-            marginTop: 30,
-          }}>
+            marginTop: 15,
+          }}
+        >
           <Button
             type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             onPress={() => {
               setLabel('');
               Keyboard.dismiss();
-              clear();
               setTimeout(() => {
                 closeSheet();
               }, 100);
@@ -153,7 +216,6 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
           <Button
             type={ButtonTypeEnum.Primary}
             title={translate('save') as string}
-            style={{ marginLeft: 10 }}
             onPress={() => {
               createAddressTag();
             }}

@@ -1,17 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, Pressable } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
   AddressKindEnum,
-  ButtonTypeEnum,
   ModeEnum,
   RouteEnum,
-  ScreenEnum,
   SnackbarDurationEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
@@ -19,10 +22,7 @@ import {
 import RegText from './RegText';
 import FadeText from './FadeText';
 import Clipboard from '@react-native-clipboard/clipboard';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import Button from './Button';
 import { CopyIcon } from './Icons/CopyIcon';
-import { ChevronDown, ChevronUp } from './Icons/Chevron';
 import { EyeIcon } from './Icons/EyeIcon';
 import { TriangleAlert } from './Icons/TriangleAlert';
 import { ShieldIcon } from './Icons/ShieldIcon';
@@ -30,80 +30,36 @@ import { ListIcon } from './Icons/ListIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import Address from './Address/Address';
+import { getZingoLogo } from '../../app/utils/ZingoAppData';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
   ufvk?: string;
-  screenName: ScreenEnum;
   index: number;
   setIndex: (i: number) => void;
   total: number;
   show: (s: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => void;
-  changeIndex?: (index: number) => void;
   hasTransparent?: boolean;
-  showMoreOptions?: boolean;
-  setShowMoreOptions?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   address,
   ufvk,
-  screenName,
   show,
   total,
   index,
   setIndex,
-  changeIndex,
-  hasTransparent,
-  showMoreOptions,
-  setShowMoreOptions,
 }) => {
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, mode, addressBook } = context;
   const { colors } = useTheme() as ThemeType;
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
-  const contentHeight = useRef(0);
-
-  const animatedHeight = useSharedValue(0);
-  const animatedOpacity = useSharedValue(0);
-
   const scrollViewRef = useRef<ScrollView>(null);
 
   const isBasic = ModeEnum.basic === mode;
   const isUnified = address?.addressKind === AddressKindEnum.u;
-
-  const toggle = () => {
-    setShowMoreOptions && setShowMoreOptions(prev => {
-      const next = !prev;
-
-      animatedHeight.value = withTiming(next ? contentHeight.current : 0, {
-        duration: 300,
-        easing: Easing.out(Easing.cubic),
-      });
-
-      animatedOpacity.value = withTiming(next ? 1 : 0, {
-        duration: 300,
-        easing: Easing.out(Easing.cubic),
-      });
-
-      if (!prev) {
-        setTimeout(() => {
-          scrollViewRef.current?.scrollToEnd({ animated: true });
-        }, 200);
-      }
-
-      return next;
-    });
-  };
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: animatedHeight.value,
-    opacity: animatedOpacity.value,
-    transform: [{ translateY: showMoreOptions ? 0 : -5 }],
-    overflow: 'hidden',
-  }));
 
   useEffect(() => {
     if (privacy) {
@@ -119,13 +75,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     }
   }, [expandQRAddress, privacy]);
 
-  useEffect(() => {
-    return () => {
-      setShowMoreOptions && setShowMoreOptions(false);
-      animatedStyle.height = 0;
-    };
-  }, [animatedStyle, setShowMoreOptions]);
-
   function contactFromAddress() {
     const contact = addressBook.find(c => c.address === address?.address);
     return contact ? contact.label : '';
@@ -133,19 +82,18 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 
   const doCopy = () => {
     Clipboard.setString(ufvk ? ufvk : address ? address.address : '');
-    addLastSnackbar({
-      message: ufvk
+    addLastSnackbar(
+      ufvk
         ? (translate('seed.tapcopy-ufvk-message') as string)
         : (translate('history.addresscopied') as string),
-      duration: SnackbarDurationEnum.short,
-      screenName: [screenName],
-    });
+      SnackbarDurationEnum.short,
+    );
   };
 
   const doAddressList = () => {
     navigation.navigate(RouteEnum.AddressList, {
-      addressKind: address ? address.addressKind : AddressKindEnum.u, 
-      setIndex: setIndex
+      addressKind: address ? address.addressKind : AddressKindEnum.u,
+      setIndex: setIndex,
     });
   };
 
@@ -153,57 +101,49 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     <View style={{ flexDirection: 'column', width: '100%' }}>
       <ScrollView
         ref={scrollViewRef}
+        bounces={false}
+        alwaysBounceVertical={false}
         style={{ width: '100%' }}
         contentContainerStyle={{
           alignItems: 'center',
-          paddingBottom: 20,
-        }}>
-        {ufvk || (address && address.address !== (translate('receive.noaddress') as string)) ? (
+          paddingBottom: 100,
+        }}
+      >
+        {ufvk ||
+        (address &&
+          address.address !== (translate('receive.noaddress') as string)) ? (
           <>
             {address && !isBasic && !isUnified && (
               <View
                 style={{
-                  width: '95%',
+                  alignSelf: 'center',
                   display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  backgroundColor: colors.warning.background,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  backgroundColor: colors.bottomSheetBackground,
                   borderRadius: 10,
-                  borderColor: colors.warning.border,
+                  borderColor: colors.bottomSheetBorder,
                   borderWidth: 1,
-                  padding: 10,
+                  paddingHorizontal: 19,
+                  paddingVertical: 13,
                   marginTop: 10,
-                }}>
-                <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                  <TriangleAlert color={colors.warning.primary} size={24} style={{ marginRight: 10 }} />
-                  <Text style={{ color: colors.warning.title, fontWeight: 'bold', fontSize: 16 }}>
-                    {translate('receive.transparent.warning.title') as string}
-                  </Text>
-                </View>
-                <Text style={{ color: colors.warning.text }}>
-                  {translate('receive.transparent.warning.description') as string}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    changeIndex && changeIndex(0);
-                  }}
+                }}
+              >
+                <TriangleAlert
+                  color="#F79700"
+                  size={20}
+                  style={{ marginRight: 10 }}
+                />
+                <Text
                   style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: '100%',
-                    backgroundColor: colors.primary,
-                    padding: 10,
-                    borderRadius: 5,
-                    marginTop: 10,
-                  }}>
-                  <ShieldIcon color={colors.background} size={24} style={{ marginRight: 5 }} />
-                  <Text style={{ color: colors.background, fontWeight: 'bold', fontSize: 14 }}>
-                    {translate('receive.transparent.warning.button') as string}
-                  </Text>
-                </TouchableOpacity>
+                    color: '#F79700',
+                    fontSize: 14,
+                    flexShrink: 1,
+                  }}
+                >
+                  {translate('receive.transparent-expose-warning') as string}
+                </Text>
               </View>
             )}
             <View
@@ -213,7 +153,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 alignItems: 'center',
                 marginTop: 10,
                 marginBottom: 5,
-              }}>
+              }}
+            >
               {!isBasic && address && isUnified && (
                 <View
                   style={{
@@ -221,28 +162,41 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginTop: 10,
-                  }}>
+                  }}
+                >
                   <View
                     style={{
                       flexDirection: 'row',
                       justifyContent: 'center',
                       alignItems: 'center',
-                    }}>
-                    <ShieldIcon color={colors.primary} size={24} style={{ marginRight: 10 }} />
+                    }}
+                  >
+                    <ShieldIcon
+                      color={colors.primary}
+                      size={20}
+                      style={{ marginRight: 10 }}
+                    />
                     <RegText
                       style={{
                         fontWeight: 'bold',
                         opacity: 0.9,
                         marginRight: 10,
-                      }}>
+                      }}
+                    >
                       {
-                        (address && address.has_orchard === true && address.has_sapling === false
+                        (address &&
+                        address.has_orchard === true &&
+                        address.has_sapling === false
                           ? translate('receive.shielded-orchard')
-                          : address && address.has_orchard === true && address.has_sapling === true
-                          ? translate('receive.shielded-orchard-sapling')
-                          : address && address.has_orchard === false && address.has_sapling === true
-                          ? translate('receive.shielded-sapling')
-                          : '') as string
+                          : address &&
+                              address.has_orchard === true &&
+                              address.has_sapling === true
+                            ? translate('receive.shielded-orchard-sapling')
+                            : address &&
+                                address.has_orchard === false &&
+                                address.has_sapling === true
+                              ? translate('receive.shielded-sapling')
+                              : '') as string
                       }
                     </RegText>
                   </View>
@@ -255,20 +209,27 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginTop: 10,
-                  }}>
+                  }}
+                >
                   <View
                     style={{
                       flexDirection: 'row',
                       justifyContent: 'center',
                       alignItems: 'center',
-                    }}>
-                    <EyeIcon color={colors.warning.primaryDark} size={24} style={{ marginRight: 10 }} />
+                    }}
+                  >
+                    <EyeIcon
+                      color={colors.warning.primaryDark}
+                      size={20}
+                      style={{ marginRight: 10 }}
+                    />
                     <RegText
                       style={{
                         fontWeight: 'bold',
                         opacity: 0.9,
                         marginRight: 10,
-                      }}>
+                      }}
+                    >
                       {address && (translate('receive.t-title') as string)}
                     </RegText>
                   </View>
@@ -280,19 +241,30 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginTop: 10,
-                }}>
+                }}
+              >
                 <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'center',
                     alignItems: 'center',
-                  }}>
-                  {total > 1 && <FadeText>{` (${index + 1} / ${total}) `}</FadeText>}
+                  }}
+                >
+                  {total > 1 && (
+                    <FadeText>{` (${index + 1} / ${total}) `}</FadeText>
+                  )}
                 </View>
               </View>
             </View>
 
-            <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text }}>
+            <View
+              style={{
+                marginTop: 10,
+                marginHorizontal: 20,
+                padding: 10,
+                backgroundColor: colors.text,
+              }}
+            >
               {ufvk ? (
                 <>
                   {expandQRAddress ? (
@@ -301,10 +273,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       size={200}
                       ecl="L"
                       backgroundColor={colors.text}
-                      logo={require('../../assets/img/logobig-zingo.png')}
+                      logo={getZingoLogo()}
                       logoSize={30}
                       logoBackgroundColor={colors.text}
-                      logoBorderRadius={5} /* android not soported */
+                      logoBorderRadius={7} /* android not soported */
                       logoMargin={3}
                     />
                   ) : (
@@ -316,20 +288,24 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         alignItems: 'center',
                         borderWidth: 1,
                         borderColor: colors.text,
-                      }}>
-                      <TouchableOpacity onPress={() => {
-                        setExpandQRAddress(true);
-                        setTimeout(() => {
-                          setExpandQRAddress(false);
-                        }, 5 * 1000);
-                      }}>
+                      }}
+                    >
+                      <TouchableOpacity
+                        onPress={() => {
+                          setExpandQRAddress(true);
+                          setTimeout(() => {
+                            setExpandQRAddress(false);
+                          }, 5 * 1000);
+                        }}
+                      >
                         <Text
                           style={{
                             color: colors.zingo,
                             textDecorationLine: 'underline',
                             marginTop: 15,
                             minHeight: 48,
-                          }}>
+                          }}
+                        >
                           {translate('seed.tapreveal') as string}
                         </Text>
                       </TouchableOpacity>
@@ -342,10 +318,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   size={200}
                   ecl="L"
                   backgroundColor={colors.text}
-                  logo={require('../../assets/img/logobig-zingo.png')}
+                  logo={getZingoLogo()}
                   logoSize={30}
                   logoBackgroundColor={colors.text}
-                  logoBorderRadius={5} /* android not soported */
+                  logoBorderRadius={7} /* android not soported */
                   logoMargin={3}
                 />
               )}
@@ -357,7 +333,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 marginVertical: 0,
                 width: '100%',
                 justifyContent: 'space-evenly',
-              }}>
+              }}
+            >
               <View
                 style={{
                   flexDirection: 'row',
@@ -365,7 +342,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   alignItems: 'center',
                   marginTop: 20,
                   marginBottom: 5,
-                }}>
+                }}
+              >
                 <TouchableOpacity onPress={doCopy}>
                   <View
                     style={{
@@ -374,14 +352,19 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       paddingHorizontal: 5,
                       paddingVertical: 5,
                       marginHorizontal: 10,
-                    }}>
-                    <CopyIcon color={colors.money} size={24} opacity={0.9} style={{ margin: 3 }} />
+                    }}
+                  >
+                    <CopyIcon
+                      color={colors.money}
+                      size={20}
+                      opacity={0.9}
+                      style={{ margin: 3 }}
+                    />
                   </View>
                 </TouchableOpacity>
                 {address && !isBasic && (
                   <>
-                    <TouchableOpacity
-                      onPress={() => show('VA')}>
+                    <TouchableOpacity onPress={() => show('VA')}>
                       <View
                         style={{
                           borderRadius: 30,
@@ -389,10 +372,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           paddingHorizontal: 5,
                           paddingVertical: 5,
                           marginHorizontal: 10,
-                        }}>
+                        }}
+                      >
                         <FontAwesomeIcon
                           style={{ margin: 5, opacity: 0.9 }}
-                          size={24}
+                          size={20}
                           icon={faCircleCheck}
                           color={colors.money}
                         />
@@ -407,8 +391,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                             paddingHorizontal: 5,
                             paddingVertical: 5,
                             marginHorizontal: 10,
-                          }}>
-                          <ListIcon color={colors.money} size={24} opacity={0.9} style={{ margin: 3 }} />
+                          }}
+                        >
+                          <ListIcon
+                            color={colors.money}
+                            size={20}
+                            opacity={0.9}
+                            style={{ margin: 3 }}
+                          />
                         </View>
                       </TouchableOpacity>
                     )}
@@ -418,10 +408,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             </View>
             {ufvk && (
               <Address
-                  address={ufvk}
-                  style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
-                  onPress={() => show('EA')}
-                />
+                address={ufvk}
+                style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+                onPress={() => show('EA')}
+              />
             )}
             {address && (
               <View
@@ -431,13 +421,15 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   justifyContent: 'center',
                   alignItems: 'center',
                   marginBottom: 20,
-                }}>
+                }}
+              >
                 {contactFromAddress() ? (
                   <Text
                     style={{
                       color: colors.zingo,
                       fontSize: 16,
-                    }}>
+                    }}
+                  >
                     {contactFromAddress()}
                   </Text>
                 ) : (
@@ -447,7 +439,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         color: colors.zingo,
                         textDecorationLine: 'underline',
                         fontSize: 16,
-                      }}>
+                      }}
+                    >
                       {translate('receive.add-tag') as string}
                     </Text>
                   </TouchableOpacity>
@@ -456,110 +449,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   address={address.address}
                   style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
                   onPress={() => show('EA')}
+                  testID={
+                    address.addressKind === AddressKindEnum.u
+                      ? 'receive.unified-address'
+                      : undefined
+                  }
                 />
               </View>
             )}
-            <View
-              style={{
-                flexDirection: 'column',
-                width: '100%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 10,
-              }}>
-              {!isBasic && address && (
-                <>
-                  {isUnified ? (
-                    <Button
-                      onPress={() => show('NA')}
-                      title={translate('receive.newu-option') as string}
-                      type={ButtonTypeEnum.Primary}
-                    />
-                  ) : (
-                    <Button
-                      onPress={() => show('NA')}
-                      title={translate('receive.transparent.newt-option') as string}
-                      type={ButtonTypeEnum.Tertiary}
-                    />
-                  )}
-
-                  {isUnified && hasTransparent && (
-                    <>
-                      <Pressable
-                        onPress={toggle}
-                        style={{
-                          width: '70%',
-                          marginVertical: 26,
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          paddingHorizontal: 10,
-                        }}>
-                        <TriangleAlert
-                          size={24}
-                          color={showMoreOptions ? colors.warning.primary : colors.zingo}
-                          style={{ marginRight: 16 }}
-                        />
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            color: showMoreOptions ? colors.warning.primary : colors.zingo,
-                          }}>
-                          {translate('receive.danger-zone') as string}{' '}
-                        </Text>
-                        {showMoreOptions ? (
-                          <ChevronUp size={20} color={colors.warning.primary} style={{ marginLeft: 16 }} />
-                        ) : (
-                          <ChevronDown size={20} color={colors.zingo} style={{ marginLeft: 16 }} />
-                        )}
-                      </Pressable>
-
-                      <Animated.View style={[animatedStyle]}>
-                        <View
-                          style={{
-                            width: '100%',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
-                          <TouchableOpacity
-                            onLayout={e => {
-                              contentHeight.current = e.nativeEvent.layout.height;
-                            }}
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: 10,
-                              backgroundColor: colors.secondary,
-                              borderColor: colors.secondaryBorder,
-                              borderWidth: 1,
-                              padding: 0,
-                              paddingLeft: 20,
-                              paddingRight: 20,
-                              borderRadius: 10,
-                              maxWidth: '90%',
-                              minWidth: '30%',
-                              minHeight: 48,
-                              width: '80%',
-                            }}
-                            onPress={() => {
-                              show('TW');
-                              setShowMoreOptions && setShowMoreOptions(false);
-                              animatedHeight.value = 0;
-                            }}>
-                            <Text style={{ color: colors.text }}>
-                              {translate('receive.go-to-transparent') as string}
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      </Animated.View>
-                    </>
-                  )}
-                </>
-              )}
-            </View>
           </>
         ) : (
           <View
@@ -569,7 +466,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               justifyContent: 'center',
               marginTop: 50,
               marginBottom: 30,
-            }}>
+            }}
+          >
             <RegText>{ufvk ? ufvk : address ? address.address : ''}</RegText>
           </View>
         )}

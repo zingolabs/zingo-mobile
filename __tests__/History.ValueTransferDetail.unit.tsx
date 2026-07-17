@@ -7,17 +7,22 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
 import ValueTransferDetail from '../components/History/components/ValueTransferDetail';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '../app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import { RouteEnum } from '../app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(i: number): DrawerScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail> {
+function makeDrawerProps(
+  i: number,
+): NativeStackScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail> {
   return {
     navigation: mockNavigation,
     route: {
@@ -35,7 +40,7 @@ function makeDrawerProps(i: number): DrawerScreenProps<AppDrawerParamList, Route
 // test suite
 describe('Component History ValueTransferDetail - test', () => {
   //unit test
-  const state = defaultAppContextLoaded;
+  const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
@@ -62,7 +67,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail {...props_1} />
       </ContextAppLoadedProvider>,
     );
-    const num = screen.getAllByText('0.0000');
+    const num = screen.getAllByText('0');
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
     screen.getByText('orchard memo\nsapling memo');
@@ -75,7 +80,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail {...props_2} />
       </ContextAppLoadedProvider>,
     );
-    const num = screen.getAllByText('0.0000');
+    const num = screen.getAllByText('0');
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
   });

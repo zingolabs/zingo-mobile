@@ -13,6 +13,7 @@ export enum SettingsNameEnum {
   recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',
   performanceLevel = 'performanceLevel',
   blockExplorer = 'blockExplorer',
+  nym = 'nym',
 
   // internal management
   firstInstall = 'firstInstall',

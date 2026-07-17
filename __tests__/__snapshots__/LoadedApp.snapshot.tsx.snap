@@ -44,7 +44,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
           }
         }
       >
-        zingo
+        Zingo
       </Text>
       <Text
         style={
@@ -54,7 +54,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
           }
         }
       >
-        version
+        2.0.19 (307)
       </Text>
     </View>
     <View

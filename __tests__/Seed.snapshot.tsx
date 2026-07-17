@@ -18,12 +18,14 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { DrawerScreenProps } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import NewSeed from '../app/LoadingApp/components/NewSeed';
 
-function makeDrawerProps(a: SeedActionEnum): DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed> {
+function makeDrawerProps(
+  a: SeedActionEnum,
+): NativeStackScreenProps<AppDrawerParamList, RouteEnum.Seed> {
   return {
     navigation: mockNavigation,
     route: {
@@ -38,9 +40,9 @@ function makeDrawerProps(a: SeedActionEnum): DrawerScreenProps<AppDrawerParamLis
 // test suite
 describe('Component Seed - test', () => {
   //snapshot test
-  const stateLoaded = defaultAppContextLoaded;
+  const stateLoaded = { ...defaultAppContextLoaded };
   stateLoaded.translate = mockTranslate;
-  stateLoaded.wallet = mockWallet;
+  stateLoaded.birthday = mockWallet.birthday || 0;
   stateLoaded.info = mockInfo;
   stateLoaded.totalBalance = mockTotalBalance;
   const onOk = jest.fn();
@@ -83,12 +85,11 @@ describe('Component Seed - test', () => {
   });
   const contextLoading = defaultAppContextLoading;
   contextLoading.translate = mockTranslate;
-  contextLoading.wallet = mockWallet;
   //contextLoading.totalBalance = mockTotalBalance;
   test('Seed New - snapshot', () => {
     const seed = render(
       <ContextAppLoadingProvider value={contextLoading}>
-        <NewSeed onClickOK={onOk} />
+        <NewSeed wallet={mockWallet} onClickOK={onOk} />
       </ContextAppLoadingProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();

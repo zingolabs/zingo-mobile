@@ -1,22 +1,39 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
-import { Text, View, ActivityIndicator, ScrollView, Image, TouchableOpacity, TextInput, Alert, NativeSyntheticEvent, Keyboard } from 'react-native';
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Text, View, ActivityIndicator, Image, Pressable } from 'react-native';
+import { showConfirm } from '../../showConfirm';
 import { useTheme } from '@react-navigation/native';
 
-import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context-menu-view';
-
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faEllipsisV, faWifi } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
+import ActionMenuBottomSheet, {
+  ActionMenuBottomSheetAction,
+} from '../../../components/Components/ActionMenuBottomSheet';
+
 import { ThemeType } from '../../types';
-import { ButtonTypeEnum, ChainNameEnum, GlobalConst, ModeEnum, SelectServerEnum } from '../../AppState';
+import { ButtonTypeEnum, ModeEnum, SelectServerEnum } from '../../AppState';
 import Button from '../../../components/Components/Button';
 import { ContextAppLoading } from '../../context';
+import {
+  getZingoLogo,
+  getZingoName,
+  getZingoVersion,
+} from '../../utils/ZingoAppData';
 import BoldText from '../../../components/Components/BoldText';
-import FadeText from '../../../components/Components/FadeText';
-import ChainTypeToggle from '../../../components/Components/ChainTypeToggle';
+import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
@@ -24,19 +41,12 @@ type StartMenuProps = {
   recoverRecoveryWalletInfo: (b: boolean) => void;
   changeMode: (v: ModeEnum) => void;
   customServer: () => void;
-  customServerShow: boolean;
-  customServerOffline: boolean;
-  onPressServerOffline: (v: boolean) => void;
-  customServerChainName: string;
-  onPressServerChainName: (v: ChainNameEnum) => void;
-  customServerUri: string;
-  setCustomServerUri: (v: string) => void;
-  usingCustomServer: () => void;
-  setCustomServerShow: (v: boolean) => void;
   walletExists: boolean;
+  hasBackupWallet: boolean;
   openCurrentWallet: () => void;
   createNewWallet: () => void;
   getwalletToRestore: () => void;
+  restoreLastBackup: () => void;
 };
 
 const StartMenu: React.FunctionComponent<StartMenuProps> = ({
@@ -45,256 +55,271 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   recoverRecoveryWalletInfo,
   changeMode,
   customServer,
-  customServerShow,
-  customServerOffline,
-  onPressServerOffline,
-  customServerChainName,
-  onPressServerChainName,
-  customServerUri,
-  setCustomServerUri,
-  usingCustomServer,
-  setCustomServerShow,
   walletExists,
+  hasBackupWallet,
   openCurrentWallet,
   createNewWallet,
   getwalletToRestore,
+  restoreLastBackup,
 }) => {
   const context = useContext(ContextAppLoading);
   const { netInfo, mode, translate, server, selectServer } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
+
+  const [containerH, setContainerH] = useState<number>(0);
+  const [headerH, setHeaderH] = useState<number>(0);
+  const startMenuSheetRef = useRef<BottomSheet>(null);
+  const optionsMenuRef = useRef<BottomSheetModal>(null);
+
+  const startMenuSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  // Consolidates the three legacy ContextMenu kebabs into one action list
+  // gated by network + mode + saved-state. Order: recoverkeys → primary
+  // action (advanced vs custom server) → restore backup.
+  const optionsActions = useMemo<ActionMenuBottomSheetAction[]>(() => {
+    if (actionButtonsDisabled) {
+      return [];
+    }
+    const list: ActionMenuBottomSheetAction[] = [];
+    if (hasRecoveryWalletInfoSaved) {
+      list.push({
+        label: translate('loadingapp.recoverkeys') as string,
+        onPress: () => recoverRecoveryWalletInfo(true),
+      });
+    }
+    if (netInfo.isConnected) {
+      if (mode === ModeEnum.basic) {
+        list.push({
+          label: translate('loadingapp.advancedmode') as string,
+          onPress: () => changeMode(ModeEnum.advanced),
+        });
+      } else {
+        list.push({
+          label: translate('loadingapp.custom') as string,
+          onPress: () => customServer(),
+        });
+        if (hasBackupWallet) {
+          list.push({
+            label: translate('loadedapp.restorebackupwallet') as string,
+            onPress: () =>
+              showConfirm({
+                title: translate('loadedapp.restorebackupwallet') as string,
+                message: translate(
+                  'loadedapp.alert-restorebackupwallet-body',
+                ) as string,
+                buttons: [
+                  {
+                    text: translate('confirm') as string,
+                    onPress: () => restoreLastBackup(),
+                  },
+                  { text: translate('cancel') as string, style: 'cancel' },
+                ],
+              }),
+          });
+        }
+      }
+    }
+    return list;
+  }, [
+    actionButtonsDisabled,
+    hasRecoveryWalletInfoSaved,
+    netInfo.isConnected,
+    mode,
+    hasBackupWallet,
+    translate,
+    recoverRecoveryWalletInfo,
+    changeMode,
+    customServer,
+    restoreLastBackup,
+  ]);
+
+  const renderStartMenuHandle = useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: 12,
+          paddingBottom: 8,
+          paddingHorizontal: 16,
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+          borderTopWidth: 1,
+          borderLeftWidth: 0.5,
+          borderRightWidth: 0.5,
+          borderTopColor: colors.bottomSheetBorder,
+          borderLeftColor: colors.bottomSheetBorder,
+          borderRightColor: colors.bottomSheetBorder,
+        }}
+      >
+        {/* StartMenu-only quirk: the parent header section has no opaque
+            background (unlike the standard <Header/> used elsewhere), and
+            on Android the straight middle of the top border between the
+            two corner arcs is dropped. Paint it explicitly between the
+            corner radii. */}
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 40,
+            right: 40,
+            height: 1,
+            backgroundColor: colors.bottomSheetBorder,
+          }}
+        />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <BoldText
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: 16,
+              lineHeight: 28,
+              textAlign: 'center',
+            }}
+          >
+            {translate('loadingapp.welcome') as string}
+          </BoldText>
+        </View>
+      </View>
+    ),
+    [colors, translate],
+  );
 
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: colors.background,
-      }}>
-      <View
-        style={{
-          backgroundColor: colors.card,
-          padding: 10,
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          zIndex: 999,
-        }}>
-        {netInfo.isConnected && !actionButtonsDisabled && (
-          <>
-            {mode === ModeEnum.basic ? (
-              <ContextMenu
-                title={translate('loadedapp.options') as string}
-                dropdownMenuMode={true}
-                actions={
-                  hasRecoveryWalletInfoSaved
-                    ? [{ title: translate('loadingapp.recoverkeys') as string }, {title: translate('loadingapp.advancedmode') as string }]
-                    : [{ title: translate('loadingapp.advancedmode') as string }]
-                }
-                onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
-                  if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
-                    recoverRecoveryWalletInfo(true);
-                  } else if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 1) {
-                    changeMode(ModeEnum.advanced);
-                  } else if (!hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
-                    changeMode(ModeEnum.advanced);
-                  }
-                }}
-              >
-                <FontAwesomeIcon style={{ width: 40, padding: 10 }} icon={faEllipsisV} color={'#ffffff'} size={40} />
-              </ContextMenu>
-            ) : (
-              <ContextMenu
-                title={translate('loadedapp.options') as string}
-                dropdownMenuMode={true}
-                actions={
-                  hasRecoveryWalletInfoSaved
-                    ? [{ title: translate('loadingapp.recoverkeys') as string }, { title: translate('loadingapp.custom') as string }]
-                    : [{ title: translate('loadingapp.custom') as string }]
-                }
-                onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
-                  if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
-                    recoverRecoveryWalletInfo(true);
-                  } else if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 1) {
-                    customServer();
-                  } else if (!hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
-                    customServer();
-                  }
-                }}
-              >
-                <FontAwesomeIcon style={{ width: 40, padding: 10 }} icon={faEllipsisV} color={'#ffffff'} size={40} />
-              </ContextMenu>
-            )}
-          </>
-        )}
-        {!netInfo.isConnected && hasRecoveryWalletInfoSaved && !actionButtonsDisabled && (
-          <ContextMenu
-            title={translate('loadedapp.options') as string}
-            dropdownMenuMode={true}
-            actions={[{ title: translate('loadingapp.recoverkeys') as string }]}
-            onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
-              if (e.nativeEvent.index === 0) {
-                recoverRecoveryWalletInfo(true);
-              }
-            }}
-          >
-            <FontAwesomeIcon style={{ width: 40, padding: 10 }} icon={faEllipsisV} color={'#ffffff'} size={40} />
-          </ContextMenu>
-        )}
-      </View>
-      <ScrollView
-        style={{ maxHeight: '90%' }}
-        keyboardShouldPersistTaps={'handled'}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-          padding: 20,
-        }}>
+      }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
+    >
+      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <View
           style={{
+            backgroundColor: colors.card,
+            padding: 10,
+            position: 'absolute',
+            top: 0,
+            right: 0,
+          }}
+        >
+          {optionsActions.length > 0 && (
+            <Pressable
+              onPress={() => optionsMenuRef.current?.present()}
+              style={{ width: 40, padding: 10 }}
+              hitSlop={8}
+            >
+              <FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={32} />
+            </Pressable>
+          )}
+        </View>
+        <View
+          style={{
+            alignItems: 'center',
+            paddingTop: 20,
+            paddingBottom: 20,
+          }}
+        >
+          <Text
+            style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}
+          >
+            {getZingoName()}
+          </Text>
+          <Text style={{ color: colors.zingo, fontSize: 15 }}>
+            {getZingoVersion()}
+          </Text>
+          <Image
+            source={getZingoLogo()}
+            style={{
+              width: 100,
+              height: 100,
+              resizeMode: 'contain',
+              marginTop: 10,
+              borderRadius: 22,
+            }}
+          />
+        </View>
+      </View>
+      <BottomSheet
+        ref={startMenuSheetRef}
+        snapPoints={startMenuSnapPoints}
+        index={0}
+        enableDynamicSizing={false}
+        enablePanDownToClose={false}
+        enableContentPanningGesture={false}
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior={'restore'}
+        android_keyboardInputMode={'adjustResize'}
+        backgroundStyle={{
+          backgroundColor: colors.bottomSheetBackground,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 40,
+        }}
+        handleComponent={renderStartMenuHandle}
+      >
+        <BottomSheetScrollView
+          keyboardShouldPersistTaps={'handled'}
+          bounces={false}
+          alwaysBounceVertical={false}
+          style={{
             flex: 1,
+            backgroundColor: colors.bottomSheetBackground,
+          }}
+          contentContainerStyle={{
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <View style={{ marginBottom: 30, display: 'flex', alignItems: 'center' }}>
-            <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
-              {translate('zingo') as string}
-            </Text>
-            <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
-            <Image
-              source={require('../../../assets/img/logobig-zingo.png')}
-              style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10, borderRadius: 10 }}
-            />
-          </View>
-
+            justifyContent: 'flex-start',
+            paddingHorizontal: 20,
+            paddingBottom: 30,
+          }}
+        >
           {selectServer !== SelectServerEnum.offline && (
             <>
               <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                 {`${translate('loadingapp.actualserver') as string} [${
-                  translate(`settings.value-chainname-${server.chainName}`) as string
+                  translate(
+                    `settings.value-chainname-${server.chainName}`,
+                  ) as string
                 }]`}
               </BoldText>
-              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server.uri}</BoldText>
+              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>
+                {server.uri}
+              </BoldText>
             </>
           )}
           {selectServer === SelectServerEnum.offline && (
-            <View style={{ flexDirection: 'row' }}>
-              <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                {translate('loadingapp.actualserver') as string}
-              </BoldText>
-              <BoldText style={{ fontSize: 15, marginBottom: 3, color: 'red' }}>
-                {' ' + (translate('settings.server-offline') as string)}
-              </BoldText>
-            </View>
-          )}
-
-          {customServerShow && (
-            <View
-              style={{
-                borderColor: colors.primaryDisabled,
-                borderWidth: 1,
-                paddingTop: 10,
-                paddingLeft: 10,
-                paddingRight: 10,
-                marginBottom: 5,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              {true && (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: 0,
-                    marginBottom: 10,
-                    paddingHorizontal: 5,
-                    paddingVertical: 1,
-                    borderColor: customServerOffline ? colors.primary : colors.zingo,
-                    borderWidth: customServerOffline ? 2 : 1,
-                    borderRadius: 10,
-                    minWidth: 25,
-                    minHeight: 25,
-                  }}>
-                  <TouchableOpacity onPress={() => onPressServerOffline(!customServerOffline)}>
-                    <View style={{ flexDirection: 'row', margin: 0, padding: 0 }}>
-                      <FontAwesomeIcon icon={faWifi} color={customServerOffline ? 'red' : colors.zingo} size={18} />
-                      <FadeText style={{ marginLeft: 10, marginRight: 5 }}>
-                        {translate('settings.server-offline') as string}
-                      </FadeText>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              )}
-              {!customServerOffline && (
-                <>
-                  <ChainTypeToggle
-                    customServerChainName={customServerChainName}
-                    onPress={onPressServerChainName}
-                    translate={translate}
-                    disabled={actionButtonsDisabled}
-                  />
-                  <View
-                    style={{
-                      borderColor: colors.border,
-                      borderWidth: 1,
-                      marginBottom: 10,
-                      width: '100%',
-                      maxWidth: '100%',
-                      minWidth: '50%',
-                      minHeight: 48,
-                      alignItems: 'center',
-                    }}>
-                    <TextInput
-                      placeholder={GlobalConst.serverPlaceHolder}
-                      placeholderTextColor={colors.placeholder}
-                      style={{
-                        color: colors.text,
-                        fontWeight: '600',
-                        fontSize: 18,
-                        minWidth: '90%',
-                        minHeight: 48,
-                        marginLeft: 5,
-                        backgroundColor: 'transparent',
-                      }}
-                      value={customServerUri}
-                      onChangeText={setCustomServerUri}
-                      editable={!actionButtonsDisabled}
-                      maxLength={100}
-                    />
-                  </View>
-                </>
-              )}
+            <>
               <View style={{ flexDirection: 'row' }}>
-                <Button
-                  type={ButtonTypeEnum.Secondary}
-                  title={translate('cancel') as string}
-                  disabled={actionButtonsDisabled}
-                  onPress={() => {
-                    onPressServerOffline(false);
-                    onPressServerChainName(ChainNameEnum.mainChainName);
-                    setCustomServerUri('');
-                    setCustomServerShow(false);
-                    Keyboard.dismiss();
-                  }}
-                  style={{ marginBottom: 10 }}
-                  twoButtons={true}
-                />
-                <Button
-                  type={ButtonTypeEnum.Primary}
-                  title={translate('save') as string}
-                  disabled={actionButtonsDisabled}
-                  onPress={() => {
-                    usingCustomServer();
-                    Keyboard.dismiss();
-                  }}
-                  style={{ marginBottom: 10, marginLeft: 10 }}
-                  twoButtons={true}
-                />
+                <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
+                  {translate('loadingapp.actualserver') as string}
+                </BoldText>
+                <BoldText
+                  style={{ fontSize: 15, marginBottom: 3, color: 'red' }}
+                >
+                  {' ' + (translate('settings.server-offline') as string)}
+                </BoldText>
               </View>
-            </View>
+              {/* Offline has no server URI, but the chain is still configured
+                  (create/restore derive keys chain-specifically). Show the same
+                  [Network] label the other modes display. */}
+              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>
+                {`[${
+                  translate(
+                    `settings.value-chainname-${server.chainName}`,
+                  ) as string
+                }]`}
+              </BoldText>
+            </>
           )}
 
-          {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
+          {(!netInfo.isConnected ||
+            netInfo.type === NetInfoStateType.cellular ||
+            netInfo.isConnectionExpensive) && (
             <>
               <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                 {translate('report.networkstatus') as string}
@@ -305,8 +330,15 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   flexDirection: 'row',
                   alignItems: 'flex-end',
                   marginHorizontal: 20,
-                }}>
-                <View style={{ display: 'flex', flexDirection: 'column', marginBottom: 10 }}>
+                }}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginBottom: 10,
+                  }}
+                >
                   {!netInfo.isConnected && (
                     <BoldText style={{ fontSize: 15, color: 'red' }}>
                       {' '}
@@ -339,7 +371,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   alignItems: 'flex-end',
                   marginHorizontal: 20,
                   marginBottom: 20,
-                }}>
+                }}
+              >
                 <View
                   style={{
                     display: 'flex',
@@ -349,8 +382,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                     borderWidth: 1,
                     borderRadius: 5,
                     padding: 5,
-                  }}>
-                  <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
+                  }}
+                >
+                  <BoldText
+                    style={{ fontSize: 15, color: colors.primaryDisabled }}
+                  >
                     {translate('loadingapp.noopenwallet-message') as string}
                   </BoldText>
                 </View>
@@ -365,7 +401,13 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             </>
           )}
 
-          {netInfo.isConnected && selectServer !== SelectServerEnum.offline && (
+          {/* Create works Offline too: the seed is generated locally and its
+              birthday falls back to the chain's activation height (the wallet
+              just won't sync until a server is chosen). Show it both online and
+              in Offline mode. */}
+          {((netInfo.isConnected &&
+            selectServer !== SelectServerEnum.offline) ||
+            selectServer === SelectServerEnum.offline) && (
             <Button
               testID="loadingapp.createnewwallet"
               type={ButtonTypeEnum.Primary}
@@ -373,18 +415,22 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               disabled={actionButtonsDisabled}
               onPress={() => {
                 if (walletExists) {
-                  Alert.alert(
-                    translate('loadingapp.alert-newwallet-title') as string,
-                    translate('loadingapp.alert-newwallet-body') as string,
-                    [
+                  showConfirm({
+                    title: translate(
+                      'loadingapp.alert-newwallet-title',
+                    ) as string,
+                    message: translate(
+                      'loadingapp.alert-newwallet-body',
+                    ) as string,
+                    buttons: [
                       {
                         text: translate('confirm') as string,
+                        style: 'destructive',
                         onPress: () => createNewWallet(),
                       },
                       { text: translate('cancel') as string, style: 'cancel' },
                     ],
-                    { cancelable: false },
-                  );
+                  });
                 } else {
                   createNewWallet();
                 }
@@ -393,8 +439,20 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             />
           )}
 
-          {netInfo.isConnected && selectServer !== SelectServerEnum.offline && (
-            <View style={{ marginTop: 10, display: 'flex', alignItems: 'center', width: '100%' }}>
+          {/* Restore works Offline: seed/UFVK derivation needs no Indexer
+              (the wallet just won't sync until a server is chosen). Show it
+              both online and in Offline mode. */}
+          {((netInfo.isConnected &&
+            selectServer !== SelectServerEnum.offline) ||
+            selectServer === SelectServerEnum.offline) && (
+            <View
+              style={{
+                marginTop: 10,
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+              }}
+            >
               <Button
                 testID="loadingapp.restorewalletseedufvk"
                 type={ButtonTypeEnum.Secondary}
@@ -413,7 +471,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 flexDirection: 'row',
                 alignItems: 'flex-end',
                 marginHorizontal: 20,
-              }}>
+              }}
+            >
               <View
                 style={{
                   display: 'flex',
@@ -423,8 +482,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   borderWidth: 1,
                   borderRadius: 5,
                   padding: 5,
-                }}>
-                <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
+                }}
+              >
+                <BoldText
+                  style={{ fontSize: 15, color: colors.primaryDisabled }}
+                >
                   {translate('loadingapp.nointernet-message') as string}
                 </BoldText>
               </View>
@@ -438,7 +500,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 flexDirection: 'row',
                 alignItems: 'flex-end',
                 marginHorizontal: 20,
-              }}>
+              }}
+            >
               <View
                 style={{
                   display: 'flex',
@@ -448,8 +511,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   borderWidth: 1,
                   borderRadius: 5,
                   padding: 5,
-                }}>
-                <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
+                }}
+              >
+                <BoldText
+                  style={{ fontSize: 15, color: colors.primaryDisabled }}
+                >
                   {translate('loadingapp.offline-message') as string}
                 </BoldText>
               </View>
@@ -457,10 +523,19 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           )}
 
           {actionButtonsDisabled && (
-            <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              style={{ marginVertical: 20 }}
+            />
           )}
-        </View>
-      </ScrollView>
+        </BottomSheetScrollView>
+      </BottomSheet>
+      <ActionMenuBottomSheet
+        ref={optionsMenuRef}
+        title={translate('loadedapp.options') as string}
+        actions={optionsActions}
+      />
     </View>
   );
 };

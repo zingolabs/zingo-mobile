@@ -26,7 +26,8 @@ const FadeText: React.FunctionComponent<FadeTextProps> = ({
       numberOfLines={numberOfLines}
       ellipsizeMode={ellipsizeMode}
       style={{ opacity: 0.65, color: colors.text, ...style }}
-      selectable={selectable}>
+      selectable={selectable}
+    >
       {children}
     </Text>
   );

@@ -1,0 +1,14 @@
+appId: org.ZingoLabs.Zingo
+---
+- launchApp:
+    clearState: true
+
+# In basic mode the wallet is created automatically.
+# The app lands on the Receive screen.
+- extendedWaitUntil:
+    visible:
+      id: "receive.title"
+    timeout: 120000
+
+- assertVisible:
+    id: "receive.unified-address"

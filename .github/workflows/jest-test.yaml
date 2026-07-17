@@ -9,9 +9,26 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
 
       - run: yarn
 
-      - run: yarn test
+      - name: Audit dependencies
+        run: |
+          yarn audit --level critical || audit_code=$?
+          [ $((${audit_code:-0} & 16)) -eq 0 ]
+
+      - run: yarn coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
 

@@ -1,5 +1,9 @@
-import { CurrencyEnum, LanguageEnum, BlockExplorerEnum } from '../../app/AppState';
-import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
+import {
+  CurrencyEnum,
+  LanguageEnum,
+  BlockExplorerEnum,
+} from '../../app/AppState';
+import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const mockTranslate = (p: string) => {
   if (p === 'about.copyright') {
@@ -28,10 +32,6 @@ export const mockTranslate = (p: string) => {
       {
         value: CurrencyEnum.USDCurrency,
         text: 'text USD',
-      },
-      {
-        value: CurrencyEnum.USDTORCurrency,
-        text: 'text USD TOR',
       },
     ];
   } else if (p === 'settings.languages') {
@@ -131,8 +131,12 @@ export const mockTranslate = (p: string) => {
         text: 'text Zcashexplorer',
       },
       {
-        value: BlockExplorerEnum.Zypherscan,
-        text: 'text Zypherscan',
+        value: BlockExplorerEnum.Zexplorer,
+        text: 'text Zexplorer',
+      },
+      {
+        value: BlockExplorerEnum.None,
+        text: 'text None',
       },
     ];
   } else {

@@ -9,6 +9,7 @@ on:
 jobs:
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
+    secrets: inherit
 
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
@@ -34,6 +35,7 @@ jobs:
           - { abi: x86, api-level: 29, target: default }
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
     needs: [create-timestamp, create-cache-key, android-build]
+    secrets: inherit
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
@@ -50,5 +52,6 @@ jobs:
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
     needs: [create-cache-key, ios-build]
+    secrets: inherit
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
