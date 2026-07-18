@@ -193,14 +193,41 @@ export async function restoreExistingWalletBackup(): Promise<string> {
   }
 }
 
-// Flushes the in-memory wallet state to disk. Returns "true"/"false" or
-// an "error: ..." prefix.
-export async function doSave(): Promise<string> {
+/**
+ * Whether a native save/backup resolution reports success. The bridges are
+ * trimodal (zingo-mobile#1151): Android resolves boolean true/false, iOS
+ * resolves "true"/"false", and both resolve "Error: ..." prose from their
+ * catch blocks. Success is knowable only from the two success shapes; any
+ * other value — including error prose — is a failure.
+ */
+export function nativeSaveSucceeded(result: boolean | string): boolean {
+  return result === true || result === GlobalConst.true;
+}
+
+// Flushes the in-memory wallet state to disk. The native bridge's trimodal
+// resolution is classified here, at the single seam (nativeSaveSucceeded),
+// and a rejected native promise is contained as false — never re-encoded
+// as "Error: ..." prose. Callers learn the outcome from the boolean alone
+// (zingo-mobile#1151; audit Issue P).
+export async function doSave(): Promise<boolean> {
   try {
-    return await RPCModule.doSave();
+    return nativeSaveSucceeded(await RPCModule.doSave());
   } catch (error) {
     console.log(`Critical Error doSave ${error}`);
-    return `Error: ${error}`;
+    return false;
+  }
+}
+
+// Snapshots the wallet file to its on-device backup twin. Same contract as
+// doSave: the trimodal native resolution is classified at this seam and a
+// rejection is contained as false, so no caller ever awaits doSaveBackup
+// without failure handling (audit Issue P, scenario three).
+export async function doSaveBackup(): Promise<boolean> {
+  try {
+    return nativeSaveSucceeded(await RPCModule.doSaveBackup());
+  } catch (error) {
+    console.log(`Critical Error doSaveBackup ${error}`);
+    return false;
   }
 }
 
@@ -488,12 +515,7 @@ export async function getLatestBlockServerInfo(
   try {
     const heightStr: string =
       await RPCModule.getLatestBlockServerInfo(serverUri);
-    if (heightStr) {
-      if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error server height ${heightStr}`);
-        return heightStr;
-      }
-    } else {
+    if (!heightStr) {
       console.log('Internal Error server height');
       return 'Error: Internal RPC Error: server height';
     }

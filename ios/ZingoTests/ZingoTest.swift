@@ -768,3 +768,113 @@ final class ExecuteParseAddressInvalid: XCTestCase {
         }
     }
 }
+
+/// The wallet-file base64 guard (zingo-mobile#1151; audit Issue Q). The FFI
+/// save path now crosses as bytes, so the historical attack string — a valid
+/// base64 export beginning with "error" — is unrepresentable there; this
+/// validator's one remaining consumer is restoreExistingWalletBackup, which
+/// checks file content read back from disk. Its acceptance rules are pinned
+/// here: base64 is recognized by structure alone, never by sentinel.
+class WalletFileBase64Tests: XCTestCase {
+    func testContentResemblingAnErrorSentinelIsValid() {
+        // Every case variant of the historical sentinel is well-formed
+        // base64 and must validate.
+        XCTAssertTrue(WalletExport.isValidBase64("errorAAA"))
+        XCTAssertTrue(WalletExport.isValidBase64("ERRORAAA"))
+    }
+
+    func testFailureProseNeverValidates() {
+        // Prose always contains ':' and ' ', both outside the base64
+        // alphabet.
+        XCTAssertFalse(WalletExport.isValidBase64("Error: disk full"))
+    }
+
+    func testEmptyContentNeverValidates() {
+        XCTAssertFalse(WalletExport.isValidBase64(""))
+    }
+
+    func testMalformedContentNeverValidates() {
+        XCTAssertFalse(WalletExport.isValidBase64("not base64 at all"))
+    }
+
+    func testPaddingMayOnlyTrail() {
+        XCTAssertFalse(WalletExport.isValidBase64("AB=A"))
+        XCTAssertTrue(WalletExport.isValidBase64("ABCD"))
+    }
+
+    func testPaddingIsAtMostTwoCharacters() {
+        XCTAssertFalse(WalletExport.isValidBase64("A==="))
+    }
+
+    func testTrailingBitsMustBeZero() {
+        // Non-canonical padding decodes downstream-dependently: the Rust
+        // STANDARD engine rejects it, so the guard must too.
+        XCTAssertFalse(WalletExport.isValidBase64("AB=="))
+        XCTAssertFalse(WalletExport.isValidBase64("AAB="))
+        XCTAssertTrue(WalletExport.isValidBase64("AA=="))
+        XCTAssertTrue(WalletExport.isValidBase64("AAA="))
+    }
+}
+
+/// The bridge-outcome contract for every migrated FFI (zingo-mobile#1151):
+/// whether a call succeeded is knowable from the channel of its result —
+/// resolved versus rejected — never from its content. One case per FFI,
+/// exercising the typed error family the Rust side now throws for it.
+/// These are the Swift twins of the Rust init_error_channel_tests, the
+/// Kotlin FfiOutcomeTest, and the TypeScript ffiOutcome tests.
+class FfiOutcomeTests: XCTestCase {
+    private let ffiFailures: [(code: String, error: ZingolibError)] = [
+        ("init_new", ZingolibError.Init(message: "boom")),
+        ("init_from_seed", ZingolibError.Init(message: "boom")),
+        ("init_from_ufvk", ZingolibError.Init(message: "boom")),
+        ("init_from_b64", ZingolibError.Init(message: "boom")),
+        ("run_sync", ZingolibError.Sync(message: "boom")),
+        ("pause_sync", ZingolibError.Sync(message: "boom")),
+        ("status_sync", ZingolibError.Sync(message: "boom")),
+        ("poll_sync", ZingolibError.Sync(message: "boom")),
+        ("run_rescan", ZingolibError.Rescan(message: "boom")),
+        // The read getters' Rust sides are prose-free; their one typed
+        // failure family is the uninitialized client.
+        ("get_latest_block_wallet", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_version", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_unified_addresses", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_transparent_addresses", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_wallet_save_required", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_config_wallet_performance", ZingolibError.LightclientNotInitialized(message: "boom")),
+        ("get_wallet_version", ZingolibError.LightclientNotInitialized(message: "boom")),
+        // The save shells run the save internals, whose failures throw;
+        // success is the only value their data channel carries.
+        ("save_wallet_bytes", ZingolibError.Save(message: "boom")),
+        ("save_wallet_backup", ZingolibError.Save(message: "boom")),
+        // The wallet-read getters whose domain failures are the typed
+        // Read variant.
+        ("get_balance", ZingolibError.Read(message: "boom")),
+        ("get_spendable_balance_total", ZingolibError.Read(message: "boom")),
+        ("get_value_transfers", ZingolibError.Read(message: "boom")),
+        ("get_messages", ZingolibError.Read(message: "boom")),
+        ("get_latest_block_server", ZingolibError.Read(message: "boom")),
+    ]
+
+    func testResolvedValuesPassThroughUnclassified() {
+        // The value deliberately wears the historical error sentinel:
+        // classification must be by channel, never by content.
+        let proseLikeData = "Error: looks like prose but is legitimate data"
+
+        for (code, _) in ffiFailures {
+            guard case .resolved(let value) = FfiOutcome.of(code, { proseLikeData }) else {
+                return XCTFail("FFI \(code) must resolve")
+            }
+            XCTAssertEqual(value, proseLikeData, "FFI \(code) must resolve its value verbatim")
+        }
+    }
+
+    func testThrownFfiErrorsRejectUnderTheFfiName() {
+        for (code, failure) in ffiFailures {
+            guard case .rejected(let rejectedCode, let error) = FfiOutcome.of(code, { throw failure }) else {
+                return XCTFail("FFI \(code) must reject on a thrown error")
+            }
+            XCTAssertEqual(rejectedCode, code)
+            XCTAssertTrue(error is ZingolibError, "FFI \(code) must reject with its typed error")
+        }
+    }
+}

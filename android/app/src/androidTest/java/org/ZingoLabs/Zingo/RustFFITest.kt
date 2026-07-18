@@ -415,6 +415,10 @@ class ExecuteSendFromOrchard {
         println("\nConfirm Txid:")
         println(confirmJson)
 
+        // A second launch while the first sync still runs is idempotent:
+        // the bridge answers with status on the data channel ("Sync task
+        // already running."), and the polling loop below observes the sync
+        // to completion either way.
         syncJson = uniffi.zingo.runSync()
         println("\nSync:")
         println(syncJson)
