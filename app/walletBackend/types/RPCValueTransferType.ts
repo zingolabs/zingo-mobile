@@ -12,6 +12,9 @@ export type RPCValueTransferType = {
   kind: RPCValueTransfersKindEnum;
   value: number;
   recipient_address?: string;
-  pool_received?: PoolEnum;
+  // Pool lists arrive in protocol order: transparent, sapling, orchard,
+  // ironwood. A transfer can span pools (e.g. an Orchard + Ironwood receive).
+  pools_sent_from?: PoolEnum[];
+  pools_received?: PoolEnum[];
   memos?: string[];
 };

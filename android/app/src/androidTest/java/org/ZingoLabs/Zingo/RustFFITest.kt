@@ -123,7 +123,8 @@ data class ValueTransfer (
     var kind : String = "",
     var value : Long = 0L,
     var recipient_address : String? = null,
-    var pool_received : String? = null,
+    var pools_sent_from : List<String>? = null,
+    var pools_received : List<String>? = null,
     var memos : List<String>? = null,
 )
 
@@ -531,7 +532,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
         // first item have to be a `Received`
         assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("received")
-        assertThat(valueTranfers.value_transfers[2].pool_received).isEqualTo("Orchard")
+        assertThat(valueTranfers.value_transfers[2].pools_received).isEqualTo(listOf("Orchard"))
         assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
         assertThat(valueTranfers.value_transfers[2].value).isEqualTo(1000000)
     }

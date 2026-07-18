@@ -118,7 +118,8 @@ struct ValueTransfer: Codable, Equatable {
     let kind: String
     let value: Int64
     let recipient_address: String?
-    let pool_received: String?
+    let pools_sent_from: [String]?
+    let pools_received: [String]?
     let memos: [String]?
 }
 
@@ -589,7 +590,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
             XCTAssertEqual(vts.value_transfers[1].transaction_fee, 10_000)
 
             XCTAssertEqual(vts.value_transfers[2].kind, "received")
-            XCTAssertEqual(vts.value_transfers[2].pool_received, "Orchard")
+            XCTAssertEqual(vts.value_transfers[2].pools_received, ["Orchard"])
             XCTAssertEqual(vts.value_transfers[2].status, "confirmed")
             XCTAssertEqual(vts.value_transfers[2].value, 1_000_000)
         } catch {

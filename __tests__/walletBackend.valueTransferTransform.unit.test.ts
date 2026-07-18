@@ -2,7 +2,7 @@
  * @format
  */
 
-import { ValueTransferKindEnum } from '../app/AppState';
+import { PoolEnum, ValueTransferKindEnum } from '../app/AppState';
 import { RPCValueTransfersKindEnum } from '../app/walletBackend/enums/RPCValueTransfersKindEnum';
 import { RPCValueTransfersStatusEnum } from '../app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { transformValueTransfer } from '../app/walletBackend/transforms/valueTransferTransform';
@@ -187,8 +187,36 @@ describe('transformValueTransfer — optional fields', () => {
     expect(result.memos).toEqual(['hello', '']);
   });
 
-  test('poolType is undefined when pool_received is absent', () => {
+  test('poolType is undefined when pools_received is absent', () => {
     const result = transformValueTransfer(makeVt(), 1100, 1100);
     expect(result.poolType).toBeUndefined();
+  });
+
+  test('poolType is undefined when pools_received is empty', () => {
+    const result = transformValueTransfer(
+      makeVt({ pools_received: [] }),
+      1100,
+      1100,
+    );
+    expect(result.poolType).toBeUndefined();
+  });
+
+  test('poolType is the single received pool', () => {
+    const result = transformValueTransfer(
+      makeVt({ pools_received: [PoolEnum.OrchardPool] }),
+      1100,
+      1100,
+    );
+    expect(result.poolType).toBe(PoolEnum.OrchardPool);
+  });
+
+  test('poolType is the newest pool when a transfer spans pools', () => {
+    // pools_received arrives in protocol order; ironwood is the newest.
+    const result = transformValueTransfer(
+      makeVt({ pools_received: [PoolEnum.OrchardPool, PoolEnum.IronwoodPool] }),
+      1100,
+      1100,
+    );
+    expect(result.poolType).toBe(PoolEnum.IronwoodPool);
   });
 });

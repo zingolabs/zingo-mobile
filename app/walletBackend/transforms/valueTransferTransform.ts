@@ -68,7 +68,13 @@ export function transformValueTransfer(
     !vt.memos || vt.memos.length === 0 || !vt.memos.join('')
       ? undefined
       : vt.memos;
-  result.poolType = !vt.pool_received ? undefined : vt.pool_received;
+  // `pools_received` is in protocol order (transparent, sapling, orchard,
+  // ironwood); a transfer can span pools, and the app displays one, so
+  // surface the newest pool present.
+  result.poolType =
+    !vt.pools_received || vt.pools_received.length === 0
+      ? undefined
+      : vt.pools_received[vt.pools_received.length - 1];
 
   if (result.status === RPCValueTransfersStatusEnum.failed) {
     console.log('[RPC] failed value transfer (transformed):', result);
