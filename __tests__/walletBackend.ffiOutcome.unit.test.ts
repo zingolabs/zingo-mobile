@@ -41,7 +41,7 @@ describe('init family wrappers pass resolutions through and contain rejections',
     [
       'init_new',
       'createNewWallet',
-      () => createNewWallet('uri', 'main', 'Medium', '1'),
+      () => createNewWallet('uri', '0', 'main', 'Medium', '1'),
     ],
     [
       'init_from_seed',
