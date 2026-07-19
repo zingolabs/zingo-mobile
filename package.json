@@ -107,7 +107,7 @@
     "react-native-svg-transformer": "^1.5.3",
     "react-test-renderer": "19.1.4",
     "rimraf": "^6.0.1",
-    "typescript": "5.5.4"
+    "typescript": "7.0.2"
   },
   "engines": {
     "node": ">=20"
