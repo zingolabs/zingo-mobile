@@ -1742,12 +1742,12 @@
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
-"@react-navigation/native-stack@^7.17.6":
-  version "7.17.6"
-  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.17.6.tgz#15613793b6b6c63bb36c6fd495b50ffa31b6ec6c"
-  integrity sha512-CnNPnlSGnrxPyHguDp/xDg5w9STMmIoI6IFZe7cpvEeD0GF/LTzvZ0gmq+hPJTm2/KIrnuPx34emCofzpht45g==
+"@react-navigation/native-stack@^7.17.9":
+  version "7.17.9"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.17.9.tgz#659c3ba0c6ef4fb5f8e19e42f3ac4e58c63d15c2"
+  integrity sha512-gXNSBxNjg9zpgOPgptwp5zM6LLorwXn2V8T4NuLZLjYe5DDovC+gtu6NhDXazwctiTWdff+BRwWbWK7zXvSvnw==
   dependencies:
-    "@react-navigation/elements" "^2.9.26"
+    "@react-navigation/elements" "^2.9.29"
     color "^4.2.3"
     sf-symbols-typescript "^2.1.0"
     warn-once "^0.1.1"
