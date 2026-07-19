@@ -103,7 +103,7 @@
     "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-react-native": "^5.0.0",
     "jest": "^30.3.0",
-    "prettier": "^3.9.4",
+    "prettier": "^3.9.5",
     "react-native-svg-transformer": "^1.5.3",
     "react-test-renderer": "19.1.4",
     "rimraf": "^6.0.1",
