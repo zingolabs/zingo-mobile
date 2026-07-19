@@ -90,7 +90,7 @@
     "@testing-library/react-native": "^13.2.0",
     "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.16",
-    "@types/node": "^26.1.0",
+    "@types/node": "^26.1.1",
     "@types/randomcolor": "^0.5.9",
     "@types/react": "^19.1.0",
     "@types/react-test-renderer": "^19.1.0",
