@@ -5826,10 +5826,10 @@ joi@^17.2.1:
     "@sideway/formula" "^3.0.1"
     "@sideway/pinpoint" "^2.0.0"
 
-js-base64@^3.8.0:
-  version "3.8.0"
-  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.8.0.tgz#cfc7b3d0f15dc6f69403c50df8ff2decca1a23ad"
-  integrity sha512-65kvbemyZhj+ExQt1PEFyBEjL5vAHysu1lJdW1AwhhChkO8ZBPizYk/m9GVrpbS2Je1hF+UYZ+6KywqtZV8mHw==
+js-base64@^3.8.1:
+  version "3.8.1"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.8.1.tgz#b04bf95d803cc924d0831e5a7790519567ef1c8a"
+  integrity sha512-5xVjhUZlHHeuO2W7w2rDFj/Kl1xLX+HjZxdOQwCsUOifl6UaoH1o1wsbsTMz+r0aeC7gCijvru02j6TfKZWzKg==
 
 js-message@1.0.7:
   version "1.0.7"
