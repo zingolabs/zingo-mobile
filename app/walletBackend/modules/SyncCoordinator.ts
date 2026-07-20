@@ -198,10 +198,12 @@ export class SyncCoordinator {
         this.config.onMessagesChanged([], 0);
         this.config.onBalanceChanged({
           totalOrchardBalance: 0,
+          totalIronwoodBalance: 0,
           totalSaplingBalance: 0,
           totalTransparentBalance: 0,
           confirmedTransparentBalance: 0,
           confirmedOrchardBalance: 0,
+          confirmedIronwoodBalance: 0,
           confirmedSaplingBalance: 0,
           totalSpendableBalance: 0,
         } as TotalBalanceClass);

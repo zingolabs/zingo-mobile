@@ -71,6 +71,8 @@ export type AppDrawerParamList = {
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
   [RouteEnum.MeetIronwood]: undefined;
+  [RouteEnum.MigrationStrategy]: undefined;
+  [RouteEnum.MigrationTransactions]: undefined;
 
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;

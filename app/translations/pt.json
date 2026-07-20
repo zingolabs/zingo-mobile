@@ -786,6 +786,9 @@
   },
   "pools": {
     "title": "Fundos nas Pools",
+    "ironwood-title": "IRONWOOD",
+    "ironwood-balance": "Saldo Total",
+    "ironwood-confirmed-balance": "Saldo confirmado",
     "orchard-title": "ORCHARD (UA)",
     "orchard-balance": "Saldo Total",
     "orchard-confirmed-balance": "Saldo confirmado",
@@ -810,7 +813,8 @@
     "phase2-body": "**Fase 2 — Enviar em lotes.** Os envios são feitos em janelas de tempo. Não operamos em segundo plano: avisaremos para você abrir o app e autorizar cada lote.",
     "bucket": "Lote",
     "back": "Voltar",
-    "next": "Avançar"
+    "next": "Avançar",
+    "close": "Fechar"
   },
   "ironwoodbanner": {
     "warning": "Após a **NU6.3**, os fundos não podem se mover dentro da pool Orchard. **{amount}** precisa migrar para a Ironwood.",
@@ -818,6 +822,44 @@
     "at-risk": "em risco",
     "balance": "Saldo:",
     "start": "Começar"
+  },
+  "migrationstrategy": {
+    "title": "Estratégia de migração",
+    "intro": "Para verificar a integridade da rede, seus fundos da Orchard precisam migrar para a nova pool **Ironwood**. Como é uma transferência entre pools, escolha o nível de privacidade da migração.",
+    "now-label": "Migrar agora",
+    "now-body": "Uma transferência, concluída em minutos. Todo o seu saldo de **{amount}** fica publicamente visível na cadeia.",
+    "private-label": "Migrar com privacidade",
+    "private-body": "Distribui as transferências ao longo de ~3 dias em quantias padrão, misturando-se com outros usuários. Requer abrir o app algumas vezes.",
+    "coming-soon": "Em breve",
+    "back": "Voltar",
+    "start": "Começar"
+  },
+  "migrationtransactions": {
+    "title": "Transações de migração",
+    "subtitle": "Vamos criar **{count}** transações para você mesmo simultaneamente.",
+    "subtitle-one": "Vamos criar **1** transação para você mesmo.",
+    "tx": "Transação {n}",
+    "flow": "Orchard → Ironwood",
+    "inputs": "Entradas",
+    "output": "Saída",
+    "fee": "Taxa",
+    "total": "Total",
+    "notes": "notas",
+    "note-one": "nota",
+    "txs": "txs",
+    "tx-one": "tx",
+    "fee-suffix": "de taxa",
+    "confirm-in": "Confirma em",
+    "confirm-in-value": "1 bloco, juntas",
+    "loading": "Planejando sua migração…",
+    "error-title": "Não foi possível planejar a migração",
+    "nothing-title": "Nada para migrar",
+    "nothing-body": "Sua pool da Orchard não tem fundos que valham a pena migrar agora.",
+    "success": "Transações de migração transmitidas.",
+    "submitting": "Enviando…",
+    "back": "Voltar",
+    "accept": "Aceitar",
+    "close": "Fechar"
   },
   "uris": {
     "baduri": "Error: Erro na URI .",

@@ -364,6 +364,52 @@ export async function sendPropose(proposeJson: string): Promise<string> {
   }
 }
 
+// Plans the immediate Orchard -> Ironwood drain without broadcasting. Mirrors
+// the native `planOrchardDrainProcess` (propose/preview phase). Returns the raw
+// JSON (parseable as RPCDrainPlanType); the caller checks for an `error`
+// prefix / field before parsing.
+export async function planOrchardDrain(): Promise<string> {
+  try {
+    const planStr: string = await RPCModule.planOrchardDrainProcess();
+    if (planStr) {
+      if (planStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error planOrchardDrain ${planStr}`);
+        return planStr;
+      }
+    } else {
+      console.log('Internal Error planOrchardDrain');
+      return 'Error: Internal RPC Error: planOrchardDrain';
+    }
+    return planStr;
+  } catch (error) {
+    console.log(`Critical Error planOrchardDrain ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Executes the immediate Orchard -> Ironwood drain: builds and broadcasts every
+// drain transaction at once. Mirrors the native `drainOrchardProcess`. Returns
+// the raw JSON (parseable as RPCDrainType); the caller checks for an `error`
+// prefix / field before parsing.
+export async function drainOrchard(): Promise<string> {
+  try {
+    const drainStr: string = await RPCModule.drainOrchardProcess();
+    if (drainStr) {
+      if (drainStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error drainOrchard ${drainStr}`);
+        return drainStr;
+      }
+    } else {
+      console.log('Internal Error drainOrchard');
+      return 'Error: Internal RPC Error: drainOrchard';
+    }
+    return drainStr;
+  } catch (error) {
+    console.log(`Critical Error drainOrchard ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
 // Returns the spendable balance that could be sent to `address` right now,
 // honoring privacy levels and donation flags. Returns the raw JSON
 // (parseable as RPCSpendablebalanceType).

@@ -786,6 +786,9 @@
   },
   "pools": {
     "title": "Fon Havuzları",
+    "ironwood-title": "IRONWOOD",
+    "ironwood-balance": "Toplam Bakiye",
+    "ironwood-confirmed-balance": "Onaylanmış bakiye",
     "orchard-title": "ORCHARD (UA)",
     "orchard-balance": "Toplam Bakiye",
     "orchard-confirmed-balance": "Onaylanmış bakiye",
@@ -810,7 +813,8 @@
     "phase2-body": "**Aşama 2 — Partiler hâlinde gönderim.** Gönderimler zaman aralıklarında yapılır. Arka planda çalışmıyoruz: her partiyi yetkilendirmeniz için uygulamayı açmanızı bildireceğiz.",
     "bucket": "Parti",
     "back": "Geri",
-    "next": "İleri"
+    "next": "İleri",
+    "close": "Kapat"
   },
   "ironwoodbanner": {
     "warning": "**NU6.3**'ten sonra fonlar Orchard havuzu içinde hareket edemez. **{amount}** Ironwood'a taşınmalı.",
@@ -818,6 +822,44 @@
     "at-risk": "risk altında",
     "balance": "Bakiye:",
     "start": "Başlat"
+  },
+  "migrationstrategy": {
+    "title": "Geçiş Stratejisi",
+    "intro": "Ağ bütünlüğünü doğrulamak için Orchard fonlarınızın yeni **Ironwood** havuzuna taşınması gerekir. Bu, havuzlar arası bir transfer olduğundan geçişin gizlilik düzeyini seçin.",
+    "now-label": "Şimdi taşı",
+    "now-body": "Tek transfer, dakikalar içinde tamamlanır. **{amount}** tutarındaki tüm bakiyeniz zincirde herkese görünür olur.",
+    "private-label": "Gizli taşı",
+    "private-body": "Transferleri standart tutarlarda ~3 güne yayar ve diğer kullanıcılarla karışır. Uygulamayı birkaç kez açmanız gerekir.",
+    "coming-soon": "Yakında",
+    "back": "Geri",
+    "start": "Başla"
+  },
+  "migrationtransactions": {
+    "title": "Geçiş işlemleri",
+    "subtitle": "Kendinize aynı anda **{count}** işlem oluşturacağız.",
+    "subtitle-one": "Kendinize **1** işlem oluşturacağız.",
+    "tx": "İşlem {n}",
+    "flow": "Orchard → Ironwood",
+    "inputs": "Girdiler",
+    "output": "Çıktı",
+    "fee": "Ücret",
+    "total": "Toplam",
+    "notes": "not",
+    "note-one": "not",
+    "txs": "işlem",
+    "tx-one": "işlem",
+    "fee-suffix": "ücret",
+    "confirm-in": "Onay",
+    "confirm-in-value": "1 blok, birlikte",
+    "loading": "Geçişiniz planlanıyor…",
+    "error-title": "Geçiş planlanamadı",
+    "nothing-title": "Taşınacak bir şey yok",
+    "nothing-body": "Orchard havuzunuzda şu anda taşımaya değer fon yok.",
+    "success": "Geçiş işlemleri yayınlandı.",
+    "submitting": "Gönderiliyor…",
+    "back": "Geri",
+    "accept": "Kabul et",
+    "close": "Kapat"
   },
   "uris": {
     "baduri": "Error: Geçersiz URI.",

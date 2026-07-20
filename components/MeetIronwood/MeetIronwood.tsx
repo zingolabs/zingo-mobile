@@ -6,7 +6,13 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { BackHandler, Text, useWindowDimensions, View } from 'react-native';
+import {
+  BackHandler,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   cancelAnimation,
@@ -25,7 +31,7 @@ import Animated, {
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightLong, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '../Components/BoldText';
@@ -420,9 +426,12 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
     if (index < STEP_COUNT - 1) {
       goTo(index + 1);
     } else {
-      closeScreen();
+      // Last onboarding step continues into the migration flow rather than
+      // closing. The migration screens end the flow (reset to Home) once the
+      // user accepts or backs all the way out.
+      navigation.navigate(RouteEnum.MigrationStrategy);
     }
-  }, [index, goTo, closeScreen]);
+  }, [index, goTo, navigation]);
 
   // While onboarding is focused, the Android hardware back button closes it
   // (same as finishing) instead of popping to the screen behind it.
@@ -579,6 +588,27 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Escape hatch: close the onboarding and go straight Home. Same
+          one-way reset as the hardware back button. */}
+      <TouchableOpacity
+        testID="meetironwood.close"
+        onPress={closeScreen}
+        accessibilityLabel={translate('meetironwood.close') as string}
+        hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+        style={{
+          position: 'absolute',
+          top: 18,
+          right: 18,
+          zIndex: 10,
+          width: 34,
+          height: 34,
+          borderRadius: 17,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <FontAwesomeIcon icon={faXmark} size={22} color={colors.placeholder} />
+      </TouchableOpacity>
       <GestureDetector gesture={pan}>
         <Animated.View
           entering={FadeInUp.duration(420)

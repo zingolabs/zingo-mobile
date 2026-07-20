@@ -135,6 +135,12 @@ const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
 const Pools = React.lazy(() => import('../../components/Pools'));
 const MeetIronwood = React.lazy(() => import('../../components/MeetIronwood'));
+const MigrationStrategy = React.lazy(
+  () => import('../../components/MigrationStrategy'),
+);
+const MigrationTransactions = React.lazy(
+  () => import('../../components/MigrationTransactions'),
+);
 const Insight = React.lazy(() => import('../../components/Insight'));
 const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
 const ComputingTxContent = React.lazy(
@@ -2551,6 +2557,18 @@ export class LoadedAppClass extends Component<
                       component={MeetIronwood}
                       // One-way onboarding: no swipe-back to the screen behind
                       // it; the screen closes by resetting the stack to Home.
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationStrategy}
+                      component={MigrationStrategy}
+                      // Continues the one-way onboarding flow; back is handled
+                      // in-screen, not by swipe.
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationTransactions}
+                      component={MigrationTransactions}
                       options={{ gestureEnabled: false }}
                     />
                     <RootNavigator.Screen name={RouteEnum.AddressBook}>

@@ -786,6 +786,9 @@
   },
   "pools": {
     "title": "Fund Pools",
+    "ironwood-title": "IRONWOOD",
+    "ironwood-balance": "Total Balance",
+    "ironwood-confirmed-balance": "Confirmed Balance",
     "orchard-title": "ORCHARD (UA)",
     "orchard-balance": "Total Balance",
     "orchard-confirmed-balance": "Confirmed Balance",
@@ -810,7 +813,8 @@
     "phase2-body": "**Phase 2 — Send in batches.** Shipments are sent in time windows. We don't operate in the background: we'll notify you to open the app and authorize each batch.",
     "bucket": "Bucket",
     "back": "Back",
-    "next": "Next"
+    "next": "Next",
+    "close": "Close"
   },
   "ironwoodbanner": {
     "warning": "After **NU6.3**, funds can't move inside the Orchard pool. **{amount}** needs to migrate to Ironwood.",
@@ -818,6 +822,44 @@
     "at-risk": "at risk",
     "balance": "Balance:",
     "start": "Start"
+  },
+  "migrationstrategy": {
+    "title": "Migration Strategy",
+    "intro": "To verify network integrity, your Orchard funds need to migrate to the new **Ironwood** pool. Since this is a cross-pool transfer, choose the privacy level of the migration.",
+    "now-label": "Migrate now",
+    "now-body": "One transfer, done in minutes. Your full balance of **{amount}** becomes publicly visible on-chain.",
+    "private-label": "Migrate privately",
+    "private-body": "Spreads transfers over ~3 days in standard amounts, blending with other users. Requires opening the app a few times.",
+    "coming-soon": "Coming soon",
+    "back": "Back",
+    "start": "Start"
+  },
+  "migrationtransactions": {
+    "title": "Migration transactions",
+    "subtitle": "We'll create **{count}** transactions to yourself simultaneously.",
+    "subtitle-one": "We'll create **1** transaction to yourself.",
+    "tx": "Transaction {n}",
+    "flow": "Orchard → Ironwood",
+    "inputs": "Inputs",
+    "output": "Output",
+    "fee": "Fee",
+    "total": "Total",
+    "notes": "notes",
+    "note-one": "note",
+    "txs": "txs",
+    "tx-one": "tx",
+    "fee-suffix": "fee",
+    "confirm-in": "Confirm in",
+    "confirm-in-value": "1 block, together",
+    "loading": "Planning your migration…",
+    "error-title": "Couldn't plan the migration",
+    "nothing-title": "Nothing to migrate",
+    "nothing-body": "Your Orchard pool has no funds worth migrating right now.",
+    "success": "Migration transactions broadcast.",
+    "submitting": "Sending…",
+    "back": "Back",
+    "accept": "Accept",
+    "close": "Close"
   },
   "uris": {
     "baduri": "Error: Bad URI.",

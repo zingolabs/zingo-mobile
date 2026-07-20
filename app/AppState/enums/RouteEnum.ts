@@ -23,6 +23,8 @@ export enum RouteEnum {
   SyncReport = 'SyncReport',
   Pools = 'Pools',
   MeetIronwood = 'MeetIronwood',
+  MigrationStrategy = 'MigrationStrategy',
+  MigrationTransactions = 'MigrationTransactions',
 
   // Drawer with params
   AddressBook = 'AddressBook',

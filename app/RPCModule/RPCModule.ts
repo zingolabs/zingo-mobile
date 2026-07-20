@@ -104,6 +104,10 @@ interface RPCModuleAPI {
   shieldProcess(): Promise<string>;
   confirmProcess(): Promise<string>;
 
+  // Ironwood migration (Orchard -> Ironwood drain)
+  planOrchardDrainProcess(): Promise<string>;
+  drainOrchardProcess(): Promise<string>;
+
   // Wallet options / configuration
   getOptionWalletInfo(): Promise<string>;
   setOptionWalletProcess(): Promise<string>;

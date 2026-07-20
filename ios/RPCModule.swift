@@ -1538,4 +1538,66 @@ class RPCModule: NSObject {
       }
   }
 
+  func fnPlanOrchardDrainProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try planOrchardDrain()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] planOrchardDrain. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] planOrchardDrain. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  @objc(planOrchardDrainProcess:reject:)
+  func planOrchardDrainProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnPlanOrchardDrainProcess(dict)
+        }
+      }
+  }
+
+  func fnDrainOrchardProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try drainOrchardToIronwood()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] drainOrchardToIronwood. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] drainOrchardToIronwood. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  @objc(drainOrchardProcess:reject:)
+  func drainOrchardProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnDrainOrchardProcess(dict)
+        }
+      }
+  }
+
 }

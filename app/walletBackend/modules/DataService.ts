@@ -101,11 +101,15 @@ export class DataService {
 
       const balance: TotalBalanceClass = {
         totalOrchardBalance: (balanceJSON.total_orchard_balance || 0) / 10 ** 8,
+        totalIronwoodBalance:
+          (balanceJSON.total_ironwood_balance || 0) / 10 ** 8,
         totalSaplingBalance: (balanceJSON.total_sapling_balance || 0) / 10 ** 8,
         totalTransparentBalance:
           (balanceJSON.total_transparent_balance || 0) / 10 ** 8,
         confirmedOrchardBalance:
           (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
+        confirmedIronwoodBalance:
+          (balanceJSON.confirmed_ironwood_balance || 0) / 10 ** 8,
         confirmedSaplingBalance:
           (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
         confirmedTransparentBalance:
