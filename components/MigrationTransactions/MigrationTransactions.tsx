@@ -106,6 +106,11 @@ const MigrationTransactions: React.FunctionComponent<
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  // Which phase failed, so the error screen doesn't mislabel a broadcast
+  // failure (Accept) as a planning failure.
+  const [errorTitleKey, setErrorTitleKey] = useState<string>(
+    'migrationtransactions.error-title',
+  );
 
   const currencyName = info.currencyName;
   const zec = useCallback(
@@ -153,6 +158,7 @@ const MigrationTransactions: React.FunctionComponent<
 
   const onAccept = useCallback(async () => {
     setSubmitting(true);
+    setErrorTitleKey('migrationtransactions.broadcast-error-title');
     const drainStr = await drainOrchard();
     if (drainStr.toLowerCase().startsWith(GlobalConst.error)) {
       setSubmitting(false);
@@ -240,7 +246,7 @@ const MigrationTransactions: React.FunctionComponent<
                 textAlign: 'center',
               }}
             >
-              {translate('migrationtransactions.error-title') as string}
+              {translate(errorTitleKey) as string}
             </Text>
             <Text
               style={{

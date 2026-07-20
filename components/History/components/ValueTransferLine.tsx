@@ -17,6 +17,7 @@ import {
   //faComments,
   faFileLines,
   faPaperPlane,
+  faRightLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
@@ -112,10 +113,12 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     vt.confirmations < GlobalConst.minConfirmations &&
     vt.status !== RPCValueTransfersStatusEnum.failed
       ? faRefresh
-      : vt.kind === ValueTransferKindEnum.Received ||
-          vt.kind === ValueTransferKindEnum.Shield
-        ? faArrowDown
-        : faArrowUp;
+      : vt.kind === ValueTransferKindEnum.Migration
+        ? faRightLeft
+        : vt.kind === ValueTransferKindEnum.Received ||
+            vt.kind === ValueTransferKindEnum.Shield
+          ? faArrowDown
+          : faArrowUp;
 
   const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
 
@@ -428,7 +431,18 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                                                   ? (translate(
                                                       'history.rejection',
                                                     ) as string)
-                                                  : ''}
+                                                  : vt.kind ===
+                                                        ValueTransferKindEnum.Migration &&
+                                                      vt.confirmations === 0
+                                                    ? (translate(
+                                                        'history.migrating',
+                                                      ) as string)
+                                                    : vt.kind ===
+                                                        ValueTransferKindEnum.Migration
+                                                      ? (translate(
+                                                          'history.migration',
+                                                        ) as string)
+                                                      : ''}
                   </FadeText>
                   <View
                     style={{

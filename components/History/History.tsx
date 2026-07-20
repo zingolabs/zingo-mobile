@@ -423,6 +423,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           (vt.kind === ValueTransferKindEnum.Sent ||
             vt.kind === ValueTransferKindEnum.SendToSelf ||
             vt.kind === ValueTransferKindEnum.MemoToSelf ||
+            vt.kind === ValueTransferKindEnum.Migration ||
             vt.kind === ValueTransferKindEnum.Rejection)
         ) {
           selectedKind = true;
