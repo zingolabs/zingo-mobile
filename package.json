@@ -30,7 +30,7 @@
     "release:beta:prep": "node scripts/release/release-prep.mjs beta"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^7.3.0",
+    "@fortawesome/fontawesome-svg-core": "^7.3.1",
     "@fortawesome/free-regular-svg-icons": "^7.3.0",
     "@fortawesome/free-solid-svg-icons": "^7.3.0",
     "@fortawesome/react-native-fontawesome": "^1.0.0",
