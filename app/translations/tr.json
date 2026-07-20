@@ -797,6 +797,28 @@
     "transparent-confirmed-balance": "Onaylanmış Bakiye",
     "dust": "Şeffaf miktar, gizlenmek için çok küçük."
   },
+  "meetironwood": {
+    "title": "Ironwood ile Tanışın",
+    "title2": "Taşıma nasıl işliyor",
+    "orchard": "ORCHARD",
+    "ironwood": "IRONWOOD",
+    "step1-body-1": "**NU6.3**, yeni **Ironwood** havuzunu getiriyor ve **Orchard** havuzunu mühürlüyor. Güncellemeden sonra fonlar Orchard içinde artık hareket ettirilemez.",
+    "step1-body-2": "Orchard fonlarınızı harcanabilir tutmak için şimdi **Ironwood**'a taşıyın; daha güçlü, biçimsel olarak doğrulanmış gizlilik ve gelecekteki kuantum güvenliğine daha kolay bir yol kazanın.",
+    "phase1-label": "AŞAMA 1 - BÖLME",
+    "phase1-body": "**Aşama 1 — Bölme.** Hızlı bir dahili işlem, gizliliğinizi korumak için bakiyelerinizi standart hale getirir.",
+    "phase2-label": "AŞAMA 2 - PARTİLER HÂLİNDE GÖNDERİM",
+    "phase2-body": "**Aşama 2 — Partiler hâlinde gönderim.** Gönderimler zaman aralıklarında yapılır. Arka planda çalışmıyoruz: her partiyi yetkilendirmeniz için uygulamayı açmanızı bildireceğiz.",
+    "bucket": "Parti",
+    "back": "Geri",
+    "next": "İleri"
+  },
+  "ironwoodbanner": {
+    "warning": "**NU6.3**'ten sonra fonlar Orchard havuzu içinde hareket edemez. **{amount}** Ironwood'a taşınmalı.",
+    "pool": "Orchard",
+    "at-risk": "risk altında",
+    "balance": "Bakiye:",
+    "start": "Başlat"
+  },
   "uris": {
     "baduri": "Error: Geçersiz URI.",
     "notvalid": "Geçerli bir Zcash adresi değildi",

@@ -134,6 +134,7 @@ const Seed = React.lazy(() => import('../../components/Seed'));
 const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
 const Pools = React.lazy(() => import('../../components/Pools'));
+const MeetIronwood = React.lazy(() => import('../../components/MeetIronwood'));
 const Insight = React.lazy(() => import('../../components/Insight'));
 const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
 const ComputingTxContent = React.lazy(
@@ -1184,6 +1185,58 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ totalBalance });
     }
+    this.checkMeetIronwood(totalBalance);
+  };
+
+  // Launched at most once per wallet-load session; balance updates arrive
+  // every poll, so re-entries after the first launch bail out immediately.
+  private meetIronwoodLaunched = false;
+
+  checkMeetIronwood = async (totalBalance: TotalBalanceClass | null) => {
+    if (this.meetIronwoodLaunched) {
+      return;
+    }
+    // zingolib's confirmed_orchard_balance sums only unspent, confirmed,
+    // non-dust notes (each note must exceed the ZIP-317 marginal fee of
+    // 5000 zats), so a positive value means the wallet holds at least one
+    // spendable non-dust Orchard note.
+    if (!totalBalance || totalBalance.confirmedOrchardBalance <= 0) {
+      console.log(
+        'meet ironwood: no spendable non-dust orchard funds',
+        totalBalance?.confirmedOrchardBalance,
+      );
+      return;
+    }
+    if (!GlobalConst.ironwoodOnboardEveryLoad) {
+      const seen = (await SettingsFileImpl.readSettings()).ironwoodOnboardSeen;
+      if (seen) {
+        return;
+      }
+    }
+    // only if the App is in the foreground.
+    const background = await AsyncStorage.getItem(GlobalConst.background);
+    if (background !== GlobalConst.no) {
+      console.log('meet ironwood: app in background');
+      return;
+    }
+    // don't stack on top of the basic-mode seed modal; retry on a later
+    // sync tick instead.
+    if (this.state.isSeedViewModalOpen || this.meetIronwoodLaunched) {
+      return;
+    }
+    // the inner navigator may not be captured yet on the very first balance
+    // fetch; leave `meetIronwoodLaunched` false so the next tick retries.
+    if (!this.drawerNav) {
+      console.log('meet ironwood: navigator not ready yet');
+      return;
+    }
+    this.meetIronwoodLaunched = true;
+    console.log('meet ironwood: launching onboarding');
+    await SettingsFileImpl.writeSettings(
+      SettingsNameEnum.ironwoodOnboardSeen,
+      true,
+    );
+    this.drawerNav.navigate(RouteEnum.MeetIronwood);
   };
 
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
@@ -1193,6 +1246,11 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ syncingStatus });
     }
+    // balances are only refetched when the wallet needs saving, so the
+    // balance callback can fire exactly once per session; retrying here on
+    // every sync tick means a transient bail (navigator not captured yet,
+    // seed modal open, app backgrounded) doesn't lose the launch forever.
+    this.checkMeetIronwood(this.state.totalBalance);
   };
 
   setIsSeedViewModalOpen = (value: boolean) => {
@@ -2487,6 +2545,13 @@ export class LoadedAppClass extends Component<
                     <RootNavigator.Screen
                       name={RouteEnum.Pools}
                       component={Pools}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MeetIronwood}
+                      component={MeetIronwood}
+                      // One-way onboarding: no swipe-back to the screen behind
+                      // it; the screen closes by resetting the stack to Home.
+                      options={{ gestureEnabled: false }}
                     />
                     <RootNavigator.Screen name={RouteEnum.AddressBook}>
                       {props => (

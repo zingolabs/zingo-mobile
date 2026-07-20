@@ -44,6 +44,7 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import ValueTransferLine from './components/ValueTransferLine';
+import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import { ContextAppLoaded } from '../../app/context';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
@@ -125,6 +126,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
     zenniesDonationAddress,
     setPrivacyOption,
     currency,
+    totalBalance,
+    readOnly,
+    info,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.History;
@@ -151,6 +155,17 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [headerH, setHeaderH] = useState<number>(0);
   const [usdRowH, setUsdRowH] = useState<number>(0);
   const [priceRowH, setPriceRowH] = useState<number>(0);
+  const [bannerH, setBannerH] = useState<number>(0);
+
+  // Persistent "migrate Orchard → Ironwood" call-to-action. Shown whenever
+  // the wallet holds spendable (confirmed, non-dust) Orchard funds — the same
+  // signal that arms the auto-launch onboarding. While the debug flag is on
+  // it always shows so the banner can be exercised without such funds.
+  const showIronwoodBanner =
+    !readOnly &&
+    (GlobalConst.ironwoodOnboardEveryLoad ||
+      (!!totalBalance && totalBalance.confirmedOrchardBalance > 0));
+  const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const historySheetRef = useRef<BottomSheet>(null);
@@ -304,7 +319,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
     if (containerH <= 0 || headerH <= 0) {
       return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
-    const snapBase = containerH - headerH - SNAP_GAP;
+    // The banner (when shown) sits between the header and the sheet in normal
+    // flow, so the sheet's low/mid snaps must shrink by its height to leave it
+    // uncovered; the max snap still climbs over both.
+    const snapBase = containerH - headerH - bannerH - SNAP_GAP;
     // Smallest sheet: full header visible, including the PriceRow at the
     // bottom of the Header (only present when zecPrice > 0).
     const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
@@ -327,7 +345,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
     }
     points.push(snapMax);
     return points;
-  }, [currency, server.chainName, containerH, headerH, usdRowH, priceRowH]);
+  }, [
+    currency,
+    server.chainName,
+    containerH,
+    headerH,
+    usdRowH,
+    priceRowH,
+    bannerH,
+  ]);
 
   const priceSnapIndex = priceRowH > 0 ? 0 : null;
   const onPriceSnapChange = usePriceSnapAutoClose(
@@ -765,6 +791,20 @@ const History: React.FunctionComponent<HistoryProps> = ({
             onPriceRowLayout={setPriceRowH}
             onManualFetchPrice={revealPrice}
           />
+        </View>
+        {/* Measured so the history sheet's snap points sit just below it. An
+            empty wrapper reports height 0 when the banner is hidden. */}
+        <View
+          onLayout={e => setBannerH(e.nativeEvent.layout.height)}
+          pointerEvents="box-none"
+        >
+          {showIronwoodBanner && (
+            <IronwoodMigrationBanner
+              amount={orchardAmount}
+              currencyName={info.currencyName}
+              onStart={() => navigation.navigate(RouteEnum.MeetIronwood)}
+            />
+          )}
         </View>
       </View>
       <Animated.View

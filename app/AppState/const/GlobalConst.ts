@@ -36,4 +36,9 @@ export const GlobalConst = {
   // `swapChain` on address-book contacts and to branch the ZEC vs non-ZEC
   // address validation/scan paths. Single source so it never drifts.
   zecSwapChain: 'ZEC',
+  // While true, the "Meet Ironwood" onboarding launches on every wallet
+  // load that finds spendable (non-dust) Orchard funds. Set to false for
+  // the release behavior: launch only once, gated by the persisted
+  // `ironwoodOnboardSeen` setting.
+  ironwoodOnboardEveryLoad: true,
 };

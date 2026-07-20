@@ -30,6 +30,7 @@ export default class SettingsFileClass {
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   nym: boolean;
+  ironwoodOnboardSeen: boolean;
 
   constructor(
     server: ServerType,
@@ -50,6 +51,7 @@ export default class SettingsFileClass {
     performanceLevel: RPCPerformanceLevelEnum,
     blockExplorer: BlockExplorerEnum,
     nym: boolean,
+    ironwoodOnboardSeen: boolean,
   ) {
     this.server = server;
     this.currency = currency;
@@ -69,5 +71,6 @@ export default class SettingsFileClass {
     this.performanceLevel = performanceLevel;
     this.blockExplorer = blockExplorer;
     this.nym = nym;
+    this.ironwoodOnboardSeen = ironwoodOnboardSeen;
   }
 }

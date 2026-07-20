@@ -797,6 +797,28 @@
     "transparent-confirmed-balance": "Cantidad Confirmada",
     "dust": "La cantidad transparente es demasiado pequeña para ser blindada."
   },
+  "meetironwood": {
+    "title": "Conoce Ironwood",
+    "title2": "Cómo funciona la migración",
+    "orchard": "ORCHARD",
+    "ironwood": "IRONWOOD",
+    "step1-body-1": "**NU6.3** introduce el nuevo pool **Ironwood** y sella el pool **Orchard**. Tras la actualización, los fondos ya no podrán moverse dentro de Orchard.",
+    "step1-body-2": "Mueve tus fondos de Orchard a **Ironwood** ahora para mantenerlos disponibles, con una privacidad más sólida y verificada formalmente y un camino más fácil hacia la seguridad cuántica futura.",
+    "phase1-label": "FASE 1 - DIVIDIR",
+    "phase1-body": "**Fase 1 — Dividir.** Una transacción interna rápida estandariza tus saldos para proteger tu privacidad.",
+    "phase2-label": "FASE 2 - ENVIAR POR LOTES",
+    "phase2-body": "**Fase 2 — Enviar por lotes.** Los envíos se realizan en ventanas de tiempo. No operamos en segundo plano: te avisaremos para que abras la app y autorices cada lote.",
+    "bucket": "Lote",
+    "back": "Atrás",
+    "next": "Siguiente"
+  },
+  "ironwoodbanner": {
+    "warning": "Tras **NU6.3**, los fondos no podrán moverse dentro del pool Orchard. **{amount}** debe migrar a Ironwood.",
+    "pool": "Orchard",
+    "at-risk": "en riesgo",
+    "balance": "Saldo:",
+    "start": "Empezar"
+  },
   "uris": {
     "baduri": "Error: URI errónea.",
     "notvalid": "No era una dirección válida para zcash",

@@ -70,6 +70,7 @@ export type AppDrawerParamList = {
     { phase?: 'created' | 'failed'; errorMessage?: string } | undefined;
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
+  [RouteEnum.MeetIronwood]: undefined;
 
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
