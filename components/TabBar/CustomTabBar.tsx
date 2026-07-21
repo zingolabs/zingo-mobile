@@ -46,8 +46,10 @@ function renderNavIcon(
     const isPending =
       mode === ModeEnum.basic &&
       !!totalBalance &&
-      ((totalBalance.totalOrchardBalance > 0 &&
-        totalBalance.confirmedOrchardBalance === 0) ||
+      ((totalBalance.totalIronwoodBalance > 0 &&
+        totalBalance.confirmedIronwoodBalance === 0) ||
+        (totalBalance.totalOrchardBalance > 0 &&
+          totalBalance.confirmedOrchardBalance === 0) ||
         (totalBalance.totalSaplingBalance > 0 &&
           totalBalance.confirmedSaplingBalance === 0) ||
         (totalBalance.totalTransparentBalance > 0 &&

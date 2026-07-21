@@ -2324,13 +2324,17 @@ export class LoadedAppClass extends Component<
                                   selectServer !== SelectServerEnum.offline &&
                                   (mode === ModeEnum.advanced ||
                                     (!!totalBalance &&
-                                      totalBalance.confirmedOrchardBalance +
+                                      totalBalance.confirmedIronwoodBalance +
+                                        totalBalance.confirmedOrchardBalance +
                                         totalBalance.confirmedSaplingBalance >
                                         0) ||
                                     (!!totalBalance &&
-                                      ((totalBalance.totalOrchardBalance > 0 &&
-                                        totalBalance.confirmedOrchardBalance ===
+                                      ((totalBalance.totalIronwoodBalance > 0 &&
+                                        totalBalance.confirmedIronwoodBalance ===
                                           0) ||
+                                        (totalBalance.totalOrchardBalance > 0 &&
+                                          totalBalance.confirmedOrchardBalance ===
+                                            0) ||
                                         (totalBalance.totalSaplingBalance > 0 &&
                                           totalBalance.confirmedSaplingBalance ===
                                             0)) &&

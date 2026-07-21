@@ -116,7 +116,8 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               size={36}
               amtZec={
                 totalBalance
-                  ? totalBalance.totalOrchardBalance +
+                  ? totalBalance.totalIronwoodBalance +
+                    totalBalance.totalOrchardBalance +
                     totalBalance.totalSaplingBalance +
                     totalBalance.totalTransparentBalance
                   : 0
@@ -128,6 +129,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               totalBalance &&
               (totalBalance.totalOrchardBalance !==
                 totalBalance.confirmedOrchardBalance ||
+                totalBalance.totalIronwoodBalance > 0 ||
                 totalBalance.totalSaplingBalance > 0 ||
                 totalBalance.totalTransparentBalance > 0) && (
                 <TouchableOpacity
@@ -163,7 +165,9 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
 
         {receivedLegend &&
           totalBalance &&
-          totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance >
+          totalBalance.totalIronwoodBalance +
+            totalBalance.totalOrchardBalance +
+            totalBalance.totalSaplingBalance >
             0 && (
             <View
               style={{
@@ -181,6 +185,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 color={colors.primary}
                 size={14}
                 amtZec={
+                  totalBalance.totalIronwoodBalance +
                   totalBalance.totalOrchardBalance +
                   totalBalance.totalSaplingBalance
                 }
@@ -203,7 +208,8 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 price={zecPrice.zecPrice}
                 amtZec={
                   totalBalance
-                    ? totalBalance.totalOrchardBalance +
+                    ? totalBalance.totalIronwoodBalance +
+                      totalBalance.totalOrchardBalance +
                       totalBalance.totalSaplingBalance +
                       totalBalance.totalTransparentBalance
                     : 0
