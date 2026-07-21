@@ -96,9 +96,7 @@ describe('sync family rejections are contained and reported, never sniffed', () 
 
   it('run_rescan', async () => {
     const { coordinator, onError } = makeCoordinator();
-    bridge.runRescanProcess.mockRejectedValueOnce(
-      new Error('bridge exploded'),
-    );
+    bridge.runRescanProcess.mockRejectedValueOnce(new Error('bridge exploded'));
 
     await coordinator.refreshSync(true);
 
@@ -109,9 +107,7 @@ describe('sync family rejections are contained and reported, never sniffed', () 
 
   it('pause_sync', async () => {
     const { coordinator, onError } = makeCoordinator();
-    bridge.pauseSyncProcess.mockRejectedValueOnce(
-      new Error('bridge exploded'),
-    );
+    bridge.pauseSyncProcess.mockRejectedValueOnce(new Error('bridge exploded'));
 
     await coordinator.pauseSyncProcess();
 

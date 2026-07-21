@@ -226,9 +226,8 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
       (BUILD_WEIGHT * progress.built + (1 - BUILD_WEIGHT) * progress.sent) /
       total;
     const step =
-      (progress.phase === 'transmitting'
-        ? 1 - BUILD_WEIGHT
-        : BUILD_WEIGHT) / total;
+      (progress.phase === 'transmitting' ? 1 - BUILD_WEIGHT : BUILD_WEIGHT) /
+      total;
     ceilingRef.current = Math.min(0.985, real + step);
   }, [progress, txCount]);
 

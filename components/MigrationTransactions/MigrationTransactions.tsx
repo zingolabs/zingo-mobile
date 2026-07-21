@@ -23,9 +23,7 @@ const ZATS_PER_ZEC = 10 ** 8;
 // Collapse repeated same-value notes into distinct {value, count} groups,
 // preserving first-appearance order, so a fragmented wallet renders "10 (×3)"
 // instead of the same amount many times.
-const groupInputs = (
-  inputs: number[],
-): { value: number; count: number }[] => {
+const groupInputs = (inputs: number[]): { value: number; count: number }[] => {
   const groups: { value: number; count: number }[] = [];
   for (const v of inputs) {
     const existing = groups.find(g => g.value === v);
@@ -160,10 +158,7 @@ const MigrationTransactions: React.FunctionComponent<
 
   const transactions = plan?.transactions ?? [];
   const txCount = transactions.length;
-  const noteCount = transactions.reduce(
-    (sum, tx) => sum + tx.inputs.length,
-    0,
-  );
+  const noteCount = transactions.reduce((sum, tx) => sum + tx.inputs.length, 0);
   const isEmpty = !loading && !errorMsg && txCount === 0;
 
   const title = (
@@ -320,7 +315,9 @@ const MigrationTransactions: React.FunctionComponent<
       : 'migrationtransactions.notes',
   ) as string;
   const txWord = translate(
-    txCount === 1 ? 'migrationtransactions.tx-one' : 'migrationtransactions.txs',
+    txCount === 1
+      ? 'migrationtransactions.tx-one'
+      : 'migrationtransactions.txs',
   ) as string;
   const feeSuffix = translate('migrationtransactions.fee-suffix') as string;
   const totalSummary = `${noteCount} ${noteWord} · ${txCount} ${txWord} · ${zec(
@@ -367,7 +364,11 @@ const MigrationTransactions: React.FunctionComponent<
               )}
               value={
                 <Text
-                  style={{ color: colors.text, fontSize: 14, fontWeight: '700' }}
+                  style={{
+                    color: colors.text,
+                    fontSize: 14,
+                    fontWeight: '700',
+                  }}
                 >
                   {translate('migrationtransactions.flow') as string}
                 </Text>
@@ -379,7 +380,9 @@ const MigrationTransactions: React.FunctionComponent<
                 translate('migrationtransactions.inputs') as string
               } (${tx.inputs.length})`}
               value={groupInputs(tx.inputs)
-                .map(g => (g.count > 1 ? `${zec(g.value)} (×${g.count})` : zec(g.value)))
+                .map(g =>
+                  g.count > 1 ? `${zec(g.value)} (×${g.count})` : zec(g.value),
+                )
                 .join(', ')}
               colors={colors}
             />

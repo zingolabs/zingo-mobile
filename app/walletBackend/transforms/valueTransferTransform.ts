@@ -1,4 +1,8 @@
-import { ValueTransferType, ValueTransferKindEnum, PoolEnum } from '../../AppState';
+import {
+  ValueTransferType,
+  ValueTransferKindEnum,
+  PoolEnum,
+} from '../../AppState';
 import { RPCValueTransferType } from '../types/RPCValueTransferType';
 import { RPCValueTransfersKindEnum } from '../enums/RPCValueTransfersKindEnum';
 import { RPCValueTransfersStatusEnum } from '../enums/RPCValueTransfersStatusEnum';

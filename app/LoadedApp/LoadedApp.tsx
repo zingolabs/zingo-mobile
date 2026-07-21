@@ -1385,9 +1385,7 @@ export class LoadedAppClass extends Component<
                       this.state.info.currencyName
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
-              } else if (
-                vtNew[0].kind === ValueTransferKindEnum.Migration
-              ) {
+              } else if (vtNew[0].kind === ValueTransferKindEnum.Migration) {
                 // Orchard -> Ironwood migration: report the migrated amount
                 // (surfaced via the value-transfer `value`) plus the fee paid.
                 message =
@@ -1397,10 +1395,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('history.migration') as string) +
                   (vtNew[0].amount > 0
                     ? ' ' +
-                      Utils.parseNumberFloatToStringLocale(
-                        vtNew[0].amount,
-                        8,
-                      ) +
+                      Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
                       ' ' +
                       this.state.info.currencyName
                     : '') +

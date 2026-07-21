@@ -570,7 +570,8 @@ const ValueTransferDetail: React.FunctionComponent<
                                               ) as string)
                                             : valueTransfer.kind ===
                                                   ValueTransferKindEnum.Migration &&
-                                                valueTransfer.confirmations === 0
+                                                valueTransfer.confirmations ===
+                                                  0
                                               ? (translate(
                                                   'history.migrating',
                                                 ) as string)

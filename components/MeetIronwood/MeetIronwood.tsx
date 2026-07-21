@@ -6,12 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  BackHandler,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { BackHandler, Text, useWindowDimensions, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   cancelAnimation,
@@ -321,7 +316,9 @@ const Phase1Graphic: React.FunctionComponent<{
       color={arrowColor}
       style={{ marginHorizontal: 20 }}
     />
-    <View style={{ width: 104, flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>
+    <View
+      style={{ width: 104, flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}
+    >
       {Array.from({ length: 6 }, (_, i: number) => (
         <MiniCard key={i} size={30} color={green} />
       ))}
@@ -336,7 +333,14 @@ const PieBadge: React.FunctionComponent<{ green: string; size?: number }> = ({
   size = 22,
 }) => (
   <Svg width={size} height={size} viewBox="0 0 22 22">
-    <Circle cx="11" cy="11" r="8.5" stroke={green} strokeWidth="1.5" fill="none" />
+    <Circle
+      cx="11"
+      cy="11"
+      r="8.5"
+      stroke={green}
+      strokeWidth="1.5"
+      fill="none"
+    />
     <Path d="M11 11 L11 2.5 A8.5 8.5 0 0 1 19.5 11 Z" fill={green} />
   </Svg>
 );
