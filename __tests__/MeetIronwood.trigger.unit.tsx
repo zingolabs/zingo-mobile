@@ -223,13 +223,18 @@ describe('MeetIronwood auto-launch trigger', () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
-  test('persists the seen flag when it launches', async () => {
+  test('does not spend the seen flag merely by launching', async () => {
+    // Launching is not seeing: the onboarding screen persists the flag once
+    // the user has actually been through it, so a crash or a kill in between
+    // leaves the onboarding to come back rather than silently consumed.
     const instance = makeInstance();
-    (instance as any).drawerNav = { navigate: jest.fn() };
+    const navigate = jest.fn();
+    (instance as any).drawerNav = { navigate };
 
     await instance.checkMeetIronwood(makeBalance(0.001));
 
-    expect(mockWriteSettings).toHaveBeenCalledWith(
+    expect(navigate).toHaveBeenCalledWith(RouteEnum.MeetIronwood);
+    expect(mockWriteSettings).not.toHaveBeenCalledWith(
       SettingsNameEnum.ironwoodOnboardSeen,
       true,
     );

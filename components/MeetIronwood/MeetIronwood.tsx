@@ -30,9 +30,14 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
+import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
+import {
+  ButtonTypeEnum,
+  RouteEnum,
+  SettingsNameEnum,
+} from '../../app/AppState';
 
 // Pool artwork palette — Orchard teal and Ironwood gold are one-off brand
 // accents for this onboarding, not part of the app theme.
@@ -418,12 +423,39 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
     [activeIndex, offset, width],
   );
 
+  // `ironwoodOnboardSeen` is what stops the auto-launch firing again on the
+  // next wallet load, so it is written from here — where the user has actually
+  // been through the flow — instead of at launch time. Write-once per mount;
+  // `writeSettings` rewrites the whole settings file, so repeating it on every
+  // page change would be a pointless read-modify-write.
+  const markedSeen = useRef(false);
+  const markSeen = useCallback(() => {
+    if (markedSeen.current) {
+      return;
+    }
+    markedSeen.current = true;
+    SettingsFileImpl.writeSettings(SettingsNameEnum.ironwoodOnboardSeen, true);
+  }, []);
+
+  // Landing on the last page means the whole explainer has been shown, so it
+  // counts from there on whether the user continues into the migration or
+  // turns back.
+  useEffect(() => {
+    if (index === STEP_COUNT - 1) {
+      markSeen();
+    }
+  }, [index, markSeen]);
+
   // The onboarding is a one-way flow. Closing resets the inner stack to Home
   // rather than popping, so you can't land back on the screen underneath, and
   // once closed the onboarding isn't left on the stack to return to.
   const closeScreen = useCallback(() => {
+    // Backing out deliberately counts too, even from page one — re-showing a
+    // modal somebody just dismissed is a nag, and the History banner is still
+    // there as the way back in.
+    markSeen();
     navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
-  }, [navigation]);
+  }, [markSeen, navigation]);
 
   const onPrimary = useCallback(() => {
     if (index < STEP_COUNT - 1) {

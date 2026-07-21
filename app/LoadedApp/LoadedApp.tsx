@@ -1254,10 +1254,11 @@ export class LoadedAppClass extends Component<
     }
     this.meetIronwoodLaunched = true;
     console.log('meet ironwood: launching onboarding');
-    await SettingsFileImpl.writeSettings(
-      SettingsNameEnum.ironwoodOnboardSeen,
-      true,
-    );
+    // `ironwoodOnboardSeen` is written by the onboarding screen itself, not
+    // here — launching is not seeing. A crash or a kill between this navigate
+    // and the user reading anything leaves the flag unset, so the onboarding
+    // comes back on the next load instead of being silently spent.
+    // `meetIronwoodLaunched` still keeps it to one launch per session.
     this.drawerNav.navigate(RouteEnum.MeetIronwood);
   };
 
