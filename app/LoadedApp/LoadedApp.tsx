@@ -74,6 +74,7 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
+  isIronwoodActive,
 } from '../AppState';
 import Utils from '../utils';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
@@ -1203,6 +1204,18 @@ export class LoadedAppClass extends Component<
 
   checkMeetIronwood = async (totalBalance: TotalBalanceClass | null) => {
     if (this.meetIronwoodLaunched) {
+      return;
+    }
+    // There is nowhere to migrate to until NU6.3 activates on the connected
+    // chain. Checked against the server's tip on every call rather than once,
+    // so a wallet that is running while the fork lands picks it up on the next
+    // sync tick without a restart.
+    if (!isIronwoodActive(this.state.info)) {
+      console.log(
+        'meet ironwood: not activated on this chain yet',
+        this.state.info?.chainName,
+        this.state.info?.latestBlock,
+      );
       return;
     }
     // zingolib's confirmed_orchard_balance sums only unspent, confirmed,

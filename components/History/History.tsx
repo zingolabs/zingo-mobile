@@ -32,6 +32,7 @@ import {
   CurrencyEnum,
   FilterEnum,
   GlobalConst,
+  isIronwoodActive,
   RouteEnum,
   ScreenEnum,
   ValueTransferKindEnum,
@@ -157,12 +158,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [priceRowH, setPriceRowH] = useState<number>(0);
   const [bannerH, setBannerH] = useState<number>(0);
 
-  // Persistent "migrate Orchard → Ironwood" call-to-action. Shown whenever
-  // the wallet holds spendable (confirmed, non-dust) Orchard funds — the same
-  // signal that arms the auto-launch onboarding. While the debug flag is on
-  // it always shows so the banner can be exercised without such funds.
+  // Persistent "migrate Orchard → Ironwood" call-to-action. Shown once NU6.3
+  // has activated on the connected chain and the wallet holds spendable
+  // (confirmed, non-dust) Orchard funds — the same signals that arm the
+  // auto-launch onboarding. While the debug flag is on the balance condition
+  // is waived so the banner can be exercised without such funds; activation
+  // is never waived, since the migration it offers cannot succeed before it.
   const showIronwoodBanner =
     !readOnly &&
+    isIronwoodActive(info) &&
     (GlobalConst.ironwoodOnboardEveryLoad ||
       (!!totalBalance && totalBalance.confirmedOrchardBalance > 0));
   const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;

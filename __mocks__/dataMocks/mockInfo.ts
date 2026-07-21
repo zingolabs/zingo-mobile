@@ -7,4 +7,5 @@ export const mockInfo: InfoType = {
   latestBlock: 2000000,
   version: 'server_version',
   currencyName: CurrencyNameEnum.ZEC,
+  ironwoodActivationHeight: 3428143,
 };

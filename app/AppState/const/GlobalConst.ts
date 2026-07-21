@@ -36,9 +36,12 @@ export const GlobalConst = {
   // `swapChain` on address-book contacts and to branch the ZEC vs non-ZEC
   // address validation/scan paths. Single source so it never drifts.
   zecSwapChain: 'ZEC',
-  // While true, the "Meet Ironwood" onboarding launches on every wallet
-  // load that finds spendable (non-dust) Orchard funds. Set to false for
-  // the release behavior: launch only once, gated by the persisted
-  // `ironwoodOnboardSeen` setting.
-  ironwoodOnboardEveryLoad: true,
+  // Debug flag. While true, the "Meet Ironwood" onboarding launches on every
+  // wallet load that finds spendable (non-dust) Orchard funds, and the
+  // migration banner shows regardless of balance. False is the release
+  // behavior: launch once, gated by the persisted `ironwoodOnboardSeen`
+  // setting. Neither case bypasses the NU6.3 activation check — on regtest,
+  // where every upgrade activates at genesis, the flag alone is enough to
+  // exercise both. See `isIronwoodActive`.
+  ironwoodOnboardEveryLoad: false,
 };

@@ -284,6 +284,10 @@ export class DataService {
           infoJSON.chain_name === ChainNameEnum.mainChainName
             ? CurrencyNameEnum.ZEC
             : CurrencyNameEnum.TAZ,
+        // `?? null` collapses both "no activation scheduled" (null) and "older
+        // native lib that doesn't report it" (undefined) into the same
+        // not-yet-active answer.
+        ironwoodActivationHeight: infoJSON.ironwood_activation_height ?? null,
       };
 
       this.config.onInfoChanged(info);

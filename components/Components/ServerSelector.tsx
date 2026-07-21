@@ -69,6 +69,9 @@ const blankInfo = (
     chainName === ChainNameEnum.mainChainName
       ? CurrencyNameEnum.ZEC
       : CurrencyNameEnum.TAZ,
+  // Only the native layer knows this, and this info is for a server we may
+  // not have connected to. Display-only, so nothing here reads it.
+  ironwoodActivationHeight: null,
 });
 
 const ServerSelector: React.FunctionComponent<ServerSelectorProps> = ({
