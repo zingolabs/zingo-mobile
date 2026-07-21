@@ -834,7 +834,26 @@
     "private-body": "Transferleri standart tutarlarda ~3 güne yayar ve diğer kullanıcılarla karışır. Uygulamayı birkaç kez açmanız gerekir.",
     "coming-soon": "Yakında",
     "back": "Geri",
-    "start": "Başla"
+    "start": "Başla",
+    "close": "Kapat",
+    "close-confirm-title": "Emin misiniz?",
+    "close-confirm-message": "Şimdi çıkarsanız, geçiş yapana kadar Orchard bakiyenizi harcayamazsınız. Geçişi istediğiniz zaman ana ekrandan sürdürebilirsiniz.",
+    "close-confirm-exit": "Çık"
+  },
+  "migrationsending": {
+    "title": "İşlemler gönderiliyor",
+    "subtitle": "Orchard notlarınız Ironwood havuzuna yayınlanıyor. Tüm işlemler gönderilene kadar uygulamayı açık tutun.",
+    "tx": "İşlem {n}",
+    "total": "Toplam aktarılan",
+    "status-queued": "Sırada",
+    "status-calculating": "Hesaplanıyor",
+    "status-calculated": "Hesaplandı",
+    "status-sending": "Gönderiliyor",
+    "status-sent": "Gönderildi",
+    "hint": "Bu biraz zaman alabilir. Lütfen uygulamayı açık tutun.",
+    "success": "Geçiş işlemleri yayınlandı.",
+    "error-title": "Geçiş gönderilemedi",
+    "close": "Kapat"
   },
   "migrationtransactions": {
     "title": "Geçiş işlemleri",

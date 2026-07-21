@@ -1600,4 +1600,39 @@ class RPCModule: NSObject {
       }
   }
 
+  func fnDrainStatusProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try drainStatus()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] drainStatus. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] drainStatus. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  // Polled concurrently while `drainOrchardProcess` runs. Dispatched on the
+  // global concurrent queue so it does not queue behind the in-flight drain;
+  // the native `drainStatus()` reads a side channel, never the lightclient lock
+  // the drain holds, so the poll returns immediately.
+  @objc(drainStatusProcess:reject:)
+  func drainStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnDrainStatusProcess(dict)
+        }
+      }
+  }
+
 }

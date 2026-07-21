@@ -10,9 +10,8 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
-import { planOrchardDrain, drainOrchard } from '../../app/walletBackend';
+import { planOrchardDrain } from '../../app/walletBackend';
 import { RPCDrainPlanType } from '../../app/walletBackend/types/RPCDrainPlanType';
-import { RPCDrainType } from '../../app/walletBackend/types/RPCDrainType';
 
 type MigrationTransactionsProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -99,18 +98,12 @@ const MigrationTransactions: React.FunctionComponent<
   MigrationTransactionsProps
 > = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, addLastSnackbar } = context;
+  const { translate, info } = context;
   const { colors } = useTheme() as ThemeType;
 
   const [plan, setPlan] = useState<RPCDrainPlanType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [submitting, setSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  // Which phase failed, so the error screen doesn't mislabel a broadcast
-  // failure (Accept) as a planning failure.
-  const [errorTitleKey, setErrorTitleKey] = useState<string>(
-    'migrationtransactions.error-title',
-  );
 
   const currencyName = info.currencyName;
   const zec = useCallback(
@@ -156,30 +149,14 @@ const MigrationTransactions: React.FunctionComponent<
     };
   }, []);
 
-  const onAccept = useCallback(async () => {
-    setSubmitting(true);
-    setErrorTitleKey('migrationtransactions.broadcast-error-title');
-    const drainStr = await drainOrchard();
-    if (drainStr.toLowerCase().startsWith(GlobalConst.error)) {
-      setSubmitting(false);
-      setErrorMsg(drainStr);
-      return;
-    }
-    try {
-      const parsed: RPCDrainType = JSON.parse(drainStr);
-      if (parsed.error) {
-        setSubmitting(false);
-        setErrorMsg(parsed.error);
-        return;
-      }
-    } catch (e) {
-      setSubmitting(false);
-      setErrorMsg(`${e}`);
-      return;
-    }
-    addLastSnackbar(translate('migrationtransactions.success') as string);
-    goHome();
-  }, [addLastSnackbar, translate, goHome]);
+  // Accepting hands off to the dedicated sending screen, which owns the
+  // broadcast and its live progress. We pass the previewed transactions so its
+  // list matches exactly what the user just approved.
+  const onAccept = useCallback(() => {
+    navigation.navigate(RouteEnum.MigrationSending, {
+      transactions: plan?.transactions ?? [],
+    });
+  }, [navigation, plan]);
 
   const transactions = plan?.transactions ?? [];
   const txCount = transactions.length;
@@ -246,7 +223,7 @@ const MigrationTransactions: React.FunctionComponent<
                 textAlign: 'center',
               }}
             >
-              {translate(errorTitleKey) as string}
+              {translate('migrationtransactions.error-title') as string}
             </Text>
             <Text
               style={{
@@ -268,10 +245,9 @@ const MigrationTransactions: React.FunctionComponent<
           }}
         >
           <Button
-            type={ButtonTypeEnum.Secondary}
+            type={ButtonTypeEnum.Ghost}
             title={translate('migrationtransactions.back') as string}
             onPress={() => navigation.goBack()}
-            style={{ backgroundColor: 'transparent' }}
           />
         </View>
       </View>
@@ -354,6 +330,7 @@ const MigrationTransactions: React.FunctionComponent<
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={{
           paddingHorizontal: 20,
           paddingTop: 40,
@@ -448,24 +425,17 @@ const MigrationTransactions: React.FunctionComponent<
       >
         <Button
           testID="migrationtransactions.back"
-          type={ButtonTypeEnum.Secondary}
+          type={ButtonTypeEnum.Ghost}
           title={translate('migrationtransactions.back') as string}
           onPress={() => navigation.goBack()}
           twoButtons={true}
-          disabled={submitting}
-          style={{ backgroundColor: 'transparent' }}
         />
         <Button
           testID="migrationtransactions.accept"
           type={ButtonTypeEnum.Primary}
-          title={
-            submitting
-              ? (translate('migrationtransactions.submitting') as string)
-              : (translate('migrationtransactions.accept') as string)
-          }
+          title={translate('migrationtransactions.accept') as string}
           onPress={onAccept}
           twoButtons={true}
-          disabled={submitting}
         />
       </View>
     </View>

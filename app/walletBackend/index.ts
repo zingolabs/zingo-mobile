@@ -16,6 +16,7 @@ export {
   doSave,
   doSaveBackup,
   drainOrchard,
+  drainStatus,
   fetchWallet,
   getBalanceInfo,
   getDonationAddress,

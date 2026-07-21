@@ -410,6 +410,26 @@ export async function drainOrchard(): Promise<string> {
   }
 }
 
+// Snapshot of the in-flight drain's progress, for rendering "Building i/N" then
+// "Broadcasting i/N". Mirrors the native `drainStatusProcess`; safe to poll
+// concurrently with a running `drainOrchard` (native reads a side channel, not
+// the lightclient lock). Returns the raw JSON: `null` when no drain is running,
+// otherwise `{ total, built, sent, phase }` (parseable as RPCDrainStatusType).
+// The caller checks for an `error` prefix before parsing.
+export async function drainStatus(): Promise<string> {
+  try {
+    const statusStr: string = await RPCModule.drainStatusProcess();
+    if (statusStr && statusStr.toLowerCase().startsWith(GlobalConst.error)) {
+      console.log(`Error drainStatus ${statusStr}`);
+      return statusStr;
+    }
+    return statusStr;
+  } catch (error) {
+    console.log(`Critical Error drainStatus ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
 // Returns the spendable balance that could be sent to `address` right now,
 // honoring privacy levels and donation flags. Returns the raw JSON
 // (parseable as RPCSpendablebalanceType).

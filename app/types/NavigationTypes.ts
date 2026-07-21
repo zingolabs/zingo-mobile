@@ -9,6 +9,7 @@ import {
   ValueTransferType,
 } from '../AppState';
 import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
+import { RPCDrainTxType } from '../walletBackend/types/RPCDrainPlanType';
 
 /**
  * Root navigation parameter list for the main stack navigator
@@ -73,6 +74,9 @@ export type AppDrawerParamList = {
   [RouteEnum.MeetIronwood]: undefined;
   [RouteEnum.MigrationStrategy]: undefined;
   [RouteEnum.MigrationTransactions]: undefined;
+  // The immediate drain broadcasts here; `transactions` is the previewed plan,
+  // so the list matches what the user accepted while the drain re-plans/sends.
+  [RouteEnum.MigrationSending]: { transactions: RPCDrainTxType[] };
 
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;

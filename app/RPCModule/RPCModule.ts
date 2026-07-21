@@ -107,6 +107,9 @@ interface RPCModuleAPI {
   // Ironwood migration (Orchard -> Ironwood drain)
   planOrchardDrainProcess(): Promise<string>;
   drainOrchardProcess(): Promise<string>;
+  // Live progress of the in-flight drain; safe to poll concurrently with
+  // drainOrchardProcess (reads a native side channel, not the lightclient lock).
+  drainStatusProcess(): Promise<string>;
 
   // Wallet options / configuration
   getOptionWalletInfo(): Promise<string>;

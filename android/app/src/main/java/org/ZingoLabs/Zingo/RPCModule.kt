@@ -1298,4 +1298,28 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // Polled concurrently while drainOrchardProcess runs. Launched on
+    // Dispatchers.IO (a thread pool), so it does not queue behind the in-flight
+    // drain; the native drainStatus() reads a side channel, never the
+    // lightclient lock the drain holds, so the poll returns immediately.
+    @ReactMethod
+    fun drainStatusProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val resp = uniffi.zingo.drainStatus()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] drainStatus: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
 }

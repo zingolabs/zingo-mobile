@@ -9,7 +9,6 @@ import React, {
 import {
   BackHandler,
   Text,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -31,7 +30,7 @@ import Animated, {
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowRightLong, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '../Components/BoldText';
@@ -588,27 +587,6 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Escape hatch: close the onboarding and go straight Home. Same
-          one-way reset as the hardware back button. */}
-      <TouchableOpacity
-        testID="meetironwood.close"
-        onPress={closeScreen}
-        accessibilityLabel={translate('meetironwood.close') as string}
-        hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
-        style={{
-          position: 'absolute',
-          top: 18,
-          right: 18,
-          zIndex: 10,
-          width: 34,
-          height: 34,
-          borderRadius: 17,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <FontAwesomeIcon icon={faXmark} size={22} color={colors.placeholder} />
-      </TouchableOpacity>
       <GestureDetector gesture={pan}>
         <Animated.View
           entering={FadeInUp.duration(420)
@@ -691,11 +669,10 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           >
             <Button
               testID="meetironwood.back"
-              type={ButtonTypeEnum.Secondary}
+              type={ButtonTypeEnum.Ghost}
               title={translate('meetironwood.back') as string}
               onPress={() => goTo(index - 1)}
               twoButtons={true}
-              style={{ backgroundColor: 'transparent' }}
             />
             <Button
               testID="meetironwood.primary"

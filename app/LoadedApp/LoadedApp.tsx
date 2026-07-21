@@ -141,6 +141,9 @@ const MigrationStrategy = React.lazy(
 const MigrationTransactions = React.lazy(
   () => import('../../components/MigrationTransactions'),
 );
+const MigrationSending = React.lazy(
+  () => import('../../components/MigrationSending'),
+);
 const Insight = React.lazy(() => import('../../components/Insight'));
 const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
 const ComputingTxContent = React.lazy(
@@ -2596,6 +2599,13 @@ export class LoadedAppClass extends Component<
                     <RootNavigator.Screen
                       name={RouteEnum.MigrationTransactions}
                       component={MigrationTransactions}
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationSending}
+                      component={MigrationSending}
+                      // The drain broadcasts here and can't be interrupted;
+                      // swipe-back is off and hardware-back is blocked in-screen.
                       options={{ gestureEnabled: false }}
                     />
                     <RootNavigator.Screen name={RouteEnum.AddressBook}>

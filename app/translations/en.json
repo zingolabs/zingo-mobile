@@ -834,7 +834,26 @@
     "private-body": "Spreads transfers over ~3 days in standard amounts, blending with other users. Requires opening the app a few times.",
     "coming-soon": "Coming soon",
     "back": "Back",
-    "start": "Start"
+    "start": "Start",
+    "close": "Close",
+    "close-confirm-title": "Are you sure?",
+    "close-confirm-message": "If you exit now, you won't be able to spend your Orchard funds until you migrate. You can resume the migration anytime from the home screen.",
+    "close-confirm-exit": "Exit"
+  },
+  "migrationsending": {
+    "title": "Sending transactions",
+    "subtitle": "Broadcasting your Orchard notes to the Ironwood pool. Keep the app open until every transaction is sent.",
+    "tx": "Transaction {n}",
+    "total": "Total transferred",
+    "status-queued": "Queued",
+    "status-calculating": "Calculating",
+    "status-calculated": "Calculated",
+    "status-sending": "Sending",
+    "status-sent": "Sent",
+    "hint": "This can take a moment. Please keep the app open.",
+    "success": "Migration transactions broadcast.",
+    "error-title": "Couldn't send the migration",
+    "close": "Close"
   },
   "migrationtransactions": {
     "title": "Migration transactions",

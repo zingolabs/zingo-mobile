@@ -202,9 +202,11 @@ const ConfirmBottomSheet: React.FC = () => {
                     // cancel but carry a soft-coral border/text so the risky
                     // choice reads as a warning rather than the positive Primary.
                     type={
-                      b.style === 'cancel' || b.style === 'destructive'
-                        ? ButtonTypeEnum.Secondary
-                        : ButtonTypeEnum.Primary
+                      b.style === 'ghost'
+                        ? ButtonTypeEnum.Ghost
+                        : b.style === 'cancel' || b.style === 'destructive'
+                          ? ButtonTypeEnum.Secondary
+                          : ButtonTypeEnum.Primary
                     }
                     title={b.text}
                     style={

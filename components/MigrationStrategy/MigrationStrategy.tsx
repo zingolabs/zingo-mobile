@@ -1,14 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
+import { showConfirm } from '../../app/showConfirm';
 import Utils from '../../app/utils';
 
 type MigrationStrategyProps = NativeStackScreenProps<
@@ -160,6 +163,31 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   const { colors } = useTheme() as ThemeType;
   const [selected, setSelected] = useState<StrategyOption>('now');
 
+  // Leaving the migration flow returns to Home. Reset (not goBack) so the
+  // one-way onboarding/migration stack isn't left underneath to return to.
+  const closeMigration = useCallback(() => {
+    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+  }, [navigation]);
+
+  // The X asks first: exiting here strands the user's Orchard funds until they
+  // come back and migrate, so confirm before dropping out of the flow.
+  const onClose = useCallback(() => {
+    showConfirm({
+      title: translate('migrationstrategy.close-confirm-title') as string,
+      message: translate('migrationstrategy.close-confirm-message') as string,
+      // Inverted emphasis: we'd rather the user stay, so Cancel is the filled
+      // Primary (the obvious tap) and Exit is a de-emphasized Ghost.
+      buttons: [
+        {
+          text: translate('migrationstrategy.close-confirm-exit') as string,
+          onPress: closeMigration,
+          style: 'ghost',
+        },
+        { text: translate('cancel') as string, style: 'default' },
+      ],
+    });
+  }, [translate, closeMigration]);
+
   // Orchard balance shown so the user sees what would cross the pool boundary
   // (and become publicly visible) on the immediate path.
   const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
@@ -174,7 +202,28 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Escape hatch: confirm, then exit the migration flow to Home. */}
+      <TouchableOpacity
+        testID="migrationstrategy.close"
+        onPress={onClose}
+        accessibilityLabel={translate('migrationstrategy.close') as string}
+        hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+        style={{
+          position: 'absolute',
+          top: 18,
+          right: 18,
+          zIndex: 10,
+          width: 34,
+          height: 34,
+          borderRadius: 17,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <FontAwesomeIcon icon={faXmark} size={22} color={colors.placeholder} />
+      </TouchableOpacity>
       <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={{
           paddingHorizontal: 24,
           paddingTop: 40,
@@ -226,11 +275,10 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
       >
         <Button
           testID="migrationstrategy.back"
-          type={ButtonTypeEnum.Secondary}
+          type={ButtonTypeEnum.Ghost}
           title={translate('migrationstrategy.back') as string}
           onPress={() => navigation.goBack()}
           twoButtons={true}
-          style={{ backgroundColor: 'transparent' }}
         />
         <Button
           testID="migrationstrategy.start"

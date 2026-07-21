@@ -100,7 +100,9 @@ const Button: React.FunctionComponent<ButtonProps> = ({
             }
           : type === ButtonTypeEnum.Ghost
             ? {
-                color: colors.text,
+                // Ghost carries brand-green (primary) text as its formal
+                // style; instances no longer override the color per call.
+                color: colors.primary,
                 textTransform: 'none',
               }
             : type === ButtonTypeEnum.Nym

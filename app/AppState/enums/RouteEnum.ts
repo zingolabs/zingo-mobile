@@ -25,6 +25,7 @@ export enum RouteEnum {
   MeetIronwood = 'MeetIronwood',
   MigrationStrategy = 'MigrationStrategy',
   MigrationTransactions = 'MigrationTransactions',
+  MigrationSending = 'MigrationSending',
 
   // Drawer with params
   AddressBook = 'AddressBook',

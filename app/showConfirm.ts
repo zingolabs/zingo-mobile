@@ -5,7 +5,7 @@
  * BottomSheetModalProvider. The sheet is registered exactly once per
  * provider; calling showConfirm before mount no-ops (warns in dev).
  */
-export type ConfirmButtonStyle = 'default' | 'cancel' | 'destructive';
+export type ConfirmButtonStyle = 'default' | 'cancel' | 'destructive' | 'ghost';
 
 export type ConfirmButton = {
   text: string;
