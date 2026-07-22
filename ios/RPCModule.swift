@@ -1635,4 +1635,232 @@ class RPCModule: NSObject {
       }
   }
 
+  func fnPlanIronwoodMigrationProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try planIronwoodMigration()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] planIronwoodMigration. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] planIronwoodMigration. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  @objc(planIronwoodMigrationProcess:reject:)
+  func planIronwoodMigrationProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnPlanIronwoodMigrationProcess(dict)
+        }
+      }
+  }
+
+  func fnStartIronwoodMigrationProcess(_ dict: [AnyHashable: Any]) {
+      if let planHashHex = dict["plan_hash_hex"] as? String,
+          let perBucket = dict["per_bucket"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          // Empty string means "keep zingolib's default cadence" (the
+          // module's numeric-arg-as-string convention).
+          let resp = try startIronwoodMigration(
+            planHashHex: planHashHex,
+            perBucket: perBucket.isEmpty ? nil : UInt32(perBucket)
+          )
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] startIronwoodMigration. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] startIronwoodMigration. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  @objc(startIronwoodMigrationProcess:perBucket:resolve:reject:)
+  func startIronwoodMigrationProcess(_ plan_hash_hex: String, perBucket per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["plan_hash_hex": plan_hash_hex, "per_bucket": per_bucket, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnStartIronwoodMigrationProcess(dict)
+        }
+      }
+  }
+
+  func fnContinueNoteSplittingProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try continueNoteSplitting()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] continueNoteSplitting. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] continueNoteSplitting. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  // Proves and broadcasts one splitting round, so like the drain it runs
+  // long; the global concurrent queue keeps it off the main thread.
+  @objc(continueNoteSplittingProcess:reject:)
+  func continueNoteSplittingProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnContinueNoteSplittingProcess(dict)
+        }
+      }
+  }
+
+  func fnReschedulePartsProcess(_ dict: [AnyHashable: Any]) {
+      if let perBucket = dict["per_bucket"] as? String,
+          let perBucketNum = UInt32(perBucket),
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try rescheduleParts(perBucket: perBucketNum)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] rescheduleParts. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] rescheduleParts. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  @objc(reschedulePartsProcess:resolve:reject:)
+  func reschedulePartsProcess(_ per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["per_bucket": per_bucket, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnReschedulePartsProcess(dict)
+        }
+      }
+  }
+
+  func fnMigrationStatusProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try migrationStatus()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] migrationStatus. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] migrationStatus. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  @objc(migrationStatusProcess:reject:)
+  func migrationStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnMigrationStatusProcess(dict)
+        }
+      }
+  }
+
+  func fnReconcileMigrationProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try reconcileMigration()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] reconcileMigration. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] reconcileMigration. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  @objc(reconcileMigrationProcess:reject:)
+  func reconcileMigrationProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnReconcileMigrationProcess(dict)
+        }
+      }
+  }
+
+  func fnCancelIronwoodMigrationProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try cancelIronwoodMigration()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] cancelIronwoodMigration. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] cancelIronwoodMigration. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  @objc(cancelIronwoodMigrationProcess:reject:)
+  func cancelIronwoodMigrationProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnCancelIronwoodMigrationProcess(dict)
+        }
+      }
+  }
+
 }

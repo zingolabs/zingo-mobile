@@ -10,6 +10,7 @@ import {
 } from '../AppState';
 import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
 import { RPCDrainTxType } from '../walletBackend/types/RPCDrainPlanType';
+import { RPCMigrationPlanType } from '../walletBackend/types/RPCMigrationPlanType';
 
 /**
  * Root navigation parameter list for the main stack navigator
@@ -77,6 +78,15 @@ export type AppDrawerParamList = {
   // The immediate drain broadcasts here; `transactions` is the previewed plan,
   // so the list matches what the user accepted while the drain re-plans/sends.
   [RouteEnum.MigrationSending]: { transactions: RPCDrainTxType[] };
+  [RouteEnum.MigrationSplitPlan]: undefined;
+  // The splitting loop runs here; `plan` is the consented preview so the
+  // transaction rows match what the user accepted. Absent on banner-rescue
+  // re-entry, where the screen renders coarsely from migrationStatus.
+  [RouteEnum.MigrationSplitting]: { plan?: RPCMigrationPlanType } | undefined;
+  [RouteEnum.MigrationCadence]: undefined;
+  // The cadence the user picked, so Back from the review screen can restore
+  // the selection.
+  [RouteEnum.MigrationSchedule]: { perBucket: number };
 
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;

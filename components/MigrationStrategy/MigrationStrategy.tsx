@@ -19,8 +19,9 @@ type MigrationStrategyProps = NativeStackScreenProps<
   RouteEnum.MigrationStrategy
 >;
 
-// The two migration paths ZIP 318 offers. Only the immediate drain is wired
-// up for now; the scheduled/private path is presented as coming soon.
+// The two migration paths ZIP 318 offers: the immediate drain ('now') and
+// the private two-phase path ('private': split notes, then send batches
+// inside scheduled windows).
 type StrategyOption = 'now' | 'private';
 
 // Renders a translated string, bolding the spans wrapped in `**` so a single
@@ -248,11 +249,9 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
         <OptionCard
           title={translate('migrationstrategy.private-label') as string}
           body={translate('migrationstrategy.private-body') as string}
-          selected={false}
-          onPress={() => {}}
+          selected={selected === 'private'}
+          onPress={() => setSelected('private')}
           colors={colors}
-          disabled={true}
-          badge={translate('migrationstrategy.coming-soon') as string}
         />
         <View style={{ height: 14 }} />
         <OptionCard
@@ -284,9 +283,14 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           testID="migrationstrategy.start"
           type={ButtonTypeEnum.Primary}
           title={translate('migrationstrategy.start') as string}
-          onPress={() => navigation.navigate(RouteEnum.MigrationTransactions)}
+          onPress={() =>
+            navigation.navigate(
+              selected === 'private'
+                ? RouteEnum.MigrationSplitPlan
+                : RouteEnum.MigrationTransactions,
+            )
+          }
           twoButtons={true}
-          disabled={selected !== 'now'}
         />
       </View>
     </View>

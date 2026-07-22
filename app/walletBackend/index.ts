@@ -8,8 +8,10 @@
 import WalletBackend from './WalletBackend';
 
 export {
+  cancelIronwoodMigration,
   changeServer,
   checkMyAddress,
+  continueNoteSplitting,
   createNewTransparentAddress,
   createNewUnifiedAddress,
   createNewWallet,
@@ -32,9 +34,13 @@ export {
   getZenniesDonationAddress,
   isWalletAddress,
   loadExistingWallet,
+  migrationStatus,
   parseAddress,
+  planIronwoodMigration,
   planOrchardDrain,
+  reconcileMigration,
   removeTransaction,
+  rescheduleParts,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
@@ -43,6 +49,7 @@ export {
   setCryptoDefaultProvider,
   shieldConfirm,
   shieldPropose,
+  startIronwoodMigration,
   walletBackupExists,
   walletExists,
 } from './utils/walletUtils';

@@ -430,6 +430,178 @@ export async function drainStatus(): Promise<string> {
   }
 }
 
+// Plans the private (ZIP 318 two-phase) Orchard -> Ironwood migration without
+// signing or broadcasting anything. Mirrors the native
+// `planIronwoodMigrationProcess`. Returns the raw JSON (parseable as
+// RPCMigrationPlanType, including the consent `plan_hash`); the caller checks
+// for an `error` prefix / field before parsing.
+export async function planIronwoodMigration(): Promise<string> {
+  try {
+    const planStr: string = await RPCModule.planIronwoodMigrationProcess();
+    if (planStr) {
+      if (planStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error planIronwoodMigration ${planStr}`);
+        return planStr;
+      }
+    } else {
+      console.log('Internal Error planIronwoodMigration');
+      return 'Error: Internal RPC Error: planIronwoodMigration';
+    }
+    return planStr;
+  } catch (error) {
+    console.log(`Critical Error planIronwoodMigration ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Records the user's consent to the exact plan they were shown (its
+// `plan_hash` from planIronwoodMigration) and persists the migration state.
+// Nothing is broadcast; continueNoteSplitting drives the rounds afterwards.
+// `perBucket` null keeps zingolib's default cadence (changeable later via
+// rescheduleParts, until the first part is signed). Returns the raw JSON
+// (`{ started: true }` or `{ error }` — notably ConsentStale when the notes
+// changed since planning).
+export async function startIronwoodMigration(
+  planHashHex: string,
+  perBucket: number | null,
+): Promise<string> {
+  try {
+    const startStr: string = await RPCModule.startIronwoodMigrationProcess(
+      planHashHex,
+      perBucket === null ? '' : String(perBucket),
+    );
+    if (startStr) {
+      if (startStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error startIronwoodMigration ${startStr}`);
+        return startStr;
+      }
+    } else {
+      console.log('Internal Error startIronwoodMigration');
+      return 'Error: Internal RPC Error: startIronwoodMigration';
+    }
+    return startStr;
+  } catch (error) {
+    console.log(`Critical Error startIronwoodMigration ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Drives one step of note splitting: proves and broadcasts the next round of
+// Orchard self-sends, or reports what the pending round is waiting on. Long-
+// running like drainOrchard (Halo2 proving); the native side dispatches it on
+// the concurrent pool. Returns the raw JSON (parseable as RPCSplitStepType).
+export async function continueNoteSplitting(): Promise<string> {
+  try {
+    const stepStr: string = await RPCModule.continueNoteSplittingProcess();
+    if (stepStr) {
+      if (stepStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error continueNoteSplitting ${stepStr}`);
+        return stepStr;
+      }
+    } else {
+      console.log('Internal Error continueNoteSplitting');
+      return 'Error: Internal RPC Error: continueNoteSplitting';
+    }
+    return stepStr;
+  } catch (error) {
+    console.log(`Critical Error continueNoteSplitting ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Sets the Phase 2 cadence (parts per broadcast window) and re-buckets every
+// part with fresh randomization. Callable any time between consent and the
+// first signed part; afterwards fails with CadenceFixed. After success the
+// old schedule is void: re-read migrationStatus and re-arm the reminders.
+// Returns the raw JSON (`{ rescheduled: true }` or `{ error }`).
+export async function rescheduleParts(perBucket: number): Promise<string> {
+  try {
+    const rescheduleStr: string = await RPCModule.reschedulePartsProcess(
+      String(perBucket),
+    );
+    if (rescheduleStr) {
+      if (rescheduleStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error rescheduleParts ${rescheduleStr}`);
+        return rescheduleStr;
+      }
+    } else {
+      console.log('Internal Error rescheduleParts');
+      return 'Error: Internal RPC Error: rescheduleParts';
+    }
+    return rescheduleStr;
+  } catch (error) {
+    console.log(`Critical Error rescheduleParts ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// The private migration's progress, arranged for direct rendering (parseable
+// as RPCMigrationStatusType). `phase` is null when no migration is in
+// progress. ZIP 318 requires showing its `orchard_confirmed_spendable`
+// figure while one is.
+export async function migrationStatus(): Promise<string> {
+  try {
+    const statusStr: string = await RPCModule.migrationStatusProcess();
+    if (statusStr) {
+      if (statusStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error migrationStatus ${statusStr}`);
+        return statusStr;
+      }
+    } else {
+      console.log('Internal Error migrationStatus');
+      return 'Error: Internal RPC Error: migrationStatus';
+    }
+    return statusStr;
+  } catch (error) {
+    console.log(`Critical Error migrationStatus ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Classifies every part against the local chain view, applies what is safe
+// unattended and returns what needs the app (parseable as RPCReconcileType).
+// Call on every launch; never syncs, offline-safe.
+export async function reconcileMigration(): Promise<string> {
+  try {
+    const reportStr: string = await RPCModule.reconcileMigrationProcess();
+    if (reportStr) {
+      if (reportStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error reconcileMigration ${reportStr}`);
+        return reportStr;
+      }
+    } else {
+      console.log('Internal Error reconcileMigration');
+      return 'Error: Internal RPC Error: reconcileMigration';
+    }
+    return reportStr;
+  } catch (error) {
+    console.log(`Critical Error reconcileMigration ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Abandons the in-progress private migration: confirmed parts stand, pending
+// ones are dropped and their notes released. Returns the raw JSON
+// (`{ cancelled: true }` or `{ error }`).
+export async function cancelIronwoodMigration(): Promise<string> {
+  try {
+    const cancelStr: string = await RPCModule.cancelIronwoodMigrationProcess();
+    if (cancelStr) {
+      if (cancelStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error cancelIronwoodMigration ${cancelStr}`);
+        return cancelStr;
+      }
+    } else {
+      console.log('Internal Error cancelIronwoodMigration');
+      return 'Error: Internal RPC Error: cancelIronwoodMigration';
+    }
+    return cancelStr;
+  } catch (error) {
+    console.log(`Critical Error cancelIronwoodMigration ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
 // Returns the spendable balance that could be sent to `address` right now,
 // honoring privacy levels and donation flags. Returns the raw JSON
 // (parseable as RPCSpendablebalanceType).

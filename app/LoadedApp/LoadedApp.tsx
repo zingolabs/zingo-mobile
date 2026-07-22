@@ -33,6 +33,7 @@ import {
   isWalletAddress,
   loadExistingWallet,
   parseAddress,
+  reconcileMigration,
   setConfigWalletToProd,
 } from '../walletBackend';
 import {
@@ -144,6 +145,18 @@ const MigrationTransactions = React.lazy(
 );
 const MigrationSending = React.lazy(
   () => import('../../components/MigrationSending'),
+);
+const MigrationSplitPlan = React.lazy(
+  () => import('../../components/MigrationSplitPlan'),
+);
+const MigrationSplitting = React.lazy(
+  () => import('../../components/MigrationSplitting'),
+);
+const MigrationCadence = React.lazy(
+  () => import('../../components/MigrationCadence'),
+);
+const MigrationSchedule = React.lazy(
+  () => import('../../components/MigrationSchedule'),
 );
 const Insight = React.lazy(() => import('../../components/Insight'));
 const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
@@ -878,6 +891,16 @@ export class LoadedAppClass extends Component<
     // Configure the RPC to start doing refreshes
     await this.rpc.clearTimers();
     await this.rpc.configure();
+
+    // ZIP 318: classify the private migration's parts on every launch and
+    // apply what is safe unattended (promotions, expiries, rebuilds,
+    // completion). Never syncs, offline-safe, a no-op without a migration.
+    // The app-facing actions need no handling here: the History banner reads
+    // migration_status on focus and routes the user to the right screen.
+    reconcileMigration().catch(() => {
+      // Offline-safe by contract; a transient failure just defers the
+      // cleanup to the next launch.
+    });
 
     this.clearToAddr();
 
@@ -2619,6 +2642,29 @@ export class LoadedAppClass extends Component<
                       component={MigrationSending}
                       // The drain broadcasts here and can't be interrupted;
                       // swipe-back is off and hardware-back is blocked in-screen.
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationSplitPlan}
+                      component={MigrationSplitPlan}
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationSplitting}
+                      component={MigrationSplitting}
+                      // Splitting rounds broadcast here and can't be
+                      // interrupted; swipe-back off, hardware-back blocked
+                      // in-screen.
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationCadence}
+                      component={MigrationCadence}
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationSchedule}
+                      component={MigrationSchedule}
                       options={{ gestureEnabled: false }}
                     />
                     <RootNavigator.Screen name={RouteEnum.AddressBook}>
