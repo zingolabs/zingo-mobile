@@ -13,14 +13,14 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import OptionsPanel, { OptionsPanelProps } from './OptionsPanel';
 import { useOptionsPanel } from '../../app/context/optionsPanel';
 
-const FADE_DURATION_MS = 320;
-// Open sequence (total ≈ 700ms = slide duration):
-//   1) 0–350ms:  only the sheet slides down — panel stays at opacity 0
-//   2) 350–670ms: panel fades 0 → 1 while the sheet is still sliding,
+const FADE_DURATION_MS = 125;
+// Open sequence (total ≈ 250ms = slide duration):
+//   1) 0–125ms:   only the sheet slides down — panel stays at opacity 0
+//   2) 125–250ms: panel fades 0 → 1 while the sheet is still sliding,
 //      producing the "morphing" overlap between the two surfaces
 //   3) end:       panel at full opacity, sheet fully off-screen
 // Close path is untouched: panel just fades 1 → 0 immediately.
-const OPEN_FADE_DELAY_MS = 350;
+const OPEN_FADE_DELAY_MS = 125;
 
 type OptionsPanelHostProps = OptionsPanelProps & {
   /** Active app surface (navigator). Stays fixed; only the sheet inside

@@ -165,6 +165,66 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                     style={{ marginVertical: 20 }}
                   />
                 )}
+                {/* Ironwood (NU6.3) — the new shielded pool, shown at the top
+                    as the migration destination. */}
+                <>
+                  <BoldText>
+                    {translate('pools.ironwood-title') as string}
+                  </BoldText>
+
+                  <View style={{ display: 'flex', marginLeft: 25 }}>
+                    <DetailLine
+                      label={translate('pools.ironwood-balance') as string}
+                    >
+                      <ZecAmount
+                        testID="ironwood-total-balance"
+                        amtZec={totalBalance.totalIronwoodBalance}
+                        size={14}
+                        currencyName={info.currencyName}
+                        style={{
+                          opacity:
+                            totalBalance.confirmedIronwoodBalance > 0 &&
+                            totalBalance.confirmedIronwoodBalance ===
+                              totalBalance.totalIronwoodBalance
+                              ? 1
+                              : 0.5,
+                        }}
+                        privacy={privacy}
+                      />
+                    </DetailLine>
+                    <DetailLine
+                      label={
+                        translate('pools.ironwood-confirmed-balance') as string
+                      }
+                    >
+                      <ZecAmount
+                        testID="ironwood-confirmed-balance"
+                        amtZec={totalBalance.confirmedIronwoodBalance}
+                        size={14}
+                        currencyName={info.currencyName}
+                        color={
+                          totalBalance.confirmedIronwoodBalance > 0 &&
+                          totalBalance.confirmedIronwoodBalance ===
+                            totalBalance.totalIronwoodBalance
+                            ? colors.primary
+                            : 'red'
+                        }
+                        privacy={privacy}
+                      />
+                    </DetailLine>
+                  </View>
+
+                  <View
+                    style={{
+                      height: 1,
+                      width: '100%',
+                      backgroundColor: 'white',
+                      marginTop: 15,
+                      marginBottom: 10,
+                    }}
+                  />
+                </>
+
                 {orchardPool && (
                   <>
                     <BoldText>

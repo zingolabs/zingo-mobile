@@ -1,0 +1,504 @@
+/* eslint-disable react-native/no-inline-styles */
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import {
+  Animated,
+  BackHandler,
+  Easing,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
+import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useKeepAwake } from '@sayem314/react-native-keep-awake';
+
+import BoldText from '../Components/BoldText';
+import Button from '../Components/Button';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { ContextAppLoaded } from '../../app/context';
+import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
+import Utils from '../../app/utils';
+import { drainOrchard, drainStatus } from '../../app/walletBackend';
+import { RPCDrainType } from '../../app/walletBackend/types/RPCDrainType';
+import { RPCDrainStatusType } from '../../app/walletBackend/types/RPCDrainStatusType';
+
+type MigrationSendingProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.MigrationSending
+>;
+
+const ZATS_PER_ZEC = 10 ** 8;
+
+// Share of the progress bar each drain phase owns: building (proving, the slow
+// part) fills the first 90%, broadcasting the last 10%.
+const BUILD_WEIGHT = 0.9;
+
+// Compact ZEC amount for the per-transaction note list: trims trailing zeros so
+// a 10 ZEC note reads "10" and a dust note "0.01", matching the preview values.
+const fmt = (zats: number): string =>
+  `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
+
+// Where a transaction is in its lifecycle, derived from the drain's live
+// { built, sent, phase } snapshot. Build proves+signs each tx (queued ->
+// calculating -> calculated); transmit broadcasts them (calculated -> sending
+// -> sent).
+type TxStatus = 'queued' | 'calculating' | 'calculated' | 'sending' | 'sent';
+
+const deriveStatus = (
+  index: number,
+  progress: RPCDrainStatusType | null,
+): TxStatus => {
+  if (!progress) {
+    return 'queued';
+  }
+  if (progress.phase === 'building') {
+    if (index < progress.built) {
+      return 'calculated';
+    }
+    if (index === progress.built) {
+      return 'calculating';
+    }
+    return 'queued';
+  }
+  // Transmitting: every transaction is already built.
+  if (index < progress.sent) {
+    return 'sent';
+  }
+  if (index === progress.sent) {
+    return 'sending';
+  }
+  return 'calculated';
+};
+
+const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
+  navigation,
+  route,
+}) => {
+  // Keep the screen awake for the whole broadcast: proving each transaction can
+  // take a while and the user should be able to watch it finish. The hook holds
+  // the lock only while this screen is mounted, so it is scoped to exactly here
+  // and released the moment we navigate away.
+  useKeepAwake();
+
+  const context = useContext(ContextAppLoaded);
+  const { translate, addLastSnackbar, info } = context;
+  const { colors } = useTheme() as ThemeType;
+
+  const transactions = route.params?.transactions ?? [];
+  const txCount = transactions.length;
+  // Total value landing in the Ironwood pool across every transaction (the sum
+  // of the single output each drain transaction creates).
+  const totalTransferred = transactions.reduce((sum, tx) => sum + tx.output, 0);
+  const totalTransferredStr = `${Utils.parseNumberFloatToStringLocale(
+    totalTransferred / ZATS_PER_ZEC,
+    4,
+  )} ${info.currencyName}`;
+
+  const [progress, setProgress] = useState<RPCDrainStatusType | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [succeeded, setSucceeded] = useState<boolean>(false);
+
+  const goHome = useCallback(() => {
+    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+  }, [navigation]);
+
+  // Broadcasting can't be interrupted, so block hardware-back for the whole
+  // screen. Success resets to Home on its own; the error state offers a button.
+  useFocusEffect(
+    useCallback(() => {
+      const sub = BackHandler.addEventListener('hardwareBackPress', () => true);
+      return () => sub.remove();
+    }, []),
+  );
+
+  // Marks the drain complete for the progress bar (fills to 100%). A ref, not
+  // state, so the animation loop reads the latest value without re-subscribing.
+  const doneRef = useRef(false);
+
+  // Run the drain once, polling the native side channel for progress while the
+  // single long drain call is in flight. Both run concurrently on separate
+  // native queues; drainStatus reads a side channel, not the lightclient lock
+  // the drain holds, so the poll stays live throughout.
+  useEffect(() => {
+    let cancelled = false;
+    let polling = false;
+    const poll = setInterval(async () => {
+      if (polling) {
+        return;
+      }
+      polling = true;
+      try {
+        const statusStr = await drainStatus();
+        if (!statusStr.toLowerCase().startsWith(GlobalConst.error)) {
+          const parsed = JSON.parse(statusStr) as RPCDrainStatusType | null;
+          if (parsed && !cancelled) {
+            setProgress(parsed);
+          }
+        }
+      } catch {
+        // Transient read/parse between ticks; the next tick recovers.
+      } finally {
+        polling = false;
+      }
+    }, 300);
+
+    (async () => {
+      let failure: string | null = null;
+      try {
+        const drainStr = await drainOrchard();
+        if (drainStr.toLowerCase().startsWith(GlobalConst.error)) {
+          failure = drainStr;
+        } else {
+          const parsed: RPCDrainType = JSON.parse(drainStr);
+          if (parsed.error) {
+            failure = parsed.error;
+          }
+        }
+      } catch (e) {
+        failure = `${e}`;
+      }
+      clearInterval(poll);
+      if (cancelled) {
+        return;
+      }
+      // Stop the trickle either way; the drain is no longer progressing.
+      doneRef.current = true;
+      if (failure) {
+        setErrorMsg(failure);
+        return;
+      }
+      // Mark every transaction sent and flip to the succeeded state, which fills
+      // the bar to 100% and then navigates. (The transmit phase is near-instant
+      // next to proving, so the poll rarely observes it — this is what makes the
+      // bar reliably finish full instead of stalling where building left it.)
+      setProgress({
+        total: txCount,
+        built: txCount,
+        sent: txCount,
+        phase: 'transmitting',
+      });
+      addLastSnackbar(translate('migrationsending.success') as string);
+      setSucceeded(true);
+    })();
+
+    return () => {
+      cancelled = true;
+      clearInterval(poll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ----- Always-animated progress bar -----
+  // A continuously-easing "trickle": the bar glides toward a ceiling set just
+  // past confirmed progress and never quite reaches it, so it is always in
+  // motion and never jumps in discrete steps. Real progress events push the
+  // ceiling forward; completion pushes it to 1.
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  const currentRef = useRef(0);
+  const ceilingRef = useRef(0.08); // small head start so it moves from mount
+
+  useEffect(() => {
+    const id = progressAnim.addListener(({ value }) => {
+      currentRef.current = value;
+    });
+    return () => progressAnim.removeListener(id);
+  }, [progressAnim]);
+
+  // Recompute the ceiling as real progress lands: one step of headroom beyond
+  // confirmed work. Building (proving, the slow part) owns the first 90% of the
+  // bar and broadcasting the last 10%, so a step is worth 0.9/total while
+  // building and 0.1/total while transmitting.
+  useEffect(() => {
+    if (!progress) {
+      return;
+    }
+    const total = progress.total || txCount;
+    if (total <= 0) {
+      return;
+    }
+    const real =
+      (BUILD_WEIGHT * progress.built + (1 - BUILD_WEIGHT) * progress.sent) /
+      total;
+    const step =
+      (progress.phase === 'transmitting' ? 1 - BUILD_WEIGHT : BUILD_WEIGHT) /
+      total;
+    ceilingRef.current = Math.min(0.985, real + step);
+  }, [progress, txCount]);
+
+  // The trickle driver: chains short eased steps, each closing a fraction of the
+  // gap to the ceiling, so the bar is perpetually moving and never steps. Stops
+  // once the drain finishes; the completion effect below fills the bar to 100%.
+  useEffect(() => {
+    let cancelled = false;
+    const tick = () => {
+      if (cancelled || doneRef.current) {
+        return;
+      }
+      const cur = currentRef.current;
+      const target = cur + (ceilingRef.current - cur) * 0.12;
+      Animated.timing(progressAnim, {
+        toValue: target,
+        duration: 360,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      }).start(({ finished }) => {
+        if (finished && !cancelled && !doneRef.current) {
+          tick();
+        }
+      });
+    };
+    tick();
+    return () => {
+      cancelled = true;
+      progressAnim.stopAnimation();
+    };
+  }, [progressAnim]);
+
+  // On success, glide the bar the rest of the way to 100% (superseding the now-
+  // stopped trickle), then navigate home once the user has seen it complete.
+  useEffect(() => {
+    if (!succeeded) {
+      return;
+    }
+    let cancelled = false;
+    Animated.timing(progressAnim, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start(({ finished }) => {
+      if (finished && !cancelled) {
+        goHome();
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [succeeded, progressAnim, goHome]);
+
+  const statusMeta: Record<TxStatus, { key: string; color: string }> = {
+    queued: {
+      key: 'migrationsending.status-queued',
+      color: colors.placeholder,
+    },
+    calculating: {
+      key: 'migrationsending.status-calculating',
+      color: colors.primary,
+    },
+    calculated: {
+      key: 'migrationsending.status-calculated',
+      color: colors.text,
+    },
+    sending: {
+      key: 'migrationsending.status-sending',
+      color: colors.primary,
+    },
+    sent: {
+      key: 'migrationsending.status-sent',
+      color: colors.primary,
+    },
+  };
+
+  const title = (
+    <BoldText style={{ fontSize: 22, marginBottom: 10 }}>
+      {translate('migrationsending.title') as string}
+    </BoldText>
+  );
+
+  // ----- Error -----
+  if (errorMsg) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <ScrollView
+          contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
+        >
+          {title}
+          <View
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Text
+              style={{
+                color: colors.text,
+                fontSize: 17,
+                fontWeight: '700',
+                marginBottom: 10,
+                textAlign: 'center',
+              }}
+            >
+              {translate('migrationsending.error-title') as string}
+            </Text>
+            <Text
+              style={{
+                color: colors.placeholder,
+                fontSize: 14,
+                textAlign: 'center',
+              }}
+            >
+              {errorMsg}
+            </Text>
+          </View>
+        </ScrollView>
+        <View
+          style={{
+            paddingBottom: 24,
+            paddingHorizontal: 24,
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            type={ButtonTypeEnum.Primary}
+            title={translate('migrationsending.close') as string}
+            onPress={goHome}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  // ----- Sending -----
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 24,
+          paddingTop: 40,
+          paddingBottom: 24,
+        }}
+      >
+        {title}
+        <Text
+          style={{
+            color: colors.placeholder,
+            fontSize: 15,
+            lineHeight: 22,
+            marginBottom: 18,
+          }}
+        >
+          {translate('migrationsending.subtitle') as string}
+        </Text>
+
+        {/* Total value moving into Ironwood across all transactions. */}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 28,
+          }}
+        >
+          <Text style={{ color: colors.placeholder, fontSize: 14 }}>
+            {translate('migrationsending.total') as string}
+          </Text>
+          <Text style={{ color: colors.text, fontSize: 16, fontWeight: '700' }}>
+            {totalTransferredStr}
+          </Text>
+        </View>
+
+        {transactions.map((tx, i) => {
+          const meta = statusMeta[deriveStatus(i, progress)];
+          // The value this transaction moves into Ironwood (its single output).
+          const value = fmt(tx.output);
+          return (
+            <View
+              key={i}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: colors.bottomSheetBorder,
+                backgroundColor: colors.bottomSheetBackground,
+                borderRadius: 12,
+                paddingHorizontal: 16,
+                paddingVertical: 16,
+                marginBottom: 14,
+              }}
+            >
+              <View
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: meta.color,
+                  marginRight: 14,
+                }}
+              />
+              <Text
+                style={{
+                  color: colors.text,
+                  fontSize: 15,
+                  fontWeight: '700',
+                  marginRight: 12,
+                }}
+              >
+                {(translate('migrationsending.tx') as string).replace(
+                  '{n}',
+                  String(i + 1),
+                )}
+              </Text>
+              <Text
+                style={{ color: colors.primary, fontSize: 14, flexShrink: 1 }}
+                numberOfLines={1}
+              >
+                {value}
+              </Text>
+              <Text
+                style={{
+                  marginLeft: 'auto',
+                  color: meta.color,
+                  fontSize: 12,
+                  fontWeight: '600',
+                  letterSpacing: 1,
+                }}
+              >
+                {(translate(meta.key) as string).toUpperCase()}
+              </Text>
+            </View>
+          );
+        })}
+      </ScrollView>
+
+      {/* Always-animated progress bar, pinned above the hint. */}
+      <View style={{ paddingHorizontal: 24, paddingBottom: 28 }}>
+        <View
+          style={{
+            width: '100%',
+            height: 6,
+            borderRadius: 3,
+            backgroundColor: colors.bottomSheetBorder,
+            overflow: 'hidden',
+          }}
+        >
+          <Animated.View
+            style={{
+              height: '100%',
+              borderRadius: 3,
+              backgroundColor: colors.primary,
+              width: progressAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+              }),
+            }}
+          />
+        </View>
+        <Text
+          style={{
+            color: colors.placeholder,
+            fontSize: 13,
+            marginTop: 14,
+            textAlign: 'center',
+          }}
+        >
+          {translate('migrationsending.hint') as string}
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+export default MigrationSending;

@@ -101,11 +101,15 @@ export class DataService {
 
       const balance: TotalBalanceClass = {
         totalOrchardBalance: (balanceJSON.total_orchard_balance || 0) / 10 ** 8,
+        totalIronwoodBalance:
+          (balanceJSON.total_ironwood_balance || 0) / 10 ** 8,
         totalSaplingBalance: (balanceJSON.total_sapling_balance || 0) / 10 ** 8,
         totalTransparentBalance:
           (balanceJSON.total_transparent_balance || 0) / 10 ** 8,
         confirmedOrchardBalance:
           (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
+        confirmedIronwoodBalance:
+          (balanceJSON.confirmed_ironwood_balance || 0) / 10 ** 8,
         confirmedSaplingBalance:
           (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
         confirmedTransparentBalance:
@@ -280,6 +284,10 @@ export class DataService {
           infoJSON.chain_name === ChainNameEnum.mainChainName
             ? CurrencyNameEnum.ZEC
             : CurrencyNameEnum.TAZ,
+        // `?? null` collapses both "no activation scheduled" (null) and "older
+        // native lib that doesn't report it" (undefined) into the same
+        // not-yet-active answer.
+        ironwoodActivationHeight: infoJSON.ironwood_activation_height ?? null,
       };
 
       this.config.onInfoChanged(info);

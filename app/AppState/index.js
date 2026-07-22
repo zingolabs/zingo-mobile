@@ -57,6 +57,7 @@ import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
 import { GlobalConst } from './const/GlobalConst';
+import { isIronwoodActive } from './const/IronwoodActivation';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -124,4 +125,5 @@ export {
   LaunchingModeEnum,
   BlockExplorerEnum,
   GlobalConst,
+  isIronwoodActive,
 };

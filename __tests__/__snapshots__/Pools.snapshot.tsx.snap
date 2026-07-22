@@ -65,6 +65,217 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             {
               "flexDirection": "row",
               "marginHorizontal": 5,
+              "opacity": 1,
+            }
+          }
+        >
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={false}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "flex-end",
+                  "flexDirection": "row",
+                  "margin": 0,
+                  "padding": 0,
+                }
+              }
+              testID="ironwood-total-balance"
+            >
+              <Text
+                style={
+                  {
+                    "color": "#ffffff",
+                    "fontSize": 14,
+                    "fontWeight": "700",
+                    "margin": 0,
+                    "padding": 0,
+                  }
+                }
+                testID="ironwood-total-balance.big-part"
+              >
+                 0.5
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "marginTop": 20,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#c3c3c3",
+              "opacity": 0.65,
+            }
+          }
+        >
+          text translated
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "marginHorizontal": 5,
+            }
+          }
+        >
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={false}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "flex-end",
+                  "flexDirection": "row",
+                  "margin": 0,
+                  "padding": 0,
+                }
+              }
+              testID="ironwood-confirmed-balance"
+            >
+              <Text
+                style={
+                  {
+                    "color": "#18bd18",
+                    "fontSize": 14,
+                    "fontWeight": "700",
+                    "margin": 0,
+                    "padding": 0,
+                  }
+                }
+                testID="ironwood-confirmed-balance.big-part"
+              >
+                 0.5
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "white",
+          "height": 1,
+          "marginBottom": 10,
+          "marginTop": 15,
+          "width": "100%",
+        }
+      }
+    />
+    <Text
+      style={
+        {
+          "color": "#c3c3c3",
+          "fontSize": 16,
+          "fontWeight": "bold",
+          "opacity": 0.87,
+        }
+      }
+    >
+      text translated
+    </Text>
+    <View
+      style={
+        {
+          "display": "flex",
+          "marginLeft": 25,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "display": "flex",
+            "marginTop": 20,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#c3c3c3",
+              "opacity": 0.65,
+            }
+          }
+        >
+          text translated
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "marginHorizontal": 5,
               "opacity": 0.5,
             }
           }

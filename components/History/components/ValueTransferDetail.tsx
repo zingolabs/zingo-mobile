@@ -568,7 +568,19 @@ const ValueTransferDetail: React.FunctionComponent<
                                             ? (translate(
                                                 'history.rejection',
                                               ) as string)
-                                            : ''}
+                                            : valueTransfer.kind ===
+                                                  ValueTransferKindEnum.Migration &&
+                                                valueTransfer.confirmations ===
+                                                  0
+                                              ? (translate(
+                                                  'history.migrating',
+                                                ) as string)
+                                              : valueTransfer.kind ===
+                                                  ValueTransferKindEnum.Migration
+                                                ? (translate(
+                                                    'history.migration',
+                                                  ) as string)
+                                                : ''}
             </BoldText>
             <ZecAmount
               style={{
