@@ -13,7 +13,7 @@ env:
 
 jobs:
   build-for-testing:
-    runs-on: macos-15
+    runs-on: zingo-ios-build-12
     steps:
       - name: Xcode 16.4
         uses: maxim-lobanov/setup-xcode@v1
