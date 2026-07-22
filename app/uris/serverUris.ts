@@ -153,7 +153,7 @@ const serverUris = (
     },
     // testnet default (1)
     {
-      uri: 'https://testnet.zec.rocks',
+      uri: 'https://testnet.zec.rocks:443',
       region: '',
       chainName: ChainNameEnum.testChainName,
       default: true,
