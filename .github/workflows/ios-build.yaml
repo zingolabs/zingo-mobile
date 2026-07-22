@@ -59,6 +59,21 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
+      # CARGO_HOME is workspace-relative (see env above), so these paths cover
+      # the registry, git checkouts, and the release artifacts for all three
+      # iOS targets. Keyed on the lockfile; the prefix fallback keeps stale
+      # caches useful after a zingolib rev bump.
+      - name: Cargo cache (registry, git, iOS targets)
+        uses: actions/cache@v6
+        with:
+          path: |
+            .cargo/registry
+            .cargo/git
+            rust/target
+          key: ios-cargo-${{ hashFiles('rust/Cargo.lock') }}
+          restore-keys: |
+            ios-cargo-
+
       - name: Cargo update for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: |
