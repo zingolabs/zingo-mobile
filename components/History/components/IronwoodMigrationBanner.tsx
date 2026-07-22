@@ -109,9 +109,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
       migration.orchard_confirmed_spendable / 10 ** 8,
       4,
     )} ${currencyName}`;
-    const progress = (
-      translate('ironwoodbanner.inflight-progress') as string
-    )
+    const progress = (translate('ironwoodbanner.inflight-progress') as string)
       .replace('{confirmed}', String(migration.parts_confirmed))
       .replace('{total}', String(migration.parts_total));
 

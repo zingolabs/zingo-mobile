@@ -16,10 +16,7 @@ import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
-import {
-  migrationStatus,
-  rescheduleParts,
-} from '../../app/walletBackend';
+import { migrationStatus, rescheduleParts } from '../../app/walletBackend';
 import { RPCMigrationStatusType } from '../../app/walletBackend/types/RPCMigrationStatusType';
 
 type MigrationCadenceProps = NativeStackScreenProps<
@@ -173,7 +170,10 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   // The "fewer" preset IS zingolib's default cadence, so we never invent a
   // second opinion about a privacy parameter; "more" is maximum dispersion.
   const fewerPerBucket = status?.per_bucket ?? DEFAULT_PER_BUCKET;
-  const fewerBatches = Math.max(1, Math.ceil(parts / Math.max(1, fewerPerBucket)));
+  const fewerBatches = Math.max(
+    1,
+    Math.ceil(parts / Math.max(1, fewerPerBucket)),
+  );
   const moreBatches = Math.max(1, parts);
 
   const windowHours = ((bucketModulus * SECONDS_PER_BLOCK) / 3600).toFixed(1);
@@ -206,9 +206,7 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
     // CadenceFixed: a part is already signed, so the existing schedule
     // stands — reviewing it (and re-arming reminders) is still valid.
     if (failure.toLowerCase().includes('cadence')) {
-      addLastSnackbar(
-        translate('migrationcadence.cadence-fixed') as string,
-      );
+      addLastSnackbar(translate('migrationcadence.cadence-fixed') as string);
       navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
       return;
     }

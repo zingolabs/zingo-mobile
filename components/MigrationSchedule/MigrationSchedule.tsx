@@ -172,10 +172,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
             .split('**')
             .map((part: string, i: number) =>
               i % 2 === 1 ? (
-                <Text
-                  key={i}
-                  style={{ color: colors.text, fontWeight: '700' }}
-                >
+                <Text key={i} style={{ color: colors.text, fontWeight: '700' }}>
                   {part}
                 </Text>
               ) : (

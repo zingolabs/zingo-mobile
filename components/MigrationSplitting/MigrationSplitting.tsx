@@ -196,7 +196,11 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
       setRows(prev => {
         const stillPending = new Set(pending);
         const next = prev.map(row => {
-          if (row.status === 'sent' && row.txid && !stillPending.has(row.txid)) {
+          if (
+            row.status === 'sent' &&
+            row.txid &&
+            !stillPending.has(row.txid)
+          ) {
             return { ...row, status: 'confirmed' as TxStatus };
           }
           return row;
@@ -278,7 +282,10 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
       applyPending(pending);
       setStep(prev => ({
         kind: 'awaiting',
-        round: prev.kind === 'awaiting' || prev.kind === 'broadcast' ? prev.round : 0,
+        round:
+          prev.kind === 'awaiting' || prev.kind === 'broadcast'
+            ? prev.round
+            : 0,
         pending: pending.length,
       }));
       schedule(drive, POLL_MS);
@@ -549,7 +556,10 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
     const roundLabel =
       roundCount > 1
         ? ` ${(translate('migrationsplitting.round-of') as string)
-            .replace('{n}', String((step.kind === 'awaiting' ? step.round : 0) + 1))
+            .replace(
+              '{n}',
+              String((step.kind === 'awaiting' ? step.round : 0) + 1),
+            )
             .replace('{r}', String(roundCount))}`
         : '';
     return `${translate('migrationsplitting.confirming') as string}${roundLabel}`;

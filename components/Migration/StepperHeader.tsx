@@ -92,12 +92,7 @@ const StepperHeader: React.FunctionComponent<StepperHeaderProps> = ({
           marginHorizontal: 12,
         }}
       />
-      <StepCircle
-        label="2"
-        done={false}
-        active={sendActive}
-        colors={colors}
-      />
+      <StepCircle label="2" done={false} active={sendActive} colors={colors} />
       <Text
         style={{
           color: sendColor,
