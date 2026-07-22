@@ -1,0 +1,22 @@
+name: Rust unused dependencies
+
+on:
+  workflow_call:
+
+jobs:
+  rust-shear:
+    name: cargo shear
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Pinned so a new shear release cannot fail CI on untouched code.
+      - name: Install cargo-shear
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-shear@1.13.2
+
+      - name: Check for unused dependencies
+        working-directory: ./rust
+        run: cargo shear
