@@ -45,7 +45,7 @@ jobs:
     name: Build iOS Rust xcframework
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
-    runs-on: macos-15
+    runs-on: zingo-ios-build-12
     env:
       RUSTUP_HOME: ${{ github.workspace }}/.rustup
       CARGO_HOME:  ${{ github.workspace }}/.cargo

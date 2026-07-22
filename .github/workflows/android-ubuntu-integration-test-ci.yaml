@@ -115,7 +115,7 @@ jobs:
 
   android-ubuntu-build:
     name: Android Ubuntu Build
-    runs-on: ubuntu-24.04
+    runs-on: zingo-android-gradle-16
     env:
       RUSTFLAGS: -D warnings
       CACHE-KEY: ${{ inputs.cache-key }}
