@@ -6,7 +6,6 @@ edition = "2024"
 
 [features]
 ci = []
-regchest = []
 
 [dev-dependencies]
 zingolib = { workspace = true , features = [
@@ -15,7 +14,6 @@ zingolib = { workspace = true , features = [
 pepper-sync = { workspace = true }
 zingolib_testutils = { workspace = true }
 zingomobile_utils = { workspace = true }
-regchest_utils = { workspace = true }
 json = { workspace = true }
 env_logger = { workspace = true }
 tokio = { workspace = true }
