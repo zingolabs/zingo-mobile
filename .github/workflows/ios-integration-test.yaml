@@ -74,12 +74,16 @@ jobs:
         run: |
           set -euxo pipefail
           mkdir -p build/reports build/DerivedData
+          # The destination pins no arch: it resolves arm64 on Apple-silicon
+          # runners and x86_64 on the Intel larger-runner pool; the
+          # xcframework's simulator slice is a fat arm64+x86_64 binary
+          # either way.
           xcodebuild build-for-testing \
             -workspace Zingo.xcworkspace \
             -scheme Zingo \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
             -derivedDataPath "build/DerivedData" \
             -resultBundlePath "build/reports/Zingo-BuildForTesting.xcresult" \
             -quiet
