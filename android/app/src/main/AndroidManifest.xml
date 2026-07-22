@@ -9,6 +9,19 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <!-- Android 13+: batch reminders for the private Ironwood migration. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!--
+      notifee's core AAR auto-merges SCHEDULE_EXACT_ALARM for its optional
+      exact-alarm (AlarmManager) path. Our reminders use notifee's DEFAULT
+      WorkManager path (see app/notifications/reminders.ts) — no exact alarms —
+      so strip the unused permission to avoid Google Play's exact-alarm policy
+      declaration. RECEIVE_BOOT_COMPLETED + notifee's RebootBroadcastReceiver
+      (also from the AAR) still reschedule reminders after reboot.
+      If a trigger ever opts into alarmManager: SET_EXACT_AND_ALLOW_WHILE_IDLE,
+      remove this line and add the runtime openAlarmPermissionSettings() gate.
+    -->
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        tools:node="remove" />
 
     <application
       android:name=".MainApplication"

@@ -317,9 +317,6 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
           onPress={() => setSelected('more')}
           colors={colors}
         />
-
-        {/* ZIP 318 correlation disclosure: shown once, here, for the whole
-            manual-execution mode — not per send. */}
         <Text
           style={{
             color: colors.placeholder,

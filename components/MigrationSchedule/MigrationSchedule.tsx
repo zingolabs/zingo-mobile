@@ -262,24 +262,6 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
             </Text>
           </View>
         ))}
-
-        {/* Sliding is the flow's one graceful degradation: a plain sentence,
-            never an error state. */}
-        <View
-          style={{
-            borderWidth: 1.5,
-            borderColor: colors.primary,
-            borderRadius: 14,
-            padding: 16,
-            marginTop: 6,
-          }}
-        >
-          <Text
-            style={{ color: colors.placeholder, fontSize: 14, lineHeight: 21 }}
-          >
-            {translate('migrationschedule.miss-note') as string}
-          </Text>
-        </View>
       </ScrollView>
 
       <View
@@ -287,8 +269,11 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
           flexDirection: 'row',
           justifyContent: 'space-evenly',
           alignItems: 'center',
-          paddingBottom: 24,
+          paddingVertical: 24,
           paddingHorizontal: 24,
+          backgroundColor: '#050610',
+          borderTopColor: '#202240',
+          borderTopWidth: 1,
         }}
       >
         <Button
