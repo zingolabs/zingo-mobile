@@ -41,17 +41,14 @@ flavor architecture: see [docs/release_quickstart.md](./docs/release_quickstart.
 
 ## Testing
 ### Prerequisites
-Integration tests and end-to-end tests require a regtest server. On linux hosts, these may be run
-locally by installing the lightwalletd, zcashd and zcash-cli binaries
-(https://github.com/zingolabs/zingolib#regtest). From the `rust/android/regtest/bin/` directory run: <br />
-`ln -s path/to/lightwalletd/binary path/to/zcashd/binary path/to/zcash-cli/binary ./` <br />
-From the `rust/android/lightwalletd_bin` directory run: <br />
-`ln -s path/to/lightwalletd/binary ./`
+Integration tests and end-to-end tests require a regtest network. The test harness
+(`zingolib_testutils` scenarios, built on `zcash_local_net`) launches native `zebrad`
+(validator) and `lightwalletd` (indexer) processes for each test, so both binaries must
+be installed and discoverable via `$PATH`, or placed in the directory named by the
+`TEST_BINARIES_DIR` environment variable. This works on both Linux and macOS hosts.
 
-Alternatively, integration tests and end-to-end tests can be run on non-linux hosts with Regchest
-(https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest
-network in a docker container. Before running tests, pull the latest Regchest image from docker: <br />
-`docker pull zingodevops/regchest:013`
+Additionally, from the `rust/android/lightwalletd_bin` directory run: <br />
+`ln -s path/to/lightwalletd/binary ./`
 
 ### Yarn Tests
 1. From the root directory, run: <br />
@@ -85,13 +82,10 @@ commands.
    Specify to run a specific ABI and test: <br />
    `cargo nextest run android_integration::x86_64::test_name`
 
-To run tests with Regchest, add the `--features regchest` flag, for example: <br />
-`cargo nextest run android_integration --features regchest`
-
 For more information on running integration tests on non-default AVDs, run: <br />
 `./scripts/android_integration_tests.sh -h` <br />
 Without the cargo test runner these emulated android devices will not be able to connect to a
-lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
+regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
 
 ### End-to-End Tests (Rust nextest, Android)
 Drives the Android app from Rust against a regtest network. Lives in

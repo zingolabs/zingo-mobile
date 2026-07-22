@@ -109,7 +109,7 @@ jobs:
 
           cd rust
           rustup default stable
-          cargo update -p zingolib -p regchest_utils --aggressive
+          cargo update -p zingolib --aggressive
 
       - name: Cargo default stable
         run: |

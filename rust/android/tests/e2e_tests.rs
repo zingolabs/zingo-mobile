@@ -1,36 +1,13 @@
-#[cfg(not(feature = "regchest"))]
 use zingolib_testutils::scenarios;
 
-// ubuntu ci runner
-#[cfg(all(feature = "ci", feature = "regchest"))]
-const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
-
-// macos ci runner
-//#[cfg(feature = "ci", feature = "regchest")]
-//const UNIX_SOCKET: Option<&str> = Some("`/Users/runner/.colima/default/docker.sock`");
-
 async fn tex_send_address(abi: &str) {
-    #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
-    #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "tex_send_address");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test_ci(abi, "tex_send_address");
-
-    #[cfg(feature = "regchest")]
-    match regchest_utils::close(&docker).await {
-        Ok(_) => (),
-        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
-    }
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -40,26 +17,12 @@ async fn tex_send_address(abi: &str) {
 }
 
 async fn shielding(abi: &str) {
-    #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_transparent_mobileclient(1_000_000).await;
-    #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(UNIX_SOCKET, Some("funded_transparent_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let _local_net = scenarios::funded_transparent_mobileclient(1_000_000).await;
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "shielding");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "shielding");
-
-    #[cfg(feature = "regchest")]
-    match regchest_utils::close(&docker).await {
-        Ok(_) => (),
-        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
-    }
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -69,15 +32,7 @@ async fn shielding(abi: &str) {
 }
 
 async fn parse_invalid_address(abi: &str) {
-    #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
-    #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
@@ -85,12 +40,6 @@ async fn parse_invalid_address(abi: &str) {
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test_ci(abi, "parse_invalid_address");
-
-    #[cfg(feature = "regchest")]
-    match regchest_utils::close(&docker).await {
-        Ok(_) => (),
-        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
-    }
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -100,15 +49,7 @@ async fn parse_invalid_address(abi: &str) {
 }
 
 async fn reload_while_tx_pending(abi: &str) {
-    #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
-    #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
@@ -116,12 +57,6 @@ async fn reload_while_tx_pending(abi: &str) {
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test_ci(abi, "reload_while_tx_pending");
-
-    #[cfg(feature = "regchest")]
-    match regchest_utils::close(&docker).await {
-        Ok(_) => (),
-        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
-    }
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -146,15 +81,7 @@ async fn change_custom_server(abi: &str) {
 }
 
 async fn change_custom_regtest_server(abi: &str) {
-    #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
-    #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
@@ -162,12 +89,6 @@ async fn change_custom_regtest_server(abi: &str) {
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test_ci(abi, "change_custom_regtest_server");
-
-    #[cfg(feature = "regchest")]
-    match regchest_utils::close(&docker).await {
-        Ok(_) => (),
-        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
-    }
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -233,26 +154,12 @@ async fn screen_awake(abi: &str) {
 }
 
 async fn send(abi: &str) {
-    #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
-    #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "send");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "send");
-
-    #[cfg(feature = "regchest")]
-    match regchest_utils::close(&docker).await {
-        Ok(_) => (),
-        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
-    }
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -357,7 +264,6 @@ mod e2e {
         async fn transaction_history() {
             crate::transaction_history(ABI).await;
         }
-
     }
 
     mod x86_64 {
@@ -427,7 +333,6 @@ mod e2e {
         async fn transaction_history() {
             crate::transaction_history(ABI).await;
         }
-
     }
 
     mod arm32 {
@@ -497,7 +402,6 @@ mod e2e {
         async fn transaction_history() {
             crate::transaction_history(ABI).await;
         }
-
     }
 
     mod arm64 {
@@ -567,6 +471,5 @@ mod e2e {
         async fn transaction_history() {
             crate::transaction_history(ABI).await;
         }
-
     }
 }

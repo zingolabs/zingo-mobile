@@ -159,38 +159,8 @@ jobs:
   #       with:
   #         repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-  #     - name: Install docker
-  #       run: |
-  #         set -euxo pipefail
-
-  #         brew install qemu
-  #         brew install docker
-
-  #         brew developer on
-
-  #         brew tap-new local/old-lima || true
-  #         brew extract --version=0.22.0 lima local/old-lima || true
-  #         brew install --build-from-source local/old-lima/lima@0.22.0
-  #         brew pin lima@0.22.0
-
-  #         # Replace limactl with the no-HVF build (if you really need this patch)
-  #         LIMACTL_PATH="$(brew --prefix lima@0.22.0)/bin/limactl"
-  #         sudo curl -L -o "${LIMACTL_PATH}" https://github.com/mikekazakov/lima-nohvf/raw/master/limactl
-  #         sudo chmod +x "${LIMACTL_PATH}"
-
-  #         sudo curl -L -o /usr/local/bin/colima https://github.com/abiosoft/colima/releases/download/v0.7.3/colima-Darwin-arm64
-  #         sudo chmod +x /usr/local/bin/colima
-
-  #         /usr/local/bin/colima version || true
-  #         limactl version || true
-
-  #         brew developer off
-
-  #         colima start --network-address --arch arm64 --vm-type=qemu
-
   #     - name: Grant permissions
   #       run: |
-  #         sudo chmod 777 ~/.colima/default/docker.sock
   #         sudo chmod 777 ./scripts/ci/ios_integration_tests_ci.sh
 
   #     - name: Rust toolchain
@@ -204,9 +174,6 @@ jobs:
   #       with:
   #         tool: nextest
 
-  #     - name: Pull docker image
-  #       run: docker pull zingodevops/regchest:013
-      
   #     - name: Install nvm with node 22.18.0
   #       run: |
   #         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
@@ -236,7 +203,7 @@ jobs:
 
   #     - name: Run IOS integration tests
   #       working-directory: ./rust
-  #       run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
+  #       run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci" --verbose --release
 
   #     - name: Upload IOS test reports (.xcresult)
   #       if: ${{ always() && !cancelled() }}

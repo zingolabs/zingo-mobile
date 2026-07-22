@@ -20,7 +20,7 @@
     "build:beta:release:split": "cd android && ./gradlew assembleBetaRelease -PsplitApk=true && cd ..",
     "build:beta:debug": "cd android && ./gradlew assembleBetaDebug && cd ..",
     "build:beta:debug:split": "cd android && ./gradlew assembleBetaDebug -PsplitApk=true && cd ..",
-    "cargo:update": "cd rust && cargo update -p zingolib -p regchest_utils --aggressive && cd ..",
+    "cargo:update": "cd rust && cargo update -p zingolib --aggressive && cd ..",
     "cargo:clean": "cd rust && cargo clean && cd ..",
     "cargo:check": "cd rust && cargo check && cd ..",
     "rust:android": "node rust/android/build_android.mjs",
