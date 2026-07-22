@@ -17,6 +17,10 @@ jobs:
   js-depcheck:
     uses: ./.github/workflows/js-depcheck.yaml
 
+  android-dependency-analysis:
+    uses: ./.github/workflows/android-dependency-analysis.yaml
+    secrets: inherit
+
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
 

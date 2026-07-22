@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("com.facebook.react")
     id("org.jetbrains.kotlin.android")
+    id("com.autonomousapps.dependency-analysis")
 }
 
 /**
