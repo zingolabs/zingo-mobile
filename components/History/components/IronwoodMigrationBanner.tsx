@@ -205,8 +205,8 @@ const IronwoodMigrationBanner: React.FunctionComponent<
       {/* Warning strip */}
       <View
         style={{
-          backgroundColor: colors.warning.background,
-          borderColor: colors.warning.border,
+          backgroundColor: '#1A1200',
+          borderColor: '#3D2A00',
           borderWidth: 1,
           borderRadius: 10,
           paddingHorizontal: 14,
