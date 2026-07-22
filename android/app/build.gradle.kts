@@ -345,6 +345,11 @@ dependencies {
 
     val workVersion = "2.10.0"
 
+    // notifee brings Guava onto the runtime classpath, which retires the
+    // standalone listenablefuture jar that androidx.work compiles against;
+    // declare Guava here so the compile classpath sees the class too.
+    implementation("com.google.guava:guava:33.3.1-android")
+
     // (Java only)
     implementation("androidx.work:work-runtime:$workVersion")
 

@@ -7,6 +7,12 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Runs from t=0 with no dependencies: catches app-module Kotlin compile
+  # breakage (e.g. classpath conflicts) in a few minutes, long before the
+  # native builds and emulator jobs report.
+  android-kotlin-compile:
+    uses: ./.github/workflows/android-kotlin-compile.yaml
+
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
     secrets: inherit
