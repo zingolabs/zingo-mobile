@@ -96,6 +96,9 @@ data class SyncStatus (
 )
 
 data class Balance (
+    var total_ironwood_balance : Long = 0L,
+    var confirmed_ironwood_balance : Long = 0L,
+    var unconfirmed_ironwood_balance : Long = 0L,
     var total_sapling_balance : Long = 0L,
     var confirmed_sapling_balance : Long = 0L,
     var unconfirmed_sapling_balance : Long = 0L,
@@ -600,17 +603,24 @@ class ExecuteSaplingBalanceFromSeed {
         println("\nValue Transfers:")
         println(valueTranfersJson)
 
-        // Value Transfers
-        // 1. Received in orchard pool =     +500_000
-        // 2. Received in sapling pool =     +250_000
-        // 3. Received in transparent pool = +250_000
-        // 4. Send - 100_000 + 20_000fee =   -110_000
-        // 5. MemoToSelf orchard pool =       -10_000 (send-to-self)
-        // 6. MemoToSelf sapling pool =       -10_000 (send-to-self)
-        // 7. MemoToSelf transparent pool =   -15_000 (send-to-self)
-        // 8. Upgrading sapling pool =        -20_000 (shield)
+        // Value Transfers, on the ironwood-activated regtest chain. Shield
+        // and self-send outputs prefer the Ironwood pool (confirmed policy),
+        // so part of the orchard change and the shielded transparent funds
+        // land in Ironwood rather than Orchard.
+        // 1. Received in orchard pool =         +500_000
+        // 2. Received in sapling pool =         +250_000
+        // 3. Received in transparent pool =     +250_000
+        // 4. Send - 100_000 + 20_000fee =       -120_000
+        // 5. MemoToSelf orchard pool =           -20_000 fee,
+        //    100_000 of orchard change lands in ironwood
+        // 6. MemoToSelf sapling pool =           -10_000 fee
+        // 7. MemoToSelf sapling->transparent =   -15_000 fee,
+        //    100_000 moves to transparent
+        // 8. Shield transparent->ironwood =      -20_000 fee,
+        //    330_000 lands in ironwood
         //
-        // orchard pool     = 710_000
+        // ironwood pool    = 430_000
+        // orchard pool     = 260_000
         // sapling pool     = 125_000
         // transparent pool = 0
 
@@ -619,8 +629,10 @@ class ExecuteSaplingBalanceFromSeed {
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balance.total_orchard_balance).isEqualTo(710000)
-        assertThat(balance.confirmed_orchard_balance).isEqualTo(710000)
+        assertThat(balance.total_ironwood_balance).isEqualTo(430000)
+        assertThat(balance.confirmed_ironwood_balance).isEqualTo(430000)
+        assertThat(balance.total_orchard_balance).isEqualTo(260000)
+        assertThat(balance.confirmed_orchard_balance).isEqualTo(260000)
         assertThat(balance.total_sapling_balance).isEqualTo(125000)
         assertThat(balance.confirmed_sapling_balance).isEqualTo(125000)
         assertThat(balance.confirmed_transparent_balance).isEqualTo(0)
