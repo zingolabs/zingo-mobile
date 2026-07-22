@@ -14,6 +14,9 @@ jobs:
   rust-shear:
     uses: ./.github/workflows/rust-shear.yaml
 
+  js-depcheck:
+    uses: ./.github/workflows/js-depcheck.yaml
+
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
 

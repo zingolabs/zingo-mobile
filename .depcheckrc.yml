@@ -1,0 +1,35 @@
+# Configuration for `yarn depcheck` (also run by CI: js-depcheck.yaml).
+# Every entry here is a verified false positive of depcheck's static
+# analysis, with the reason it must stay installed. Do not add a package
+# without recording why.
+ignores:
+  # Required peer dependency of @react-navigation/native-stack and
+  # @react-navigation/bottom-tabs; imported by them, not by app code.
+  - 'react-native-screens'
+  # Required peer dependency (~7) of @fortawesome/react-native-fontawesome.
+  - '@fortawesome/fontawesome-svg-core'
+  # Babel helper runtime imported by transpiled output, not by source.
+  - '@babel/runtime'
+  # The react-native CLI resolves these at runtime for run/build commands.
+  - '@react-native-community/cli'
+  - '@react-native-community/cli-platform-android'
+  - '@react-native-community/cli-platform-ios'
+  # Resolved via FlatCompat.extends('@react-native') in eslint.config.js.
+  - '@react-native/eslint-config'
+  # Used implicitly by the TypeScript compiler, not imported.
+  - 'typescript'
+  - '@types/react-test-renderer'
+  # Metro resolves `import { Buffer } from 'buffer'` (app/utils/Utils.ts) to
+  # this package; depcheck misreads it as the Node builtin.
+  - 'buffer'
+  # Version overrides, not duplicates: @react-native/eslint-config requests
+  # ft-flow ^2 / react-native ^4, which crash under ESLint 9. These top-level
+  # pins win hoisting so plugin resolution loads the ESLint-9-compatible
+  # majors. Removing them breaks `yarn lint`.
+  - 'eslint-plugin-ft-flow'
+  - 'eslint-plugin-react-native'
+
+# Phantom-dependency detection stays off until the three currently
+# transitive tools (@eslint/eslintrc, jest-environment-node,
+# @react-native/metro-babel-transformer) are declared explicitly.
+skip-missing: true
