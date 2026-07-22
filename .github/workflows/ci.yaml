@@ -6,6 +6,13 @@ on:
     branches: [main, dev, stable]
   workflow_dispatch:
 
+# A new push to a PR supersedes the in-flight run, so cancel it and free its
+# runners; cancelling the caller run also cancels every reusable-workflow job
+# it fanned out. Mainline pushes are never cancelled.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
