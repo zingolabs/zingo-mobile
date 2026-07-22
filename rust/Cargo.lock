@@ -2261,7 +2261,7 @@ dependencies = [
 [[package]]
 name = "pepper-sync"
 version = "0.5.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Fironwood#ba5fdef493264f813ee74e87a7c533f1176f2eb0"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#7e8ba3730cd1a1718b1db68879b51100b723c83d"
 dependencies = [
  "bip32",
  "byteorder",
@@ -2291,7 +2291,7 @@ dependencies = [
  "zcash_protocol",
  "zcash_transparent",
  "zingo-memo",
- "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=feat%2Fironwood)",
+ "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption)",
  "zingo-status",
  "zip32",
 ]
@@ -3735,6 +3735,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-socks"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7e2948f60dbe26b35f2c7fb74ac2854c1fddded0fe9d7548fcc674a246f7615"
+dependencies = [
+ "either",
+ "futures-util",
+ "thiserror 1.0.69",
+ "tokio",
+]
+
+[[package]]
 name = "tokio-stream"
 version = "0.1.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5005,7 +5017,7 @@ source = "git+https://github.com/zingolabs/infrastructure.git?rev=537f84d3d81b22
 [[package]]
 name = "zingo-memo"
 version = "0.1.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Fironwood#ba5fdef493264f813ee74e87a7c533f1176f2eb0"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#7e8ba3730cd1a1718b1db68879b51100b723c83d"
 dependencies = [
  "zcash_address",
  "zcash_encoding",
@@ -5030,21 +5042,25 @@ dependencies = [
 [[package]]
 name = "zingo-netutils"
 version = "5.0.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Fironwood#ba5fdef493264f813ee74e87a7c533f1176f2eb0"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#7e8ba3730cd1a1718b1db68879b51100b723c83d"
 dependencies = [
  "http",
+ "hyper-util",
  "lightwallet-protocol",
  "rustls 0.23.42",
  "thiserror 2.0.19",
+ "tokio",
  "tokio-rustls",
+ "tokio-socks",
  "tokio-stream",
  "tonic",
+ "tower",
 ]
 
 [[package]]
 name = "zingo-price"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Fironwood#ba5fdef493264f813ee74e87a7c533f1176f2eb0"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#7e8ba3730cd1a1718b1db68879b51100b723c83d"
 dependencies = [
  "byteorder",
  "reqwest",
@@ -5059,7 +5075,7 @@ dependencies = [
 [[package]]
 name = "zingo-status"
 version = "0.2.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Fironwood#ba5fdef493264f813ee74e87a7c533f1176f2eb0"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#7e8ba3730cd1a1718b1db68879b51100b723c83d"
 dependencies = [
  "byteorder",
  "zcash_protocol",
@@ -5082,7 +5098,7 @@ source = "git+https://github.com/zingolabs/infrastructure.git?rev=537f84d3d81b22
 [[package]]
 name = "zingolib"
 version = "5.0.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Fironwood#ba5fdef493264f813ee74e87a7c533f1176f2eb0"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#7e8ba3730cd1a1718b1db68879b51100b723c83d"
 dependencies = [
  "append-only-vec",
  "bech32",
@@ -5129,7 +5145,7 @@ dependencies = [
  "zcash_protocol",
  "zcash_transparent",
  "zingo-memo",
- "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=feat%2Fironwood)",
+ "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption)",
  "zingo-price",
  "zingo-status",
  "zingo_common_components",
@@ -5140,7 +5156,7 @@ dependencies = [
 [[package]]
 name = "zingolib_testutils"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Fironwood#ba5fdef493264f813ee74e87a7c533f1176f2eb0"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#7e8ba3730cd1a1718b1db68879b51100b723c83d"
 dependencies = [
  "http",
  "nonempty",
@@ -5152,7 +5168,7 @@ dependencies = [
  "zcash_local_net",
  "zcash_primitives",
  "zcash_protocol",
- "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=feat%2Fironwood)",
+ "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption)",
  "zingo_common_components",
  "zingo_test_vectors",
  "zingolib",
