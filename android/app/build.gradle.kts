@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("com.facebook.react")
     id("org.jetbrains.kotlin.android")
+    id("com.autonomousapps.dependency-analysis")
 }
 
 /**
@@ -326,7 +327,6 @@ dependencies {
     androidTestImplementation("com.wix:detox:20.51.4")
     implementation("androidx.appcompat:appcompat:1.7.0")
 
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation(project(":react-native-device-info")) {
         exclude(group = "com.google.firebase")
         exclude(group = "com.google.android.gms")
@@ -334,8 +334,9 @@ dependencies {
     }
     implementation("com.facebook.soloader:soloader:0.10.5")
 
-    // Detox tests getAttributes() needs this
-    debugImplementation("com.google.android.material:material:1.12.0")
+    // Detox tests getAttributes() reaches this by reflection at runtime, so
+    // it is runtime-only: no source references exist for compile analysis.
+    debugRuntimeOnly("com.google.android.material:material:1.12.0")
 
     // Hermes is always enabled in RN 0.74+
     implementation("com.facebook.react:hermes-android")
@@ -343,24 +344,26 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${rootProject.extra["kotlinVersion"] as String}")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
+    // Coroutines are used directly (CoroutineScope/Dispatchers in RPCModule
+    // and the JVM unit tests), so the dependency is declared here rather
+    // than borrowed from another library's dependency graph.
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+
+    // Nullability/threading annotations referenced by app sources.
+    implementation("androidx.annotation:annotation:1.8.1")
+
     val workVersion = "2.10.0"
 
-    // notifee brings Guava onto the runtime classpath, which retires the
-    // standalone listenablefuture jar that androidx.work compiles against;
-    // declare Guava here so the compile classpath sees the class too.
+    // BackgroundSyncWorker consumes the ListenableFuture WorkManager
+    // returns, so the class's provider must be declared, not borrowed from
+    // work-runtime's dependency graph. With notifee bringing Guava onto the
+    // runtime classpath, Guava's metadata retires the standalone
+    // listenablefuture jar (the empty 9999.0 placeholder supersedes 1.0),
+    // so Guava itself is the only real provider left.
     implementation("com.google.guava:guava:33.3.1-android")
 
-    // (Java only)
     implementation("androidx.work:work-runtime:$workVersion")
-
-    // Kotlin + coroutines
-    implementation("androidx.work:work-runtime-ktx:$workVersion")
-
-    // optional - RxJava2 support
-    implementation("androidx.work:work-rxjava2:$workVersion")
-
-    // optional - Test helpers
-    androidTestImplementation("androidx.work:work-testing:$workVersion")
 
     // optional - Multiprocess support
     implementation("androidx.work:work-multiprocess:$workVersion")
@@ -368,23 +371,24 @@ dependencies {
     // google truth testing framework
     androidTestImplementation("com.google.truth:truth:1.1.3")
 
-    // JSON parsing
+    // JSON parsing: the Kotlin module plus the core/databind classes the
+    // sources use directly (ObjectMapper, JsonNode, and friends).
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.18.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
 
     // JVM unit tests for pure logic (no device or emulator)
     testImplementation("junit:junit:4.13.2")
 
-    // JUnit test runners
+    // JUnit test runners; the instrumented sources use the JUnit 4 API and
+    // the androidx.test runner/rules directly.
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
-
-    // Kotlin extensions for androidx.test.ext.junit
-    androidTestImplementation("androidx.test.ext:junit-ktx:1.2.1")
+    androidTestImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test:rules:1.7.0")
+    androidTestImplementation("androidx.test:runner:1.7.0")
 
     // uniffi needs this
     implementation("net.java.dev.jna:jna:5.18.1@aar")
-
-    // back navigation implementation
-    implementation("androidx.activity:activity:1.10.1")
 
     // encrypted file storage
     implementation("androidx.security:security-crypto:1.0.0")
