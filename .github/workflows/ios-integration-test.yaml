@@ -13,7 +13,11 @@ env:
 
 jobs:
   build-for-testing:
-    runs-on: zingo-ios-build-12
+    # Stock runners, deliberately: the huge macos-15 fleet queues in seconds,
+    # while the max-4 zingo-ios-build-12 pool is left to the xcframework
+    # build alone. The xcodebuild destination pins no arch (see the
+    # build-for-testing step), so Apple-silicon stock runners are fine.
+    runs-on: macos-15
     steps:
       - name: Xcode 16.4
         uses: maxim-lobanov/setup-xcode@v1
