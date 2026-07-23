@@ -1,0 +1,13 @@
+[package]
+name = "workbench"
+version = "0.1.0"
+edition = "2021"
+description = "Developer and CI tooling for zingo-mobile."
+publish = false
+
+[dependencies]
+serde_json = { workspace = true }
+
+[[bin]]
+name = "ci-gate"
+path = "src/main.rs"

@@ -13,3 +13,4 @@ zingolib_testutils = { workspace = true }
 zingomobile_utils = { workspace = true }
 regchest_utils = { workspace = true }
 tokio = { workspace = true }
+zcash_local_net = { git = "https://github.com/zingolabs/infrastructure.git", rev = "537f84d3d81b228c06ae82365f306ff364e164da" }

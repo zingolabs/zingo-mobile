@@ -6,26 +6,55 @@ on:
     branches: [main, dev, stable]
   workflow_dispatch:
 
+# A new push to a PR supersedes the in-flight run, so cancel it and free its
+# runners; cancelling the caller run also cancels every reusable-workflow job
+# it fanned out. Mainline pushes are never cancelled.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# actions: write lets the fail-all steps in the blocking jobs cancel this
+# run, and lets ci-gate read the run's artifact and job listings. Fork
+# PRs get a read-only token regardless; there the cancel step fails
+# harmlessly inside an already-failing job.
+permissions:
+  contents: read
+  actions: write
+
 jobs:
+  # Every blocking check opts into fail-all: its first failure cancels
+  # the whole run (see CONTEXT.md). Nightly leaves fail-all off to keep
+  # the complete picture.
+
   # Runs from t=0 with no dependencies: catches app-module Kotlin compile
   # breakage (e.g. classpath conflicts) in a few minutes, long before the
   # native builds and emulator jobs report.
   android-kotlin-compile:
     uses: ./.github/workflows/android-kotlin-compile.yaml
+    with:
+      fail-all: true
 
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
     secrets: inherit
+    with:
+      fail-all: true
 
   rust-shear:
     uses: ./.github/workflows/rust-shear.yaml
+    with:
+      fail-all: true
 
   js-depcheck:
     uses: ./.github/workflows/js-depcheck.yaml
+    with:
+      fail-all: true
 
   android-dependency-analysis:
     uses: ./.github/workflows/android-dependency-analysis.yaml
     secrets: inherit
+    with:
+      fail-all: true
 
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
@@ -33,24 +62,40 @@ jobs:
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
 
+  # PR CI covers the primary target only (x86_64 / API 34). The full ABI
+  # matrix, the x86 / API 29 lane, and the whole iOS pipeline — whose
+  # macOS-runner queue dominated PR wall-clock — run on ci-nightly.
   android-build:
     strategy:
       matrix:
-        arch: [ x86_64, x86, arm64-v8a, armeabi-v7a ]
+        arch: [ x86_64 ]
     uses: ./.github/workflows/android-build.yaml
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
+      fail-all: true
 
+  android-apk-build:
+    uses: ./.github/workflows/android-apk-build.yaml
+    needs: [create-cache-key, android-build]
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      abi: x86_64
+      fail-all: true
+
+  # Deliberately NO needs-edge on android-apk-build: the buckets start
+  # at workflow launch, front-load all APK-independent setup, and hold
+  # at the ci-gate artifact gate until the APK artifact lands (or abort
+  # when the APK build concludes without success). This overlaps ~10
+  # minutes of bucket setup with the build path.
   android-ubuntu-integration-test-ci:
     strategy:
       matrix:
         config:
           - { abi: x86_64, api-level: 34, target: default }
-          - { abi: x86, api-level: 29, target: default }
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, create-cache-key, android-build]
+    needs: [create-timestamp, create-cache-key]
     secrets: inherit
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
@@ -58,12 +103,26 @@ jobs:
       abi: ${{ matrix.config.abi }}
       api-level: ${{ matrix.config['api-level'] }}
       target: ${{ matrix.config.target }}
+      fail-all: true
 
+  # iOS runs per-PR as a trailing, advisory stage: it starts only after
+  # every blocking check has passed, so the fast path's verdict is never
+  # delayed by the macOS-runner queue and a red fast path skips iOS
+  # entirely. Advisory mode records iOS failures without failing the PR;
+  # ci-nightly remains the enforced iOS gate.
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
-    needs: create-cache-key
+    needs:
+      - android-kotlin-compile
+      - jest-test
+      - rust-shear
+      - js-depcheck
+      - android-dependency-analysis
+      - create-cache-key
+      - android-ubuntu-integration-test-ci
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      advisory: true
 
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
@@ -71,3 +130,4 @@ jobs:
     secrets: inherit
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      advisory: true
