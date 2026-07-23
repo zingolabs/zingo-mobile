@@ -162,7 +162,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, totalBalance, info } = context;
   const { colors } = useTheme() as ThemeType;
-  const [selected, setSelected] = useState<StrategyOption>('now');
+  const [selected, setSelected] = useState<StrategyOption>('private');
 
   // Leaving the migration flow returns to Home. Reset (not goBack) so the
   // one-way onboarding/migration stack isn't left underneath to return to.

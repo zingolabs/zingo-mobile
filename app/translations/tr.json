@@ -828,7 +828,18 @@
     "inflight-splitting": "Notlarınız bölünüyor — bitirmek için Devam’a dokunun.",
     "inflight-progress": "{total} nottan {confirmed} tanesi taşındı.",
     "inflight-left": "Orchard’da kalan:",
-    "continue": "Devam"
+    "continue": "Devam",
+    "details": "Ayrıntılar",
+    "batches-label": "Gruplar",
+    "batches-value": "{confirmed} / {total} tamamlandı",
+    "next-action-label": "Sonraki işlem",
+    "next-in-blocks": "{blocks} blok sonra {n}. grup",
+    "next-send-now": "{n}. grubu gönder",
+    "next-splitting": "Bölmeyi tamamla",
+    "next-all-sent": "Tüm gruplar gönderildi",
+    "status-pending": "Beklemede",
+    "status-ready": "Hazır",
+    "status-splitting": "Bölünüyor"
   },
   "migrationstrategy": {
     "title": "Geçiş Stratejisi",

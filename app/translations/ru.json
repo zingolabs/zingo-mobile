@@ -828,7 +828,18 @@
     "inflight-splitting": "Разделяем ваши ноты — нажмите «Продолжить», чтобы завершить.",
     "inflight-progress": "{confirmed} из {total} нот мигрировано.",
     "inflight-left": "Осталось в Orchard:",
-    "continue": "Продолжить"
+    "continue": "Продолжить",
+    "details": "Подробнее",
+    "batches-label": "Партии",
+    "batches-value": "{confirmed} из {total} завершено",
+    "next-action-label": "Следующее действие",
+    "next-in-blocks": "Партия {n} через ~{blocks} блоков",
+    "next-send-now": "Отправить партию {n}",
+    "next-splitting": "Завершить разделение",
+    "next-all-sent": "Все партии отправлены",
+    "status-pending": "Ожидание",
+    "status-ready": "Готово",
+    "status-splitting": "Разделение"
   },
   "migrationstrategy": {
     "title": "Стратегия миграции",

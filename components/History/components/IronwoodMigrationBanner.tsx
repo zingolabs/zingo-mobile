@@ -8,7 +8,12 @@ import { ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
 import { RouteEnum } from '../../../app/AppState';
 import { migrationStatus } from '../../../app/walletBackend';
-import { RPCMigrationStatusType } from '../../../app/walletBackend/types/RPCMigrationStatusType';
+import {
+  RPCMigrationStatusType,
+  RPCWakePointType,
+} from '../../../app/walletBackend/types/RPCMigrationStatusType';
+
+const ZATS_PER_ZEC = 10 ** 8;
 
 type IronwoodMigrationBannerProps = {
   // Orchard balance still sitting in the pool, in ZEC.
@@ -58,7 +63,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   IronwoodMigrationBannerProps
 > = ({ amount, currencyName, onStart, onResume }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { translate, info } = context;
   const { colors } = useTheme() as ThemeType;
 
   const [migration, setMigration] = useState<RPCMigrationStatusType | null>(
@@ -103,91 +108,257 @@ const IronwoodMigrationBanner: React.FunctionComponent<
 
   // ----- In-flight variant -----
   if (inFlight && migration) {
+    const splitting = phaseKind === 'note_splitting';
     const resumeRoute =
       phaseKind === 'parts_scheduled'
         ? RouteEnum.MigrationStatus
         : RouteEnum.MigrationSplitting;
+
+    // Batches (windows) rather than raw parts: a batch counts as confirmed once
+    // all its parts do (floor division), mirroring the MigrationStatus screen.
+    const perBucket = Math.max(1, migration.per_bucket ?? 1);
+    const batchesTotal = Math.max(
+      1,
+      Math.ceil(migration.parts_total / perBucket),
+    );
+    const batchesConfirmed = Math.min(
+      batchesTotal,
+      Math.floor(migration.parts_confirmed / perBucket),
+    );
+
+    // Value-migrated drives the bar, matching the MigrationStatus screen's
+    // canonical progress figure.
+    const pct =
+      migration.value_total > 0
+        ? Math.round((migration.value_migrated / migration.value_total) * 100)
+        : 0;
+
     const orchardLeftStr = `${Utils.parseNumberFloatToStringLocale(
-      migration.orchard_confirmed_spendable / 10 ** 8,
+      migration.orchard_confirmed_spendable / ZATS_PER_ZEC,
       4,
     )} ${currencyName}`;
-    const progress = (translate('ironwoodbanner.inflight-progress') as string)
-      .replace('{confirmed}', String(migration.parts_confirmed))
-      .replace('{total}', String(migration.parts_total));
+
+    // A batch is ready to send exactly when the backend reports a due batch:
+    // the window the chain is currently inside, which next_wakes cannot carry.
+    // next_wakes stays the source for the "waiting N blocks" countdown to the
+    // next scheduled window.
+    const height = info?.latestBlock ?? 0;
+    const wakes: RPCWakePointType[] = migration.next_wakes ?? [];
+    const nextWake = wakes[0];
+    const blocksUntil = nextWake ? Math.max(0, nextWake.boundary - height) : 0;
+    const ready = migration.due_now != null;
+
+    // Status pill (dot + word): Splitting while notes split, Ready when a batch
+    // can be sent now, Pending while the next window is still ahead.
+    const statusKind = splitting
+      ? 'splitting'
+      : ready
+        ? 'ready'
+        : 'pending';
+    const statusColor =
+      statusKind === 'ready'
+        ? colors.primary
+        : statusKind === 'splitting'
+          ? colors.syncing
+          : colors.warning.primary;
+    const statusLabel = translate(
+      `ironwoodbanner.status-${statusKind}`,
+    ) as string;
+
+    const batchesValue = (translate('ironwoodbanner.batches-value') as string)
+      .replace('{confirmed}', String(batchesConfirmed))
+      .replace('{total}', String(batchesTotal));
+
+    // Next action: keep splitting, send the ready batch, or wait N blocks for
+    // the next window. Amber (warning) while waiting, green (primary) to act.
+    const nextActionText = splitting
+      ? (translate('ironwoodbanner.next-splitting') as string)
+      : ready
+        ? (translate('ironwoodbanner.next-send-now') as string).replace(
+            '{n}',
+            String(batchesConfirmed + 1),
+          )
+        : !nextWake
+          ? (translate('ironwoodbanner.next-all-sent') as string)
+          : (translate('ironwoodbanner.next-in-blocks') as string)
+              .replace('{n}', String(batchesConfirmed + 1))
+              .replace('{blocks}', String(blocksUntil));
+    const nextActionActive = !splitting && (ready || !nextWake);
+    const nextActionColor = nextActionActive
+      ? colors.primary
+      : colors.warning.primary;
 
     return (
-      <View style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 18 }}>
-        <View
+      <View style={{ paddingHorizontal: 12, paddingTop: 6, paddingBottom: 12 }}>
+        <TouchableOpacity
+          testID="ironwoodbanner.resume"
+          activeOpacity={0.85}
+          onPress={() => onResume(resumeRoute)}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
             backgroundColor: colors.bottomSheetBackground,
             borderColor: colors.bottomSheetBorder,
             borderWidth: 1,
-            borderRadius: 12,
-            paddingHorizontal: 16,
-            paddingVertical: 14,
+            borderRadius: 16,
+            paddingHorizontal: 18,
+            paddingVertical: 12,
           }}
         >
-          <View style={{ flex: 1, marginRight: 12 }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: 6,
-              }}
-            >
-              <View
-                style={{
-                  width: 9,
-                  height: 9,
-                  borderRadius: 5,
-                  backgroundColor: colors.primary,
-                  marginRight: 8,
-                }}
-              />
-              <Text
-                style={{ color: colors.text, fontSize: 15, fontWeight: '700' }}
-              >
-                {translate('ironwoodbanner.inflight-title') as string}
-              </Text>
-            </View>
-            <Text style={{ color: colors.placeholder, fontSize: 13 }}>
-              {phaseKind === 'parts_scheduled'
-                ? progress
-                : (translate('ironwoodbanner.inflight-splitting') as string)}
-            </Text>
-            <Text style={{ color: colors.placeholder, fontSize: 13 }}>
-              {translate('ironwoodbanner.inflight-left') as string}{' '}
-              <Text style={{ color: colors.text, fontWeight: '700' }}>
-                {orchardLeftStr}
-              </Text>
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            testID="ironwoodbanner.resume"
-            onPress={() => onResume(resumeRoute)}
-            activeOpacity={0.8}
+          {/* Header: title + Details link */}
+          <View
             style={{
-              backgroundColor: colors.primary,
-              borderRadius: 24,
-              paddingHorizontal: 22,
-              paddingVertical: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 10,
             }}
           >
             <Text
               style={{
-                color: colors.background,
-                fontSize: 15,
+                color: colors.placeholder,
+                fontSize: 14,
                 fontWeight: '700',
               }}
             >
-              {translate('ironwoodbanner.continue') as string}
+              {translate('ironwoodbanner.inflight-title') as string}
             </Text>
-          </TouchableOpacity>
-        </View>
+            <Text
+              style={{
+                color: colors.placeholder,
+                fontSize: 12,
+                textDecorationLine: 'underline',
+              }}
+            >
+              {translate('ironwoodbanner.details') as string}
+            </Text>
+          </View>
+
+          {/* Progress bar + percentage */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: 10,
+            }}
+          >
+            <View
+              style={{
+                flex: 1,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: colors.bottomSheetBorder,
+                overflow: 'hidden',
+                marginRight: 14,
+              }}
+            >
+              <View
+                style={{
+                  width: `${pct}%`,
+                  height: '100%',
+                  borderRadius: 4,
+                  backgroundColor: colors.primary,
+                }}
+              />
+            </View>
+            <Text
+              style={{
+                color: colors.primary,
+                fontSize: 17,
+                fontWeight: '800',
+              }}
+            >
+              {pct}%
+            </Text>
+          </View>
+
+          <View
+            style={{
+              height: 1,
+              backgroundColor: colors.bottomSheetBorder,
+              marginBottom: 10,
+            }}
+          />
+
+          {/* Batches */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 8,
+            }}
+          >
+            <Text style={{ color: colors.placeholder, fontSize: 13 }}>
+              {translate('ironwoodbanner.batches-label') as string}
+            </Text>
+            <Text
+              style={{ color: colors.text, fontSize: 14, fontWeight: '700' }}
+            >
+              {batchesValue}
+            </Text>
+          </View>
+
+          {/* Next action */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 8,
+            }}
+          >
+            <Text style={{ color: colors.placeholder, fontSize: 13 }}>
+              {translate('ironwoodbanner.next-action-label') as string}
+            </Text>
+            <View
+              style={{
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+                borderRadius: 12,
+                backgroundColor: `${nextActionColor}22`,
+                flexShrink: 1,
+              }}
+            >
+              <Text
+                style={{
+                  color: nextActionColor,
+                  fontSize: 12,
+                  fontWeight: '700',
+                }}
+              >
+                {nextActionText}
+              </Text>
+            </View>
+          </View>
+
+          {/* Status + amount left */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: statusColor,
+                  marginRight: 8,
+                }}
+              />
+              <Text
+                style={{ color: colors.text, fontSize: 14, fontWeight: '700' }}
+              >
+                {statusLabel}
+              </Text>
+            </View>
+            <Text style={{ color: colors.text, fontSize: 14 }}>
+              {orchardLeftStr}
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
     );
   }

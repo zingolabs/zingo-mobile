@@ -131,12 +131,36 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
       : 0;
 
   const nextWake = wakes[0];
-  // A window is "open" once the chain reaches its boundary; before that the
-  // batch is still scheduled and only its reminder will bring the user back.
-  const nextOpen = !!nextWake && height >= nextWake.boundary;
-  // The batch the user can send right now: the earliest window whose boundary
-  // the chain has reached. `undefined` when nothing is due yet.
-  const openWake = wakes.find(wake => height >= wake.boundary);
+  // The batch to send right now: the window the chain is currently inside,
+  // reported by the backend. next_wakes lists only future windows and cannot
+  // carry this one, so the Send action reads it from here. Null means a tap
+  // would broadcast nothing, so the action stays hidden.
+  const dueNow = status?.due_now ?? null;
+
+  // One card per visible batch: the open one (dueNow) first, then the upcoming
+  // scheduled windows. Batch numbers continue from the confirmed count so
+  // "Batch 3" means the same here as on the plan screen.
+  const nextWakeBase = batchesConfirmed + (dueNow ? 2 : 1);
+  const batchCards = [
+    ...(dueNow
+      ? [
+          {
+            key: 'due',
+            n: batchesConfirmed + 1,
+            denominations: dueNow.denominations,
+            anchor: dueNow.boundary,
+            open: true,
+          },
+        ]
+      : []),
+    ...wakes.map((wake, i) => ({
+      key: `w${wake.bucket_index}`,
+      n: nextWakeBase + i,
+      denominations: wake.denominations,
+      anchor: wake.boundary,
+      open: false,
+    })),
+  ];
 
   const progressLine = (translate('migrationstatus.progress') as string)
     .replace('{confirmed}', String(batchesConfirmed))
@@ -145,16 +169,16 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
 
   // The info box: the "**…**"-wrapped boundary is emphasized, so one string
   // keeps its natural word order across locales.
-  const nextLine = nextWake
-    ? nextOpen
-      ? (translate('migrationstatus.next-open-now') as string).replace(
-          '{n}',
-          String(batchesConfirmed + 1),
-        )
-      : (translate('migrationstatus.next-opens') as string)
+  const nextLine = dueNow
+    ? (translate('migrationstatus.next-open-now') as string).replace(
+        '{n}',
+        String(batchesConfirmed + 1),
+      )
+    : nextWake
+      ? (translate('migrationstatus.next-opens') as string)
           .replace('{boundary}', String(nextWake.boundary))
           .replace('{height}', String(height))
-    : (translate('migrationstatus.all-sent') as string);
+      : (translate('migrationstatus.all-sent') as string);
   const remindersLine = (
     translate('migrationstatus.reminders') as string
   ).replace('{n}', String(wakes.length));
@@ -239,12 +263,12 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           )}
         </View>
 
-        {/* One card per upcoming window (batch) */}
-        {wakes.map((wake: RPCWakePointType, i: number) => {
-          const open = height >= wake.boundary;
+        {/* One card per batch: the open one (dueNow) first, then upcoming. */}
+        {batchCards.map(card => {
+          const open = card.open;
           return (
             <View
-              key={wake.bucket_index}
+              key={card.key}
               style={{
                 borderWidth: 1,
                 borderColor: colors.bottomSheetBorder,
@@ -267,7 +291,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                 >
                   {(translate('migrationstatus.batch') as string).replace(
                     '{n}',
-                    String(batchesConfirmed + i + 1),
+                    String(card.n),
                   )}
                 </Text>
                 {/* SCHEDULED until the window opens, then OPEN in the accent. */}
@@ -301,7 +325,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                   marginBottom: 12,
                 }}
               >
-                {wake.denominations.map((denomination: number, d: number) => (
+                {card.denominations.map((denomination: number, d: number) => (
                   <View
                     key={d}
                     style={{
@@ -329,8 +353,8 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                 }}
               >
                 {(translate('migrationstatus.tech-line') as string)
-                  .replace('{anchor}', String(wake.boundary))
-                  .replace('{sendby}', String(wake.boundary + bucketModulus))}
+                  .replace('{anchor}', String(card.anchor))
+                  .replace('{sendby}', String(card.anchor + bucketModulus))}
               </Text>
             </View>
           );
@@ -348,8 +372,8 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
         </Text>
       </ScrollView>
 
-      {openWake ? (
-        // A window is open: sending it is the primary action, Back is demoted.
+      {dueNow ? (
+        // A batch is due: sending it is the primary action, Back is demoted.
         <View
           style={{
             flexDirection: 'row',
@@ -372,7 +396,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             title={translate('migrationstatus.send') as string}
             onPress={() =>
               navigation.navigate(RouteEnum.MigrationBatchSending, {
-                denominations: openWake.denominations,
+                denominations: dueNow.denominations,
               })
             }
             twoButtons={true}

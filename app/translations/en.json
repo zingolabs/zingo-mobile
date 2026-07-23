@@ -807,8 +807,8 @@
     "title2": "How the move works",
     "orchard": "ORCHARD",
     "ironwood": "IRONWOOD",
-    "step1-body-1": "**NU6.3** introduces the new **Ironwood** pool and seals the **Orchard** pool. After the upgrade, funds can no longer move within Orchard.",
-    "step1-body-2": "Move your Orchard funds to **Ironwood** now to keep them spendable, with stronger formally-verified privacy and a smoother path to future quantum security.",
+    "step1-body-1": "**Ironwood** is a new, more private home for your Zcash. Its privacy is mathematically proven to work.",
+    "step1-body-2": "After the **NU6.3** upgrade, the old **Orchard** pool stops taking in new funds, and new payments go to Ironwood. Move your Orchard balance to Ironwood.",
     "phase1-label": "PHASE 1 - SPLIT",
     "phase1-body": "**Phase 1 — Split.** A quick internal transaction standardizes your balances to protect your privacy.",
     "phase2-label": "PHASE 2 - SEND IN BATCHES",
@@ -819,16 +819,27 @@
     "close": "Close"
   },
   "ironwoodbanner": {
-    "warning": "After **NU6.3**, funds can't move inside the Orchard pool. **{amount}** needs to migrate to Ironwood.",
+    "warning": "**NU6.3** has activated. Your Orchard **{amount}** need to migrate to Ironwood.",
     "pool": "Orchard",
     "at-risk": "at risk",
     "balance": "Balance:",
     "start": "Start",
-    "inflight-title": "Migration in progress",
+    "inflight-title": "Migration in Progress",
     "inflight-splitting": "Splitting your notes — tap Continue to finish.",
     "inflight-progress": "{confirmed} of {total} notes migrated.",
     "inflight-left": "Left in Orchard:",
-    "continue": "Continue"
+    "continue": "Continue",
+    "details": "Details",
+    "batches-label": "Batches",
+    "batches-value": "{confirmed} of {total} completed",
+    "next-action-label": "Next action",
+    "next-in-blocks": "Batch {n} in ~{blocks} blocks",
+    "next-send-now": "Send batch {n}",
+    "next-splitting": "Finish splitting",
+    "next-all-sent": "All batches sent",
+    "status-pending": "Pending",
+    "status-ready": "Ready",
+    "status-splitting": "Splitting"
   },
   "migrationstrategy": {
     "title": "Migration Strategy",
@@ -960,7 +971,7 @@
     "tech-line": "anchor {anchor} · send by {sendby}",
     "footer": "Reminders never send for you. You send each batch from here when its window is open.",
     "back": "Back to wallet",
-    "send": "Send batch now"
+    "send": "Send batch"
   },
   "migrationbatchsending": {
     "title": "Sending batch",

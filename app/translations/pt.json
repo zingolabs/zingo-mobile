@@ -828,7 +828,18 @@
     "inflight-splitting": "Dividindo suas notas — toque em Continuar para terminar.",
     "inflight-progress": "{confirmed} de {total} notas migradas.",
     "inflight-left": "Resta na Orchard:",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "details": "Detalhes",
+    "batches-label": "Lotes",
+    "batches-value": "{confirmed} de {total} concluídos",
+    "next-action-label": "Próxima ação",
+    "next-in-blocks": "Lote {n} em ~{blocks} blocos",
+    "next-send-now": "Enviar lote {n}",
+    "next-splitting": "Concluir divisão",
+    "next-all-sent": "Todos os lotes enviados",
+    "status-pending": "Pendente",
+    "status-ready": "Pronto",
+    "status-splitting": "Dividindo"
   },
   "migrationstrategy": {
     "title": "Estratégia de migração",
