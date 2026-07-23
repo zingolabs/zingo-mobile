@@ -346,8 +346,17 @@ else
     adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
 
     echo -e "\nRunning integration tests..."
+    # The launched chain's activation-heights spec, exported by the host
+    # test harness; the on-device tests build their regtest chain hint
+    # from it.
+    activation_heights_args=()
+    if [ -n "${ACTIVATION_HEIGHTS:-}" ]; then
+        activation_heights_args=(-e activation_heights "${ACTIVATION_HEIGHTS}")
+    fi
+
     adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.$test_name \
         -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output \
+        "${activation_heights_args[@]}" \
         -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
         | tee "${test_report_dir}/test_results.txt"
 
