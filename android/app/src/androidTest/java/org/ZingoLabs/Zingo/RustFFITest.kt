@@ -1,5 +1,6 @@
 package org.ZingoLabs.Zingo
 
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.experimental.categories.Category
@@ -12,6 +13,18 @@ import com.fasterxml.jackson.core.type.TypeReference
 // Jackson can use the no-arg constructor + setter injection.
 fun testMapper(): ObjectMapper = ObjectMapper()
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+// The regtest chain hint for the wallet under test. The host harness reads
+// the launched chain's activation heights back from the running validator
+// and forwards them as the `activation_heights` instrumentation argument
+// (see scripts/android_integration_tests.sh); the extended hint hands them
+// to the FFI so the wallet's schedule is the chain's, never a guess. With
+// no argument (a chain whose provisioner cannot report a schedule) the
+// bare hint keeps the FFI's historical default.
+fun regtestChainHint(): String {
+    val heights = InstrumentationRegistry.getArguments().getString("activation_heights")
+    return if (heights.isNullOrEmpty()) "regtest" else "regtest:$heights"
+}
 
 inline fun <reified T> ObjectMapper.readValue(src: String): T =
     readValue(src, object : TypeReference<T>() {})
@@ -150,7 +163,7 @@ class ExecuteAddressesFromSeed {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -198,7 +211,7 @@ class ExecuteAddressesFromUfvk {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val ufvk = Ufvk.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -249,7 +262,7 @@ class ExecuteVersionFromSeed {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -284,7 +297,7 @@ class ExecuteSyncFromSeed {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -350,7 +363,7 @@ class ExecuteSendFromOrchard {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -465,7 +478,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -553,7 +566,7 @@ class ExecuteSaplingBalanceFromSeed {
         val rpcModule = RPCModule(MainApplication.getAppReactContext())
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -665,7 +678,7 @@ class ExecuteParseAddressForTex {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -711,7 +724,7 @@ class ExecuteParseAddressInvalid {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
