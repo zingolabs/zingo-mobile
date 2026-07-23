@@ -1715,12 +1715,12 @@
     invariant "^2.2.4"
     nullthrows "^1.1.1"
 
-"@react-navigation/bottom-tabs@^7.18.3":
-  version "7.18.3"
-  resolved "https://registry.yarnpkg.com/@react-navigation/bottom-tabs/-/bottom-tabs-7.18.3.tgz#371c39aee03aa90979d64e8d97da78559fbbcc92"
-  integrity sha512-715guj97M1yklVkN9ikUl6KJL9wO6hNot7URyUm+A1r5ltEHVgahKTgR8w7e4dNwiMjUjAnOdSErR0LaX1h+kQ==
+"@react-navigation/bottom-tabs@^7.18.7":
+  version "7.18.7"
+  resolved "https://registry.yarnpkg.com/@react-navigation/bottom-tabs/-/bottom-tabs-7.18.7.tgz#fae8398aae17896952ec8082be85a9f938764645"
+  integrity sha512-c3E15wXMyAjuLmDrafKUAfXQFS5M0QMpWbRqlGTw62iSyjrwZxVEGyJ0dD0xlckAJSRUYl2Di68QKWi61aePMg==
   dependencies:
-    "@react-navigation/elements" "^2.9.26"
+    "@react-navigation/elements" "^2.9.29"
     color "^4.2.3"
     sf-symbols-typescript "^2.1.0"
 
@@ -1738,21 +1738,21 @@
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
-"@react-navigation/elements@^2.9.26":
-  version "2.9.29"
-  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.29.tgz#bcb56e14b8e26b2c908ca961de2c47fc8222a32c"
-  integrity sha512-+QpClRQacrwqr4cbHcURJwspuJ6Rmi4GlFQZgqldexDV9e3ZuyGzYNYuIDp2pIBtEKXS18oTGcsdd9XHBaGNnA==
+"@react-navigation/elements@^2.9.29":
+  version "2.9.30"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.30.tgz#60702877319f06c20b15e3f98446dcc994c67cff"
+  integrity sha512-2isleieiRMmP4WNMV2Q1u3qP1M47ZqsJ2hJ/Og11FeKXK8YmUTHya7PW7ecsgAh2CXKTxAcbfJDFTSvq2D++Tw==
   dependencies:
     color "^4.2.3"
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
-"@react-navigation/native-stack@^7.17.6":
-  version "7.17.6"
-  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.17.6.tgz#15613793b6b6c63bb36c6fd495b50ffa31b6ec6c"
-  integrity sha512-CnNPnlSGnrxPyHguDp/xDg5w9STMmIoI6IFZe7cpvEeD0GF/LTzvZ0gmq+hPJTm2/KIrnuPx34emCofzpht45g==
+"@react-navigation/native-stack@^7.17.9":
+  version "7.17.9"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.17.9.tgz#659c3ba0c6ef4fb5f8e19e42f3ac4e58c63d15c2"
+  integrity sha512-gXNSBxNjg9zpgOPgptwp5zM6LLorwXn2V8T4NuLZLjYe5DDovC+gtu6NhDXazwctiTWdff+BRwWbWK7zXvSvnw==
   dependencies:
-    "@react-navigation/elements" "^2.9.26"
+    "@react-navigation/elements" "^2.9.29"
     color "^4.2.3"
     sf-symbols-typescript "^2.1.0"
     warn-once "^0.1.1"
@@ -1776,12 +1776,12 @@
   dependencies:
     nanoid "^3.3.11"
 
-"@react-navigation/stack@^7.10.6":
-  version "7.10.6"
-  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-7.10.6.tgz#5adf039d106a097bcb5514f07c1afc9e3ec75483"
-  integrity sha512-LWtBSCPNi3Htnb3051wan5hVTsoORxUocBeuAjZ3VS1u6wTtfObeqOOhanz/L+uiAzvTWcAHhevQhtlGeFn/mg==
+"@react-navigation/stack@^7.10.10":
+  version "7.10.10"
+  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-7.10.10.tgz#627adc591a719d763bd779a7920aa75d82de6d13"
+  integrity sha512-MkQOossQWpTsGsqZt6hOprZVNNRuCkOKx0Lxz0M/tJkSF8MK+ciS2O7EjzNPJgvz+EfoYU5VQc52vLLyyVPuNA==
   dependencies:
-    "@react-navigation/elements" "^2.9.26"
+    "@react-navigation/elements" "^2.9.29"
     color "^4.2.3"
     use-latest-callback "^0.2.4"
 
@@ -1955,10 +1955,10 @@
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.5.tgz#1001cc5e6a3704b83c236027e77f2f58ea010f40"
   integrity sha512-Klz949h02Gz2uZCMGwDUSDS1YBlTdDDgbWHi+81l29tQALUtvz4rAYi5uoVhE5Lagoq6DeqAUlbrHvW/mXDgdQ==
 
-"@types/node@*", "@types/node@^26.1.0":
-  version "26.1.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-26.1.0.tgz#aa85f0727fc5611347091c478341c63650903439"
-  integrity sha512-O0A1G3xPGy4w7AgQdAQYUlQ+BKk2Oovw8eRpofyp5KdBZULnbe+WqaOVNrm705SHphCiG4XHsACrSmPu1f+Kgw==
+"@types/node@*", "@types/node@^26.1.1":
+  version "26.1.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-26.1.1.tgz#bad758d601e97d6cf457d204ee76a35fce7bd119"
+  integrity sha512-nxAkRSVkN1Y0JC1W8ky/fTfkGsMmcrRsbx+3XoZE+rMOX71kLYTV7fLXpqud1GpbpP5TuffXFqfX7fH2GgZREw==
   dependencies:
     undici-types "~8.3.0"
 
@@ -5672,10 +5672,10 @@ joi@^17.2.1:
     "@sideway/formula" "^3.0.1"
     "@sideway/pinpoint" "^2.0.0"
 
-js-base64@^3.8.0:
-  version "3.8.0"
-  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.8.0.tgz#cfc7b3d0f15dc6f69403c50df8ff2decca1a23ad"
-  integrity sha512-65kvbemyZhj+ExQt1PEFyBEjL5vAHysu1lJdW1AwhhChkO8ZBPizYk/m9GVrpbS2Je1hF+UYZ+6KywqtZV8mHw==
+js-base64@^3.8.1:
+  version "3.8.1"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.8.1.tgz#b04bf95d803cc924d0831e5a7790519567ef1c8a"
+  integrity sha512-5xVjhUZlHHeuO2W7w2rDFj/Kl1xLX+HjZxdOQwCsUOifl6UaoH1o1wsbsTMz+r0aeC7gCijvru02j6TfKZWzKg==
 
 js-message@1.0.7:
   version "1.0.7"
@@ -6790,10 +6790,10 @@ prelude-ls@^1.2.1:
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.2.1.tgz#debc6489d7a6e6b0e7611888cec880337d316396"
   integrity sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==
 
-prettier@^3.9.4:
-  version "3.9.4"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.9.4.tgz#a9c477cf1614376bd1f6bbc593d8c0d414bcec87"
-  integrity sha512-yWG/o/4oJfo036EKAfK6ACAoDOfHeRHx4tuxkfBZiauURiaSmYwlpOr5LQqKtIkRD2z1PLteme2WoxEnj4tHTg==
+prettier@^3.9.5:
+  version "3.9.5"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.9.5.tgz#4fec97736e33b9d0b620b48914fe93b530e835ad"
+  integrity sha512-/FVl766LpUfB5vXgCYOYa0MeV/441Ia99AeICQIQFTY/Nw0roZwULcXpku5i1/m5kt/baz+s4Zogspd839HSMg==
 
 pretty-format@30.4.1, pretty-format@^30.0.0, pretty-format@^30.0.5:
   version "30.4.1"
@@ -7077,10 +7077,10 @@ react-native-svg@^15.15.5:
     css-select "^5.1.0"
     css-tree "^1.1.3"
 
-react-native-toast-message@^2.3.3:
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/react-native-toast-message/-/react-native-toast-message-2.3.3.tgz#e301508d386a9902ff6b4559ecc6674f8cfdf97a"
-  integrity sha512-4IIUHwUPvKHu4gjD0Vj2aGQzqPATiblL1ey8tOqsxOWRPGGu52iIbL8M/mCz4uyqecvPdIcMY38AfwRuUADfQQ==
+react-native-toast-message@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/react-native-toast-message/-/react-native-toast-message-2.4.0.tgz#c2f0948fd43881feaabab67f4e047134ac000565"
+  integrity sha512-Ip4sPpf9707Qmn06Jp1aGJrYLx2mwTYBRjXzP7ebPvmjABA6OCT9bEh62E0L6s5zc/KPZ3rix+OnBKW/pOJZ4g==
 
 react-native-vision-camera@^4.7.2:
   version "4.7.3"

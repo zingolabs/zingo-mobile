@@ -1,0 +1,9 @@
+# Custom runner labels for actionlint's runner-label check. These are the
+# organization's provisioned GitHub-hosted larger-runner pools (org
+# Settings -> Actions -> Runners); a larger runner's configured name is its
+# runs-on label.
+self-hosted-runner:
+  labels:
+    - zingo-android-native-16
+    - zingo-android-gradle-16
+    - zingo-ios-build-12
