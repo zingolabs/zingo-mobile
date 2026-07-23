@@ -1734,9 +1734,9 @@
     use-sync-external-store "^1.5.0"
 
 "@react-navigation/elements@^2.9.29":
-  version "2.9.30"
-  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.30.tgz#60702877319f06c20b15e3f98446dcc994c67cff"
-  integrity sha512-2isleieiRMmP4WNMV2Q1u3qP1M47ZqsJ2hJ/Og11FeKXK8YmUTHya7PW7ecsgAh2CXKTxAcbfJDFTSvq2D++Tw==
+  version "2.9.35"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.35.tgz#da7e13fae069410efeafb727ef9d3ddc0931dcc3"
+  integrity sha512-e+ggAFhqlHILDERiKvTwzfz/mPfhhtEgbbDVtuul9BBChj+gVtieR6lxClMtbnO5t/vH/IJJzrwISj2QRkSa4g==
   dependencies:
     color "^4.2.3"
     use-latest-callback "^0.2.4"
