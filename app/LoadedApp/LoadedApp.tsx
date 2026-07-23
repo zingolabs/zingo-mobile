@@ -597,9 +597,12 @@ export default function LoadedApp(props: LoadedAppProps) {
           }
           let chain: ChainNameEnum = ChainNameEnum.mainChainName;
           try {
-            const parsed = JSON.parse(await parseAddress(a.address));
-            if (parsed && parsed.chain_name) {
-              chain = parsed.chain_name as ChainNameEnum;
+            const parseResult = await parseAddress(a.address);
+            if (parseResult.ok) {
+              const parsed = JSON.parse(parseResult.value);
+              if (parsed && parsed.chain_name) {
+                chain = parsed.chain_name as ChainNameEnum;
+              }
             }
           } catch {
             // unparseable address → keep the mainnet default
@@ -903,10 +906,9 @@ export class LoadedAppClass extends Component<
     // completion). Never syncs, offline-safe, a no-op without a migration.
     // The app-facing actions need no handling here: the History banner reads
     // migration_status on focus and routes the user to the right screen.
-    reconcileMigration().catch(() => {
-      // Offline-safe by contract; a transient failure just defers the
-      // cleanup to the next launch.
-    });
+    // reconcileMigration never rejects (FfiResult); a transient failure just
+    // defers the cleanup to the next launch.
+    reconcileMigration();
 
     this.clearToAddr();
 
@@ -1782,7 +1784,7 @@ export class LoadedAppClass extends Component<
     }
 
     // Same chain — try to open the wallet on the new server.
-    const result: string = await loadExistingWallet(
+    const result = await loadExistingWallet(
       value.uri,
       value.chainName,
       this.state.performanceLevel,
@@ -1790,13 +1792,15 @@ export class LoadedAppClass extends Component<
     );
 
     let openError: string | null = null;
-    if (!result || result.toLowerCase().startsWith(GlobalConst.error)) {
-      openError = result || 'loadExistingWallet returned empty';
+    if (!result.ok) {
+      openError = result.error.message;
+    } else if (!result.value) {
+      openError = 'loadExistingWallet returned empty';
     } else {
       try {
         // `resultJson` may carry an `error` field for watch-only wallets,
         // which is actually fine — we treat it as success.
-        const resultJson: RPCSeedType & RPCUfvkType = JSON.parse(result);
+        const resultJson: RPCSeedType & RPCUfvkType = JSON.parse(result.value);
         if (resultJson.error) {
           openError = String(resultJson.error);
         }
@@ -1968,11 +1972,10 @@ export class LoadedAppClass extends Component<
     );
     // Audit Issue K — do not log the setConfigWallet response; on actual
     // failure it is propagated via setLastError below.
-    if (
-      setConfigWallet &&
-      setConfigWallet.toLowerCase().startsWith(GlobalConst.error)
-    ) {
-      this.setLastError(`Set performance level error: ${setConfigWallet}`);
+    if (!setConfigWallet.ok) {
+      this.setLastError(
+        `Set performance level error: ${setConfigWallet.error.message}`,
+      );
     }
   };
 
@@ -2064,27 +2067,23 @@ export class LoadedAppClass extends Component<
       // No `await` here so Promise.race can actually enforce the 15s cap.
       // With `await` the RPC call resolves before the race starts and the
       // timer becomes a no-op (a failing server then blocks ~minutes).
-      const resultStrServerPromise = changeServer(this.state.newServer.uri);
+      const resultServerPromise = changeServer(this.state.newServer.uri);
       const timeoutServerPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 15 seconds'));
         }, 15 * 1000);
       });
 
-      const resultStrServer: string = await Promise.race([
-        resultStrServerPromise,
+      const resultServer = await Promise.race([
+        resultServerPromise,
         timeoutServerPromise,
       ]);
 
-      if (
-        resultStrServer &&
-        resultStrServer.toLowerCase().startsWith(GlobalConst.error)
-      ) {
+      if (!resultServer.ok) {
         this.addLastSnackbar(
-          `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
+          `${this.state.translate('loadedapp.changeservernew-error')} ${resultServer.error.message}`,
         );
         return;
-      } else {
       }
 
       await SettingsFileImpl.writeSettings(
@@ -2119,10 +2118,9 @@ export class LoadedAppClass extends Component<
         resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
       }
 
-      if (
-        resultStr2 &&
-        resultStr2.toLowerCase().startsWith(GlobalConst.error)
-      ) {
+      // changeWallet/changeWalletNoBackup return '' on success or a
+      // translated error string — non-empty means failure, no sniffing.
+      if (resultStr2) {
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,

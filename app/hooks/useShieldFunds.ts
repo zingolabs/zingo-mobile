@@ -6,7 +6,6 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import {
-  GlobalConst,
   PoolToShieldEnum,
   RouteEnum,
   SelectServerEnum,
@@ -16,6 +15,7 @@ import {
 import TotalBalanceClass from '../AppState/classes/TotalBalanceClass';
 import NetInfoType from '../AppState/types/NetInfoType';
 import { shieldConfirm, shieldPropose } from '../walletBackend';
+import type { FfiResult } from '../walletBackend';
 import { RPCShieldProposeType } from '../walletBackend/types/RPCShieldProposeType';
 import { RPCShieldType } from '../walletBackend/types/RPCShieldType';
 import Utils from '../utils';
@@ -79,31 +79,20 @@ export function useShieldFunds({
   const shieldProposeLockRef = useRef<boolean>(false);
 
   useEffect(() => {
-    const runShieldPropose = async (): Promise<string> => {
-      try {
-        if (shieldProposeLockRef.current) {
-          return 'Error: shield propose already running...';
-        }
-        shieldProposeLockRef.current = true;
-        const proposeStr: string = await shieldPropose();
-        if (proposeStr) {
-          if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-            console.log(`Error propose ${proposeStr}`);
-            shieldProposeLockRef.current = false;
-            return proposeStr;
-          }
-        } else {
-          console.log('Internal Error propose');
-          shieldProposeLockRef.current = false;
-          return 'Error: Internal RPC Error: propose';
-        }
-        shieldProposeLockRef.current = false;
-        return proposeStr;
-      } catch (error) {
-        console.log(`Critical Error propose ${error}`);
-        shieldProposeLockRef.current = false;
-        return `Error: ${error}`;
+    const runShieldPropose = async (): Promise<FfiResult<string>> => {
+      if (shieldProposeLockRef.current) {
+        return {
+          ok: false,
+          error: {
+            code: 'Unknown',
+            message: 'shield propose already running...',
+          },
+        };
       }
+      shieldProposeLockRef.current = true;
+      const propose = await shieldPropose();
+      shieldProposeLockRef.current = false;
+      return propose;
     };
 
     if (
@@ -115,16 +104,14 @@ export function useShieldFunds({
       (async () => {
         let proposeFee = 0;
         let proposeAmount = 0;
-        const runProposeStr = await runShieldPropose();
-        if (
-          runProposeStr &&
-          runProposeStr.toLowerCase().startsWith(GlobalConst.error)
-        ) {
-          console.log('Error shield proposing', runProposeStr);
+        const runPropose = await runShieldPropose();
+        if (!runPropose.ok) {
+          console.log('Error shield proposing', runPropose.error.message);
         } else {
           try {
-            const runProposeJson: RPCShieldProposeType =
-              JSON.parse(runProposeStr);
+            const runProposeJson: RPCShieldProposeType = JSON.parse(
+              runPropose.value,
+            );
             if (runProposeJson.error) {
               console.log('Error shield proposing', runProposeJson.error);
             } else {
@@ -174,37 +161,35 @@ export function useShieldFunds({
 
     navigation.navigate(RouteEnum.Computing);
     await shieldPropose();
-    const shieldStr = await shieldConfirm();
+    const shield = await shieldConfirm();
 
-    if (shieldStr) {
-      let success = false;
-      let errorMessage: string | undefined;
-      if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
-        errorMessage = shieldStr;
-      } else {
-        try {
-          const shieldJSON: RPCShieldType = JSON.parse(shieldStr);
-          if (shieldJSON.error) {
-            errorMessage = shieldJSON.error;
-          } else if (shieldJSON.txids) {
-            success = true;
-          }
-        } catch (e) {
-          // Unparseable response that didn't start with `error` is most
-          // likely a quirky success payload — treat it as success and let
-          // the user land on the "created" confirmation.
+    let success = false;
+    let errorMessage: string | undefined;
+    if (!shield.ok) {
+      errorMessage = shield.error.message;
+    } else {
+      try {
+        const shieldJSON: RPCShieldType = JSON.parse(shield.value);
+        if (shieldJSON.error) {
+          errorMessage = shieldJSON.error;
+        } else if (shieldJSON.txids) {
           success = true;
         }
+      } catch (e) {
+        // An unparseable SUCCESS payload is most likely a quirky success
+        // shape — treat it as success and let the user land on the
+        // "created" confirmation.
+        success = true;
       }
-      setScrollToTop?.(true);
-      setScrollToBottom?.(true);
-      setShieldingFee(0);
-      setShieldingAmount?.(0);
-      navigation.navigate(RouteEnum.Computing, {
-        phase: success ? 'created' : 'failed',
-        errorMessage: success ? undefined : errorMessage,
-      });
     }
+    setScrollToTop?.(true);
+    setScrollToBottom?.(true);
+    setShieldingFee(0);
+    setShieldingAmount?.(0);
+    navigation.navigate(RouteEnum.Computing, {
+      phase: success ? 'created' : 'failed',
+      errorMessage: success ? undefined : errorMessage,
+    });
   }, [
     setBackgroundError,
     addLastSnackbar,

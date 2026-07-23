@@ -6,7 +6,7 @@
  * when done. The inSend flag is exposed so the UI can gate actions that must
  * not run during a send.
  */
-import { SendJsonToTypeType, GlobalConst } from '../../AppState';
+import { SendJsonToTypeType } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { RPCSendProposeType } from '../types/RPCSendProposeType';
 import { RPCSendType } from '../types/RPCSendType';
@@ -40,15 +40,13 @@ export class TransactionService {
       let sendError: string = '';
       let sendTxids: string = '';
       try {
+        // sendProcess and confirmProcess reject on failure (typed FFI
+        // errors); the catch owns that path. Only an empty resolution — a
+        // programming error — is classified here.
         const proposeStr: string = await RPCModule.sendProcess(
           JSON.stringify(sendJson),
         );
-        if (proposeStr) {
-          if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-            console.log(`Error propose ${proposeStr}`);
-            sendError = proposeStr;
-          }
-        } else {
+        if (!proposeStr) {
           console.log('Internal Error propose');
           sendError = 'Error: Internal RPC Error: propose';
         }
@@ -60,12 +58,7 @@ export class TransactionService {
           }
           if (!sendError) {
             const sendStr: string = await RPCModule.confirmProcess();
-            if (sendStr) {
-              if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
-                console.log(`Error confirm ${sendStr}`);
-                sendError = sendStr;
-              }
-            } else {
+            if (!sendStr) {
               console.log('Internal Error confirm');
               sendError = 'Error: Internal RPC Error: confirm';
             }

@@ -6,7 +6,7 @@ import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import { ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
-import { GlobalConst, RouteEnum } from '../../../app/AppState';
+import { RouteEnum } from '../../../app/AppState';
 import { migrationStatus } from '../../../app/walletBackend';
 import { RPCMigrationStatusType } from '../../../app/walletBackend/types/RPCMigrationStatusType';
 
@@ -71,15 +71,17 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     useCallback(() => {
       let cancelled = false;
       (async () => {
-        const statusStr = await migrationStatus();
+        const statusResult = await migrationStatus();
         if (cancelled) {
           return;
         }
-        if (statusStr.toLowerCase().startsWith(GlobalConst.error)) {
+        if (!statusResult.ok) {
           return;
         }
         try {
-          const parsed = JSON.parse(statusStr) as RPCMigrationStatusType;
+          const parsed = JSON.parse(
+            statusResult.value,
+          ) as RPCMigrationStatusType;
           if (!parsed.error) {
             setMigration(parsed);
           }

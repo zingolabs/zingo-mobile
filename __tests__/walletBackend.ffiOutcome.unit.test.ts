@@ -2,8 +2,8 @@
  * The TypeScript quarter of the per-FFI outcome contract
  * (zingo-mobile#1151): the native bridges reject on failure, so the TS
  * layer learns outcomes from the promise channel — resolutions pass
- * through unclassified, and rejections are contained by the owning
- * try/catch, never re-derived by sniffing content.
+ * through unclassified as { ok: true }, and rejections map to a typed
+ * FfiError ({ ok: false }), never re-derived by sniffing content.
  *
  * These are the TS twins of the Rust init_error_channel_tests, the
  * Kotlin FfiOutcomeTest, and the Swift FfiOutcomeTests.
@@ -21,6 +21,7 @@ jest.mock('../app/RPCModule', () => {
 });
 
 import RPCModule from '../app/RPCModule';
+import { FfiResult } from '../app/walletBackend/ffi';
 import {
   createNewWallet,
   loadExistingWallet,
@@ -36,8 +37,8 @@ const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 // through every wrapper verbatim, never classified as a failure.
 const proseLikeData = 'Error: looks like prose but is legitimate data';
 
-describe('init family wrappers pass resolutions through and contain rejections', () => {
-  const wrappers: Array<[string, string, () => Promise<string>]> = [
+describe('init family wrappers pass resolutions through and type rejections', () => {
+  const wrappers: Array<[string, string, () => Promise<FfiResult<string>>]> = [
     [
       'init_new',
       'createNewWallet',
@@ -62,11 +63,25 @@ describe('init family wrappers pass resolutions through and contain rejections',
 
   it.each(wrappers)('%s', async (_ffi, bridgeMethod, call) => {
     bridge[bridgeMethod].mockResolvedValueOnce(proseLikeData);
-    await expect(call()).resolves.toBe(proseLikeData);
+    await expect(call()).resolves.toEqual({ ok: true, value: proseLikeData });
 
+    // A rejection carrying a ZingolibError variant name surfaces typed.
+    bridge[bridgeMethod].mockRejectedValueOnce(
+      Object.assign(new Error('Error: could not initialize'), {
+        code: 'Init',
+      }),
+    );
+    await expect(call()).resolves.toEqual({
+      ok: false,
+      error: { code: 'Init', message: 'Error: could not initialize' },
+    });
+
+    // A rejection without a recognized code maps to 'Unknown'.
     bridge[bridgeMethod].mockRejectedValueOnce(new Error('bridge exploded'));
-    const contained = await call();
-    expect(contained).toMatch(/^Error: /);
+    await expect(call()).resolves.toEqual({
+      ok: false,
+      error: { code: 'Unknown', message: 'bridge exploded' },
+    });
   });
 });
 

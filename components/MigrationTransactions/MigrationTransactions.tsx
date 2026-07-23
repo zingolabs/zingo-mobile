@@ -8,7 +8,7 @@ import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
 import { planOrchardDrain } from '../../app/walletBackend';
 import { RPCDrainPlanType } from '../../app/walletBackend/types/RPCDrainPlanType';
@@ -121,17 +121,17 @@ const MigrationTransactions: React.FunctionComponent<
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const planStr = await planOrchardDrain();
+      const planResult = await planOrchardDrain();
       if (cancelled) {
         return;
       }
-      if (planStr.toLowerCase().startsWith(GlobalConst.error)) {
-        setErrorMsg(planStr);
+      if (!planResult.ok) {
+        setErrorMsg(planResult.error.message);
         setLoading(false);
         return;
       }
       try {
-        const parsed: RPCDrainPlanType = JSON.parse(planStr);
+        const parsed: RPCDrainPlanType = JSON.parse(planResult.value);
         if (parsed.error) {
           setErrorMsg(parsed.error);
         } else {

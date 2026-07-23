@@ -7,6 +7,15 @@
  */
 import WalletBackend from './WalletBackend';
 
+export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
+export type {
+  ReschedulePartsRoute,
+  StartMigrationRoute,
+} from './utils/migrationRouting';
+export {
+  routeRescheduleParts,
+  routeStartMigration,
+} from './utils/migrationRouting';
 export {
   cancelIronwoodMigration,
   changeServer,
@@ -43,6 +52,7 @@ export {
   reconcileMigration,
   removeTransaction,
   rescheduleParts,
+  resolvedTrue,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,

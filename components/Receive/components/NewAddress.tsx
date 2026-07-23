@@ -13,7 +13,6 @@ import {
   AddressBookFileClass,
   AddressKindEnum,
   ButtonTypeEnum,
-  GlobalConst,
   ReceiverEnum,
   ScreenEnum,
   SnackbarDurationEnum,
@@ -88,37 +87,25 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             ? ReceiverEnum.o + ReceiverEnum.z
             : '';
     try {
-      let newAddressStr: string;
-      if (receivers) {
-        newAddressStr = await createNewUnifiedAddress(receivers);
-      } else {
-        newAddressStr = await createNewTransparentAddress();
-      }
+      const newAddressResult = receivers
+        ? await createNewUnifiedAddress(receivers)
+        : await createNewTransparentAddress();
 
-      if (newAddressStr) {
-        if (newAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error new address ${newAddressStr}`);
-
-          addLastSnackbar(
-            translate('receive.transparent.new-error') as string,
-            SnackbarDurationEnum.short,
-          );
-
-          // return newAddressStr;
-        }
-      } else {
-        console.log('Internal Error new address ');
-      }
-
-      if (label) {
+      if (!newAddressResult.ok) {
+        addLastSnackbar(
+          translate('receive.transparent.new-error') as string,
+          SnackbarDurationEnum.short,
+        );
+      } else if (label) {
         let newAddress: string;
         if (receivers) {
-          const newUnifiedAddressJSON: RPCUnifiedAddressType =
-            await JSON.parse(newAddressStr);
+          const newUnifiedAddressJSON: RPCUnifiedAddressType = await JSON.parse(
+            newAddressResult.value,
+          );
           newAddress = newUnifiedAddressJSON.encoded_address;
         } else {
           const newTransparentAddressJSON: RPCTransparentAddressType =
-            await JSON.parse(newAddressStr);
+            await JSON.parse(newAddressResult.value);
           newAddress = newTransparentAddressJSON.encoded_address;
         }
         //console.log(label, newAddress);
@@ -132,11 +119,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
         //console.log(ab);
         setAddressBook(ab);
       }
-
-      //return newAddressStr;
     } catch (error) {
       console.log(`Critical Error new address ${error}`);
-      //return `Error: ${error}`;
     }
 
     setLabel('');

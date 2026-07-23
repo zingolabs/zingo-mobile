@@ -15,8 +15,12 @@ import Button from '../Components/Button';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
-import { migrationStatus, rescheduleParts } from '../../app/walletBackend';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
+import {
+  migrationStatus,
+  rescheduleParts,
+  routeRescheduleParts,
+} from '../../app/walletBackend';
 import { RPCMigrationStatusType } from '../../app/walletBackend/types/RPCMigrationStatusType';
 
 type MigrationCadenceProps = NativeStackScreenProps<
@@ -139,17 +143,17 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const statusStr = await migrationStatus();
+      const statusResult = await migrationStatus();
       if (cancelled) {
         return;
       }
-      if (statusStr.toLowerCase().startsWith(GlobalConst.error)) {
-        setErrorMsg(statusStr);
+      if (!statusResult.ok) {
+        setErrorMsg(statusResult.error.message);
         setLoading(false);
         return;
       }
       try {
-        const parsed = JSON.parse(statusStr) as RPCMigrationStatusType;
+        const parsed = JSON.parse(statusResult.value) as RPCMigrationStatusType;
         if (parsed.error) {
           setErrorMsg(parsed.error);
         } else {
@@ -184,33 +188,22 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
     }
     const perBucket = selected === 'fewer' ? fewerPerBucket : 1;
     setSubmitting(true);
-    let failure: string | null = null;
-    const rescheduleStr = await rescheduleParts(perBucket);
-    if (rescheduleStr.toLowerCase().startsWith(GlobalConst.error)) {
-      failure = rescheduleStr;
-    } else {
-      try {
-        const parsed = JSON.parse(rescheduleStr);
-        if (parsed.error) {
-          failure = parsed.error;
-        }
-      } catch (e) {
-        failure = `${e}`;
-      }
-    }
+    const reschedule = await rescheduleParts(perBucket);
     setSubmitting(false);
-    if (!failure) {
-      navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
-      return;
+    const route = routeRescheduleParts(reschedule);
+    switch (route.kind) {
+      case 'proceed':
+        navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
+        return;
+      // CadenceFixed: a part is already signed, so the existing schedule
+      // stands — reviewing it (and re-arming reminders) is still valid.
+      case 'schedule-stands':
+        addLastSnackbar(translate('migrationcadence.cadence-fixed') as string);
+        navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
+        return;
+      case 'error':
+        addLastSnackbar(route.message);
     }
-    // CadenceFixed: a part is already signed, so the existing schedule
-    // stands — reviewing it (and re-arming reminders) is still valid.
-    if (failure.toLowerCase().includes('cadence')) {
-      addLastSnackbar(translate('migrationcadence.cadence-fixed') as string);
-      navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
-      return;
-    }
-    addLastSnackbar(failure);
   }, [
     submitting,
     selected,

@@ -46,26 +46,21 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
 
   const verifyAddress = async () => {
     try {
-      const verifyAddressStr = await checkMyAddress(address);
-      //console.log(verifyAddressStr);
-      if (verifyAddressStr) {
-        if (verifyAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error new address ${verifyAddressStr}`);
-          addLastSnackbar(verifyAddressStr, SnackbarDurationEnum.short);
-          setErrorAddress(verifyAddressStr);
-        }
+      const verifyAddressResult = await checkMyAddress(address);
+      if (!verifyAddressResult.ok) {
+        addLastSnackbar(
+          verifyAddressResult.error.message,
+          SnackbarDurationEnum.short,
+        );
+        setErrorAddress(verifyAddressResult.error.message);
       } else {
-        console.log('Internal Error new address ');
+        const verifyAddressJSON: RPCCheckAddressType = await JSON.parse(
+          verifyAddressResult.value,
+        );
+        setVerifyOK(verifyAddressJSON.is_wallet_address);
       }
-
-      const verifyAddressJSON: RPCCheckAddressType =
-        await JSON.parse(verifyAddressStr);
-      setVerifyOK(verifyAddressJSON.is_wallet_address);
-
-      //return newAddressStr;
     } catch (error) {
       console.log(`Critical Error new address ${error}`);
-      //return `Error: ${error}`;
     }
 
     Keyboard.dismiss();

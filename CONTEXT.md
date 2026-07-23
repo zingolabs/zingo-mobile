@@ -91,8 +91,8 @@ sent. Covers the whole migration, both phases.
 
 **Blocking check** — a PR CI job whose failure fails the pull request.
 Jest, rust-shear, js-depcheck, android-dependency-analysis, the Android
-Kotlin compile, the Android build chain, and the Android integration
-buckets are blocking checks.
+Kotlin compile, the Android JVM unit tests, the Android build chain, and
+the Android integration buckets are blocking checks.
 
 **Advisory stage** — a PR CI job that records its result without
 affecting the pull request verdict. The per-PR iOS pipeline is an

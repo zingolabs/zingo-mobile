@@ -9,7 +9,7 @@ import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
 import useTrickleProgress from '../../app/hooks/useTrickleProgress';
 import { drainOrchard, drainStatus } from '../../app/walletBackend';
@@ -122,9 +122,9 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
       }
       polling = true;
       try {
-        const statusStr = await drainStatus();
-        if (!statusStr.toLowerCase().startsWith(GlobalConst.error)) {
-          const parsed = JSON.parse(statusStr) as RPCDrainStatusType | null;
+        const status = await drainStatus();
+        if (status.ok) {
+          const parsed = JSON.parse(status.value) as RPCDrainStatusType | null;
           if (parsed && !cancelled) {
             setProgress(parsed);
           }
@@ -139,11 +139,11 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     (async () => {
       let failure: string | null = null;
       try {
-        const drainStr = await drainOrchard();
-        if (drainStr.toLowerCase().startsWith(GlobalConst.error)) {
-          failure = drainStr;
+        const drain = await drainOrchard();
+        if (!drain.ok) {
+          failure = drain.error.message;
         } else {
-          const parsed: RPCDrainType = JSON.parse(drainStr);
+          const parsed: RPCDrainType = JSON.parse(drain.value);
           if (parsed.error) {
             failure = parsed.error;
           }
