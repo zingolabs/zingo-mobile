@@ -580,6 +580,54 @@ export async function reconcileMigration(): Promise<string> {
   }
 }
 
+// Phase-2 execute tap: sends the scheduled migration's due batch (the current
+// window's parts plus any missed windows', folded in), sequencing sends
+// `spacingMs` apart. Long-running (prove + broadcast) like drainOrchard; the
+// native side dispatches it off the main queue. Mirrors the native
+// `executeDuePartsProcess`. Returns the raw JSON (parseable as
+// RPCBatchReportType); the caller checks for an `error` prefix / field before
+// parsing.
+export async function executeDueParts(spacingMs: number): Promise<string> {
+  try {
+    const reportStr: string = await RPCModule.executeDuePartsProcess(
+      String(spacingMs),
+    );
+    if (reportStr) {
+      if (reportStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error executeDueParts ${reportStr}`);
+        return reportStr;
+      }
+    } else {
+      console.log('Internal Error executeDueParts');
+      return 'Error: Internal RPC Error: executeDueParts';
+    }
+    return reportStr;
+  } catch (error) {
+    console.log(`Critical Error executeDueParts ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Snapshot of the in-flight execute batch's progress, for rendering
+// "Sending i/N". Mirrors the native `executeDuePartsStatusProcess`; safe to
+// poll concurrently with a running `executeDueParts` (native reads a side
+// channel, not the lightclient lock). Returns the raw JSON: `null` when no
+// batch is running, otherwise `{ total, resolved, sent, phase }` (parseable as
+// RPCBatchStatusType). The caller checks for an `error` prefix before parsing.
+export async function executeDuePartsStatus(): Promise<string> {
+  try {
+    const statusStr: string = await RPCModule.executeDuePartsStatusProcess();
+    if (statusStr && statusStr.toLowerCase().startsWith(GlobalConst.error)) {
+      console.log(`Error executeDuePartsStatus ${statusStr}`);
+      return statusStr;
+    }
+    return statusStr;
+  } catch (error) {
+    console.log(`Critical Error executeDuePartsStatus ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
 // Abandons the in-progress private migration: confirmed parts stand, pending
 // ones are dropped and their notes released. Returns the raw JSON
 // (`{ cancelled: true }` or `{ error }`).

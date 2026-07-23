@@ -123,6 +123,13 @@ interface RPCModuleAPI {
   reschedulePartsProcess(perBucket: string): Promise<string>;
   migrationStatusProcess(): Promise<string>;
   reconcileMigrationProcess(): Promise<string>;
+  // Phase-2 execute tap: sends a scheduled window's due batch. spacingMs (the
+  // delay sequenced between the batch's sends) crosses as a string.
+  executeDuePartsProcess(spacingMs: string): Promise<string>;
+  // Live progress of the in-flight batch; safe to poll concurrently with
+  // executeDuePartsProcess (reads a native side channel, not the lightclient
+  // lock).
+  executeDuePartsStatusProcess(): Promise<string>;
   cancelIronwoodMigrationProcess(): Promise<string>;
 
   // Wallet options / configuration

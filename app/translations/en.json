@@ -947,6 +947,31 @@
     "back": "Back",
     "confirm": "Confirm"
   },
+  "migrationstatus": {
+    "title": "Migration underway",
+    "progress": "{confirmed} of {total} batches confirmed · {pct}%",
+    "next-opens": "Next batch opens at boundary **{boundary}** (chain is at {height}).",
+    "next-open-now": "Batch {n}'s window is open — send it when you're ready.",
+    "all-sent": "All batches sent — waiting for the final confirmations.",
+    "reminders": "We'll remind you — {n} reminders scheduled.",
+    "batch": "Batch {n}",
+    "scheduled": "SCHEDULED",
+    "open": "OPEN",
+    "tech-line": "anchor {anchor} · send by {sendby}",
+    "footer": "Reminders never send for you. You send each batch from here when its window is open.",
+    "back": "Back to wallet",
+    "send": "Send batch now"
+  },
+  "migrationbatchsending": {
+    "title": "Sending batch",
+    "subtitle": "Broadcasting this window's parts to Ironwood, spaced apart for privacy. Keep the app open.",
+    "starting": "Preparing…",
+    "progress": "Sending {done} of {total}…",
+    "success": "Sent {sent} of {total} parts to Ironwood.",
+    "nothing": "Nothing was due to send right now.",
+    "error-title": "Couldn't send the batch",
+    "back": "Back to status"
+  },
   "migrationtransactions": {
     "title": "Migration transactions",
     "subtitle": "We'll create **{count}** transactions to yourself simultaneously.",

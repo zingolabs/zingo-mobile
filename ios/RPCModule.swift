@@ -1832,6 +1832,77 @@ class RPCModule: NSObject {
       }
   }
 
+  func fnExecuteDuePartsProcess(_ dict: [AnyHashable: Any]) {
+      if let spacingMs = dict["spacing_ms"] as? String,
+          let spacingMsNum = UInt64(spacingMs),
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try executeDueParts(spacingMs: spacingMsNum)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] executeDueParts. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] executeDueParts. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  // Phase-2 execute tap: proves and broadcasts the scheduled migration's due
+  // batch, so like the drain it runs long; the global concurrent queue keeps it
+  // off the main thread. `spacing_ms` crosses as a string (numeric-arg
+  // convention) — the delay sequenced between the batch's sends.
+  @objc(executeDuePartsProcess:resolve:reject:)
+  func executeDuePartsProcess(_ spacing_ms: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["spacing_ms": spacing_ms, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnExecuteDuePartsProcess(dict)
+        }
+      }
+  }
+
+  func fnExecuteDuePartsStatusProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        do {
+          let resp = try executeDuePartsStatus()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+        } catch {
+          let err = "Error: [Native] executeDuePartsStatus. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+      } else {
+          let err = "Error: [Native] executeDuePartsStatus. Command arguments problem."
+          NSLog(err)
+      }
+  }
+
+  // Polled concurrently while `executeDuePartsProcess` runs; the native
+  // `executeDuePartsStatus()` reads a side channel, never the lightclient lock
+  // the batch holds, so the poll returns immediately.
+  @objc(executeDuePartsStatusProcess:reject:)
+  func executeDuePartsStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnExecuteDuePartsStatusProcess(dict)
+        }
+      }
+  }
+
   func fnCancelIronwoodMigrationProcess(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
         do {

@@ -30,6 +30,8 @@ export enum RouteEnum {
   MigrationSplitting = 'MigrationSplitting',
   MigrationCadence = 'MigrationCadence',
   MigrationSchedule = 'MigrationSchedule',
+  MigrationStatus = 'MigrationStatus',
+  MigrationBatchSending = 'MigrationBatchSending',
 
   // Drawer with params
   AddressBook = 'AddressBook',

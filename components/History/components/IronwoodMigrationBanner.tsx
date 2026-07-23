@@ -18,7 +18,7 @@ type IronwoodMigrationBannerProps = {
   // Deep-link back into the in-flight private migration, at whichever screen
   // its phase needs next.
   onResume: (
-    route: RouteEnum.MigrationSplitting | RouteEnum.MigrationCadence,
+    route: RouteEnum.MigrationSplitting | RouteEnum.MigrationStatus,
   ) => void;
 };
 
@@ -51,8 +51,8 @@ const HighlightedText: React.FunctionComponent<{
  *   remaining Orchard-pool figure (the ZIP 318 compliance figure — a unified
  *   balance alone is not compliant while migrating) plus part progress, and
  *   Continue deep-links to the phase's screen. This is also the rescue path
- *   after a kill: splitting resumes on the splitting screen, an unchosen
- *   cadence re-offers the chooser.
+ *   after a kill: splitting resumes on the splitting screen, a scheduled
+ *   migration opens its "underway" status monitor.
  */
 const IronwoodMigrationBanner: React.FunctionComponent<
   IronwoodMigrationBannerProps
@@ -103,7 +103,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   if (inFlight && migration) {
     const resumeRoute =
       phaseKind === 'parts_scheduled'
-        ? RouteEnum.MigrationCadence
+        ? RouteEnum.MigrationStatus
         : RouteEnum.MigrationSplitting;
     const orchardLeftStr = `${Utils.parseNumberFloatToStringLocale(
       migration.orchard_confirmed_spendable / 10 ** 8,

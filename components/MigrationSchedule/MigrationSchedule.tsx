@@ -84,8 +84,14 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
     };
   }, []);
 
-  const goHome = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+  // Confirming lands on the in-flight monitor (reset, so Back can't return to
+  // the planning flow), whether or not reminders were granted — the migration
+  // is scheduled either way and the status screen is its home from here.
+  const goStatus = useCallback(() => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: RouteEnum.MigrationStatus }],
+    });
   }, [navigation]);
 
   const wakes = useMemo(() => status?.next_wakes ?? [], [status]);
@@ -114,8 +120,8 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
       addLastSnackbar(translate('migrationschedule.denied') as string);
     }
     setConfirming(false);
-    goHome();
-  }, [confirming, wakes, translate, addLastSnackbar, goHome]);
+    goStatus();
+  }, [confirming, wakes, translate, addLastSnackbar, goStatus]);
 
   // ----- Loading / error -----
   if (loading || errorMsg) {

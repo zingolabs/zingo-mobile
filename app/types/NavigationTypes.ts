@@ -87,6 +87,15 @@ export type AppDrawerParamList = {
   // The cadence the user picked, so Back from the review screen can restore
   // the selection.
   [RouteEnum.MigrationSchedule]: { perBucket: number };
+  // The in-flight "Migration underway" monitor: the landing after the schedule
+  // is confirmed and the parts_scheduled banner's resume target. Reads
+  // migrationStatus, so it needs no params.
+  [RouteEnum.MigrationStatus]: undefined;
+  // Broadcasts the open window's due batch (execute_due_parts) with live
+  // progress. `denominations` is the window's batch, previewed while the send
+  // runs; absent on a defensive re-entry, where the screen sends whatever is
+  // due.
+  [RouteEnum.MigrationBatchSending]: { denominations?: number[] } | undefined;
 
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;

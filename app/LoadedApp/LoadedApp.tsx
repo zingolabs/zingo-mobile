@@ -158,6 +158,12 @@ const MigrationCadence = React.lazy(
 const MigrationSchedule = React.lazy(
   () => import('../../components/MigrationSchedule'),
 );
+const MigrationStatus = React.lazy(
+  () => import('../../components/MigrationStatus'),
+);
+const MigrationBatchSending = React.lazy(
+  () => import('../../components/MigrationBatchSending'),
+);
 const Insight = React.lazy(() => import('../../components/Insight'));
 const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
 const ComputingTxContent = React.lazy(
@@ -2665,6 +2671,20 @@ export class LoadedAppClass extends Component<
                     <RootNavigator.Screen
                       name={RouteEnum.MigrationSchedule}
                       component={MigrationSchedule}
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationStatus}
+                      component={MigrationStatus}
+                      // Reached by reset (post-confirm) and by the banner; its
+                      // own "Back to wallet" resets home, so swipe-back off.
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationBatchSending}
+                      component={MigrationBatchSending}
+                      // The batch broadcasts here and can't be interrupted;
+                      // swipe-back is off and hardware-back is blocked in-screen.
                       options={{ gestureEnabled: false }}
                     />
                     <RootNavigator.Screen name={RouteEnum.AddressBook}>

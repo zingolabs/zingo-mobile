@@ -232,6 +232,13 @@ RCT_EXTERN_METHOD(migrationStatusProcess:
 RCT_EXTERN_METHOD(reconcileMigrationProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(executeDuePartsProcess:
+    (NSString)spacing_ms
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(executeDuePartsStatusProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(cancelIronwoodMigrationProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)

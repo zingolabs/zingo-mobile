@@ -947,6 +947,31 @@
     "back": "Geri",
     "confirm": "Onayla"
   },
+  "migrationstatus": {
+    "title": "Geçiş sürüyor",
+    "progress": "{total} gruptan {confirmed} tanesi onaylandı · %{pct}",
+    "next-opens": "Sonraki grup **{boundary}** sınırında açılır (zincir {height} hizasında).",
+    "next-open-now": "{n}. grubun penceresi açık — hazır olduğunuzda gönderin.",
+    "all-sent": "Tüm gruplar gönderildi — son onaylar bekleniyor.",
+    "reminders": "Size hatırlatacağız — {n} hatırlatıcı planlandı.",
+    "batch": "Grup {n}",
+    "scheduled": "PLANLANDI",
+    "open": "AÇIK",
+    "tech-line": "çapa {anchor} · son gönderim {sendby}",
+    "footer": "Hatırlatıcılar sizin yerinize göndermez. Her grubu penceresi açıldığında buradan siz gönderirsiniz.",
+    "back": "Cüzdana dön",
+    "send": "Grubu şimdi gönder"
+  },
+  "migrationbatchsending": {
+    "title": "Grup gönderiliyor",
+    "subtitle": "Bu pencerenin parçaları gizlilik için aralıklı olarak Ironwood'a yayınlanıyor. Uygulamayı açık tutun.",
+    "starting": "Hazırlanıyor…",
+    "progress": "{total} parçadan {done} tanesi gönderiliyor…",
+    "success": "{total} parçadan {sent} tanesi Ironwood'a gönderildi.",
+    "nothing": "Şu anda gönderilecek bir şey yoktu.",
+    "error-title": "Grup gönderilemedi",
+    "back": "Duruma dön"
+  },
   "migrationtransactions": {
     "title": "Geçiş işlemleri",
     "subtitle": "Kendinize aynı anda **{count}** işlem oluşturacağız.",

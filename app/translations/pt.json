@@ -947,6 +947,31 @@
     "back": "Voltar",
     "confirm": "Confirmar"
   },
+  "migrationstatus": {
+    "title": "Migração em andamento",
+    "progress": "{confirmed} de {total} lotes confirmados · {pct}%",
+    "next-opens": "O próximo lote abre no limite **{boundary}** (a cadeia está em {height}).",
+    "next-open-now": "A janela do lote {n} está aberta — envie quando quiser.",
+    "all-sent": "Todos os lotes enviados — aguardando as confirmações finais.",
+    "reminders": "Vamos lembrar você — {n} lembretes agendados.",
+    "batch": "Lote {n}",
+    "scheduled": "AGENDADO",
+    "open": "ABERTO",
+    "tech-line": "âncora {anchor} · enviar até {sendby}",
+    "footer": "Os lembretes nunca enviam por você. Você envia cada lote a partir daqui quando a janela dele está aberta.",
+    "back": "Voltar à carteira",
+    "send": "Enviar lote agora"
+  },
+  "migrationbatchsending": {
+    "title": "Enviando lote",
+    "subtitle": "Transmitindo as partes desta janela para a Ironwood, espaçadas por privacidade. Mantenha o app aberto.",
+    "starting": "Preparando…",
+    "progress": "Enviando {done} de {total}…",
+    "success": "{sent} de {total} partes enviadas para a Ironwood.",
+    "nothing": "Nada a enviar no momento.",
+    "error-title": "Não foi possível enviar o lote",
+    "back": "Voltar ao status"
+  },
   "migrationtransactions": {
     "title": "Transações de migração",
     "subtitle": "Vamos criar **{count}** transações para você mesmo simultaneamente.",

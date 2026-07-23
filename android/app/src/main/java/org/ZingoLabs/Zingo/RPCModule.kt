@@ -1455,6 +1455,54 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // Phase-2 execute tap: sends the scheduled migration's due batch. Long-
+    // running (prove + broadcast) like drainOrchardProcess, so it runs on
+    // Dispatchers.IO; `spacingMs` crosses as a string (the module's numeric-arg
+    // convention) — the delay sequenced between the batch's sends.
+    @ReactMethod
+    fun executeDuePartsProcess(spacingMs: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.executeDueParts(spacingMs.toULong())
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] executeDueParts: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    // Polled concurrently while executeDuePartsProcess runs; the native
+    // executeDuePartsStatus() reads a side channel, never the lightclient lock
+    // the batch holds, so the poll returns immediately.
+    @ReactMethod
+    fun executeDuePartsStatusProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val resp = uniffi.zingo.executeDuePartsStatus()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: [Native] executeDuePartsStatus: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
     @ReactMethod
     fun cancelIronwoodMigrationProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
