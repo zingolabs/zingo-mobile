@@ -68,3 +68,29 @@ jobs:
       abi: ${{ matrix.config.abi }}
       api-level: ${{ matrix.config['api-level'] }}
       target: ${{ matrix.config.target }}
+
+  # iOS runs per-PR as a trailing, advisory stage: it starts only after
+  # every blocking check has passed, so the fast path's verdict is never
+  # delayed by the macOS-runner queue and a red fast path skips iOS
+  # entirely. Advisory mode records iOS failures without failing the PR;
+  # ci-nightly remains the enforced iOS gate.
+  ios-build:
+    uses: ./.github/workflows/ios-build.yaml
+    needs:
+      - jest-test
+      - rust-shear
+      - js-depcheck
+      - android-dependency-analysis
+      - create-cache-key
+      - android-ubuntu-integration-test-ci
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      advisory: true
+
+  ios-integration-test:
+    uses: ./.github/workflows/ios-integration-test.yaml
+    needs: [create-cache-key, ios-build]
+    secrets: inherit
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      advisory: true
