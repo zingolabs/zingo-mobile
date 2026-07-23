@@ -5,9 +5,21 @@ import {
 } from '../types/RPCMixnetType';
 
 /**
- * The validated outcome of a mixnet status call: either a well-formed
- * status, or the failure message. A discriminated union so callers must
- * handle both arms; `socks5Addr` is `null` in every mode but `ready`.
+ * Why a mixnet call failed, as a compile-time-enforced type
+ * (zingo-mobile#1151, audit Issues Q and R): a `nativeRejection` arrived on
+ * the error channel — a rejected native promise — while the other reasons
+ * are payload validation failures. No failure is ever inferred from prose
+ * inside the data channel.
+ */
+export type MixnetFailure =
+  | { readonly reason: 'nativeRejection'; readonly message: string }
+  | { readonly reason: 'malformedPayload'; readonly payload: string }
+  | { readonly reason: 'unrecognizedMode'; readonly claimed: string };
+
+/**
+ * The validated outcome of a mixnet status call. A discriminated union so
+ * callers must handle both arms; `socks5Addr` is `null` in every mode but
+ * `ready`.
  */
 export type MixnetStatusReport =
   | {
@@ -15,24 +27,26 @@ export type MixnetStatusReport =
       readonly mode: RPCMixnetModeEnum;
       readonly socks5Addr: string | null;
     }
-  | { readonly kind: 'error'; readonly message: string };
+  | { readonly kind: 'failure'; readonly failure: MixnetFailure };
 
 /**
  * The validated outcome of a bootstrap-detail call: the (possibly empty)
- * narration line, or the failure message.
+ * narration line, or the failure.
  */
 export type MixnetDetailReport =
   | { readonly kind: 'detail'; readonly detail: string }
-  | { readonly kind: 'error'; readonly message: string };
+  | { readonly kind: 'failure'; readonly failure: MixnetFailure };
 
 /**
- * Whether a native/zingolib reply is the `Error: ...` failure convention
- * rather than a JSON payload.
+ * Converts a value thrown by the native bridge — the error channel — into
+ * the typed failure. Never inspects the data channel.
  *
  * Pure function — no side effects.
  */
-export function hasErrorPrefix(nativeReply: string): boolean {
-  return nativeReply.toLowerCase().startsWith('error');
+export function describeRejection(thrown: unknown): MixnetFailure {
+  const message =
+    thrown instanceof Error ? thrown.message : String(thrown ?? 'unknown');
+  return { reason: 'nativeRejection', message };
 }
 
 /**
@@ -64,43 +78,40 @@ export function parseMixnetMode(candidate: unknown): RPCMixnetModeEnum | null {
  * impurity it threatens is the thrown exception, which this converts into
  * the `null` arm.
  */
-function parseJsonOrNull(nativeReply: string): unknown {
+function parseJsonOrNull(dataReply: string): unknown {
   try {
-    return JSON.parse(nativeReply);
+    return JSON.parse(dataReply);
   } catch {
     return null;
   }
 }
 
 /**
- * Transforms a raw `mixnet_mode` / `attach_mixnet` / `enable_mixnet` /
- * `disable_mixnet` reply into a validated status report.
+ * Transforms the DATA channel of a status-shaped mixnet call into a
+ * validated report. The reply is never sniffed for error prose — a reply
+ * that is not a JSON status object is a `malformedPayload` failure, exactly
+ * as an `"Error: ..."` string would be if one ever leaked into the data
+ * channel.
  *
- * Pure function — no side effects. Total over every string input: the
- * error-prefix convention, malformed JSON, a payload-level error field,
- * and an unrecognized mode each land in the `error` arm with a message
- * naming what went wrong.
+ * Pure function — no side effects. Total over every string input.
  */
-export function transformMixnetStatus(nativeReply: string): MixnetStatusReport {
-  if (hasErrorPrefix(nativeReply)) {
-    return { kind: 'error', message: nativeReply };
-  }
-  const parsedReply: unknown = parseJsonOrNull(nativeReply);
+export function transformMixnetStatus(dataReply: string): MixnetStatusReport {
+  const parsedReply: unknown = parseJsonOrNull(dataReply);
   if (parsedReply === null || typeof parsedReply !== 'object') {
     return {
-      kind: 'error',
-      message: `Mixnet status is not a JSON object: ${nativeReply}`,
+      kind: 'failure',
+      failure: { reason: 'malformedPayload', payload: dataReply },
     };
   }
   const statusPayload = parsedReply as RPCMixnetStatusType;
-  if (statusPayload.error !== undefined) {
-    return { kind: 'error', message: statusPayload.error };
-  }
   const validatedMode = parseMixnetMode(statusPayload.mixnet_mode);
   if (validatedMode === null) {
     return {
-      kind: 'error',
-      message: `Unrecognized mixnet mode: ${String(statusPayload.mixnet_mode)}`,
+      kind: 'failure',
+      failure: {
+        reason: 'unrecognizedMode',
+        claimed: String(statusPayload.mixnet_mode),
+      },
     };
   }
   const socks5Addr =
@@ -112,27 +123,21 @@ export function transformMixnetStatus(nativeReply: string): MixnetStatusReport {
 }
 
 /**
- * Transforms a raw `mixnet_bootstrap_detail` reply into a validated detail
- * report. An absent or empty detail is a legitimate quiet state and yields
- * the empty string, not an error.
+ * Transforms the DATA channel of a `mixnet_bootstrap_detail` reply into a
+ * validated report. An absent or empty detail is the legitimate quiet state
+ * and yields the empty string, not a failure.
  *
  * Pure function — no side effects. Total over every string input.
  */
-export function transformMixnetDetail(nativeReply: string): MixnetDetailReport {
-  if (hasErrorPrefix(nativeReply)) {
-    return { kind: 'error', message: nativeReply };
-  }
-  const parsedReply: unknown = parseJsonOrNull(nativeReply);
+export function transformMixnetDetail(dataReply: string): MixnetDetailReport {
+  const parsedReply: unknown = parseJsonOrNull(dataReply);
   if (parsedReply === null || typeof parsedReply !== 'object') {
     return {
-      kind: 'error',
-      message: `Mixnet detail is not a JSON object: ${nativeReply}`,
+      kind: 'failure',
+      failure: { reason: 'malformedPayload', payload: dataReply },
     };
   }
   const detailPayload = parsedReply as RPCMixnetDetailType;
-  if (detailPayload.error !== undefined) {
-    return { kind: 'error', message: detailPayload.error };
-  }
   const narrationLine =
     typeof detailPayload.detail === 'string' ? detailPayload.detail : '';
   return { kind: 'detail', detail: narrationLine };

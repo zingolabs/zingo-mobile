@@ -2,13 +2,27 @@ import RPCModule from '../../RPCModule';
 import {
   MixnetDetailReport,
   MixnetStatusReport,
+  describeRejection,
   transformMixnetDetail,
   transformMixnetStatus,
 } from '../transforms/mixnetTransform';
 
-// The effectful edge of the Mixnet Mode surface: each function makes one
-// native call and delegates every decision to the pure transforms in
-// `mixnetTransform.ts`, so all logic stays unit-testable without a bridge.
+// The effectful edge of the Mixnet Mode surface. Each function makes one
+// native call; the two channels are settled separately and typed
+// (zingo-mobile#1151): the resolved DATA string goes to a pure transform,
+// and a REJECTION — the error channel — is contained here at the single
+// seam as the typed `failure` arm, never re-encoded as prose. All decision
+// logic lives in the pure transforms.
+
+async function statusCall(
+  nativeCall: () => Promise<string>,
+): Promise<MixnetStatusReport> {
+  try {
+    return transformMixnetStatus(await nativeCall());
+  } catch (thrown: unknown) {
+    return { kind: 'failure', failure: describeRejection(thrown) };
+  }
+}
 
 /**
  * Attach Mixnet Mode to an already-running, platform-hosted SOCKS5 endpoint
@@ -18,8 +32,7 @@ import {
 export async function attachMixnet(
   socks5Addr: string,
 ): Promise<MixnetStatusReport> {
-  const nativeReply: string = await RPCModule.attachMixnet(socks5Addr);
-  return transformMixnetStatus(nativeReply);
+  return statusCall(() => RPCModule.attachMixnet(socks5Addr));
 }
 
 /**
@@ -29,8 +42,7 @@ export async function attachMixnet(
 export async function enableMixnet(
   proxyPath: string,
 ): Promise<MixnetStatusReport> {
-  const nativeReply: string = await RPCModule.enableMixnet(proxyPath);
-  return transformMixnetStatus(nativeReply);
+  return statusCall(() => RPCModule.enableMixnet(proxyPath));
 }
 
 /**
@@ -38,18 +50,19 @@ export async function enableMixnet(
  * clearnet for the send and price surfaces.
  */
 export async function disableMixnet(): Promise<MixnetStatusReport> {
-  const nativeReply: string = await RPCModule.disableMixnet();
-  return transformMixnetStatus(nativeReply);
+  return statusCall(() => RPCModule.disableMixnet());
 }
 
 /** The current Mixnet Mode, with the local SOCKS5 address when ready. */
 export async function getMixnetStatus(): Promise<MixnetStatusReport> {
-  const nativeReply: string = await RPCModule.mixnetModeInfo();
-  return transformMixnetStatus(nativeReply);
+  return statusCall(() => RPCModule.mixnetModeInfo());
 }
 
 /** The live bootstrap narration line, empty outside of bootstrapping. */
 export async function getMixnetBootstrapDetail(): Promise<MixnetDetailReport> {
-  const nativeReply: string = await RPCModule.mixnetBootstrapDetailInfo();
-  return transformMixnetDetail(nativeReply);
+  try {
+    return transformMixnetDetail(await RPCModule.mixnetBootstrapDetailInfo());
+  } catch (thrown: unknown) {
+    return { kind: 'failure', failure: describeRejection(thrown) };
+  }
 }
