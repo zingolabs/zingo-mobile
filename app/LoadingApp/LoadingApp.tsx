@@ -32,6 +32,7 @@ import {
   getVersionInfo,
   getWalletKind,
   loadExistingWallet,
+  resolvedTrue,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
@@ -1939,7 +1940,7 @@ export class LoadingAppClass extends Component<
   restoreLastBackup = async () => {
     this.setState({ screen: RouteEnum.Launching, actionButtonsDisabled: true });
     const result = await restoreExistingWalletBackup();
-    if (!result.ok || !result.value || result.value === GlobalConst.false) {
+    if (!resolvedTrue(result)) {
       this.addLastSnackbar(
         this.state.translate('rpc.backupnotfound-error') as string,
       );

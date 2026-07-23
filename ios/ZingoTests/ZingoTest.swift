@@ -873,10 +873,77 @@ class FfiOutcomeTests: XCTestCase {
 
     func testNonFfiErrorsRejectAsUnknown() {
         struct Boom: Error {}
-        guard case .rejected(let code, _, let error) = FfiOutcome.of({ throw Boom() }) else {
+        guard case .rejected(let code, let message, let error) = FfiOutcome.of({ throw Boom() }) else {
             return XCTFail("A non-FFI error must still reject")
         }
         XCTAssertEqual(code, "Unknown", "Errors outside the contract reject under the catch-all code")
+        XCTAssertFalse(message.isEmpty, "Even a catch-all rejection carries a diagnostic message")
         XCTAssertTrue(error is Boom, "The original error object crosses the bridge")
+    }
+}
+
+/// The numeric-arg contract of the bridge (zingo-mobile#1151): a malformed
+/// or overflowing string throws the typed InvalidInput with the same
+/// message shape the Android bridge rejects with — never a silent default
+/// (the old per_bucket bug) and never an unsettled promise (the old
+/// reschedule/execute bug). The Swift twin of the Kotlin FfiArgsTest.
+class FfiArgsTests: XCTestCase {
+    func testValidNumbersParse() throws {
+        XCTAssertEqual(try FfiArgs.requiredU32("7", name: "per_bucket"), 7)
+        XCTAssertEqual(try FfiArgs.requiredU32("4294967295", name: "per_bucket"), UInt32.max)
+        XCTAssertEqual(try FfiArgs.requiredU64("250", name: "spacing_ms"), 250)
+        XCTAssertEqual(
+            try FfiArgs.requiredU64("18446744073709551615", name: "spacing_ms"), UInt64.max)
+        XCTAssertEqual(try FfiArgs.optionalU32("7", name: "per_bucket"), 7)
+    }
+
+    func testEmptyOptionalMeansAbsentNeverZero() throws {
+        XCTAssertNil(try FfiArgs.optionalU32("", name: "per_bucket"))
+    }
+
+    func testMalformedAndOverflowingValuesRejectAsInvalidInput() {
+        let rejected: [(raw: String, parse: () throws -> Any)] = [
+            ("not-a-number", { try FfiArgs.requiredU32("not-a-number", name: "per_bucket") }),
+            ("-1", { try FfiArgs.requiredU32("-1", name: "per_bucket") }),
+            ("4294967296", { try FfiArgs.requiredU32("4294967296", name: "per_bucket") }),
+            ("1.5", { try FfiArgs.optionalU32("1.5", name: "per_bucket") as Any }),
+            ("18446744073709551616",
+             { try FfiArgs.requiredU64("18446744073709551616", name: "spacing_ms") }),
+        ]
+        for (raw, parse) in rejected {
+            XCTAssertThrowsError(try parse(), "\"\(raw)\" must reject, never default") { error in
+                guard case ZingolibError.InvalidInput = error else {
+                    return XCTFail("\"\(raw)\" must throw the typed InvalidInput, got \(error)")
+                }
+            }
+        }
+    }
+
+    func testTheRejectionMessageMatchesTheAndroidBridgeShape() {
+        XCTAssertThrowsError(try FfiArgs.requiredU32("nope", name: "per_bucket")) { error in
+            guard case ZingolibError.InvalidInput(let message) = error else {
+                return XCTFail("expected the typed InvalidInput, got \(error)")
+            }
+            XCTAssertEqual(message, "per_bucket must be a u32: \"nope\"")
+        }
+        XCTAssertThrowsError(try FfiArgs.requiredU64("nope", name: "spacing_ms")) { error in
+            guard case ZingolibError.InvalidInput(let message) = error else {
+                return XCTFail("expected the typed InvalidInput, got \(error)")
+            }
+            XCTAssertEqual(message, "spacing_ms must be a u64: \"nope\"")
+        }
+    }
+
+    func testTheRejectionCrossesTheBridgeAsInvalidInputNeverUnknown() {
+        let outcome = FfiOutcome.of {
+            _ = try FfiArgs.requiredU32("not-a-number", name: "per_bucket")
+            return ""
+        }
+        guard case .rejected(let code, _, _) = outcome else {
+            return XCTFail("a malformed numeric arg must reject")
+        }
+        XCTAssertEqual(
+            code, "InvalidInput",
+            "a malformed numeric arg must reject under InvalidInput on both platforms")
     }
 }

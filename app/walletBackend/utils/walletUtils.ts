@@ -61,11 +61,21 @@ export async function getZecPrice(): Promise<{
 // Wallet lifecycle — create / load / restore / save / delete
 // ---------------------------------------------------------------------------
 
+/**
+ * The native "true"/"false" resolution protocol collapsed to a boolean:
+ * true only for a successful resolution whose value is truthy and not the
+ * "false" sentinel. A rejection is false — the typed error never re-enters
+ * the data channel as prose a caller could mistake for success
+ * (zingo-mobile#1151; the backup-restore latent bug).
+ */
+export function resolvedTrue(result: FfiResult<string>): boolean {
+  return result.ok && !!result.value && result.value !== GlobalConst.false;
+}
+
 // True iff a wallet file is present on disk. zingolib reports the answer as
 // the string "true"/"false"; collapsed to a real boolean here.
 export async function walletExists(): Promise<boolean> {
-  const result = await callFfi(RPCModule.walletExists());
-  return result.ok && !!result.value && result.value !== GlobalConst.false;
+  return resolvedTrue(await callFfi(RPCModule.walletExists()));
 }
 
 // Bootstraps a brand-new wallet for the given server/chain. The success value
@@ -486,8 +496,7 @@ export async function isWalletAddress(address: string): Promise<boolean> {
 // as the string "true"/"false"; we collapse it to a real boolean here so
 // callers don't have to repeat the GlobalConst.false comparison.
 export async function walletBackupExists(): Promise<boolean> {
-  const result = await callFfi(RPCModule.walletBackupExists());
-  return result.ok && !!result.value && result.value !== GlobalConst.false;
+  return resolvedTrue(await callFfi(RPCModule.walletBackupExists()));
 }
 
 // Returns the latest block height the given server reports; the success

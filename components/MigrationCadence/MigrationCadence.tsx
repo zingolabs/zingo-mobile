@@ -16,7 +16,11 @@ import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
-import { migrationStatus, rescheduleParts } from '../../app/walletBackend';
+import {
+  migrationStatus,
+  rescheduleParts,
+  routeRescheduleParts,
+} from '../../app/walletBackend';
 import { RPCMigrationStatusType } from '../../app/walletBackend/types/RPCMigrationStatusType';
 
 type MigrationCadenceProps = NativeStackScreenProps<
@@ -185,32 +189,21 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
     const perBucket = selected === 'fewer' ? fewerPerBucket : 1;
     setSubmitting(true);
     const reschedule = await rescheduleParts(perBucket);
-    let failure: string | null = null;
-    if (!reschedule.ok) {
-      failure = reschedule.error.message;
-    } else {
-      try {
-        const parsed = JSON.parse(reschedule.value);
-        if (parsed.error) {
-          failure = parsed.error;
-        }
-      } catch (e) {
-        failure = `${e}`;
-      }
-    }
     setSubmitting(false);
-    if (failure === null) {
-      navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
-      return;
+    const route = routeRescheduleParts(reschedule);
+    switch (route.kind) {
+      case 'proceed':
+        navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
+        return;
+      // CadenceFixed: a part is already signed, so the existing schedule
+      // stands — reviewing it (and re-arming reminders) is still valid.
+      case 'schedule-stands':
+        addLastSnackbar(translate('migrationcadence.cadence-fixed') as string);
+        navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
+        return;
+      case 'error':
+        addLastSnackbar(route.message);
     }
-    // CadenceFixed: a part is already signed, so the existing schedule
-    // stands — reviewing it (and re-arming reminders) is still valid.
-    if (!reschedule.ok && reschedule.error.code === 'MigrationCadenceFixed') {
-      addLastSnackbar(translate('migrationcadence.cadence-fixed') as string);
-      navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
-      return;
-    }
-    addLastSnackbar(failure);
   }, [
     submitting,
     selected,

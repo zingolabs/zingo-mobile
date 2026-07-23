@@ -965,14 +965,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     // `perBucket` crosses the bridge as a string (the module's numeric-arg
-    // convention); empty means "keep zingolib's default cadence".
+    // convention); empty means "keep zingolib's default cadence", and a
+    // malformed value rejects as InvalidInput, matching the iOS bridge.
     @ReactMethod
     fun startIronwoodMigrationProcess(planHashHex: String, perBucket: String, promise: Promise) {
         FfiOutcome.settling(promise, "start_ironwood_migration") {
             uniffi.zingo.initLogging()
             uniffi.zingo.startIronwoodMigration(
                 planHashHex,
-                if (perBucket.isEmpty()) null else perBucket.toUInt()
+                FfiArgs.optionalU32(perBucket, "per_bucket")
             )
         }
     }
@@ -992,7 +993,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun reschedulePartsProcess(perBucket: String, promise: Promise) {
         FfiOutcome.settling(promise, "reschedule_parts") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.rescheduleParts(perBucket.toUInt())
+            uniffi.zingo.rescheduleParts(FfiArgs.requiredU32(perBucket, "per_bucket"))
         }
     }
 
@@ -1020,7 +1021,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun executeDuePartsProcess(spacingMs: String, promise: Promise) {
         FfiOutcome.settling(promise, "execute_due_parts") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.executeDueParts(spacingMs.toULong())
+            uniffi.zingo.executeDueParts(FfiArgs.requiredU64(spacingMs, "spacing_ms"))
         }
     }
 

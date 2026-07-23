@@ -13,6 +13,7 @@ import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
 import {
   planIronwoodMigration,
+  routeStartMigration,
   startIronwoodMigration,
 } from '../../app/walletBackend';
 import {
@@ -169,40 +170,27 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
     }
     setStarting(true);
     const start = await startIronwoodMigration(plan.plan_hash, null);
-    let failure: string | null = null;
-    if (!start.ok) {
-      failure = start.error.message;
-    } else {
-      try {
-        const parsed = JSON.parse(start.value);
-        if (parsed.error) {
-          failure = parsed.error;
-        }
-      } catch (e) {
-        failure = `${e}`;
-      }
-    }
     setStarting(false);
-    if (failure === null) {
-      navigation.navigate(RouteEnum.MigrationSplitting, { plan });
-      return;
+    const route = routeStartMigration(start);
+    switch (route.kind) {
+      case 'proceed':
+        navigation.navigate(RouteEnum.MigrationSplitting, { plan });
+        return;
+      // A migration already exists (e.g. re-entry after a kill between
+      // consent and splitting): resume it instead of erroring.
+      case 'resume':
+        navigation.navigate(RouteEnum.MigrationSplitting, {});
+        return;
+      // ConsentStale: the wallet's notes changed between planning and
+      // consent. Replan and let the user review the fresh plan.
+      case 'replan':
+        addLastSnackbar(translate('migrationsplitplan.replanned') as string);
+        fetchPlan();
+        return;
+      case 'error':
+        setErrorOnStart(true);
+        setErrorMsg(route.message);
     }
-    const code = start.ok ? null : start.error.code;
-    // A migration already exists (e.g. re-entry after a kill between consent
-    // and splitting): resume it instead of erroring.
-    if (code === 'MigrationAlreadyInProgress') {
-      navigation.navigate(RouteEnum.MigrationSplitting, {});
-      return;
-    }
-    // ConsentStale: the wallet's notes changed between planning and consent.
-    // Replan and let the user review the fresh plan.
-    if (code === 'MigrationConsentStale') {
-      addLastSnackbar(translate('migrationsplitplan.replanned') as string);
-      fetchPlan();
-      return;
-    }
-    setErrorOnStart(true);
-    setErrorMsg(failure);
   }, [plan, starting, navigation, addLastSnackbar, translate, fetchPlan]);
 
   const splitRounds = plan?.split_rounds ?? [];

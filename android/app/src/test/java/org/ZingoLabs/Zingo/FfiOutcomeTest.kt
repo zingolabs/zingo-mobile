@@ -128,6 +128,18 @@ class FfiOutcomeTest {
     }
 
     @Test
+    fun lockPoisonedRejectsUnderItsVariantName() {
+        // Completes the 21/21 variant matrix: the one code the table above
+        // does not carry, thrown by any lightclient call whose lock a
+        // panicking thread poisoned.
+        val failure = ZingolibException.LightclientLockPoisoned("boom")
+        assertEquals(
+            FfiOutcome.Rejected("LightclientLockPoisoned", "get_balance", failure),
+            FfiOutcome.of("get_balance") { throw failure },
+        )
+    }
+
+    @Test
     fun unknownThrowableRejectsAsUnknown() {
         // The derivation is total: anything outside the typed FFI family
         // crosses under "Unknown", never under a class name of its own.

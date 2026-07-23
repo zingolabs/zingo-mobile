@@ -94,6 +94,32 @@ enum FfiOutcome {
   }
 }
 
+/// Pure parsers for the bridge's string-crossing numeric arguments. A
+/// malformed or overflowing value throws the typed InvalidInput — the same
+/// code and message shape the Android bridge rejects with — never a silent
+/// default and never an unsettled promise. Pure — no I/O, no platform
+/// dependencies — so the parsers run under plain XCTest unit tests.
+enum FfiArgs {
+  static func requiredU32(_ raw: String, name: String) throws -> UInt32 {
+    guard let parsed = UInt32(raw) else {
+      throw ZingolibError.InvalidInput(message: "\(name) must be a u32: \"\(raw)\"")
+    }
+    return parsed
+  }
+
+  /// Empty means absent — the module's "keep the default" convention.
+  static func optionalU32(_ raw: String, name: String) throws -> UInt32? {
+    raw.isEmpty ? nil : try requiredU32(raw, name: name)
+  }
+
+  static func requiredU64(_ raw: String, name: String) throws -> UInt64 {
+    guard let parsed = UInt64(raw) else {
+      throw ZingolibError.InvalidInput(message: "\(name) must be a u64: \"\(raw)\"")
+    }
+    return parsed
+  }
+}
+
 @objc(RPCModule)
 class RPCModule: NSObject {
   
@@ -1019,14 +1045,9 @@ class RPCModule: NSObject {
           // module's numeric-arg-as-string convention); anything else must
           // parse as a u32 — a malformed value rejects as InvalidInput
           // instead of silently keeping the default.
-          var perBucket: UInt32? = nil
-          if !per_bucket.isEmpty {
-            guard let parsed = UInt32(per_bucket) else {
-              throw ZingolibError.InvalidInput(message: "per_bucket must be a u32: \"\(per_bucket)\"")
-            }
-            perBucket = parsed
-          }
-          return try startIronwoodMigration(planHashHex: plan_hash_hex, perBucket: perBucket)
+          try startIronwoodMigration(
+            planHashHex: plan_hash_hex,
+            perBucket: FfiArgs.optionalU32(per_bucket, name: "per_bucket"))
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1049,10 +1070,7 @@ class RPCModule: NSObject {
           // `per_bucket` crosses as a string (numeric-arg convention); a
           // malformed value rejects as InvalidInput — never an unsettled
           // promise.
-          guard let perBucket = UInt32(per_bucket) else {
-            throw ZingolibError.InvalidInput(message: "per_bucket must be a u32: \"\(per_bucket)\"")
-          }
-          return try rescheduleParts(perBucket: perBucket)
+          try rescheduleParts(perBucket: FfiArgs.requiredU32(per_bucket, name: "per_bucket"))
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1085,10 +1103,7 @@ class RPCModule: NSObject {
         FfiOutcome.of {
           // A malformed spacing rejects as InvalidInput — never an
           // unsettled promise.
-          guard let spacingMs = UInt64(spacing_ms) else {
-            throw ZingolibError.InvalidInput(message: "spacing_ms must be a u64: \"\(spacing_ms)\"")
-          }
-          return try executeDueParts(spacingMs: spacingMs)
+          try executeDueParts(spacingMs: FfiArgs.requiredU64(spacing_ms, name: "spacing_ms"))
         }.settle(resolve: resolve, reject: reject)
       }
   }

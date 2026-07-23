@@ -34,6 +34,14 @@ jobs:
     with:
       fail-all: true
 
+  # The plain-JVM bridge-contract tests (FfiOutcome, FfiArgs): the only
+  # executable tests of the Kotlin bridge, so they gate the PR alongside
+  # the compile check.
+  android-unit-test:
+    uses: ./.github/workflows/android-unit-test.yaml
+    with:
+      fail-all: true
+
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
     secrets: inherit
@@ -114,6 +122,7 @@ jobs:
     uses: ./.github/workflows/ios-build.yaml
     needs:
       - android-kotlin-compile
+      - android-unit-test
       - jest-test
       - rust-shear
       - js-depcheck
