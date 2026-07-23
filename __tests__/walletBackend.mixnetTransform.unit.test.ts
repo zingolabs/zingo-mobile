@@ -1,20 +1,30 @@
 import { RPCMixnetModeEnum } from '../app/walletBackend/enums/RPCMixnetModeEnum';
 import {
-  hasErrorPrefix,
+  describeRejection,
   parseMixnetMode,
   transformMixnetDetail,
   transformMixnetStatus,
 } from '../app/walletBackend/transforms/mixnetTransform';
 
-describe('hasErrorPrefix', () => {
-  it('recognizes the native error convention in either case', () => {
-    expect(hasErrorPrefix('Error: [Native] attach mixnet: boom')).toBe(true);
-    expect(hasErrorPrefix('error: something')).toBe(true);
+describe('describeRejection', () => {
+  it('carries an Error message from the error channel', () => {
+    expect(describeRejection(new Error('attach_mixnet: endpoint dead'))).toEqual(
+      {
+        reason: 'nativeRejection',
+        message: 'attach_mixnet: endpoint dead',
+      },
+    );
   });
 
-  it('passes JSON payloads through', () => {
-    expect(hasErrorPrefix('{"mixnet_mode":"ready"}')).toBe(false);
-    expect(hasErrorPrefix('')).toBe(false);
+  it('stringifies non-Error throwables without throwing itself', () => {
+    expect(describeRejection('bridge gone')).toEqual({
+      reason: 'nativeRejection',
+      message: 'bridge gone',
+    });
+    expect(describeRejection(undefined)).toEqual({
+      reason: 'nativeRejection',
+      message: 'unknown',
+    });
   });
 });
 
@@ -40,11 +50,11 @@ describe('parseMixnetMode', () => {
 
 describe('transformMixnetStatus', () => {
   it('reports ready with the SOCKS5 address', () => {
-    const nativeReply = JSON.stringify({
+    const dataReply = JSON.stringify({
       mixnet_mode: 'ready',
       socks5_addr: '127.0.0.1:43210',
     });
-    expect(transformMixnetStatus(nativeReply)).toEqual({
+    expect(transformMixnetStatus(dataReply)).toEqual({
       kind: 'status',
       mode: RPCMixnetModeEnum.ready,
       socks5Addr: '127.0.0.1:43210',
@@ -66,60 +76,54 @@ describe('transformMixnetStatus', () => {
 
   it('never surfaces a stale address outside of ready', () => {
     // A died payload must not carry a dialable address even if one leaks in.
-    const nativeReply = JSON.stringify({
+    const dataReply = JSON.stringify({
       mixnet_mode: 'died',
       socks5_addr: '127.0.0.1:1',
     });
-    expect(transformMixnetStatus(nativeReply)).toEqual({
+    expect(transformMixnetStatus(dataReply)).toEqual({
       kind: 'status',
       mode: RPCMixnetModeEnum.died,
       socks5Addr: null,
     });
   });
 
-  it('lands the native error convention in the error arm', () => {
-    const nativeReply = 'Error: [Native] mixnet mode: bridge unavailable';
-    expect(transformMixnetStatus(nativeReply)).toEqual({
-      kind: 'error',
-      message: nativeReply,
+  it('treats error prose in the data channel as a malformed payload, never as an error signal', () => {
+    // The channel-purity contract (audit Issues Q and R): the data channel
+    // is never sniffed for prefixes, so a leaked "Error: ..." string is
+    // simply not a status payload.
+    const leakedProse = 'Error: [Native] mixnet mode: something';
+    expect(transformMixnetStatus(leakedProse)).toEqual({
+      kind: 'failure',
+      failure: { reason: 'malformedPayload', payload: leakedProse },
     });
   });
 
-  it('lands a payload-level error field in the error arm', () => {
-    const nativeReply = JSON.stringify({ error: 'no lightclient' });
-    expect(transformMixnetStatus(nativeReply)).toEqual({
-      kind: 'error',
-      message: 'no lightclient',
+  it('lands malformed JSON in the failure arm rather than throwing', () => {
+    expect(transformMixnetStatus('not json at all').kind).toBe('failure');
+    expect(transformMixnetStatus('').kind).toBe('failure');
+  });
+
+  it('lands an unrecognized mode in the failure arm', () => {
+    const dataReply = JSON.stringify({ mixnet_mode: 'hibernating' });
+    expect(transformMixnetStatus(dataReply)).toEqual({
+      kind: 'failure',
+      failure: { reason: 'unrecognizedMode', claimed: 'hibernating' },
     });
-  });
-
-  it('lands malformed JSON in the error arm rather than throwing', () => {
-    expect(transformMixnetStatus('not json at all').kind).toBe('error');
-    expect(transformMixnetStatus('').kind).toBe('error');
-  });
-
-  it('lands an unrecognized mode in the error arm', () => {
-    const nativeReply = JSON.stringify({ mixnet_mode: 'hibernating' });
-    const report = transformMixnetStatus(nativeReply);
-    expect(report.kind).toBe('error');
-    if (report.kind === 'error') {
-      expect(report.message).toContain('hibernating');
-    }
   });
 });
 
 describe('transformMixnetDetail', () => {
   it('reports the narration line', () => {
-    const nativeReply = JSON.stringify({
+    const dataReply = JSON.stringify({
       detail: 'attempt 2/10: 2 in flight, 0 failed',
     });
-    expect(transformMixnetDetail(nativeReply)).toEqual({
+    expect(transformMixnetDetail(dataReply)).toEqual({
       kind: 'detail',
       detail: 'attempt 2/10: 2 in flight, 0 failed',
     });
   });
 
-  it('treats an absent or empty detail as the quiet state, not an error', () => {
+  it('treats an absent or empty detail as the quiet state, not a failure', () => {
     expect(transformMixnetDetail(JSON.stringify({ detail: '' }))).toEqual({
       kind: 'detail',
       detail: '',
@@ -130,15 +134,7 @@ describe('transformMixnetDetail', () => {
     });
   });
 
-  it('lands the native error convention in the error arm', () => {
-    const nativeReply = 'Error: [Native] mixnet bootstrap detail: boom';
-    expect(transformMixnetDetail(nativeReply)).toEqual({
-      kind: 'error',
-      message: nativeReply,
-    });
-  });
-
-  it('lands malformed JSON in the error arm rather than throwing', () => {
-    expect(transformMixnetDetail('{{{{').kind).toBe('error');
+  it('lands malformed JSON in the failure arm rather than throwing', () => {
+    expect(transformMixnetDetail('{{{{').kind).toBe('failure');
   });
 });

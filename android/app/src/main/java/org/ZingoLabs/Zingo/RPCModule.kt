@@ -997,108 +997,48 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // Mixnet Mode (send-over-nym). Out-of-band error settlement per
+    // FfiOutcome (zingo-mobile#1151, audit Issues Q and R): the resolved
+    // value is always data, a typed ZingolibException rejects, and nothing
+    // is ever encoded as error prose inside the success channel.
+
     @ReactMethod
     fun attachMixnet(socks5Addr: String, promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.attachMixnet(socks5Addr)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] attach mixnet: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
+        FfiOutcome.settling(promise, "attach_mixnet") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.attachMixnet(socks5Addr)
         }
     }
 
     @ReactMethod
     fun enableMixnet(proxyPath: String, promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.enableMixnet(proxyPath)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] enable mixnet: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
+        FfiOutcome.settling(promise, "enable_mixnet") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.enableMixnet(proxyPath)
         }
     }
 
     @ReactMethod
     fun disableMixnet(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.disableMixnet()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] disable mixnet: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
+        FfiOutcome.settling(promise, "disable_mixnet") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.disableMixnet()
         }
     }
 
     @ReactMethod
     fun mixnetModeInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.mixnetMode()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] mixnet mode: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
+        FfiOutcome.settling(promise, "mixnet_mode") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.mixnetMode()
         }
     }
 
     @ReactMethod
     fun mixnetBootstrapDetailInfo(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.mixnetBootstrapDetail()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: [Native] mixnet bootstrap detail: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
+        FfiOutcome.settling(promise, "mixnet_bootstrap_detail") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.mixnetBootstrapDetail()
         }
     }
 
