@@ -27,6 +27,17 @@ jobs:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
 
+  android-apk-build:
+    strategy:
+      matrix:
+        abi: [ x86_64, x86 ]
+      fail-fast: false
+    uses: ./.github/workflows/android-apk-build.yaml
+    needs: [create-cache-key, android-build]
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      abi: ${{ matrix.abi }}
+
   android-ubuntu-integration-test-ci:
     strategy:
       matrix:
@@ -35,7 +46,7 @@ jobs:
           - { abi: x86, api-level: 29, target: default }
       fail-fast: false
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, create-cache-key, android-build]
+    needs: [create-timestamp, create-cache-key, android-apk-build]
     secrets: inherit
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}

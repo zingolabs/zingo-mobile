@@ -32,11 +32,15 @@ export const GlobalConst = {
   keyStore: 'KeyStore',
   utf8: 'utf8',
   minConfirmations: 3,
-  // SwapKit chain code for Zcash — the stable 'ZEC' ticker used as the default
+  // Chain code for Zcash — the stable 'ZEC' ticker used as the default
   // `swapChain` on address-book contacts and to branch the ZEC vs non-ZEC
   // address validation/scan paths. Single source so it never drifts.
   zecSwapChain: 'ZEC',
-  // TEMP: swaps disabled — hides the Swap tab and the Swap history filter.
-  // Set back to `true` to restore swaps.
-  swapEnabled: true,
+  // Debug flag for the auto-launched "Meet Ironwood" onboarding only. While
+  // true it relaunches on every wallet load that finds spendable (non-dust)
+  // Orchard funds; false is the release behavior — launch once, gated by the
+  // persisted `ironwoodOnboardSeen` setting. Never bypasses the NU6.3
+  // activation check, and has no bearing on the migration banner, which
+  // tracks Orchard funds alone. See `isIronwoodActive`.
+  ironwoodOnboardEveryLoad: false,
 };

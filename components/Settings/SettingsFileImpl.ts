@@ -240,6 +240,11 @@ export default class SettingsFileImpl {
       if (!settings.hasOwnProperty(SettingsNameEnum.nym)) {
         settings.nym = false;
       }
+      if (!settings.hasOwnProperty(SettingsNameEnum.ironwoodOnboardSeen)) {
+        // the wallet hasn't shown the "Meet Ironwood" onboarding yet; it
+        // launches once, the first time spendable Orchard funds are detected.
+        settings.ironwoodOnboardSeen = false;
+      }
       // Silent migration: legacy "USDTOR" currency is dropped in favor of "USD".
       // Tor support has been removed; users on an older settings.json get rewritten transparently.
       if ((settings.currency as string) === 'USDTOR') {

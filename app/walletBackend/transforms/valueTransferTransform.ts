@@ -1,7 +1,26 @@
-import { ValueTransferType, ValueTransferKindEnum } from '../../AppState';
+import {
+  ValueTransferType,
+  ValueTransferKindEnum,
+  PoolEnum,
+} from '../../AppState';
 import { RPCValueTransferType } from '../types/RPCValueTransferType';
 import { RPCValueTransfersKindEnum } from '../enums/RPCValueTransfersKindEnum';
 import { RPCValueTransfersStatusEnum } from '../enums/RPCValueTransfersStatusEnum';
+
+/**
+ * An Orchard -> Ironwood migration is a send-to-self whose funding pools
+ * include Orchard and whose received pools include Ironwood. zingolib does not
+ * model migration as its own value-transfer kind (see its `send-to-self` doc:
+ * `pools_sent_from: [Orchard]` + `pools_received: [Ironwood]`), so we derive it
+ * here from the pool movement.
+ */
+function isOrchardToIronwoodMigration(vt: RPCValueTransferType): boolean {
+  return (
+    vt.kind === RPCValueTransfersKindEnum.sendToSelf &&
+    !!vt.pools_sent_from?.includes(PoolEnum.OrchardPool) &&
+    !!vt.pools_received?.includes(PoolEnum.IronwoodPool)
+  );
+}
 
 /**
  * Maps a raw zingolib value transfer to the app's ValueTransferType.
@@ -22,8 +41,9 @@ export function transformValueTransfer(
 
   result.txid = vt.txid;
   result.time = vt.datetime;
-  result.kind =
-    vt.kind === RPCValueTransfersKindEnum.memoToSelf
+  result.kind = isOrchardToIronwoodMigration(vt)
+    ? ValueTransferKindEnum.Migration
+    : vt.kind === RPCValueTransfersKindEnum.memoToSelf
       ? ValueTransferKindEnum.MemoToSelf
       : vt.kind === RPCValueTransfersKindEnum.sendToSelf
         ? ValueTransferKindEnum.SendToSelf
@@ -68,7 +88,13 @@ export function transformValueTransfer(
     !vt.memos || vt.memos.length === 0 || !vt.memos.join('')
       ? undefined
       : vt.memos;
-  result.poolType = !vt.pool_received ? undefined : vt.pool_received;
+  // `pools_received` is in protocol order (transparent, sapling, orchard,
+  // ironwood); a transfer can span pools, and the app displays one, so
+  // surface the newest pool present.
+  result.poolType =
+    !vt.pools_received || vt.pools_received.length === 0
+      ? undefined
+      : vt.pools_received[vt.pools_received.length - 1];
 
   if (result.status === RPCValueTransfersStatusEnum.failed) {
     console.log('[RPC] failed value transfer (transformed):', result);

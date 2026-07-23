@@ -22,9 +22,9 @@ import Button from '../../Components/Button';
  * Informational sheet that surfaces the raw error(s) returned by the fee
  * (`sendPropose`) and/or spendable-balance RPC. Both are shown when present —
  * they are frequently the same underlying failure, but showing each under its
- * own label makes that explicit rather than hiding one. Modelled on the swap
- * `InsufficientFundsSheet`: title bar with a close X, the error text, and a
- * one-tap "Support" affordance (opens a pre-filled email).
+ * own label makes that explicit rather than hiding one. Title bar with a
+ * close X, the error text, and a one-tap "Support" affordance (opens a
+ * pre-filled email).
  */
 
 type SendErrorSheetProps = {

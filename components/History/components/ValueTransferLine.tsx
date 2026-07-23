@@ -12,12 +12,12 @@ import {
   faArrowDown,
   faArrowUp,
   faRefresh,
-  faRightLeft,
   faComment,
   faTriangleExclamation,
   //faComments,
   faFileLines,
   faPaperPlane,
+  faRightLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
@@ -38,7 +38,6 @@ import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import { swapStatusLabel } from '../../../app/swap/swapStatusLabel';
 import Utils from '../../../app/utils';
 //import Utils from '../../../app/utils';
 
@@ -101,46 +100,21 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
 
   const amountColor =
     vt.status === RPCValueTransfersStatusEnum.failed
-      ? // Swap-kind failed rows use the same coral red the rest of the app
-        // surfaces for failed transactions in the sub-line; the legacy
-        // `colors.zingo` (muted gray) is kept for non-swap failed rows so
-        // existing Sent/Received-failed visuals stay unchanged.
-        vt.kind === ValueTransferKindEnum.Swap
-        ? 'coral'
-        : colors.zingo
-      : // Swap rows do not carry per-leg confirmations the way zingolib VTs
-        // do — `confirmations` is a binary flag (0 or 1). Decide colour
-        // purely on swap direction so an inbound swap reads like a
-        // Received row (primary / green) and an outbound swap reads like
-        // a Sent row (text / default), matching the user's mental model
-        // of money entering vs leaving the wallet.
-        vt.kind === ValueTransferKindEnum.Swap
-        ? vt.swapIsInbound
+      ? colors.zingo
+      : vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations
+        ? colors.primaryDisabled
+        : vt.kind === ValueTransferKindEnum.Received ||
+            vt.kind === ValueTransferKindEnum.Shield
           ? colors.primary
-          : colors.text
-        : vt.confirmations >= 0 &&
-            vt.confirmations < GlobalConst.minConfirmations
-          ? colors.primaryDisabled
-          : vt.kind === ValueTransferKindEnum.Received ||
-              vt.kind === ValueTransferKindEnum.Shield
-            ? colors.primary
-            : colors.text;
+          : colors.text;
 
-  // Swap rows get the bidirectional `faRightLeft` icon so they read as
-  // distinct from plain Sent/Received in the list. A non-terminal swap (still
-  // pending / processing per `RPCValueTransfersStatusEnum.mempool` or
-  // `calculated`) gets the spinning `faRefresh` instead so the user sees
-  // activity at a glance.
   const icon =
-    vt.kind === ValueTransferKindEnum.Swap
-      ? vt.status !== RPCValueTransfersStatusEnum.failed &&
-        vt.status !== RPCValueTransfersStatusEnum.confirmed
-        ? faRefresh
-        : faRightLeft
-      : vt.confirmations >= 0 &&
-          vt.confirmations < GlobalConst.minConfirmations &&
-          vt.status !== RPCValueTransfersStatusEnum.failed
-        ? faRefresh
+    vt.confirmations >= 0 &&
+    vt.confirmations < GlobalConst.minConfirmations &&
+    vt.status !== RPCValueTransfersStatusEnum.failed
+      ? faRefresh
+      : vt.kind === ValueTransferKindEnum.Migration
+        ? faRightLeft
         : vt.kind === ValueTransferKindEnum.Received ||
             vt.kind === ValueTransferKindEnum.Shield
           ? faArrowDown
@@ -196,12 +170,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             {!!vt.address &&
               !readOnly &&
               selectServer !== SelectServerEnum.offline &&
-              !addressProtected &&
-              // Send affordance doesn't apply to swap rows: the address on
-              // the line is either an ephemeral t-addr (outbound) or a
-              // provider-issued deposit address (inbound) — neither is a
-              // reusable recipient for a one-off send.
-              vt.kind !== ValueTransferKindEnum.Swap && (
+              !addressProtected && (
                 <View
                   style={{
                     width: 67,
@@ -381,117 +350,99 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       fontWeight: 'bold',
                       color:
                         vt.status === RPCValueTransfersStatusEnum.failed
-                          ? // Swap-failed labels use the same coral red the
-                            // sub-line uses for failed transactions; non-swap
-                            // failed labels keep `colors.zingo` for backward
-                            // visual compatibility with Sent/Received-failed.
-                            vt.kind === ValueTransferKindEnum.Swap
-                            ? 'coral'
-                            : colors.zingo
-                          : // Inbound swaps mirror a Received row's
-                            // colouring (primary / green); outbound swaps
-                            // mirror a Sent row's (text / default). Same
-                            // mental model as the amount colour above.
-                            vt.kind === ValueTransferKindEnum.Swap
-                            ? vt.swapIsInbound
-                              ? colors.primary
-                              : colors.text
-                            : vt.kind === ValueTransferKindEnum.Received ||
-                                vt.kind === ValueTransferKindEnum.Shield
-                              ? colors.primary
-                              : colors.text,
+                          ? colors.zingo
+                          : vt.kind === ValueTransferKindEnum.Received ||
+                              vt.kind === ValueTransferKindEnum.Shield
+                            ? colors.primary
+                            : colors.text,
                       fontSize:
-                        // Swap rows are a synthesised projection of a
-                        // SwapRecord and do not carry per-leg confirmation
-                        // counts — `confirmations` is a flag, not a count —
-                        // so the "below min-confirmations → small" branch
-                        // is the wrong one to take. Render at the same
-                        // size as a settled VT.
-                        vt.kind === ValueTransferKindEnum.Swap
-                          ? 18
-                          : vt.confirmations >= 0 &&
-                              vt.confirmations < GlobalConst.minConfirmations
-                            ? 14
-                            : 18,
+                        vt.confirmations >= 0 &&
+                        vt.confirmations < GlobalConst.minConfirmations
+                          ? 14
+                          : 18,
                     }}
                   >
-                    {vt.kind === ValueTransferKindEnum.Swap
-                      ? vt.status === RPCValueTransfersStatusEnum.failed
-                        ? (translate('history.swap-failed') as string)
-                        : vt.status === RPCValueTransfersStatusEnum.confirmed
-                          ? (translate('history.swap') as string)
-                          : (translate('history.swapping') as string)
+                    {vt.status === RPCValueTransfersStatusEnum.failed &&
+                    vt.kind === ValueTransferKindEnum.Sent
+                      ? (translate('history.sent-failed') as string)
                       : vt.status === RPCValueTransfersStatusEnum.failed &&
-                          vt.kind === ValueTransferKindEnum.Sent
-                        ? (translate('history.sent-failed') as string)
+                          vt.kind === ValueTransferKindEnum.Shield
+                        ? (translate('history.shield-failed') as string)
                         : vt.status === RPCValueTransfersStatusEnum.failed &&
-                            vt.kind === ValueTransferKindEnum.Shield
-                          ? (translate('history.shield-failed') as string)
-                          : vt.status === RPCValueTransfersStatusEnum.failed &&
-                              vt.kind === ValueTransferKindEnum.Received
-                            ? (translate('history.received-failed') as string)
+                            vt.kind === ValueTransferKindEnum.Received
+                          ? (translate('history.received-failed') as string)
+                          : vt.kind === ValueTransferKindEnum.Sent &&
+                              vt.confirmations === 0
+                            ? (translate('history.sending') as string)
                             : vt.kind === ValueTransferKindEnum.Sent &&
-                                vt.confirmations === 0
-                              ? (translate('history.sending') as string)
-                              : vt.kind === ValueTransferKindEnum.Sent &&
-                                  vt.confirmations !== 0
-                                ? (translate('history.sent') as string)
+                                vt.confirmations !== 0
+                              ? (translate('history.sent') as string)
+                              : vt.kind === ValueTransferKindEnum.Received &&
+                                  vt.confirmations === 0
+                                ? (translate('history.receiving') as string)
                                 : vt.kind === ValueTransferKindEnum.Received &&
-                                    vt.confirmations === 0
-                                  ? (translate('history.receiving') as string)
+                                    vt.confirmations !== 0
+                                  ? (translate('history.received') as string)
                                   : vt.kind ===
-                                        ValueTransferKindEnum.Received &&
-                                      vt.confirmations !== 0
-                                    ? (translate('history.received') as string)
+                                        ValueTransferKindEnum.MemoToSelf &&
+                                      vt.confirmations === 0
+                                    ? (translate(
+                                        'history.sendingtoself',
+                                      ) as string)
                                     : vt.kind ===
                                           ValueTransferKindEnum.MemoToSelf &&
-                                        vt.confirmations === 0
+                                        vt.confirmations !== 0
                                       ? (translate(
-                                          'history.sendingtoself',
+                                          'history.memotoself',
                                         ) as string)
                                       : vt.kind ===
-                                            ValueTransferKindEnum.MemoToSelf &&
-                                          vt.confirmations !== 0
+                                            ValueTransferKindEnum.SendToSelf &&
+                                          vt.confirmations === 0
                                         ? (translate(
-                                            'history.memotoself',
+                                            'history.sendingtoself',
                                           ) as string)
                                         : vt.kind ===
                                               ValueTransferKindEnum.SendToSelf &&
-                                            vt.confirmations === 0
+                                            vt.confirmations !== 0
                                           ? (translate(
-                                              'history.sendingtoself',
+                                              'history.sendtoself',
                                             ) as string)
                                           : vt.kind ===
-                                                ValueTransferKindEnum.SendToSelf &&
-                                              vt.confirmations !== 0
+                                                ValueTransferKindEnum.Shield &&
+                                              vt.confirmations === 0
                                             ? (translate(
-                                                'history.sendtoself',
+                                                'history.shielding',
                                               ) as string)
                                             : vt.kind ===
                                                   ValueTransferKindEnum.Shield &&
-                                                vt.confirmations === 0
+                                                vt.confirmations !== 0
                                               ? (translate(
-                                                  'history.shielding',
+                                                  'history.shield',
                                                 ) as string)
                                               : vt.kind ===
-                                                    ValueTransferKindEnum.Shield &&
-                                                  vt.confirmations !== 0
+                                                    ValueTransferKindEnum.Rejection &&
+                                                  vt.confirmations === 0
                                                 ? (translate(
-                                                    'history.shield',
+                                                    'history.sending',
                                                   ) as string)
                                                 : vt.kind ===
                                                       ValueTransferKindEnum.Rejection &&
-                                                    vt.confirmations === 0
+                                                    vt.confirmations !== 0
                                                   ? (translate(
-                                                      'history.sending',
+                                                      'history.rejection',
                                                     ) as string)
                                                   : vt.kind ===
-                                                        ValueTransferKindEnum.Rejection &&
-                                                      vt.confirmations !== 0
+                                                        ValueTransferKindEnum.Migration &&
+                                                      vt.confirmations === 0
                                                     ? (translate(
-                                                        'history.rejection',
+                                                        'history.migrating',
                                                       ) as string)
-                                                    : ''}
+                                                    : vt.kind ===
+                                                        ValueTransferKindEnum.Migration
+                                                      ? (translate(
+                                                          'history.migration',
+                                                        ) as string)
+                                                      : ''}
                   </FadeText>
                   <View
                     style={{
@@ -593,18 +544,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                         : 40,
                   }}
                 >
-                  {/* Swap rows surface the granular SwapStatusEnum label
-                      (matches the SwapDetail status block verbatim);
-                      everything else falls back to the VT-status-based
-                      label which is what the rest of the History list
-                      has always rendered. The visual decisions above
-                      (colour / icon / alignment) stay driven by the VT
-                      status because they only need three buckets
-                      (failed / in-mempool-ish / pre-evidence). */}
-                  {vt.kind === ValueTransferKindEnum.Swap &&
-                  vt.swapStatus !== undefined
-                    ? swapStatusLabel(vt.swapStatus, translate)
-                    : (translate(`history.${vt.status}`) as string)}
+                  {translate(`history.${vt.status}`) as string}
                 </FadeText>
               </View>
             )}

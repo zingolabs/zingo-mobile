@@ -18,30 +18,49 @@ jobs:
     uses: ./.github/workflows/jest-test.yaml
     secrets: inherit
 
+  rust-shear:
+    uses: ./.github/workflows/rust-shear.yaml
+
+  js-depcheck:
+    uses: ./.github/workflows/js-depcheck.yaml
+
+  android-dependency-analysis:
+    uses: ./.github/workflows/android-dependency-analysis.yaml
+    secrets: inherit
+
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
 
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
 
+  # PR CI covers the primary target only (x86_64 / API 34). The full ABI
+  # matrix, the x86 / API 29 lane, and the whole iOS pipeline — whose
+  # macOS-runner queue dominated PR wall-clock — run on ci-nightly.
   android-build:
     strategy:
       matrix:
-        arch: [ x86_64, x86, arm64-v8a, armeabi-v7a ]
+        arch: [ x86_64 ]
     uses: ./.github/workflows/android-build.yaml
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
 
+  android-apk-build:
+    uses: ./.github/workflows/android-apk-build.yaml
+    needs: [create-cache-key, android-build]
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      abi: x86_64
+
   android-ubuntu-integration-test-ci:
     strategy:
       matrix:
         config:
           - { abi: x86_64, api-level: 34, target: default }
-          - { abi: x86, api-level: 29, target: default }
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, create-cache-key, android-build]
+    needs: [create-timestamp, create-cache-key, android-apk-build]
     secrets: inherit
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
@@ -50,11 +69,23 @@ jobs:
       api-level: ${{ matrix.config['api-level'] }}
       target: ${{ matrix.config.target }}
 
+  # iOS runs per-PR as a trailing, advisory stage: it starts only after
+  # every blocking check has passed, so the fast path's verdict is never
+  # delayed by the macOS-runner queue and a red fast path skips iOS
+  # entirely. Advisory mode records iOS failures without failing the PR;
+  # ci-nightly remains the enforced iOS gate.
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
-    needs: create-cache-key
+    needs:
+      - jest-test
+      - rust-shear
+      - js-depcheck
+      - android-dependency-analysis
+      - create-cache-key
+      - android-ubuntu-integration-test-ci
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      advisory: true
 
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
@@ -62,3 +93,4 @@ jobs:
     secrets: inherit
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      advisory: true

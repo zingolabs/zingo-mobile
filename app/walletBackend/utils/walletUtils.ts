@@ -193,14 +193,41 @@ export async function restoreExistingWalletBackup(): Promise<string> {
   }
 }
 
-// Flushes the in-memory wallet state to disk. Returns "true"/"false" or
-// an "error: ..." prefix.
-export async function doSave(): Promise<string> {
+/**
+ * Whether a native save/backup resolution reports success. The bridges are
+ * trimodal (zingo-mobile#1151): Android resolves boolean true/false, iOS
+ * resolves "true"/"false", and both resolve "Error: ..." prose from their
+ * catch blocks. Success is knowable only from the two success shapes; any
+ * other value — including error prose — is a failure.
+ */
+export function nativeSaveSucceeded(result: boolean | string): boolean {
+  return result === true || result === GlobalConst.true;
+}
+
+// Flushes the in-memory wallet state to disk. The native bridge's trimodal
+// resolution is classified here, at the single seam (nativeSaveSucceeded),
+// and a rejected native promise is contained as false — never re-encoded
+// as "Error: ..." prose. Callers learn the outcome from the boolean alone
+// (zingo-mobile#1151; audit Issue P).
+export async function doSave(): Promise<boolean> {
   try {
-    return await RPCModule.doSave();
+    return nativeSaveSucceeded(await RPCModule.doSave());
   } catch (error) {
     console.log(`Critical Error doSave ${error}`);
-    return `Error: ${error}`;
+    return false;
+  }
+}
+
+// Snapshots the wallet file to its on-device backup twin. Same contract as
+// doSave: the trimodal native resolution is classified at this seam and a
+// rejection is contained as false, so no caller ever awaits doSaveBackup
+// without failure handling (audit Issue P, scenario three).
+export async function doSaveBackup(): Promise<boolean> {
+  try {
+    return nativeSaveSucceeded(await RPCModule.doSaveBackup());
+  } catch (error) {
+    console.log(`Critical Error doSaveBackup ${error}`);
+    return false;
   }
 }
 
@@ -337,6 +364,72 @@ export async function sendPropose(proposeJson: string): Promise<string> {
   }
 }
 
+// Plans the immediate Orchard -> Ironwood drain without broadcasting. Mirrors
+// the native `planOrchardDrainProcess` (propose/preview phase). Returns the raw
+// JSON (parseable as RPCDrainPlanType); the caller checks for an `error`
+// prefix / field before parsing.
+export async function planOrchardDrain(): Promise<string> {
+  try {
+    const planStr: string = await RPCModule.planOrchardDrainProcess();
+    if (planStr) {
+      if (planStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error planOrchardDrain ${planStr}`);
+        return planStr;
+      }
+    } else {
+      console.log('Internal Error planOrchardDrain');
+      return 'Error: Internal RPC Error: planOrchardDrain';
+    }
+    return planStr;
+  } catch (error) {
+    console.log(`Critical Error planOrchardDrain ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Executes the immediate Orchard -> Ironwood drain: builds and broadcasts every
+// drain transaction at once. Mirrors the native `drainOrchardProcess`. Returns
+// the raw JSON (parseable as RPCDrainType); the caller checks for an `error`
+// prefix / field before parsing.
+export async function drainOrchard(): Promise<string> {
+  try {
+    const drainStr: string = await RPCModule.drainOrchardProcess();
+    if (drainStr) {
+      if (drainStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error drainOrchard ${drainStr}`);
+        return drainStr;
+      }
+    } else {
+      console.log('Internal Error drainOrchard');
+      return 'Error: Internal RPC Error: drainOrchard';
+    }
+    return drainStr;
+  } catch (error) {
+    console.log(`Critical Error drainOrchard ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
+// Snapshot of the in-flight drain's progress, for rendering "Building i/N" then
+// "Broadcasting i/N". Mirrors the native `drainStatusProcess`; safe to poll
+// concurrently with a running `drainOrchard` (native reads a side channel, not
+// the lightclient lock). Returns the raw JSON: `null` when no drain is running,
+// otherwise `{ total, built, sent, phase }` (parseable as RPCDrainStatusType).
+// The caller checks for an `error` prefix before parsing.
+export async function drainStatus(): Promise<string> {
+  try {
+    const statusStr: string = await RPCModule.drainStatusProcess();
+    if (statusStr && statusStr.toLowerCase().startsWith(GlobalConst.error)) {
+      console.log(`Error drainStatus ${statusStr}`);
+      return statusStr;
+    }
+    return statusStr;
+  } catch (error) {
+    console.log(`Critical Error drainStatus ${error}`);
+    return `Error: ${error}`;
+  }
+}
+
 // Returns the spendable balance that could be sent to `address` right now,
 // honoring privacy levels and donation flags. Returns the raw JSON
 // (parseable as RPCSpendablebalanceType).
@@ -422,20 +515,6 @@ export async function createNewTransparentAddress(): Promise<string> {
   }
 }
 
-// Reserves a fresh ZIP-320 refund-scope (ephemeral) transparent address. The
-// wallet persists the new index so subsequent sync ticks scan it and any
-// incoming UTXOs surface as normal wallet transactions. Returns raw JSON:
-// `{ account, address_index, scope, encoded_address }`. Callers (swap flow)
-// must use one per swap intent — reuse would defeat the privacy property.
-export async function reserveEphemeralAddress(): Promise<string> {
-  try {
-    return await RPCModule.reserveEphemeralAddressProcess();
-  } catch (error) {
-    console.log(`Critical Error reserveEphemeralAddress ${error}`);
-    return `Error: ${error}`;
-  }
-}
-
 // Requests zingolib to forget about a transaction. Returns the raw response
 // from the bridge — either an "error: ..." prefix on failure or a
 // human-readable status message on success, which the caller is expected to
@@ -502,12 +581,7 @@ export async function getLatestBlockServerInfo(
   try {
     const heightStr: string =
       await RPCModule.getLatestBlockServerInfo(serverUri);
-    if (heightStr) {
-      if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error server height ${heightStr}`);
-        return heightStr;
-      }
-    } else {
+    if (!heightStr) {
       console.log('Internal Error server height');
       return 'Error: Internal RPC Error: server height';
     }

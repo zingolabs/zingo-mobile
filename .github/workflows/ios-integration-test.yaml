@@ -6,6 +6,13 @@ on:
       cache-key:
         required: true
         type: string
+      advisory:
+        # Advisory mode: job failures are recorded but do not fail the
+        # caller, for runs where iOS is informational (per-PR CI) rather
+        # than a gate (nightly).
+        required: false
+        default: false
+        type: boolean
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
@@ -13,6 +20,7 @@ env:
 
 jobs:
   build-for-testing:
+    continue-on-error: ${{ inputs.advisory }}
     # Stock runners, deliberately: the huge macos-15 fleet queues in seconds,
     # while the max-4 zingo-ios-build-12 pool is left to the xcframework
     # build alone. The xcodebuild destination pins no arch (see the
@@ -36,11 +44,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-
-      - name: Generate SwapKit secrets module
-        env:
-          SWAPKIT_API_KEY: ${{ secrets.SWAPKIT_API_KEY }}
-        run: ./scripts/ci/generate-swapkit-secrets.sh
 
       - name: Restore iOS xcframework cache
         uses: actions/cache/restore@v6
@@ -97,6 +100,7 @@ jobs:
         with:
           name: xctestrun-and-products
           path: ios/build/DerivedData/Build/Products
+          retention-days: 3
 
       - name: Upload IOS build reports (.xcresult)
         if: ${{ always() && !cancelled() }}

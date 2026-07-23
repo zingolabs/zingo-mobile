@@ -9,6 +9,7 @@ import {
   ValueTransferType,
 } from '../AppState';
 import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
+import { RPCDrainTxType } from '../walletBackend/types/RPCDrainPlanType';
 
 /**
  * Root navigation parameter list for the main stack navigator
@@ -61,7 +62,6 @@ export type AppDrawerParamList = {
   [RouteEnum.History]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
-  [RouteEnum.Swap]: undefined;
   [RouteEnum.Messages]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
@@ -71,13 +71,18 @@ export type AppDrawerParamList = {
     { phase?: 'created' | 'failed'; errorMessage?: string } | undefined;
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
+  [RouteEnum.MeetIronwood]: undefined;
+  [RouteEnum.MigrationStrategy]: undefined;
+  [RouteEnum.MigrationTransactions]: undefined;
+  // The immediate drain broadcasts here; `transactions` is the previewed plan,
+  // so the list matches what the user accepted while the drain re-plans/sends.
+  [RouteEnum.MigrationSending]: { transactions: RPCDrainTxType[] };
 
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
   [RouteEnum.AddressList]: AddressListNavigationState | undefined;
   [RouteEnum.ValueTransferDetail]:
     ValueTransferDetailNavigationState | undefined;
-  [RouteEnum.SwapDetail]: SwapDetailNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
   [RouteEnum.Seed]: SeedNavigationState | undefined;
@@ -97,7 +102,7 @@ export type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
   active: boolean;
   // When true the scanner returns the scanned string verbatim — no `zcash:`
-  // prefixing — for non-Zcash address fields (address book / swap). The caller
+  // prefixing — for non-Zcash address fields (address book). The caller
   // validates it per its own chain.
   raw?: boolean;
 };
@@ -111,20 +116,6 @@ export type ValueTransferDetailNavigationState = {
   index: number;
   vt: ValueTransferType;
   valueTransfersSliced: ValueTransferType[];
-  totalLength: number;
-};
-
-/**
- * Params for the SwapDetail screen. Mirrors `ValueTransferDetailNavigationState`
- * structure (index + slice + total) so the up/down chevron navigation feels
- * identical, but the slice is a list of `recordId`s rather than full
- * `SwapRecord` snapshots. The screen looks up the current record live from
- * `context.swapRecords` on every render so background mutations by the
- * poller surface without the params going stale.
- */
-export type SwapDetailNavigationState = {
-  index: number;
-  recordIds: string[];
   totalLength: number;
 };
 

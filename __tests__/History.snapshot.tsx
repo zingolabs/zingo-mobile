@@ -41,7 +41,12 @@ describe('Component History - test', () => {
   state.valueTransfers = mockValueTransfers;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
-  state.info = mockInfo;
+  // `mockInfo`'s tip predates NU6.3, which would hide the Ironwood migration
+  // banner; put the chain past activation so these snapshots keep covering it.
+  state.info = {
+    ...mockInfo,
+    latestBlock: mockInfo.ironwoodActivationHeight as number,
+  };
   state.totalBalance = mockTotalBalance;
   const onFunction = jest.fn();
 

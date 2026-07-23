@@ -24,6 +24,201 @@ exports[`Component History - test History currency USD, privacy high & mode adva
     <View
       onLayout={[Function]}
     />
+    <View
+      onLayout={[Function]}
+      pointerEvents="box-none"
+    >
+      <View
+        style={
+          {
+            "paddingBottom": 18,
+            "paddingHorizontal": 12,
+            "paddingTop": 8,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "#262527",
+              "borderColor": "#65491C",
+              "borderRadius": 10,
+              "borderWidth": 1,
+              "marginBottom": 10,
+              "paddingHorizontal": 14,
+              "paddingVertical": 12,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "#888888",
+                "fontSize": 13,
+                "lineHeight": 19,
+              }
+            }
+          >
+            <Text>
+              text translated
+            </Text>
+          </Text>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "#031124",
+              "borderColor": "#05234C",
+              "borderRadius": 12,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 14,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flex": 1,
+                "marginRight": 12,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "marginBottom": 6,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "#F99D00",
+                    "borderRadius": 5,
+                    "height": 9,
+                    "marginRight": 8,
+                    "width": 9,
+                  }
+                }
+              />
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 15,
+                    "fontWeight": "700",
+                  }
+                }
+              >
+                text translated
+              </Text>
+              <View
+                style={
+                  {
+                    "backgroundColor": "rgba(249, 157, 0, 0.15)",
+                    "borderRadius": 6,
+                    "marginLeft": 8,
+                    "paddingHorizontal": 8,
+                    "paddingVertical": 2,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#F99D00",
+                      "fontSize": 12,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 13,
+                }
+              }
+            >
+              text translated
+               
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontWeight": "700",
+                  }
+                }
+              >
+                0.6000
+              </Text>
+               
+              ZEC
+            </Text>
+          </View>
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "backgroundColor": "#18bd18",
+                "borderRadius": 24,
+                "opacity": 1,
+                "paddingHorizontal": 22,
+                "paddingVertical": 10,
+              }
+            }
+            testID="ironwoodbanner.start"
+          >
+            <Text
+              style={
+                {
+                  "color": "#011401",
+                  "fontSize": 15,
+                  "fontWeight": "700",
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
   </View>
 </View>
 `;
@@ -52,6 +247,201 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     <View
       onLayout={[Function]}
     />
+    <View
+      onLayout={[Function]}
+      pointerEvents="box-none"
+    >
+      <View
+        style={
+          {
+            "paddingBottom": 18,
+            "paddingHorizontal": 12,
+            "paddingTop": 8,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "#262527",
+              "borderColor": "#65491C",
+              "borderRadius": 10,
+              "borderWidth": 1,
+              "marginBottom": 10,
+              "paddingHorizontal": 14,
+              "paddingVertical": 12,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "#888888",
+                "fontSize": 13,
+                "lineHeight": 19,
+              }
+            }
+          >
+            <Text>
+              text translated
+            </Text>
+          </Text>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "#031124",
+              "borderColor": "#05234C",
+              "borderRadius": 12,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 14,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flex": 1,
+                "marginRight": 12,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "marginBottom": 6,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "#F99D00",
+                    "borderRadius": 5,
+                    "height": 9,
+                    "marginRight": 8,
+                    "width": 9,
+                  }
+                }
+              />
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 15,
+                    "fontWeight": "700",
+                  }
+                }
+              >
+                text translated
+              </Text>
+              <View
+                style={
+                  {
+                    "backgroundColor": "rgba(249, 157, 0, 0.15)",
+                    "borderRadius": 6,
+                    "marginLeft": 8,
+                    "paddingHorizontal": 8,
+                    "paddingVertical": 2,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#F99D00",
+                      "fontSize": 12,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 13,
+                }
+              }
+            >
+              text translated
+               
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontWeight": "700",
+                  }
+                }
+              >
+                0.6000
+              </Text>
+               
+              ZEC
+            </Text>
+          </View>
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "backgroundColor": "#18bd18",
+                "borderRadius": 24,
+                "opacity": 1,
+                "paddingHorizontal": 22,
+                "paddingVertical": 10,
+              }
+            }
+            testID="ironwoodbanner.start"
+          >
+            <Text
+              style={
+                {
+                  "color": "#011401",
+                  "fontSize": 15,
+                  "fontWeight": "700",
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
   </View>
 </View>
 `;

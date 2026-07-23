@@ -80,12 +80,7 @@ export class DataService {
       let spendableJSON: RPCSpendablebalanceType =
         {} as RPCSpendablebalanceType;
       if (spendableStr) {
-        if (spendableStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error spendable balance ${spendableStr}`);
-          this.config.onError(`Error spendable balance: ${spendableStr}`);
-        } else {
-          spendableJSON = await JSON.parse(spendableStr);
-        }
+        spendableJSON = await JSON.parse(spendableStr);
       } else {
         console.log('Internal Error spendable balance');
       }
@@ -98,13 +93,7 @@ export class DataService {
           Date.now() - start2,
         );
       }
-      if (balanceStr) {
-        if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error balance ${balanceStr}`);
-          this.config.onError(`Error balance: ${balanceStr}`);
-          return;
-        }
-      } else {
+      if (!balanceStr) {
         console.log('Internal Error balance');
         return;
       }
@@ -112,11 +101,15 @@ export class DataService {
 
       const balance: TotalBalanceClass = {
         totalOrchardBalance: (balanceJSON.total_orchard_balance || 0) / 10 ** 8,
+        totalIronwoodBalance:
+          (balanceJSON.total_ironwood_balance || 0) / 10 ** 8,
         totalSaplingBalance: (balanceJSON.total_sapling_balance || 0) / 10 ** 8,
         totalTransparentBalance:
           (balanceJSON.total_transparent_balance || 0) / 10 ** 8,
         confirmedOrchardBalance:
           (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
+        confirmedIronwoodBalance:
+          (balanceJSON.confirmed_ironwood_balance || 0) / 10 ** 8,
         confirmedSaplingBalance:
           (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
         confirmedTransparentBalance:
@@ -148,15 +141,10 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (unifiedAddressesStr) {
-        if (unifiedAddressesStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error addresses ${unifiedAddressesStr}`);
-          this.config.onError(
-            `Error unified addresses: ${unifiedAddressesStr}`,
-          );
-          return;
-        }
-      } else {
+      // The routed getters reject on failure, so error handling lives in
+      // the owning catch; a resolved value is data, never inspected for
+      // an error sentinel (zingo-mobile#1151).
+      if (!unifiedAddressesStr) {
         console.log('Internal Error addresses');
         return;
       }
@@ -172,15 +160,7 @@ export class DataService {
           Date.now() - start2,
         );
       }
-      if (transparentAddressStr) {
-        if (transparentAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error addresses ${transparentAddressStr}`);
-          this.config.onError(
-            `Error transparent addresses: ${transparentAddressStr}`,
-          );
-          return;
-        }
-      } else {
+      if (!transparentAddressStr) {
         console.log('Internal Error addresses');
         return;
       }
@@ -240,13 +220,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (heightStr) {
-        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error wallet height ${heightStr}`);
-          this.config.onError(`Error wallet height: ${heightStr}`);
-          return;
-        }
-      } else {
+      if (!heightStr) {
         console.log('Internal Error wallet height');
         return;
       }
@@ -310,6 +284,10 @@ export class DataService {
           infoJSON.chain_name === ChainNameEnum.mainChainName
             ? CurrencyNameEnum.ZEC
             : CurrencyNameEnum.TAZ,
+        // `?? null` collapses both "no activation scheduled" (null) and "older
+        // native lib that doesn't report it" (undefined) into the same
+        // not-yet-active answer.
+        ironwoodActivationHeight: infoJSON.ironwood_activation_height ?? null,
       };
 
       this.config.onInfoChanged(info);
@@ -337,13 +315,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (zingolibStr) {
-        if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error zingolib version ${zingolibStr}`);
-          this.config.onError(`Error zingolib version: ${zingolibStr}`);
-          zingolibStr = GlobalConst.zingolibError;
-        }
-      } else {
+      if (!zingolibStr) {
         console.log('Internal Error zingolib version');
         zingolibStr = GlobalConst.zingolibNone;
       }
@@ -352,6 +324,8 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error zingolib version ${error}`);
       this.config.onError(`Error zingolib version: ${error}`);
+      // The version display still needs a value when the FFI rejects.
+      this.config.onZingolibVersionChanged(GlobalConst.zingolibError);
     } finally {
       this.fetchZingolibVersionLock = false;
     }
@@ -395,12 +369,7 @@ export class DataService {
         );
       }
       if (heightStr) {
-        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error server height ${heightStr}`);
-          this.config.onError(`Error server height: ${heightStr}`);
-        } else {
-          this.lastServerBlockHeight = Number(heightStr);
-        }
+        this.lastServerBlockHeight = Number(heightStr);
       } else {
         console.log('Internal Error server height');
       }
@@ -413,13 +382,7 @@ export class DataService {
           Date.now() - start2,
         );
       }
-      if (valueTransfersStr) {
-        if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error value transfers ${valueTransfersStr}`);
-          this.config.onError(`Error value transfers: ${valueTransfersStr}`);
-          return;
-        }
-      } else {
+      if (!valueTransfersStr) {
         console.log('Internal Error value transfers');
         return;
       }
@@ -467,13 +430,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (messagesStr) {
-        if (messagesStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error value transfers messages ${messagesStr}`);
-          this.config.onError(`Error value transfers messages: ${messagesStr}`);
-          return;
-        }
-      } else {
+      if (!messagesStr) {
         console.log('Internal Error value transfers messages');
         return;
       }
@@ -519,15 +476,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (walletSaveRequiredStr) {
-        if (walletSaveRequiredStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error wallet save required ${walletSaveRequiredStr}`);
-          this.config.onError(
-            `Error wallet save required: ${walletSaveRequiredStr}`,
-          );
-          return false;
-        }
-      } else {
+      if (!walletSaveRequiredStr) {
         console.log('Internal Error wallet save required');
         return false;
       }
@@ -557,19 +506,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (configWalletPerformanceStr) {
-        if (
-          configWalletPerformanceStr.toLowerCase().startsWith(GlobalConst.error)
-        ) {
-          console.log(
-            `Error wallet config performance ${configWalletPerformanceStr}`,
-          );
-          this.config.onError(
-            `Error wallet config performance: ${configWalletPerformanceStr}`,
-          );
-          return;
-        }
-      } else {
+      if (!configWalletPerformanceStr) {
         console.log('Internal Error wallet config performance');
         return;
       }
@@ -594,13 +531,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (walletVersionStr) {
-        if (walletVersionStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error wallet version ${walletVersionStr}`);
-          this.config.onError(`Error wallet version: ${walletVersionStr}`);
-          return;
-        }
-      } else {
+      if (!walletVersionStr) {
         console.log('Internal Error wallet version');
         return;
       }

@@ -509,6 +509,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       chainName === ChainNameEnum.mainChainName
         ? CurrencyNameEnum.ZEC
         : CurrencyNameEnum.TAZ,
+    // Only the native layer knows this, and this info is for a server we may
+    // not have connected to. Display-only, so nothing here reads it.
+    ironwoodActivationHeight: null,
   });
 
   const updateSelectedInfo = async (
@@ -566,9 +569,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     updateSelectedInfo(parsed, customServerChainName);
   };
 
-  // Debounced custom-server check — same mechanism as the Swap amount → quote:
-  // each keystroke restarts the timer (clearTimeout cleanup), so the check runs
-  // once ~1s after the user stops typing, not on every key.
+  // Debounced custom-server check: each keystroke restarts the timer
+  // (clearTimeout cleanup), so the check runs once ~1s after the user stops
+  // typing, not on every key.
   useEffect(() => {
     if (selectServer !== SelectServerEnum.custom) {
       return;

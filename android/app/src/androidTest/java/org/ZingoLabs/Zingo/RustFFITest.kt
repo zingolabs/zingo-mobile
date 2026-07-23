@@ -1,5 +1,6 @@
 package org.ZingoLabs.Zingo
 
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.experimental.categories.Category
@@ -12,6 +13,18 @@ import com.fasterxml.jackson.core.type.TypeReference
 // Jackson can use the no-arg constructor + setter injection.
 fun testMapper(): ObjectMapper = ObjectMapper()
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+// The regtest chain hint for the wallet under test. The host harness reads
+// the launched chain's activation heights back from the running validator
+// and forwards them as the `activation_heights` instrumentation argument
+// (see scripts/android_integration_tests.sh); the extended hint hands them
+// to the FFI so the wallet's schedule is the chain's, never a guess. With
+// no argument (a chain whose provisioner cannot report a schedule) the
+// bare hint keeps the FFI's historical default.
+fun regtestChainHint(): String {
+    val heights = InstrumentationRegistry.getArguments().getString("activation_heights")
+    return if (heights.isNullOrEmpty()) "regtest" else "regtest:$heights"
+}
 
 inline fun <reified T> ObjectMapper.readValue(src: String): T =
     readValue(src, object : TypeReference<T>() {})
@@ -96,6 +109,9 @@ data class SyncStatus (
 )
 
 data class Balance (
+    var total_ironwood_balance : Long = 0L,
+    var confirmed_ironwood_balance : Long = 0L,
+    var unconfirmed_ironwood_balance : Long = 0L,
     var total_sapling_balance : Long = 0L,
     var confirmed_sapling_balance : Long = 0L,
     var unconfirmed_sapling_balance : Long = 0L,
@@ -123,7 +139,8 @@ data class ValueTransfer (
     var kind : String = "",
     var value : Long = 0L,
     var recipient_address : String? = null,
-    var pool_received : String? = null,
+    var pools_sent_from : List<String>? = null,
+    var pools_received : List<String>? = null,
     var memos : List<String>? = null,
 )
 
@@ -146,7 +163,7 @@ class ExecuteAddressesFromSeed {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -194,7 +211,7 @@ class ExecuteAddressesFromUfvk {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val ufvk = Ufvk.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -245,7 +262,7 @@ class ExecuteVersionFromSeed {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -280,7 +297,7 @@ class ExecuteSyncFromSeed {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -346,7 +363,7 @@ class ExecuteSendFromOrchard {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -414,6 +431,10 @@ class ExecuteSendFromOrchard {
         println("\nConfirm Txid:")
         println(confirmJson)
 
+        // A second launch while the first sync still runs is idempotent:
+        // the bridge answers with status on the data channel ("Sync task
+        // already running."), and the polling loop below observes the sync
+        // to completion either way.
         syncJson = uniffi.zingo.runSync()
         println("\nSync:")
         println(syncJson)
@@ -457,7 +478,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -531,7 +552,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
         // first item have to be a `Received`
         assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("received")
-        assertThat(valueTranfers.value_transfers[2].pool_received).isEqualTo("Orchard")
+        assertThat(valueTranfers.value_transfers[2].pools_received).isEqualTo(listOf("Orchard"))
         assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
         assertThat(valueTranfers.value_transfers[2].value).isEqualTo(1000000)
     }
@@ -545,7 +566,7 @@ class ExecuteSaplingBalanceFromSeed {
         val rpcModule = RPCModule(MainApplication.getAppReactContext())
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -595,17 +616,24 @@ class ExecuteSaplingBalanceFromSeed {
         println("\nValue Transfers:")
         println(valueTranfersJson)
 
-        // Value Transfers
-        // 1. Received in orchard pool =     +500_000
-        // 2. Received in sapling pool =     +250_000
-        // 3. Received in transparent pool = +250_000
-        // 4. Send - 100_000 + 20_000fee =   -110_000
-        // 5. MemoToSelf orchard pool =       -10_000 (send-to-self)
-        // 6. MemoToSelf sapling pool =       -10_000 (send-to-self)
-        // 7. MemoToSelf transparent pool =   -15_000 (send-to-self)
-        // 8. Upgrading sapling pool =        -20_000 (shield)
+        // Value Transfers, on the ironwood-activated regtest chain. Shield
+        // and self-send outputs prefer the Ironwood pool (confirmed policy),
+        // so part of the orchard change and the shielded transparent funds
+        // land in Ironwood rather than Orchard.
+        // 1. Received in orchard pool =         +500_000
+        // 2. Received in sapling pool =         +250_000
+        // 3. Received in transparent pool =     +250_000
+        // 4. Send - 100_000 + 20_000fee =       -120_000
+        // 5. MemoToSelf orchard pool =           -20_000 fee,
+        //    100_000 of orchard change lands in ironwood
+        // 6. MemoToSelf sapling pool =           -10_000 fee
+        // 7. MemoToSelf sapling->transparent =   -15_000 fee,
+        //    100_000 moves to transparent
+        // 8. Shield transparent->ironwood =      -20_000 fee,
+        //    330_000 lands in ironwood
         //
-        // orchard pool     = 710_000
+        // ironwood pool    = 430_000
+        // orchard pool     = 260_000
         // sapling pool     = 125_000
         // transparent pool = 0
 
@@ -614,8 +642,10 @@ class ExecuteSaplingBalanceFromSeed {
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balance.total_orchard_balance).isEqualTo(710000)
-        assertThat(balance.confirmed_orchard_balance).isEqualTo(710000)
+        assertThat(balance.total_ironwood_balance).isEqualTo(430000)
+        assertThat(balance.confirmed_ironwood_balance).isEqualTo(430000)
+        assertThat(balance.total_orchard_balance).isEqualTo(260000)
+        assertThat(balance.confirmed_orchard_balance).isEqualTo(260000)
         assertThat(balance.total_sapling_balance).isEqualTo(125000)
         assertThat(balance.confirmed_sapling_balance).isEqualTo(125000)
         assertThat(balance.confirmed_transparent_balance).isEqualTo(0)
@@ -648,7 +678,7 @@ class ExecuteParseAddressForTex {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -694,7 +724,7 @@ class ExecuteParseAddressInvalid {
         val mapper = testMapper()
 
         val serveruri = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()

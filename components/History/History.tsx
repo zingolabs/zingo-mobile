@@ -32,6 +32,7 @@ import {
   CurrencyEnum,
   FilterEnum,
   GlobalConst,
+  isIronwoodActive,
   RouteEnum,
   ScreenEnum,
   ValueTransferKindEnum,
@@ -44,11 +45,11 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import ValueTransferLine from './components/ValueTransferLine';
+import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import { ContextAppLoaded } from '../../app/context';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
-import { swapRecordToValueTransfer } from '../../app/swap';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import Header from '../Header';
 import Utils from '../../app/utils';
@@ -118,7 +119,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const {
     translate,
     valueTransfers,
-    swapRecords,
     language,
     setBackgroundError,
     addLastSnackbar,
@@ -127,6 +127,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
     zenniesDonationAddress,
     setPrivacyOption,
     currency,
+    totalBalance,
+    readOnly,
+    info,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.History;
@@ -153,6 +156,25 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [headerH, setHeaderH] = useState<number>(0);
   const [usdRowH, setUsdRowH] = useState<number>(0);
   const [priceRowH, setPriceRowH] = useState<number>(0);
+  const [bannerH, setBannerH] = useState<number>(0);
+
+  // Persistent "migrate Orchard → Ironwood" call-to-action. It stands or falls
+  // on funds alone: shown for as long as the wallet holds anything left to
+  // migrate, and gone the moment it doesn't. Deliberately independent of
+  // `ironwoodOnboardSeen` — having been through the onboarding once does not
+  // migrate the funds, so the way back in has to stay put.
+  //
+  // zingolib's confirmed_orchard_balance excludes dust, so `> 0` means at
+  // least one note worth migrating; a wallet left holding only dust reads as
+  // done. The two other conditions are hard blocks, not preferences: NU6.3
+  // must have activated for the migration to be possible at all, and
+  // watch-only wallets cannot spend.
+  const showIronwoodBanner =
+    !readOnly &&
+    isIronwoodActive(info) &&
+    !!totalBalance &&
+    totalBalance.confirmedOrchardBalance > 0;
+  const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const historySheetRef = useRef<BottomSheet>(null);
@@ -306,7 +328,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
     if (containerH <= 0 || headerH <= 0) {
       return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
-    const snapBase = containerH - headerH - SNAP_GAP;
+    // The banner (when shown) sits between the header and the sheet in normal
+    // flow, so the sheet's low/mid snaps must shrink by its height to leave it
+    // uncovered; the max snap still climbs over both.
+    const snapBase = containerH - headerH - bannerH - SNAP_GAP;
     // Smallest sheet: full header visible, including the PriceRow at the
     // bottom of the Header (only present when zecPrice > 0).
     const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
@@ -329,7 +354,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
     }
     points.push(snapMax);
     return points;
-  }, [currency, server.chainName, containerH, headerH, usdRowH, priceRowH]);
+  }, [
+    currency,
+    server.chainName,
+    containerH,
+    headerH,
+    usdRowH,
+    priceRowH,
+    bannerH,
+  ]);
 
   const priceSnapIndex = priceRowH > 0 ? 0 : null;
   const onPriceSnapChange = usePriceSnapAutoClose(
@@ -376,18 +409,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
     );
   }, [priceRowH, historySnapPoints]);
 
-  // Merge zingolib-reported value transfers with swap rows projected from the
-  // app-level `swapRecords` mirror. We do NOT dedup against the underlying
-  // outbound Sent VT — by design (see Phase 5 decision in swap-backlog): the
-  // user sees the Swap row alongside the underlying Sent so the chronology
-  // stays explicit. Sorted by `time` descending so the merged stream still
-  // looks chronological to the list.
   const mergedValueTransfers = useMemo(() => {
-    const swapRows = (swapRecords ?? []).map(swapRecordToValueTransfer);
-    const base = valueTransfers ?? [];
-    if (swapRows.length === 0) return base;
-    return [...base, ...swapRows].sort((a, b) => b.time - a.time);
-  }, [valueTransfers, swapRecords]);
+    return valueTransfers ?? [];
+  }, [valueTransfers]);
 
   const fetchValueTransfersFiltered = useMemo(() => {
     if (mergedValueTransfers.length === 0 && valueTransfers === null) {
@@ -408,6 +432,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           (vt.kind === ValueTransferKindEnum.Sent ||
             vt.kind === ValueTransferKindEnum.SendToSelf ||
             vt.kind === ValueTransferKindEnum.MemoToSelf ||
+            vt.kind === ValueTransferKindEnum.Migration ||
             vt.kind === ValueTransferKindEnum.Rejection)
         ) {
           selectedKind = true;
@@ -419,11 +444,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
         } else if (
           filterKind === FilterEnum.shielded &&
           vt.kind === ValueTransferKindEnum.Shield
-        ) {
-          selectedKind = true;
-        } else if (
-          filterKind === FilterEnum.swap &&
-          vt.kind === ValueTransferKindEnum.Swap
         ) {
           selectedKind = true;
         }
@@ -553,51 +573,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const setValueTransferDetailModalShow = useCallback(
     (_index: number, vt: ValueTransferType) => {
-      // VTD and SwapDetail each navigate ONLY through rows of their own
-      // kind so the up/down chevrons never land on a record the screen
-      // cannot render. We derive the per-kind slice + new index here at
-      // tap time from the same `valueTransfersSliced` the list is
-      // showing — no separate state, just two filtered projections of
-      // the same source array. `totalLength` reflects the matching kind
-      // in the broader filtered set (so "3 of 12" reads coherently).
-      if (
-        vt.kind === ValueTransferKindEnum.Swap &&
-        vt.swapRecordId !== undefined
-      ) {
-        const swapSlice = valueTransfersSliced.filter(
-          item =>
-            item.kind === ValueTransferKindEnum.Swap &&
-            item.swapRecordId !== undefined,
-        );
-        const recordIds = swapSlice.map(item => item.swapRecordId!);
-        const targetIndex = recordIds.indexOf(vt.swapRecordId);
-        const totalLength =
-          valueTransfersFiltered !== null
-            ? valueTransfersFiltered.filter(
-                item => item.kind === ValueTransferKindEnum.Swap,
-              ).length
-            : recordIds.length;
-        navigation.navigate(RouteEnum.SwapDetail, {
-          index: targetIndex >= 0 ? targetIndex : 0,
-          recordIds,
-          totalLength,
-        });
-        return;
-      }
-      const vtSlice = valueTransfersSliced.filter(
-        item => item.kind !== ValueTransferKindEnum.Swap,
-      );
-      const targetIndex = vtSlice.indexOf(vt);
+      const targetIndex = valueTransfersSliced.indexOf(vt);
       const totalLength =
         valueTransfersFiltered !== null
-          ? valueTransfersFiltered.filter(
-              item => item.kind !== ValueTransferKindEnum.Swap,
-            ).length
-          : vtSlice.length;
+          ? valueTransfersFiltered.length
+          : valueTransfersSliced.length;
       navigation.navigate(RouteEnum.ValueTransferDetail, {
         index: targetIndex >= 0 ? targetIndex : 0,
         vt: vt,
-        valueTransfersSliced: vtSlice,
+        valueTransfersSliced: valueTransfersSliced,
         totalLength,
       });
     },
@@ -817,6 +801,20 @@ const History: React.FunctionComponent<HistoryProps> = ({
             onPriceRowLayout={setPriceRowH}
             onManualFetchPrice={revealPrice}
           />
+        </View>
+        {/* Measured so the history sheet's snap points sit just below it. An
+            empty wrapper reports height 0 when the banner is hidden. */}
+        <View
+          onLayout={e => setBannerH(e.nativeEvent.layout.height)}
+          pointerEvents="box-none"
+        >
+          {showIronwoodBanner && (
+            <IronwoodMigrationBanner
+              amount={orchardAmount}
+              currencyName={info.currencyName}
+              onStart={() => navigation.navigate(RouteEnum.MeetIronwood)}
+            />
+          )}
         </View>
       </View>
       <Animated.View

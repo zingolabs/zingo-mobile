@@ -44,7 +44,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
 
   const validateAddress = (scannedAddress: string) => {
     if (raw) {
-      // Non-Zcash scan (address book / swap): hand back the string verbatim;
+      // Non-Zcash scan (address book): hand back the string verbatim;
       // the caller validates it for its chain. No `zcash:` prefixing.
       setAddress(scannedAddress);
       return;

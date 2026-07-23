@@ -20,4 +20,5 @@ export enum SettingsNameEnum {
   basicFirstViewSeed = 'basicFirstViewSeed',
   version = 'version',
   firstUpdateWithDonation = 'firstUpdateWithDonation',
+  ironwoodOnboardSeen = 'ironwoodOnboardSeen',
 }

@@ -14,7 +14,6 @@ export enum RouteEnum {
   History = 'History',
   Send = 'Send',
   Receive = 'Receive',
-  Swap = 'Swap',
   Messages = 'Messages',
   Settings = 'Settings',
   About = 'About',
@@ -23,6 +22,10 @@ export enum RouteEnum {
   Computing = 'Computing',
   SyncReport = 'SyncReport',
   Pools = 'Pools',
+  MeetIronwood = 'MeetIronwood',
+  MigrationStrategy = 'MigrationStrategy',
+  MigrationTransactions = 'MigrationTransactions',
+  MigrationSending = 'MigrationSending',
 
   // Drawer with params
   AddressBook = 'AddressBook',
@@ -30,7 +33,6 @@ export enum RouteEnum {
   ScannerAddress = 'ScannerAddress',
   ScannerUfvk = 'ScannerUfvk',
   ValueTransferDetail = 'ValueTransferDetail',
-  SwapDetail = 'SwapDetail',
   Confirm = 'Confirm',
   Ufvk = 'Ufvk',
   Seed = 'Seed',

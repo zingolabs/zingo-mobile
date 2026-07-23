@@ -8,7 +8,6 @@ import {
   ContextAppLoading,
   ContextAppLoadingProvider,
 } from './contextAppLoading';
-import { SwapServiceProvider, useSwapService } from './contextSwapService';
 
 export {
   defaultAppContextLoaded,
@@ -17,6 +16,4 @@ export {
   defaultAppContextLoading,
   ContextAppLoading,
   ContextAppLoadingProvider,
-  SwapServiceProvider,
-  useSwapService,
 };

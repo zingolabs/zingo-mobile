@@ -18,8 +18,6 @@ import { SendFilledIcon } from '../Components/Icons/SendFilledIcon';
 import { SendOutlineIcon } from '../Components/Icons/SendOutlineIcon';
 import { ReceiveIcon } from '../Components/Icons/ReceiveIcon';
 import { ReceiveFilledIcon } from '../Components/Icons/ReceiveFilledIcon';
-import { SwapOutlineIcon } from '../Components/Icons/SwapOutlineIcon';
-import { SwapFilledIcon } from '../Components/Icons/SwapFilledIcon';
 
 const ICON_SIZE = 28;
 const SEND_SIZE = 25;
@@ -48,8 +46,10 @@ function renderNavIcon(
     const isPending =
       mode === ModeEnum.basic &&
       !!totalBalance &&
-      ((totalBalance.totalOrchardBalance > 0 &&
-        totalBalance.confirmedOrchardBalance === 0) ||
+      ((totalBalance.totalIronwoodBalance > 0 &&
+        totalBalance.confirmedIronwoodBalance === 0) ||
+        (totalBalance.totalOrchardBalance > 0 &&
+          totalBalance.confirmedOrchardBalance === 0) ||
         (totalBalance.totalSaplingBalance > 0 &&
           totalBalance.confirmedSaplingBalance === 0) ||
         (totalBalance.totalTransparentBalance > 0 &&
@@ -64,13 +64,6 @@ function renderNavIcon(
       <SendFilledIcon size={SEND_SIZE} color={color} />
     ) : (
       <SendOutlineIcon size={SEND_SIZE} color={color} />
-    );
-  }
-  if (routeName === RouteEnum.Swap) {
-    return isFocused ? (
-      <SwapFilledIcon size={ICON_SIZE} color={color} />
-    ) : (
-      <SwapOutlineIcon size={ICON_SIZE} color={color} />
     );
   }
   return isFocused ? (

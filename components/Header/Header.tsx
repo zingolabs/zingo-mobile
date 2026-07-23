@@ -290,7 +290,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 !(
                   mode === ModeEnum.basic &&
                   totalBalance &&
-                  totalBalance.totalOrchardBalance +
+                  totalBalance.totalIronwoodBalance +
+                    totalBalance.totalOrchardBalance +
                     totalBalance.totalSaplingBalance <=
                     0
                 ) ? (

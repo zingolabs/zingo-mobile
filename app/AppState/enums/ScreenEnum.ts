@@ -16,7 +16,6 @@ export enum ScreenEnum {
   Confirm = 'Confirm',
   ScannerAddress = 'ScannerAddress',
   Receive = 'Receive',
-  Swap = 'Swap',
   AddressList = 'AddressList',
   MessagesList = 'MessagesList',
   Settings = 'Settings',
