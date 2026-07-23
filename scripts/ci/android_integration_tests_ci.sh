@@ -66,10 +66,17 @@ fi
 
 cd android
 
-# Create integration test report directory
-test_report_dir="app/build/outputs/integration_test_reports/${abi}"
+# Create integration test report directory. Keyed by test name as well as
+# ABI so tests sharing one emulator session (bucketed CI jobs) do not
+# overwrite each other's reports.
+test_report_dir="app/build/outputs/integration_test_reports/${abi}/${test_name}"
 rm -rf "${test_report_dir}"
 mkdir -p "${test_report_dir}"
+
+# A clean slate for this test's app state: the emulator may be carrying a
+# previous test's wallet data when several tests share one session.
+adb -s emulator-5554 uninstall org.ZingoLabs.Zingo &> /dev/null || true
+adb -s emulator-5554 uninstall org.ZingoLabs.Zingo.test &> /dev/null || true
 
 echo -e "\nInstalling Test APK..."
 i=0
@@ -140,17 +147,24 @@ fi
 
 echo -e "\nTest reports saved: android/${test_report_dir}"
     
+# When several tests share one emulator session (bucketed CI jobs), the
+# session's owner — the workflow's emulator runner — does the teardown;
+# KEEP_EMULATORS tells this per-test script to leave the emulator alive.
 if [[ $(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE | cut -d' ' -f2) -ne -1 || \
         $(cat "${test_report_dir}/test_results.txt" | grep 'FAILURES!!!') ]]; then
     echo -e "\nIntegration tests FAILED"
 
-    # Kill all emulators
-    ../scripts/kill_emulators.sh
+    if [ -z "${KEEP_EMULATORS:-}" ]; then
+        # Kill all emulators
+        ../scripts/kill_emulators.sh
+    fi
 
     exit 1
 fi
 
 echo -e "\nIntegration tests PASSED"
 
-# Kill all emulators
-../scripts/kill_emulators.sh
+if [ -z "${KEEP_EMULATORS:-}" ]; then
+    # Kill all emulators
+    ../scripts/kill_emulators.sh
+fi

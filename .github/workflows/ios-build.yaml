@@ -128,6 +128,7 @@ jobs:
           path: |
             ios/Zingolib.xcframework
             ios/zingo.swift
+          retention-days: 3
 
   cache-native-ios-uniffi:
     name: Cache iOS xcframework
