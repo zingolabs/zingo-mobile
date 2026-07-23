@@ -18,6 +18,13 @@ on:
       target:
         required: true
         type: string
+      # Fail-all (see CONTEXT.md): when true, the first failure here
+      # cancels the whole run, and the bucket matrix fails fast. PR CI
+      # opts in; ci-nightly keeps the complete-signal default.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
@@ -116,16 +123,33 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
 
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+
   # The app and androidTest APKs are assembled once per ABI by the
   # android-apk-build workflow at the caller level; this workflow only
-  # consumes its android-build-outputs artifact.
+  # consumes its android-build-outputs artifact. PR CI calls this
+  # workflow WITHOUT a needs-edge on the APK build: the buckets start at
+  # workflow launch, run every APK-independent step (setup, harness
+  # prebuild, regtest binaries), and then hold at the ci-gate artifact
+  # gate until the APK artifact lands — overlapping ~10 minutes of setup
+  # with the build path. ci-nightly keeps its needs-edge, so there the
+  # gate opens instantly.
   android-ubuntu-integration-test-ci:
     name: Android Ubuntu Integration test
     needs:
       - android-ubuntu-integration-test-ci-avd-cache
     runs-on: ubuntu-24.04
     strategy:
-      fail-fast: false
+      fail-fast: ${{ inputs.fail-all }}
       # Buckets of three tests share one job, so the runner setup and
       # emulator boot amortize across the bucket instead of being paid
       # once per test.
@@ -263,12 +287,6 @@ jobs:
       - name: Yarn install
         run: yarn
 
-      - name: Download Android build outputs
-        uses: actions/download-artifact@v4
-        with:
-          name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          path: android/app/build/outputs
-
       # Resolve the zingolib commit the same way android-build does: the
       # GITHUB_SHA under zingolib CI, otherwise the pinned rev in
       # rust/Cargo.toml. The ci-build image tag is content-addressed from
@@ -331,6 +349,31 @@ jobs:
           TEST_BINARIES_DIR="$(pwd)/rust/test_binaries/bins"
           echo "TEST_BINARIES_DIR=$TEST_BINARIES_DIR" >> "$GITHUB_ENV"
 
+      # Compile the nextest harness while the APK build is still running;
+      # the emulator step then reuses the warm target directory.
+      - name: Prebuild test harness
+        working-directory: ./rust
+        run: cargo nextest run --no-run --features ci --release
+
+      # Everything above needs nothing from the APK build. Hold here
+      # until its artifact lands; abort promptly if it can never land.
+      - name: Wait for the APK artifact (ci-gate)
+        working-directory: ./rust
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cargo run -p workbench --bin ci-gate -- \
+            --artifact "android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}" \
+            --upstream "Android APK build" \
+            --timeout-secs 2700 \
+            --poll-secs 20
+
+      - name: Download Android build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          path: android/app/build/outputs
+
       - name: Run Android Integration Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -358,3 +401,14 @@ jobs:
           name: test-android-integration-reports-${{ env.ABI }}-${{ matrix.bucket.name }}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/integration_test_reports
           retention-days: 7
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });

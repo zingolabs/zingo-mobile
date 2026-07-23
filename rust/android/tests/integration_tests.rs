@@ -325,23 +325,21 @@ async fn execute_sapling_balance_from_seed(abi: &str) {
 }
 
 async fn execute_parse_address_for_tex(abi: &str) {
+    // Address parsing only needs a reachable server with nonzero height,
+    // so the cheap scenario suffices; the multi-pool funded scenario
+    // costs ~150s more of regtest setup per test.
     #[cfg(not(feature = "regchest"))]
-    let local_net =
-        scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
+    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(not(feature = "regchest"))]
     let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
     #[cfg(feature = "regchest")]
     let activation_heights: Option<String> = None;
     #[cfg(feature = "regchest")]
-    let docker = match regchest_utils::launch(
-        UNIX_SOCKET,
-        Some("funded_orchard_sapling_transparent_shielded_mobileclient"),
-    )
-    .await
-    {
-        Ok(d) => d,
-        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-    };
+    let docker =
+        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
+            Ok(d) => d,
+            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+        };
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) = zingomobile_utils::android_integration_test(
@@ -370,23 +368,21 @@ async fn execute_parse_address_for_tex(abi: &str) {
 }
 
 async fn execute_parse_address_invalid(abi: &str) {
+    // Address parsing only needs a reachable server with nonzero height,
+    // so the cheap scenario suffices; the multi-pool funded scenario
+    // costs ~150s more of regtest setup per test.
     #[cfg(not(feature = "regchest"))]
-    let local_net =
-        scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
+    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(not(feature = "regchest"))]
     let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
     #[cfg(feature = "regchest")]
     let activation_heights: Option<String> = None;
     #[cfg(feature = "regchest")]
-    let docker = match regchest_utils::launch(
-        UNIX_SOCKET,
-        Some("funded_orchard_sapling_transparent_shielded_mobileclient"),
-    )
-    .await
-    {
-        Ok(d) => d,
-        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-    };
+    let docker =
+        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
+            Ok(d) => d,
+            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+        };
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) = zingomobile_utils::android_integration_test(

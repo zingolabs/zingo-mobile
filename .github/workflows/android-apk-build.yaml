@@ -14,6 +14,14 @@ on:
       abi:
         required: true
         type: string
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not. The PR integration
+      # buckets also watch this job through the ci-gate artifact gate, so
+      # they abort even if the cancellation races.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
@@ -144,3 +152,14 @@ jobs:
           path: |
             android/app/build/outputs
           retention-days: 3
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
