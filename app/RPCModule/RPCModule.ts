@@ -120,6 +120,14 @@ interface RPCModuleAPI {
     minConfirmations: string,
   ): Promise<string>;
   setCryptoDefaultProvider(): Promise<string>;
+
+  // Mixnet Mode (send-over-nym). The Android native module implements these
+  // today; the iOS methods land with the Mac-gated iOS step.
+  attachMixnet(socks5Addr: string): Promise<string>;
+  enableMixnet(proxyPath: string): Promise<string>;
+  disableMixnet(): Promise<string>;
+  mixnetModeInfo(): Promise<string>;
+  mixnetBootstrapDetailInfo(): Promise<string>;
 }
 
 export default NativeModules.RPCModule as RPCModuleAPI;
