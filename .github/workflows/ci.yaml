@@ -13,26 +13,48 @@ concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# actions: write lets the fail-all steps in the blocking jobs cancel this
+# run, and lets ci-gate read the run's artifact and job listings. Fork
+# PRs get a read-only token regardless; there the cancel step fails
+# harmlessly inside an already-failing job.
+permissions:
+  contents: read
+  actions: write
+
 jobs:
+  # Every blocking check opts into fail-all: its first failure cancels
+  # the whole run (see CONTEXT.md). Nightly leaves fail-all off to keep
+  # the complete picture.
+
   # Runs from t=0 with no dependencies: catches app-module Kotlin compile
   # breakage (e.g. classpath conflicts) in a few minutes, long before the
   # native builds and emulator jobs report.
   android-kotlin-compile:
     uses: ./.github/workflows/android-kotlin-compile.yaml
+    with:
+      fail-all: true
 
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
     secrets: inherit
+    with:
+      fail-all: true
 
   rust-shear:
     uses: ./.github/workflows/rust-shear.yaml
+    with:
+      fail-all: true
 
   js-depcheck:
     uses: ./.github/workflows/js-depcheck.yaml
+    with:
+      fail-all: true
 
   android-dependency-analysis:
     uses: ./.github/workflows/android-dependency-analysis.yaml
     secrets: inherit
+    with:
+      fail-all: true
 
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
@@ -52,6 +74,7 @@ jobs:
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
+      fail-all: true
 
   android-apk-build:
     uses: ./.github/workflows/android-apk-build.yaml
@@ -59,14 +82,20 @@ jobs:
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: x86_64
+      fail-all: true
 
+  # Deliberately NO needs-edge on android-apk-build: the buckets start
+  # at workflow launch, front-load all APK-independent setup, and hold
+  # at the ci-gate artifact gate until the APK artifact lands (or abort
+  # when the APK build concludes without success). This overlaps ~10
+  # minutes of bucket setup with the build path.
   android-ubuntu-integration-test-ci:
     strategy:
       matrix:
         config:
           - { abi: x86_64, api-level: 34, target: default }
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, create-cache-key, android-apk-build]
+    needs: [create-timestamp, create-cache-key]
     secrets: inherit
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
@@ -74,6 +103,7 @@ jobs:
       abi: ${{ matrix.config.abi }}
       api-level: ${{ matrix.config['api-level'] }}
       target: ${{ matrix.config.target }}
+      fail-all: true
 
   # iOS runs per-PR as a trailing, advisory stage: it starts only after
   # every blocking check has passed, so the fast path's verdict is never
@@ -83,6 +113,7 @@ jobs:
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
     needs:
+      - android-kotlin-compile
       - jest-test
       - rust-shear
       - js-depcheck

@@ -2,6 +2,13 @@ name: Android Kotlin compile
 
 on:
   workflow_call:
+    inputs:
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   android-kotlin-compile:
@@ -43,3 +50,14 @@ jobs:
       - name: Compile release Kotlin
         working-directory: ./android
         run: ./gradlew :app:compileProdReleaseKotlin
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
