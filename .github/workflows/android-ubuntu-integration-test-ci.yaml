@@ -343,12 +343,10 @@ jobs:
           # KEEP_EMULATORS: the per-test runner script must not shut the
           # emulator down between the bucket's tests — this action boots
           # it once for the whole bucket and tears it down afterwards.
-          script: |
-            tests=""
-            for t in ${{ matrix.bucket.tests }}; do
-              tests="$tests android_integration::${{ env.NEXTEST-ABI }}::$t"
-            done
-            KEEP_EMULATORS=1 cargo nextest run $tests --features "ci" --verbose --release
+          # One line only: the emulator-runner action executes each line
+          # of `script` as its own `sh -c`, so multi-line shell constructs
+          # never parse.
+          script: KEEP_EMULATORS=1 cargo nextest run $(for t in ${{ matrix.bucket.tests }}; do printf 'android_integration::${{ env.NEXTEST-ABI }}::%s ' "$t"; done) --features "ci" --verbose --release
           working-directory: ./rust
         env:
           TEST_BINARIES_DIR: ${{ env.TEST_BINARIES_DIR }}
