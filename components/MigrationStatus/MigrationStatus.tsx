@@ -9,7 +9,7 @@ import Button from '../Components/Button';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import { migrationStatus } from '../../app/walletBackend';
 import {
   RPCMigrationStatusType,
@@ -47,17 +47,19 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
     useCallback(() => {
       let cancelled = false;
       (async () => {
-        const statusStr = await migrationStatus();
+        const statusResult = await migrationStatus();
         if (cancelled) {
           return;
         }
-        if (statusStr.toLowerCase().startsWith(GlobalConst.error)) {
-          setErrorMsg(statusStr);
+        if (!statusResult.ok) {
+          setErrorMsg(statusResult.error.message);
           setLoading(false);
           return;
         }
         try {
-          const parsed = JSON.parse(statusStr) as RPCMigrationStatusType;
+          const parsed = JSON.parse(
+            statusResult.value,
+          ) as RPCMigrationStatusType;
           if (parsed.error) {
             setErrorMsg(parsed.error);
           } else {

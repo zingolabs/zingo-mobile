@@ -154,18 +154,21 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
       setLoading(true);
       let resultStr: string = '';
       switch (tab) {
-        case 'sent':
-          resultStr = await getTotalValueToAddress();
-          //console.log('################# value', resultStr);
+        case 'sent': {
+          const result = await getTotalValueToAddress();
+          resultStr = result.ok ? result.value : '';
           break;
-        case 'sends':
-          resultStr = await getTotalSpendsToAddress();
-          //console.log('################# sends', resultStr);
+        }
+        case 'sends': {
+          const result = await getTotalSpendsToAddress();
+          resultStr = result.ok ? result.value : '';
           break;
-        case 'memobytes':
-          resultStr = await getTotalMemobytesToAddress();
-          //console.log('################# memobytes', resultStr);
+        }
+        case 'memobytes': {
+          const result = await getTotalMemobytesToAddress();
+          resultStr = result.ok ? result.value : '';
           break;
+        }
         default:
           break;
       }

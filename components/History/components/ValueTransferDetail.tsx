@@ -336,30 +336,28 @@ const ValueTransferDetail: React.FunctionComponent<
     // not use await here.
     navigation.navigate(RouteEnum.Computing);
 
-    let actionStr: string = await removeTransaction(valueTransfer.txid);
+    const actionResult = await removeTransaction(valueTransfer.txid);
 
-    console.log('REMOVE', actionStr);
+    console.log('REMOVE', actionResult);
 
-    if (actionStr) {
-      if (actionStr.toLowerCase().startsWith(GlobalConst.error)) {
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          translate(`history.${action}-title`) as string,
-          `${translate(`history.${action}-error`)} ${actionStr}`,
-          false,
-          translate,
-        );
-      } else {
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          translate(`history.${action}-title`) as string,
-          `${translate(`history.${action}-message`)} ${actionStr}`,
-          true,
-          translate,
-        );
-      }
+    if (!actionResult.ok) {
+      createAlert(
+        setBackgroundError,
+        addLastSnackbar,
+        translate(`history.${action}-title`) as string,
+        `${translate(`history.${action}-error`)} ${actionResult.error.message}`,
+        false,
+        translate,
+      );
+    } else if (actionResult.value) {
+      createAlert(
+        setBackgroundError,
+        addLastSnackbar,
+        translate(`history.${action}-title`) as string,
+        `${translate(`history.${action}-message`)} ${actionResult.value}`,
+        true,
+        translate,
+      );
     }
     // change to the history screen, just in case.
     navigation.navigate(RouteEnum.HomeStack, {

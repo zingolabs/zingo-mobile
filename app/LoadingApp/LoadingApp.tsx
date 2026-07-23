@@ -638,7 +638,7 @@ export class LoadingAppClass extends Component<
 
     if (exists) {
       this.setState({ walletExists: true });
-      let result: string = await loadExistingWallet(
+      const result = await loadExistingWallet(
         this.state.server.uri,
         this.state.server.chainName,
         this.state.performanceLevel,
@@ -647,18 +647,22 @@ export class LoadingAppClass extends Component<
 
       let error = false;
       let errorText = '';
-      if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
+      if (result.ok && result.value) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType & RPCUfvkType =
-            await JSON.parse(result);
+          const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
+            result.value,
+          );
           if (!resultJson.error) {
             // Load the wallet and navigate to the vts screen
             let readOnly: boolean = false;
             let orchardPool: boolean = false;
             let saplingPool: boolean = false;
             let transparentPool: boolean = false;
-            const walletKindStr: string = await getWalletKind();
+            const walletKindResult = await getWalletKind();
+            const walletKindStr: string = walletKindResult.ok
+              ? walletKindResult.value
+              : walletKindResult.error.message;
             try {
               const walletKindJSON: RPCWalletKindType =
                 await JSON.parse(walletKindStr);
@@ -739,7 +743,7 @@ export class LoadingAppClass extends Component<
         }
       } else {
         error = true;
-        errorText = result;
+        errorText = result.ok ? result.value : result.error.message;
       }
       if (error) {
         await this.walletErrorHandle(
@@ -1465,7 +1469,7 @@ export class LoadingAppClass extends Component<
     // ADR 0007). A non-zero value here would act as an explicit override.
     const serverUri = offline ? '' : this.state.server.uri;
     const birthday = '0';
-    let seed: string = await createNewWallet(
+    const seed = await createNewWallet(
       serverUri,
       birthday,
       this.state.server.chainName,
@@ -1473,10 +1477,10 @@ export class LoadingAppClass extends Component<
       GlobalConst.minConfirmations.toString(),
     );
 
-    if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
+    if (seed.ok && seed.value) {
       let seedJSON = {} as RPCSeedType;
       try {
-        seedJSON = await JSON.parse(seed);
+        seedJSON = await JSON.parse(seed.value);
         if (seedJSON.error) {
           this.setState({ actionButtonsDisabled: false });
           createAlert(
@@ -1526,7 +1530,7 @@ export class LoadingAppClass extends Component<
       }));
     } else {
       this.walletErrorHandle(
-        seed,
+        seed.ok ? seed.value : seed.error.message,
         this.state.translate('loadingapp.creatingwallet-label') as string,
         RouteEnum.StartMenu,
         false,
@@ -1625,7 +1629,7 @@ export class LoadingAppClass extends Component<
       type = RestoreFromTypeEnum.ufvkRestoreFrom;
     }
 
-    let result: string;
+    let result: Awaited<ReturnType<typeof restoreWalletFromSeed>>;
     if (type === RestoreFromTypeEnum.seedRestoreFrom) {
       result = await restoreWalletFromSeed(
         seedUfvk.toLowerCase(),
@@ -1648,10 +1652,12 @@ export class LoadingAppClass extends Component<
 
     let error = false;
     let errorText = '';
-    if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
+    if (result.ok && result.value) {
       try {
         // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(result);
+        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
+          result.value,
+        );
         if (!resultJson.error) {
           // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
           await SettingsFileImpl.writeSettings(
@@ -1663,7 +1669,10 @@ export class LoadingAppClass extends Component<
           let orchardPool: boolean = false;
           let saplingPool: boolean = false;
           let transparentPool: boolean = false;
-          const walletKindStr: string = await getWalletKind();
+          const walletKindResult = await getWalletKind();
+          const walletKindStr: string = walletKindResult.ok
+            ? walletKindResult.value
+            : walletKindResult.error.message;
           console.log('KIND...', walletKindStr);
           try {
             const walletKindJSON: RPCWalletKindType =
@@ -1735,7 +1744,7 @@ export class LoadingAppClass extends Component<
       }
     } else {
       error = true;
-      errorText = result;
+      errorText = result.ok ? result.value : result.error.message;
     }
     if (error) {
       this.walletErrorHandle(
@@ -1930,7 +1939,7 @@ export class LoadingAppClass extends Component<
   restoreLastBackup = async () => {
     this.setState({ screen: RouteEnum.Launching, actionButtonsDisabled: true });
     const result = await restoreExistingWalletBackup();
-    if (!result || result === GlobalConst.false) {
+    if (!result.ok || !result.value || result.value === GlobalConst.false) {
       this.addLastSnackbar(
         this.state.translate('rpc.backupnotfound-error') as string,
       );
@@ -1944,33 +1953,20 @@ export class LoadingAppClass extends Component<
   };
 
   async fetchZingolibVersion(): Promise<void> {
-    try {
-      const start = Date.now();
-      let zingolibStr: string = await getVersionInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > zingolib version - ',
-          Date.now() - start,
-        );
-      }
-      if (zingolibStr) {
-        if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error zingolib version ${zingolibStr}`);
-          zingolibStr = GlobalConst.zingolibError;
-        }
-      } else {
-        console.log('Internal Error zingolib version');
-        zingolibStr = GlobalConst.zingolibNone;
-      }
-
-      //const start2 = Date.now();
-      this.setState({
-        zingolibVersion: zingolibStr,
-      });
-    } catch (error) {
-      console.log(`Critical Error info ${error}`);
-      return;
+    const zingolibResult = await getVersionInfo();
+    let zingolibStr: string;
+    if (!zingolibResult.ok) {
+      // The version display still needs a value when the FFI rejects.
+      zingolibStr = GlobalConst.zingolibError;
+    } else if (!zingolibResult.value) {
+      zingolibStr = GlobalConst.zingolibNone;
+    } else {
+      zingolibStr = zingolibResult.value;
     }
+
+    this.setState({
+      zingolibVersion: zingolibStr,
+    });
   }
 
   render() {

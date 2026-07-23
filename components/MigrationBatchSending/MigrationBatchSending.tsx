@@ -9,7 +9,7 @@ import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import { executeDueParts, executeDuePartsStatus } from '../../app/walletBackend';
 import { RPCBatchReportType } from '../../app/walletBackend/types/RPCBatchReportType';
 import { RPCBatchStatusType } from '../../app/walletBackend/types/RPCBatchStatusType';
@@ -81,9 +81,9 @@ const MigrationBatchSending: React.FunctionComponent<
       }
       polling = true;
       try {
-        const statusStr = await executeDuePartsStatus();
-        if (!statusStr.toLowerCase().startsWith(GlobalConst.error)) {
-          const parsed = JSON.parse(statusStr) as RPCBatchStatusType | null;
+        const status = await executeDuePartsStatus();
+        if (status.ok) {
+          const parsed = JSON.parse(status.value) as RPCBatchStatusType | null;
           if (parsed && !cancelled) {
             setProgress(parsed);
           }
@@ -99,11 +99,11 @@ const MigrationBatchSending: React.FunctionComponent<
       let failure: string | null = null;
       let report: RPCBatchReportType | null = null;
       try {
-        const reportStr = await executeDueParts(BATCH_SEND_SPACING_MS);
-        if (reportStr.toLowerCase().startsWith(GlobalConst.error)) {
-          failure = reportStr;
+        const reportResult = await executeDueParts(BATCH_SEND_SPACING_MS);
+        if (!reportResult.ok) {
+          failure = reportResult.error.message;
         } else {
-          const parsed = JSON.parse(reportStr) as RPCBatchReportType;
+          const parsed = JSON.parse(reportResult.value) as RPCBatchReportType;
           if (parsed.error) {
             failure = parsed.error;
           } else {

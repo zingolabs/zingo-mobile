@@ -7,6 +7,7 @@
  */
 import WalletBackend from './WalletBackend';
 
+export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
 export {
   cancelIronwoodMigration,
   changeServer,

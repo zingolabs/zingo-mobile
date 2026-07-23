@@ -68,19 +68,21 @@ export class SyncCoordinator {
         performance,
       );
       if (performance !== this.config.performanceLevel) {
-        const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
-          this.config.performanceLevel,
-          GlobalConst.minConfirmations.toString(),
-        );
-        console.log(
-          '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET',
-          setConfigWallet,
-        );
-        if (
-          setConfigWallet &&
-          setConfigWallet.toLowerCase().startsWith(GlobalConst.error)
-        ) {
-          this.config.onError(`Set wallet to prod error: ${setConfigWallet}`);
+        // setConfigWalletToProdProcess rejects on failure (typed FFI errors);
+        // the catch owns the error path, and this tick's caller is a
+        // setInterval with no rejection handler, so the rejection must be
+        // contained here.
+        try {
+          const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
+            this.config.performanceLevel,
+            GlobalConst.minConfirmations.toString(),
+          );
+          console.log(
+            '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET',
+            setConfigWallet,
+          );
+        } catch (error) {
+          this.config.onError(`Set wallet to prod error: ${error}`);
         }
         // The seam classifies the trimodal native resolution and contains
         // a rejection as false; this tick has no rejection handler of its

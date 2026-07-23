@@ -119,8 +119,8 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      const ua: string = await getDonationAddress();
-      return ua;
+      const ua = await getDonationAddress();
+      return ua.ok ? ua.value : '';
     }
     return '';
   }
@@ -142,8 +142,8 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      const ua: string = await getZenniesDonationAddress();
-      return ua;
+      const ua = await getZenniesDonationAddress();
+      return ua.ok ? ua.value : '';
     }
     return '';
   }
@@ -362,21 +362,17 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
-    const result: string = await parseAddress(address);
+    const result = await parseAddress(address);
     let isValid: boolean = false;
     let isFullUA: boolean = false;
     let onlyOrchardUA: string = '';
 
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error)) {
-        return { isValid, onlyOrchardUA };
-      }
-    } else {
+    if (!result.ok || !result.value) {
       return { isValid, onlyOrchardUA };
     }
     let resultJSON = {} as RPCParseAddressType;
     try {
-      resultJSON = await JSON.parse(result);
+      resultJSON = await JSON.parse(result.value);
     } catch (e) {
       return { isValid, onlyOrchardUA };
     }
@@ -412,17 +408,13 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<boolean> {
-    const result: string = await parseAddress(address);
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error)) {
-        return false;
-      }
-    } else {
+    const result = await parseAddress(address);
+    if (!result.ok || !result.value) {
       return false;
     }
     let resultJSON = {} as RPCParseAddressType;
     try {
-      resultJSON = await JSON.parse(result);
+      resultJSON = await JSON.parse(result.value);
     } catch (e) {
       return false;
     }

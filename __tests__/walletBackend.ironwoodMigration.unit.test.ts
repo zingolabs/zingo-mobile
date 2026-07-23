@@ -1,29 +1,27 @@
 /**
- * The private-migration wrapper family (zingo-mobile#1187): all seven
- * walletUtils wrappers around the ZIP 318 bridge methods share one
- * contract, so one table exercises them all:
- *   - a non-empty resolution passes through verbatim, even when it wears
- *     the error sentinel (the sniff only logs, it never classifies);
- *   - an empty resolution becomes the internal-RPC error string;
- *   - a rejection is contained as `Error: ...`, never thrown;
+ * The private-migration wrapper family (zingo-mobile#1187): all nine
+ * walletUtils wrappers around the ZIP 318 bridge methods share one typed
+ * FFI contract, so one table exercises them all:
+ *   - a resolution passes through verbatim as { ok: true }, even when it
+ *     wears the historical error sentinel (data is never sniffed);
+ *   - a rejection whose `.code` is a ZingolibError variant name maps to
+ *     { ok: false } with that code;
+ *   - a rejection without a recognized code maps to code 'Unknown';
  *   - numeric arguments cross the bridge as strings, null cadence as ''.
  */
 // Every member of the mocked bridge is a lazily created jest.fn, so a future
 // import-time touch of some other RPCModule member cannot break this suite.
-jest.mock('../app/RPCModule', () => {
-  const members: Record<PropertyKey, jest.Mock> = {};
-  return {
-    __esModule: true,
-    default: new Proxy(members, {
-      get: (target, prop) => (target[prop] ??= jest.fn()),
-    }),
-  };
-});
+jest.mock('../app/RPCModule', () =>
+  require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
+);
 
 import RPCModule from '../app/RPCModule';
+import { FfiResult } from '../app/walletBackend/ffi';
 import {
   cancelIronwoodMigration,
   continueNoteSplitting,
+  executeDueParts,
+  executeDuePartsStatus,
   migrationStatus,
   planIronwoodMigration,
   reconcileMigration,
@@ -36,14 +34,13 @@ const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 const consentPlanHash = 'ab'.repeat(32);
 
 // The widened signature through which a case's untyped callArgs are applied.
-type CallableWrapper = (...args: unknown[]) => Promise<string>;
+type CallableWrapper = (...args: unknown[]) => Promise<FfiResult<string>>;
 
 // Each case names only the wrapper and its arguments. The bridge method
-// (`${wrapper.name}Process`) and the internal-error spelling (wrapper.name)
-// are derived, so each wrapper's identity is written exactly once — in the
-// code under test.
+// (`${wrapper.name}Process`) is derived, so each wrapper's identity is
+// written exactly once — in the code under test.
 type WrapperCase = {
-  wrapper: (...args: never[]) => Promise<string>;
+  wrapper: (...args: never[]) => Promise<FfiResult<string>>;
   callArgs: unknown[];
   expectedBridgeArgs: string[];
 };
@@ -65,35 +62,55 @@ const wrapperCases: WrapperCase[] = [
   { wrapper: rescheduleParts, callArgs: [8], expectedBridgeArgs: ['8'] },
   { wrapper: migrationStatus, callArgs: [], expectedBridgeArgs: [] },
   { wrapper: reconcileMigration, callArgs: [], expectedBridgeArgs: [] },
+  { wrapper: executeDueParts, callArgs: [2000], expectedBridgeArgs: ['2000'] },
+  { wrapper: executeDuePartsStatus, callArgs: [], expectedBridgeArgs: [] },
   { wrapper: cancelIronwoodMigration, callArgs: [], expectedBridgeArgs: [] },
 ];
 
-describe('private-migration wrappers share one bridge contract', () => {
+describe('private-migration wrappers share one typed FFI contract', () => {
   it.each(wrapperCases)(
     '$wrapper.name',
     async ({ wrapper, callArgs, expectedBridgeArgs }) => {
       const bridgeMethod = bridge[`${wrapper.name}Process`];
       const callWrapper = () => (wrapper as CallableWrapper)(...callArgs);
 
-      // Passthrough is unconditional: a resolution wearing the error
-      // sentinel is logged but returned verbatim, like any other data.
+      // Passthrough is unconditional: a resolution wearing the historical
+      // error sentinel is data like any other, never re-classified.
       const passthroughResolutions = [
         '{ "started": true }',
         'Error: ConsentStale',
       ];
       for (const resolution of passthroughResolutions) {
         bridgeMethod.mockResolvedValueOnce(resolution);
-        await expect(callWrapper()).resolves.toBe(resolution);
+        await expect(callWrapper()).resolves.toEqual({
+          ok: true,
+          value: resolution,
+        });
         expect(bridgeMethod).toHaveBeenLastCalledWith(...expectedBridgeArgs);
       }
 
-      bridgeMethod.mockResolvedValueOnce('');
-      await expect(callWrapper()).resolves.toBe(
-        `Error: Internal RPC Error: ${wrapper.name}`,
+      // A rejection whose `.code` is a ZingolibError variant name surfaces
+      // as that typed code with the bridge's human message.
+      bridgeMethod.mockRejectedValueOnce(
+        Object.assign(new Error('Error: consent stale: notes changed'), {
+          code: 'MigrationConsentStale',
+        }),
       );
+      await expect(callWrapper()).resolves.toEqual({
+        ok: false,
+        error: {
+          code: 'MigrationConsentStale',
+          message: 'Error: consent stale: notes changed',
+        },
+      });
 
+      // A rejection without a recognized code maps to 'Unknown', never
+      // escapes as a thrown error.
       bridgeMethod.mockRejectedValueOnce(new Error('bridge exploded'));
-      await expect(callWrapper()).resolves.toMatch(/^Error: /);
+      await expect(callWrapper()).resolves.toEqual({
+        ok: false,
+        error: { code: 'Unknown', message: 'bridge exploded' },
+      });
     },
   );
 });

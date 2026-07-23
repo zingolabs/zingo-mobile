@@ -9,7 +9,7 @@ import Button from '../Components/Button';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
 import {
   planIronwoodMigration,
@@ -137,14 +137,14 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
     setLoading(true);
     setErrorMsg(null);
     setErrorOnStart(false);
-    const planStr = await planIronwoodMigration();
-    if (planStr.toLowerCase().startsWith(GlobalConst.error)) {
-      setErrorMsg(planStr);
+    const planResult = await planIronwoodMigration();
+    if (!planResult.ok) {
+      setErrorMsg(planResult.error.message);
       setLoading(false);
       return;
     }
     try {
-      const parsed: RPCMigrationPlanType = JSON.parse(planStr);
+      const parsed: RPCMigrationPlanType = JSON.parse(planResult.value);
       if (parsed.error) {
         setErrorMsg(parsed.error);
       } else {
@@ -168,13 +168,13 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
       return;
     }
     setStarting(true);
+    const start = await startIronwoodMigration(plan.plan_hash, null);
     let failure: string | null = null;
-    const startStr = await startIronwoodMigration(plan.plan_hash, null);
-    if (startStr.toLowerCase().startsWith(GlobalConst.error)) {
-      failure = startStr;
+    if (!start.ok) {
+      failure = start.error.message;
     } else {
       try {
-        const parsed = JSON.parse(startStr);
+        const parsed = JSON.parse(start.value);
         if (parsed.error) {
           failure = parsed.error;
         }
@@ -183,20 +183,20 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
       }
     }
     setStarting(false);
-    if (!failure) {
+    if (failure === null) {
       navigation.navigate(RouteEnum.MigrationSplitting, { plan });
       return;
     }
-    const lower = failure.toLowerCase();
+    const code = start.ok ? null : start.error.code;
     // A migration already exists (e.g. re-entry after a kill between consent
     // and splitting): resume it instead of erroring.
-    if (lower.includes('already in progress')) {
+    if (code === 'MigrationAlreadyInProgress') {
       navigation.navigate(RouteEnum.MigrationSplitting, {});
       return;
     }
     // ConsentStale: the wallet's notes changed between planning and consent.
     // Replan and let the user review the fresh plan.
-    if (lower.includes('re-plan') || lower.includes('notes changed')) {
+    if (code === 'MigrationConsentStale') {
       addLastSnackbar(translate('migrationsplitplan.replanned') as string);
       fetchPlan();
       return;

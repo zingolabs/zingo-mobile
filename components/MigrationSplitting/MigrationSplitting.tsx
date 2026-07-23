@@ -25,7 +25,7 @@ import Button from '../Components/Button';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import useTrickleProgress from '../../app/hooks/useTrickleProgress';
 import {
   continueNoteSplitting,
@@ -229,17 +229,17 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
       if (cancelled) {
         return;
       }
-      const stepStr = await continueNoteSplitting();
+      const stepResult = await continueNoteSplitting();
       if (cancelled) {
         return;
       }
       let failure: string | null = null;
       let parsed: RPCSplitStepType | null = null;
-      if (stepStr.toLowerCase().startsWith(GlobalConst.error)) {
-        failure = stepStr;
+      if (!stepResult.ok) {
+        failure = stepResult.error.message;
       } else {
         try {
-          parsed = JSON.parse(stepStr) as RPCSplitStepType;
+          parsed = JSON.parse(stepResult.value) as RPCSplitStepType;
           if (parsed.error) {
             failure = parsed.error;
           }
@@ -296,13 +296,15 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
     // the terminal state instead of an empty working view.
     (async () => {
       if (!plan) {
-        const statusStr = await migrationStatus();
+        const statusResult = await migrationStatus();
         if (cancelled) {
           return;
         }
-        if (!statusStr.toLowerCase().startsWith(GlobalConst.error)) {
+        if (statusResult.ok) {
           try {
-            const status = JSON.parse(statusStr) as RPCMigrationStatusType;
+            const status = JSON.parse(
+              statusResult.value,
+            ) as RPCMigrationStatusType;
             if (
               status.phase?.kind === 'parts_scheduled' ||
               status.phase?.kind === 'complete'

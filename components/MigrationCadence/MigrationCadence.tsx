@@ -15,7 +15,7 @@ import Button from '../Components/Button';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import { migrationStatus, rescheduleParts } from '../../app/walletBackend';
 import { RPCMigrationStatusType } from '../../app/walletBackend/types/RPCMigrationStatusType';
 
@@ -139,17 +139,17 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const statusStr = await migrationStatus();
+      const statusResult = await migrationStatus();
       if (cancelled) {
         return;
       }
-      if (statusStr.toLowerCase().startsWith(GlobalConst.error)) {
-        setErrorMsg(statusStr);
+      if (!statusResult.ok) {
+        setErrorMsg(statusResult.error.message);
         setLoading(false);
         return;
       }
       try {
-        const parsed = JSON.parse(statusStr) as RPCMigrationStatusType;
+        const parsed = JSON.parse(statusResult.value) as RPCMigrationStatusType;
         if (parsed.error) {
           setErrorMsg(parsed.error);
         } else {
@@ -184,13 +184,13 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
     }
     const perBucket = selected === 'fewer' ? fewerPerBucket : 1;
     setSubmitting(true);
+    const reschedule = await rescheduleParts(perBucket);
     let failure: string | null = null;
-    const rescheduleStr = await rescheduleParts(perBucket);
-    if (rescheduleStr.toLowerCase().startsWith(GlobalConst.error)) {
-      failure = rescheduleStr;
+    if (!reschedule.ok) {
+      failure = reschedule.error.message;
     } else {
       try {
-        const parsed = JSON.parse(rescheduleStr);
+        const parsed = JSON.parse(reschedule.value);
         if (parsed.error) {
           failure = parsed.error;
         }
@@ -199,13 +199,13 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
       }
     }
     setSubmitting(false);
-    if (!failure) {
+    if (failure === null) {
       navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
       return;
     }
     // CadenceFixed: a part is already signed, so the existing schedule
     // stands — reviewing it (and re-arming reminders) is still valid.
-    if (failure.toLowerCase().includes('cadence')) {
+    if (!reschedule.ok && reschedule.error.code === 'MigrationCadenceFixed') {
       addLastSnackbar(translate('migrationcadence.cadence-fixed') as string);
       navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
       return;
