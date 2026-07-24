@@ -813,6 +813,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               amount={orchardAmount}
               currencyName={info.currencyName}
               onStart={() => navigation.navigate(RouteEnum.MeetIronwood)}
+              onResume={route => navigation.navigate(route)}
             />
           )}
         </View>

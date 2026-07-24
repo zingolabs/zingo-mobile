@@ -25,6 +25,23 @@ jobs:
   # Every blocking check opts into fail-all: its first failure cancels
   # the whole run (see CONTEXT.md). Nightly leaves fail-all off to keep
   # the complete picture.
+
+  # Runs from t=0 with no dependencies: catches app-module Kotlin compile
+  # breakage (e.g. classpath conflicts) in a few minutes, long before the
+  # native builds and emulator jobs report.
+  android-kotlin-compile:
+    uses: ./.github/workflows/android-kotlin-compile.yaml
+    with:
+      fail-all: true
+
+  # The plain-JVM bridge-contract tests (FfiOutcome, FfiArgs): the only
+  # executable tests of the Kotlin bridge, so they gate the PR alongside
+  # the compile check.
+  android-unit-test:
+    uses: ./.github/workflows/android-unit-test.yaml
+    with:
+      fail-all: true
+
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
     secrets: inherit
@@ -104,6 +121,8 @@ jobs:
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
     needs:
+      - android-kotlin-compile
+      - android-unit-test
       - jest-test
       - rust-shear
       - js-depcheck

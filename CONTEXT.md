@@ -4,11 +4,95 @@ A glossary of the ubiquitous language of this repository. Terms are added
 as they are resolved in design discussions; each entry states what the
 term means here, and, where useful, what it does not mean.
 
+## Ironwood migration (ZIP 318)
+
+Vocabulary for the ZIP 318 Orchard→Ironwood migration flows (the immediate
+drain and the private two-phase path). API-facing terms follow zingolib's
+`lightclient/migrate.rs`; UI-facing terms are the deliberately smaller set the
+user sees. Code uses the API terms; rendered copy uses only the UI terms.
+
+### Migration paths
+
+**Migration**:
+Moving the wallet's Orchard funds into the Ironwood pool under ZIP 318, by
+either path.
+
+**Drain**:
+The immediate path: every Orchard note sent to Ironwood as-is, amounts visible
+on-chain, in one interactive session. UI label: "Migrate now".
+_Avoid_: fast path, happy path (session slang, not product language)
+
+**Private migration**:
+The two-phase path: note splitting, then scheduled sending inside windows.
+UI label: "Migrate privately".
+_Avoid_: privacy path, scheduled migration
+
+### The private path
+
+**Note splitting**:
+Phase 1. Resizing (splitting or consolidating) Orchard notes into exact
+denominations via Orchard self-sends, driven to completion in one interactive
+session. Stepper label: "Split notes".
+_Avoid_: Phase 1 (in UI copy), restructuring
+
+**Round**:
+One set of split transactions broadcast together; the next round may only
+start after the previous round confirms. A plan has one or more rounds.
+
+**Part**:
+One denomination-sized unit bound at the end of splitting; each part becomes
+one Orchard→Ironwood transfer in phase 2. In UI copy, call it a **note** —
+each part consumes exactly one split note.
+_Avoid_ in UI: part, shipment
+
+**Sending**:
+Phase 2. Broadcasting parts in batches inside scheduled windows, resumable
+across app kills, driven by notifications. Stepper label: "Send batches".
+_Avoid_: Phase 2 (in UI copy)
+
+**Batch**:
+The group of parts broadcast together in one window. UI-facing term.
+_Avoid_: bucket (API-internal), shipment
+
+**Window**:
+One 256-block (~5.3h) anchor-height bucket during which a batch may be sent.
+UI-facing term.
+_Avoid_: bucket, epoch
+
+**Cadence**:
+How many parts share each window (`per_bucket`). Chosen once, after splitting
+completes and before any part is signed; only re-buckets existing parts, never
+re-cuts notes. UI frame: "How many batches?"
+
+**Wake**:
+An OS-scheduled re-entry into the app for a window. Two kinds per window: a
+silent refresh at the window boundary (sync-only, captures proof material) and
+a user-facing notification at the window's random target time (leads to the
+execute screen). In UI copy the notification is a **reminder**; a batch is
+**due** at its target time, never "send by" (lateness is designed-for, not a
+deadline miss).
+
+**Slid**:
+A part whose window became unwitnessable and which moved itself to a coming
+window. Rendered as a plain explanatory sentence, never an error.
+
+**Stranded**:
+Value left out of the plan because moving it would cost more than it carries.
+Disclosed at consent.
+
+**Residual**:
+What remains when the migration completes; disclosed on completion.
+
+**Consent**:
+The single user approval of an exact plan hash before anything is signed or
+sent. Covers the whole migration, both phases.
+
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.
 Jest, rust-shear, js-depcheck, android-dependency-analysis, the Android
-build chain, and the Android integration buckets are blocking checks.
+Kotlin compile, the Android JVM unit tests, the Android build chain, and
+the Android integration buckets are blocking checks.
 
 **Advisory stage** — a PR CI job that records its result without
 affecting the pull request verdict. The per-PR iOS pipeline is an
@@ -20,7 +104,8 @@ the verdict path.
 
 **Bucket** — a group of Android integration tests that share one CI job,
 so runner setup and emulator boot amortize across the group instead of
-being paid once per test.
+being paid once per test. Unrelated to the migration API's `per_bucket`
+windowing sense, which UI copy avoids entirely.
 
 **Fail-all** — the policy that the first failure of any blocking check
 cancels the entire run at once, rather than letting the surviving checks

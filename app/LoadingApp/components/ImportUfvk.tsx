@@ -77,9 +77,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   useEffect(() => {
     if (!netInfo.isConnected || selectServer !== SelectServerEnum.offline) {
       (async () => {
-        const resp: string = await getLatestBlockServerInfo(server.uri);
-        if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
-          setLatestBlock(Number(resp));
+        const resp = await getLatestBlockServerInfo(server.uri);
+        if (resp.ok && resp.value) {
+          setLatestBlock(Number(resp.value));
         }
       })();
     }

@@ -33,6 +33,7 @@ import {
   isWalletAddress,
   loadExistingWallet,
   parseAddress,
+  reconcileMigration,
   setConfigWalletToProd,
 } from '../walletBackend';
 import {
@@ -149,6 +150,24 @@ const MigrationTransactions = React.lazy(
 );
 const MigrationSending = React.lazy(
   () => import('../../components/MigrationSending'),
+);
+const MigrationSplitPlan = React.lazy(
+  () => import('../../components/MigrationSplitPlan'),
+);
+const MigrationSplitting = React.lazy(
+  () => import('../../components/MigrationSplitting'),
+);
+const MigrationCadence = React.lazy(
+  () => import('../../components/MigrationCadence'),
+);
+const MigrationSchedule = React.lazy(
+  () => import('../../components/MigrationSchedule'),
+);
+const MigrationStatus = React.lazy(
+  () => import('../../components/MigrationStatus'),
+);
+const MigrationBatchSending = React.lazy(
+  () => import('../../components/MigrationBatchSending'),
 );
 const Insight = React.lazy(() => import('../../components/Insight'));
 const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
@@ -583,9 +602,12 @@ export default function LoadedApp(props: LoadedAppProps) {
           }
           let chain: ChainNameEnum = ChainNameEnum.mainChainName;
           try {
-            const parsed = JSON.parse(await parseAddress(a.address));
-            if (parsed && parsed.chain_name) {
-              chain = parsed.chain_name as ChainNameEnum;
+            const parseResult = await parseAddress(a.address);
+            if (parseResult.ok) {
+              const parsed = JSON.parse(parseResult.value);
+              if (parsed && parsed.chain_name) {
+                chain = parsed.chain_name as ChainNameEnum;
+              }
             }
           } catch {
             // unparseable address → keep the mainnet default
@@ -896,6 +918,15 @@ export class LoadedAppClass extends Component<
     // Configure the RPC to start doing refreshes
     await this.rpc.clearTimers();
     await this.rpc.configure();
+
+    // ZIP 318: classify the private migration's parts on every launch and
+    // apply what is safe unattended (promotions, expiries, rebuilds,
+    // completion). Never syncs, offline-safe, a no-op without a migration.
+    // The app-facing actions need no handling here: the History banner reads
+    // migration_status on focus and routes the user to the right screen.
+    // reconcileMigration never rejects (FfiResult); a transient failure just
+    // defers the cleanup to the next launch.
+    reconcileMigration();
 
     this.clearToAddr();
 
@@ -1788,7 +1819,7 @@ export class LoadedAppClass extends Component<
     }
 
     // Same chain — try to open the wallet on the new server.
-    const result: string = await loadExistingWallet(
+    const result = await loadExistingWallet(
       value.uri,
       value.chainName,
       this.state.performanceLevel,
@@ -1796,13 +1827,15 @@ export class LoadedAppClass extends Component<
     );
 
     let openError: string | null = null;
-    if (!result || result.toLowerCase().startsWith(GlobalConst.error)) {
-      openError = result || 'loadExistingWallet returned empty';
+    if (!result.ok) {
+      openError = result.error.message;
+    } else if (!result.value) {
+      openError = 'loadExistingWallet returned empty';
     } else {
       try {
         // `resultJson` may carry an `error` field for watch-only wallets,
         // which is actually fine — we treat it as success.
-        const resultJson: RPCSeedType & RPCUfvkType = JSON.parse(result);
+        const resultJson: RPCSeedType & RPCUfvkType = JSON.parse(result.value);
         if (resultJson.error) {
           openError = String(resultJson.error);
         }
@@ -1974,11 +2007,10 @@ export class LoadedAppClass extends Component<
     );
     // Audit Issue K — do not log the setConfigWallet response; on actual
     // failure it is propagated via setLastError below.
-    if (
-      setConfigWallet &&
-      setConfigWallet.toLowerCase().startsWith(GlobalConst.error)
-    ) {
-      this.setLastError(`Set performance level error: ${setConfigWallet}`);
+    if (!setConfigWallet.ok) {
+      this.setLastError(
+        `Set performance level error: ${setConfigWallet.error.message}`,
+      );
     }
   };
 
@@ -2070,27 +2102,23 @@ export class LoadedAppClass extends Component<
       // No `await` here so Promise.race can actually enforce the 15s cap.
       // With `await` the RPC call resolves before the race starts and the
       // timer becomes a no-op (a failing server then blocks ~minutes).
-      const resultStrServerPromise = changeServer(this.state.newServer.uri);
+      const resultServerPromise = changeServer(this.state.newServer.uri);
       const timeoutServerPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 15 seconds'));
         }, 15 * 1000);
       });
 
-      const resultStrServer: string = await Promise.race([
-        resultStrServerPromise,
+      const resultServer = await Promise.race([
+        resultServerPromise,
         timeoutServerPromise,
       ]);
 
-      if (
-        resultStrServer &&
-        resultStrServer.toLowerCase().startsWith(GlobalConst.error)
-      ) {
+      if (!resultServer.ok) {
         this.addLastSnackbar(
-          `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
+          `${this.state.translate('loadedapp.changeservernew-error')} ${resultServer.error.message}`,
         );
         return;
-      } else {
       }
 
       await SettingsFileImpl.writeSettings(
@@ -2125,10 +2153,9 @@ export class LoadedAppClass extends Component<
         resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
       }
 
-      if (
-        resultStr2 &&
-        resultStr2.toLowerCase().startsWith(GlobalConst.error)
-      ) {
+      // changeWallet/changeWalletNoBackup return '' on success or a
+      // translated error string — non-empty means failure, no sniffing.
+      if (resultStr2) {
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
@@ -2656,6 +2683,43 @@ export class LoadedAppClass extends Component<
                       name={RouteEnum.MigrationSending}
                       component={MigrationSending}
                       // The drain broadcasts here and can't be interrupted;
+                      // swipe-back is off and hardware-back is blocked in-screen.
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationSplitPlan}
+                      component={MigrationSplitPlan}
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationSplitting}
+                      component={MigrationSplitting}
+                      // Splitting rounds broadcast here and can't be
+                      // interrupted; swipe-back off, hardware-back blocked
+                      // in-screen.
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationCadence}
+                      component={MigrationCadence}
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationSchedule}
+                      component={MigrationSchedule}
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationStatus}
+                      component={MigrationStatus}
+                      // Reached by reset (post-confirm) and by the banner; its
+                      // own "Back to wallet" resets home, so swipe-back off.
+                      options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MigrationBatchSending}
+                      component={MigrationBatchSending}
+                      // The batch broadcasts here and can't be interrupted;
                       // swipe-back is off and hardware-back is blocked in-screen.
                       options={{ gestureEnabled: false }}
                     />

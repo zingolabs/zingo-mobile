@@ -111,6 +111,27 @@ interface RPCModuleAPI {
   // drainOrchardProcess (reads a native side channel, not the lightclient lock).
   drainStatusProcess(): Promise<string>;
 
+  // Ironwood private migration (ZIP 318 note splitting + scheduled parts).
+  // Numeric arguments cross the bridge as strings; empty perBucket keeps
+  // zingolib's default cadence.
+  planIronwoodMigrationProcess(): Promise<string>;
+  startIronwoodMigrationProcess(
+    planHashHex: string,
+    perBucket: string,
+  ): Promise<string>;
+  continueNoteSplittingProcess(): Promise<string>;
+  reschedulePartsProcess(perBucket: string): Promise<string>;
+  migrationStatusProcess(): Promise<string>;
+  reconcileMigrationProcess(): Promise<string>;
+  // Phase-2 execute tap: sends a scheduled window's due batch. spacingMs (the
+  // delay sequenced between the batch's sends) crosses as a string.
+  executeDuePartsProcess(spacingMs: string): Promise<string>;
+  // Live progress of the in-flight batch; safe to poll concurrently with
+  // executeDuePartsProcess (reads a native side channel, not the lightclient
+  // lock).
+  executeDuePartsStatusProcess(): Promise<string>;
+  cancelIronwoodMigrationProcess(): Promise<string>;
+
   // Wallet options / configuration
   getOptionWalletInfo(): Promise<string>;
   setOptionWalletProcess(): Promise<string>;

@@ -355,6 +355,14 @@ jobs:
         working-directory: ./rust
         run: cargo nextest run --no-run --features ci --release
 
+      # The zingo crate's host-side unit tests (the error funnel, the
+      # consent-hash parser, the channel contracts) run on the binaries the
+      # prebuild just produced — effectively free here, and executed
+      # nowhere else in PR CI.
+      - name: Run host-side unit tests
+        working-directory: ./rust
+        run: cargo nextest run -p zingo --release
+
       # Everything above needs nothing from the APK build. Hold here
       # until its artifact lands; abort promptly if it can never land.
       - name: Wait for the APK artifact (ci-gate)

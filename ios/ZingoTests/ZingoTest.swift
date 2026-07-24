@@ -818,41 +818,35 @@ class WalletFileBase64Tests: XCTestCase {
 
 /// The bridge-outcome contract for every migrated FFI (zingo-mobile#1151):
 /// whether a call succeeded is knowable from the channel of its result —
-/// resolved versus rejected — never from its content. One case per FFI,
-/// exercising the typed error family the Rust side now throws for it.
-/// These are the Swift twins of the Rust init_error_channel_tests, the
-/// Kotlin FfiOutcomeTest, and the TypeScript ffiOutcome tests.
+/// resolved versus rejected — never from its content, and a rejection's
+/// code is exactly the thrown ZingolibError variant's name, the stable
+/// code shared by every bridge. One case per contract variant. These are
+/// the Swift twins of the Rust init_error_channel_tests, the Kotlin
+/// FfiOutcomeTest, and the TypeScript ffiOutcome tests.
 class FfiOutcomeTests: XCTestCase {
-    private let ffiFailures: [(code: String, error: ZingolibError)] = [
-        ("init_new", ZingolibError.Init(message: "boom")),
-        ("init_from_seed", ZingolibError.Init(message: "boom")),
-        ("init_from_ufvk", ZingolibError.Init(message: "boom")),
-        ("init_from_b64", ZingolibError.Init(message: "boom")),
-        ("run_sync", ZingolibError.Sync(message: "boom")),
-        ("pause_sync", ZingolibError.Sync(message: "boom")),
-        ("status_sync", ZingolibError.Sync(message: "boom")),
-        ("poll_sync", ZingolibError.Sync(message: "boom")),
-        ("run_rescan", ZingolibError.Rescan(message: "boom")),
-        // The read getters' Rust sides are prose-free; their one typed
-        // failure family is the uninitialized client.
-        ("get_latest_block_wallet", ZingolibError.LightclientNotInitialized(message: "boom")),
-        ("get_version", ZingolibError.LightclientNotInitialized(message: "boom")),
-        ("get_unified_addresses", ZingolibError.LightclientNotInitialized(message: "boom")),
-        ("get_transparent_addresses", ZingolibError.LightclientNotInitialized(message: "boom")),
-        ("get_wallet_save_required", ZingolibError.LightclientNotInitialized(message: "boom")),
-        ("get_config_wallet_performance", ZingolibError.LightclientNotInitialized(message: "boom")),
-        ("get_wallet_version", ZingolibError.LightclientNotInitialized(message: "boom")),
-        // The save shells run the save internals, whose failures throw;
-        // success is the only value their data channel carries.
-        ("save_wallet_bytes", ZingolibError.Save(message: "boom")),
-        ("save_wallet_backup", ZingolibError.Save(message: "boom")),
-        // The wallet-read getters whose domain failures are the typed
-        // Read variant.
-        ("get_balance", ZingolibError.Read(message: "boom")),
-        ("get_spendable_balance_total", ZingolibError.Read(message: "boom")),
-        ("get_value_transfers", ZingolibError.Read(message: "boom")),
-        ("get_messages", ZingolibError.Read(message: "boom")),
-        ("get_latest_block_server", ZingolibError.Read(message: "boom")),
+    // Every contract variant, paired with its stable rejection code.
+    private let contractVariants: [(error: ZingolibError, code: String)] = [
+        (ZingolibError.LightclientNotInitialized(message: "boom"), "LightclientNotInitialized"),
+        (ZingolibError.LightclientLockPoisoned(message: "boom"), "LightclientLockPoisoned"),
+        (ZingolibError.Panic(message: "boom"), "Panic"),
+        (ZingolibError.Save(message: "boom"), "Save"),
+        (ZingolibError.Init(message: "boom"), "Init"),
+        (ZingolibError.Sync(message: "boom"), "Sync"),
+        (ZingolibError.Rescan(message: "boom"), "Rescan"),
+        (ZingolibError.Read(message: "boom"), "Read"),
+        (ZingolibError.Send(message: "boom"), "Send"),
+        (ZingolibError.Shield(message: "boom"), "Shield"),
+        (ZingolibError.InvalidInput(message: "boom"), "InvalidInput"),
+        (ZingolibError.Wallet(message: "boom"), "Wallet"),
+        (ZingolibError.Indexer(message: "boom"), "Indexer"),
+        (ZingolibError.Offline(message: "boom"), "Offline"),
+        (ZingolibError.SideChannelPoisoned(message: "boom"), "SideChannelPoisoned"),
+        (ZingolibError.MigrationNotInProgress(message: "boom"), "MigrationNotInProgress"),
+        (ZingolibError.MigrationAlreadyInProgress(message: "boom"), "MigrationAlreadyInProgress"),
+        (ZingolibError.MigrationConsentStale(message: "boom"), "MigrationConsentStale"),
+        (ZingolibError.MigrationCadenceFixed(message: "boom"), "MigrationCadenceFixed"),
+        (ZingolibError.MigrationSplit(message: "boom"), "MigrationSplit"),
+        (ZingolibError.Migration(message: "boom"), "Migration"),
     ]
 
     func testResolvedValuesPassThroughUnclassified() {
@@ -860,21 +854,96 @@ class FfiOutcomeTests: XCTestCase {
         // classification must be by channel, never by content.
         let proseLikeData = "Error: looks like prose but is legitimate data"
 
-        for (code, _) in ffiFailures {
-            guard case .resolved(let value) = FfiOutcome.of(code, { proseLikeData }) else {
-                return XCTFail("FFI \(code) must resolve")
+        guard case .resolved(let value) = FfiOutcome.of({ proseLikeData }) else {
+            return XCTFail("A returning call must resolve")
+        }
+        XCTAssertEqual(value, proseLikeData, "A returning call must resolve its value verbatim")
+    }
+
+    func testThrownFfiErrorsRejectUnderTheVariantName() {
+        for (failure, expectedCode) in contractVariants {
+            guard case .rejected(let code, let message, let error) = FfiOutcome.of({ throw failure }) else {
+                return XCTFail("Variant \(expectedCode) must reject on a thrown error")
             }
-            XCTAssertEqual(value, proseLikeData, "FFI \(code) must resolve its value verbatim")
+            XCTAssertEqual(code, expectedCode, "The rejection code is exactly the variant's name")
+            XCTAssertEqual(message, "boom", "The rejection message is the error's message, verbatim")
+            XCTAssertTrue(error is ZingolibError, "Variant \(expectedCode) must reject with its typed error")
         }
     }
 
-    func testThrownFfiErrorsRejectUnderTheFfiName() {
-        for (code, failure) in ffiFailures {
-            guard case .rejected(let rejectedCode, let error) = FfiOutcome.of(code, { throw failure }) else {
-                return XCTFail("FFI \(code) must reject on a thrown error")
-            }
-            XCTAssertEqual(rejectedCode, code)
-            XCTAssertTrue(error is ZingolibError, "FFI \(code) must reject with its typed error")
+    func testNonFfiErrorsRejectAsUnknown() {
+        struct Boom: Error {}
+        guard case .rejected(let code, let message, let error) = FfiOutcome.of({ throw Boom() }) else {
+            return XCTFail("A non-FFI error must still reject")
         }
+        XCTAssertEqual(code, "Unknown", "Errors outside the contract reject under the catch-all code")
+        XCTAssertFalse(message.isEmpty, "Even a catch-all rejection carries a diagnostic message")
+        XCTAssertTrue(error is Boom, "The original error object crosses the bridge")
+    }
+}
+
+/// The numeric-arg contract of the bridge (zingo-mobile#1151): a malformed
+/// or overflowing string throws the typed InvalidInput with the same
+/// message shape the Android bridge rejects with — never a silent default
+/// (the old per_bucket bug) and never an unsettled promise (the old
+/// reschedule/execute bug). The Swift twin of the Kotlin FfiArgsTest.
+class FfiArgsTests: XCTestCase {
+    func testValidNumbersParse() throws {
+        XCTAssertEqual(try FfiArgs.requiredU32("7", name: "per_bucket"), 7)
+        XCTAssertEqual(try FfiArgs.requiredU32("4294967295", name: "per_bucket"), UInt32.max)
+        XCTAssertEqual(try FfiArgs.requiredU64("250", name: "spacing_ms"), 250)
+        XCTAssertEqual(
+            try FfiArgs.requiredU64("18446744073709551615", name: "spacing_ms"), UInt64.max)
+        XCTAssertEqual(try FfiArgs.optionalU32("7", name: "per_bucket"), 7)
+    }
+
+    func testEmptyOptionalMeansAbsentNeverZero() throws {
+        XCTAssertNil(try FfiArgs.optionalU32("", name: "per_bucket"))
+    }
+
+    func testMalformedAndOverflowingValuesRejectAsInvalidInput() {
+        let rejected: [(raw: String, parse: () throws -> Any)] = [
+            ("not-a-number", { try FfiArgs.requiredU32("not-a-number", name: "per_bucket") }),
+            ("-1", { try FfiArgs.requiredU32("-1", name: "per_bucket") }),
+            ("4294967296", { try FfiArgs.requiredU32("4294967296", name: "per_bucket") }),
+            ("1.5", { try FfiArgs.optionalU32("1.5", name: "per_bucket") as Any }),
+            ("18446744073709551616",
+             { try FfiArgs.requiredU64("18446744073709551616", name: "spacing_ms") }),
+        ]
+        for (raw, parse) in rejected {
+            XCTAssertThrowsError(try parse(), "\"\(raw)\" must reject, never default") { error in
+                guard case ZingolibError.InvalidInput = error else {
+                    return XCTFail("\"\(raw)\" must throw the typed InvalidInput, got \(error)")
+                }
+            }
+        }
+    }
+
+    func testTheRejectionMessageMatchesTheAndroidBridgeShape() {
+        XCTAssertThrowsError(try FfiArgs.requiredU32("nope", name: "per_bucket")) { error in
+            guard case ZingolibError.InvalidInput(let message) = error else {
+                return XCTFail("expected the typed InvalidInput, got \(error)")
+            }
+            XCTAssertEqual(message, "per_bucket must be a u32: \"nope\"")
+        }
+        XCTAssertThrowsError(try FfiArgs.requiredU64("nope", name: "spacing_ms")) { error in
+            guard case ZingolibError.InvalidInput(let message) = error else {
+                return XCTFail("expected the typed InvalidInput, got \(error)")
+            }
+            XCTAssertEqual(message, "spacing_ms must be a u64: \"nope\"")
+        }
+    }
+
+    func testTheRejectionCrossesTheBridgeAsInvalidInputNeverUnknown() {
+        let outcome = FfiOutcome.of {
+            _ = try FfiArgs.requiredU32("not-a-number", name: "per_bucket")
+            return ""
+        }
+        guard case .rejected(let code, _, _) = outcome else {
+            return XCTFail("a malformed numeric arg must reject")
+        }
+        XCTAssertEqual(
+            code, "InvalidInput",
+            "a malformed numeric arg must reject under InvalidInput on both platforms")
     }
 }

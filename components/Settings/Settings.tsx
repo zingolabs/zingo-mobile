@@ -557,12 +557,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setCheckingServer(true);
     // Probe the block height, capped by the app's standard 15s server timeout
     // so a dead/slow server can't hang the check.
-    const heightStr = await Promise.race([
+    const height = await Promise.race([
       getLatestBlockServerInfo(uri),
-      new Promise<string>(resolve =>
-        setTimeout(() => resolve('Error: timeout'), 15 * 1000),
+      new Promise<Awaited<ReturnType<typeof getLatestBlockServerInfo>>>(
+        resolve =>
+          setTimeout(
+            () =>
+              resolve({
+                ok: false,
+                error: { code: 'Unknown', message: 'timeout' },
+              }),
+            15 * 1000,
+          ),
       ),
     ]);
+    const heightStr = height.ok ? height.value : '';
     const working = /^\d+$/.test(heightStr);
     setCheckingServer(false);
     setSelectedServerActive(working);
@@ -873,13 +882,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         // Settings server panel: a server that doesn't respond (e.g.
         // https://pepe.com) fails fast HERE without touching the live
         // connection, instead of hanging inside changeServer/restore.
-        const heightStr = await Promise.race([
+        const height = await Promise.race([
           getLatestBlockServerInfo(serverUriParsed),
-          new Promise<string>(resolve =>
-            setTimeout(() => resolve('Error: timeout'), 15 * 1000),
+          new Promise<Awaited<ReturnType<typeof getLatestBlockServerInfo>>>(
+            resolve =>
+              setTimeout(
+                () =>
+                  resolve({
+                    ok: false,
+                    error: { code: 'Unknown', message: 'timeout' },
+                  }),
+                15 * 1000,
+              ),
           ),
         ]);
-        if (!/^\d+$/.test(heightStr)) {
+        if (!height.ok || !/^\d+$/.test(height.value)) {
           addLastSnackbar(
             translate('loadedapp.tryingnewserver-error') as string,
           );

@@ -4,70 +4,55 @@
  * These were originally static methods on the RPC class. They are standalone
  * named exports so components can import only what they need without depending
  * on the full WalletBackend.
+ *
+ * Every wrapper around a native method is pure: one native call, mapped
+ * through callFfi into an FfiResult. Failures arrive only on the promise's
+ * rejection channel (typed FFI errors); resolved values are data, never
+ * inspected for an error sentinel.
  */
 import { WalletType, GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
+import { callFfi, FfiResult } from '../ffi';
 import { RPCZecPriceType } from '../types/RPCZecPriceType';
 import { RPCSeedType } from '../types/RPCSeedType';
 
 /**
  * Fetches the current ZEC/USD price from the zingolib price oracle.
  *
- * Price sentinel values from zingolib:
+ * Price sentinel values:
  *   0   — initial/default (no price data yet)
- *  -1   — error inside zingolib
- *  -2   — error in RPCModule or this function
+ *  -1   — error inside zingolib (a typed FFI rejection, or an oracle error)
+ *  -2   — malformed/empty success payload
  *  > 0  — real USD price
  */
 export async function getZecPrice(): Promise<{
   price: number;
   error: string;
 }> {
+  const result = await callFfi(RPCModule.zecPriceInfo());
+  if (!result.ok) {
+    return { price: -1, error: result.error.message };
+  }
+  if (!result.value) {
+    return { price: -2, error: 'Internal Error fetching price' };
+  }
   try {
-    // values:
-    // 0   - initial/default value
-    // -1  - error in zingolib.
-    // -2  - error in RPCModule, likely.
-    // > 0 - real value
-    const start = Date.now();
-    const resultStr: string = await RPCModule.zecPriceInfo();
-    if (Date.now() - start > 4000) {
-      console.log(
-        '=========================================== > get ZEC price - ',
-        Date.now() - start,
-      );
+    const resultJSON: RPCZecPriceType = JSON.parse(result.value);
+    if (resultJSON.error) {
+      return { price: -1, error: resultJSON.error };
     }
-
-    if (resultStr) {
-      if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error fetching price ${resultStr}`);
-        return { price: -1, error: resultStr };
-      } else {
-        const resultJSON: RPCZecPriceType = await JSON.parse(resultStr);
-        if (resultJSON.error) {
-          console.log(`Error fetching price ${resultJSON.error}`);
-          return { price: -1, error: resultJSON.error };
-        }
-        if (!resultJSON.current_price) {
-          // if no exists the field or is empty
-          return { price: 0, error: '' };
-        }
-        if (resultJSON.current_price && isNaN(resultJSON.current_price)) {
-          console.log(`Error fetching price ${resultJSON.current_price}`);
-          return {
-            price: -1,
-            error: `Error fetching price ${resultJSON.current_price}`,
-          };
-        } else {
-          return { price: resultJSON.current_price, error: '' };
-        }
-      }
-    } else {
-      console.log('Internal Error fetching price');
-      return { price: -2, error: 'Internal Error fetching price' };
+    if (!resultJSON.current_price) {
+      // if no exists the field or is empty
+      return { price: 0, error: '' };
     }
+    if (isNaN(resultJSON.current_price)) {
+      return {
+        price: -1,
+        error: `Error fetching price ${resultJSON.current_price}`,
+      };
+    }
+    return { price: resultJSON.current_price, error: '' };
   } catch (error) {
-    console.log(`Critical Error fetching price ${error}`);
     return { price: -2, error: `Critical Error fetching price ${error}` };
   }
 }
@@ -76,20 +61,25 @@ export async function getZecPrice(): Promise<{
 // Wallet lifecycle — create / load / restore / save / delete
 // ---------------------------------------------------------------------------
 
+/**
+ * The native "true"/"false" resolution protocol collapsed to a boolean:
+ * true only for a successful resolution whose value is truthy and not the
+ * "false" sentinel. A rejection is false — the typed error never re-enters
+ * the data channel as prose a caller could mistake for success
+ * (zingo-mobile#1151; the backup-restore latent bug).
+ */
+export function resolvedTrue(result: FfiResult<string>): boolean {
+  return result.ok && !!result.value && result.value !== GlobalConst.false;
+}
+
 // True iff a wallet file is present on disk. zingolib reports the answer as
 // the string "true"/"false"; collapsed to a real boolean here.
 export async function walletExists(): Promise<boolean> {
-  try {
-    const result: string = await RPCModule.walletExists();
-    return !!result && result !== GlobalConst.false;
-  } catch (error) {
-    console.log(`Critical Error walletExists ${error}`);
-    return false;
-  }
+  return resolvedTrue(await callFfi(RPCModule.walletExists()));
 }
 
-// Bootstraps a brand-new wallet for the given server/chain. Returns the raw
-// JSON (parseable as RPCWalletInfoType) or an "error: ..." prefix.
+// Bootstraps a brand-new wallet for the given server/chain. The success value
+// is the raw JSON (parseable as RPCWalletInfoType).
 //
 // `birthday` is only used in Offline mode (empty serverUri), where there is no
 // Indexer to ask for the chain tip; online it is ignored (pass "0").
@@ -99,19 +89,16 @@ export async function createNewWallet(
   chainHint: string,
   performanceLevel: string,
   minConfirmations: string,
-): Promise<string> {
-  try {
-    return await RPCModule.createNewWallet(
+): Promise<FfiResult<string>> {
+  return callFfi(
+    RPCModule.createNewWallet(
       serverUri,
       birthday,
       chainHint,
       performanceLevel,
       minConfirmations,
-    );
-  } catch (error) {
-    console.log(`Critical Error createNewWallet ${error}`);
-    return `Error: ${error}`;
-  }
+    ),
+  );
 }
 
 // Reconstructs a wallet from a 24-word seed + birthday block height.
@@ -122,20 +109,17 @@ export async function restoreWalletFromSeed(
   chainHint: string,
   performanceLevel: string,
   minConfirmations: string,
-): Promise<string> {
-  try {
-    return await RPCModule.restoreWalletFromSeed(
+): Promise<FfiResult<string>> {
+  return callFfi(
+    RPCModule.restoreWalletFromSeed(
       seed,
       birthday,
       serverUri,
       chainHint,
       performanceLevel,
       minConfirmations,
-    );
-  } catch (error) {
-    console.log(`Critical Error restoreWalletFromSeed ${error}`);
-    return `Error: ${error}`;
-  }
+    ),
+  );
 }
 
 // Reconstructs a view-only wallet from a UFVK + birthday block height.
@@ -146,20 +130,17 @@ export async function restoreWalletFromUfvk(
   chainHint: string,
   performanceLevel: string,
   minConfirmations: string,
-): Promise<string> {
-  try {
-    return await RPCModule.restoreWalletFromUfvk(
+): Promise<FfiResult<string>> {
+  return callFfi(
+    RPCModule.restoreWalletFromUfvk(
       ufvk,
       birthday,
       serverUri,
       chainHint,
       performanceLevel,
       minConfirmations,
-    );
-  } catch (error) {
-    console.log(`Critical Error restoreWalletFromUfvk ${error}`);
-    return `Error: ${error}`;
-  }
+    ),
+  );
 }
 
 // Loads the wallet file already on disk against the given server/chain.
@@ -168,29 +149,24 @@ export async function loadExistingWallet(
   chainHint: string,
   performanceLevel: string,
   minConfirmations: string,
-): Promise<string> {
-  try {
-    return await RPCModule.loadExistingWallet(
+): Promise<FfiResult<string>> {
+  return callFfi(
+    RPCModule.loadExistingWallet(
       serverUri,
       chainHint,
       performanceLevel,
       minConfirmations,
-    );
-  } catch (error) {
-    console.log(`Critical Error loadExistingWallet ${error}`);
-    return `Error: ${error}`;
-  }
+    ),
+  );
 }
 
 // Restores the wallet from its on-device backup file (the `.migrating`
-// twin EncryptedFile manages). Returns the raw response.
-export async function restoreExistingWalletBackup(): Promise<string> {
-  try {
-    return await RPCModule.restoreExistingWalletBackup();
-  } catch (error) {
-    console.log(`Critical Error restoreExistingWalletBackup ${error}`);
-    return `Error: ${error}`;
-  }
+// twin EncryptedFile manages). The success value is the native "true"/"false"
+// data protocol.
+export async function restoreExistingWalletBackup(): Promise<
+  FfiResult<string>
+> {
+  return callFfi(RPCModule.restoreExistingWalletBackup());
 }
 
 /**
@@ -237,24 +213,16 @@ export async function doSaveBackup(): Promise<boolean> {
 
 // Points the running wallet at a different lightwalletd server. Caller is
 // responsible for racing this against a timeout and reverting on failure.
-export async function changeServer(serverUri: string): Promise<string> {
-  try {
-    return await RPCModule.changeServerProcess(serverUri);
-  } catch (error) {
-    console.log(`Critical Error changeServer ${error}`);
-    return `Error: ${error}`;
-  }
+export async function changeServer(
+  serverUri: string,
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.changeServerProcess(serverUri));
 }
 
-// Fetches lightwalletd / chain metadata. Returns raw JSON (parseable as
-// RPCInfoType).
-export async function getServerInfo(): Promise<string> {
-  try {
-    return await RPCModule.infoServerInfo();
-  } catch (error) {
-    console.log(`Critical Error getServerInfo ${error}`);
-    return `Error: ${error}`;
-  }
+// Fetches lightwalletd / chain metadata. The success value is raw JSON
+// (parseable as RPCInfoType).
+export async function getServerInfo(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.infoServerInfo());
 }
 
 // Persists the runtime performance level + min-confirmations into the
@@ -262,26 +230,15 @@ export async function getServerInfo(): Promise<string> {
 export async function setConfigWalletToProd(
   performanceLevel: string,
   minConfirmations: string,
-): Promise<string> {
-  try {
-    return await RPCModule.setConfigWalletToProdProcess(
-      performanceLevel,
-      minConfirmations,
-    );
-  } catch (error) {
-    console.log(`Critical Error setConfigWalletToProd ${error}`);
-    return `Error: ${error}`;
-  }
+): Promise<FfiResult<string>> {
+  return callFfi(
+    RPCModule.setConfigWalletToProdProcess(performanceLevel, minConfirmations),
+  );
 }
 
 // Tells zingolib which crypto provider (e.g. ring) to use. One-shot at boot.
-export async function setCryptoDefaultProvider(): Promise<string> {
-  try {
-    return await RPCModule.setCryptoDefaultProvider();
-  } catch (error) {
-    console.log(`Critical Error setCryptoDefaultProvider ${error}`);
-    return `Error: ${error}`;
-  }
+export async function setCryptoDefaultProvider(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.setCryptoDefaultProvider());
 }
 
 // ---------------------------------------------------------------------------
@@ -289,272 +246,248 @@ export async function setCryptoDefaultProvider(): Promise<string> {
 // ---------------------------------------------------------------------------
 
 // Returns the wallet balance breakdown (transparent / sapling / orchard,
-// spendable / unconfirmed). Raw JSON (parseable as RPCBalanceType).
-export async function getBalanceInfo(): Promise<string> {
-  try {
-    return await RPCModule.getBalanceInfo();
-  } catch (error) {
-    console.log(`Critical Error getBalanceInfo ${error}`);
-    return `Error: ${error}`;
-  }
+// spendable / unconfirmed). The success value is raw JSON (parseable as
+// RPCBalanceType).
+export async function getBalanceInfo(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.getBalanceInfo());
 }
 
 // Returns the zingolib version string used to compose About/Settings.
-export async function getVersionInfo(): Promise<string> {
-  try {
-    return await RPCModule.getVersionInfo();
-  } catch (error) {
-    console.log(`Critical Error getVersionInfo ${error}`);
-    return `Error: ${error}`;
-  }
+export async function getVersionInfo(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.getVersionInfo());
 }
 
-// Returns the wallet kind (seed vs ufvk). Raw JSON the caller parses.
-export async function getWalletKind(): Promise<string> {
-  try {
-    return await RPCModule.walletKindInfo();
-  } catch (error) {
-    console.log(`Critical Error getWalletKind ${error}`);
-    return `Error: ${error}`;
-  }
+// Returns the wallet kind (seed vs ufvk). The success value is raw JSON the
+// caller parses.
+export async function getWalletKind(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.walletKindInfo());
 }
 
 // Returns the ZingoLabs donation unified address (mainnet only — caller
-// must gate by chain). The bridge returns a freshly-generated UA every
-// time. On exception we return the raw "Error: ..." string for the caller
-// to surface — same pattern as the other one-shots in this file.
-export async function getDonationAddress(): Promise<string> {
-  try {
-    return await RPCModule.getDonationAddress();
-  } catch (error) {
-    console.log(`Critical Error getDonationAddress ${error}`);
-    return `Error: ${error}`;
-  }
+// must gate by chain). The bridge returns a freshly-generated UA every time.
+export async function getDonationAddress(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.getDonationAddress());
 }
 
 // Same as `getDonationAddress` but for the Zennies-for-Zingo wallet.
-export async function getZenniesDonationAddress(): Promise<string> {
-  try {
-    return await RPCModule.getZenniesDonationAddress();
-  } catch (error) {
-    console.log(`Critical Error getZenniesDonationAddress ${error}`);
-    return `Error: ${error}`;
-  }
+export async function getZenniesDonationAddress(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.getZenniesDonationAddress());
 }
 
 // Pre-calculates the fee and validates a send without broadcasting. Mirrors
 // the native `sendProcess` (propose phase). `proposeJson` is a stringified
 // SendJson zingolib expects, with recipients/amounts/memos.
-export async function sendPropose(proposeJson: string): Promise<string> {
-  try {
-    const proposeStr: string = await RPCModule.sendProcess(proposeJson);
-    if (proposeStr) {
-      if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error propose ${proposeStr}`);
-        return proposeStr;
-      }
-    } else {
-      console.log('Internal Error propose');
-      return 'Error: Internal RPC Error: propose';
-    }
-    return proposeStr;
-  } catch (error) {
-    console.log(`Critical Error propose ${error}`);
-    return `Error: ${error}`;
-  }
+export async function sendPropose(
+  proposeJson: string,
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.sendProcess(proposeJson));
 }
 
 // Plans the immediate Orchard -> Ironwood drain without broadcasting. Mirrors
-// the native `planOrchardDrainProcess` (propose/preview phase). Returns the raw
-// JSON (parseable as RPCDrainPlanType); the caller checks for an `error`
-// prefix / field before parsing.
-export async function planOrchardDrain(): Promise<string> {
-  try {
-    const planStr: string = await RPCModule.planOrchardDrainProcess();
-    if (planStr) {
-      if (planStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error planOrchardDrain ${planStr}`);
-        return planStr;
-      }
-    } else {
-      console.log('Internal Error planOrchardDrain');
-      return 'Error: Internal RPC Error: planOrchardDrain';
-    }
-    return planStr;
-  } catch (error) {
-    console.log(`Critical Error planOrchardDrain ${error}`);
-    return `Error: ${error}`;
-  }
+// the native `planOrchardDrainProcess` (propose/preview phase). The success
+// value is raw JSON (parseable as RPCDrainPlanType).
+export async function planOrchardDrain(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.planOrchardDrainProcess());
 }
 
 // Executes the immediate Orchard -> Ironwood drain: builds and broadcasts every
-// drain transaction at once. Mirrors the native `drainOrchardProcess`. Returns
-// the raw JSON (parseable as RPCDrainType); the caller checks for an `error`
-// prefix / field before parsing.
-export async function drainOrchard(): Promise<string> {
-  try {
-    const drainStr: string = await RPCModule.drainOrchardProcess();
-    if (drainStr) {
-      if (drainStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error drainOrchard ${drainStr}`);
-        return drainStr;
-      }
-    } else {
-      console.log('Internal Error drainOrchard');
-      return 'Error: Internal RPC Error: drainOrchard';
-    }
-    return drainStr;
-  } catch (error) {
-    console.log(`Critical Error drainOrchard ${error}`);
-    return `Error: ${error}`;
-  }
+// drain transaction at once. Mirrors the native `drainOrchardProcess`. The
+// success value is raw JSON (parseable as RPCDrainType).
+export async function drainOrchard(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.drainOrchardProcess());
 }
 
 // Snapshot of the in-flight drain's progress, for rendering "Building i/N" then
 // "Broadcasting i/N". Mirrors the native `drainStatusProcess`; safe to poll
 // concurrently with a running `drainOrchard` (native reads a side channel, not
-// the lightclient lock). Returns the raw JSON: `null` when no drain is running,
-// otherwise `{ total, built, sent, phase }` (parseable as RPCDrainStatusType).
-// The caller checks for an `error` prefix before parsing.
-export async function drainStatus(): Promise<string> {
-  try {
-    const statusStr: string = await RPCModule.drainStatusProcess();
-    if (statusStr && statusStr.toLowerCase().startsWith(GlobalConst.error)) {
-      console.log(`Error drainStatus ${statusStr}`);
-      return statusStr;
-    }
-    return statusStr;
-  } catch (error) {
-    console.log(`Critical Error drainStatus ${error}`);
-    return `Error: ${error}`;
-  }
+// the lightclient lock). The success value is raw JSON: `null` when no drain
+// is running, otherwise `{ total, built, sent, phase }` (parseable as
+// RPCDrainStatusType).
+export async function drainStatus(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.drainStatusProcess());
+}
+
+// Plans the private (ZIP 318 two-phase) Orchard -> Ironwood migration without
+// signing or broadcasting anything. Mirrors the native
+// `planIronwoodMigrationProcess`. The success value is raw JSON (parseable as
+// RPCMigrationPlanType, including the consent `plan_hash`).
+export async function planIronwoodMigration(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.planIronwoodMigrationProcess());
+}
+
+// Records the user's consent to the exact plan they were shown (its
+// `plan_hash` from planIronwoodMigration) and persists the migration state.
+// Nothing is broadcast; continueNoteSplitting drives the rounds afterwards.
+// `perBucket` null keeps zingolib's default cadence (changeable later via
+// rescheduleParts, until the first part is signed). The success value is
+// `{ started: true }` JSON; a stale consent rejects with code
+// MigrationConsentStale.
+export async function startIronwoodMigration(
+  planHashHex: string,
+  perBucket: number | null,
+): Promise<FfiResult<string>> {
+  return callFfi(
+    RPCModule.startIronwoodMigrationProcess(
+      planHashHex,
+      perBucket === null ? '' : String(perBucket),
+    ),
+  );
+}
+
+// Drives one step of note splitting: proves and broadcasts the next round of
+// Orchard self-sends, or reports what the pending round is waiting on. Long-
+// running like drainOrchard (Halo2 proving); the native side dispatches it on
+// the concurrent pool. The success value is raw JSON (parseable as
+// RPCSplitStepType).
+export async function continueNoteSplitting(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.continueNoteSplittingProcess());
+}
+
+// Sets the Phase 2 cadence (parts per broadcast window) and re-buckets every
+// part with fresh randomization. Callable any time between consent and the
+// first signed part; afterwards rejects with code MigrationCadenceFixed.
+// After success the old schedule is void: re-read migrationStatus and re-arm
+// the reminders. The success value is `{ rescheduled: true }` JSON.
+export async function rescheduleParts(
+  perBucket: number,
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.reschedulePartsProcess(String(perBucket)));
+}
+
+// The private migration's progress, arranged for direct rendering (parseable
+// as RPCMigrationStatusType). `phase` is null when no migration is in
+// progress. ZIP 318 requires showing its `orchard_confirmed_spendable`
+// figure while one is.
+export async function migrationStatus(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.migrationStatusProcess());
+}
+
+// Classifies every part against the local chain view, applies what is safe
+// unattended and returns what needs the app (parseable as RPCReconcileType).
+// Call on every launch; never syncs, offline-safe.
+export async function reconcileMigration(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.reconcileMigrationProcess());
+}
+
+// Phase-2 execute tap: sends the scheduled migration's due batch (the current
+// window's parts plus any missed windows', folded in), sequencing sends
+// `spacingMs` apart. Long-running (prove + broadcast) like drainOrchard; the
+// native side dispatches it off the main queue. Mirrors the native
+// `executeDuePartsProcess`. The success value is raw JSON (parseable as
+// RPCBatchReportType).
+export async function executeDueParts(
+  spacingMs: number,
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.executeDuePartsProcess(String(spacingMs)));
+}
+
+// Snapshot of the in-flight execute batch's progress, for rendering
+// "Sending i/N". Mirrors the native `executeDuePartsStatusProcess`; safe to
+// poll concurrently with a running `executeDueParts` (native reads a side
+// channel, not the lightclient lock). The success value is raw JSON: `null`
+// when no batch is running, otherwise `{ total, resolved, sent, phase }`
+// (parseable as RPCBatchStatusType).
+export async function executeDuePartsStatus(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.executeDuePartsStatusProcess());
+}
+
+// Abandons the in-progress private migration: confirmed parts stand, pending
+// ones are dropped and their notes released. The success value is
+// `{ cancelled: true }` JSON.
+export async function cancelIronwoodMigration(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.cancelIronwoodMigrationProcess());
 }
 
 // Returns the spendable balance that could be sent to `address` right now,
-// honoring privacy levels and donation flags. Returns the raw JSON
+// honoring privacy levels and donation flags. The success value is raw JSON
 // (parseable as RPCSpendablebalanceType).
 export async function getSpendableBalanceWithAddress(
   address: string,
   zennies: string,
-): Promise<string> {
-  try {
-    return await RPCModule.getSpendableBalanceWithAddressInfo(address, zennies);
-  } catch (error) {
-    console.log(`Critical Error getSpendableBalanceWithAddress ${error}`);
-    return `Error: ${error}`;
-  }
+): Promise<FfiResult<string>> {
+  return callFfi(
+    RPCModule.getSpendableBalanceWithAddressInfo(address, zennies),
+  );
 }
 
-// Validates and classifies a Zcash address. Returns the raw JSON
+// Validates and classifies a Zcash address. The success value is raw JSON
 // (parseable as RPCParseAddressType) — callers use it to decide whether
 // the address is transparent, sapling, orchard, unified or TEX.
-export async function parseAddress(address: string): Promise<string> {
-  try {
-    return await RPCModule.parseAddressInfo(address);
-  } catch (error) {
-    console.log(`Critical Error parseAddress ${error}`);
-    return `Error: ${error}`;
-  }
+export async function parseAddress(
+  address: string,
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.parseAddressInfo(address));
 }
 
 // Aggregated lifetime spending metrics, used by the Insight pie chart.
-// Each helper returns a raw JSON map keyed by recipient address; the caller
-// parses it into { [address]: number }. The three flavors return:
+// Each helper's success value is a raw JSON map keyed by recipient address;
+// the caller parses it into { [address]: number }. The three flavors return:
 //   value     — total ZEC sent (zats), plus a "fee" entry
 //   spends    — number of transactions sent to each recipient
 //   memobytes — total memo bytes sent to each recipient
-export async function getTotalValueToAddress(): Promise<string> {
-  try {
-    return await RPCModule.getTotalValueToAddressInfo();
-  } catch (error) {
-    console.log(`Critical Error getTotalValueToAddress ${error}`);
-    return `Error: ${error}`;
-  }
+export async function getTotalValueToAddress(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.getTotalValueToAddressInfo());
 }
 
-export async function getTotalSpendsToAddress(): Promise<string> {
-  try {
-    return await RPCModule.getTotalSpendsToAddressInfo();
-  } catch (error) {
-    console.log(`Critical Error getTotalSpendsToAddress ${error}`);
-    return `Error: ${error}`;
-  }
+export async function getTotalSpendsToAddress(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.getTotalSpendsToAddressInfo());
 }
 
-export async function getTotalMemobytesToAddress(): Promise<string> {
-  try {
-    return await RPCModule.getTotalMemobytesToAddressInfo();
-  } catch (error) {
-    console.log(`Critical Error getTotalMemobytesToAddress ${error}`);
-    return `Error: ${error}`;
-  }
+export async function getTotalMemobytesToAddress(): Promise<
+  FfiResult<string>
+> {
+  return callFfi(RPCModule.getTotalMemobytesToAddressInfo());
 }
 
 // Generates a fresh unified address. `receivers` is the concatenation of
-// receiver tags zingolib understands (e.g. "o", "z", "oz"). Returns the raw
-// JSON response — the caller is expected to parse it as RPCUnifiedAddressType.
+// receiver tags zingolib understands (e.g. "o", "z", "oz"). The success value
+// is raw JSON (parseable as RPCUnifiedAddressType).
 export async function createNewUnifiedAddress(
   receivers: string,
-): Promise<string> {
-  try {
-    return await RPCModule.createNewUnifiedAddressProcess(receivers);
-  } catch (error) {
-    console.log(`Critical Error createNewUnifiedAddress ${error}`);
-    return `Error: ${error}`;
-  }
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.createNewUnifiedAddressProcess(receivers));
 }
 
-// Generates a fresh transparent (t-) address. Returns the raw JSON response;
-// the caller is expected to parse it as RPCTransparentAddressType.
-export async function createNewTransparentAddress(): Promise<string> {
-  try {
-    return await RPCModule.createNewTransparentAddressProcess();
-  } catch (error) {
-    console.log(`Critical Error createNewTransparentAddress ${error}`);
-    return `Error: ${error}`;
-  }
+// Generates a fresh transparent (t-) address. The success value is raw JSON
+// (parseable as RPCTransparentAddressType).
+export async function createNewTransparentAddress(): Promise<
+  FfiResult<string>
+> {
+  return callFfi(RPCModule.createNewTransparentAddressProcess());
 }
 
-// Requests zingolib to forget about a transaction. Returns the raw response
-// from the bridge — either an "error: ..." prefix on failure or a
-// human-readable status message on success, which the caller is expected to
-// surface in an alert. zingolib does not return structured data here.
-export async function removeTransaction(txid: string): Promise<string> {
-  try {
-    return await RPCModule.removeTransactionProcess(txid);
-  } catch (error) {
-    console.log(`Critical Error removeTransaction ${error}`);
-    return `Error: ${error}`;
-  }
+// Requests zingolib to forget about a transaction. The success value is a
+// human-readable status message the caller is expected to surface in an
+// alert. zingolib does not return structured data here.
+export async function removeTransaction(
+  txid: string,
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.removeTransactionProcess(txid));
 }
 
 // Asks zingolib whether the given address belongs to the loaded wallet.
-// Returns the raw JSON response (parseable as RPCCheckAddressType) or the
-// "error: ..." prefix. Callers that only need the boolean answer should use
-// `isWalletAddress` instead — it builds on this helper.
-export async function checkMyAddress(address: string): Promise<string> {
-  try {
-    return await RPCModule.checkMyAddressInfo(address);
-  } catch (error) {
-    console.log(`Critical Error checkMyAddress ${error}`);
-    return `Error: ${error}`;
-  }
+// The success value is raw JSON (parseable as RPCCheckAddressType). Callers
+// that only need the boolean answer should use `isWalletAddress` instead —
+// it builds on this helper.
+export async function checkMyAddress(
+  address: string,
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.checkMyAddressInfo(address));
 }
 
 // True iff the given Zcash address belongs to the loaded wallet. Used by
-// the address book to flag own-vs-external entries. On any failure (RPC
-// error, parse error, exception) we conservatively return false — better to
-// show an external address as external than mislabel a stranger's as own.
+// the address book to flag own-vs-external entries. On any failure (FFI
+// error, parse error) we conservatively return false — better to show an
+// external address as external than mislabel a stranger's as own.
 export async function isWalletAddress(address: string): Promise<boolean> {
-  const checkStr = await checkMyAddress(address);
-  if (!checkStr || checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+  const check = await checkMyAddress(address);
+  if (!check.ok || !check.value) {
     return false;
   }
   try {
-    const parsed: { is_wallet_address?: boolean } = JSON.parse(checkStr);
+    const parsed: { is_wallet_address?: boolean } = JSON.parse(check.value);
     return parsed.is_wallet_address === true;
   } catch (error) {
-    console.log(`Critical Error isWalletAddress parse ${error}`);
     return false;
   }
 }
@@ -563,78 +496,30 @@ export async function isWalletAddress(address: string): Promise<boolean> {
 // as the string "true"/"false"; we collapse it to a real boolean here so
 // callers don't have to repeat the GlobalConst.false comparison.
 export async function walletBackupExists(): Promise<boolean> {
-  try {
-    const result: string = await RPCModule.walletBackupExists();
-    return !!result && result !== GlobalConst.false;
-  } catch (error) {
-    console.log(`Critical Error walletBackupExists ${error}`);
-    return false;
-  }
+  return resolvedTrue(await callFfi(RPCModule.walletBackupExists()));
 }
 
-// Returns the latest block height the given server reports as a plain string
-// (zingolib serializes it as a stringified integer). Callers measure wall-clock
-// time around this to compute server latency.
+// Returns the latest block height the given server reports; the success
+// value is a plain string (zingolib serializes it as a stringified integer).
+// Callers measure wall-clock time around this to compute server latency.
 export async function getLatestBlockServerInfo(
   serverUri: string,
-): Promise<string> {
-  try {
-    const heightStr: string =
-      await RPCModule.getLatestBlockServerInfo(serverUri);
-    if (!heightStr) {
-      console.log('Internal Error server height');
-      return 'Error: Internal RPC Error: server height';
-    }
-    return heightStr;
-  } catch (error) {
-    console.log(`Critical Error server height ${error}`);
-    return `Error: ${error}`;
-  }
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.getLatestBlockServerInfo(serverUri));
 }
 
 // Pre-calculates the shielding fee and shieldable amount without broadcasting.
 // Mirrors the native `shieldProcess` (propose phase). Pair with `shieldConfirm`
 // to actually execute the shield.
-export async function shieldPropose(): Promise<string> {
-  try {
-    const proposeStr: string = await RPCModule.shieldProcess();
-    if (proposeStr) {
-      if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error propose ${proposeStr}`);
-        return proposeStr;
-      }
-    } else {
-      console.log('Internal Error propose');
-      return 'Error: Internal RPC Error: propose';
-    }
-    return proposeStr;
-  } catch (error) {
-    console.log(`Critical Error propose ${error}`);
-    return `Error: ${error}`;
-  }
+export async function shieldPropose(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.shieldProcess());
 }
 
 // Executes the shielding transaction proposed by `shieldPropose`. Mirrors the
 // native `confirmProcess` (confirm phase). Must be called after a successful
 // propose with a still-valid balance.
-export async function shieldConfirm(): Promise<string> {
-  try {
-    const shieldStr: string = await RPCModule.confirmProcess();
-    if (shieldStr) {
-      if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error shield ${shieldStr}`);
-        return shieldStr;
-      }
-    } else {
-      console.log('Internal Error shield ');
-      return 'Error: Internal RPC Error: shield ';
-    }
-
-    return shieldStr;
-  } catch (error) {
-    console.log(`Critical Error shield ${error}`);
-    return `Error: ${error}`;
-  }
+export async function shieldConfirm(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.confirmProcess());
 }
 
 /**
@@ -649,25 +534,12 @@ export async function fetchWallet(
 ): Promise<WalletType | null> {
   if (readOnly) {
     // only viewing key & birthday
+    const result = await callFfi(RPCModule.getUfvkInfo());
+    if (!result.ok || !result.value) {
+      return null;
+    }
     try {
-      const start = Date.now();
-      const ufvkStr: string = await RPCModule.getUfvkInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > get ufvk - ',
-          Date.now() - start,
-        );
-      }
-      if (ufvkStr) {
-        if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error ufvk ${ufvkStr}`);
-          return null;
-        }
-      } else {
-        console.log('Internal Error ufvk');
-        return null;
-      }
-      const RPCufvk: WalletType = await JSON.parse(ufvkStr);
+      const RPCufvk: WalletType = JSON.parse(result.value);
 
       const wallet: WalletType = {} as WalletType;
       if (RPCufvk.birthday) {
@@ -679,30 +551,16 @@ export async function fetchWallet(
 
       return wallet;
     } catch (error) {
-      console.log(`Critical Error ufvk ${error}`);
       return null;
     }
   } else {
     // only seed & birthday
+    const result = await callFfi(RPCModule.getSeedInfo());
+    if (!result.ok || !result.value) {
+      return null;
+    }
     try {
-      const start2 = Date.now();
-      const seedStr: string = await RPCModule.getSeedInfo();
-      if (Date.now() - start2 > 4000) {
-        console.log(
-          '=========================================== > get seed - ',
-          Date.now() - start2,
-        );
-      }
-      if (seedStr) {
-        if (seedStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error seed ${seedStr}`);
-          return null;
-        }
-      } else {
-        console.log('Internal Error seed');
-        return null;
-      }
-      const RPCseed: RPCSeedType = await JSON.parse(seedStr);
+      const RPCseed: RPCSeedType = JSON.parse(result.value);
 
       const wallet: WalletType = {} as WalletType;
       if (RPCseed.seed_phrase) {
@@ -714,7 +572,6 @@ export async function fetchWallet(
 
       return wallet;
     } catch (error) {
-      console.log(`Critical Error seed ${error}`);
       return null;
     }
   }

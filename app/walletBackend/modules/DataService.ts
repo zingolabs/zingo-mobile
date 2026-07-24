@@ -250,13 +250,10 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (infoStr) {
-        if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error info & server block height ${infoStr}`);
-          this.config.onError(`Error info: ${infoStr}`);
-          infoError = true;
-        }
-      } else {
+      // infoServerInfo rejects on failure (typed FFI errors); the catch owns
+      // the error path, so a resolved value is data. Only an empty resolution
+      // — a programming error — is classified here.
+      if (!infoStr) {
         console.log('Internal Error info & server block height');
         infoError = true;
       }

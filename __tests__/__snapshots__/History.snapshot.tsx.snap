@@ -40,8 +40,8 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         <View
           style={
             {
-              "backgroundColor": "#262527",
-              "borderColor": "#65491C",
+              "backgroundColor": "#1A1200",
+              "borderColor": "#3D2A00",
               "borderRadius": 10,
               "borderWidth": 1,
               "marginBottom": 10,
@@ -263,8 +263,8 @@ exports[`Component History - test History no currency, privacy normal & mode bas
         <View
           style={
             {
-              "backgroundColor": "#262527",
-              "borderColor": "#65491C",
+              "backgroundColor": "#1A1200",
+              "borderColor": "#3D2A00",
               "borderRadius": 10,
               "borderWidth": 1,
               "marginBottom": 10,

@@ -7,9 +7,20 @@
  */
 import WalletBackend from './WalletBackend';
 
+export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
+export type {
+  ReschedulePartsRoute,
+  StartMigrationRoute,
+} from './utils/migrationRouting';
 export {
+  routeRescheduleParts,
+  routeStartMigration,
+} from './utils/migrationRouting';
+export {
+  cancelIronwoodMigration,
   changeServer,
   checkMyAddress,
+  continueNoteSplitting,
   createNewTransparentAddress,
   createNewUnifiedAddress,
   createNewWallet,
@@ -17,6 +28,8 @@ export {
   doSaveBackup,
   drainOrchard,
   drainStatus,
+  executeDueParts,
+  executeDuePartsStatus,
   fetchWallet,
   getBalanceInfo,
   getDonationAddress,
@@ -32,9 +45,14 @@ export {
   getZenniesDonationAddress,
   isWalletAddress,
   loadExistingWallet,
+  migrationStatus,
   parseAddress,
+  planIronwoodMigration,
   planOrchardDrain,
+  reconcileMigration,
   removeTransaction,
+  rescheduleParts,
+  resolvedTrue,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
@@ -43,6 +61,7 @@ export {
   setCryptoDefaultProvider,
   shieldConfirm,
   shieldPropose,
+  startIronwoodMigration,
   walletBackupExists,
   walletExists,
 } from './utils/walletUtils';

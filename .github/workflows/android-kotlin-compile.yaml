@@ -1,0 +1,63 @@
+name: Android Kotlin compile
+
+on:
+  workflow_call:
+    inputs:
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  android-kotlin-compile:
+    name: Android Kotlin compile (fast)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      - run: yarn
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      # The app module compiles the UniFFI bindings from
+      # build/generated/source/uniffi/release/java. The full pipeline
+      # generates them by building the Rust natives; this job stages the
+      # checked-in copy instead, so the Kotlin compile runs in minutes and
+      # surfaces classpath breakage (for example dependency-resolution
+      # conflicts) long before the ~20-minute native builds finish.
+      - name: Stage checked-in UniFFI bindings
+        run: |
+          mkdir -p android/app/build/generated/source/uniffi/release/java/uniffi/zingo
+          cp rust/lib/src/uniffi/zingo/zingo.kt \
+            android/app/build/generated/source/uniffi/release/java/uniffi/zingo/
+
+      - name: Compile release Kotlin
+        working-directory: ./android
+        run: ./gradlew :app:compileProdReleaseKotlin
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });

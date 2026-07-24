@@ -1,19 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import {
-  Animated,
-  BackHandler,
-  Easing,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { Animated, BackHandler, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
@@ -22,8 +9,9 @@ import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
+import useTrickleProgress from '../../app/hooks/useTrickleProgress';
 import { drainOrchard, drainStatus } from '../../app/walletBackend';
 import { RPCDrainType } from '../../app/walletBackend/types/RPCDrainType';
 import { RPCDrainStatusType } from '../../app/walletBackend/types/RPCDrainStatusType';
@@ -102,7 +90,6 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
 
   const [progress, setProgress] = useState<RPCDrainStatusType | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [succeeded, setSucceeded] = useState<boolean>(false);
 
   const goHome = useCallback(() => {
     navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
@@ -117,9 +104,10 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     }, []),
   );
 
-  // Marks the drain complete for the progress bar (fills to 100%). A ref, not
-  // state, so the animation loop reads the latest value without re-subscribing.
-  const doneRef = useRef(false);
+  // Always-animated progress bar: real progress events push its ceiling
+  // forward; completion glides it to 100% and then navigates.
+  const trickle = useTrickleProgress();
+  const { setCeiling, stop, finish } = trickle;
 
   // Run the drain once, polling the native side channel for progress while the
   // single long drain call is in flight. Both run concurrently on separate
@@ -134,9 +122,9 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
       }
       polling = true;
       try {
-        const statusStr = await drainStatus();
-        if (!statusStr.toLowerCase().startsWith(GlobalConst.error)) {
-          const parsed = JSON.parse(statusStr) as RPCDrainStatusType | null;
+        const status = await drainStatus();
+        if (status.ok) {
+          const parsed = JSON.parse(status.value) as RPCDrainStatusType | null;
           if (parsed && !cancelled) {
             setProgress(parsed);
           }
@@ -151,11 +139,11 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     (async () => {
       let failure: string | null = null;
       try {
-        const drainStr = await drainOrchard();
-        if (drainStr.toLowerCase().startsWith(GlobalConst.error)) {
-          failure = drainStr;
+        const drain = await drainOrchard();
+        if (!drain.ok) {
+          failure = drain.error.message;
         } else {
-          const parsed: RPCDrainType = JSON.parse(drainStr);
+          const parsed: RPCDrainType = JSON.parse(drain.value);
           if (parsed.error) {
             failure = parsed.error;
           }
@@ -167,16 +155,16 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
       if (cancelled) {
         return;
       }
-      // Stop the trickle either way; the drain is no longer progressing.
-      doneRef.current = true;
       if (failure) {
+        // Stop the trickle; the drain is no longer progressing.
+        stop();
         setErrorMsg(failure);
         return;
       }
-      // Mark every transaction sent and flip to the succeeded state, which fills
-      // the bar to 100% and then navigates. (The transmit phase is near-instant
-      // next to proving, so the poll rarely observes it — this is what makes the
-      // bar reliably finish full instead of stalling where building left it.)
+      // Mark every transaction sent, then glide the bar to 100% and navigate.
+      // (The transmit phase is near-instant next to proving, so the poll
+      // rarely observes it — this is what makes the bar reliably finish full
+      // instead of stalling where building left it.)
       setProgress({
         total: txCount,
         built: txCount,
@@ -184,7 +172,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
         phase: 'transmitting',
       });
       addLastSnackbar(translate('migrationsending.success') as string);
-      setSucceeded(true);
+      finish(goHome);
     })();
 
     return () => {
@@ -193,22 +181,6 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ----- Always-animated progress bar -----
-  // A continuously-easing "trickle": the bar glides toward a ceiling set just
-  // past confirmed progress and never quite reaches it, so it is always in
-  // motion and never jumps in discrete steps. Real progress events push the
-  // ceiling forward; completion pushes it to 1.
-  const progressAnim = useRef(new Animated.Value(0)).current;
-  const currentRef = useRef(0);
-  const ceilingRef = useRef(0.08); // small head start so it moves from mount
-
-  useEffect(() => {
-    const id = progressAnim.addListener(({ value }) => {
-      currentRef.current = value;
-    });
-    return () => progressAnim.removeListener(id);
-  }, [progressAnim]);
 
   // Recompute the ceiling as real progress lands: one step of headroom beyond
   // confirmed work. Building (proving, the slow part) owns the first 90% of the
@@ -228,59 +200,8 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     const step =
       (progress.phase === 'transmitting' ? 1 - BUILD_WEIGHT : BUILD_WEIGHT) /
       total;
-    ceilingRef.current = Math.min(0.985, real + step);
-  }, [progress, txCount]);
-
-  // The trickle driver: chains short eased steps, each closing a fraction of the
-  // gap to the ceiling, so the bar is perpetually moving and never steps. Stops
-  // once the drain finishes; the completion effect below fills the bar to 100%.
-  useEffect(() => {
-    let cancelled = false;
-    const tick = () => {
-      if (cancelled || doneRef.current) {
-        return;
-      }
-      const cur = currentRef.current;
-      const target = cur + (ceilingRef.current - cur) * 0.12;
-      Animated.timing(progressAnim, {
-        toValue: target,
-        duration: 360,
-        easing: Easing.linear,
-        useNativeDriver: false,
-      }).start(({ finished }) => {
-        if (finished && !cancelled && !doneRef.current) {
-          tick();
-        }
-      });
-    };
-    tick();
-    return () => {
-      cancelled = true;
-      progressAnim.stopAnimation();
-    };
-  }, [progressAnim]);
-
-  // On success, glide the bar the rest of the way to 100% (superseding the now-
-  // stopped trickle), then navigate home once the user has seen it complete.
-  useEffect(() => {
-    if (!succeeded) {
-      return;
-    }
-    let cancelled = false;
-    Animated.timing(progressAnim, {
-      toValue: 1,
-      duration: 500,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: false,
-    }).start(({ finished }) => {
-      if (finished && !cancelled) {
-        goHome();
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [succeeded, progressAnim, goHome]);
+    setCeiling(real + step);
+  }, [progress, txCount, setCeiling]);
 
   const statusMeta: Record<TxStatus, { key: string; color: string }> = {
     queued: {
@@ -479,7 +400,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
               height: '100%',
               borderRadius: 3,
               backgroundColor: colors.primary,
-              width: progressAnim.interpolate({
+              width: trickle.progress.interpolate({
                 inputRange: [0, 1],
                 outputRange: ['0%', '100%'],
               }),
