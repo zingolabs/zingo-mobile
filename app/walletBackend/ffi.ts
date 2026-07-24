@@ -27,7 +27,6 @@ const FFI_ERROR_CODES = [
   'MigrationNotInProgress',
   'MigrationAlreadyInProgress',
   'MigrationConsentStale',
-  'MigrationCadenceFixed',
   'MigrationSplit',
   'Migration',
   'Mixnet',

@@ -1,29 +1,19 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
-import SegmentedBar from '../Migration/SegmentedBar';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import Utils from '../../app/utils/Utils';
-import {
-  ButtonTypeEnum,
-  RouteEnum,
-  TARGET_BLOCK_SPACING_SECONDS,
-} from '../../app/AppState';
-import {
-  cancelIronwoodMigration,
-  migrationStatus,
-  reconcileMigration,
-} from '../../app/walletBackend';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
+import { migrationStatus } from '../../app/walletBackend';
 import {
   RPCMigrationStatusType,
-  RPCBroadcastWindowType,
+  RPCWakePointType,
 } from '../../app/walletBackend/types/RPCMigrationStatusType';
 
 type MigrationStatusProps = NativeStackScreenProps<
@@ -44,45 +34,25 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, language } = context;
+  const { translate, info } = context;
   const { colors } = useTheme() as ThemeType;
 
   const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [clearing, setClearing] = useState<boolean>(false);
-  // Whether a status has ever rendered, so a later failed read can be ignored.
-  const rendered = useRef<boolean>(false);
 
-  // A window opens at a block boundary, and `due_now` is what puts the Send
-  // Batch button on screen. Reading only on focus left the user watching a
-  // screen whose window had already opened, so the tip drives the refresh.
-  const height = info?.latestBlock ?? 0;
-
-  // Re-read on focus and on every new block: the phase advances while the user
-  // watches (parts confirm, windows open), so a status screen must reflect the
-  // live truth.
+  // Re-read on every focus: the phase advances while the user is away (parts
+  // confirm, windows open), so a status screen must reflect the live truth.
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
       (async () => {
-        // A background refresh that fails leaves the last good render in
-        // place. Only the first read has nothing to fall back to.
-        const fail = (msg: string) => {
-          if (!rendered.current) {
-            setErrorMsg(msg);
-          }
-        };
-        await reconcileMigration();
-        if (cancelled) {
-          return;
-        }
         const statusResult = await migrationStatus();
         if (cancelled) {
           return;
         }
         if (!statusResult.ok) {
-          fail(statusResult.error.message);
+          setErrorMsg(statusResult.error.message);
           setLoading(false);
           return;
         }
@@ -91,42 +61,25 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             statusResult.value,
           ) as RPCMigrationStatusType;
           if (parsed.error) {
-            fail(parsed.error);
+            setErrorMsg(parsed.error);
           } else {
-            rendered.current = true;
             setStatus(parsed);
             setErrorMsg(null);
           }
         } catch (e) {
-          fail(`${e}`);
+          setErrorMsg(`${e}`);
         }
         setLoading(false);
       })();
       return () => {
         cancelled = true;
       };
-      // `height` is a trigger, not a value the body reads: a new block is the
-      // only thing that can open a window while this screen stays mounted.
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [height]),
+    }, []),
   );
 
   const goHome = useCallback(() => {
     navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
   }, [navigation]);
-
-  // Clearing the migration frees the wallet to plan again from the notes it
-  // actually holds. Confirmed parts stand; a stalled migration has none.
-  const onStartOver = useCallback(async () => {
-    setClearing(true);
-    const cancelled = await cancelIronwoodMigration();
-    setClearing(false);
-    if (cancelled.ok) {
-      goHome();
-    } else {
-      setErrorMsg(cancelled.error.message);
-    }
-  }, [goHome]);
 
   // ----- Loading / error -----
   if (loading || errorMsg) {
@@ -157,104 +110,33 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
     );
   }
 
-  const wakes: RPCBroadcastWindowType[] = status?.upcoming_windows ?? [];
-  // per_bucket is parts-per-window; a batch counts as confirmed once all of its
-  // parts confirm (floor division), so partial windows don't over-report.
-  const perBucket = Math.max(1, status?.per_bucket ?? 1);
+  const wakes: RPCWakePointType[] = status?.next_wakes ?? [];
+  // The ZIP 318 schedule draws each part its own window, so progress counts
+  // parts directly.
   const partsTotal = status?.parts_total ?? 0;
   const partsConfirmed = status?.parts_confirmed ?? 0;
   const bucketModulus = status?.bucket_modulus ?? 144;
+  const height = info?.latestBlock ?? 0;
 
-  const batchesTotal = Math.max(1, Math.ceil(partsTotal / perBucket));
-  const batchesConfirmed = Math.min(
-    batchesTotal,
-    Math.floor(partsConfirmed / perBucket),
-  );
-
-  // The bar counts notes, not batches: a cadence that fits every note into one
-  // window would otherwise draw a single undivided block. The batch cards below
-  // are where the windows are enumerated.
-  const notesTotal = Math.max(1, partsTotal);
-  const notesConfirmed = Math.min(notesTotal, partsConfirmed);
-  const pct = Math.round((notesConfirmed / notesTotal) * 100);
-
-  // A scheduled migration that bound no parts has nothing to send and no way
-  // to gain any: every entry point refuses while it exists. Offer the one exit.
-  if (status?.phase?.kind === 'parts_scheduled' && partsTotal === 0) {
-    return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <StepperHeader splitDone={true} sendActive={true} />
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 32,
-          }}
-        >
-          <BoldText
-            style={{ fontSize: 18, marginBottom: 10, textAlign: 'center' }}
-          >
-            {translate('migrationstatus.stalled-title') as string}
-          </BoldText>
-          <Text
-            style={{
-              color: colors.placeholder,
-              fontSize: 15,
-              lineHeight: 22,
-              textAlign: 'center',
-            }}
-          >
-            {translate('migrationstatus.stalled-body') as string}
-          </Text>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-            paddingBottom: 24,
-            paddingHorizontal: 24,
-          }}
-        >
-          <Button
-            testID="migrationstatus.home"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationstatus.back') as string}
-            onPress={goHome}
-            twoButtons={true}
-          />
-          <Button
-            testID="migrationstatus.start-over"
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationstatus.start-over') as string}
-            onPress={onStartOver}
-            disabled={clearing}
-            twoButtons={true}
-          />
-        </View>
-      </View>
-    );
-  }
+  const batchesTotal = Math.max(1, partsTotal);
+  const batchesConfirmed = Math.min(batchesTotal, partsConfirmed);
+  const valueTotal = status?.value_total ?? 0;
+  const pct =
+    valueTotal > 0
+      ? Math.round(((status?.value_migrated ?? 0) / valueTotal) * 100)
+      : 0;
 
   const nextWake = wakes[0];
   // The batch to send right now: the window the chain is currently inside,
-  // reported by the backend. upcoming_windows lists only future windows and cannot
+  // reported by the backend. next_wakes lists only future windows and cannot
   // carry this one, so the Send action reads it from here. Null means a tap
   // would broadcast nothing, so the action stays hidden.
   const dueNow = status?.due_now ?? null;
-  const confirming = !dueNow && (status?.parts_broadcast ?? 0) > 0;
-  // The bar's broadcast run outlives `confirming`: a new window can open while
-  // the batch still mines, which surfaces the dueNow card but changes nothing
-  // about the parts in flight. Keyed to parts_broadcast alone, the run stays
-  // lit until those parts confirm, and the confirm flash lands on lit segments
-  // instead of blanks.
-  const broadcasting = (status?.parts_broadcast ?? 0) > 0;
 
   // One card per visible batch: the open one (dueNow) first, then the upcoming
   // scheduled windows. Batch numbers continue from the confirmed count so
   // "Batch 3" means the same here as on the plan screen.
-  const nextWakeBase = batchesConfirmed + (dueNow || confirming ? 2 : 1);
+  const nextWakeBase = batchesConfirmed + (dueNow ? 2 : 1);
   const batchCards = [
     ...(dueNow
       ? [
@@ -276,11 +158,9 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
     })),
   ];
 
-  // Notes, matching the bar directly above it. The cards below carry the batch
-  // count, so nothing is lost by counting the finer unit here.
   const progressLine = (translate('migrationstatus.progress') as string)
-    .replace('{confirmed}', String(notesConfirmed))
-    .replace('{total}', String(notesTotal))
+    .replace('{confirmed}', String(batchesConfirmed))
+    .replace('{total}', String(batchesTotal))
     .replace('{pct}', String(pct));
 
   // The info box: the "**…**"-wrapped boundary is emphasized, so one string
@@ -290,33 +170,14 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
         '{n}',
         String(batchesConfirmed + 1),
       )
-    : confirming
-      ? (translate('migrationstatus.confirming') as string).replace(
-          '{n}',
-          String(batchesConfirmed + 1),
-        )
-      : nextWake
-        ? (translate('migrationstatus.next-opens') as string)
-            .replace('{blocks}', String(Math.max(0, nextWake.boundary - height)))
-            .replace(
-              '{time}',
-              // The block count is exact; the wall-clock it covers is the
-              // estimate, at the observed spacing when one has converged.
-              Utils.formatDurationMs(
-                Math.max(0, nextWake.boundary - height) *
-                  (info?.secondsPerBlock ?? TARGET_BLOCK_SPACING_SECONDS) *
-                  1000,
-                language,
-              ),
-            )
-        : (translate('migrationstatus.all-sent') as string);
-  const remindersLine =
-    wakes.length === 1
-      ? (translate('migrationstatus.reminders-one') as string)
-      : (translate('migrationstatus.reminders') as string).replace(
-          '{n}',
-          String(wakes.length),
-        );
+    : nextWake
+      ? (translate('migrationstatus.next-opens') as string)
+          .replace('{boundary}', String(nextWake.boundary))
+          .replace('{height}', String(height))
+      : (translate('migrationstatus.all-sent') as string);
+  const remindersLine = (
+    translate('migrationstatus.reminders') as string
+  ).replace('{n}', String(wakes.length));
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -333,13 +194,23 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           {translate('migrationstatus.title') as string}
         </BoldText>
 
-        <View style={{ marginBottom: 10 }}>
-          <SegmentedBar
-            segments={notesTotal}
-            progress={notesConfirmed / notesTotal}
-            active={broadcasting ? notesConfirmed : undefined}
-            activeSpan={status?.parts_broadcast ?? 0}
-            activeColor={colors.syncing}
+        {/* Progress bar + line */}
+        <View
+          style={{
+            height: 6,
+            borderRadius: 3,
+            backgroundColor: colors.bottomSheetBorder,
+            overflow: 'hidden',
+            marginBottom: 10,
+          }}
+        >
+          <View
+            style={{
+              width: `${pct}%`,
+              height: '100%',
+              borderRadius: 3,
+              backgroundColor: colors.primary,
+            }}
           />
         </View>
         <Text
@@ -364,9 +235,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             marginBottom: 20,
           }}
         >
-          <Text
-            style={{ color: colors.placeholder, fontSize: 14, lineHeight: 21 }}
-          >
+          <Text style={{ color: colors.placeholder, fontSize: 14, lineHeight: 21 }}>
             {nextLine.split('**').map((part: string, i: number) =>
               i % 2 === 1 ? (
                 <Text key={i} style={{ color: colors.text, fontWeight: '700' }}>
@@ -414,11 +283,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                 }}
               >
                 <Text
-                  style={{
-                    color: colors.text,
-                    fontSize: 17,
-                    fontWeight: '700',
-                  }}
+                  style={{ color: colors.text, fontSize: 17, fontWeight: '700' }}
                 >
                   {(translate('migrationstatus.batch') as string).replace(
                     '{n}',
@@ -429,9 +294,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                 <View
                   style={{
                     borderWidth: 1,
-                    borderColor: open
-                      ? colors.primary
-                      : colors.bottomSheetBorder,
+                    borderColor: open ? colors.primary : colors.bottomSheetBorder,
                     borderRadius: 20,
                     paddingHorizontal: 12,
                     paddingVertical: 4,
@@ -442,6 +305,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                       color: open ? colors.primary : colors.placeholder,
                       fontSize: 12,
                       fontWeight: '600',
+                      letterSpacing: 0.5,
                     }}
                   >
                     {open
@@ -511,7 +375,6 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             flexDirection: 'row',
             justifyContent: 'space-evenly',
             alignItems: 'center',
-            paddingTop: 24,
             paddingBottom: 24,
             paddingHorizontal: 24,
           }}
@@ -538,7 +401,6 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
       ) : (
         <View
           style={{
-            paddingTop: 24,
             paddingBottom: 24,
             paddingHorizontal: 24,
             alignItems: 'center',

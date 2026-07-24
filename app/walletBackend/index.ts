@@ -8,17 +8,8 @@
 import WalletBackend from './WalletBackend';
 
 export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
-export type {
-  CadencePlanRoute,
-  ReschedulePartsRoute,
-  StartMigrationRoute,
-} from './utils/migrationRouting';
-export {
-  routeCadencePlan,
-  routeRescheduleParts,
-  routeStartMigration,
-} from './utils/migrationRouting';
-export { scanInProgress } from './utils/syncProgress';
+export type { StartMigrationRoute } from './utils/migrationRouting';
+export { routeStartMigration } from './utils/migrationRouting';
 export {
   cancelIronwoodMigration,
   changeServer,
@@ -55,7 +46,6 @@ export {
   quickSplit,
   reconcileMigration,
   removeTransaction,
-  rescheduleParts,
   resolvedTrue,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,

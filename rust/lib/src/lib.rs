@@ -104,8 +104,6 @@ pub enum ZingolibError {
     MigrationAlreadyInProgress,
     #[error("Error: consent stale: {0}")]
     MigrationConsentStale(String),
-    #[error("Error: cadence fixed: {0}")]
-    MigrationCadenceFixed(String),
     #[error("Error: note splitting: {0}")]
     MigrationSplit(String),
     #[error("Error: migration: {0}")]
@@ -2627,18 +2625,14 @@ pub fn plan_ironwood_migration() -> Result<String, ZingolibError> {
 /// state. Nothing is broadcast here; `continue_note_splitting` drives the
 /// rounds afterwards.
 ///
-/// `per_bucket` is accepted for FFI-shape stability and ignored: the ZIP 318
-/// Poisson schedule draws the broadcast cadence itself and no longer takes a
-/// per-window cap. Signing is always `LazyAtBoundary` (the only sound
-/// strategy while ZIP 244 commits the anchor into the signature hash).
+/// The broadcast cadence is not a parameter: the ZIP 318 Poisson schedule
+/// draws every delay itself. Signing is always `LazyAtBoundary` (the only
+/// sound strategy while ZIP 244 commits the anchor into the signature hash).
 ///
 /// Returns `{ started: true }`; failure throws typed — notably
 /// `MigrationConsentStale` when the wallet's notes changed since planning
 /// (replan and re-show).
-pub fn start_ironwood_migration(
-    plan_hash_hex: String,
-    _per_bucket: Option<u32>,
-) -> Result<String, ZingolibError> {
+pub fn start_ironwood_migration(plan_hash_hex: String) -> Result<String, ZingolibError> {
     with_initialized_lightclient(|lightclient| {
         let hash = hex_to_hash32(&plan_hash_hex)
             .ok_or_else(|| ZingolibError::InvalidInput("invalid plan hash".to_string()))?;
@@ -2703,31 +2697,14 @@ pub fn continue_note_splitting() -> Result<String, ZingolibError> {
     })
 }
 
-/// Always fails typed with `MigrationCadenceFixed`: the ZIP 318 Poisson
-/// schedule draws every broadcast delay itself, so there is no per-window
-/// cadence left to choose. The entry point survives for FFI-shape stability
-/// until the cadence surface is retired from the native and TS layers.
-pub fn reschedule_parts(_per_bucket: u32) -> Result<String, ZingolibError> {
-    with_initialized_lightclient(|_lightclient| {
-        Err(ZingolibError::MigrationCadenceFixed(
-            "the ZIP 318 schedule draws its own cadence; rescheduling is not available"
-                .to_string(),
-        ))
-    })
-}
-
 /// The migration's progress, arranged for direct rendering. ZIP 318 requires
 /// showing `orchard_confirmed_spendable` (the Orchard-pool figure
 /// specifically) while a migration is in flight.
 ///
 /// Returns `{ orchard_confirmed_spendable, phase, parts_total,
-/// parts_confirmed, parts_broadcast, value_total, value_migrated,
-/// per_bucket, bucket_modulus,
-/// upcoming_windows: [{ bucket_index, boundary, part_ids, denominations,
-/// window_opens_unix_time, latest_target_unix_time }], due_now }`.
-/// `parts_broadcast` counts parts submitted but not yet mined (the sent,
-/// in-flight batch); they sit outside `upcoming_windows` and `due_now` and
-/// clear into the confirmed figures as parts mine. `phase` is `null`
+/// parts_confirmed, value_total, value_migrated, bucket_modulus,
+/// next_wakes: [{ bucket_index, boundary, part_ids, denominations,
+/// estimated_unix_time, estimated_target_unix_time }], due_now }`. `phase` is `null`
 /// when no migration is in progress, else `{ kind }` with per-kind fields
 /// (`round`/`pending_txids` while note splitting, `residual` when complete).
 /// `denominations` (zatoshis) mirror `part_ids` element-for-element, so a
@@ -2807,10 +2784,6 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                 "parts_confirmed" => status.parts_confirmed,
                 "value_total" => status.value_total,
                 "value_migrated" => status.value_migrated,
-                // The per-window cadence choice is gone (the ZIP 318 Poisson
-                // schedule draws delays itself); the key stays for JSON-shape
-                // stability until the TS layer drops it.
-                "per_bucket" => json::JsonValue::Null,
                 "bucket_modulus" => bucket_modulus,
                 "next_wakes" => next_wakes,
                 "due_now" => due_now,

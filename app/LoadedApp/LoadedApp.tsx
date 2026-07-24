@@ -156,9 +156,6 @@ const MigrationSplitPlan = React.lazy(
 const MigrationSplitting = React.lazy(
   () => import('../../components/MigrationSplitting'),
 );
-const MigrationCadence = React.lazy(
-  () => import('../../components/MigrationCadence'),
-);
 const MigrationSchedule = React.lazy(
   () => import('../../components/MigrationSchedule'),
 );
@@ -2626,11 +2623,6 @@ export class LoadedAppClass extends Component<
                       // Splitting rounds broadcast here and can't be
                       // interrupted; swipe-back off, hardware-back blocked
                       // in-screen.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationCadence}
-                      component={MigrationCadence}
                       options={{ gestureEnabled: false }}
                     />
                     <RootNavigator.Screen

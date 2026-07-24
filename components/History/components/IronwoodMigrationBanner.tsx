@@ -233,15 +233,13 @@ const IronwoodMigrationBanner: React.FunctionComponent<
       ? RouteEnum.MigrationStatus
       : RouteEnum.MigrationSplitting;
 
-    // The bar counts notes, one segment each. Batches would be the coarser
-    // unit, but a cadence that fits the whole plan into one window leaves a
-    // single undivided block, and before the cadence is chosen per_bucket
-    // carries zingolib's provisional k_max of 8 rather than anything the user
-    // picked. parts_total is projected from the plan through Phase 1 and is the
-    // bound count afterwards, so the segments hold their meaning throughout.
-    const notesTotal = Math.max(1, migration.parts_total);
-    const notesConfirmed = Math.min(notesTotal, migration.parts_confirmed);
-    const pct = Math.round((notesConfirmed / notesTotal) * 100);
+    // The ZIP 318 schedule draws each part its own window, so progress counts
+    // parts directly, mirroring the MigrationStatus screen.
+    const batchesTotal = Math.max(1, migration.parts_total);
+    const batchesConfirmed = Math.min(
+      batchesTotal,
+      migration.parts_confirmed,
+    );
 
     // Batch numbering for the next-action line only. A batch counts as
     // confirmed once all its notes do (floor division), as on the status
