@@ -28,7 +28,8 @@
     "rust:android-local": "node rust/android/build_android_local.mjs",
     "rust:ios": "node rust/ios/build_ios.mjs",
     "release:prod:prep": "node scripts/release/release-prep.mjs prod",
-    "release:beta:prep": "node scripts/release/release-prep.mjs beta"
+    "release:beta:prep": "node scripts/release/release-prep.mjs beta",
+    "pods": "cd ios && pod install && cd .."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.3.0",
