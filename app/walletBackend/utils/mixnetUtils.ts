@@ -66,3 +66,20 @@ export async function getMixnetBootstrapDetail(): Promise<MixnetDetailReport> {
     return { kind: 'failure', failure: describeRejection(thrown) };
   }
 }
+
+/**
+ * The canonical ZIP-0318 IP-correlation disclaimer: one constant from
+ * zingolib so every frontend renders the same text, verbatim and
+ * untranslated. Null when the native layer rejects — the text is
+ * presentation only, and a broken FFI already fails the operational
+ * surface closed through the typed reports above.
+ */
+export async function getMixnetIpCorrelationDisclaimer(): Promise<
+  string | null
+> {
+  try {
+    return await RPCModule.mixnetIpCorrelationDisclaimerInfo();
+  } catch {
+    return null;
+  }
+}

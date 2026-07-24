@@ -1043,6 +1043,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun mixnetIpCorrelationDisclaimerInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "mixnet_ip_correlation_disclaimer") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.mixnetIpCorrelationDisclaimer()
+        }
+    }
+
+    @ReactMethod
     fun getSpendableBalanceWithAddressInfo(address: String, zennies: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
