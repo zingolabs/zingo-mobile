@@ -154,14 +154,19 @@ fn ffi_error(e: LightClientError) -> ZingolibError {
         LightClientError::FileError(_) => ZingolibError::Save(text),
         LightClientError::WalletError(_) => ZingolibError::Wallet(text),
         LightClientError::Offline => ZingolibError::Offline,
-        LightClientError::PriceError(_) | LightClientError::PriceFetchUnsupported => {
+        LightClientError::PriceError(_) | LightClientError::PriceFetchRequiresMixnet => {
             ZingolibError::Read(text)
+        }
+        LightClientError::MixnetNotReady(_) | LightClientError::NoEligibleBroadcastIndexer => {
+            ZingolibError::Mixnet(text)
+        }
+        LightClientError::MigrationBroadcastTargetIsSyncEndpoint { .. } => {
+            ZingolibError::Migration(text)
         }
         LightClientError::MigrationError(inner) => match inner {
             MigrationError::NoMigration => ZingolibError::MigrationNotInProgress,
             MigrationError::AlreadyInProgress => ZingolibError::MigrationAlreadyInProgress,
             MigrationError::ConsentStale => ZingolibError::MigrationConsentStale(text),
-            MigrationError::CadenceFixed => ZingolibError::MigrationCadenceFixed(text),
             MigrationError::ScheduledMigrationExists => ZingolibError::MigrationAlreadyInProgress,
             MigrationError::PreSignedUnavailable
             | MigrationError::NoteSplittingRequired
@@ -1216,11 +1221,6 @@ mod error_funnel_tests {
                 LightClientError::MigrationError(MigrationError::ConsentStale),
                 |e| matches!(e, ZingolibError::MigrationConsentStale(_)),
                 "MigrationConsentStale",
-            ),
-            (
-                LightClientError::MigrationError(MigrationError::CadenceFixed),
-                |e| matches!(e, ZingolibError::MigrationCadenceFixed(_)),
-                "MigrationCadenceFixed",
             ),
             (
                 LightClientError::MigrationError(MigrationError::PreSignedUnavailable),
@@ -2543,6 +2543,7 @@ fn migration_phase_json(phase: &MigrationPhase) -> json::JsonValue {
         MigrationPhase::NoteSplitting {
             round,
             pending_txids,
+            queued,
         } => object! {
             "kind" => "note_splitting",
             "round" => *round,
@@ -2550,6 +2551,10 @@ fn migration_phase_json(phase: &MigrationPhase) -> json::JsonValue {
                 .iter()
                 .map(|txid| txid.to_string())
                 .collect::<Vec<_>>(),
+            // Split transactions drawn onto the ZIP 318 preparation
+            // schedule but not yet due; the next call transmits the due
+            // ones or reports the earliest due height.
+            "queued" => queued.len(),
         },
         MigrationPhase::PartsScheduled => object! { "kind" => "parts_scheduled" },
         MigrationPhase::Complete { residual } => object! {
@@ -2614,29 +2619,24 @@ pub fn plan_ironwood_migration() -> Result<String, ZingolibError> {
 /// state. Nothing is broadcast here; `continue_note_splitting` drives the
 /// rounds afterwards.
 ///
-/// `per_bucket` caps how many parts share one broadcast window; `null` keeps
-/// zingolib's default, and `reschedule_parts` can change it any time before
-/// the first part is signed. Signing is always `LazyAtBoundary` (the only
-/// sound strategy while ZIP 244 commits the anchor into the signature hash).
+/// `per_bucket` is accepted for FFI-shape stability and ignored: the ZIP 318
+/// Poisson schedule draws the broadcast cadence itself and no longer takes a
+/// per-window cap. Signing is always `LazyAtBoundary` (the only sound
+/// strategy while ZIP 244 commits the anchor into the signature hash).
 ///
 /// Returns `{ started: true }`; failure throws typed — notably
 /// `MigrationConsentStale` when the wallet's notes changed since planning
 /// (replan and re-show).
 pub fn start_ironwood_migration(
     plan_hash_hex: String,
-    per_bucket: Option<u32>,
+    _per_bucket: Option<u32>,
 ) -> Result<String, ZingolibError> {
     with_initialized_lightclient(|lightclient| {
         let hash = hex_to_hash32(&plan_hash_hex)
             .ok_or_else(|| ZingolibError::InvalidInput("invalid plan hash".to_string()))?;
         RT.block_on(async move {
             lightclient
-                .start_ironwood_migration(
-                    AccountId::ZERO,
-                    SigningStrategy::LazyAtBoundary,
-                    hash,
-                    per_bucket,
-                )
+                .start_ironwood_migration(AccountId::ZERO, SigningStrategy::LazyAtBoundary, hash)
                 .await
                 .map_err(ffi_error)?;
             Ok(object! { "started" => true }.pretty(2))
@@ -2682,6 +2682,10 @@ pub fn continue_note_splitting() -> Result<String, ZingolibError> {
                         .map(|txid| txid.to_string())
                         .collect::<Vec<_>>(),
                 },
+                SplitStep::AwaitingSchedule { next_due } => object! {
+                    "step" => "awaiting_schedule",
+                    "next_due" => u32::from(next_due),
+                },
                 SplitStep::SplittingComplete => object! {
                     "step" => "splitting_complete",
                 },
@@ -2691,22 +2695,16 @@ pub fn continue_note_splitting() -> Result<String, ZingolibError> {
     })
 }
 
-/// Sets how many parts share each broadcast window and re-buckets every part
-/// under the new cadence with fresh randomization. Callable any time between
-/// consent and the first signed part; afterwards it fails typed with
-/// `MigrationCadenceFixed`. After a successful call the old schedule is void:
-/// re-read `migration_status` and re-arm the platform scheduler.
-///
-/// Returns `{ rescheduled: true }`; failure throws typed.
-pub fn reschedule_parts(per_bucket: u32) -> Result<String, ZingolibError> {
-    with_initialized_lightclient(|lightclient| {
-        RT.block_on(async move {
-            lightclient
-                .reschedule_parts(per_bucket)
-                .await
-                .map_err(ffi_error)?;
-            Ok(object! { "rescheduled" => true }.pretty(2))
-        })
+/// Always fails typed with `MigrationCadenceFixed`: the ZIP 318 Poisson
+/// schedule draws every broadcast delay itself, so there is no per-window
+/// cadence left to choose. The entry point survives for FFI-shape stability
+/// until the cadence surface is retired from the native and TS layers.
+pub fn reschedule_parts(_per_bucket: u32) -> Result<String, ZingolibError> {
+    with_initialized_lightclient(|_lightclient| {
+        Err(ZingolibError::MigrationCadenceFixed(
+            "the ZIP 318 schedule draws its own cadence; rescheduling is not available"
+                .to_string(),
+        ))
     })
 }
 
@@ -2729,10 +2727,9 @@ pub fn migration_status() -> Result<String, ZingolibError> {
     with_initialized_lightclient_read(|lightclient| {
         RT.block_on(async move {
             let status = lightclient.migration_status().await.map_err(ffi_error)?;
-            // Join each wake's part ids to their denominations (and
-            // pick up the effective cadence) from the persisted
-            // migration state; WakePoint alone carries only ids.
-            let (denoms_by_id, per_bucket, bucket_modulus) = {
+            // Join each wake's part ids to their denominations from the
+            // persisted migration state; WakePoint alone carries only ids.
+            let (denoms_by_id, bucket_modulus) = {
                 let wallet = lightclient.wallet().read().await;
                 match &wallet.migration {
                     Some(state) => (
@@ -2741,12 +2738,10 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                             .iter()
                             .map(|part| (part.id.0, part.denomination))
                             .collect::<std::collections::HashMap<_, _>>(),
-                        Some(state.params.k_max),
                         state.params.bucket_modulus,
                     ),
                     None => (
                         std::collections::HashMap::new(),
-                        None,
                         MigrationParams::provisional(wallet.chain_type()).bucket_modulus,
                     ),
                 }
@@ -2799,7 +2794,10 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                 "parts_confirmed" => status.parts_confirmed,
                 "value_total" => status.value_total,
                 "value_migrated" => status.value_migrated,
-                "per_bucket" => per_bucket,
+                // The per-window cadence choice is gone (the ZIP 318 Poisson
+                // schedule draws delays itself); the key stays for JSON-shape
+                // stability until the TS layer drops it.
+                "per_bucket" => json::JsonValue::Null,
                 "bucket_modulus" => bucket_modulus,
                 "next_wakes" => next_wakes,
                 "due_now" => due_now,
