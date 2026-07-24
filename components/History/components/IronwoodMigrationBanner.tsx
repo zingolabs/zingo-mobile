@@ -114,16 +114,12 @@ const IronwoodMigrationBanner: React.FunctionComponent<
         ? RouteEnum.MigrationStatus
         : RouteEnum.MigrationSplitting;
 
-    // Batches (windows) rather than raw parts: a batch counts as confirmed once
-    // all its parts do (floor division), mirroring the MigrationStatus screen.
-    const perBucket = Math.max(1, migration.per_bucket ?? 1);
-    const batchesTotal = Math.max(
-      1,
-      Math.ceil(migration.parts_total / perBucket),
-    );
+    // The ZIP 318 schedule draws each part its own window, so progress counts
+    // parts directly, mirroring the MigrationStatus screen.
+    const batchesTotal = Math.max(1, migration.parts_total);
     const batchesConfirmed = Math.min(
       batchesTotal,
-      Math.floor(migration.parts_confirmed / perBucket),
+      migration.parts_confirmed,
     );
 
     // Value-migrated drives the bar, matching the MigrationStatus screen's

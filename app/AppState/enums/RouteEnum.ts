@@ -28,7 +28,6 @@ export enum RouteEnum {
   MigrationSending = 'MigrationSending',
   MigrationSplitPlan = 'MigrationSplitPlan',
   MigrationSplitting = 'MigrationSplitting',
-  MigrationCadence = 'MigrationCadence',
   MigrationSchedule = 'MigrationSchedule',
   MigrationStatus = 'MigrationStatus',
   MigrationBatchSending = 'MigrationBatchSending',

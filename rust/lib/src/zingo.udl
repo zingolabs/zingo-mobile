@@ -19,7 +19,6 @@ enum ZingolibError {
     "MigrationNotInProgress",
     "MigrationAlreadyInProgress",
     "MigrationConsentStale",
-    "MigrationCadenceFixed",
     "MigrationSplit",
     "Migration"
 };
@@ -237,17 +236,11 @@ namespace zingo {
 
   [Throws=ZingolibError]
   string start_ironwood_migration(
-    string plan_hash_hex,
-    u32? per_bucket
+    string plan_hash_hex
   );
 
   [Throws=ZingolibError]
   string continue_note_splitting();
-
-  [Throws=ZingolibError]
-  string reschedule_parts(
-    u32 per_bucket
-  );
 
   [Throws=ZingolibError]
   string migration_status();

@@ -53,8 +53,8 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<boolean>(false);
 
-  // The cadence chooser just called reschedule_parts, which re-bucketed with
-  // fresh randomization — so this fetch, after it, is the schedule's truth.
+  // Splitting just completed and scheduling drew every window, so this
+  // fetch is the schedule's truth.
   useEffect(() => {
     let cancelled = false;
     (async () => {

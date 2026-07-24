@@ -941,20 +941,6 @@
     "retry": "Retry",
     "close": "Close"
   },
-  "migrationcadence": {
-    "title": "Schedule the transfers",
-    "intro": "Your **{notes} notes** will be sent to Ironwood in **batches**. The blockchain is divided into windows of **{blocks} blocks** (~{hours}h); each batch goes out in its own window.",
-    "how-many": "How many batches?",
-    "fewer-title": "Fewer, larger batches",
-    "fewer-body": "Done sooner — more notes visible together.",
-    "more-title": "More, smaller batches",
-    "more-body": "Takes longer — better privacy.",
-    "duration-hours": "Finishes in about {n} hours",
-    "duration-days": "Finishes in about {n} days",
-    "disclosure": "Each batch is sent when you open its reminder. Sending at times you are active is what can link the batches to you — a steady response pattern helps.",
-    "cadence-fixed": "Sending already began — the batch schedule can no longer change.",
-    "review": "Review schedule"
-  },
   "migrationschedule": {
     "title": "Review & confirm",
     "intro": "Confirming schedules a **reminder for each batch**. When a reminder arrives, open the app and send that batch. Nothing is sent automatically.",

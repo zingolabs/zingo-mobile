@@ -62,7 +62,6 @@ enum FfiOutcome {
     case .MigrationNotInProgress(let message): return ("MigrationNotInProgress", message)
     case .MigrationAlreadyInProgress(let message): return ("MigrationAlreadyInProgress", message)
     case .MigrationConsentStale(let message): return ("MigrationConsentStale", message)
-    case .MigrationCadenceFixed(let message): return ("MigrationCadenceFixed", message)
     case .MigrationSplit(let message): return ("MigrationSplit", message)
     case .Migration(let message): return ("Migration", message)
     }
@@ -1037,17 +1036,11 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(startIronwoodMigrationProcess:perBucket:resolve:reject:)
-  func startIronwoodMigrationProcess(_ plan_hash_hex: String, perBucket per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(startIronwoodMigrationProcess:resolve:reject:)
+  func startIronwoodMigrationProcess(_ plan_hash_hex: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          // Empty string means "keep zingolib's default cadence" (the
-          // module's numeric-arg-as-string convention); anything else must
-          // parse as a u32 — a malformed value rejects as InvalidInput
-          // instead of silently keeping the default.
-          try startIronwoodMigration(
-            planHashHex: plan_hash_hex,
-            perBucket: FfiArgs.optionalU32(per_bucket, name: "per_bucket"))
+          try startIronwoodMigration(planHashHex: plan_hash_hex)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1059,18 +1052,6 @@ class RPCModule: NSObject {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try continueNoteSplitting()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  @objc(reschedulePartsProcess:resolve:reject:)
-  func reschedulePartsProcess(_ per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          // `per_bucket` crosses as a string (numeric-arg convention); a
-          // malformed value rejects as InvalidInput — never an unsettled
-          // promise.
-          try rescheduleParts(perBucket: FfiArgs.requiredU32(per_bucket, name: "per_bucket"))
         }.settle(resolve: resolve, reject: reject)
       }
   }

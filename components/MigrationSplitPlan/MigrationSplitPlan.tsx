@@ -162,14 +162,13 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   }, [fetchPlan]);
 
   // Accept = consent: bind the user's approval to the exact plan hash they
-  // were shown. Cadence stays at zingolib's default here; the chooser after
-  // splitting sets it via reschedule_parts.
+  // were shown. The ZIP 318 schedule draws the broadcast cadence itself.
   const onAccept = useCallback(async () => {
     if (!plan?.plan_hash || starting) {
       return;
     }
     setStarting(true);
-    const start = await startIronwoodMigration(plan.plan_hash, null);
+    const start = await startIronwoodMigration(plan.plan_hash);
     setStarting(false);
     const route = routeStartMigration(start);
     switch (route.kind) {

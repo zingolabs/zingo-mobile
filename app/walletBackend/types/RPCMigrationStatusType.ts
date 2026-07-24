@@ -54,9 +54,7 @@ export type RPCMigrationStatusType = {
   parts_confirmed: number;
   value_total: number;
   value_migrated: number;
-  // The effective cadence (parts per window); null when no migration exists.
-  per_bucket: number | null;
-  // Window length in blocks (256 provisionally).
+  // Window length in blocks (144 provisionally).
   bucket_modulus: number;
   next_wakes: RPCWakePointType[];
   // The batch broadcastable this instant (the window the chain is inside), or

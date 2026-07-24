@@ -941,20 +941,6 @@
     "retry": "Reintentar",
     "close": "Cerrar"
   },
-  "migrationcadence": {
-    "title": "Programa las transferencias",
-    "intro": "Tus **{notes} notas** se enviarán a Ironwood en **lotes**. La blockchain se divide en ventanas de **{blocks} bloques** (~{hours}h); cada lote sale en su propia ventana.",
-    "how-many": "¿Cuántos lotes?",
-    "fewer-title": "Menos lotes, más grandes",
-    "fewer-body": "Termina antes — más notas visibles juntas.",
-    "more-title": "Más lotes, más pequeños",
-    "more-body": "Tarda más — mejor privacidad.",
-    "duration-hours": "Termina en unas {n} horas",
-    "duration-days": "Termina en unos {n} días",
-    "disclosure": "Cada lote se envía cuando abres su recordatorio. Enviar en tus horas de actividad es lo que puede vincular los lotes contigo — un patrón de respuesta constante ayuda.",
-    "cadence-fixed": "El envío ya comenzó — el calendario de lotes ya no puede cambiar.",
-    "review": "Revisar calendario"
-  },
   "migrationschedule": {
     "title": "Revisar y confirmar",
     "intro": "Confirmar programa un **recordatorio por cada lote**. Cuando llegue un recordatorio, abre la app y envía ese lote. Nada se envía automáticamente.",

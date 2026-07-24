@@ -941,20 +941,6 @@
     "retry": "Yeniden dene",
     "close": "Kapat"
   },
-  "migrationcadence": {
-    "title": "Aktarımları planlayın",
-    "intro": "**{notes} notunuz** Ironwood’a **gruplar** halinde gönderilecek. Blok zinciri **{blocks} bloklu** pencerelere bölünür (~{hours}sa); her grup kendi penceresinde gönderilir.",
-    "how-many": "Kaç grup?",
-    "fewer-title": "Daha az, daha büyük gruplar",
-    "fewer-body": "Daha erken biter — birlikte görünen not sayısı artar.",
-    "more-title": "Daha çok, daha küçük gruplar",
-    "more-body": "Daha uzun sürer — daha iyi gizlilik.",
-    "duration-hours": "Yaklaşık {n} saatte biter",
-    "duration-days": "Yaklaşık {n} günde biter",
-    "disclosure": "Her grup, hatırlatıcısını açtığınızda gönderilir. Aktif olduğunuz saatlerde göndermek grupları sizinle ilişkilendirebilir — düzenli bir yanıt ritmi yardımcı olur.",
-    "cadence-fixed": "Gönderim zaten başladı — grup takvimi artık değiştirilemez.",
-    "review": "Takvimi gözden geçir"
-  },
   "migrationschedule": {
     "title": "Gözden geçir ve onayla",
     "intro": "Onaylamak, **her grup için bir hatırlatıcı** planlar. Hatırlatıcı geldiğinde uygulamayı açın ve o grubu gönderin. Hiçbir şey otomatik gönderilmez.",

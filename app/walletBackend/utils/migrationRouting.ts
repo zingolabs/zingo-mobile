@@ -42,30 +42,3 @@ export function routeStartMigration(
   return { kind: 'proceed' };
 }
 
-export type ReschedulePartsRoute =
-  | { kind: 'proceed' }
-  | { kind: 'schedule-stands' }
-  | { kind: 'error'; message: string };
-
-// Routes reschedule_parts at the cadence screen: CadenceFixed means a part
-// is already signed, so the existing schedule stands and reviewing it is
-// still valid; anything else is an error.
-export function routeRescheduleParts(
-  reschedule: FfiResult<string>,
-): ReschedulePartsRoute {
-  if (!reschedule.ok) {
-    if (reschedule.error.code === 'MigrationCadenceFixed') {
-      return { kind: 'schedule-stands' };
-    }
-    return { kind: 'error', message: reschedule.error.message };
-  }
-  try {
-    const parsed = JSON.parse(reschedule.value);
-    if (parsed.error) {
-      return { kind: 'error', message: String(parsed.error) };
-    }
-  } catch (e) {
-    return { kind: 'error', message: `${e}` };
-  }
-  return { kind: 'proceed' };
-}

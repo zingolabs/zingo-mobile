@@ -83,10 +83,7 @@ export type AppDrawerParamList = {
   // transaction rows match what the user accepted. Absent on banner-rescue
   // re-entry, where the screen renders coarsely from migrationStatus.
   [RouteEnum.MigrationSplitting]: { plan?: RPCMigrationPlanType } | undefined;
-  [RouteEnum.MigrationCadence]: undefined;
-  // The cadence the user picked, so Back from the review screen can restore
-  // the selection.
-  [RouteEnum.MigrationSchedule]: { perBucket: number };
+  [RouteEnum.MigrationSchedule]: undefined;
   // The in-flight "Migration underway" monitor: the landing after the schedule
   // is confirmed and the parts_scheduled banner's resume target. Reads
   // migrationStatus, so it needs no params.

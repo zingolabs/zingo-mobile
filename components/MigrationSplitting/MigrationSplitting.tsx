@@ -535,7 +535,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
             testID="migrationsplitting.continue"
             type={ButtonTypeEnum.Primary}
             title={translate('migrationsplitting.continue') as string}
-            onPress={() => navigation.navigate(RouteEnum.MigrationCadence)}
+            onPress={() => navigation.navigate(RouteEnum.MigrationSchedule)}
           />
         </View>
       </View>

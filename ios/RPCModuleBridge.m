@@ -216,15 +216,10 @@ RCT_EXTERN_METHOD(planIronwoodMigrationProcess:
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(startIronwoodMigrationProcess:
     (NSString)plan_hash_hex
-                  perBucket:(NSString)per_bucket
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(continueNoteSplittingProcess:
     (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(reschedulePartsProcess:
-    (NSString)per_bucket
-                  resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(migrationStatusProcess:
     (RCTPromiseResolveBlock)resolve

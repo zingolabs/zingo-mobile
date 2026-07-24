@@ -844,7 +844,6 @@ class FfiOutcomeTests: XCTestCase {
         (ZingolibError.MigrationNotInProgress(message: "boom"), "MigrationNotInProgress"),
         (ZingolibError.MigrationAlreadyInProgress(message: "boom"), "MigrationAlreadyInProgress"),
         (ZingolibError.MigrationConsentStale(message: "boom"), "MigrationConsentStale"),
-        (ZingolibError.MigrationCadenceFixed(message: "boom"), "MigrationCadenceFixed"),
         (ZingolibError.MigrationSplit(message: "boom"), "MigrationSplit"),
         (ZingolibError.Migration(message: "boom"), "Migration"),
     ]

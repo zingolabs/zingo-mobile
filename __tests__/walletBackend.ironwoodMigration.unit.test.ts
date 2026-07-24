@@ -25,7 +25,6 @@ import {
   migrationStatus,
   planIronwoodMigration,
   reconcileMigration,
-  rescheduleParts,
   startIronwoodMigration,
 } from '../app/walletBackend/utils/walletUtils';
 
@@ -49,17 +48,10 @@ const wrapperCases: WrapperCase[] = [
   { wrapper: planIronwoodMigration, callArgs: [], expectedBridgeArgs: [] },
   {
     wrapper: startIronwoodMigration,
-    // A null cadence crosses as the empty string ("keep zingolib's default").
-    callArgs: [consentPlanHash, null],
-    expectedBridgeArgs: [consentPlanHash, ''],
-  },
-  {
-    wrapper: startIronwoodMigration,
-    callArgs: [consentPlanHash, 4],
-    expectedBridgeArgs: [consentPlanHash, '4'],
+    callArgs: [consentPlanHash],
+    expectedBridgeArgs: [consentPlanHash],
   },
   { wrapper: continueNoteSplitting, callArgs: [], expectedBridgeArgs: [] },
-  { wrapper: rescheduleParts, callArgs: [8], expectedBridgeArgs: ['8'] },
   { wrapper: migrationStatus, callArgs: [], expectedBridgeArgs: [] },
   { wrapper: reconcileMigration, callArgs: [], expectedBridgeArgs: [] },
   { wrapper: executeDueParts, callArgs: [2000], expectedBridgeArgs: ['2000'] },

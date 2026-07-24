@@ -111,19 +111,15 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   }
 
   const wakes: RPCWakePointType[] = status?.next_wakes ?? [];
-  // per_bucket is parts-per-window; a batch counts as confirmed once all of its
-  // parts confirm (floor division), so partial windows don't over-report.
-  const perBucket = Math.max(1, status?.per_bucket ?? 1);
+  // The ZIP 318 schedule draws each part its own window, so progress counts
+  // parts directly.
   const partsTotal = status?.parts_total ?? 0;
   const partsConfirmed = status?.parts_confirmed ?? 0;
-  const bucketModulus = status?.bucket_modulus ?? 256;
+  const bucketModulus = status?.bucket_modulus ?? 144;
   const height = info?.latestBlock ?? 0;
 
-  const batchesTotal = Math.max(1, Math.ceil(partsTotal / perBucket));
-  const batchesConfirmed = Math.min(
-    batchesTotal,
-    Math.floor(partsConfirmed / perBucket),
-  );
+  const batchesTotal = Math.max(1, partsTotal);
+  const batchesConfirmed = Math.min(batchesTotal, partsConfirmed);
   const valueTotal = status?.value_total ?? 0;
   const pct =
     valueTotal > 0
