@@ -1,26 +1,7 @@
-import {
-  ValueTransferType,
-  ValueTransferKindEnum,
-  PoolEnum,
-} from '../../AppState';
+import { ValueTransferType, ValueTransferKindEnum } from '../../AppState';
 import { RPCValueTransferType } from '../types/RPCValueTransferType';
 import { RPCValueTransfersKindEnum } from '../enums/RPCValueTransfersKindEnum';
 import { RPCValueTransfersStatusEnum } from '../enums/RPCValueTransfersStatusEnum';
-
-/**
- * An Orchard -> Ironwood migration is a send-to-self whose funding pools
- * include Orchard and whose received pools include Ironwood. zingolib does not
- * model migration as its own value-transfer kind (see its `send-to-self` doc:
- * `pools_sent_from: [Orchard]` + `pools_received: [Ironwood]`), so we derive it
- * here from the pool movement.
- */
-function isOrchardToIronwoodMigration(vt: RPCValueTransferType): boolean {
-  return (
-    vt.kind === RPCValueTransfersKindEnum.sendToSelf &&
-    !!vt.pools_sent_from?.includes(PoolEnum.OrchardPool) &&
-    !!vt.pools_received?.includes(PoolEnum.IronwoodPool)
-  );
-}
 
 /**
  * Maps a raw zingolib value transfer to the app's ValueTransferType.
@@ -41,21 +22,22 @@ export function transformValueTransfer(
 
   result.txid = vt.txid;
   result.time = vt.datetime;
-  result.kind = isOrchardToIronwoodMigration(vt)
-    ? ValueTransferKindEnum.Migration
-    : vt.kind === RPCValueTransfersKindEnum.memoToSelf
-      ? ValueTransferKindEnum.MemoToSelf
-      : vt.kind === RPCValueTransfersKindEnum.sendToSelf
-        ? ValueTransferKindEnum.SendToSelf
-        : vt.kind === RPCValueTransfersKindEnum.received
-          ? ValueTransferKindEnum.Received
-          : vt.kind === RPCValueTransfersKindEnum.sent
-            ? ValueTransferKindEnum.Sent
-            : vt.kind === RPCValueTransfersKindEnum.shield
-              ? ValueTransferKindEnum.Shield
-              : vt.kind === RPCValueTransfersKindEnum.rejection
-                ? ValueTransferKindEnum.Rejection
-                : vt.kind;
+  result.kind =
+    vt.kind === RPCValueTransfersKindEnum.migration
+      ? ValueTransferKindEnum.Migration
+      : vt.kind === RPCValueTransfersKindEnum.memoToSelf
+        ? ValueTransferKindEnum.MemoToSelf
+        : vt.kind === RPCValueTransfersKindEnum.sendToSelf
+          ? ValueTransferKindEnum.SendToSelf
+          : vt.kind === RPCValueTransfersKindEnum.received
+            ? ValueTransferKindEnum.Received
+            : vt.kind === RPCValueTransfersKindEnum.sent
+              ? ValueTransferKindEnum.Sent
+              : vt.kind === RPCValueTransfersKindEnum.shield
+                ? ValueTransferKindEnum.Shield
+                : vt.kind === RPCValueTransfersKindEnum.rejection
+                  ? ValueTransferKindEnum.Rejection
+                  : vt.kind;
   result.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
   result.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
 
