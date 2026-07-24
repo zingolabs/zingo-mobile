@@ -449,6 +449,17 @@
     "nym-network": "NYM Ağı",
     "nym-enhanced-privacy": "Gelişmiş Gizlilik"
   },
+  "mixnet": {
+    "status": {
+      "off": "Mixnet kapalı (açık ağ)",
+      "bootstrapping": "Mixnet'e bağlanılıyor…",
+      "ready": "Mixnet hazır",
+      "died": "Mixnet bağlantısı koptu",
+      "unknown": "Mixnet kullanılamıyor"
+    },
+    "send-blocked": "Mixnet hazır olana kadar gönderim duraklatıldı",
+    "reenable": "Mixnet'i yeniden etkinleştir"
+  },
   "header": {
     "lastupdate": "Son güncelleme:"
   },

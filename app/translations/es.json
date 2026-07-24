@@ -449,6 +449,17 @@
     "nym-network": "Red NYM",
     "nym-enhanced-privacy": "Privacidad Mejorada"
   },
+  "mixnet": {
+    "status": {
+      "off": "Mixnet apagada (red abierta)",
+      "bootstrapping": "Conectando a la mixnet…",
+      "ready": "Mixnet lista",
+      "died": "Conexión mixnet perdida",
+      "unknown": "Mixnet no disponible"
+    },
+    "send-blocked": "El envío está pausado hasta que la mixnet esté lista",
+    "reenable": "Reactivar mixnet"
+  },
   "header": {
     "lastupdate": "Última actualización:"
   },
