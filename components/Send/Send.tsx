@@ -78,6 +78,11 @@ import {
   parseAddress,
   sendPropose,
 } from '../../app/walletBackend';
+import {
+  classifySendFailure,
+  retryOnAnotherServer,
+  sendFailureMessage,
+} from '../../app/walletBackend/transforms/sendFailureTransform';
 import Utils from '../../app/utils';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
@@ -985,8 +990,6 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     navigation.navigate(RouteEnum.Computing);
 
-    let error = '';
-    let customError: string | undefined;
     try {
       await sendTransaction(sendPageStatePar);
 
@@ -1001,16 +1004,16 @@ const Send: React.FunctionComponent<SendProps> = ({
       navigation.navigate(RouteEnum.Computing, { phase: 'created' });
       return;
     } catch (err1) {
-      error = err1 as string;
+      let failure = classifySendFailure(err1 as string);
 
-      customError = interceptCustomError(error);
-
-      // in this point the App is failing, there is two possibilities:
-      // 1. Server Error
-      // 2. Another type of Error
-      // here is worth it to try again with the best working server...
-      // if the user selected a `custom` server, then we cannot change it.
-      if (!customError && selectServer !== SelectServerEnum.custom) {
+      // The transform decides which families a server switch can plausibly
+      // help; the wallet's own verdicts (dust, duplicate nullifier, a
+      // fail-closed mixnet refusal) are excluded there. If the user selected
+      // a `custom` server, we cannot change it regardless.
+      if (
+        retryOnAnotherServer(failure) &&
+        selectServer !== SelectServerEnum.custom
+      ) {
         // Pick a working server, same pattern as boot/recovery: the live
         // registry first (best, excluding the failed server, no probe), then
         // the static list ranked by latency (also excluding the failed one).
@@ -1061,37 +1064,14 @@ const Send: React.FunctionComponent<SendProps> = ({
           navigation.navigate(RouteEnum.Computing, { phase: 'created' });
           return;
         } catch (err2) {
-          error = err2 as string;
-
-          customError = interceptCustomError(error);
+          failure = classifySendFailure(err2 as string);
         }
       }
-    }
 
-    navigation.navigate(RouteEnum.Computing, {
-      phase: 'failed',
-      errorMessage: customError ? customError : error,
-    });
-  };
-
-  const interceptCustomError = (error: string) => {
-    // these error are not server related.
-    if (
-      error.includes('18: bad-txns-sapling-duplicate-nullifier') ||
-      error.includes('18: bad-txns-sprout-duplicate-nullifier') ||
-      error.includes('18: bad-txns-orchard-duplicate-nullifier')
-    ) {
-      // bad-txns-xxxxxxxxx-duplicate-nullifier (3 errors)
-      return translate('send.duplicate-nullifier-error') as string;
-    } else if (error.includes('64: dust')) {
-      // dust
-      return translate('send.dust-error') as string;
-    } else if (error.includes('Nym mixnet')) {
-      // A fail-closed Mixnet Mode refusal (bootstrapping or died) is never a
-      // server problem: switching servers cannot help and would churn the
-      // user's selection, so skip the retry and surface the typed refusal
-      // verbatim.
-      return error;
+      navigation.navigate(RouteEnum.Computing, {
+        phase: 'failed',
+        errorMessage: sendFailureMessage(failure, translate),
+      });
     }
   };
 
