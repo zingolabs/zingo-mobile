@@ -27,6 +27,19 @@ export type MixnetView = {
 };
 
 /**
+ * The view before the coordinator's first publication on a platform that
+ * runs the mixnet policy: the transport is being brought up, so sends stay
+ * blocked (fail-closed) and the user's action is to wait.
+ */
+export const INITIAL_MIXNET_VIEW: MixnetView = {
+  statusKey: 'mixnet.status.bootstrapping',
+  socks5Addr: null,
+  narration: null,
+  sendBlocked: true,
+  recovery: 'wait',
+};
+
+/**
  * Derives the screen-facing view from the typed reports.
  *
  * Pure function — no side effects. The fail-closed invariant lives here in

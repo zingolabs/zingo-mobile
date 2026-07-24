@@ -164,6 +164,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
     nym: nymContext,
+    mixnetView,
+    disableMixnet,
+    reenableMixnet,
     foregroundEpoch,
     readOnly,
     setPrivacyOption,
@@ -1666,6 +1669,79 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         <NymSwitchOn width={40} height={19} />
                       ) : (
                         <SwitchOff width={40} height={19} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+
+              {/* Mixnet Mode (send-over-nym): a live per-session control,
+                  never persisted — forced on at wallet load, turning it off
+                  is this session's deliberate clearnet consent, and a died
+                  or failed transport recovers only through the re-enable
+                  here or on the send screen. Rendered only where the
+                  policy runs (mixnetView is null on platforms whose
+                  transport has not landed). */}
+              {mixnetView !== null && (
+                <View
+                  style={{ marginHorizontal: 25, marginVertical: 15 }}
+                  testID="settings.mixnet"
+                >
+                  <BoldText>
+                    {translate('settings.nym-privacy-network') as string}
+                  </BoldText>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginTop: 5,
+                    }}
+                  >
+                    {mixnetView.statusKey === 'mixnet.status.ready' ? (
+                      <NymOn width={22} height={22} />
+                    ) : (
+                      <NymOff width={22} height={22} />
+                    )}
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <BoldText
+                        style={{
+                          color:
+                            mixnetView.statusKey === 'mixnet.status.ready'
+                              ? '#07FF94'
+                              : colors.text,
+                        }}
+                      >
+                        {translate(mixnetView.statusKey) as string}
+                      </BoldText>
+                      <FadeText>
+                        {mixnetView.narration !== null
+                          ? mixnetView.narration
+                          : (translate(
+                              'settings.nym-enhanced-privacy',
+                            ) as string)}
+                      </FadeText>
+                    </View>
+                    <TouchableOpacity
+                      testID="settings.mixnet-toggle"
+                      onPress={() => {
+                        if (mixnetView.sendBlocked === false &&
+                            mixnetView.statusKey === 'mixnet.status.off') {
+                          reenableMixnet();
+                        } else if (
+                          mixnetView.statusKey === 'mixnet.status.ready' ||
+                          mixnetView.statusKey === 'mixnet.status.bootstrapping'
+                        ) {
+                          disableMixnet();
+                        } else {
+                          // died / unknown: the only way up is a fresh start.
+                          reenableMixnet();
+                        }
+                      }}
+                    >
+                      {mixnetView.statusKey === 'mixnet.status.off' ? (
+                        <SwitchOff width={40} height={19} />
+                      ) : (
+                        <NymSwitchOn width={40} height={19} />
                       )}
                     </TouchableOpacity>
                   </View>

@@ -167,6 +167,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     zingolibVersion,
     setPrivacyOption,
     nym: nymContext,
+    mixnetView,
+    reenableMixnet,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Send;
@@ -862,7 +864,12 @@ const Send: React.FunctionComponent<SendProps> = ({
         maxAmount > 0 &&
         !(
           !memoEnabled && Utils.parseStringLocaleToNumberFloat(amountText) === 0
-        ),
+        ) &&
+        // Mixnet Mode fail-closed verdict: while the transport is
+        // bootstrapping, died, or unknowable, sending stays blocked; only
+        // `ready` or the user's explicit clearnet consent (`off`) opens it.
+        // Null means the platform runs no mixnet policy yet (iOS).
+        (mixnetView === null || !mixnetView.sendBlocked),
     );
   }, [
     memoEnabled,
@@ -872,6 +879,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     validMemo,
     fee,
     maxAmount,
+    mixnetView,
   ]);
 
   useEffect(() => {
@@ -2116,6 +2124,32 @@ const Send: React.FunctionComponent<SendProps> = ({
                   marginVertical: 0,
                 }}
               >
+                {mixnetView !== null && mixnetView.sendBlocked && (
+                  <View
+                    style={{
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      marginBottom: 10,
+                    }}
+                    testID="send.mixnet-blocked"
+                  >
+                    <FadeText style={{ textAlign: 'center' }}>
+                      {`${translate('mixnet.send-blocked') as string} (${translate(mixnetView.statusKey) as string})`}
+                    </FadeText>
+                    {mixnetView.narration !== null && (
+                      <FadeText style={{ textAlign: 'center' }}>
+                        {mixnetView.narration}
+                      </FadeText>
+                    )}
+                    {mixnetView.recovery === 'reenable' && (
+                      <TouchableOpacity onPress={() => reenableMixnet()}>
+                        <RegText color={colors.primary}>
+                          {translate('mixnet.reenable') as string}
+                        </RegText>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
                 <View
                   style={{
                     flexGrow: 1,
