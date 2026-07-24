@@ -1086,6 +1086,12 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else if (error.includes('64: dust')) {
       // dust
       return translate('send.dust-error') as string;
+    } else if (error.includes('Nym mixnet')) {
+      // A fail-closed Mixnet Mode refusal (bootstrapping or died) is never a
+      // server problem: switching servers cannot help and would churn the
+      // user's selection, so skip the retry and surface the typed refusal
+      // verbatim.
+      return error;
     }
   };
 
