@@ -69,6 +69,7 @@ import {
   BlockExplorerEnum,
 } from '../../app/AppState';
 import { getLatestBlockServerInfo } from '../../app/walletBackend';
+import { getMixnetIpCorrelationDisclaimer } from '../../app/walletBackend/utils/mixnetUtils';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -247,6 +248,25 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
+  // The canonical ZIP-0318 IP-correlation disclaimer, fetched once from the
+  // FFI wherever the Mixnet Mode section renders; null until it arrives (or
+  // when the native layer rejects, in which case nothing renders).
+  const [mixnetDisclaimer, setMixnetDisclaimer] = useState<string | null>(null);
+  const mixnetSupported = mixnetView !== null;
+  useEffect(() => {
+    if (!mixnetSupported) {
+      return;
+    }
+    let alive = true;
+    getMixnetIpCorrelationDisclaimer().then((text: string | null) => {
+      if (alive) {
+        setMixnetDisclaimer(text);
+      }
+    });
+    return () => {
+      alive = false;
+    };
+  }, [mixnetSupported]);
   const [listServerUri, setListServerUri] = useState<string>('');
   const [listServerChainName, setListServerChainName] = useState<string>('');
   const [customServerUri, setCustomServerUri] = useState<string>('');
@@ -1745,6 +1765,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       )}
                     </TouchableOpacity>
                   </View>
+                  {/* The canonical disclaimer renders verbatim (one string
+                      from zingolib, deliberately untranslated) so every
+                      frontend names the same residual exposure: sync stays
+                      on the ordinary connection even while the mode is on. */}
+                  {mixnetDisclaimer !== null && (
+                    <FadeText style={{ marginTop: 8 }}>
+                      {mixnetDisclaimer}
+                    </FadeText>
+                  )}
                 </View>
               )}
 

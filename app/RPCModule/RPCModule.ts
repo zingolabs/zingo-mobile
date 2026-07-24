@@ -159,6 +159,7 @@ interface RPCModuleAPI {
   disableMixnet(): Promise<string>;
   mixnetModeInfo(): Promise<string>;
   mixnetBootstrapDetailInfo(): Promise<string>;
+  mixnetIpCorrelationDisclaimerInfo(): Promise<string>;
 }
 
 export default NativeModules.RPCModule as RPCModuleAPI;
