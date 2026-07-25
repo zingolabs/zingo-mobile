@@ -188,16 +188,17 @@ describe('the price fetch gate', () => {
     expect(mockedBridge.zecPriceInfo).not.toHaveBeenCalled();
   });
 
-  it('fetches normally once the transport is ready', async () => {
+  it('fetches normally once the transport is ready, attested', async () => {
     mockedAlwaysOn.mockReturnValue(true);
     recordMixnetTransportReady(true);
     mockedBridge.zecPriceInfo.mockResolvedValue(
-      JSON.stringify({ current_price: 42.5 }),
+      JSON.stringify({ current_price: 42.5, via_socks5: '127.0.0.1:1080' }),
     );
 
     await expect(getZecPrice()).resolves.toEqual({
       kind: 'price',
       usd: 42.5,
+      route: { kind: 'attested', viaSocks5: '127.0.0.1:1080' },
     });
   });
 });
