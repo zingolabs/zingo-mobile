@@ -5,6 +5,7 @@
   "scripts": {
     "android:prod": "react-native run-android --mode prodDebug",
     "android:beta": "react-native run-android --mode betaDebug",
+    "android:alwayson": "react-native run-android --mode alwaysonDebug",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest --verbose",
