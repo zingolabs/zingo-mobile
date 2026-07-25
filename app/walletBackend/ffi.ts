@@ -17,6 +17,7 @@ const FFI_ERROR_CODES = [
   'Sync',
   'Rescan',
   'Read',
+  'Mixnet',
   'Send',
   'Shield',
   'InvalidInput',

@@ -834,6 +834,7 @@ class FfiOutcomeTests: XCTestCase {
         (ZingolibError.Sync(message: "boom"), "Sync"),
         (ZingolibError.Rescan(message: "boom"), "Rescan"),
         (ZingolibError.Read(message: "boom"), "Read"),
+        (ZingolibError.Mixnet(message: "boom"), "Mixnet"),
         (ZingolibError.Send(message: "boom"), "Send"),
         (ZingolibError.Shield(message: "boom"), "Shield"),
         (ZingolibError.InvalidInput(message: "boom"), "InvalidInput"),
