@@ -15,7 +15,7 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
  * Mount once per BottomSheetModalProvider via the <BottomSheetBackHandler />
  * wrapper, since the hook reads from the modal context.
  */
-export function useBottomSheetBackHandler() {
+function useBottomSheetBackHandler() {
   const { dismiss } = useBottomSheetModal();
 
   useEffect(() => {

@@ -30,6 +30,7 @@ import {
   ScreenEnum,
 } from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { deriveListSelection } from '../../app/utils/listSelection';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
@@ -533,6 +534,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     [colors, abDetailTitle],
   );
 
+  const detailSelection = deriveListSelection(addressBookSliced, currentItem);
+
   return (
     <View
       style={{
@@ -989,10 +992,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             key={`detail-${abDetailKey}`}
             index={currentItem ?? -1}
             item={
-              currentItem !== null &&
-              currentItem > -1 &&
-              addressBookSliced[currentItem]
-                ? addressBookSliced[currentItem]
+              // Both null (sheet closed) and -1 (Add-new mode) mean "no
+              // real item"; deriveListSelection folds them into one
+              // non-selected state.
+              detailSelection.kind === 'selected'
+                ? detailSelection.item
                 : ({} as AddressBookFileClass)
             }
             cancel={cancel}

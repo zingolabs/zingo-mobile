@@ -12,13 +12,16 @@
  */
 import { WalletType, GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
-import { callFfi, FfiErrorCode, FfiResult } from '../ffi';
+import { callFfi, decodeFfiJson, FfiErrorCode, FfiResult } from '../ffi';
 import {
   COVERED_SURFACE_REFUSAL,
   coveredSurfacePermitted,
 } from './mixnetGate';
 import { RPCZecPriceType } from '../types/RPCZecPriceType';
-import { RPCSeedType } from '../types/RPCSeedType';
+import {
+  WalletFetchOutcome,
+  interpretWalletFetchResult,
+} from './walletFetchOutcome';
 
 /**
  * The typed outcome of a price fetch, enumerated over the real ways the
@@ -109,74 +112,70 @@ export async function getZecPrice(): Promise<ZecPriceOutcome> {
     return { kind: 'gateRefusal', error: COVERED_SURFACE_REFUSAL };
   }
   const startedAt = Date.now();
-  const result = await callFfi(RPCModule.zecPriceInfo());
-  if (!result.ok) {
+  const decoded = decodeFfiJson(await callFfi(RPCModule.zecPriceInfo()));
+  if (decoded.kind === 'ffiRejection') {
     console.log(
       'price fetch failed: ffi rejection',
-      result.error.code,
-      result.error.message,
+      decoded.code,
+      decoded.message,
     );
-    return {
-      kind: 'ffiRejection',
-      code: result.error.code,
-      message: result.error.message,
-    };
+    return decoded;
   }
-  if (!result.value) {
+  if (decoded.kind === 'emptyPayload') {
     console.log('price fetch failed: empty success payload from the bridge');
     return { kind: 'malformedPayload', payload: '', detail: 'empty payload' };
   }
-  try {
-    const resultJSON: RPCZecPriceType = JSON.parse(result.value);
-    if (resultJSON.error) {
-      console.log(
-        'price fetch failed: oracle error in payload',
-        resultJSON.error,
-      );
-      return { kind: 'oracleError', error: resultJSON.error };
-    }
-    if (!resultJSON.current_price) {
-      // if no exists the field or is empty
-      return { kind: 'noData' };
-    }
-    if (isNaN(resultJSON.current_price)) {
-      console.log(
-        'price fetch failed: non-numeric price',
-        String(resultJSON.current_price),
-      );
-      return {
-        kind: 'malformedPayload',
-        payload: result.value,
-        detail: `non-numeric price ${resultJSON.current_price}`,
-      };
-    }
-    // Success logs too: absence of a failure line must never be the only
-    // signal, and the attestation makes the route positively observable.
-    const route: PriceRouteAttestation =
-      resultJSON.via_socks5 !== undefined
-        ? { kind: 'attested', viaSocks5: resultJSON.via_socks5 }
-        : { kind: 'preAttestationNativeLayer' };
-    console.log(
-      'price fetch ok:',
-      resultJSON.current_price,
-      'via',
-      route.kind === 'attested' ? route.viaSocks5 : 'PRE-ATTESTATION LAYER',
-      `${Date.now() - startedAt}ms`,
-    );
-    return { kind: 'price', usd: resultJSON.current_price, route };
-  } catch (error) {
+  if (decoded.kind === 'malformedPayload') {
     // The payload that failed to parse is the diagnostic; log it verbatim.
     console.log(
       'price fetch failed: unparseable payload',
-      result.value,
-      String(error),
+      decoded.payload,
+      decoded.detail,
+    );
+    return decoded;
+  }
+  if (typeof decoded.value !== 'object' || decoded.value === null) {
+    console.log('price fetch failed: non-object payload', decoded.raw);
+    return {
+      kind: 'malformedPayload',
+      payload: decoded.raw,
+      detail: 'non-object payload',
+    };
+  }
+  const resultJSON = decoded.value as RPCZecPriceType;
+  if (resultJSON.error) {
+    console.log('price fetch failed: oracle error in payload', resultJSON.error);
+    return { kind: 'oracleError', error: resultJSON.error };
+  }
+  if (!resultJSON.current_price) {
+    // if no exists the field or is empty
+    return { kind: 'noData' };
+  }
+  if (isNaN(resultJSON.current_price)) {
+    console.log(
+      'price fetch failed: non-numeric price',
+      String(resultJSON.current_price),
     );
     return {
       kind: 'malformedPayload',
-      payload: result.value,
-      detail: String(error),
+      payload: decoded.raw,
+      detail: `non-numeric price ${resultJSON.current_price}`,
     };
   }
+  // Success logs too: absence of a failure line must never be the only
+  // signal, and the attestation makes the route positively observable.
+  const route: PriceRouteAttestation =
+    resultJSON.via_socks5 !== undefined
+      ? { kind: 'attested', viaSocks5: resultJSON.via_socks5 }
+      : { kind: 'preAttestationNativeLayer' };
+  console.log(
+    'price fetch ok:',
+    resultJSON.current_price,
+    'via',
+    route.kind === 'attested' ? route.viaSocks5 : 'PRE-ATTESTATION LAYER',
+    `${Date.now() - startedAt}ms`,
+  );
+  return { kind: 'price', usd: resultJSON.current_price, route };
 }
 
 // ---------------------------------------------------------------------------
@@ -584,16 +583,12 @@ export async function checkMyAddress(
 // error, parse error) we conservatively return false — better to show an
 // external address as external than mislabel a stranger's as own.
 export async function isWalletAddress(address: string): Promise<boolean> {
-  const check = await checkMyAddress(address);
-  if (!check.ok || !check.value) {
-    return false;
-  }
-  try {
-    const parsed: { is_wallet_address?: boolean } = JSON.parse(check.value);
-    return parsed.is_wallet_address === true;
-  } catch (error) {
-    return false;
-  }
+  const decoded = decodeFfiJson(await checkMyAddress(address));
+  return (
+    decoded.kind === 'json' &&
+    (decoded.value as { is_wallet_address?: unknown } | null)
+      ?.is_wallet_address === true
+  );
 }
 
 // True iff a wallet backup file exists on disk. zingolib reports the answer
@@ -627,56 +622,41 @@ export async function shieldConfirm(): Promise<FfiResult<string>> {
 }
 
 /**
- * Returns the wallet's secret material for the backup/seed display screens.
+ * Fetches the wallet's secret material and names the outcome.
  *
- * readOnly = true  → returns { birthday, ufvk } (viewing-key wallets only)
- * readOnly = false → returns { birthday, seed } (full wallet)
- * Returns null on any error.
+ * readOnly = true  → the wallet is { birthday, ufvk } (viewing-key wallets)
+ * readOnly = false → the wallet is { birthday, seed } (full wallet)
+ *
+ * Callers that store or display the material must switch on the outcome:
+ * every non-`complete` arm is a distinct failure, and none of them is a
+ * wallet. See [`WalletFetchOutcome`].
+ */
+export async function fetchWalletOutcome(
+  readOnly: boolean,
+): Promise<WalletFetchOutcome> {
+  const result = await callFfi(
+    readOnly ? RPCModule.getUfvkInfo() : RPCModule.getSeedInfo(),
+  );
+  const outcome = interpretWalletFetchResult(result, readOnly);
+  if (outcome.kind !== 'complete') {
+    console.log(
+      `${readOnly ? 'ufvk' : 'seed'} fetch failed:`,
+      outcome.kind,
+      outcome.kind === 'ffiRejection' ? outcome.message : '',
+    );
+  }
+  return outcome;
+}
+
+/**
+ * Presence-only view of [`fetchWalletOutcome`]: the wallet when the fetch
+ * produced one, null otherwise. Callers that must react to failure — or
+ * must not mistake "no key material" for a usable wallet — take the
+ * outcome instead.
  */
 export async function fetchWallet(
   readOnly: boolean,
 ): Promise<WalletType | null> {
-  if (readOnly) {
-    // only viewing key & birthday
-    const result = await callFfi(RPCModule.getUfvkInfo());
-    if (!result.ok || !result.value) {
-      return null;
-    }
-    try {
-      const RPCufvk: WalletType = JSON.parse(result.value);
-
-      const wallet: WalletType = {} as WalletType;
-      if (RPCufvk.birthday) {
-        wallet.birthday = RPCufvk.birthday;
-      }
-      if (RPCufvk.ufvk) {
-        wallet.ufvk = RPCufvk.ufvk;
-      }
-
-      return wallet;
-    } catch (error) {
-      return null;
-    }
-  } else {
-    // only seed & birthday
-    const result = await callFfi(RPCModule.getSeedInfo());
-    if (!result.ok || !result.value) {
-      return null;
-    }
-    try {
-      const RPCseed: RPCSeedType = JSON.parse(result.value);
-
-      const wallet: WalletType = {} as WalletType;
-      if (RPCseed.seed_phrase) {
-        wallet.seed = RPCseed.seed_phrase;
-      }
-      if (RPCseed.birthday) {
-        wallet.birthday = RPCseed.birthday;
-      }
-
-      return wallet;
-    } catch (error) {
-      return null;
-    }
-  }
+  const outcome = await fetchWalletOutcome(readOnly);
+  return outcome.kind === 'complete' ? outcome.wallet : null;
 }

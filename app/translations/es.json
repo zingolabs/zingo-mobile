@@ -156,6 +156,7 @@
     "support": "Email de soporte de {name}",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
+    "recoveryinfo-error": "No se pudo leer la información de recuperación del monedero, así que no se guardó nada en este dispositivo. La opción se ha desactivado de nuevo.",
     "differentchain-error": "Estás cambiando a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin tu frase semilla.",
     "serverchain-mismatch": "El servidor reporta una cadena diferente a la seleccionada. Revisa el selector de cadena e inténtalo de nuevo.",
     "changingwallet-label": "Error cambiando de Monedero",
@@ -631,6 +632,7 @@
     },
     "verification-success": "Esta dirección te pertenece y es segura para recibir fondos.",
     "verification-failure": "Esta dirección no te pertenece.",
+    "verification-unavailable": "No se pudo completar la verificación. Inténtalo de nuevo.",
     "add-tag": "Añadir etiqueta"
   },
   "history": {

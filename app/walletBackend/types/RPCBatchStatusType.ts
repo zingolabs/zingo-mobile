@@ -3,7 +3,7 @@
 // from the native call means no batch is running (before it starts, or once it
 // has finished); otherwise the counts are 0..=total and advance as the batch
 // proves, submits, then waits out the spacing before the next part.
-export type RPCBatchStatusPhase = 'sending' | 'spacing';
+type RPCBatchStatusPhase = 'sending' | 'spacing';
 
 export type RPCBatchStatusType = {
   // Parts owed this batch (N), fixed for the whole batch.
