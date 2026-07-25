@@ -17,7 +17,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
-import { deriveAddressSelection } from './addressSelection';
+import { deriveListSelection } from '../../app/utils/listSelection';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '../Components/SingleAddress';
@@ -281,19 +281,17 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   // The effect above encodes an empty filtered list as index 0, so a
   // non-null index is not by itself proof that an address exists.
-  // deriveAddressSelection maps every (list, index) pair to exactly one
-  // named state and clamps a stale index left over from a previous list.
-  const uSelection = useMemo(
-    () => deriveAddressSelection(uAddr, uAddrIndex),
-    [uAddr, uAddrIndex],
+  // deriveListSelection maps every (list, index) pair to exactly one
+  // named state.
+  const currentSelection = useMemo(
+    () =>
+      index === 0
+        ? deriveListSelection(uAddr, uAddrIndex)
+        : deriveListSelection(tAddr, tAddrIndex),
+    [index, uAddr, uAddrIndex, tAddr, tAddrIndex],
   );
-  const tSelection = useMemo(
-    () => deriveAddressSelection(tAddr, tAddrIndex),
-    [tAddr, tAddrIndex],
-  );
-  const currentSelection = index === 0 ? uSelection : tSelection;
   const selectedAddressText =
-    currentSelection.kind === 'selected' ? currentSelection.address.address : '';
+    currentSelection.kind === 'selected' ? currentSelection.item.address : '';
 
   const isAdvanced = mode !== ModeEnum.basic;
   const canPickScope = isAdvanced && tAddr && tAddr.length > 0;
@@ -399,29 +397,25 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   // Resolve the address currently shown based on the scope index.
   const currentAddress = useMemo(() => {
-    if (index === 0) {
-      if (uSelection.kind === 'selected') {
-        return uSelection.address;
-      }
-      return new UnifiedAddressClass(
-        0,
-        translate('receive.noaddress') as string,
-        AddressKindEnum.u,
-        false,
-        false,
-        false,
-      );
+    if (currentSelection.kind === 'selected') {
+      return currentSelection.item;
     }
-    if (tSelection.kind === 'selected') {
-      return tSelection.address;
-    }
-    return new TransparentAddressClass(
-      0,
-      translate('receive.noaddress') as string,
-      AddressKindEnum.t,
-      RPCAddressScopeEnum.external,
-    );
-  }, [index, uSelection, tSelection, translate]);
+    return index === 0
+      ? new UnifiedAddressClass(
+          0,
+          translate('receive.noaddress') as string,
+          AddressKindEnum.u,
+          false,
+          false,
+          false,
+        )
+      : new TransparentAddressClass(
+          0,
+          translate('receive.noaddress') as string,
+          AddressKindEnum.t,
+          RPCAddressScopeEnum.external,
+        );
+  }, [currentSelection, index, translate]);
 
   const setCurrentAddrIndex = index === 0 ? setUAddrIndex : setTAddrIndex;
   const currentTotal = index === 0 ? uAddr.length : tAddr.length;

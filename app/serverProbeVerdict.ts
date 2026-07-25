@@ -1,13 +1,12 @@
 /**
  * Pure verdict on a selectingServer() probe result.
  *
- * selectingServer resolves a server only when its probe actually answered
- * (selectingServer.ts checks `latency !== null` strictly), so any resolved
- * probe is a reachable server — including one that measured 0 ms, which
- * happens when the two Date.now() calls land in the same millisecond against
- * a localhost/LAN regtest server. The truthiness reads this replaces
- * (`serverChecked && serverChecked.latency`) misread exactly that 0 as the
- * null "probe failed" state.
+ * selectingServer resolves a server only when its probe actually answered,
+ * so any resolved probe describes a reachable server — including one that
+ * measured 0 ms, which happens when the probe's two Date.now() calls land
+ * in the same millisecond against a localhost/LAN regtest server. The
+ * strict `latency !== null` read is therefore load-bearing: truthiness
+ * would fold that 0 into the null "no measurement" state.
  */
 import { ServerUrisType } from './AppState';
 
