@@ -91,22 +91,53 @@ describe('the existence probes contain rejections as false', () => {
   });
 });
 
-describe('getZecPrice maps outcomes to its documented sentinels', () => {
-  it.each([
-    ['a typed rejection', typedRejection('Indexer', 'oracle down'), -1],
-    ['an empty resolution', Promise.resolve(''), -2],
-    ['an { error } body', Promise.resolve('{"error":"no feed"}'), -1],
-    ['a body without a price', Promise.resolve('{}'), 0],
-    ['an unparseable body', Promise.resolve('not json'), -2],
-  ])('%s', async (_case, native, sentinel) => {
-    bridge.zecPriceInfo.mockReturnValueOnce(native);
-    const { price } = await getZecPrice();
-    expect(price).toBe(sentinel);
+describe('getZecPrice discriminates every outcome as a typed variant', () => {
+  it('a typed rejection carries its variant code through', async () => {
+    bridge.zecPriceInfo.mockReturnValueOnce(
+      typedRejection('Indexer', 'oracle down'),
+    );
+    await expect(getZecPrice()).resolves.toEqual({
+      kind: 'ffiRejection',
+      code: 'Indexer',
+      message: 'oracle down',
+    });
+  });
+
+  it('an empty resolution is a malformed payload', async () => {
+    bridge.zecPriceInfo.mockResolvedValueOnce('');
+    await expect(getZecPrice()).resolves.toMatchObject({
+      kind: 'malformedPayload',
+      payload: '',
+    });
+  });
+
+  it('an { error } body is the oracle reporting failure', async () => {
+    bridge.zecPriceInfo.mockResolvedValueOnce('{"error":"no feed"}');
+    await expect(getZecPrice()).resolves.toEqual({
+      kind: 'oracleError',
+      error: 'no feed',
+    });
+  });
+
+  it('a body without a price is noData, not an error', async () => {
+    bridge.zecPriceInfo.mockResolvedValueOnce('{}');
+    await expect(getZecPrice()).resolves.toEqual({ kind: 'noData' });
+  });
+
+  it('an unparseable body is a malformed payload carrying the payload', async () => {
+    bridge.zecPriceInfo.mockResolvedValueOnce('not json');
+    await expect(getZecPrice()).resolves.toMatchObject({
+      kind: 'malformedPayload',
+      payload: 'not json',
+    });
   });
 
   it('a real price crosses the data channel', async () => {
     bridge.zecPriceInfo.mockResolvedValueOnce('{"current_price": 42.5}');
-    await expect(getZecPrice()).resolves.toEqual({ price: 42.5, error: '' });
+    await expect(getZecPrice()).resolves.toEqual({
+      kind: 'price',
+      usd: 42.5,
+    });
   });
 });
 

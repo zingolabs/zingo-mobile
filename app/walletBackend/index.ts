@@ -8,6 +8,11 @@
 import WalletBackend from './WalletBackend';
 
 export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
+export type {
+  ZecPriceOutcome,
+  ZecPriceOutcomeHandlers,
+} from './utils/walletUtils';
+export { matchZecPriceOutcome } from './utils/walletUtils';
 export type { StartMigrationRoute } from './utils/migrationRouting';
 export { routeStartMigration } from './utils/migrationRouting';
 export { scanInProgress } from './utils/syncProgress';

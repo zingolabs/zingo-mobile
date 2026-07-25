@@ -181,10 +181,10 @@ describe('the price fetch gate', () => {
     mockedAlwaysOn.mockReturnValue(true);
     recordMixnetTransportReady(false);
 
-    const { price, error } = await getZecPrice();
-
-    expect(price).toBe(-1);
-    expect(error).toBe(COVERED_SURFACE_REFUSAL);
+    await expect(getZecPrice()).resolves.toEqual({
+      kind: 'gateRefusal',
+      error: COVERED_SURFACE_REFUSAL,
+    });
     expect(mockedBridge.zecPriceInfo).not.toHaveBeenCalled();
   });
 
@@ -195,9 +195,9 @@ describe('the price fetch gate', () => {
       JSON.stringify({ current_price: 42.5 }),
     );
 
-    const { price, error } = await getZecPrice();
-
-    expect(price).toBe(42.5);
-    expect(error).toBe('');
+    await expect(getZecPrice()).resolves.toEqual({
+      kind: 'price',
+      usd: 42.5,
+    });
   });
 });

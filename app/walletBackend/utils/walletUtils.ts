@@ -12,7 +12,7 @@
  */
 import { WalletType, GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
-import { callFfi, FfiResult } from '../ffi';
+import { callFfi, FfiErrorCode, FfiResult } from '../ffi';
 import {
   COVERED_SURFACE_REFUSAL,
   coveredSurfacePermitted,
@@ -21,49 +21,132 @@ import { RPCZecPriceType } from '../types/RPCZecPriceType';
 import { RPCSeedType } from '../types/RPCSeedType';
 
 /**
- * Fetches the current ZEC/USD price from the zingolib price oracle.
- *
- * Price sentinel values:
- *   0   — initial/default (no price data yet)
- *  -1   — error inside zingolib (a typed FFI rejection, or an oracle error)
- *  -2   — malformed/empty success payload
- *  > 0  — real USD price
+ * The typed outcome of a price fetch, enumerated over the real ways the
+ * surface fails (ADR 0002: errors are types; the sendFailureTransform
+ * precedent). The legacy sentinel numbers (0 / -1 / -2) collapsed four
+ * genuinely different failures into one bucket; each arm here is grounded
+ * in a distinct producer:
+ * - `price`: the oracle answered with a usable USD price.
+ * - `noData`: the oracle answered, but carries no price yet.
+ * - `gateRefusal`: the always-on fail-closed gate refused before any
+ *   network touch — the transport is not `ready`.
+ * - `ffiRejection`: the typed error channel rejected; `code` names the
+ *   ZingolibError variant ('Read' is zingolib's oracle leg — over the
+ *   mixnet in the always-on flavors; 'Mixnet' is the wallet's own
+ *   fail-closed verdict; 'Unknown' is a bridge anomaly).
+ * - `oracleError`: the data channel resolved, and the payload itself
+ *   reports the oracle failed.
+ * - `malformedPayload`: the resolution is unusable (empty, unparseable,
+ *   or a non-numeric price) — the payload travels for diagnosis.
  */
-export async function getZecPrice(): Promise<{
-  price: number;
-  error: string;
-}> {
+export type ZecPriceOutcome =
+  | { readonly kind: 'price'; readonly usd: number }
+  | { readonly kind: 'noData' }
+  | { readonly kind: 'gateRefusal'; readonly error: string }
+  | {
+      readonly kind: 'ffiRejection';
+      readonly code: FfiErrorCode;
+      readonly message: string;
+    }
+  | { readonly kind: 'oracleError'; readonly error: string }
+  | {
+      readonly kind: 'malformedPayload';
+      readonly payload: string;
+      readonly detail: string;
+    };
+
+/**
+ * One handler per [`ZecPriceOutcome`] arm, each receiving its narrowed
+ * variant. Exhaustive by construction: a new arm fails compilation at
+ * every handler record, by name, until the consumer decides what that
+ * arm means for it — no default case to forget.
+ */
+export type ZecPriceOutcomeHandlers<R> = {
+  [K in ZecPriceOutcome['kind']]: (
+    outcome: Extract<ZecPriceOutcome, { kind: K }>,
+  ) => R;
+};
+
+/**
+ * Dispatches an outcome to its arm's handler. The assertion is safe by
+ * construction — the discriminant selects exactly the handler declared
+ * for it — and exists only because TypeScript cannot yet correlate a
+ * union-keyed record access with its argument.
+ */
+export function matchZecPriceOutcome<R>(
+  outcome: ZecPriceOutcome,
+  handlers: ZecPriceOutcomeHandlers<R>,
+): R {
+  return (handlers[outcome.kind] as (o: ZecPriceOutcome) => R)(outcome);
+}
+
+/**
+ * Fetches the current ZEC/USD price from the zingolib price oracle and
+ * classifies the outcome. Every failure arm also lands verbatim in the dev
+ * log: the screens render only a terse headline, and the silent alpha
+ * flavors have no other price diagnostics at all.
+ */
+export async function getZecPrice(): Promise<ZecPriceOutcome> {
   // The always-on flavors' fail-closed gate: the price fetch reaches a CEX
   // over HTTPS, so while the mixnet transport is not ready it must refuse
   // rather than hand the exchange an IP-to-wallet correlation.
   if (!coveredSurfacePermitted()) {
-    return { price: -1, error: COVERED_SURFACE_REFUSAL };
+    return { kind: 'gateRefusal', error: COVERED_SURFACE_REFUSAL };
   }
   const result = await callFfi(RPCModule.zecPriceInfo());
   if (!result.ok) {
-    return { price: -1, error: result.error.message };
+    console.log(
+      'price fetch failed: ffi rejection',
+      result.error.code,
+      result.error.message,
+    );
+    return {
+      kind: 'ffiRejection',
+      code: result.error.code,
+      message: result.error.message,
+    };
   }
   if (!result.value) {
-    return { price: -2, error: 'Internal Error fetching price' };
+    console.log('price fetch failed: empty success payload from the bridge');
+    return { kind: 'malformedPayload', payload: '', detail: 'empty payload' };
   }
   try {
     const resultJSON: RPCZecPriceType = JSON.parse(result.value);
     if (resultJSON.error) {
-      return { price: -1, error: resultJSON.error };
+      console.log(
+        'price fetch failed: oracle error in payload',
+        resultJSON.error,
+      );
+      return { kind: 'oracleError', error: resultJSON.error };
     }
     if (!resultJSON.current_price) {
       // if no exists the field or is empty
-      return { price: 0, error: '' };
+      return { kind: 'noData' };
     }
     if (isNaN(resultJSON.current_price)) {
+      console.log(
+        'price fetch failed: non-numeric price',
+        String(resultJSON.current_price),
+      );
       return {
-        price: -1,
-        error: `Error fetching price ${resultJSON.current_price}`,
+        kind: 'malformedPayload',
+        payload: result.value,
+        detail: `non-numeric price ${resultJSON.current_price}`,
       };
     }
-    return { price: resultJSON.current_price, error: '' };
+    return { kind: 'price', usd: resultJSON.current_price };
   } catch (error) {
-    return { price: -2, error: `Critical Error fetching price ${error}` };
+    // The payload that failed to parse is the diagnostic; log it verbatim.
+    console.log(
+      'price fetch failed: unparseable payload',
+      result.value,
+      String(error),
+    );
+    return {
+      kind: 'malformedPayload',
+      payload: result.value,
+      detail: String(error),
+    };
   }
 }
 
