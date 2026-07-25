@@ -31,6 +31,7 @@ export {
   executeDueParts,
   executeDuePartsStatus,
   fetchWallet,
+  fetchWalletOutcome,
   getBalanceInfo,
   getDonationAddress,
   getLatestBlockServerInfo,

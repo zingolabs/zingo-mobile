@@ -18,7 +18,10 @@ import {
   coveredSurfacePermitted,
 } from './mixnetGate';
 import { RPCZecPriceType } from '../types/RPCZecPriceType';
-import { RPCSeedType } from '../types/RPCSeedType';
+import {
+  WalletFetchOutcome,
+  interpretWalletFetchResult,
+} from './walletFetchOutcome';
 
 /**
  * The typed outcome of a price fetch, enumerated over the real ways the
@@ -628,56 +631,41 @@ export async function shieldConfirm(): Promise<FfiResult<string>> {
 }
 
 /**
- * Returns the wallet's secret material for the backup/seed display screens.
+ * Fetches the wallet's secret material and names the outcome.
  *
- * readOnly = true  → returns { birthday, ufvk } (viewing-key wallets only)
- * readOnly = false → returns { birthday, seed } (full wallet)
- * Returns null on any error.
+ * readOnly = true  → the wallet is { birthday, ufvk } (viewing-key wallets)
+ * readOnly = false → the wallet is { birthday, seed } (full wallet)
+ *
+ * Callers that store or display the material must switch on the outcome:
+ * every non-`complete` arm is a distinct failure, and none of them is a
+ * wallet. See [`WalletFetchOutcome`].
+ */
+export async function fetchWalletOutcome(
+  readOnly: boolean,
+): Promise<WalletFetchOutcome> {
+  const result = await callFfi(
+    readOnly ? RPCModule.getUfvkInfo() : RPCModule.getSeedInfo(),
+  );
+  const outcome = interpretWalletFetchResult(result, readOnly);
+  if (outcome.kind !== 'complete') {
+    console.log(
+      `${readOnly ? 'ufvk' : 'seed'} fetch failed:`,
+      outcome.kind,
+      outcome.kind === 'ffiRejection' ? outcome.message : '',
+    );
+  }
+  return outcome;
+}
+
+/**
+ * Presence-only view of [`fetchWalletOutcome`]: the wallet when the fetch
+ * produced one, null otherwise. Callers that must react to failure — or
+ * must not mistake "no key material" for a usable wallet — take the
+ * outcome instead.
  */
 export async function fetchWallet(
   readOnly: boolean,
 ): Promise<WalletType | null> {
-  if (readOnly) {
-    // only viewing key & birthday
-    const result = await callFfi(RPCModule.getUfvkInfo());
-    if (!result.ok || !result.value) {
-      return null;
-    }
-    try {
-      const RPCufvk: WalletType = JSON.parse(result.value);
-
-      const wallet: WalletType = {} as WalletType;
-      if (RPCufvk.birthday) {
-        wallet.birthday = RPCufvk.birthday;
-      }
-      if (RPCufvk.ufvk) {
-        wallet.ufvk = RPCufvk.ufvk;
-      }
-
-      return wallet;
-    } catch (error) {
-      return null;
-    }
-  } else {
-    // only seed & birthday
-    const result = await callFfi(RPCModule.getSeedInfo());
-    if (!result.ok || !result.value) {
-      return null;
-    }
-    try {
-      const RPCseed: RPCSeedType = JSON.parse(result.value);
-
-      const wallet: WalletType = {} as WalletType;
-      if (RPCseed.seed_phrase) {
-        wallet.seed = RPCseed.seed_phrase;
-      }
-      if (RPCseed.birthday) {
-        wallet.birthday = RPCseed.birthday;
-      }
-
-      return wallet;
-    } catch (error) {
-      return null;
-    }
-  }
+  const outcome = await fetchWalletOutcome(readOnly);
+  return outcome.kind === 'complete' ? outcome.wallet : null;
 }
