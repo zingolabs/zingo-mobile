@@ -126,7 +126,10 @@ import {
   INITIAL_MIXNET_VIEW,
   MixnetView,
 } from '../walletBackend/transforms/mixnetPresenter';
-import { startMixnetTransport } from '../walletBackend/utils/nymTransport';
+import {
+  isMixnetAlwaysOn,
+  startMixnetTransport,
+} from '../walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
@@ -837,8 +840,11 @@ export class LoadedAppClass extends Component<
       // Mixnet Mode: fail-closed initial view where the policy runs
       // (Android); null where the platform transport has not landed yet
       // (iOS until the Mac-gated step), which leaves the send gate open.
+      // The "always on" flavor (the silent alpha APK) also starts null and
+      // stays null — publications are withheld below — so the stock UI
+      // renders while the forced-on transport policy runs unchanged.
       mixnetView:
-        Platform.OS === GlobalConst.platformOSandroid
+        Platform.OS === GlobalConst.platformOSandroid && !isMixnetAlwaysOn()
           ? INITIAL_MIXNET_VIEW
           : null,
       disableMixnet: this.disableMixnet,
@@ -873,7 +879,13 @@ export class LoadedAppClass extends Component<
       onZingolibVersionChanged: this.setZingolibVersion,
       onBirthdayChanged: this.setBirthday,
       onError: this.setLastError,
-      onMixnetViewChanged: this.setMixnetView,
+      // In the "always on" flavor the view is withheld from the context, so
+      // every mixnet surface (Settings section, banners, the Send gate)
+      // stays on its stock rendering and a fail-closed refusal arrives as a
+      // plain send error. The coordinator still runs the forced-on policy.
+      onMixnetViewChanged: isMixnetAlwaysOn()
+        ? () => {}
+        : this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
       mixnetSupported: Platform.OS === GlobalConst.platformOSandroid,
       readOnly: props.readOnly,

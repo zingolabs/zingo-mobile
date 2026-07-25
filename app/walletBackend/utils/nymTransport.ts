@@ -12,6 +12,8 @@ import { StartMixnetTransport } from '../modules/MixnetCoordinator';
 interface NymTransportModuleAPI {
   startMixnetTransport(): Promise<string>;
   stopMixnetTransport(): Promise<null>;
+  /** Constant from getConstants(): true only in the "always on" flavor. */
+  mixnetAlwaysOn?: boolean;
 }
 
 const NymTransportModule = NativeModules.NymTransportModule as NymTransportModuleAPI;
@@ -31,4 +33,16 @@ export const startMixnetTransport: StartMixnetTransport = () =>
  */
 export async function stopMixnetTransport(): Promise<void> {
   await NymTransportModule.stopMixnetTransport();
+}
+
+/**
+ * Whether this build is the "Always On" flavor — the silent alpha APK
+ * (CONTEXT.md). True means the app withholds the Mixnet Mode UI projection
+ * (no toggle, banner, or disclaimer) while the forced-on, fail-closed
+ * transport policy runs unchanged, so a refusal surfaces as a plain send
+ * error. Guarded because the module is absent on platforms without the
+ * native transport (iOS until the Mac-gated step).
+ */
+export function isMixnetAlwaysOn(): boolean {
+  return NymTransportModule?.mixnetAlwaysOn === true;
 }
