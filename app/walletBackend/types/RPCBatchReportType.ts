@@ -13,13 +13,13 @@
 // completion); parts without an outcome entry were not attempted and remain
 // due. `error` marks an infrastructure failure (offline, no migration) where
 // no batch ran at all.
-export type RPCPartSendResultType =
+type RPCPartSendResultType =
   | { kind: 'sent'; txid: string }
   | { kind: 'slid' }
   | { kind: 'not_due'; estimated_unix_time: number }
   | { kind: 'failed'; error: string };
 
-export type RPCPartOutcomeType = {
+type RPCPartOutcomeType = {
   part: number;
   denomination: number;
   result: RPCPartSendResultType;
