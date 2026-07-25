@@ -55,14 +55,14 @@ The group of parts broadcast together in one window. UI-facing term.
 _Avoid_: bucket (API-internal), shipment
 
 **Window**:
-One 256-block (~5.3h) anchor-height bucket during which a batch may be sent.
-UI-facing term.
+One bucket-modulus span of anchor heights (144 blocks, ~3h provisionally)
+during which a batch may be sent. UI-facing term.
 _Avoid_: bucket, epoch
 
-**Cadence**:
-How many parts share each window (`per_bucket`). Chosen once, after splitting
-completes and before any part is signed; only re-buckets existing parts, never
-re-cuts notes. UI frame: "How many batches?"
+**Cadence** (retired):
+Formerly the user-chosen parts-per-window count (`per_bucket`). The ZIP 318
+Poisson schedule draws every broadcast delay itself, so there is no cadence
+to choose and no chooser screen; the term survives only in history.
 
 **Wake**:
 An OS-scheduled re-entry into the app for a window. Two kinds per window: a
@@ -87,6 +87,29 @@ What remains when the migration completes; disclosed on completion.
 The single user approval of an exact plan hash before anything is signed or
 sent. Covers the whole migration, both phases.
 
+## Mixnet Mode
+
+**Mixnet Mode**:
+Routing the send (transaction broadcast) and price-fetch surfaces over the
+Nym mixnet. Synchronization is never covered; the IP-correlation disclaimer
+(ZIP-0318) states that boundary. Modes: `off`, `bootstrapping`, `ready`,
+`died`.
+
+**Fail-closed**:
+The policy that when Mixnet Mode is anything but `off`, a covered surface
+that cannot reach the mixnet refuses rather than falling back to clearnet.
+A refusal is not a server error and is never retried.
+
+**Silent alpha APK**:
+An alpha build of the app that routes the covered surfaces over Nym with
+the stock (pre-Mixnet-Mode) UX/UI — no toggle, no banners, no disclaimer
+screen. Its purpose is isolating transport behavior from UI work.
+_Avoid_: silent mode (it is a build, not a runtime mode)
+
+**Always On** (build flavor):
+The build flavor that produces the silent alpha APK: Mixnet Mode is enabled
+unconditionally at wallet initialization and cannot be disabled at runtime.
+
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.
@@ -104,8 +127,15 @@ the verdict path.
 
 **Bucket** — a group of Android integration tests that share one CI job,
 so runner setup and emulator boot amortize across the group instead of
-being paid once per test. Unrelated to the migration API's `per_bucket`
-windowing sense, which UI copy avoids entirely.
+being paid once per test. Unrelated to the migration schedule's windowing
+sense of the word, which UI copy avoids entirely.
+
+**Mobileclient scenario contract** — the agreement that the
+`*_mobileclient` regtest scenarios zingo-mobile consumes from zingolib
+keep pre-ironwood semantics: the scenario chain never activates NU6.3,
+no funds can land in the Ironwood pool, and the on-device ledgers assert
+the pre-ironwood distribution. An ironwood-era ledger is valid only
+after a coordinated change on both sides of the contract.
 
 **Fail-all** — the policy that the first failure of any blocking check
 cancels the entire run at once, rather than letting the surviving checks
