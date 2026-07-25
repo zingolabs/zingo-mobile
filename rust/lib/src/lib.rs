@@ -125,12 +125,27 @@ impl ZingolibError {
     }
 }
 
+/// Renders an error with its full `source` chain, deepest cause last.
+/// Display alone truncates: the price fetch's UnknownIssuer root cause hid
+/// for a whole debugging session under three layers of "request failed" —
+/// the chain is the diagnostic, so the FFI text carries all of it.
+fn error_chain_text(e: &dyn std::error::Error) -> String {
+    let mut text = e.to_string();
+    let mut source = e.source();
+    while let Some(cause) = source {
+        text.push_str(": ");
+        text.push_str(&cause.to_string());
+        source = cause.source();
+    }
+    text
+}
+
 /// The one pure funnel from zingolib's error taxonomy to the FFI's typed
 /// variants. Exhaustive at every level on purpose: a new zingolib variant
 /// fails compilation here instead of degrading to prose in the data channel.
 fn ffi_error(e: LightClientError) -> ZingolibError {
     use zingolib::lightclient::error::MigrationError;
-    let text = e.to_string();
+    let text = error_chain_text(&e);
     match e {
         LightClientError::SyncLaunchError
         | LightClientError::SyncNotRunning
