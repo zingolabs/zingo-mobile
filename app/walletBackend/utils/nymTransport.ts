@@ -16,15 +16,31 @@ interface NymTransportModuleAPI {
   mixnetAlwaysOn?: boolean;
 }
 
-const NymTransportModule = NativeModules.NymTransportModule as NymTransportModuleAPI;
+/**
+ * Resolved lazily on every call, never at module load: the module is absent
+ * on platforms without the native transport (iOS until the Mac-gated step),
+ * and eager capture couples every importer to the host's NativeModules
+ * shape (which broke the unit suites through the mixnet gate's import).
+ */
+function nymTransportModule(): NymTransportModuleAPI | undefined {
+  return NativeModules?.NymTransportModule as
+    | NymTransportModuleAPI
+    | undefined;
+}
 
 /**
  * The injected `StartMixnetTransport` seam for the coordinator: (re)start
  * the platform-hosted proxy and yield its local SOCKS5 address. Rejections
- * propagate to the coordinator, which publishes the typed failure view.
+ * propagate to the coordinator, which publishes the typed failure view; a
+ * platform without the module rejects the same way.
  */
-export const startMixnetTransport: StartMixnetTransport = () =>
-  NymTransportModule.startMixnetTransport();
+export const startMixnetTransport: StartMixnetTransport = async () => {
+  const module = nymTransportModule();
+  if (module === undefined) {
+    throw new Error('NymTransportModule is not present on this platform');
+  }
+  return module.startMixnetTransport();
+};
 
 /**
  * Deliberate teardown of the platform-hosted proxy (app shutdown or the
@@ -32,7 +48,7 @@ export const startMixnetTransport: StartMixnetTransport = () =>
  * cancels its liveness monitor before the listener goes down.
  */
 export async function stopMixnetTransport(): Promise<void> {
-  await NymTransportModule.stopMixnetTransport();
+  await nymTransportModule()?.stopMixnetTransport();
 }
 
 /**
@@ -44,5 +60,5 @@ export async function stopMixnetTransport(): Promise<void> {
  * native transport (iOS until the Mac-gated step).
  */
 export function isMixnetAlwaysOn(): boolean {
-  return NymTransportModule?.mixnetAlwaysOn === true;
+  return nymTransportModule()?.mixnetAlwaysOn === true;
 }

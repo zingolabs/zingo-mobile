@@ -130,6 +130,7 @@ import {
   isMixnetAlwaysOn,
   startMixnetTransport,
 } from '../walletBackend/utils/nymTransport';
+import { flavorDefaultChainName } from '../utils/flavor';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
@@ -194,9 +195,17 @@ type LoadedAppProps = {
   toggleTheme: (mode: ModeEnum) => void;
 };
 
+// The flavor's chain decides the fallback default server (the testnet
+// alpha flavor falls back to the testnet default); persisted settings
+// always override this.
+const flavorDefaultServer =
+  serverUris(() => {}).find(
+    s => s.chainName === flavorDefaultChainName() && s.default,
+  ) ?? serverUris(() => {})[0];
+
 const SERVER_DEFAULT_0: ServerType = {
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
+  uri: flavorDefaultServer.uri,
+  chainName: flavorDefaultServer.chainName,
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
@@ -882,12 +891,22 @@ export class LoadedAppClass extends Component<
       // In the "always on" flavor the view is withheld from the context, so
       // every mixnet surface (Settings section, banners, the Send gate)
       // stays on its stock rendering and a fail-closed refusal arrives as a
-      // plain send error. The coordinator still runs the forced-on policy.
+      // plain typed send error. The coordinator still runs the forced-on
+      // policy, and the view lands in the dev log instead — the silent
+      // flavors keep the UI stock, not the diagnostics.
       onMixnetViewChanged: isMixnetAlwaysOn()
-        ? () => {}
+        ? (view: MixnetView) => {
+            console.log(
+              'mixnet (silent):',
+              view.statusKey,
+              view.socks5Addr ?? '',
+              view.narration ?? '',
+            );
+          }
         : this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
       mixnetSupported: Platform.OS === GlobalConst.platformOSandroid,
+      mixnetAlwaysOn: isMixnetAlwaysOn(),
       readOnly: props.readOnly,
       server: props.server,
       performanceLevel: props.performanceLevel,
