@@ -2,7 +2,7 @@
 // `migration_status` (native `migrationStatusProcess`), arranged for direct
 // rendering. Values in zatoshis, heights in blocks, times in unix seconds.
 
-export type RPCMigrationPhaseType = {
+type RPCMigrationPhaseType = {
   kind: 'planned' | 'note_splitting' | 'parts_scheduled' | 'complete';
   // note_splitting: the round currently awaiting confirmation (from zero).
   round?: number;
@@ -36,7 +36,7 @@ export type RPCBroadcastWindowType = {
 // carries only future windows and structurally cannot hold this one, so the
 // "send batch" action reads it from here. `denominations` align
 // element-for-element with `part_ids`, both in the window's broadcast order.
-export type RPCDueBatchType = {
+type RPCDueBatchType = {
   // The current bucket's opening boundary (the parts' anchor height).
   boundary: number;
   part_ids: number[];
