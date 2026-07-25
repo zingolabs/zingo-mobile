@@ -76,6 +76,7 @@ import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
+import { flavorDefaultChainName } from '../utils/flavor';
 import Utils from '../utils';
 import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
@@ -117,9 +118,17 @@ type LoadingAppProps = {
   toggleTheme: (mode: ModeEnum) => void;
 };
 
+// The flavor's chain decides the first-run default server (the testnet
+// alpha flavor starts on the testnet default); a persisted server setting
+// always overrides this.
+const flavorDefaultServer: ServerUrisType =
+  serverUris(() => {}).find(
+    (s: ServerUrisType) => s.chainName === flavorDefaultChainName() && s.default,
+  ) ?? serverUris(() => {})[0];
+
 const SERVER_DEFAULT_0: ServerType = {
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
+  uri: flavorDefaultServer.uri,
+  chainName: flavorDefaultServer.chainName,
 } as ServerType;
 
 const activationHeight = {
@@ -539,7 +548,7 @@ export class LoadingAppClass extends Component<
       walletExists: false,
       hasBackupWallet: false,
       customServerUri: '',
-      customServerChainName: ChainNameEnum.mainChainName,
+      customServerChainName: flavorDefaultChainName(),
       customServerOffline: false,
       customServerAuto: false,
       customServerCustom: false,
