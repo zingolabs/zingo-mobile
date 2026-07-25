@@ -132,11 +132,23 @@ describe('getZecPrice discriminates every outcome as a typed variant', () => {
     });
   });
 
-  it('a real price crosses the data channel', async () => {
+  it('a real price crosses the data channel with its route attestation', async () => {
+    bridge.zecPriceInfo.mockResolvedValueOnce(
+      '{"current_price": 42.5, "via_socks5": "127.0.0.1:1080"}',
+    );
+    await expect(getZecPrice()).resolves.toEqual({
+      kind: 'price',
+      usd: 42.5,
+      route: { kind: 'attested', viaSocks5: '127.0.0.1:1080' },
+    });
+  });
+
+  it('a pre-attestation native layer is its own named case, never a bare null', async () => {
     bridge.zecPriceInfo.mockResolvedValueOnce('{"current_price": 42.5}');
     await expect(getZecPrice()).resolves.toEqual({
       kind: 'price',
       usd: 42.5,
+      route: { kind: 'preAttestationNativeLayer' },
     });
   });
 });

@@ -2015,11 +2015,20 @@ pub fn get_total_spends_to_address() -> Result<String, ZingolibError> {
 pub fn zec_price() -> Result<String, ZingolibError> {
     with_initialized_lightclient(|lightclient| {
         RT.block_on(async move {
-            let price = lightclient
+            // The LightClient method rather than the wallet directly: it
+            // owns the Mixnet Mode routing policy for the price fetch. The
+            // payload carries the route attestation with the price, so the
+            // app layer holds per-fetch evidence — absence of a failure is
+            // never the only signal.
+            let fetch = lightclient
                 .update_current_price()
                 .await
                 .map_err(ffi_error)?;
-            Ok(object! { "current_price" => price }.pretty(2))
+            Ok(object! {
+                "current_price" => fetch.usd,
+                "via_socks5" => fetch.via_socks5,
+            }
+            .pretty(2))
         })
     })
 }

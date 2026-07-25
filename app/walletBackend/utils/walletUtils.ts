@@ -39,8 +39,23 @@ import { RPCSeedType } from '../types/RPCSeedType';
  * - `malformedPayload`: the resolution is unusable (empty, unparseable,
  *   or a non-numeric price) — the payload travels for diagnosis.
  */
+/**
+ * Whether — and through which tunnel — a successful price fetch attested
+ * its route. Absence is not a bare null: it has exactly one producer, a
+ * native layer that predates the attestation, and consumers must name
+ * that case to handle it. Absence of a failure is never the only signal
+ * that the covered path ran.
+ */
+export type PriceRouteAttestation =
+  | { readonly kind: 'attested'; readonly viaSocks5: string }
+  | { readonly kind: 'preAttestationNativeLayer' };
+
 export type ZecPriceOutcome =
-  | { readonly kind: 'price'; readonly usd: number }
+  | {
+      readonly kind: 'price';
+      readonly usd: number;
+      readonly route: PriceRouteAttestation;
+    }
   | { readonly kind: 'noData' }
   | { readonly kind: 'gateRefusal'; readonly error: string }
   | {
@@ -93,6 +108,7 @@ export async function getZecPrice(): Promise<ZecPriceOutcome> {
   if (!coveredSurfacePermitted()) {
     return { kind: 'gateRefusal', error: COVERED_SURFACE_REFUSAL };
   }
+  const startedAt = Date.now();
   const result = await callFfi(RPCModule.zecPriceInfo());
   if (!result.ok) {
     console.log(
@@ -134,7 +150,20 @@ export async function getZecPrice(): Promise<ZecPriceOutcome> {
         detail: `non-numeric price ${resultJSON.current_price}`,
       };
     }
-    return { kind: 'price', usd: resultJSON.current_price };
+    // Success logs too: absence of a failure line must never be the only
+    // signal, and the attestation makes the route positively observable.
+    const route: PriceRouteAttestation =
+      resultJSON.via_socks5 !== undefined
+        ? { kind: 'attested', viaSocks5: resultJSON.via_socks5 }
+        : { kind: 'preAttestationNativeLayer' };
+    console.log(
+      'price fetch ok:',
+      resultJSON.current_price,
+      'via',
+      route.kind === 'attested' ? route.viaSocks5 : 'PRE-ATTESTATION LAYER',
+      `${Date.now() - startedAt}ms`,
+    );
+    return { kind: 'price', usd: resultJSON.current_price, route };
   } catch (error) {
     // The payload that failed to parse is the diagnostic; log it verbatim.
     console.log(
