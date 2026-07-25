@@ -9,7 +9,7 @@ import {
  * the bootstrap, or re-enable a lost transport. A closed union so screens
  * must render every case the policy can produce.
  */
-export type MixnetRecoveryAction = 'none' | 'wait' | 'reenable';
+type MixnetRecoveryAction = 'none' | 'wait' | 'reenable';
 
 /**
  * The screen-facing projection of the mixnet state. `statusKey` is a
