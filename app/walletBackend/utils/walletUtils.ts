@@ -12,7 +12,7 @@
  */
 import { WalletType, GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
-import { callFfi, FfiErrorCode, FfiResult } from '../ffi';
+import { callFfi, decodeFfiJson, FfiErrorCode, FfiResult } from '../ffi';
 import {
   COVERED_SURFACE_REFUSAL,
   coveredSurfacePermitted,
@@ -112,74 +112,70 @@ export async function getZecPrice(): Promise<ZecPriceOutcome> {
     return { kind: 'gateRefusal', error: COVERED_SURFACE_REFUSAL };
   }
   const startedAt = Date.now();
-  const result = await callFfi(RPCModule.zecPriceInfo());
-  if (!result.ok) {
+  const decoded = decodeFfiJson(await callFfi(RPCModule.zecPriceInfo()));
+  if (decoded.kind === 'ffiRejection') {
     console.log(
       'price fetch failed: ffi rejection',
-      result.error.code,
-      result.error.message,
+      decoded.code,
+      decoded.message,
     );
-    return {
-      kind: 'ffiRejection',
-      code: result.error.code,
-      message: result.error.message,
-    };
+    return decoded;
   }
-  if (!result.value) {
+  if (decoded.kind === 'emptyPayload') {
     console.log('price fetch failed: empty success payload from the bridge');
     return { kind: 'malformedPayload', payload: '', detail: 'empty payload' };
   }
-  try {
-    const resultJSON: RPCZecPriceType = JSON.parse(result.value);
-    if (resultJSON.error) {
-      console.log(
-        'price fetch failed: oracle error in payload',
-        resultJSON.error,
-      );
-      return { kind: 'oracleError', error: resultJSON.error };
-    }
-    if (!resultJSON.current_price) {
-      // if no exists the field or is empty
-      return { kind: 'noData' };
-    }
-    if (isNaN(resultJSON.current_price)) {
-      console.log(
-        'price fetch failed: non-numeric price',
-        String(resultJSON.current_price),
-      );
-      return {
-        kind: 'malformedPayload',
-        payload: result.value,
-        detail: `non-numeric price ${resultJSON.current_price}`,
-      };
-    }
-    // Success logs too: absence of a failure line must never be the only
-    // signal, and the attestation makes the route positively observable.
-    const route: PriceRouteAttestation =
-      resultJSON.via_socks5 !== undefined
-        ? { kind: 'attested', viaSocks5: resultJSON.via_socks5 }
-        : { kind: 'preAttestationNativeLayer' };
-    console.log(
-      'price fetch ok:',
-      resultJSON.current_price,
-      'via',
-      route.kind === 'attested' ? route.viaSocks5 : 'PRE-ATTESTATION LAYER',
-      `${Date.now() - startedAt}ms`,
-    );
-    return { kind: 'price', usd: resultJSON.current_price, route };
-  } catch (error) {
+  if (decoded.kind === 'malformedPayload') {
     // The payload that failed to parse is the diagnostic; log it verbatim.
     console.log(
       'price fetch failed: unparseable payload',
-      result.value,
-      String(error),
+      decoded.payload,
+      decoded.detail,
+    );
+    return decoded;
+  }
+  if (typeof decoded.value !== 'object' || decoded.value === null) {
+    console.log('price fetch failed: non-object payload', decoded.raw);
+    return {
+      kind: 'malformedPayload',
+      payload: decoded.raw,
+      detail: 'non-object payload',
+    };
+  }
+  const resultJSON = decoded.value as RPCZecPriceType;
+  if (resultJSON.error) {
+    console.log('price fetch failed: oracle error in payload', resultJSON.error);
+    return { kind: 'oracleError', error: resultJSON.error };
+  }
+  if (!resultJSON.current_price) {
+    // if no exists the field or is empty
+    return { kind: 'noData' };
+  }
+  if (isNaN(resultJSON.current_price)) {
+    console.log(
+      'price fetch failed: non-numeric price',
+      String(resultJSON.current_price),
     );
     return {
       kind: 'malformedPayload',
-      payload: result.value,
-      detail: String(error),
+      payload: decoded.raw,
+      detail: `non-numeric price ${resultJSON.current_price}`,
     };
   }
+  // Success logs too: absence of a failure line must never be the only
+  // signal, and the attestation makes the route positively observable.
+  const route: PriceRouteAttestation =
+    resultJSON.via_socks5 !== undefined
+      ? { kind: 'attested', viaSocks5: resultJSON.via_socks5 }
+      : { kind: 'preAttestationNativeLayer' };
+  console.log(
+    'price fetch ok:',
+    resultJSON.current_price,
+    'via',
+    route.kind === 'attested' ? route.viaSocks5 : 'PRE-ATTESTATION LAYER',
+    `${Date.now() - startedAt}ms`,
+  );
+  return { kind: 'price', usd: resultJSON.current_price, route };
 }
 
 // ---------------------------------------------------------------------------
@@ -587,16 +583,12 @@ export async function checkMyAddress(
 // error, parse error) we conservatively return false — better to show an
 // external address as external than mislabel a stranger's as own.
 export async function isWalletAddress(address: string): Promise<boolean> {
-  const check = await checkMyAddress(address);
-  if (!check.ok || !check.value) {
-    return false;
-  }
-  try {
-    const parsed: { is_wallet_address?: boolean } = JSON.parse(check.value);
-    return parsed.is_wallet_address === true;
-  } catch (error) {
-    return false;
-  }
+  const decoded = decodeFfiJson(await checkMyAddress(address));
+  return (
+    decoded.kind === 'json' &&
+    (decoded.value as { is_wallet_address?: unknown } | null)
+      ?.is_wallet_address === true
+  );
 }
 
 // True iff a wallet backup file exists on disk. zingolib reports the answer
