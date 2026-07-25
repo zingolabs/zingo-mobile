@@ -13,6 +13,10 @@
 import { WalletType, GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { callFfi, FfiResult } from '../ffi';
+import {
+  COVERED_SURFACE_REFUSAL,
+  coveredSurfacePermitted,
+} from './mixnetGate';
 import { RPCZecPriceType } from '../types/RPCZecPriceType';
 import { RPCSeedType } from '../types/RPCSeedType';
 
@@ -29,6 +33,12 @@ export async function getZecPrice(): Promise<{
   price: number;
   error: string;
 }> {
+  // The always-on flavors' fail-closed gate: the price fetch reaches a CEX
+  // over HTTPS, so while the mixnet transport is not ready it must refuse
+  // rather than hand the exchange an IP-to-wallet correlation.
+  if (!coveredSurfacePermitted()) {
+    return { price: -1, error: COVERED_SURFACE_REFUSAL };
+  }
   const result = await callFfi(RPCModule.zecPriceInfo());
   if (!result.ok) {
     return { price: -1, error: result.error.message };
