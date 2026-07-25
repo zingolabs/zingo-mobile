@@ -26,7 +26,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import WalletBackend, { fetchWallet } from '../walletBackend';
+import WalletBackend, { fetchWalletOutcome } from '../walletBackend';
 import {
   changeServer,
   doSave,
@@ -2003,9 +2003,21 @@ export class LoadedAppClass extends Component<
     if (!value) {
       await removeRecoveryWalletInfo();
     } else {
-      const wallet = await fetchWallet(this.state.readOnly);
-      if (wallet) {
-        await createUpdateRecoveryWalletInfo(wallet);
+      const outcome = await fetchWalletOutcome(this.state.readOnly);
+      if (outcome.kind === 'complete') {
+        await createUpdateRecoveryWalletInfo(outcome.wallet);
+      } else {
+        // Nothing was stored, so the setting must not claim otherwise:
+        // revert the toggle and tell the user instead of silently leaving
+        // an enabled switch with no backup behind it.
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.recoveryWalletInfoOnDevice,
+          false,
+        );
+        this.setState({ recoveryWalletInfoOnDevice: false });
+        this.addLastSnackbar(
+          this.state.translate('loadedapp.recoveryinfo-error') as string,
+        );
       }
     }
   };

@@ -85,6 +85,7 @@ import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
+import { serverProbeVerdict } from '../serverProbeVerdict';
 import { isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
@@ -1028,8 +1029,12 @@ export class LoadingAppClass extends Component<
       ),
     );
     let fasterServer: ServerType = {} as ServerType;
-    if (server && server.latency) {
-      fasterServer = { uri: server.uri, chainName: server.chainName };
+    const bestVerdict = serverProbeVerdict(server);
+    if (bestVerdict.kind === 'reachable') {
+      fasterServer = {
+        uri: bestVerdict.server.uri,
+        chainName: bestVerdict.server.chainName,
+      };
     } else {
       fasterServer = actualServer;
       // likely here there is a internet/wifi conection problem
@@ -1114,11 +1119,7 @@ export class LoadingAppClass extends Component<
       obsolete: false,
     } as ServerUrisType;
     const serverChecked = await selectingServer([s]);
-    if (serverChecked && serverChecked.latency) {
-      return true;
-    } else {
-      return false;
-    }
+    return serverProbeVerdict(serverChecked).kind === 'reachable';
   };
 
   walletErrorHandle = async (
@@ -1402,7 +1403,7 @@ export class LoadingAppClass extends Component<
         obsolete: false,
       } as ServerUrisType;
       const serverChecked = await selectingServer([cs]);
-      if (!serverChecked || !serverChecked.latency) {
+      if (serverProbeVerdict(serverChecked).kind !== 'reachable') {
         this.addLastSnackbar(
           (this.state.translate('loadedapp.changeservernew-error') as string) +
             uri,

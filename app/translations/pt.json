@@ -156,6 +156,7 @@
     "support": "E-mail de suporte do {name}",
     "changeservernew-error": "Error ao tentar alterar para um novo servidor: ",
     "readingwallet-error": "Error ao tentar ler a carteira com o novo servidor:",
+    "recoveryinfo-error": "Não foi possível ler as informações de recuperação da carteira, portanto nada foi armazenado neste dispositivo. A configuração foi desativada novamente.",
     "differentchain-error": "Você está mudando para um servidor com uma rede diferente, você não terá mais acesso a essa carteira sem suas frases de recuperação.",
     "serverchain-mismatch": "O servidor informa uma rede diferente da selecionada. Verifique o seletor de rede e tente novamente.",
     "changingwallet-label": "Error ao Alterar a Carteira",
@@ -631,6 +632,7 @@
     },
     "verification-success": "Este endereço pertence a você e é seguro para receber fundos.",
     "verification-failure": "Este endereço não pertence a você.",
+    "verification-unavailable": "Não foi possível concluir a verificação. Tente novamente.",
     "add-tag": "Adicionar etiqueta"
   },
   "history": {

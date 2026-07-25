@@ -17,6 +17,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
+import { deriveAddressSelection } from './addressSelection';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '../Components/SingleAddress';
@@ -278,6 +279,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     }
   }, [addresses]);
 
+  // The effect above encodes an empty filtered list as index 0, so a
+  // non-null index is not by itself proof that an address exists.
+  // deriveAddressSelection maps every (list, index) pair to exactly one
+  // named state and clamps a stale index left over from a previous list.
+  const uSelection = useMemo(
+    () => deriveAddressSelection(uAddr, uAddrIndex),
+    [uAddr, uAddrIndex],
+  );
+  const tSelection = useMemo(
+    () => deriveAddressSelection(tAddr, tAddrIndex),
+    [tAddr, tAddrIndex],
+  );
+  const currentSelection = index === 0 ? uSelection : tSelection;
+  const selectedAddressText =
+    currentSelection.kind === 'selected' ? currentSelection.address.address : '';
+
   const isAdvanced = mode !== ModeEnum.basic;
   const canPickScope = isAdvanced && tAddr && tAddr.length > 0;
 
@@ -373,13 +390,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   );
 
   const doCopy = () => {
-    Clipboard.setString(
-      index === 0 && uAddrIndex !== null
-        ? uAddr[uAddrIndex].address
-        : index === 1 && tAddrIndex !== null
-          ? tAddr[tAddrIndex].address
-          : '',
-    );
+    Clipboard.setString(selectedAddressText);
     addLastSnackbar(
       translate('history.addresscopied') as string,
       SnackbarDurationEnum.short,
@@ -389,8 +400,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   // Resolve the address currently shown based on the scope index.
   const currentAddress = useMemo(() => {
     if (index === 0) {
-      if (uAddrIndex !== null && uAddr.length > 0) {
-        return uAddr[uAddrIndex];
+      if (uSelection.kind === 'selected') {
+        return uSelection.address;
       }
       return new UnifiedAddressClass(
         0,
@@ -401,8 +412,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         false,
       );
     }
-    if (tAddrIndex !== null && tAddr.length > 0) {
-      return tAddr[tAddrIndex];
+    if (tSelection.kind === 'selected') {
+      return tSelection.address;
     }
     return new TransparentAddressClass(
       0,
@@ -410,11 +421,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       AddressKindEnum.t,
       RPCAddressScopeEnum.external,
     );
-  }, [index, uAddrIndex, tAddrIndex, uAddr, tAddr, translate]);
+  }, [index, uSelection, tSelection, translate]);
 
   const setCurrentAddrIndex = index === 0 ? setUAddrIndex : setTAddrIndex;
   const currentTotal = index === 0 ? uAddr.length : tAddr.length;
-  const currentAddrIndex = index === 0 ? (uAddrIndex ?? 0) : (tAddrIndex ?? 0);
+  const currentAddrIndex =
+    currentSelection.kind === 'selected' ? currentSelection.index : 0;
 
   const returnPage = (
     <View
@@ -614,13 +626,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           )}
           {sheetType === 'NAT' && (
             <NewAddressTag
-              address={
-                index === 0 && uAddrIndex !== null
-                  ? uAddr[uAddrIndex].address
-                  : index === 1 && tAddrIndex !== null
-                    ? tAddr[tAddrIndex].address
-                    : ''
-              }
+              address={selectedAddressText}
               own={true}
               closeSheet={hide}
               setAddressBook={setAddressBook}
@@ -647,13 +653,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               closeSheet={hide}
               title={translate('receive.title-address') as string}
               button={translate('receive.copy-address-button') as string}
-              address={
-                index === 0 && uAddrIndex !== null
-                  ? uAddr[uAddrIndex].address
-                  : index === 1 && tAddrIndex !== null
-                    ? tAddr[tAddrIndex].address
-                    : ''
-              }
+              address={selectedAddressText}
             />
           )}
         </BottomSheetView>

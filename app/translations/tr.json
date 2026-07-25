@@ -156,6 +156,7 @@
     "support": "{name} destek mail",
     "changeservernew-error": "Error Sunucuyu yenisiyle değiştirmeye çalışırken bir hata oluştu ",
     "readingwallet-error": "Error Yeni sunucuyla cüzdanı okuma girişiminde hata oluştu:",
+    "recoveryinfo-error": "Cüzdan kurtarma bilgileri okunamadı, bu nedenle bu cihaza hiçbir şey kaydedilmedi. Ayar yeniden kapatıldı.",
     "differentchain-error": "Farklı bir zincire sahip bir sunucuya geçiyorsunuz, bu kurtarma ifadesi olmadan bu cüzdana artık erişiminiz olmayacak.",
     "serverchain-mismatch": "Sunucu seçtiğinizden farklı bir zincir bildiriyor. Zincir seçiciyi kontrol edip tekrar deneyin.",
     "changingwallet-label": "Error Cüzdan değiştirilirken bir hata oluştu",
@@ -631,6 +632,7 @@
     },
     "verification-success": "Bu adres size aittir ve fon almak için güvenlidir.",
     "verification-failure": "Bu adres size ait değil.",
+    "verification-unavailable": "Doğrulama tamamlanamadı. Lütfen tekrar deneyin.",
     "add-tag": "Etiket ekle"
   },
   "history": {

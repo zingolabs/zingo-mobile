@@ -156,6 +156,7 @@
     "support": "{name} support email",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
+    "recoveryinfo-error": "Could not read the wallet recovery information, so nothing was stored on this device. The setting has been turned back off.",
     "differentchain-error": "You are changing to a server with a different chain, you will no longer have access to this wallet without the seed phrase.",
     "serverchain-mismatch": "The server reports a different chain than the one you selected. Check the chain selector and try again.",
     "changingwallet-label": "Error changing Wallet",
@@ -631,6 +632,7 @@
     },
     "verification-success": "This address belongs to you and is safe for receiving funds.",
     "verification-failure": "This address does not belong to you.",
+    "verification-unavailable": "The verification could not be completed. Please try again.",
     "add-tag": "Add tag"
   },
   "history": {
