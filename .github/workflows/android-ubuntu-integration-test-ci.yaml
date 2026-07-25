@@ -332,8 +332,15 @@ jobs:
           echo "CI_BUILD_TAG=$TAG" >> "$GITHUB_ENV"
           echo "Computed ci-build tag: $TAG"
 
+      # A runner can lose registry egress for minutes at a time (2026-07-25:
+      # four consecutive 60s dial timeouts to registry-1.docker.io cancelled
+      # a whole run through fail-all). Space the retries across ~13 minutes
+      # to outlast such an outage. Podman does not retry 4xx responses, so a
+      # tag that was never published still fails on the first attempt.
       - name: Pull ci-build image
-        run: podman pull docker.io/zingodevops/ci-build:${CI_BUILD_TAG}
+        run: |
+          podman pull --retry 8 --retry-delay 45s \
+            docker.io/zingodevops/ci-build:${CI_BUILD_TAG}
 
       - name: Extract binaries & params from image
         run: |
