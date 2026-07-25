@@ -1,4 +1,8 @@
 import { getNumberFormatSettings } from 'react-native-localize';
+import {
+  parseNumberFloatToStringLocale,
+  parseStringLocaleToNumberFloat,
+} from './localeNumber';
 import { format as dateFnsFormat, differenceInMinutes } from 'date-fns';
 import type { Locale } from 'date-fns';
 import {
@@ -184,22 +188,14 @@ export default class Utils {
   }
 
   static parseStringLocaleToNumberFloat(stringValue: string): number {
-    const { decimalSeparator } = getNumberFormatSettings();
-
-    return Number(
-      stringValue.replace(new RegExp(`\\${decimalSeparator}`), '.'),
-    );
+    return parseStringLocaleToNumberFloat(stringValue);
   }
 
   static parseNumberFloatToStringLocale(
     numberValue: number,
     toFixed: number,
   ): string {
-    const { decimalSeparator } = getNumberFormatSettings();
-
-    let stringValue = numberValue.toFixed(toFixed);
-
-    return stringValue.replace(new RegExp('\\.'), `${decimalSeparator}`);
+    return parseNumberFloatToStringLocale(numberValue, toFixed);
   }
 
   static getBlockExplorerTxIDURL(
