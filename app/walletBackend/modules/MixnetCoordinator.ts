@@ -42,10 +42,10 @@ import { recordMixnetTransportReady } from '../utils/mixnetGate';
 export type StartMixnetTransport = () => Promise<string>;
 
 /** How often the coordinator polls while the transport is bootstrapping. */
-export const BOOTSTRAP_POLL_MILLIS = 2_000;
+const BOOTSTRAP_POLL_MILLIS = 2_000;
 
 /** How often the coordinator polls outside of bootstrapping. */
-export const STEADY_POLL_MILLIS = 30_000;
+const STEADY_POLL_MILLIS = 30_000;
 
 /**
  * How long an auto-recovering coordinator waits after a failure, `died`, or

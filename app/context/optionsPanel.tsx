@@ -48,14 +48,12 @@ export const OptionsPanelProvider: React.FC<{ children: React.ReactNode }> = ({
   // without threading the context through props.
   useEffect(() => {
     registerToggle(toggle);
-    registerOpen(open);
     registerClose(close);
     return () => {
       registerToggle(null);
-      registerOpen(null);
       registerClose(null);
     };
-  }, [toggle, open, close]);
+  }, [toggle, close]);
 
   const value = useMemo<OptionsPanelContextValue>(
     () => ({ isOpen, open, close, toggle }),
@@ -79,14 +77,10 @@ export const useOptionsPanel = (): OptionsPanelContextValue =>
 // ---------------------------------------------------------------------------
 type Listener = (() => void) | null;
 let _toggleListener: Listener = null;
-let _openListener: Listener = null;
 let _closeListener: Listener = null;
 
 const registerToggle = (fn: Listener) => {
   _toggleListener = fn;
-};
-const registerOpen = (fn: Listener) => {
-  _openListener = fn;
 };
 const registerClose = (fn: Listener) => {
   _closeListener = fn;
@@ -106,13 +100,6 @@ export const toggleOptionsPanel = (): void => {
     return;
   }
   _toggleListener();
-};
-export const openOptionsPanel = (): void => {
-  if (!_openListener) {
-    warnUnwired('open');
-    return;
-  }
-  _openListener();
 };
 export const closeOptionsPanel = (): void => {
   if (!_closeListener) {
