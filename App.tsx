@@ -130,7 +130,7 @@ export const basicTheme: ThemeType = {
 
 const Stack = createStackNavigator<AppStackParamList>();
 
-export const navigationRef = createNavigationContainerRef();
+const navigationRef = createNavigationContainerRef();
 
 const App: React.FunctionComponent = () => {
   const [theme, setTheme] = useState<ThemeType>(advancedTheme);

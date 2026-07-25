@@ -66,7 +66,7 @@ export async function armBatchReminders(
   }
 }
 
-export async function cancelBatchReminders(): Promise<void> {
+async function cancelBatchReminders(): Promise<void> {
   const ids = await notifee.getTriggerNotificationIds();
   const ours = ids.filter(id => id.startsWith(REMINDER_PREFIX));
   if (ours.length > 0) {

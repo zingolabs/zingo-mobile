@@ -1,7 +1,7 @@
 // What one `continue_note_splitting` call did (native
 // `continueNoteSplittingProcess`). The splitting loop matches on `step`:
 // sync between calls and keep going until `splitting_complete`.
-export type RPCSplitStepKind =
+type RPCSplitStepKind =
   'round_broadcast' | 'awaiting_confirmation' | 'splitting_complete';
 
 export type RPCSplitStepType = {

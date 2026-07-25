@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Animated, Easing } from 'react-native';
 
-export type TrickleProgress = {
+type TrickleProgress = {
   // The bar's value, 0..1. Interpolate to a width percentage.
   progress: Animated.Value;
   // Push the ceiling forward as real progress lands. Clamped to 0.985 so the
