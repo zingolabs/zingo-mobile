@@ -2,19 +2,21 @@
  * The typed verdict of an address-ownership check (ADR 0002: errors are
  * types; the getZecPrice precedent).
  *
- * The screen used to store `is_wallet_address` directly off `JSON.parse`
- * behind a `!== null` gate, so a payload missing the field stored
- * `undefined`, passed the gate, and rendered the definitive "this address
- * does not belong to you". A verification screen reporting a confident
- * false negative is the worst form this class of bug can take, so a
- * failed check gets its own arms and never reaches a verdict row:
- * - `unattempted`: the user has not run a check yet (initial state).
+ * A verification screen must never present a failed check as a verdict —
+ * a confident "this address does not belong to you" produced by a broken
+ * reply is the worst answer this screen can give — so the failures carry
+ * their own arms:
+ * - `unattempted`: no check has run yet (the screen's initial state).
  * - `mine` / `notMine`: the backend answered with an actual boolean.
  * - `ffiRejection`: the typed error channel rejected.
  * - `malformed`: the payload is empty, unparseable, or carries no boolean
  *   `is_wallet_address` — the check produced no verdict at all.
  */
-import { FfiErrorCode, FfiResult } from '../../../app/walletBackend/ffi';
+import {
+  decodeFfiJson,
+  FfiErrorCode,
+  FfiResult,
+} from '../../../app/walletBackend/ffi';
 
 export type CheckAddressVerdict =
   | { readonly kind: 'unattempted' }
@@ -37,24 +39,20 @@ export type CheckAddressVerdict =
 export function interpretCheckAddressResult(
   result: FfiResult<string>,
 ): CheckAddressVerdict {
-  if (!result.ok) {
-    return {
-      kind: 'ffiRejection',
-      code: result.error.code,
-      message: result.error.message,
-    };
+  const decoded = decodeFfiJson(result);
+  switch (decoded.kind) {
+    case 'ffiRejection':
+      return decoded;
+    case 'emptyPayload':
+      return { kind: 'malformed', reason: 'empty payload' };
+    case 'malformedPayload':
+      return { kind: 'malformed', reason: decoded.detail };
+    case 'json': {
+      const parsed = decoded.value as { is_wallet_address?: unknown } | null;
+      if (typeof parsed?.is_wallet_address !== 'boolean') {
+        return { kind: 'malformed', reason: 'missing is_wallet_address' };
+      }
+      return parsed.is_wallet_address ? { kind: 'mine' } : { kind: 'notMine' };
+    }
   }
-  if (!result.value) {
-    return { kind: 'malformed', reason: 'empty payload' };
-  }
-  let parsed: { is_wallet_address?: unknown };
-  try {
-    parsed = JSON.parse(result.value);
-  } catch (error) {
-    return { kind: 'malformed', reason: String(error) };
-  }
-  if (typeof parsed?.is_wallet_address !== 'boolean') {
-    return { kind: 'malformed', reason: 'missing is_wallet_address' };
-  }
-  return parsed.is_wallet_address ? { kind: 'mine' } : { kind: 'notMine' };
 }
