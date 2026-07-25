@@ -10,10 +10,10 @@ import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
-import { migrationStatus } from '../../app/walletBackend';
+import { migrationStatus, reconcileMigration } from '../../app/walletBackend';
 import {
   RPCMigrationStatusType,
-  RPCWakePointType,
+  RPCBroadcastWindowType,
 } from '../../app/walletBackend/types/RPCMigrationStatusType';
 
 type MigrationStatusProps = NativeStackScreenProps<
@@ -47,6 +47,10 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
     useCallback(() => {
       let cancelled = false;
       (async () => {
+        await reconcileMigration();
+        if (cancelled) {
+          return;
+        }
         const statusResult = await migrationStatus();
         if (cancelled) {
           return;
@@ -110,7 +114,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
     );
   }
 
-  const wakes: RPCWakePointType[] = status?.next_wakes ?? [];
+  const wakes: RPCBroadcastWindowType[] = status?.upcoming_windows ?? [];
   // per_bucket is parts-per-window; a batch counts as confirmed once all of its
   // parts confirm (floor division), so partial windows don't over-report.
   const perBucket = Math.max(1, status?.per_bucket ?? 1);
@@ -124,23 +128,20 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
     batchesTotal,
     Math.floor(partsConfirmed / perBucket),
   );
-  const valueTotal = status?.value_total ?? 0;
-  const pct =
-    valueTotal > 0
-      ? Math.round(((status?.value_migrated ?? 0) / valueTotal) * 100)
-      : 0;
+  const pct = Math.round((batchesConfirmed / batchesTotal) * 100);
 
   const nextWake = wakes[0];
   // The batch to send right now: the window the chain is currently inside,
-  // reported by the backend. next_wakes lists only future windows and cannot
+  // reported by the backend. upcoming_windows lists only future windows and cannot
   // carry this one, so the Send action reads it from here. Null means a tap
   // would broadcast nothing, so the action stays hidden.
   const dueNow = status?.due_now ?? null;
+  const confirming = !dueNow && (status?.parts_broadcast ?? 0) > 0;
 
   // One card per visible batch: the open one (dueNow) first, then the upcoming
   // scheduled windows. Batch numbers continue from the confirmed count so
   // "Batch 3" means the same here as on the plan screen.
-  const nextWakeBase = batchesConfirmed + (dueNow ? 2 : 1);
+  const nextWakeBase = batchesConfirmed + (dueNow || confirming ? 2 : 1);
   const batchCards = [
     ...(dueNow
       ? [
@@ -174,11 +175,16 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
         '{n}',
         String(batchesConfirmed + 1),
       )
-    : nextWake
-      ? (translate('migrationstatus.next-opens') as string)
-          .replace('{boundary}', String(nextWake.boundary))
-          .replace('{height}', String(height))
-      : (translate('migrationstatus.all-sent') as string);
+    : confirming
+      ? (translate('migrationstatus.confirming') as string).replace(
+          '{n}',
+          String(batchesConfirmed + 1),
+        )
+      : nextWake
+        ? (translate('migrationstatus.next-opens') as string)
+            .replace('{boundary}', String(nextWake.boundary))
+            .replace('{height}', String(height))
+        : (translate('migrationstatus.all-sent') as string);
   const remindersLine = (
     translate('migrationstatus.reminders') as string
   ).replace('{n}', String(wakes.length));
@@ -198,24 +204,39 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           {translate('migrationstatus.title') as string}
         </BoldText>
 
-        {/* Progress bar + line */}
-        <View
-          style={{
-            height: 6,
-            borderRadius: 3,
-            backgroundColor: colors.bottomSheetBorder,
-            overflow: 'hidden',
-            marginBottom: 10,
-          }}
-        >
-          <View
-            style={{
-              width: `${pct}%`,
-              height: '100%',
-              borderRadius: 3,
-              backgroundColor: colors.primary,
-            }}
-          />
+        <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+          {Array.from({ length: batchesTotal }).map((_, i) => {
+            const fillColor =
+              i < batchesConfirmed
+                ? colors.primary
+                : confirming && i === batchesConfirmed
+                  ? colors.syncing
+                  : null;
+            return (
+              <View
+                key={i}
+                style={{
+                  flex: 1,
+                  height: 6,
+                  borderRadius: 3,
+                  backgroundColor: colors.bottomSheetBorder,
+                  overflow: 'hidden',
+                  marginRight: i < batchesTotal - 1 ? 3 : 0,
+                }}
+              >
+                {fillColor && (
+                  <View
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: 3,
+                      backgroundColor: fillColor,
+                    }}
+                  />
+                )}
+              </View>
+            );
+          })}
         </View>
         <Text
           style={{
@@ -239,7 +260,9 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             marginBottom: 20,
           }}
         >
-          <Text style={{ color: colors.placeholder, fontSize: 14, lineHeight: 21 }}>
+          <Text
+            style={{ color: colors.placeholder, fontSize: 14, lineHeight: 21 }}
+          >
             {nextLine.split('**').map((part: string, i: number) =>
               i % 2 === 1 ? (
                 <Text key={i} style={{ color: colors.text, fontWeight: '700' }}>
@@ -287,7 +310,11 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                 }}
               >
                 <Text
-                  style={{ color: colors.text, fontSize: 17, fontWeight: '700' }}
+                  style={{
+                    color: colors.text,
+                    fontSize: 17,
+                    fontWeight: '700',
+                  }}
                 >
                   {(translate('migrationstatus.batch') as string).replace(
                     '{n}',
@@ -298,7 +325,9 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                 <View
                   style={{
                     borderWidth: 1,
-                    borderColor: open ? colors.primary : colors.bottomSheetBorder,
+                    borderColor: open
+                      ? colors.primary
+                      : colors.bottomSheetBorder,
                     borderRadius: 20,
                     paddingHorizontal: 12,
                     paddingVertical: 4,

@@ -19,6 +19,6 @@ export type RPCDrainPlanType = {
   // Total fees across every transaction.
   fee?: number;
   // Value left behind in the Orchard pool because moving it is not worthwhile.
-  stranded?: number;
+  residual?: number;
   error?: string;
 };

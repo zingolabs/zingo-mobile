@@ -1063,6 +1063,30 @@ class RPCModule: NSObject {
       }
   }
 
+  // Proves and broadcasts one Phase 1 splitting round (ADR 0016), so like the
+  // drain it runs long; the global concurrent queue keeps it off the main
+  // thread.
+  @objc(quickSplitProcess:reject:)
+  func quickSplitProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try quickSplit()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  // Polled concurrently while `quickSplitProcess` runs; the native
+  // `splitStatus()` reads a side channel, never the lightclient lock the round
+  // holds, so the poll returns immediately.
+  @objc(splitStatusProcess:reject:)
+  func splitStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try splitStatus()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
   @objc(reschedulePartsProcess:resolve:reject:)
   func reschedulePartsProcess(_ per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
@@ -1080,6 +1104,15 @@ class RPCModule: NSObject {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try migrationStatus()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(windowTimelineProcess:reject:)
+  func windowTimelineProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try windowTimeline()
         }.settle(resolve: resolve, reject: reject)
       }
   }

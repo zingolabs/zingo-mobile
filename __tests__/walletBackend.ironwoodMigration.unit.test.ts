@@ -1,5 +1,5 @@
 /**
- * The private-migration wrapper family (zingo-mobile#1187): all nine
+ * The private-migration wrapper family (zingo-mobile#1187): all eleven
  * walletUtils wrappers around the ZIP 318 bridge methods share one typed
  * FFI contract, so one table exercises them all:
  *   - a resolution passes through verbatim as { ok: true }, even when it
@@ -24,8 +24,10 @@ import {
   executeDuePartsStatus,
   migrationStatus,
   planIronwoodMigration,
+  quickSplit,
   reconcileMigration,
   rescheduleParts,
+  splitStatus,
   startIronwoodMigration,
 } from '../app/walletBackend/utils/walletUtils';
 
@@ -59,6 +61,8 @@ const wrapperCases: WrapperCase[] = [
     expectedBridgeArgs: [consentPlanHash, '4'],
   },
   { wrapper: continueNoteSplitting, callArgs: [], expectedBridgeArgs: [] },
+  { wrapper: quickSplit, callArgs: [], expectedBridgeArgs: [] },
+  { wrapper: splitStatus, callArgs: [], expectedBridgeArgs: [] },
   { wrapper: rescheduleParts, callArgs: [8], expectedBridgeArgs: ['8'] },
   { wrapper: migrationStatus, callArgs: [], expectedBridgeArgs: [] },
   { wrapper: reconcileMigration, callArgs: [], expectedBridgeArgs: [] },

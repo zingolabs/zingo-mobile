@@ -989,6 +989,28 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // Phase 1 splitting round (ADR 0016). Proves and broadcasts, so like the
+    // drain it runs long and holds the lightclient; settling launches on
+    // Dispatchers.IO, which keeps it off the main queue and lets status polls
+    // through.
+    @ReactMethod
+    fun quickSplitProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "quick_split") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.quickSplit()
+        }
+    }
+
+    // Polled concurrently while quickSplitProcess runs; the native splitStatus()
+    // reads a side channel, never the lightclient lock the round holds, so the
+    // poll returns immediately.
+    @ReactMethod
+    fun splitStatusProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "split_status") {
+            uniffi.zingo.splitStatus()
+        }
+    }
+
     @ReactMethod
     fun reschedulePartsProcess(perBucket: String, promise: Promise) {
         FfiOutcome.settling(promise, "reschedule_parts") {
@@ -1001,6 +1023,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun migrationStatusProcess(promise: Promise) {
         FfiOutcome.settling(promise, "migration_status") {
             uniffi.zingo.migrationStatus()
+        }
+    }
+
+    @ReactMethod
+    fun windowTimelineProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "window_timeline") {
+            uniffi.zingo.windowTimeline()
         }
     }
 

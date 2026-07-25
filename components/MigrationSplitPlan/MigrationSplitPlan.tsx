@@ -11,11 +11,7 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
-import {
-  planIronwoodMigration,
-  routeStartMigration,
-  startIronwoodMigration,
-} from '../../app/walletBackend';
+import { planIronwoodMigration } from '../../app/walletBackend';
 import {
   RPCMigrationPlanType,
   RPCSplitTxType,
@@ -100,23 +96,22 @@ const Card: React.FunctionComponent<{
   </View>
 );
 
-// The consent screen of the private migration: renders the exact note-
-// splitting plan (plus the fees and stranded value the whole migration
-// implies) and, on Accept, records consent to its hash. Nothing is signed or
-// broadcast here; MigrationSplitting drives the rounds afterwards.
+// The Phase 1 disclosure screen of the private migration: renders the exact
+// note-splitting plan (plus the fees and stranded value the whole migration
+// implies). Phase 1 splitting carries no consent hash (ADR 0016) — the plan is
+// the disclosure surface, and Accept simply proceeds to MigrationSplitting,
+// which drives the stateless quick_split rounds. Phase 2 (the schedule) captures
+// its own consent later, at the cadence screen.
 const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, addLastSnackbar } = context;
+  const { translate, info } = context;
   const { colors } = useTheme() as ThemeType;
 
   const [plan, setPlan] = useState<RPCMigrationPlanType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  // Distinguishes "couldn't plan" from "couldn't start" in the error title.
-  const [errorOnStart, setErrorOnStart] = useState<boolean>(false);
-  const [starting, setStarting] = useState<boolean>(false);
 
   const currencyName = info.currencyName;
   const zec = useCallback(
@@ -137,7 +132,6 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   const fetchPlan = useCallback(async () => {
     setLoading(true);
     setErrorMsg(null);
-    setErrorOnStart(false);
     const planResult = await planIronwoodMigration();
     if (!planResult.ok) {
       setErrorMsg(planResult.error.message);
@@ -161,43 +155,30 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
     fetchPlan();
   }, [fetchPlan]);
 
-  // Accept = consent: bind the user's approval to the exact plan hash they
-  // were shown. Cadence stays at zingolib's default here; the chooser after
-  // splitting sets it via reschedule_parts.
-  const onAccept = useCallback(async () => {
-    if (!plan?.plan_hash || starting) {
+  // Accept: Phase 1 has no consent hash (ADR 0016), so this just proceeds to
+  // the stateless splitting rounds. The plan is passed through for the row
+  // labels. Cadence captures the Phase 2 schedule consent afterwards. When the
+  // notes are already part-ready (no rounds) Phase 1 is a no-op, so skip the
+  // splitting ceremony and go straight to the Phase 2 cadence chooser.
+  const onAccept = useCallback(() => {
+    if (!plan) {
       return;
     }
-    setStarting(true);
-    const start = await startIronwoodMigration(plan.plan_hash, null);
-    setStarting(false);
-    const route = routeStartMigration(start);
-    switch (route.kind) {
-      case 'proceed':
-        navigation.navigate(RouteEnum.MigrationSplitting, { plan });
-        return;
-      // A migration already exists (e.g. re-entry after a kill between
-      // consent and splitting): resume it instead of erroring.
-      case 'resume':
-        navigation.navigate(RouteEnum.MigrationSplitting, {});
-        return;
-      // ConsentStale: the wallet's notes changed between planning and
-      // consent. Replan and let the user review the fresh plan.
-      case 'replan':
-        addLastSnackbar(translate('migrationsplitplan.replanned') as string);
-        fetchPlan();
-        return;
-      case 'error':
-        setErrorOnStart(true);
-        setErrorMsg(route.message);
+    const hasSplits = (plan.split_rounds?.length ?? 0) > 0;
+    if (!hasSplits && (plan.parts?.length ?? 0) > 0) {
+      navigation.navigate(RouteEnum.MigrationCadence);
+      return;
     }
-  }, [plan, starting, navigation, addLastSnackbar, translate, fetchPlan]);
+    navigation.navigate(RouteEnum.MigrationSplitting, { plan });
+  }, [plan, navigation]);
 
   const splitRounds = plan?.split_rounds ?? [];
   const roundCount = splitRounds.length;
   const txCount = splitRounds.reduce((sum, round) => sum + round.length, 0);
   const noteCount = plan?.parts?.length ?? 0;
   const isEmpty = !loading && !errorMsg && txCount === 0 && noteCount === 0;
+  // Notes already the right size: nothing to split, but there is value to move.
+  const noSplitNeeded = !loading && !errorMsg && txCount === 0 && noteCount > 0;
 
   const title = (
     <BoldText style={{ fontSize: 22, marginBottom: 8 }}>
@@ -252,13 +233,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
                 textAlign: 'center',
               }}
             >
-              {
-                translate(
-                  errorOnStart
-                    ? 'migrationsplitplan.start-error-title'
-                    : 'migrationsplitplan.error-title',
-                ) as string
-              }
+              {translate('migrationsplitplan.error-title') as string}
             </Text>
             <Text
               style={{
@@ -334,6 +309,99 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             type={ButtonTypeEnum.Primary}
             title={translate('migrationsplitplan.close') as string}
             onPress={goHome}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  // ----- Notes already part-ready: no splitting, straight to Phase 2 -----
+  if (noSplitNeeded) {
+    const partsFee = plan?.parts_fee ?? 0;
+    const stranded = plan?.residual ?? 0;
+    const readyWord = translate(
+      noteCount === 1
+        ? 'migrationsplitplan.note-one'
+        : 'migrationsplitplan.notes',
+    ) as string;
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <StepperHeader splitDone={true} sendActive={false} />
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingTop: 24,
+            paddingBottom: 24,
+          }}
+        >
+          <BoldText style={{ fontSize: 22, marginBottom: 8 }}>
+            {translate('migrationsplitplan.nosplit-title') as string}
+          </BoldText>
+          <Text
+            style={{
+              color: colors.placeholder,
+              fontSize: 15,
+              lineHeight: 22,
+              marginBottom: 24,
+            }}
+          >
+            {translate('migrationsplitplan.nosplit-body') as string}
+          </Text>
+          <Card colors={colors}>
+            <Row
+              label={translate('migrationsplitplan.nosplit-ready') as string}
+              value={`${noteCount} ${readyWord}`}
+              colors={colors}
+              bold={true}
+            />
+            <Row
+              label={translate('migrationsplitplan.sending-fee') as string}
+              value={zec(partsFee)}
+              colors={colors}
+            />
+            {stranded > 0 ? (
+              <Row
+                label={translate('migrationsplitplan.stranded') as string}
+                value={zec(stranded)}
+                colors={colors}
+              />
+            ) : null}
+          </Card>
+          {stranded > 0 ? (
+            <Text
+              style={{
+                color: colors.placeholder,
+                fontSize: 13,
+                lineHeight: 19,
+              }}
+            >
+              {translate('migrationsplitplan.stranded-note') as string}
+            </Text>
+          ) : null}
+        </ScrollView>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            paddingBottom: 24,
+            paddingHorizontal: 24,
+          }}
+        >
+          <Button
+            testID="migrationsplitplan.back"
+            type={ButtonTypeEnum.Ghost}
+            title={translate('migrationsplitplan.back') as string}
+            onPress={() => navigation.goBack()}
+            twoButtons={true}
+          />
+          <Button
+            testID="migrationsplitplan.continue"
+            type={ButtonTypeEnum.Primary}
+            title={translate('migrationsplitplan.continue') as string}
+            onPress={onAccept}
+            twoButtons={true}
           />
         </View>
       </View>
@@ -498,10 +566,10 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             value={zec(plan?.parts_fee ?? 0)}
             colors={colors}
           />
-          {(plan?.stranded ?? 0) > 0 ? (
+          {(plan?.residual ?? 0) > 0 ? (
             <Row
               label={translate('migrationsplitplan.stranded') as string}
-              value={zec(plan?.stranded ?? 0)}
+              value={zec(plan?.residual ?? 0)}
               colors={colors}
             />
           ) : null}
@@ -511,7 +579,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             colors={colors}
           />
         </Card>
-        {(plan?.stranded ?? 0) > 0 ? (
+        {(plan?.residual ?? 0) > 0 ? (
           <Text
             style={{
               color: colors.placeholder,
@@ -557,7 +625,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           title={translate('migrationsplitplan.accept') as string}
           onPress={onAccept}
           twoButtons={true}
-          disabled={starting}
+          disabled={!plan}
         />
       </View>
     </View>

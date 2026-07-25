@@ -7,10 +7,10 @@ import { ContextAppLoaded } from '../../../app/context';
 import { ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
 import { RouteEnum } from '../../../app/AppState';
-import { migrationStatus } from '../../../app/walletBackend';
+import { migrationStatus, reconcileMigration } from '../../../app/walletBackend';
 import {
   RPCMigrationStatusType,
-  RPCWakePointType,
+  RPCBroadcastWindowType,
 } from '../../../app/walletBackend/types/RPCMigrationStatusType';
 
 const ZATS_PER_ZEC = 10 ** 8;
@@ -76,6 +76,15 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     useCallback(() => {
       let cancelled = false;
       (async () => {
+        // Apply confirmations that landed since the last pass before reading.
+        // migration_status reports persisted part state, and reconcile is what
+        // promotes a mined batch out of Broadcast. Launch is the only other
+        // place it runs, so without this a batch that confirms mid-session
+        // reads as unsent until relaunch. Offline, a no-op with no migration.
+        await reconcileMigration();
+        if (cancelled) {
+          return;
+        }
         const statusResult = await migrationStatus();
         if (cancelled) {
           return;
@@ -126,12 +135,10 @@ const IronwoodMigrationBanner: React.FunctionComponent<
       Math.floor(migration.parts_confirmed / perBucket),
     );
 
-    // Value-migrated drives the bar, matching the MigrationStatus screen's
-    // canonical progress figure.
-    const pct =
-      migration.value_total > 0
-        ? Math.round((migration.value_migrated / migration.value_total) * 100)
-        : 0;
+    // The segmented bar is a batch counter: one segment per batch, each lit
+    // whole or not at all, so the percentage tracks confirmed batches rather
+    // than value (which would half-fill a segment mid-confirmation).
+    const pct = Math.round((batchesConfirmed / batchesTotal) * 100);
 
     const orchardLeftStr = `${Utils.parseNumberFloatToStringLocale(
       migration.orchard_confirmed_spendable / ZATS_PER_ZEC,
@@ -139,35 +146,38 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     )} ${currencyName}`;
 
     // A batch is ready to send exactly when the backend reports a due batch:
-    // the window the chain is currently inside, which next_wakes cannot carry.
-    // next_wakes stays the source for the "waiting N blocks" countdown to the
-    // next scheduled window.
+    // the window the chain is currently inside, which upcoming_windows cannot
+    // carry. upcoming_windows stays the source for the "waiting N blocks"
+    // countdown to the next scheduled window.
     const height = info?.latestBlock ?? 0;
-    const wakes: RPCWakePointType[] = migration.next_wakes ?? [];
+    const wakes: RPCBroadcastWindowType[] = migration.upcoming_windows ?? [];
     const nextWake = wakes[0];
     const blocksUntil = nextWake ? Math.max(0, nextWake.boundary - height) : 0;
     const ready = migration.due_now != null;
+    // A batch broadcast but not yet mined: sent, confirming on-chain. Its window
+    // is gone from both due_now and upcoming_windows, so without this signal it would
+    // read as the next batch still pending.
+    const confirming = !splitting && !ready && migration.parts_broadcast > 0;
 
     // Status pill (dot + word): Splitting while notes split, Ready when a batch
-    // can be sent now, Pending while the next window is still ahead.
+    // can be sent now, Confirming while a sent batch mines, Pending while the
+    // next window is still ahead.
     const statusKind = splitting
       ? 'splitting'
       : ready
         ? 'ready'
-        : 'pending';
+        : confirming
+          ? 'confirming'
+          : 'pending';
     const statusColor =
       statusKind === 'ready'
         ? colors.primary
-        : statusKind === 'splitting'
+        : statusKind === 'splitting' || statusKind === 'confirming'
           ? colors.syncing
           : colors.warning.primary;
     const statusLabel = translate(
       `ironwoodbanner.status-${statusKind}`,
     ) as string;
-
-    const batchesValue = (translate('ironwoodbanner.batches-value') as string)
-      .replace('{confirmed}', String(batchesConfirmed))
-      .replace('{total}', String(batchesTotal));
 
     // Next action: keep splitting, send the ready batch, or wait N blocks for
     // the next window. Amber (warning) while waiting, green (primary) to act.
@@ -178,15 +188,22 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             '{n}',
             String(batchesConfirmed + 1),
           )
-        : !nextWake
-          ? (translate('ironwoodbanner.next-all-sent') as string)
-          : (translate('ironwoodbanner.next-in-blocks') as string)
-              .replace('{n}', String(batchesConfirmed + 1))
-              .replace('{blocks}', String(blocksUntil));
+        : confirming
+          ? (translate('ironwoodbanner.next-confirming') as string).replace(
+              '{n}',
+              String(batchesConfirmed + 1),
+            )
+          : !nextWake
+            ? (translate('ironwoodbanner.next-all-sent') as string)
+            : (translate('ironwoodbanner.next-in-blocks') as string)
+                .replace('{n}', String(batchesConfirmed + 1))
+                .replace('{blocks}', String(blocksUntil));
     const nextActionActive = !splitting && (ready || !nextWake);
-    const nextActionColor = nextActionActive
-      ? colors.primary
-      : colors.warning.primary;
+    const nextActionColor = confirming
+      ? colors.syncing
+      : nextActionActive
+        ? colors.primary
+        : colors.warning.primary;
 
     return (
       <View style={{ paddingHorizontal: 12, paddingTop: 6, paddingBottom: 12 }}>
@@ -240,24 +257,42 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               marginBottom: 10,
             }}
           >
-            <View
-              style={{
-                flex: 1,
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: colors.bottomSheetBorder,
-                overflow: 'hidden',
-                marginRight: 14,
-              }}
-            >
-              <View
-                style={{
-                  width: `${pct}%`,
-                  height: '100%',
-                  borderRadius: 4,
-                  backgroundColor: colors.primary,
-                }}
-              />
+            <View style={{ flex: 1, flexDirection: 'row', marginRight: 14 }}>
+              {Array.from({ length: batchesTotal }).map((_, i) => {
+                // Whole-segment fill, never partial: solid for a confirmed
+                // batch, the syncing accent for the one in flight, empty track
+                // otherwise.
+                const fillColor =
+                  i < batchesConfirmed
+                    ? colors.primary
+                    : confirming && i === batchesConfirmed
+                      ? colors.syncing
+                      : null;
+                return (
+                  <View
+                    key={i}
+                    style={{
+                      flex: 1,
+                      height: 8,
+                      borderRadius: 4,
+                      backgroundColor: colors.bottomSheetBorder,
+                      overflow: 'hidden',
+                      marginRight: i < batchesTotal - 1 ? 3 : 0,
+                    }}
+                  >
+                    {fillColor && (
+                      <View
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: 4,
+                          backgroundColor: fillColor,
+                        }}
+                      />
+                    )}
+                  </View>
+                );
+              })}
             </View>
             <Text
               style={{
@@ -277,25 +312,6 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               marginBottom: 10,
             }}
           />
-
-          {/* Batches */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 8,
-            }}
-          >
-            <Text style={{ color: colors.placeholder, fontSize: 13 }}>
-              {translate('ironwoodbanner.batches-label') as string}
-            </Text>
-            <Text
-              style={{ color: colors.text, fontSize: 14, fontWeight: '700' }}
-            >
-              {batchesValue}
-            </Text>
-          </View>
 
           {/* Next action */}
           <View

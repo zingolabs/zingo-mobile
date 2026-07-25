@@ -835,10 +835,12 @@
     "next-action-label": "Next action",
     "next-in-blocks": "Batch {n} in ~{blocks} blocks",
     "next-send-now": "Send batch {n}",
+    "next-confirming": "Batch {n} sent, confirming",
     "next-splitting": "Finish splitting",
     "next-all-sent": "All batches sent",
     "status-pending": "Pending",
     "status-ready": "Ready",
+    "status-confirming": "Confirming",
     "status-splitting": "Splitting"
   },
   "migrationstrategy": {
@@ -904,6 +906,10 @@
     "replanned": "Your notes changed — review the updated plan.",
     "nothing-title": "Nothing to migrate",
     "nothing-body": "Your Orchard pool has no funds worth migrating right now.",
+    "nosplit-title": "No splitting needed",
+    "nosplit-body": "Your Orchard notes are already the right size, so there is nothing to split. You can go straight to scheduling the migration.",
+    "nosplit-ready": "Ready to migrate",
+    "continue": "Continue",
     "back": "Back",
     "accept": "Accept",
     "close": "Close"
@@ -940,15 +946,16 @@
     "more-body": "Takes longer — better privacy.",
     "duration-hours": "Finishes in about {n} hours",
     "duration-days": "Finishes in about {n} days",
-    "disclosure": "Each batch is sent when you open its reminder. Sending at times you are active is what can link the batches to you — a steady response pattern helps.",
+    "disclosure": "The first batch sends right away; each later batch when you open its reminder. Sending at times you are active is what can link the batches to you — a steady response pattern helps.",
     "cadence-fixed": "Sending already began — the batch schedule can no longer change.",
+    "replanned": "Your notes changed — review the updated schedule.",
     "review": "Review schedule"
   },
   "migrationschedule": {
     "title": "Review & confirm",
-    "intro": "Confirming schedules a **reminder for each batch**. When a reminder arrives, open the app and send that batch. Nothing is sent automatically.",
+    "intro": "Confirming sends the first batch now and schedules a **reminder for each later batch**. When a reminder arrives, open the app and send that batch.",
     "batch": "Batch {n}",
-    "due": "due ≈ {time}",
+    "due": "reminder ≈ {time}",
     "tech-line": "anchor {anchor} · window {window}",
     "miss-note": "If you miss a window, the batch simply waits for a future one — that's expected, not an error.",
     "reminder-title": "Time to send batch {n}",
@@ -963,6 +970,7 @@
     "progress": "{confirmed} of {total} batches confirmed · {pct}%",
     "next-opens": "Next batch opens at boundary **{boundary}** (chain is at {height}).",
     "next-open-now": "Batch {n}'s window is open — send it when you're ready.",
+    "confirming": "Batch **{n}** sent, confirming on-chain.",
     "all-sent": "All batches sent — waiting for the final confirmations.",
     "reminders": "We'll remind you — {n} reminders scheduled.",
     "batch": "Batch {n}",
@@ -970,7 +978,7 @@
     "open": "OPEN",
     "tech-line": "anchor {anchor} · send by {sendby}",
     "footer": "Reminders never send for you. You send each batch from here when its window is open.",
-    "back": "Back to wallet",
+    "back": "Back",
     "send": "Send batch"
   },
   "migrationbatchsending": {

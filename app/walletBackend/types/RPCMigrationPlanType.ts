@@ -27,7 +27,7 @@ export type RPCMigrationPlanType = {
   parts_fee?: number;
   // Value left behind because moving it costs more than it carries. Consent
   // must disclose this.
-  stranded?: number;
+  residual?: number;
   // Consent hash of this exact plan (hex). Pass back unchanged to
   // startIronwoodMigration when the user accepts.
   plan_hash?: string;

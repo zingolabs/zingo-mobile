@@ -835,10 +835,12 @@
     "next-action-label": "Sonraki işlem",
     "next-in-blocks": "{blocks} blok sonra {n}. grup",
     "next-send-now": "{n}. grubu gönder",
+    "next-confirming": "{n}. grup gönderildi, onaylanıyor",
     "next-splitting": "Bölmeyi tamamla",
     "next-all-sent": "Tüm gruplar gönderildi",
     "status-pending": "Beklemede",
     "status-ready": "Hazır",
+    "status-confirming": "Onaylanıyor",
     "status-splitting": "Bölünüyor"
   },
   "migrationstrategy": {
@@ -904,6 +906,10 @@
     "replanned": "Notlarınız değişti — güncellenen planı gözden geçirin.",
     "nothing-title": "Taşınacak bir şey yok",
     "nothing-body": "Orchard havuzunuzda şu anda taşımaya değer fon yok.",
+    "nosplit-title": "Bölme gerekmiyor",
+    "nosplit-body": "Orchard notlarınız zaten doğru boyutta, bölünecek bir şey yok. Doğrudan geçiş planlamasına geçebilirsiniz.",
+    "nosplit-ready": "Taşımaya hazır",
+    "continue": "Devam et",
     "back": "Geri",
     "accept": "Kabul et",
     "close": "Kapat"
@@ -940,15 +946,16 @@
     "more-body": "Daha uzun sürer — daha iyi gizlilik.",
     "duration-hours": "Yaklaşık {n} saatte biter",
     "duration-days": "Yaklaşık {n} günde biter",
-    "disclosure": "Her grup, hatırlatıcısını açtığınızda gönderilir. Aktif olduğunuz saatlerde göndermek grupları sizinle ilişkilendirebilir — düzenli bir yanıt ritmi yardımcı olur.",
+    "disclosure": "İlk grup hemen gönderilir; sonraki her grup ise hatırlatıcısını açtığınızda. Aktif olduğunuz saatlerde göndermek grupları sizinle ilişkilendirebilir — düzenli bir yanıt ritmi yardımcı olur.",
     "cadence-fixed": "Gönderim zaten başladı — grup takvimi artık değiştirilemez.",
+    "replanned": "Notlarınız değişti — güncellenen takvimi gözden geçirin.",
     "review": "Takvimi gözden geçir"
   },
   "migrationschedule": {
     "title": "Gözden geçir ve onayla",
-    "intro": "Onaylamak, **her grup için bir hatırlatıcı** planlar. Hatırlatıcı geldiğinde uygulamayı açın ve o grubu gönderin. Hiçbir şey otomatik gönderilmez.",
+    "intro": "Onaylamak ilk grubu şimdi gönderir ve **sonraki her grup için bir hatırlatıcı** planlar. Hatırlatıcı geldiğinde uygulamayı açın ve o grubu gönderin.",
     "batch": "Grup {n}",
-    "due": "zamanı ≈ {time}",
+    "due": "hatırlatıcı ≈ {time}",
     "tech-line": "çapa {anchor} · pencere {window}",
     "miss-note": "Bir pencereyi kaçırırsanız grup gelecekteki bir pencereyi bekler — bu beklenen bir durumdur, hata değildir.",
     "reminder-title": "Grup {n} gönderme zamanı",
@@ -963,6 +970,7 @@
     "progress": "{total} gruptan {confirmed} tanesi onaylandı · %{pct}",
     "next-opens": "Sonraki grup **{boundary}** sınırında açılır (zincir {height} hizasında).",
     "next-open-now": "{n}. grubun penceresi açık — hazır olduğunuzda gönderin.",
+    "confirming": "**{n}**. grup gönderildi, zincirde onaylanıyor.",
     "all-sent": "Tüm gruplar gönderildi — son onaylar bekleniyor.",
     "reminders": "Size hatırlatacağız — {n} hatırlatıcı planlandı.",
     "batch": "Grup {n}",
@@ -970,7 +978,7 @@
     "open": "AÇIK",
     "tech-line": "çapa {anchor} · son gönderim {sendby}",
     "footer": "Hatırlatıcılar sizin yerinize göndermez. Her grubu penceresi açıldığında buradan siz gönderirsiniz.",
-    "back": "Cüzdana dön",
+    "back": "Geri",
     "send": "Grubu şimdi gönder"
   },
   "migrationbatchsending": {

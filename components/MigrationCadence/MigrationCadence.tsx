@@ -18,10 +18,12 @@ import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import {
   migrationStatus,
-  rescheduleParts,
-  routeRescheduleParts,
+  planIronwoodMigration,
+  routeStartMigration,
+  startIronwoodMigration,
 } from '../../app/walletBackend';
 import { RPCMigrationStatusType } from '../../app/walletBackend/types/RPCMigrationStatusType';
+import { RPCMigrationPlanType } from '../../app/walletBackend/types/RPCMigrationPlanType';
 
 type MigrationCadenceProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -123,10 +125,14 @@ const PresetCard: React.FunctionComponent<PresetCardProps> = ({
   </TouchableOpacity>
 );
 
-// The phase 2 cadence chooser ("How many batches?"). Presented in the same
-// session that received SplittingComplete; "Review schedule" records the
-// choice via reschedule_parts (re-callable until the first part is signed)
-// and hands off to the schedule review screen, which arms the reminders.
+// The Phase 2 cadence chooser ("How many batches?"), shown once splitting
+// completes. The notes are fully split by now, so this is where Phase 2 consent
+// is captured: "Review schedule" calls start_ironwood_migration with the chosen
+// per-bucket cadence, binding the parts and scheduling them, then hands off to
+// the schedule review screen that arms the reminders. There is no migration
+// state yet, so the part count and the fresh consent hash come from a live
+// plan_ironwood_migration read (ADR 0016), and the bucket cadence params from
+// migration_status's provisional values.
 const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   navigation,
 }) => {
@@ -135,41 +141,53 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   const { colors } = useTheme() as ThemeType;
 
   const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
+  const [plan, setPlan] = useState<RPCMigrationPlanType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selected, setSelected] = useState<CadenceChoice>('fewer');
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const statusResult = await migrationStatus();
-      if (cancelled) {
-        return;
-      }
-      if (!statusResult.ok) {
-        setErrorMsg(statusResult.error.message);
-        setLoading(false);
-        return;
-      }
-      try {
-        const parsed = JSON.parse(statusResult.value) as RPCMigrationStatusType;
-        if (parsed.error) {
-          setErrorMsg(parsed.error);
-        } else {
-          setStatus(parsed);
-        }
-      } catch (e) {
-        setErrorMsg(`${e}`);
-      }
+  const load = useCallback(async () => {
+    setLoading(true);
+    setErrorMsg(null);
+    const [statusResult, planResult] = await Promise.all([
+      migrationStatus(),
+      planIronwoodMigration(),
+    ]);
+    if (!statusResult.ok) {
+      setErrorMsg(statusResult.error.message);
       setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
+      return;
+    }
+    if (!planResult.ok) {
+      setErrorMsg(planResult.error.message);
+      setLoading(false);
+      return;
+    }
+    try {
+      const parsedStatus = JSON.parse(
+        statusResult.value,
+      ) as RPCMigrationStatusType;
+      const parsedPlan = JSON.parse(planResult.value) as RPCMigrationPlanType;
+      if (parsedStatus.error) {
+        setErrorMsg(parsedStatus.error);
+      } else if (parsedPlan.error) {
+        setErrorMsg(parsedPlan.error);
+      } else {
+        setStatus(parsedStatus);
+        setPlan(parsedPlan);
+      }
+    } catch (e) {
+      setErrorMsg(`${e}`);
+    }
+    setLoading(false);
   }, []);
 
-  const parts = status?.parts_total ?? 0;
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const parts = plan?.parts?.length ?? 0;
   const bucketModulus = status?.bucket_modulus ?? 256;
   // The "fewer" preset IS zingolib's default cadence, so we never invent a
   // second opinion about a privacy parameter; "more" is maximum dispersion.
@@ -182,35 +200,45 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
 
   const windowHours = ((bucketModulus * SECONDS_PER_BLOCK) / 3600).toFixed(1);
 
+  // Review = Phase 2 consent: start_ironwood_migration binds the parts to the
+  // now-split notes and schedules them under the chosen cadence. Its consent
+  // hash is the plan we just read (post-split), not the pre-split one.
   const onReview = useCallback(async () => {
-    if (submitting) {
+    if (submitting || !plan?.plan_hash) {
       return;
     }
     const perBucket = selected === 'fewer' ? fewerPerBucket : 1;
     setSubmitting(true);
-    const reschedule = await rescheduleParts(perBucket);
+    const start = await startIronwoodMigration(plan.plan_hash, perBucket);
     setSubmitting(false);
-    const route = routeRescheduleParts(reschedule);
+    const route = routeStartMigration(start);
     switch (route.kind) {
       case 'proceed':
         navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
         return;
-      // CadenceFixed: a part is already signed, so the existing schedule
-      // stands — reviewing it (and re-arming reminders) is still valid.
-      case 'schedule-stands':
-        addLastSnackbar(translate('migrationcadence.cadence-fixed') as string);
+      // A migration already exists (re-entry after Phase 2 already started):
+      // its schedule stands — review it.
+      case 'resume':
         navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
+        return;
+      // ConsentStale: notes changed between the plan read and this call. Reload
+      // the fresh figures so the user reviews and schedules against them.
+      case 'replan':
+        addLastSnackbar(translate('migrationcadence.replanned') as string);
+        load();
         return;
       case 'error':
         addLastSnackbar(route.message);
     }
   }, [
     submitting,
+    plan,
     selected,
     fewerPerBucket,
     navigation,
     addLastSnackbar,
     translate,
+    load,
   ]);
 
   // ----- Loading / error -----

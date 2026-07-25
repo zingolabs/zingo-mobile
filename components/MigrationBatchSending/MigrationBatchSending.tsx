@@ -126,8 +126,9 @@ const MigrationBatchSending: React.FunctionComponent<
       const outcomes = report?.outcomes ?? [];
       const sent = outcomes.filter(o => o.result.kind === 'sent').length;
       if (outcomes.length === 0) {
-        // Reached with nothing actually due (e.g. targets still ahead); the
-        // monitor will show why.
+        // Reached with nothing actually due (the window has not opened yet, or
+        // every part already confirmed or slid to a later window); the monitor
+        // will show why.
         addLastSnackbar(translate('migrationbatchsending.nothing') as string);
       } else {
         addLastSnackbar(

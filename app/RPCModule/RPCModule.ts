@@ -120,8 +120,18 @@ interface RPCModuleAPI {
     perBucket: string,
   ): Promise<string>;
   continueNoteSplittingProcess(): Promise<string>;
+  // Phase 1 splitting, stateless and send-shaped (ADR 0016). One call per
+  // round; loop until the outcome is `complete`, then startIronwoodMigration.
+  quickSplitProcess(): Promise<string>;
+  // Live progress of the in-flight splitting round; safe to poll concurrently
+  // with quickSplitProcess (reads a native side channel, not the lightclient
+  // lock).
+  splitStatusProcess(): Promise<string>;
   reschedulePartsProcess(perBucket: string): Promise<string>;
   migrationStatusProcess(): Promise<string>;
+  // The window calendar (past, current, future) for a schedule grid, valid
+  // with or without a migration; null before the wallet has ever synced.
+  windowTimelineProcess(): Promise<string>;
   reconcileMigrationProcess(): Promise<string>;
   // Phase-2 execute tap: sends a scheduled window's due batch. spacingMs (the
   // delay sequenced between the batch's sends) crosses as a string.

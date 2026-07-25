@@ -14,10 +14,11 @@ export type RPCMigrationPhaseType = {
 };
 
 // One coming broadcast window. Two wakes per window: a silent sync near
-// `estimated_unix_time` (the boundary, where proof material is captured) and
-// the user-facing reminder at `estimated_target_unix_time` (when every part
-// of the window is due).
-export type RPCWakePointType = {
+// `window_opens_unix_time` (the boundary, where proof material is captured, and
+// from which the window's parts are already due) and the user-facing reminder
+// at `latest_target_unix_time` — advisory only, a hint for when to nudge
+// the user so sends disperse across the window, no longer a gate on sending.
+export type RPCBroadcastWindowType = {
   bucket_index: number;
   // The window's opening boundary, also the parts' anchor height.
   boundary: number;
@@ -26,15 +27,15 @@ export type RPCWakePointType = {
   // Denominations (zatoshis) mirroring part_ids element-for-element — the
   // window's batch, ready to render.
   denominations: number[];
-  estimated_unix_time: number;
-  estimated_target_unix_time: number;
+  window_opens_unix_time: number;
+  latest_target_unix_time: number;
 };
 
 // The batch the user can broadcast right now: the window the chain is
-// currently inside, plus any overdue parts folded in. `next_wakes` carries
-// only future windows and structurally cannot hold this one, so the "send
-// batch" action reads it from here. `denominations` align element-for-element
-// with `part_ids`, both in the window's broadcast order.
+// currently inside, plus any overdue parts folded in. `upcoming_windows`
+// carries only future windows and structurally cannot hold this one, so the
+// "send batch" action reads it from here. `denominations` align
+// element-for-element with `part_ids`, both in the window's broadcast order.
 export type RPCDueBatchType = {
   // The current bucket's opening boundary (the parts' anchor height).
   boundary: number;
@@ -52,16 +53,21 @@ export type RPCMigrationStatusType = {
   phase: RPCMigrationPhaseType | null;
   parts_total: number;
   parts_confirmed: number;
+  // Parts submitted to the network but not yet mined: the sent, in-flight
+  // batch. Zero until a batch broadcasts, clearing into parts_confirmed as
+  // parts mine, so it distinguishes "batch sent, confirming" from "not sent".
+  parts_broadcast: number;
   value_total: number;
   value_migrated: number;
   // The effective cadence (parts per window); null when no migration exists.
   per_bucket: number | null;
   // Window length in blocks (256 provisionally).
   bucket_modulus: number;
-  next_wakes: RPCWakePointType[];
-  // The batch broadcastable this instant (the window the chain is inside), or
-  // null when a send now would build nothing (no migration, wrong phase, every
-  // part still ahead of its random target, or all parts confirmed).
+  upcoming_windows: RPCBroadcastWindowType[];
+  // The batch broadcastable this instant (the window the chain is inside),
+  // populated for the whole open window from its boundary onward, or null when
+  // a send now would build nothing (no migration, wrong phase, the window not
+  // yet open, or all parts confirmed).
   due_now: RPCDueBatchType | null;
   error?: string;
 };

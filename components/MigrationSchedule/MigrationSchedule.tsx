@@ -20,7 +20,7 @@ import Utils from '../../app/utils';
 import { migrationStatus } from '../../app/walletBackend';
 import {
   RPCMigrationStatusType,
-  RPCWakePointType,
+  RPCBroadcastWindowType,
 } from '../../app/walletBackend/types/RPCMigrationStatusType';
 import {
   armBatchReminders,
@@ -38,9 +38,11 @@ const fmt = (zats: number): string =>
   `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
 // The schedule review: one card per coming window with its batch (the
-// denominations due) and when the reminder will fire. Confirm asks for
-// notification permission and arms one reminder per window at its random
-// target time — nothing is ever sent without the user opening the app.
+// denominations due) and when its reminder will fire. Confirm asks for
+// notification permission, arms one reminder per window at its advisory target
+// time (each batch is due from its boundary; the target only paces the nudge),
+// then attempts the first batch right away. It opened in the current bucket,
+// so it is due now and sends without waiting for a reminder.
 const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
   navigation,
 }) => {
@@ -94,7 +96,22 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
     });
   }, [navigation]);
 
-  const wakes = useMemo(() => status?.next_wakes ?? [], [status]);
+  const wakes = useMemo(() => status?.upcoming_windows ?? [], [status]);
+
+  // upcoming_windows carries only future windows. The first batch opens in the
+  // current bucket, so it rides in due_now (immediately sendable) and never
+  // appears here — number the coming windows past it, exactly as the status
+  // screen does, or the first future window would mislabel as "Batch 1".
+  const perBucket = Math.max(1, status?.per_bucket ?? 1);
+  const batchesTotal = Math.max(
+    1,
+    Math.ceil((status?.parts_total ?? 0) / perBucket),
+  );
+  const batchesConfirmed = Math.min(
+    batchesTotal,
+    Math.floor((status?.parts_confirmed ?? 0) / perBucket),
+  );
+  const nextWakeBase = batchesConfirmed + (status?.due_now ? 2 : 1);
 
   const onConfirm = useCallback(async () => {
     if (confirming) {
@@ -104,12 +121,12 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
     const granted = await requestReminderPermission();
     if (granted) {
       await armBatchReminders(
-        wakes.map((wake: RPCWakePointType, i: number) => ({
+        wakes.map((wake: RPCBroadcastWindowType, i: number) => ({
           id: String(wake.bucket_index),
-          timestampMs: wake.estimated_target_unix_time * 1000,
+          timestampMs: wake.latest_target_unix_time * 1000,
           title: (
             translate('migrationschedule.reminder-title') as string
-          ).replace('{n}', String(i + 1)),
+          ).replace('{n}', String(nextWakeBase + i)),
           body: translate('migrationschedule.reminder-body') as string,
         })),
       );
@@ -120,8 +137,34 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
       addLastSnackbar(translate('migrationschedule.denied') as string);
     }
     setConfirming(false);
-    goStatus();
-  }, [confirming, wakes, translate, addLastSnackbar, goStatus]);
+    // The plan is agreed. The first batch opened in the current bucket, so it's
+    // due now. Attempt it immediately instead of parking on the monitor for a
+    // manual tap: MigrationBatchSending auto-runs execute_due_parts on mount and
+    // resets to the monitor when done. Later batches wait for their reminders.
+    const due = status?.due_now;
+    if (due && due.denominations.length > 0) {
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: RouteEnum.MigrationBatchSending,
+            params: { denominations: due.denominations },
+          },
+        ],
+      });
+    } else {
+      goStatus();
+    }
+  }, [
+    confirming,
+    wakes,
+    nextWakeBase,
+    status,
+    navigation,
+    translate,
+    addLastSnackbar,
+    goStatus,
+  ]);
 
   // ----- Loading / error -----
   if (loading || errorMsg) {
@@ -187,7 +230,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
             )}
         </Text>
 
-        {wakes.map((wake: RPCWakePointType, i: number) => (
+        {wakes.map((wake: RPCBroadcastWindowType, i: number) => (
           <View
             key={wake.bucket_index}
             style={{
@@ -212,7 +255,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
               >
                 {(translate('migrationschedule.batch') as string).replace(
                   '{n}',
-                  String(i + 1),
+                  String(nextWakeBase + i),
                 )}
               </Text>
               {/* Wall-clock time leads; block heights are the metadata. */}
@@ -222,7 +265,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
                 {(translate('migrationschedule.due') as string).replace(
                   '{time}',
                   Utils.formatDate(
-                    wake.estimated_target_unix_time * 1000,
+                    wake.latest_target_unix_time * 1000,
                     'EEE, MMM d · HH:mm',
                     language,
                   ),

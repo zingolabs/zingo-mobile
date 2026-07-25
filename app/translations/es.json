@@ -835,10 +835,12 @@
     "next-action-label": "Próxima acción",
     "next-in-blocks": "Lote {n} en ~{blocks} bloques",
     "next-send-now": "Enviar lote {n}",
+    "next-confirming": "Lote {n} enviado, confirmando",
     "next-splitting": "Terminar división",
     "next-all-sent": "Todos los lotes enviados",
     "status-pending": "Pendiente",
     "status-ready": "Listo",
+    "status-confirming": "Confirmando",
     "status-splitting": "Dividiendo"
   },
   "migrationstrategy": {
@@ -904,6 +906,10 @@
     "replanned": "Tus notas cambiaron — revisa el plan actualizado.",
     "nothing-title": "Nada que migrar",
     "nothing-body": "Tu pool de Orchard no tiene fondos que valga la pena migrar ahora mismo.",
+    "nosplit-title": "No hace falta dividir",
+    "nosplit-body": "Tus notas de Orchard ya tienen el tamaño correcto, así que no hay nada que dividir. Puedes pasar directamente a programar la migración.",
+    "nosplit-ready": "Listas para migrar",
+    "continue": "Continuar",
     "back": "Atrás",
     "accept": "Aceptar",
     "close": "Cerrar"
@@ -940,15 +946,16 @@
     "more-body": "Tarda más — mejor privacidad.",
     "duration-hours": "Termina en unas {n} horas",
     "duration-days": "Termina en unos {n} días",
-    "disclosure": "Cada lote se envía cuando abres su recordatorio. Enviar en tus horas de actividad es lo que puede vincular los lotes contigo — un patrón de respuesta constante ayuda.",
+    "disclosure": "El primer lote se envía de inmediato; cada lote posterior cuando abres su recordatorio. Enviar en tus horas de actividad es lo que puede vincular los lotes contigo — un patrón de respuesta constante ayuda.",
     "cadence-fixed": "El envío ya comenzó — el calendario de lotes ya no puede cambiar.",
+    "replanned": "Tus notas cambiaron — revisa el calendario actualizado.",
     "review": "Revisar calendario"
   },
   "migrationschedule": {
     "title": "Revisar y confirmar",
-    "intro": "Confirmar programa un **recordatorio por cada lote**. Cuando llegue un recordatorio, abre la app y envía ese lote. Nada se envía automáticamente.",
+    "intro": "Confirmar envía el primer lote ahora y programa un **recordatorio por cada lote posterior**. Cuando llegue un recordatorio, abre la app y envía ese lote.",
     "batch": "Lote {n}",
-    "due": "listo ≈ {time}",
+    "due": "recordatorio ≈ {time}",
     "tech-line": "ancla {anchor} · ventana {window}",
     "miss-note": "Si te pierdes una ventana, el lote simplemente espera una futura — es lo esperado, no un error.",
     "reminder-title": "Hora de enviar el lote {n}",
@@ -963,6 +970,7 @@
     "progress": "{confirmed} de {total} lotes confirmados · {pct}%",
     "next-opens": "El siguiente lote se abre en el límite **{boundary}** (la cadena está en {height}).",
     "next-open-now": "La ventana del lote {n} está abierta — envíalo cuando quieras.",
+    "confirming": "Lote **{n}** enviado, confirmando en la cadena.",
     "all-sent": "Todos los lotes enviados — esperando las confirmaciones finales.",
     "reminders": "Te avisaremos — {n} recordatorios programados.",
     "batch": "Lote {n}",
@@ -970,7 +978,7 @@
     "open": "ABIERTO",
     "tech-line": "ancla {anchor} · enviar antes de {sendby}",
     "footer": "Los recordatorios nunca envían por ti. Envías cada lote desde aquí cuando su ventana está abierta.",
-    "back": "Volver a la cartera",
+    "back": "Atrás",
     "send": "Enviar lote ahora"
   },
   "migrationbatchsending": {

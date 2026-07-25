@@ -835,10 +835,12 @@
     "next-action-label": "Próxima ação",
     "next-in-blocks": "Lote {n} em ~{blocks} blocos",
     "next-send-now": "Enviar lote {n}",
+    "next-confirming": "Lote {n} enviado, confirmando",
     "next-splitting": "Concluir divisão",
     "next-all-sent": "Todos os lotes enviados",
     "status-pending": "Pendente",
     "status-ready": "Pronto",
+    "status-confirming": "Confirmando",
     "status-splitting": "Dividindo"
   },
   "migrationstrategy": {
@@ -904,6 +906,10 @@
     "replanned": "Suas notas mudaram — revise o plano atualizado.",
     "nothing-title": "Nada para migrar",
     "nothing-body": "Sua pool da Orchard não tem fundos que valham a pena migrar agora.",
+    "nosplit-title": "Sem divisão necessária",
+    "nosplit-body": "Suas notas da Orchard já têm o tamanho certo, então não há nada para dividir. Você pode ir direto para o agendamento da migração.",
+    "nosplit-ready": "Prontas para migrar",
+    "continue": "Continuar",
     "back": "Voltar",
     "accept": "Aceitar",
     "close": "Fechar"
@@ -940,15 +946,16 @@
     "more-body": "Demora mais — melhor privacidade.",
     "duration-hours": "Termina em cerca de {n} horas",
     "duration-days": "Termina em cerca de {n} dias",
-    "disclosure": "Cada lote é enviado quando você abre o lembrete dele. Enviar nos horários em que você está ativo é o que pode vincular os lotes a você — um padrão de resposta constante ajuda.",
+    "disclosure": "O primeiro lote é enviado imediatamente; cada lote seguinte quando você abre o lembrete dele. Enviar nos horários em que você está ativo é o que pode vincular os lotes a você — um padrão de resposta constante ajuda.",
     "cadence-fixed": "O envio já começou — o cronograma dos lotes não pode mais mudar.",
+    "replanned": "Suas notas mudaram — revise o cronograma atualizado.",
     "review": "Revisar cronograma"
   },
   "migrationschedule": {
     "title": "Revisar e confirmar",
-    "intro": "Confirmar agenda um **lembrete para cada lote**. Quando um lembrete chegar, abra o app e envie aquele lote. Nada é enviado automaticamente.",
+    "intro": "Confirmar envia o primeiro lote agora e agenda um **lembrete para cada lote seguinte**. Quando um lembrete chegar, abra o app e envie aquele lote.",
     "batch": "Lote {n}",
-    "due": "pronto ≈ {time}",
+    "due": "lembrete ≈ {time}",
     "tech-line": "âncora {anchor} · janela {window}",
     "miss-note": "Se você perder uma janela, o lote simplesmente espera por uma futura — isso é esperado, não um erro.",
     "reminder-title": "Hora de enviar o lote {n}",
@@ -963,6 +970,7 @@
     "progress": "{confirmed} de {total} lotes confirmados · {pct}%",
     "next-opens": "O próximo lote abre no limite **{boundary}** (a cadeia está em {height}).",
     "next-open-now": "A janela do lote {n} está aberta — envie quando quiser.",
+    "confirming": "Lote **{n}** enviado, confirmando na cadeia.",
     "all-sent": "Todos os lotes enviados — aguardando as confirmações finais.",
     "reminders": "Vamos lembrar você — {n} lembretes agendados.",
     "batch": "Lote {n}",
@@ -970,7 +978,7 @@
     "open": "ABERTO",
     "tech-line": "âncora {anchor} · enviar até {sendby}",
     "footer": "Os lembretes nunca enviam por você. Você envia cada lote a partir daqui quando a janela dele está aberta.",
-    "back": "Voltar à carteira",
+    "back": "Voltar",
     "send": "Enviar lote agora"
   },
   "migrationbatchsending": {
