@@ -107,8 +107,10 @@ screen. Its purpose is isolating transport behavior from UI work.
 _Avoid_: silent mode (it is a build, not a runtime mode)
 
 **Always On** (build flavor):
-The build flavor that produces the silent alpha APK: Mixnet Mode is enabled
+The build flavors that produce the silent alpha APKs: Mixnet Mode is enabled
 unconditionally at wallet initialization and cannot be disabled at runtime.
+Two network variants exist — `alwayson` first-runs on mainnet, and
+`alwaysontest` first-runs on testnet — installable side by side.
 
 ## CI
 

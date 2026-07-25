@@ -21,6 +21,20 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return "RPCModule"
     }
 
+    /**
+     * `defaultChainName` is the chain a first run of this flavor defaults
+     * to ("main" everywhere except the testnet alpha flavor). Carried as a
+     * per-flavor res string because BuildConfig generation is deliberately
+     * disabled for build reproducibility; the app reads it only when no
+     * persisted server setting exists yet.
+     */
+    override fun getConstants(): Map<String, Any> {
+        return mapOf(
+            "defaultChainName" to
+                applicationContext.resources.getString(R.string.default_chain_name),
+        )
+    }
+
     private fun getDocumentDirectory(): String {
         return applicationContext.filesDir.absolutePath
     }
