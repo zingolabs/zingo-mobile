@@ -12,7 +12,167 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
 >
   <View
     onLayout={[Function]}
-  />
+  >
+    <View
+      style={{}}
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#011401",
+            "display": "flex",
+            "minHeight": 50,
+            "paddingBottom": 10,
+            "paddingTop": 0,
+          }
+        }
+        testID="header"
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "display": "flex",
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "gap": 8,
+              "justifyContent": "center",
+              "marginHorizontal": 5,
+              "marginTop": 12,
+            }
+          }
+        >
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#011401",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                    "minHeight": 25,
+                    "minWidth": 25,
+                    "padding": 0,
+                  }
+                }
+              >
+                <
+                  color="#5a8c5a"
+                  icon={
+                    {
+                      "icon": [
+                        576,
+                        512,
+                        [],
+                        "f3c1",
+                        "M384 96c0-35.3 28.7-64 64-64s64 28.7 64 64l0 32c0 17.7 14.3 32 32 32s32-14.3 32-32l0-32c0-70.7-57.3-128-128-128S320 25.3 320 96l0 64-160 0c-35.3 0-64 28.7-64 64l0 224c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-224c0-35.3-28.7-64-64-64l-32 0 0-64z",
+                      ],
+                      "iconName": "lock-open",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={20}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "left": 0,
+            "paddingBottom": 11.5,
+            "paddingLeft": 20,
+            "paddingRight": 11.5,
+            "paddingTop": 16,
+            "position": "absolute",
+            "top": 0,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "padding": 13,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/img/logobig-zingo.png",
+            }
+          }
+          style={
+            {
+              "borderRadius": 6,
+              "height": 30,
+              "resizeMode": "contain",
+              "width": 30,
+            }
+          }
+        />
+      </View>
+    </View>
+  </View>
   <View
     style={
       {
@@ -631,7 +791,167 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
 >
   <View
     onLayout={[Function]}
-  />
+  >
+    <View
+      style={{}}
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#011401",
+            "display": "flex",
+            "minHeight": 50,
+            "paddingBottom": 10,
+            "paddingTop": 0,
+          }
+        }
+        testID="header"
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "display": "flex",
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "gap": 8,
+              "justifyContent": "center",
+              "marginHorizontal": 5,
+              "marginTop": 12,
+            }
+          }
+        >
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#011401",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                    "minHeight": 25,
+                    "minWidth": 25,
+                    "padding": 0,
+                  }
+                }
+              >
+                <
+                  color="#5a8c5a"
+                  icon={
+                    {
+                      "icon": [
+                        576,
+                        512,
+                        [],
+                        "f3c1",
+                        "M384 96c0-35.3 28.7-64 64-64s64 28.7 64 64l0 32c0 17.7 14.3 32 32 32s32-14.3 32-32l0-32c0-70.7-57.3-128-128-128S320 25.3 320 96l0 64-160 0c-35.3 0-64 28.7-64 64l0 224c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-224c0-35.3-28.7-64-64-64l-32 0 0-64z",
+                      ],
+                      "iconName": "lock-open",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={20}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "left": 0,
+            "paddingBottom": 11.5,
+            "paddingLeft": 20,
+            "paddingRight": 11.5,
+            "paddingTop": 16,
+            "position": "absolute",
+            "top": 0,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "padding": 13,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/img/logobig-zingo.png",
+            }
+          }
+          style={
+            {
+              "borderRadius": 6,
+              "height": 30,
+              "resizeMode": "contain",
+              "width": 30,
+            }
+          }
+        />
+      </View>
+    </View>
+  </View>
   <View
     style={
       {

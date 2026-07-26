@@ -1,4 +1,5 @@
 import { FfiResult } from '../ffi';
+import { RPCMigrationPlanType } from '../types/RPCMigrationPlanType';
 
 /**
  * Pure routing of the migration consent screens' FFI outcomes
@@ -40,6 +41,27 @@ export function routeStartMigration(
     return { kind: 'error', message: `${e}` };
   }
   return { kind: 'proceed' };
+}
+
+export type CadencePlanRoute =
+  | { kind: 'choose'; parts: number }
+  | { kind: 'dust'; residual: number }
+  | { kind: 'unconfirmed' };
+
+// Routes the post-split plan at the cadence screen, which must never consent
+// to a plan carrying no notes: start_ironwood_migration would bind a migration
+// with zero batches and leave no way forward. Zero notes with a residual means
+// every note sits below the sweep floor, so waiting changes nothing. Zero with
+// nothing at all means the planner saw no notes: the split's outputs are mined
+// but not yet spendable at the anchor, and the real count arrives a couple of
+// blocks later.
+export function routeCadencePlan(plan: RPCMigrationPlanType): CadencePlanRoute {
+  const parts = plan.parts?.length ?? 0;
+  if (parts > 0) {
+    return { kind: 'choose', parts };
+  }
+  const residual = plan.residual ?? 0;
+  return residual > 0 ? { kind: 'dust', residual } : { kind: 'unconfirmed' };
 }
 
 export type ReschedulePartsRoute =

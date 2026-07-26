@@ -16,7 +16,8 @@ const REMINDER_PREFIX = 'ironwood-batch-';
 export type BatchReminder = {
   // Stable per-window id (the bucket index), so re-arming replaces cleanly.
   id: string;
-  // When to fire, in ms since epoch (the window's latest_target_unix_time).
+  // When to fire, in ms since epoch: the window's advisory target, estimated
+  // from its block distance at the observed spacing.
   timestampMs: number;
   title: string;
   body: string;

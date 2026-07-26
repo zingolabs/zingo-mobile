@@ -569,9 +569,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
     </View>,
     <View key="how" style={{ alignSelf: 'stretch' }}>
       <PageTitle>{translate('meetironwood.title2') as string}</PageTitle>
-      <SectionLabel color={colors.text}>
-        {translate('meetironwood.phase1-label') as string}
-      </SectionLabel>
+
       <View style={{ marginBottom: 18 }}>
         <Phase1Graphic green={colors.primary} arrowColor={colors.text} />
       </View>
@@ -591,9 +589,6 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         }}
       />
 
-      <SectionLabel color={colors.text}>
-        {translate('meetironwood.phase2-label') as string}
-      </SectionLabel>
       <View
         style={{
           flexDirection: 'row',

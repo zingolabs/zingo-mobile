@@ -12,7 +12,89 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
 >
   <View
     onLayout={[Function]}
-  />
+  >
+    <View
+      style={{}}
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#011401",
+            "display": "flex",
+            "minHeight": 50,
+            "paddingBottom": 10,
+            "paddingTop": 0,
+          }
+        }
+        testID="header"
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "display": "flex",
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "gap": 8,
+              "justifyContent": "center",
+              "marginHorizontal": 5,
+              "marginTop": 12,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "left": 0,
+            "paddingBottom": 11.5,
+            "paddingLeft": 20,
+            "paddingRight": 11.5,
+            "paddingTop": 16,
+            "position": "absolute",
+            "top": 0,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "padding": 13,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/img/logobig-zingo.png",
+            }
+          }
+          style={
+            {
+              "borderRadius": 6,
+              "height": 30,
+              "resizeMode": "contain",
+              "width": 30,
+            }
+          }
+        />
+      </View>
+    </View>
+  </View>
   <View
     style={
       {

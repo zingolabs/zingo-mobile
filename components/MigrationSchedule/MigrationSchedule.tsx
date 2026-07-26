@@ -15,7 +15,13 @@ import Button from '../Components/Button';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
+import {
+  ButtonTypeEnum,
+  RouteEnum,
+  TARGET_BLOCK_SPACING_SECONDS,
+  estimatedTimestampMs,
+  windowTargetHeight,
+} from '../../app/AppState';
 import Utils from '../../app/utils';
 import { migrationStatus } from '../../app/walletBackend';
 import {
@@ -47,16 +53,34 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addLastSnackbar } = context;
+  const { translate, language, addLastSnackbar, info } = context;
   const { colors } = useTheme() as ThemeType;
+
+  // The payload's unix estimates assume mainnet spacing; re-derive each
+  // target's wall-clock moment from its block distance and the spacing the
+  // wallet actually observes, so the times hold on faster chains too. Without
+  // a chain tip there is no distance to scale, so the payload's own estimate
+  // stands.
+  const wakeTargetMs = useCallback(
+    (wake: RPCBroadcastWindowType): number =>
+      info?.latestBlock
+        ? estimatedTimestampMs(
+            windowTargetHeight(wake),
+            info.latestBlock,
+            info.secondsPerBlock ?? TARGET_BLOCK_SPACING_SECONDS,
+            Date.now(),
+          )
+        : wake.latest_target_unix_time * 1000,
+    [info],
+  );
 
   const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<boolean>(false);
 
-  // The cadence chooser just called reschedule_parts, which re-bucketed with
-  // fresh randomization — so this fetch, after it, is the schedule's truth.
+  // The cadence chooser just called start_ironwood_migration, which bound the
+  // parts and scheduled them — so this fetch, after it, is the schedule's truth.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -111,7 +135,39 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
     batchesTotal,
     Math.floor((status?.parts_confirmed ?? 0) / perBucket),
   );
-  const nextWakeBase = batchesConfirmed + (status?.due_now ? 2 : 1);
+  const dueNow = status?.due_now ?? null;
+  const nextWakeBase = batchesConfirmed + (dueNow ? 2 : 1);
+
+  // Consent covers every batch, including the one that leaves the moment the
+  // user confirms. It rides in due_now, which upcoming_windows structurally
+  // omits, so without a card of its own it would be sent unseen.
+  const batchCards = [
+    ...(dueNow
+      ? [
+          {
+            key: 'due',
+            n: batchesConfirmed + 1,
+            denominations: dueNow.denominations,
+            when: translate('migrationschedule.sends-now') as string,
+            tech: (
+              translate('migrationschedule.tech-line-now') as string
+            ).replace('{anchor}', String(dueNow.boundary)),
+          },
+        ]
+      : []),
+    ...wakes.map((wake: RPCBroadcastWindowType, i: number) => ({
+      key: `w${wake.bucket_index}`,
+      n: nextWakeBase + i,
+      denominations: wake.denominations,
+      when: (translate('migrationschedule.due') as string).replace(
+        '{time}',
+        Utils.formatDate(wakeTargetMs(wake), 'EEE, MMM d · HH:mm', language),
+      ),
+      tech: (translate('migrationschedule.tech-line') as string)
+        .replace('{anchor}', String(wake.boundary))
+        .replace('{window}', String(wake.bucket_index)),
+    })),
+  ];
 
   const onConfirm = useCallback(async () => {
     if (confirming) {
@@ -123,7 +179,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
       await armBatchReminders(
         wakes.map((wake: RPCBroadcastWindowType, i: number) => ({
           id: String(wake.bucket_index),
-          timestampMs: wake.latest_target_unix_time * 1000,
+          timestampMs: wakeTargetMs(wake),
           title: (
             translate('migrationschedule.reminder-title') as string
           ).replace('{n}', String(nextWakeBase + i)),
@@ -141,14 +197,13 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
     // due now. Attempt it immediately instead of parking on the monitor for a
     // manual tap: MigrationBatchSending auto-runs execute_due_parts on mount and
     // resets to the monitor when done. Later batches wait for their reminders.
-    const due = status?.due_now;
-    if (due && due.denominations.length > 0) {
+    if (dueNow && dueNow.denominations.length > 0) {
       navigation.reset({
         index: 0,
         routes: [
           {
             name: RouteEnum.MigrationBatchSending,
-            params: { denominations: due.denominations },
+            params: { denominations: dueNow.denominations },
           },
         ],
       });
@@ -158,8 +213,9 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
   }, [
     confirming,
     wakes,
+    wakeTargetMs,
     nextWakeBase,
-    status,
+    dueNow,
     navigation,
     translate,
     addLastSnackbar,
@@ -230,9 +286,9 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
             )}
         </Text>
 
-        {wakes.map((wake: RPCBroadcastWindowType, i: number) => (
+        {batchCards.map(card => (
           <View
-            key={wake.bucket_index}
+            key={card.key}
             style={{
               borderWidth: 1,
               borderColor: colors.bottomSheetBorder,
@@ -255,21 +311,14 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
               >
                 {(translate('migrationschedule.batch') as string).replace(
                   '{n}',
-                  String(nextWakeBase + i),
+                  String(card.n),
                 )}
               </Text>
               {/* Wall-clock time leads; block heights are the metadata. */}
               <Text
                 style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}
               >
-                {(translate('migrationschedule.due') as string).replace(
-                  '{time}',
-                  Utils.formatDate(
-                    wake.latest_target_unix_time * 1000,
-                    'EEE, MMM d · HH:mm',
-                    language,
-                  ),
-                )}
+                {card.when}
               </Text>
             </View>
             <View
@@ -279,7 +328,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
                 marginBottom: 12,
               }}
             >
-              {wake.denominations.map((denomination: number, d: number) => (
+              {card.denominations.map((denomination: number, d: number) => (
                 <View
                   key={d}
                   style={{
@@ -305,9 +354,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
                 fontStyle: 'italic',
               }}
             >
-              {(translate('migrationschedule.tech-line') as string)
-                .replace('{anchor}', String(wake.boundary))
-                .replace('{window}', String(wake.bucket_index))}
+              {card.tech}
             </Text>
           </View>
         ))}
@@ -320,9 +367,6 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
           alignItems: 'center',
           paddingVertical: 24,
           paddingHorizontal: 24,
-          backgroundColor: '#050610',
-          borderTopColor: '#202240',
-          borderTopWidth: 1,
         }}
       >
         <Button

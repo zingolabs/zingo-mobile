@@ -9,10 +9,12 @@ import WalletBackend from './WalletBackend';
 
 export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
 export type {
+  CadencePlanRoute,
   ReschedulePartsRoute,
   StartMigrationRoute,
 } from './utils/migrationRouting';
 export {
+  routeCadencePlan,
   routeRescheduleParts,
   routeStartMigration,
 } from './utils/migrationRouting';

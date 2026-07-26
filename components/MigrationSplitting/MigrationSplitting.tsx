@@ -8,7 +8,6 @@ import React, {
 } from 'react';
 import {
   ActivityIndicator,
-  Animated,
   BackHandler,
   ScrollView,
   Text,
@@ -22,15 +21,13 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
+import ProgressBar from '../Migration/ProgressBar';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import useTrickleProgress from '../../app/hooks/useTrickleProgress';
-import {
-  planIronwoodMigration,
-  quickSplit,
-} from '../../app/walletBackend';
+import { planIronwoodMigration, quickSplit } from '../../app/walletBackend';
 import { RPCSplitOutcomeType } from '../../app/walletBackend/types/RPCSplitOutcomeType';
 import { RPCMigrationPlanType } from '../../app/walletBackend/types/RPCMigrationPlanType';
 
@@ -46,26 +43,15 @@ const ZATS_PER_ZEC = 10 ** 8;
 // hammering the wallet.
 const POLL_MS = 15 * 1000;
 
-// Compact ZEC amount for the per-transaction output list: trims trailing zeros
-// so a 10 ZEC note reads "10" and a dust note "0.01", matching the plan values.
+// Compact ZEC amount: trims trailing zeros so a 10 ZEC total reads "10" and a
+// dust total "0.01", matching the plan values.
 const fmt = (zats: number): string =>
   `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
-// "10, 10, 1" with repeats collapsed to "10 (×2), 1".
-const outputsLabel = (outputs: number[]): string => {
-  const groups: { value: number; count: number }[] = [];
-  for (const v of outputs) {
-    const existing = groups.find(g => g.value === v);
-    if (existing) {
-      existing.count += 1;
-    } else {
-      groups.push({ value: v, count: 1 });
-    }
-  }
-  return groups
-    .map(g => (g.count > 1 ? `${fmt(g.value)} (×${g.count})` : fmt(g.value)))
-    .join(', ');
-};
+// The transaction's total re-noted value, matching the plan's Amount row. The
+// individual note denominations stay off this screen.
+const outputsLabel = (outputs: number[]): string =>
+  fmt(outputs.reduce((sum, v) => sum + v, 0));
 
 // Round-granular truth is all the splitting API offers (there is no per-tx
 // build side channel like the drain's): a row is queued until its round
@@ -286,9 +272,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
         }
         if (planResult.ok) {
           try {
-            const parsed = JSON.parse(
-              planResult.value,
-            ) as RPCMigrationPlanType;
+            const parsed = JSON.parse(planResult.value) as RPCMigrationPlanType;
             if (!parsed.error && parsed.split_rounds) {
               if (parsed.split_rounds.length === 0) {
                 setRows([]);
@@ -497,12 +481,9 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                   color: colors.primary,
                   fontSize: 12,
                   fontWeight: '600',
-                  letterSpacing: 1,
                 }}
               >
-                {(
-                  translate('migrationsplitting.status-confirmed') as string
-                ).toUpperCase()}
+                {translate('migrationsplitting.status-confirmed') as string}
               </Text>
             </View>
           ))}
@@ -649,39 +630,19 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                   color: meta.color,
                   fontSize: 12,
                   fontWeight: '600',
-                  letterSpacing: 1,
                 }}
               >
-                {(translate(meta.key) as string).toUpperCase()}
+                {translate(meta.key) as string}
               </Text>
             </View>
           );
         })}
       </ScrollView>
 
-      {/* Always-animated progress bar, pinned above the hint. */}
+      {/* Pinned above the hint. Splitting reports no discrete steps, so the
+          trickle keeps a continuous bar moving rather than counting pieces. */}
       <View style={{ paddingHorizontal: 24, paddingBottom: 28 }}>
-        <View
-          style={{
-            width: '100%',
-            height: 6,
-            borderRadius: 3,
-            backgroundColor: colors.bottomSheetBorder,
-            overflow: 'hidden',
-          }}
-        >
-          <Animated.View
-            style={{
-              height: '100%',
-              borderRadius: 3,
-              backgroundColor: colors.primary,
-              width: trickle.progress.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0%', '100%'],
-              }),
-            }}
-          />
-        </View>
+        <ProgressBar progress={trickle.progress} />
         <Text
           style={{
             color: colors.placeholder,

@@ -19,6 +19,7 @@ import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import {
   migrationStatus,
   planIronwoodMigration,
+  routeCadencePlan,
   routeStartMigration,
   startIronwoodMigration,
 } from '../../app/walletBackend';
@@ -29,6 +30,11 @@ type MigrationCadenceProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.MigrationCadence
 >;
+
+const ZATS_PER_ZEC = 10 ** 8;
+
+const fmt = (zats: number): string =>
+  `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
 // Zcash target block spacing, for turning a window count into a duration.
 const SECONDS_PER_BLOCK = 75;
@@ -187,8 +193,9 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
     load();
   }, [load]);
 
-  const parts = plan?.parts?.length ?? 0;
-  const bucketModulus = status?.bucket_modulus ?? 256;
+  const planRoute = plan ? routeCadencePlan(plan) : null;
+  const parts = planRoute?.kind === 'choose' ? planRoute.parts : 0;
+  const bucketModulus = status?.bucket_modulus ?? 144;
   // The "fewer" preset IS zingolib's default cadence, so we never invent a
   // second opinion about a privacy parameter; "more" is maximum dispersion.
   const fewerPerBucket = status?.per_bucket ?? DEFAULT_PER_BUCKET;
@@ -266,6 +273,73 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
             {errorMsg}
           </Text>
         )}
+      </View>
+    );
+  }
+
+  // ----- Nothing to schedule -----
+  // Consenting to a plan with no notes binds a migration with no batches and
+  // no way forward, so both empty plans stop here. Dust is terminal; an
+  // unanchored split resolves in a block or two, which is what Try again is
+  // for.
+  if (planRoute && planRoute.kind !== 'choose') {
+    const dust = planRoute.kind === 'dust';
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <StepperHeader splitDone={true} sendActive={true} />
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 32,
+          }}
+        >
+          <BoldText
+            style={{ fontSize: 18, marginBottom: 10, textAlign: 'center' }}
+          >
+            {
+              translate(
+                dust
+                  ? 'migrationcadence.dust-title'
+                  : 'migrationcadence.unconfirmed-title',
+              ) as string
+            }
+          </BoldText>
+          <Text
+            style={{
+              color: colors.placeholder,
+              fontSize: 15,
+              lineHeight: 22,
+              textAlign: 'center',
+            }}
+          >
+            {dust
+              ? (translate('migrationcadence.dust-body') as string).replace(
+                  '{amount}',
+                  fmt(planRoute.residual),
+                )
+              : (translate('migrationcadence.unconfirmed-body') as string)}
+          </Text>
+        </View>
+        <View
+          style={{
+            paddingBottom: 24,
+            paddingHorizontal: 24,
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            testID={dust ? 'migrationcadence.back' : 'migrationcadence.retry'}
+            type={ButtonTypeEnum.Primary}
+            title={
+              translate(
+                dust ? 'migrationcadence.back' : 'migrationcadence.retry',
+              ) as string
+            }
+            onPress={dust ? () => navigation.goBack() : load}
+          />
+        </View>
       </View>
     );
   }

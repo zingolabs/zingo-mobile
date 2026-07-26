@@ -55,9 +55,15 @@ The group of parts broadcast together in one window. UI-facing term.
 _Avoid_: bucket (API-internal), shipment
 
 **Window**:
-One 256-block (~5.3h) anchor-height bucket during which a batch may be sent.
+One 144-block (3h) anchor-height bucket during which a batch may be sent.
 UI-facing term.
 _Avoid_: bucket, epoch
+
+**Boundary**:
+The block that opens a window, and the height every part sent in that window
+anchors to. Sharing one anchor is what keeps a send free of per-wallet timing
+information. A window can only carry notes that already existed at its
+boundary, so a batch of freshly split notes waits for the next one.
 
 **Cadence**:
 How many parts share each window (`per_bucket`). Chosen once, after splitting
@@ -71,6 +77,12 @@ a user-facing notification at the window's random target time (leads to the
 execute screen). In UI copy the notification is a **reminder**; a batch is
 **due** at its target time, never "send by" (lateness is designed-for, not a
 deadline miss).
+
+**Anchored**:
+A note is anchored once the chain has advanced far enough past its
+confirmation that the wallet will spend it. A round's outputs are mined some
+blocks before they are anchored, and in that gap the note set shows neither the
+round's inputs nor its outputs, so planning over it is wrong.
 
 **Slid**:
 A part whose window became unwitnessable and which moved itself to a coming
