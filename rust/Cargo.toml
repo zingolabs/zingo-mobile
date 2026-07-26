@@ -3,9 +3,13 @@ members = ["lib", "android", "ios", "zingomobile_utils", "workbench"]
 resolver = "2"
 
 [workspace.dependencies]
-zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "feat/ironwood" }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "feat/ironwood" }
-zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "feat/ironwood" }
+# feat/ironwood merged into zingolib dev (zingolib#2419) and the branch was
+# deleted, which broke every branch-based resolve. Pin the exact commit the
+# lockfile was already frozen at; moving to zingolib dev is a deliberate
+# follow-up, not part of this unbreak.
+zingolib = { git = "https://github.com/zingolabs/zingolib", rev = "ba5fdef493264f813ee74e87a7c533f1176f2eb0" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib", rev = "ba5fdef493264f813ee74e87a7c533f1176f2eb0" }
+zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", rev = "ba5fdef493264f813ee74e87a7c533f1176f2eb0" }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
 zingomobile_utils = { path = "zingomobile_utils" }
 
