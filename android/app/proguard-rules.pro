@@ -37,6 +37,16 @@
     <init>(...);
 }
 
+# Guava — the androidTest APK asserts with Google Truth, which needs Guava
+# (e.g. ImmutableList) at runtime. Because the app ships Guava (a notifee
+# dependency, also declared for WorkManager's ListenableFuture), AGP excludes
+# Guava from the test APK and the instrumentation classpath borrows the
+# app's copy — but the app itself reaches only a sliver of Guava, so R8
+# strips the rest and Truth dies with NoClassDefFoundError on device.
+# Keep Guava intact so the tested APK can serve the test APK's needs.
+-keep class com.google.common.** { *; }
+-dontwarn com.google.common.**
+
 # JNA references AWT classes that don't exist on Android — suppress R8 warnings
 -dontwarn java.awt.**
 -dontwarn com.sun.jna.Native$AWT

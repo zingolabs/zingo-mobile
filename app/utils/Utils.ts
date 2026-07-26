@@ -1,5 +1,9 @@
 import { getNumberFormatSettings } from 'react-native-localize';
-import { format as dateFnsFormat, differenceInMinutes } from 'date-fns';
+import {
+  format as dateFnsFormat,
+  differenceInMinutes,
+  formatDistanceStrict,
+} from 'date-fns';
 import type { Locale } from 'date-fns';
 import {
   enUS,
@@ -119,8 +123,8 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      const ua: string = await getDonationAddress();
-      return ua;
+      const ua = await getDonationAddress();
+      return ua.ok ? ua.value : '';
     }
     return '';
   }
@@ -142,8 +146,8 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      const ua: string = await getZenniesDonationAddress();
-      return ua;
+      const ua = await getZenniesDonationAddress();
+      return ua.ok ? ua.value : '';
     }
     return '';
   }
@@ -362,21 +366,17 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
-    const result: string = await parseAddress(address);
+    const result = await parseAddress(address);
     let isValid: boolean = false;
     let isFullUA: boolean = false;
     let onlyOrchardUA: string = '';
 
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error)) {
-        return { isValid, onlyOrchardUA };
-      }
-    } else {
+    if (!result.ok || !result.value) {
       return { isValid, onlyOrchardUA };
     }
     let resultJSON = {} as RPCParseAddressType;
     try {
-      resultJSON = await JSON.parse(result);
+      resultJSON = await JSON.parse(result.value);
     } catch (e) {
       return { isValid, onlyOrchardUA };
     }
@@ -412,17 +412,13 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<boolean> {
-    const result: string = await parseAddress(address);
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error)) {
-        return false;
-      }
-    } else {
+    const result = await parseAddress(address);
+    if (!result.ok || !result.value) {
       return false;
     }
     let resultJSON = {} as RPCParseAddressType;
     try {
-      resultJSON = await JSON.parse(result);
+      resultJSON = await JSON.parse(result.value);
     } catch (e) {
       return false;
     }
@@ -491,6 +487,13 @@ export default class Utils {
 
   static diffInMinutes(from: Date, to: Date): number {
     return differenceInMinutes(from, to);
+  }
+
+  // Localized rough duration ("2 hours", "45 minutes") for a span in ms.
+  static formatDurationMs(ms: number, language: LanguageEnum): string {
+    return formatDistanceStrict(0, ms, {
+      locale: Utils.getDateFnsLocale(language),
+    });
   }
 
   /**

@@ -1,4 +1,4 @@
-import { ChainNameEnum, GlobalConst } from '../AppState';
+import { ChainNameEnum } from '../AppState';
 import { changeServer, getBalanceInfo, getServerInfo } from '../walletBackend';
 import { RPCInfoType } from '../walletBackend/types/RPCInfoType';
 
@@ -26,22 +26,19 @@ const checkServerURI = async (
     // the call resolves before the race starts and the 15s timer is moot —
     // a failing RPC then blocks for as long as the native side decides
     // (observed ~4 min in the wild instead of the intended 15s cap).
-    const resultStrServerPromise = changeServer(uri);
+    const resultServerPromise = changeServer(uri);
     const timeoutServerPromise = new Promise<never>((_, reject) => {
       setTimeout(() => {
         reject(new Error('Promise changeserver Timeout 15 seconds'));
       }, 15 * 1000);
     });
 
-    const resultStrServer: string = await Promise.race([
-      resultStrServerPromise,
+    const resultServer = await Promise.race([
+      resultServerPromise,
       timeoutServerPromise,
     ]);
 
-    if (
-      resultStrServer &&
-      resultStrServer.toLowerCase().startsWith(GlobalConst.error)
-    ) {
+    if (!resultServer.ok) {
       // I have to restore the old server again. Just in case.
       await changeServer(oldUri);
       // error, no timeout
@@ -49,26 +46,23 @@ const checkServerURI = async (
         result: false,
         timeout: false,
         newChainName,
-        errorDetail: `changeServer: ${resultStrServer}`,
+        errorDetail: `changeServer: ${resultServer.error.message}`,
       };
     } else {
       // the server is changed
       if (uri) {
         // the new server is not Offline mode.
         // No `await` here so Promise.race can enforce the 15s cap.
-        const infoStrPromise = getServerInfo();
+        const infoPromise = getServerInfo();
         const timeoutInfoPromise = new Promise<never>((_, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 15 seconds'));
           }, 15 * 1000);
         });
 
-        const infoStr: string = await Promise.race([
-          infoStrPromise,
-          timeoutInfoPromise,
-        ]);
+        const info = await Promise.race([infoPromise, timeoutInfoPromise]);
 
-        if (infoStr && infoStr.toLowerCase().startsWith(GlobalConst.error)) {
+        if (!info.ok) {
           // I have to restore the old server again.
           await changeServer(oldUri);
           // error, no timeout
@@ -76,11 +70,11 @@ const checkServerURI = async (
             result: false,
             timeout: false,
             newChainName,
-            errorDetail: `infoServerInfo: ${infoStr}`,
+            errorDetail: `infoServerInfo: ${info.error.message}`,
           };
         } else {
           try {
-            const infoJSON: RPCInfoType = await JSON.parse(infoStr);
+            const infoJSON: RPCInfoType = await JSON.parse(info.value);
             newChainName = infoJSON.chain_name;
           } catch (e) {
             // I have to restore the old server again.
@@ -92,29 +86,26 @@ const checkServerURI = async (
               newChainName,
               errorDetail: `infoServerInfo parse: ${
                 e instanceof Error ? e.message : String(e)
-              } | raw: ${infoStr}`,
+              } | raw: ${info.value}`,
             };
           }
         }
       } else {
         // the new server is empty -> means Offline mode.
         // No `await` here so Promise.race can enforce the 15s cap.
-        const balanceStrPromise = getBalanceInfo();
+        const balancePromise = getBalanceInfo();
         const timeoutInfoPromise = new Promise<never>((_, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 15 seconds'));
           }, 15 * 1000);
         });
 
-        const balanceStr: string = await Promise.race([
-          balanceStrPromise,
+        const balance = await Promise.race([
+          balancePromise,
           timeoutInfoPromise,
         ]);
 
-        if (
-          balanceStr &&
-          balanceStr.toLowerCase().startsWith(GlobalConst.error)
-        ) {
+        if (!balance.ok) {
           // I have to restore the old server again.
           await changeServer(oldUri);
           // error, no timeout
@@ -122,7 +113,7 @@ const checkServerURI = async (
             result: false,
             timeout: false,
             newChainName,
-            errorDetail: `getBalanceInfo: ${balanceStr}`,
+            errorDetail: `getBalanceInfo: ${balance.error.message}`,
           };
         } else {
           newChainName = undefined;

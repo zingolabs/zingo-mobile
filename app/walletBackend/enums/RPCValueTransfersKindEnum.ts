@@ -4,5 +4,6 @@ export enum RPCValueTransfersKindEnum {
   shield = 'shield',
   received = 'received',
   sendToSelf = 'send-to-self',
+  migration = 'migration',
   rejection = 'rejection',
 }

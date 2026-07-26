@@ -157,6 +157,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [usdRowH, setUsdRowH] = useState<number>(0);
   const [priceRowH, setPriceRowH] = useState<number>(0);
   const [bannerH, setBannerH] = useState<number>(0);
+  const [handleH, setHandleH] = useState<number>(0);
+  // The BottomSheet sizes its content wrapper (and therefore the list's scroll
+  // frame) to the HIGHEST snap point, not the current one. A plain
+  // RecyclerListView, unlike gorhom's own scrollables, never compensates, so at
+  // any snap below the top the frame runs past the visible window (off-screen,
+  // behind the tab bar), stranding the list's tail where it can't be scrolled
+  // up. Track the settled snap to clamp the list to the visible height instead.
+  const [snapIndex, setSnapIndex] = useState<number>(0);
 
   // Persistent "migrate Orchard → Ironwood" call-to-action. It stands or falls
   // on funds alone: shown for as long as the wallet holds anything left to
@@ -409,6 +417,19 @@ const History: React.FunctionComponent<HistoryProps> = ({
     );
   }, [priceRowH, historySnapPoints]);
 
+  // Height of the list's visible window at the settled snap: the snap's sheet
+  // height minus the handle. Clamping the RecyclerListView's frame to this
+  // (instead of letting it fill the max-snap-sized content wrapper) keeps its
+  // scroll range inside what's actually on screen, so the last row is always
+  // reachable. Stays `undefined` until the layout is measured (snap points are
+  // still percentage strings), when the list falls back to `flex: 1`.
+  const activeSnap =
+    historySnapPoints[Math.min(snapIndex, historySnapPoints.length - 1)];
+  const listAreaH =
+    typeof activeSnap === 'number' && handleH > 0
+      ? Math.max(activeSnap - handleH, 0)
+      : undefined;
+
   const mergedValueTransfers = useMemo(() => {
     return valueTransfers ?? [];
   }, [valueTransfers]);
@@ -634,6 +655,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const renderHistoryHandle = useCallback(
     () => (
       <View
+        onLayout={e => setHandleH(e.nativeEvent.layout.height)}
         style={{
           paddingTop: 8,
           paddingBottom: 6,
@@ -813,6 +835,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               amount={orchardAmount}
               currencyName={info.currencyName}
               onStart={() => navigation.navigate(RouteEnum.MeetIronwood)}
+              onResume={route => navigation.navigate(route)}
             />
           )}
         </View>
@@ -827,6 +850,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           index={0}
           onChange={i => {
             internalSnapIndexRef.current = i;
+            setSnapIndex(i);
             onPriceSnapChange(i);
           }}
           enableDynamicSizing={false}
@@ -843,10 +867,17 @@ const History: React.FunctionComponent<HistoryProps> = ({
           handleComponent={renderHistoryHandle}
         >
           <View
-            style={{
-              flex: 1,
-              backgroundColor: colors.bottomSheetBackground,
-            }}
+            style={
+              listAreaH != null
+                ? {
+                    height: listAreaH,
+                    backgroundColor: colors.bottomSheetBackground,
+                  }
+                : {
+                    flex: 1,
+                    backgroundColor: colors.bottomSheetBackground,
+                  }
+            }
           >
             {loading ? (
               <ActivityIndicator

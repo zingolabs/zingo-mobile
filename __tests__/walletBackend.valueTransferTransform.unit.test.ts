@@ -28,6 +28,7 @@ describe('transformValueTransfer — kind mapping', () => {
     [RPCValueTransfersKindEnum.received, ValueTransferKindEnum.Received],
     [RPCValueTransfersKindEnum.memoToSelf, ValueTransferKindEnum.MemoToSelf],
     [RPCValueTransfersKindEnum.sendToSelf, ValueTransferKindEnum.SendToSelf],
+    [RPCValueTransfersKindEnum.migration, ValueTransferKindEnum.Migration],
     [RPCValueTransfersKindEnum.shield, ValueTransferKindEnum.Shield],
     [RPCValueTransfersKindEnum.rejection, ValueTransferKindEnum.Rejection],
   ];

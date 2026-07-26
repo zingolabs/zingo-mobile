@@ -467,25 +467,20 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       // fee
       let proposeFee = 0;
-      const runProposeStr = await sendPropose(JSON.stringify(sendJson));
+      const runPropose = await sendPropose(JSON.stringify(sendJson));
 
       // discard result if a newer calculation (or a clear) has superseded this one
       if (feeCalculationGenRef.current !== generation) {
         return;
       }
 
-      //Alert.alert('Calculating the FEE ' + command, runProposeStr);
-      if (
-        runProposeStr &&
-        runProposeStr.toLowerCase().startsWith(GlobalConst.error)
-      ) {
+      if (!runPropose.ok) {
         // snack with error
-        setProposeSendLastError(runProposeStr);
-        //Alert.alert('Calculating the FEE', runProposeStr);
+        setProposeSendLastError(runPropose.error.message);
       } else {
         try {
           let runProposeJson: RPCSendProposeType;
-          runProposeJson = await JSON.parse(runProposeStr);
+          runProposeJson = await JSON.parse(runPropose.value);
           if (runProposeJson.error) {
             // snack with error — the error message already reaches the UI via
             // setProposeSendLastError; do not mirror to console (Audit Issue K).
@@ -517,8 +512,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           }
         } catch (e) {
           // snack with error
-          setProposeSendLastError(runProposeStr);
-          //Alert.alert('Calculating the FEE', runProposeJson.error);
+          setProposeSendLastError(runPropose.value);
         }
       }
       setFee(proposeFee);
@@ -560,7 +554,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         : 0;
       let zenniesForZingo = donationAddress ? false : donation;
       const start = Date.now();
-      const runSpendableBalanceStr = await getSpendableBalanceWithAddress(
+      const runSpendableBalance = await getSpendableBalanceWithAddress(
         addressPar,
         zenniesForZingo ? 'true' : 'false',
       );
@@ -570,17 +564,13 @@ const Send: React.FunctionComponent<SendProps> = ({
           Date.now() - start,
         );
       }
-      if (
-        runSpendableBalanceStr &&
-        runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)
-      ) {
+      if (!runSpendableBalance.ok) {
         // snack with error
-        setSpendableBalanceLastError(runSpendableBalanceStr);
-        //Alert.alert('Calculating the FEE', runProposeStr);
+        setSpendableBalanceLastError(runSpendableBalance.error.message);
       } else {
         try {
           const runSpendableBalanceJson: RPCSpendablebalanceType =
-            await JSON.parse(runSpendableBalanceStr);
+            await JSON.parse(runSpendableBalance.value);
           if (runSpendableBalanceJson.spendable_balance) {
             // Audit Issue K — do not log the spendable balance value.
             spendableBalance =
@@ -590,11 +580,10 @@ const Send: React.FunctionComponent<SendProps> = ({
         } catch (e) {
           // snack with error
           setSpendableBalanceLastError(
-            runSpendableBalanceStr +
+            runSpendableBalance.value +
               ' ' +
               (e instanceof Error ? e.message : String(e)),
           );
-          //Alert.alert('Calculating the FEE', runProposeJson.error);
         }
       }
 
@@ -2237,9 +2226,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                         let parseAddressInfoJSON: RPCParseAddressType =
                           {} as RPCParseAddressType;
                         try {
-                          parseAddressInfoJSON = JSON.parse(
-                            await parseAddress(addressText),
-                          );
+                          const parseResult = await parseAddress(addressText);
+                          if (parseResult.ok) {
+                            parseAddressInfoJSON = JSON.parse(
+                              parseResult.value,
+                            );
+                          }
                         } catch (_) {
                           // best-effort prefetch; fall through to {}
                         }

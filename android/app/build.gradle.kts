@@ -355,12 +355,15 @@ dependencies {
 
     val workVersion = "2.10.0"
 
-    implementation("androidx.work:work-runtime:$workVersion")
-
     // BackgroundSyncWorker consumes the ListenableFuture WorkManager
-    // returns; declare the class's provider instead of borrowing it from
-    // work-runtime's dependency graph.
-    implementation("com.google.guava:listenablefuture:1.0")
+    // returns, so the class's provider must be declared, not borrowed from
+    // work-runtime's dependency graph. With notifee bringing Guava onto the
+    // runtime classpath, Guava's metadata retires the standalone
+    // listenablefuture jar (the empty 9999.0 placeholder supersedes 1.0),
+    // so Guava itself is the only real provider left.
+    implementation("com.google.guava:guava:33.3.1-android")
+
+    implementation("androidx.work:work-runtime:$workVersion")
 
     // optional - Multiprocess support
     implementation("androidx.work:work-multiprocess:$workVersion")

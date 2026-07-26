@@ -10,6 +10,7 @@ import {
 } from '../AppState';
 import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
 import { RPCDrainTxType } from '../walletBackend/types/RPCDrainPlanType';
+import { RPCMigrationPlanType } from '../walletBackend/types/RPCMigrationPlanType';
 
 /**
  * Root navigation parameter list for the main stack navigator
@@ -77,6 +78,24 @@ export type AppDrawerParamList = {
   // The immediate drain broadcasts here; `transactions` is the previewed plan,
   // so the list matches what the user accepted while the drain re-plans/sends.
   [RouteEnum.MigrationSending]: { transactions: RPCDrainTxType[] };
+  [RouteEnum.MigrationSplitPlan]: undefined;
+  // The splitting loop runs here; `plan` is the consented preview so the
+  // transaction rows match what the user accepted. Absent on banner-rescue
+  // re-entry, where the screen renders coarsely from migrationStatus.
+  [RouteEnum.MigrationSplitting]: { plan?: RPCMigrationPlanType } | undefined;
+  [RouteEnum.MigrationCadence]: undefined;
+  // The cadence the user picked, so Back from the review screen can restore
+  // the selection.
+  [RouteEnum.MigrationSchedule]: { perBucket: number };
+  // The in-flight "Migration underway" monitor: the landing after the schedule
+  // is confirmed and the parts_scheduled banner's resume target. Reads
+  // migrationStatus, so it needs no params.
+  [RouteEnum.MigrationStatus]: undefined;
+  // Broadcasts the open window's due batch (execute_due_parts) with live
+  // progress. `denominations` is the window's batch, previewed while the send
+  // runs; absent on a defensive re-entry, where the screen sends whatever is
+  // due.
+  [RouteEnum.MigrationBatchSending]: { denominations?: number[] } | undefined;
 
   // Drawer with params
   [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;

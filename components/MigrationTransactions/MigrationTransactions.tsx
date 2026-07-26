@@ -8,7 +8,7 @@ import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, GlobalConst, RouteEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
 import { planOrchardDrain } from '../../app/walletBackend';
 import { RPCDrainPlanType } from '../../app/walletBackend/types/RPCDrainPlanType';
@@ -20,23 +20,8 @@ type MigrationTransactionsProps = NativeStackScreenProps<
 
 const ZATS_PER_ZEC = 10 ** 8;
 
-// Collapse repeated same-value notes into distinct {value, count} groups,
-// preserving first-appearance order, so a fragmented wallet renders "10 (×3)"
-// instead of the same amount many times.
-const groupInputs = (inputs: number[]): { value: number; count: number }[] => {
-  const groups: { value: number; count: number }[] = [];
-  for (const v of inputs) {
-    const existing = groups.find(g => g.value === v);
-    if (existing) {
-      existing.count += 1;
-    } else {
-      groups.push({ value: v, count: 1 });
-    }
-  }
-  return groups;
-};
-
-// A label/value line inside a bordered card.
+// A label/value line inside a bordered card. `bold` emphasizes the whole
+// line: full text colour on both sides, not just the value.
 const Row: React.FunctionComponent<{
   label: string;
   value: React.ReactNode;
@@ -48,10 +33,17 @@ const Row: React.FunctionComponent<{
       flexDirection: 'row',
       alignItems: 'flex-start',
       justifyContent: 'space-between',
-      paddingVertical: 8,
+      paddingVertical: 4,
     }}
   >
-    <Text style={{ color: colors.placeholder, fontSize: 14, marginRight: 12 }}>
+    <Text
+      style={{
+        color: bold ? colors.text : colors.placeholder,
+        fontSize: 14,
+        fontWeight: bold ? '700' : '400',
+        marginRight: 12,
+      }}
+    >
       {label}
     </Text>
     <View style={{ flexShrink: 1, alignItems: 'flex-end' }}>
@@ -73,18 +65,23 @@ const Row: React.FunctionComponent<{
   </View>
 );
 
+// The transaction cards sit a shade darker than the summary, so the summary
+// reads as the surface and the detail recedes.
+const TX_CARD_BACKGROUND = '#020D1C';
+
 const Card: React.FunctionComponent<{
   colors: ThemeType['colors'];
+  background?: string;
   children: React.ReactNode;
-}> = ({ colors, children }) => (
+}> = ({ colors, background, children }) => (
   <View
     style={{
       borderWidth: 1,
       borderColor: colors.bottomSheetBorder,
-      backgroundColor: colors.bottomSheetBackground,
+      backgroundColor: background ?? colors.bottomSheetBackground,
       borderRadius: 12,
       paddingHorizontal: 16,
-      paddingVertical: 6,
+      paddingVertical: 12,
       marginBottom: 14,
     }}
   >
@@ -121,17 +118,17 @@ const MigrationTransactions: React.FunctionComponent<
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const planStr = await planOrchardDrain();
+      const planResult = await planOrchardDrain();
       if (cancelled) {
         return;
       }
-      if (planStr.toLowerCase().startsWith(GlobalConst.error)) {
-        setErrorMsg(planStr);
+      if (!planResult.ok) {
+        setErrorMsg(planResult.error.message);
         setLoading(false);
         return;
       }
       try {
-        const parsed: RPCDrainPlanType = JSON.parse(planStr);
+        const parsed: RPCDrainPlanType = JSON.parse(planResult.value);
         if (parsed.error) {
           setErrorMsg(parsed.error);
         } else {
@@ -309,20 +306,7 @@ const MigrationTransactions: React.FunctionComponent<
     '{count}',
     String(txCount),
   );
-  const noteWord = translate(
-    noteCount === 1
-      ? 'migrationtransactions.note-one'
-      : 'migrationtransactions.notes',
-  ) as string;
-  const txWord = translate(
-    txCount === 1
-      ? 'migrationtransactions.tx-one'
-      : 'migrationtransactions.txs',
-  ) as string;
-  const feeSuffix = translate('migrationtransactions.fee-suffix') as string;
-  const totalSummary = `${noteCount} ${noteWord} · ${txCount} ${txWord} · ${zec(
-    plan?.fee ?? 0,
-  )} ${feeSuffix}`;
+  const totalOutput = transactions.reduce((sum, tx) => sum + tx.output, 0);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -355,35 +339,67 @@ const MigrationTransactions: React.FunctionComponent<
           )}
         </Text>
 
+        {/* Summary first: totals up top, one fact per row, then the
+            per-transaction detail. The fee leads — it's the consent number. */}
+        <Card colors={colors}>
+          <Row
+            label={translate('migrationtransactions.total-fee') as string}
+            value={zec(plan?.fee ?? 0)}
+            colors={colors}
+            bold={true}
+          />
+          <Row
+            label={translate('migrationtransactions.total-txs') as string}
+            value={String(txCount)}
+            colors={colors}
+          />
+          <Row
+            label={translate('migrationtransactions.total-notes') as string}
+            value={String(noteCount)}
+            colors={colors}
+          />
+          <Row
+            label={translate('migrationtransactions.total-amount') as string}
+            value={zec(totalOutput)}
+            colors={colors}
+          />
+          <Row
+            label={translate('migrationtransactions.confirm-in') as string}
+            value={
+              translate('migrationtransactions.confirm-in-value') as string
+            }
+            colors={colors}
+          />
+        </Card>
+
+        <View
+          style={{
+            height: 1,
+            backgroundColor: colors.bottomSheetBorder,
+            marginBottom: 14,
+          }}
+        />
+
         {transactions.map((tx, i) => (
-          <Card key={i} colors={colors}>
-            <Row
-              label={(translate('migrationtransactions.tx') as string).replace(
+          <Card key={i} colors={colors} background={TX_CARD_BACKGROUND}>
+            <Text
+              style={{
+                color: colors.text,
+                fontSize: 15,
+                fontWeight: '700',
+                paddingVertical: 4,
+              }}
+            >
+              {(translate('migrationtransactions.tx') as string).replace(
                 '{n}',
                 String(i + 1),
               )}
-              value={
-                <Text
-                  style={{
-                    color: colors.text,
-                    fontSize: 14,
-                    fontWeight: '700',
-                  }}
-                >
-                  {translate('migrationtransactions.flow') as string}
-                </Text>
-              }
-              colors={colors}
-            />
+            </Text>
+            {/* Just the note count: the amounts are standardized by the split,
+                and Output/Fee already carry the sums. */}
             <Row
-              label={`${
-                translate('migrationtransactions.inputs') as string
-              } (${tx.inputs.length})`}
-              value={groupInputs(tx.inputs)
-                .map(g =>
-                  g.count > 1 ? `${zec(g.value)} (×${g.count})` : zec(g.value),
-                )
-                .join(', ')}
+              label={translate('migrationtransactions.inputs') as string}
+              value={String(tx.inputs.length)}
               colors={colors}
             />
             <Row
@@ -399,22 +415,6 @@ const MigrationTransactions: React.FunctionComponent<
           </Card>
         ))}
 
-        {/* Totals */}
-        <Card colors={colors}>
-          <Row
-            label={translate('migrationtransactions.total') as string}
-            value={totalSummary}
-            colors={colors}
-            bold={true}
-          />
-          <Row
-            label={translate('migrationtransactions.confirm-in') as string}
-            value={
-              translate('migrationtransactions.confirm-in-value') as string
-            }
-            colors={colors}
-          />
-        </Card>
       </ScrollView>
 
       <View
