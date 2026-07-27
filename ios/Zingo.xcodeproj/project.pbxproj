@@ -579,7 +579,7 @@
 				BUNDLE_DISPLAY_NAME = Zingo;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Zingo/Zingo.entitlements;
-				CURRENT_PROJECT_VERSION = 309;
+				CURRENT_PROJECT_VERSION = 310;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
@@ -597,7 +597,7 @@
 					"$(PROJECT_DIR)",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 2.0.20;
+				MARKETING_VERSION = 2.0.21;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -622,7 +622,7 @@
 				BUNDLE_DISPLAY_NAME = Zingo;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Zingo/Zingo.entitlements;
-				CURRENT_PROJECT_VERSION = 309;
+				CURRENT_PROJECT_VERSION = 310;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
@@ -640,7 +640,7 @@
 					"$(PROJECT_DIR)",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 2.0.20;
+				MARKETING_VERSION = 2.0.21;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

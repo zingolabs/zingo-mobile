@@ -121,8 +121,8 @@ android {
         applicationId = "org.ZingoLabs.Zingo" // Real
         minSdk = rootProject.extra["minSdkVersion"] as Int
         targetSdk = rootProject.extra["targetSdkVersion"] as Int
-        versionCode = 309 // Real (prod baseline; beta flavor overrides below)
-        versionName = "2.0.20" // Real
+        versionCode = 310 // Real (prod baseline; beta flavor overrides below)
+        versionName = "2.0.21" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
