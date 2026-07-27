@@ -2,8 +2,8 @@
  * @format
  */
 
-import { FfiJsonDecode } from '../app/walletBackend/ffi';
-import { interpretServerProbe } from '../app/walletBackend/utils/connectionProbe';
+import type { FfiJsonDecode } from '../app/walletBackend/ffi';
+import { interpretServerProbe } from '../app/walletBackend/utils/serverProbeOutcome';
 
 const json = (value: unknown): FfiJsonDecode => ({
   kind: 'json',

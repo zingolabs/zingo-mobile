@@ -1,7 +1,7 @@
 import {
   matchServerProbeOutcome,
   ServerProbeOutcome,
-} from '../utils/connectionProbe';
+} from '../utils/serverProbeOutcome';
 
 /**
  * One probed target and its typed outcome, in the order the Doctor ran them.
