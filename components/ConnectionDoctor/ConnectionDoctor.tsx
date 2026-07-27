@@ -19,10 +19,12 @@ import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 import {
   connectionDoctorReport,
+  doctorRunLines,
   DoctorRun,
   interpretServerProbe,
-  matchServerProbeOutcome,
+  interpretSyncProbe,
   probeServer,
+  probeSyncServer,
 } from '../../app/walletBackend';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 
@@ -52,8 +54,8 @@ const ConnectionDoctor: React.FunctionComponent<ConnectionDoctorProps> = ({
   }, [navigation]);
 
   // The current server first, then the stock list for its chain. A
-  // user-invoked diagnostic: every clearnet leg contacts its target from
-  // the real IP, which is why nothing here runs automatically.
+  // user-invoked diagnostic: every probe contacts its target from the real
+  // IP, which is why nothing here runs automatically.
   const targets = useCallback((): string[] => {
     const stock = serverUris(translate)
       .filter(s => s.chainName === server.chainName && !s.obsolete)
@@ -64,14 +66,25 @@ const ConnectionDoctor: React.FunctionComponent<ConnectionDoctorProps> = ({
   const runDoctor = useCallback(async () => {
     setRunning(true);
     setRuns([]);
-    // Sequential on purpose: progressive results, and one slow target
-    // never multiplies load on the rest.
+    // Sequential on purpose: results render as they land, and one dead
+    // target never multiplies load on the rest. The staged sync-path probe
+    // runs for every server; the paired covered-surface probe runs for the
+    // current server only.
     for (const uri of targets()) {
-      const outcome = interpretServerProbe(await probeServer(uri));
-      setRuns(prior => [...prior, { uri, outcome }]);
+      const sync = interpretSyncProbe(await probeSyncServer(uri));
+      const run: DoctorRun =
+        uri === server.uri
+          ? {
+              kind: 'currentServer',
+              uri,
+              sync,
+              paired: interpretServerProbe(await probeServer(uri)),
+            }
+          : { kind: 'stockServer', uri, sync };
+      setRuns(prior => [...prior, run]);
     }
     setRunning(false);
-  }, [targets]);
+  }, [server.uri, targets]);
 
   const copyReport = useCallback(
     (finished: DoctorRun[]) => {
@@ -79,38 +92,6 @@ const ConnectionDoctor: React.FunctionComponent<ConnectionDoctorProps> = ({
       addLastSnackbar(translate('connectiondoctor.report-copied') as string);
     },
     [addLastSnackbar, translate],
-  );
-
-  // Plain lines, not nested components: the match produces data and the
-  // screen renders it, mirroring how the failure transforms present.
-  const legLine = useCallback(
-    (label: string, leg: { ok: boolean; detail: string; millis: number }): string =>
-      `${label}: ${
-        leg.ok
-          ? (translate('connectiondoctor.leg-ok') as string)
-          : (translate('connectiondoctor.leg-failed') as string)
-      } (${leg.millis} ms) ${leg.detail}`,
-    [translate],
-  );
-
-  const runLines = useCallback(
-    (run: DoctorRun): string[] =>
-      matchServerProbeOutcome(run.outcome, {
-        report: ({ reports }) =>
-          reports.flatMap(report => [
-            legLine(translate('connectiondoctor.clearnet') as string, report.clearnet),
-            report.mixnet
-              ? legLine(translate('connectiondoctor.mixnet') as string, report.mixnet)
-              : (translate('connectiondoctor.mixnet-not-carried') as string),
-          ]),
-        ffiRejection: ({ code, message }) => [
-          `${translate('connectiondoctor.probe-failed') as string} ${code}: ${message}`,
-        ],
-        malformedPayload: ({ detail }) => [
-          `${translate('connectiondoctor.payload-unusable') as string} ${detail}`,
-        ],
-      }),
-    [legLine, translate],
   );
 
   const snapPoints = useFullSheetSnapPoints(containerH, headerH);
@@ -156,7 +137,7 @@ const ConnectionDoctor: React.FunctionComponent<ConnectionDoctorProps> = ({
           {runs.map(run => (
             <View key={run.uri} style={{ marginBottom: 12 }}>
               <BoldText>{run.uri}</BoldText>
-              {runLines(run).map(line => (
+              {doctorRunLines(run).map(line => (
                 <FadeText key={line} style={{ marginLeft: 10 }}>
                   {line}
                 </FadeText>

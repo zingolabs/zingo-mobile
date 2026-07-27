@@ -15,6 +15,7 @@ zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "net_diag_t
 ] }
 pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "net_diag_taxonomy" }
 zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "net_diag_taxonomy" }
+zingo-net-diag = { git = "https://github.com/zingolabs/zingolib", branch = "net_diag_taxonomy" }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
 zingomobile_utils = { path = "zingomobile_utils" }
 

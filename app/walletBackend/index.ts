@@ -16,14 +16,22 @@ export {
 } from './transforms/zecPriceFailureTransform';
 export { routeStartMigration } from './utils/migrationRouting';
 export { scanInProgress } from './utils/syncProgress';
-export type { ServerProbeOutcome } from './utils/serverProbeOutcome';
+export type {
+  ServerProbeOutcome,
+  SyncProbeOutcome,
+} from './utils/serverProbeOutcome';
 export {
   interpretServerProbe,
+  interpretSyncProbe,
   matchServerProbeOutcome,
+  matchSyncProbeOutcome,
 } from './utils/serverProbeOutcome';
-export { probeServer } from './utils/connectionProbe';
+export { probeServer, probeSyncServer } from './utils/connectionProbe';
 export type { DoctorRun } from './transforms/connectionDoctorReport';
-export { connectionDoctorReport } from './transforms/connectionDoctorReport';
+export {
+  connectionDoctorReport,
+  doctorRunLines,
+} from './transforms/connectionDoctorReport';
 export {
   cancelIronwoodMigration,
   changeServer,

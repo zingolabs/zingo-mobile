@@ -3199,31 +3199,104 @@ pub fn mixnet_ip_correlation_disclaimer() -> String {
 /// unreachable server from stalling the whole Doctor run.
 const CONNECTION_PROBE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(15);
 
-/// One timed leg of a paired probe, structured across the FFI.
-pub struct ProbeLeg {
-    pub ok: bool,
-    /// The one-line success summary (chain and height) or the failure detail.
-    pub detail: String,
-    pub millis: u64,
+/// The typed failure record of one probe stage or leg (zingolib's net-diag
+/// taxonomy), structured across the FFI: the kebab-case stage, the target,
+/// and the cause chain as a vector, never a concatenated string.
+pub struct ProbeFailure {
+    pub stage: String,
+    pub target: String,
+    pub cause_chain: Vec<String>,
 }
 
-/// One target's paired probe: the clearnet leg always runs; the mixnet leg
-/// is `None` when the proxy was not ready to carry it.
+/// What a successful probe proves, as fields.
+pub struct ProbeSuccessData {
+    pub chain: String,
+    pub height: u64,
+}
+
+/// The exhaustive outcome of one probe leg. No booleans, no optional
+/// pairs: a leg either answered or failed, and each arm carries its
+/// evidence.
+pub enum ProbeLegOutcome {
+    Answered { info: ProbeSuccessData },
+    Failed { failure: ProbeFailure },
+}
+
+/// One timed leg of a paired probe.
+pub struct ProbeLeg {
+    pub millis: u64,
+    pub outcome: ProbeLegOutcome,
+}
+
+/// The mixnet side of a paired probe. Absence has exactly one producer —
+/// the proxy was not ready to carry the leg — and it is named, never null.
+pub enum MixnetLeg {
+    Probed { leg: ProbeLeg },
+    NotCarried,
+}
+
+/// One target's paired probe: the clearnet leg always runs.
 pub struct ProbeReport {
     pub host: String,
     pub clearnet: ProbeLeg,
-    pub mixnet: Option<ProbeLeg>,
+    pub mixnet: MixnetLeg,
+}
+
+/// The exhaustive outcome of one staged sync-probe stage.
+pub enum SyncStageOutcome {
+    Passed,
+    Failed { failure: ProbeFailure },
+}
+
+/// One timed stage of the staged sync-path probe. The run stops at the
+/// first failure, so a stage that does not appear was never reached.
+pub struct SyncProbeStage {
+    pub step: String,
+    pub millis: u64,
+    pub outcome: SyncStageOutcome,
+}
+
+/// The staged probe's verdict: every stage passed and the server answered
+/// with its identity, or the run stopped at the failing stage the `stages`
+/// vector already carries.
+pub enum SyncServerVerdict {
+    Reachable { info: ProbeSuccessData },
+    Stopped,
+}
+
+/// The staged sync-path probe's report for one server.
+pub struct SyncServerProbe {
+    pub server: String,
+    pub stages: Vec<SyncProbeStage>,
+    pub verdict: SyncServerVerdict,
+}
+
+fn probe_failure(failure: &zingo_net_diag::NetOpFailure) -> ProbeFailure {
+    ProbeFailure {
+        stage: failure.stage.to_string(),
+        target: failure.target.clone(),
+        cause_chain: failure.cause_chain.clone(),
+    }
+}
+
+fn probe_success(success: &zingolib::nym::probe::ProbeSuccess) -> ProbeSuccessData {
+    ProbeSuccessData {
+        chain: success.chain.clone(),
+        height: success.height,
+    }
 }
 
 fn probe_leg(leg: &zingolib::nym::probe::ProbeLeg) -> ProbeLeg {
-    let (ok, detail) = match &leg.outcome {
-        Ok(summary) => (true, summary.clone()),
-        Err(failure) => (false, failure.clone()),
-    };
     ProbeLeg {
-        ok,
-        detail,
         millis: leg.millis,
+        outcome: match &leg.outcome {
+            Ok(success) => ProbeLegOutcome::Answered {
+                info: probe_success(success),
+            },
+            Err(failure) => ProbeLegOutcome::Failed {
+                failure: probe_failure(failure),
+            },
+        },
     }
 }
 
@@ -3246,9 +3319,57 @@ pub fn probe_server(uri: String) -> Result<Vec<ProbeReport>, ZingolibError> {
                 .map(|probe| ProbeReport {
                     host: probe.host.clone(),
                     clearnet: probe_leg(&probe.clearnet),
-                    mixnet: probe.mixnet.as_ref().map(probe_leg),
+                    mixnet: probe.mixnet.as_ref().map_or(MixnetLeg::NotCarried, |leg| {
+                        MixnetLeg::Probed {
+                            leg: probe_leg(leg),
+                        }
+                    }),
                 })
                 .collect())
         })
+    })
+}
+
+/// The staged sync-path probe (the nym-diagnostics plan, Workstream A item
+/// 1, upstream at zingolib#2561): walks one server through tcp-connect,
+/// tls-channel, and grpc-info, each stage bounded and timed, stopping at
+/// the first typed failure. Runs against the ordinary synchronization path
+/// with no tunnel, no wallet, and no lock, so it needs no initialized
+/// client. A user-invoked diagnostic contacting the target from the real
+/// IP.
+pub fn probe_sync_server(uri: String) -> Result<SyncServerProbe, ZingolibError> {
+    let target: http::Uri = uri
+        .parse()
+        .map_err(|_| ZingolibError::InvalidInput(format!("unparseable server uri: {uri}")))?;
+    let probe = RT.block_on(zingolib::nym::probe::probe_sync_server(
+        &target,
+        CONNECTION_PROBE_TIMEOUT,
+    ));
+    Ok(SyncServerProbe {
+        server: probe.server.clone(),
+        stages: probe
+            .stages
+            .iter()
+            .map(|stage| SyncProbeStage {
+                step: stage.step.to_string(),
+                millis: stage.millis,
+                outcome: stage
+                    .failure
+                    .as_ref()
+                    .map_or(SyncStageOutcome::Passed, |failure| {
+                        SyncStageOutcome::Failed {
+                            failure: probe_failure(failure),
+                        }
+                    }),
+            })
+            .collect(),
+        verdict: probe
+            .info
+            .as_ref()
+            .map_or(SyncServerVerdict::Stopped, |info| {
+                SyncServerVerdict::Reachable {
+                    info: probe_success(info),
+                }
+            }),
     })
 }
