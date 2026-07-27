@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
+import { scanInProgress } from '../walletBackend/utils/syncProgress';
 
 /**
  * Derives display-ready sync state from the raw RPC sync status.
@@ -50,13 +51,7 @@ export function useSyncStatus({
           syncingStatus.percentage_total_blocks_scanned ??
           0,
       );
-      setSyncInProgress(
-        !!syncingStatus.scan_ranges &&
-          syncingStatus.scan_ranges.length > 0 &&
-          (syncingStatus.percentage_total_outputs_scanned ??
-            syncingStatus.percentage_total_blocks_scanned ??
-            0) < 100,
-      );
+      setSyncInProgress(scanInProgress(syncingStatus));
     }
   }, [
     syncingStatus,

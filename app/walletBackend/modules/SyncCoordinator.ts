@@ -16,6 +16,7 @@ import { TotalBalanceClass, GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
 import { RPCSyncPollType } from '../types/RPCSyncPollType';
+import { scanInProgress } from '../utils/syncProgress';
 import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
 import { WalletBackendConfig } from '../config/WalletBackendConfig';
 import { DataService } from './DataService';
@@ -298,12 +299,7 @@ export class SyncCoordinator {
             : Number(ss.percentage_total_blocks_scanned?.toFixed(2));
 
       // Close the poll timer if the sync finished(checked via promise above)
-      const inR: boolean =
-        !!ss.scan_ranges &&
-        ss.scan_ranges.length > 0 &&
-        (ss.percentage_total_outputs_scanned ??
-          ss.percentage_total_blocks_scanned ??
-          0) < 100;
+      const inR = scanInProgress(ss);
       if (!inR) {
         this.config.keepAwake(false);
       } else {
