@@ -12,7 +12,13 @@
  */
 import { WalletType, GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
-import { callFfi, decodeFfiJson, FfiErrorCode, FfiResult } from '../ffi';
+import {
+  callFfi,
+  decodeFfiJson,
+  FfiErrorCode,
+  FfiJsonDecode,
+  FfiResult,
+} from '../ffi';
 import {
   COVERED_SURFACE_REFUSAL,
   coveredSurfacePermitted,
@@ -58,19 +64,27 @@ export type ZecPriceOutcome =
       readonly kind: 'price';
       readonly usd: number;
       readonly route: PriceRouteAttestation;
+      readonly elapsedMs: number;
     }
-  | { readonly kind: 'noData' }
+  | { readonly kind: 'noData'; readonly elapsedMs: number }
   | { readonly kind: 'gateRefusal'; readonly error: string }
+  | { readonly kind: 'timedOut'; readonly afterMs: number }
   | {
       readonly kind: 'ffiRejection';
       readonly code: FfiErrorCode;
       readonly message: string;
+      readonly elapsedMs: number;
     }
-  | { readonly kind: 'oracleError'; readonly error: string }
+  | {
+      readonly kind: 'oracleError';
+      readonly error: string;
+      readonly elapsedMs: number;
+    }
   | {
       readonly kind: 'malformedPayload';
       readonly payload: string;
       readonly detail: string;
+      readonly elapsedMs: number;
     };
 
 /**
@@ -99,83 +113,172 @@ export function matchZecPriceOutcome<R>(
 }
 
 /**
- * Fetches the current ZEC/USD price from the zingolib price oracle and
- * classifies the outcome. Every failure arm also lands verbatim in the dev
- * log: the screens render only a terse headline, and the silent alpha
- * flavors have no other price diagnostics at all.
+ * The watchdog bound on a price fetch. The UI never waits longer than
+ * this: the race resolves `timedOut` and the spinner is released, whatever
+ * the native call is doing underneath (an on-device hang ran ~5 minutes to
+ * `tls handshake eof` before this bound existed).
+ */
+export const PRICE_FETCH_TIMEOUT_MS = 25_000;
+
+/**
+ * The raw result of one raced fetch attempt — the pure classifier's whole
+ * input. `settled` carries the decoded FFI resolution and how long it
+ * took; `watchdogTimedOut` is the 25-second bound firing first. Nothing
+ * else can happen: callFfi never throws (rejections become the typed
+ * FfiResult), so this union is total over the attempt by construction.
+ */
+export type RawPriceFetch =
+  | {
+      readonly kind: 'settled';
+      readonly decoded: FfiJsonDecode;
+      readonly elapsedMs: number;
+    }
+  | { readonly kind: 'watchdogTimedOut'; readonly afterMs: number };
+
+/**
+ * The pure, total classification of a fetch attempt: every arm of
+ * [`RawPriceFetch`] and every shape of payload lands in exactly one
+ * [`ZecPriceOutcome`] arm. No effects, no clock, no logging — fully
+ * unit-testable without mocks; the effect shell around it supplies the
+ * elapsed time and renders the log line separately.
+ */
+export function classifyPriceFetch(raw: RawPriceFetch): ZecPriceOutcome {
+  if (raw.kind === 'watchdogTimedOut') {
+    return { kind: 'timedOut', afterMs: raw.afterMs };
+  }
+  const { decoded, elapsedMs } = raw;
+  switch (decoded.kind) {
+    case 'ffiRejection':
+      return {
+        kind: 'ffiRejection',
+        code: decoded.code,
+        message: decoded.message,
+        elapsedMs,
+      };
+    case 'emptyPayload':
+      return {
+        kind: 'malformedPayload',
+        payload: '',
+        detail: 'empty payload',
+        elapsedMs,
+      };
+    case 'malformedPayload':
+      return {
+        kind: 'malformedPayload',
+        payload: decoded.payload,
+        detail: decoded.detail,
+        elapsedMs,
+      };
+    case 'json': {
+      if (typeof decoded.value !== 'object' || decoded.value === null) {
+        return {
+          kind: 'malformedPayload',
+          payload: decoded.raw,
+          detail: 'non-object payload',
+          elapsedMs,
+        };
+      }
+      const payload = decoded.value as RPCZecPriceType;
+      if (payload.error) {
+        return { kind: 'oracleError', error: payload.error, elapsedMs };
+      }
+      if (!payload.current_price) {
+        return { kind: 'noData', elapsedMs };
+      }
+      if (isNaN(payload.current_price)) {
+        return {
+          kind: 'malformedPayload',
+          payload: decoded.raw,
+          detail: `non-numeric price ${payload.current_price}`,
+          elapsedMs,
+        };
+      }
+      const route: PriceRouteAttestation =
+        payload.via_socks5 !== undefined
+          ? { kind: 'attested', viaSocks5: payload.via_socks5 }
+          : { kind: 'preAttestationNativeLayer' };
+      return { kind: 'price', usd: payload.current_price, route, elapsedMs };
+    }
+    default: {
+      const unhandled: never = decoded;
+      throw new Error(`unhandled decode: ${JSON.stringify(unhandled)}`);
+    }
+  }
+}
+
+/**
+ * The one log line per attempt, pure, exhaustive over the outcome via the
+ * handler record (ADR 0004) — including success and the gate refusal, so
+ * absence of a line always means "no attempt finished", never "it worked"
+ * and never "it was refused".
+ */
+export function describePriceOutcome(outcome: ZecPriceOutcome): string {
+  return matchZecPriceOutcome(outcome, {
+    price: o =>
+      `price fetch ok: ${o.usd} via ${
+        o.route.kind === 'attested'
+          ? o.route.viaSocks5
+          : 'PRE-ATTESTATION LAYER'
+      } ${o.elapsedMs}ms`,
+    noData: o => `price fetch: oracle returned no price data (${o.elapsedMs}ms)`,
+    gateRefusal: () =>
+      'price fetch refused: mixnet transport not ready (fail-closed gate)',
+    timedOut: o =>
+      `price fetch timed out: watchdog fired after ${o.afterMs}ms ` +
+      '(the native call may still be running and holding the wallet lock)',
+    ffiRejection: o =>
+      `price fetch failed: ffi rejection ${o.code} (${o.elapsedMs}ms) ${o.message}`,
+    oracleError: o =>
+      `price fetch failed: oracle error (${o.elapsedMs}ms) ${o.error}`,
+    malformedPayload: o =>
+      `price fetch failed: ${o.detail} (${o.elapsedMs}ms) payload: ${o.payload}`,
+  });
+}
+
+/**
+ * Fetches the current ZEC/USD price and classifies the outcome. This is
+ * the thin effect shell: the fail-closed gate check, one raced native
+ * call, the pure classifier, and one log line per attempt — all decision
+ * logic lives in [`classifyPriceFetch`].
  */
 export async function getZecPrice(): Promise<ZecPriceOutcome> {
   // The always-on flavors' fail-closed gate: the price fetch reaches a CEX
   // over HTTPS, so while the mixnet transport is not ready it must refuse
   // rather than hand the exchange an IP-to-wallet correlation.
   if (!coveredSurfacePermitted()) {
-    return { kind: 'gateRefusal', error: COVERED_SURFACE_REFUSAL };
+    const refused: ZecPriceOutcome = {
+      kind: 'gateRefusal',
+      error: COVERED_SURFACE_REFUSAL,
+    };
+    console.log(describePriceOutcome(refused));
+    return refused;
   }
   const startedAt = Date.now();
-  const decoded = decodeFfiJson(await callFfi(RPCModule.zecPriceInfo()));
-  if (decoded.kind === 'ffiRejection') {
-    console.log(
-      'price fetch failed: ffi rejection',
-      decoded.code,
-      decoded.message,
-    );
-    return decoded;
-  }
-  if (decoded.kind === 'emptyPayload') {
-    console.log('price fetch failed: empty success payload from the bridge');
-    return { kind: 'malformedPayload', payload: '', detail: 'empty payload' };
-  }
-  if (decoded.kind === 'malformedPayload') {
-    // The payload that failed to parse is the diagnostic; log it verbatim.
-    console.log(
-      'price fetch failed: unparseable payload',
-      decoded.payload,
-      decoded.detail,
-    );
-    return decoded;
-  }
-  if (typeof decoded.value !== 'object' || decoded.value === null) {
-    console.log('price fetch failed: non-object payload', decoded.raw);
-    return {
-      kind: 'malformedPayload',
-      payload: decoded.raw,
-      detail: 'non-object payload',
-    };
-  }
-  const resultJSON = decoded.value as RPCZecPriceType;
-  if (resultJSON.error) {
-    console.log('price fetch failed: oracle error in payload', resultJSON.error);
-    return { kind: 'oracleError', error: resultJSON.error };
-  }
-  if (!resultJSON.current_price) {
-    // if no exists the field or is empty
-    return { kind: 'noData' };
-  }
-  if (isNaN(resultJSON.current_price)) {
-    console.log(
-      'price fetch failed: non-numeric price',
-      String(resultJSON.current_price),
-    );
-    return {
-      kind: 'malformedPayload',
-      payload: decoded.raw,
-      detail: `non-numeric price ${resultJSON.current_price}`,
-    };
-  }
-  // Success logs too: absence of a failure line must never be the only
-  // signal, and the attestation makes the route positively observable.
-  const route: PriceRouteAttestation =
-    resultJSON.via_socks5 !== undefined
-      ? { kind: 'attested', viaSocks5: resultJSON.via_socks5 }
-      : { kind: 'preAttestationNativeLayer' };
-  console.log(
-    'price fetch ok:',
-    resultJSON.current_price,
-    'via',
-    route.kind === 'attested' ? route.viaSocks5 : 'PRE-ATTESTATION LAYER',
-    `${Date.now() - startedAt}ms`,
-  );
-  return { kind: 'price', usd: resultJSON.current_price, route };
+  let watchdog: ReturnType<typeof setTimeout> | undefined;
+  const raw = await Promise.race<RawPriceFetch>([
+    callFfi(RPCModule.zecPriceInfo()).then(result => ({
+      kind: 'settled' as const,
+      decoded: decodeFfiJson(result),
+      elapsedMs: Date.now() - startedAt,
+    })),
+    new Promise<RawPriceFetch>(resolve => {
+      watchdog = setTimeout(
+        () =>
+          resolve({
+            kind: 'watchdogTimedOut',
+            afterMs: PRICE_FETCH_TIMEOUT_MS,
+          }),
+        PRICE_FETCH_TIMEOUT_MS,
+      );
+    }),
+  ]).finally(() => {
+    if (watchdog !== undefined) {
+      clearTimeout(watchdog);
+    }
+  });
+  const outcome = classifyPriceFetch(raw);
+  console.log(describePriceOutcome(outcome));
+  return outcome;
 }
 
 // ---------------------------------------------------------------------------
