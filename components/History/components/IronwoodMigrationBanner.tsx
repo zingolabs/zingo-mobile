@@ -147,26 +147,6 @@ type IronwoodMigrationBannerProps = {
   ) => void;
 };
 
-// Renders a translated string, coloring the `**…**`-wrapped spans with the
-// warning accent so a single translation keeps its natural word order.
-const HighlightedText: React.FunctionComponent<{
-  text: string;
-  color: string;
-  highlight: string;
-}> = ({ text, color, highlight }) => (
-  <Text style={{ color, fontSize: 13, lineHeight: 19 }}>
-    {text.split('**').map((part: string, i: number) =>
-      i % 2 === 1 ? (
-        <Text key={i} style={{ color: highlight, fontWeight: '700' }}>
-          {part}
-        </Text>
-      ) : (
-        <Text key={i}>{part}</Text>
-      ),
-    )}
-  </Text>
-);
-
 /**
  * Persistent call-to-action on top of the History list. Two variants:
  *
@@ -474,15 +454,6 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   }
 
   // ----- Default variant -----
-  const amountStr = `${Utils.parseNumberFloatToStringLocale(
-    amount,
-    4,
-  )} ${currencyName}`;
-  const warning = (translate('ironwoodbanner.warning') as string).replace(
-    '{amount}',
-    amountStr,
-  );
-
   return (
     <Animated.View
       style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 18 }}
@@ -490,26 +461,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
       exiting={bannerExit()}
     >
       <Animated.View key="default" entering={variantEnter()}>
-        {/* Warning strip */}
-        <View
-          style={{
-            backgroundColor: '#1A1200',
-            borderColor: '#3D2A00',
-            borderWidth: 1,
-            borderRadius: 10,
-            paddingHorizontal: 14,
-            paddingVertical: 12,
-            marginBottom: 10,
-          }}
-        >
-          <HighlightedText
-            text={warning}
-            color={colors.placeholder}
-            highlight={colors.warning.primary}
-          />
-        </View>
-
-        {/* Orchard "at risk" card with the Start action */}
+        {/* Orchard pool card with the Start action */}
         <View
           style={{
             flexDirection: 'row',
@@ -545,19 +497,6 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               >
                 {translate('ironwoodbanner.pool') as string}
               </Text>
-              <View
-                style={{
-                  marginLeft: 8,
-                  paddingHorizontal: 8,
-                  paddingVertical: 2,
-                  borderRadius: 6,
-                  backgroundColor: 'rgba(249, 157, 0, 0.15)',
-                }}
-              >
-                <Text style={{ color: colors.warning.primary, fontSize: 12 }}>
-                  {translate('ironwoodbanner.at-risk') as string}
-                </Text>
-              </View>
             </View>
             <Text style={{ color: colors.placeholder, fontSize: 13 }}>
               {translate('ironwoodbanner.balance') as string}{' '}

@@ -22,7 +22,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle } from 'react-native-svg';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
@@ -48,9 +48,7 @@ const IRONWOOD_ACCENT = '#E4C28F';
 const IRONWOOD_BORDER = '#5A4630';
 const IRONWOOD_BG = '#241A12';
 const RING_DARK = '#3A2A1A';
-// Faint green fill behind a batch bucket, and the hairline that separates the
-// two phase sections — both one-off accents derived from the primary green.
-const BATCH_BG = 'rgba(67, 166, 55, 0.10)';
+// Hairline that separates the option sections.
 const SECTION_DIVIDER = 'rgba(255, 255, 255, 0.08)';
 
 const STEP_COUNT = 2;
@@ -256,24 +254,6 @@ const PageTitle: React.FunctionComponent<{ children: string }> = ({
   </BoldText>
 );
 
-// Left-aligned, spaced-out uppercase section heading ("PHASE 1 - SPLIT").
-const SectionLabel: React.FunctionComponent<{
-  color: string;
-  children: string;
-}> = ({ color, children }) => (
-  <Text
-    style={{
-      color,
-      fontSize: 12,
-      fontWeight: '700',
-      letterSpacing: 1.5,
-      marginBottom: 16,
-    }}
-  >
-    {children}
-  </Text>
-);
-
 // A small rounded square — the unit "note" tile used across both phase
 // diagrams. Outlined by default; the source tile is filled.
 const MiniCard: React.FunctionComponent<{
@@ -293,11 +273,16 @@ const MiniCard: React.FunctionComponent<{
   />
 );
 
-// Phase 1 — one balance splits into a standardized grid of equal notes.
+// Balance crossing from Orchard into Ironwood. The left cluster is the source —
+// one Orchard block, or the whole balance as a grid when it all moves at once.
+// The right cluster is the result — a single Ironwood note, or `count`
+// standardized notes when the balance is split.
 const Phase1Graphic: React.FunctionComponent<{
   green: string;
   arrowColor: string;
-}> = ({ green, arrowColor }) => (
+  sources?: number;
+  count?: number;
+}> = ({ green, arrowColor, sources = 1, count = 6 }) => (
   <View
     style={{
       flexDirection: 'row',
@@ -305,76 +290,71 @@ const Phase1Graphic: React.FunctionComponent<{
       justifyContent: 'center',
     }}
   >
-    <View
-      style={{
-        width: 62,
-        height: 62,
-        borderRadius: 14,
-        borderWidth: 1.5,
-        borderColor: ORCHARD_BORDER,
-        backgroundColor: ORCHARD_BG,
-      }}
-    />
+    {sources === 1 ? (
+      <View
+        style={{
+          width: 62,
+          height: 62,
+          borderRadius: 14,
+          borderWidth: 1.5,
+          borderColor: ORCHARD_BORDER,
+          backgroundColor: ORCHARD_BG,
+        }}
+      />
+    ) : (
+      <View
+        style={{ width: 104, flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}
+      >
+        {Array.from({ length: sources }, (_, i: number) => (
+          <MiniCard key={i} size={30} color={ORCHARD_ACCENT} fill={ORCHARD_BG} />
+        ))}
+      </View>
+    )}
     <FontAwesomeIcon
       icon={faArrowRightLong}
       size={24}
       color={arrowColor}
       style={{ marginHorizontal: 20 }}
     />
-    <View
-      style={{ width: 104, flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}
-    >
-      {Array.from({ length: 6 }, (_, i: number) => (
-        <MiniCard key={i} size={30} color={green} />
-      ))}
-    </View>
+    {count === 1 ? (
+      <MiniCard size={62} color={IRONWOOD_BORDER} fill={IRONWOOD_BG} />
+    ) : (
+      <View
+        style={{ width: 104, flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}
+      >
+        {Array.from({ length: count }, (_, i: number) => (
+          <MiniCard key={i} size={30} color={green} />
+        ))}
+      </View>
+    )}
   </View>
 );
 
-// The small quarter-pie badge above each batch — a batch part-way through
-// its send window.
-const PieBadge: React.FunctionComponent<{ green: string; size?: number }> = ({
-  green,
-  size = 22,
+// The bold heading for each migration option.
+const OptionTitle: React.FunctionComponent<{ children: string }> = ({
+  children,
+}) => <BoldText style={{ fontSize: 17, marginBottom: 8 }}>{children}</BoldText>;
+
+// The "coming soon" pill next to an option that isn't shippable yet.
+const SoonTag: React.FunctionComponent<{ children: string }> = ({
+  children,
 }) => (
-  <Svg width={size} height={size} viewBox="0 0 22 22">
-    <Circle
-      cx="11"
-      cy="11"
-      r="8.5"
-      stroke={green}
-      strokeWidth="1.5"
-      fill="none"
-    />
-    <Path d="M11 11 L11 2.5 A8.5 8.5 0 0 1 19.5 11 Z" fill={green} />
-  </Svg>
-);
-
-// Phase 2 — one labelled batch: a progress pie over a bucket of notes.
-const BatchBucket: React.FunctionComponent<{
-  green: string;
-  labelColor: string;
-  label: string;
-}> = ({ green, labelColor, label }) => (
-  <View style={{ alignItems: 'center' }}>
-    <PieBadge green={green} />
-    <View
-      style={{
-        marginTop: 8,
-        flexDirection: 'row',
-        gap: 8,
-        padding: 10,
-        borderRadius: 12,
-        backgroundColor: BATCH_BG,
-      }}
-    >
-      <MiniCard size={26} color={green} />
-      <MiniCard size={26} color={green} />
-    </View>
-    <Text style={{ marginTop: 8, color: labelColor, fontSize: 13 }}>
-      {label}
-    </Text>
-  </View>
+  <Text
+    style={{
+      color: IRONWOOD_ACCENT,
+      fontSize: 12,
+      fontWeight: '600',
+      borderWidth: 1,
+      borderColor: IRONWOOD_BORDER,
+      backgroundColor: IRONWOOD_BG,
+      borderRadius: 6,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      marginBottom: 8,
+    }}
+  >
+    {children}
+  </Text>
 );
 
 type MeetIronwoodProps = NativeStackScreenProps<
@@ -567,18 +547,27 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         </BodyText>
       </View>
     </View>,
-    <View key="how" style={{ alignSelf: 'stretch' }}>
+    <View key="options" style={{ alignSelf: 'stretch' }}>
       <PageTitle>{translate('meetironwood.title2') as string}</PageTitle>
 
-      <View style={{ marginBottom: 18 }}>
-        <Phase1Graphic green={colors.primary} arrowColor={colors.text} />
+      {/* Option 1 — continue as normal: funds cross to Ironwood as a single
+          note on the next ordinary spend. */}
+      <View style={{ marginBottom: 16 }}>
+        <Phase1Graphic
+          green={colors.primary}
+          arrowColor={colors.text}
+          count={1}
+        />
       </View>
+      <OptionTitle>
+        {translate('meetironwood.option1-label') as string}
+      </OptionTitle>
       <BodyText
         dimColor={colors.placeholder}
         boldColor={colors.text}
-        marginBottom={4}
+        marginBottom={0}
       >
-        {translate('meetironwood.phase1-body') as string}
+        {translate('meetironwood.option1-body') as string}
       </BodyText>
 
       <View
@@ -589,30 +578,59 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         }}
       />
 
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          paddingHorizontal: 4,
-          marginBottom: 18,
-        }}
-      >
-        {[1, 2, 3].map((n: number) => (
-          <BatchBucket
-            key={n}
-            green={colors.primary}
-            labelColor={colors.placeholder}
-            label={`${translate('meetironwood.bucket') as string} ${n}`}
-          />
-        ))}
+      {/* Option 2 — send-all migrate: the whole balance moves at once into a
+          single Ironwood note. */}
+      <View style={{ marginBottom: 16 }}>
+        <Phase1Graphic
+          green={colors.primary}
+          arrowColor={colors.text}
+          sources={6}
+          count={1}
+        />
       </View>
+      <OptionTitle>
+        {translate('meetironwood.option2-label') as string}
+      </OptionTitle>
       <BodyText
         dimColor={colors.placeholder}
         boldColor={colors.text}
         marginBottom={0}
       >
-        {translate('meetironwood.phase2-body') as string}
+        {translate('meetironwood.option2-body') as string}
       </BodyText>
+
+      <View
+        style={{
+          height: 1,
+          backgroundColor: SECTION_DIVIDER,
+          marginVertical: 22,
+        }}
+      />
+
+      {/* Option 3 — split & migrate, not shippable yet, so the whole block is
+          dimmed to read as inactive. */}
+      <View style={{ opacity: 0.5 }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 10,
+          }}
+        >
+          <OptionTitle>
+            {translate('meetironwood.option3-label') as string}
+          </OptionTitle>
+          <SoonTag>{translate('meetironwood.option3-soon') as string}</SoonTag>
+        </View>
+        <BodyText
+          dimColor={colors.placeholder}
+          boldColor={colors.text}
+          marginBottom={0}
+        >
+          {translate('meetironwood.option3-body') as string}
+        </BodyText>
+      </View>
     </View>,
   ];
 
