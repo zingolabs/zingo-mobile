@@ -4,6 +4,6 @@ export type RPCDrainType = {
   txids?: string[];
   migrated?: number;
   fee?: number;
-  stranded?: number;
+  residual?: number;
   error?: string;
 };

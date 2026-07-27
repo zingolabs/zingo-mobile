@@ -497,10 +497,10 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             value={zec(plan?.parts_fee ?? 0)}
             colors={colors}
           />
-          {(plan?.stranded ?? 0) > 0 ? (
+          {(plan?.residual ?? 0) > 0 ? (
             <Row
-              label={translate('migrationsplitplan.stranded') as string}
-              value={zec(plan?.stranded ?? 0)}
+              label={translate('migrationsplitplan.residual') as string}
+              value={zec(plan?.residual ?? 0)}
               colors={colors}
             />
           ) : null}
@@ -510,7 +510,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             colors={colors}
           />
         </Card>
-        {(plan?.stranded ?? 0) > 0 ? (
+        {(plan?.residual ?? 0) > 0 ? (
           <Text
             style={{
               color: colors.placeholder,
@@ -519,7 +519,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
               marginBottom: 10,
             }}
           >
-            {translate('migrationsplitplan.stranded-note') as string}
+            {translate('migrationsplitplan.residual-note') as string}
           </Text>
         ) : null}
 

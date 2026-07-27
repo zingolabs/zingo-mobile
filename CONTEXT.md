@@ -88,12 +88,13 @@ round's inputs nor its outputs, so planning over it is wrong.
 A part whose window became unwitnessable and which moved itself to a coming
 window. Rendered as a plain explanatory sentence, never an error.
 
-**Stranded**:
-Value left out of the plan because moving it would cost more than it carries.
-Disclosed at consent.
-
 **Residual**:
-What remains when the migration completes; disclosed on completion.
+Value left unmigrated because moving it would cost more than it carries —
+projected and disclosed at consent, reported again on completion. A plan
+never loses value silently: migrated + fees + residual equals the starting
+balance.
+_Avoid_: stranded (retired 2026-07-26 when zingolib unified the plan-time
+and completion-time vocabulary on "residual")
 
 **Consent**:
 The single user approval of an exact plan hash before anything is signed or

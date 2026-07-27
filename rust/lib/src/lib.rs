@@ -184,7 +184,7 @@ fn ffi_error(e: LightClientError) -> ZingolibError {
             MigrationError::PreSignedUnavailable
             | MigrationError::NoteSplittingRequired
             | MigrationError::DifferentAccount
-            | MigrationError::ActivationBoundaryPending { .. } => ZingolibError::Migration(text),
+            | MigrationError::IronwoodEraTooYoung { .. } => ZingolibError::Migration(text),
             MigrationError::SplitDidNotConverge(_)
             | MigrationError::SplitTransactionFailed(_)
             | MigrationError::SplitConfirmationTimeout => ZingolibError::MigrationSplit(text),
@@ -325,12 +325,13 @@ lazy_static! {
 // Live progress of the in-flight immediate Orchard->Ironwood drain, held in a
 // side channel *outside* the LIGHTCLIENT lock. `drain_orchard_to_ironwood`
 // holds LIGHTCLIENT.write() for its whole `block_on`, so a `drain_status` poll
-// that read the lightclient would deadlock behind it. Instead the drain stashes
-// a cloned `DrainProgressHandle` (an independent Arc<Mutex<Option<DrainStatus>>>)
-// here; the poller reads only this global and never contends for the drain's
-// wallet/lightclient lock. `None` between drains.
+// that read the lightclient would deadlock behind it. Instead the immediate
+// migration stashes a cloned `ImmediateMigrationProgressHandle` (an independent
+// Arc<Mutex<Option<ImmediateMigrationStatus>>>) here; the poller reads only
+// this global and never contends for the migration's wallet/lightclient lock.
+// `None` between runs.
 lazy_static! {
-    static ref DRAIN_PROGRESS: RwLock<Option<zingolib::lightclient::migrate::DrainProgressHandle>> =
+    static ref DRAIN_PROGRESS: RwLock<Option<zingolib::lightclient::migrate::ImmediateMigrationProgressHandle>> =
         RwLock::new(None);
 }
 
@@ -2427,7 +2428,7 @@ pub fn plan_orchard_drain() -> Result<String, ZingolibError> {
     with_initialized_lightclient(|lightclient| {
         RT.block_on(async move {
             let plan = lightclient
-                .plan_orchard_drain(AccountId::ZERO)
+                .plan_immediate_migration(AccountId::ZERO)
                 .await
                 .map_err(ffi_error)?;
             let transactions = plan
@@ -2445,7 +2446,7 @@ pub fn plan_orchard_drain() -> Result<String, ZingolibError> {
                 "transactions" => transactions,
                 "migrated" => plan.migrated,
                 "fee" => plan.fee,
-                "stranded" => plan.stranded,
+                "residual" => plan.residual,
             }
             .pretty(2))
         })
@@ -2458,16 +2459,16 @@ pub fn plan_orchard_drain() -> Result<String, ZingolibError> {
 /// crossing the pool boundary is visible on-chain, so the caller must have
 /// disclosed that. Mirror of `confirm`'s broadcast phase.
 ///
-/// Uses zingolib's `quick_drain`, the send-shaped mobile entry point. It pauses
+/// Uses zingolib's `quick_immediate_migration`, the send-shaped mobile entry point. It pauses
 /// our continuous background sync internally, plans against current wallet
 /// state, builds and transmits every drain transaction, then restores sync
 /// before it returns (`resume_sync: true`). No self-sync, no reconcile loop,
 /// matching `send`/`shield`. The older `drain_orchard_to_ironwood_presynced`
 /// (guard parameter) is a Rust-internal form and no longer crosses the FFI.
 ///
-/// Returns, on success, `{ txids: [..], migrated, fee, stranded }` (values in
+/// Returns, on success, `{ txids: [..], migrated, fee, residual }` (values in
 /// zatoshis). Notes worth at most the sweep minimum are left behind and
-/// reported as `stranded`.
+/// reported as `residual`.
 pub fn drain_orchard_to_ironwood() -> Result<String, ZingolibError> {
     with_initialized_lightclient(|lightclient| {
         // Publish this drain's progress handle to the DRAIN_PROGRESS side
@@ -2476,21 +2477,21 @@ pub fn drain_orchard_to_ironwood() -> Result<String, ZingolibError> {
         // handle (an independent Arc) rather than the lightclient. The handle
         // reads idle (`null`) until the drain arms it after planning.
         if let Ok(mut progress) = DRAIN_PROGRESS.write() {
-            *progress = Some(lightclient.drain_progress_handle());
+            *progress = Some(lightclient.immediate_migration_progress_handle());
         }
         let out = RT.block_on(async move {
             // quick_drain holds the pause internally: it plans, builds, and
             // transmits under one stable wallet state, then resumes sync on
             // return. resume_sync: true is the normal case.
             let summary = lightclient
-                .quick_drain(AccountId::ZERO, true)
+                .quick_immediate_migration(AccountId::ZERO, true)
                 .await
                 .map_err(ffi_error)?;
             Ok(object! {
                 "txids" => summary.txids.iter().map(|txid| txid.to_string()).collect::<Vec<_>>(),
                 "migrated" => summary.migrated,
                 "fee" => summary.fee,
-                "stranded" => summary.stranded,
+                "residual" => summary.residual,
             }
             .pretty(2))
         });
@@ -2527,14 +2528,14 @@ pub fn drain_status() -> Result<String, ZingolibError> {
         };
         Ok(match status {
             Some(s) => {
-                use zingolib::lightclient::migrate::DrainPhase;
+                use zingolib::lightclient::migrate::ImmediateMigrationPhase;
                 object! {
                     "total" => s.total,
                     "built" => s.built,
                     "sent" => s.sent,
                     "phase" => match s.phase {
-                        DrainPhase::Building => "building",
-                        DrainPhase::Transmitting => "transmitting",
+                        ImmediateMigrationPhase::Building => "building",
+                        ImmediateMigrationPhase::Transmitting => "transmitting",
                     },
                 }
                 .pretty(2)
@@ -2626,7 +2627,7 @@ pub fn plan_ironwood_migration() -> Result<String, ZingolibError> {
                 "parts" => plan.parts.clone(),
                 "split_fee" => plan.split_fee(),
                 "parts_fee" => plan.parts_fee(&params),
-                "stranded" => plan.stranded,
+                "residual" => plan.residual,
                 "plan_hash" => hash32_to_hex(&plan_hash(&plan)),
             }
             .pretty(2))
@@ -2749,25 +2750,25 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                     ),
                 }
             };
-            let next_wakes = status
-                .next_wakes
+            let upcoming_windows = status
+                .upcoming_windows
                 .iter()
-                .map(|wake| {
+                .map(|window| {
                     object! {
-                        "bucket_index" => wake.bucket_index,
-                        "boundary" => u32::from(wake.boundary),
-                        "part_ids" => wake
+                        "bucket_index" => window.bucket_index,
+                        "boundary" => u32::from(window.boundary),
+                        "part_ids" => window
                             .part_ids
                             .iter()
                             .map(|id| id.0)
                             .collect::<Vec<_>>(),
-                        "denominations" => wake
+                        "denominations" => window
                             .part_ids
                             .iter()
                             .map(|id| denoms_by_id.get(&id.0).copied().unwrap_or(0))
                             .collect::<Vec<_>>(),
-                        "estimated_unix_time" => wake.estimated_unix_time,
-                        "estimated_target_unix_time" => wake.estimated_target_unix_time,
+                        "window_opens_unix_time" => window.window_opens_unix_time,
+                        "latest_target_unix_time" => window.latest_target_unix_time,
                     }
                 })
                 .collect::<Vec<_>>();
@@ -2798,7 +2799,7 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                 "value_total" => status.value_total,
                 "value_migrated" => status.value_migrated,
                 "bucket_modulus" => bucket_modulus,
-                "next_wakes" => next_wakes,
+                "upcoming_windows" => upcoming_windows,
                 "due_now" => due_now,
             }
             .pretty(2))
@@ -2877,10 +2878,10 @@ fn batch_report_json(report: &zingolib::lightclient::migrate::BatchReport) -> js
                 },
                 PartSendResult::Slid => object! { "kind" => "slid" },
                 PartSendResult::NotDue {
-                    estimated_unix_time,
+                    window_opens_unix_time,
                 } => object! {
                     "kind" => "not_due",
-                    "estimated_unix_time" => *estimated_unix_time,
+                    "window_opens_unix_time" => *window_opens_unix_time,
                 },
                 PartSendResult::Failed { error } => object! {
                     "kind" => "failed",

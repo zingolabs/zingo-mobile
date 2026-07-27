@@ -139,7 +139,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     // next_wakes stays the source for the "waiting N blocks" countdown to the
     // next scheduled window.
     const height = info?.latestBlock ?? 0;
-    const wakes: RPCWakePointType[] = migration.next_wakes ?? [];
+    const wakes: RPCWakePointType[] = migration.upcoming_windows ?? [];
     const nextWake = wakes[0];
     const blocksUntil = nextWake ? Math.max(0, nextWake.boundary - height) : 0;
     const ready = migration.due_now != null;

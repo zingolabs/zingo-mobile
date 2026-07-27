@@ -110,7 +110,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
     );
   }
 
-  const wakes: RPCWakePointType[] = status?.next_wakes ?? [];
+  const wakes: RPCWakePointType[] = status?.upcoming_windows ?? [];
   // The ZIP 318 schedule draws each part its own window, so progress counts
   // parts directly.
   const partsTotal = status?.parts_total ?? 0;
