@@ -879,7 +879,7 @@
     "none-label": "Não migrar",
     "none-body": "Mantenha seus fundos onde estão por enquanto. Você pode começar a migrar mais tarde pela tela inicial.",
     "now-label": "Migrar agora",
-    "now-body": "Uma transferência, concluída em minutos. Todo o seu saldo de **{amount}** fica publicamente visível na cadeia.",
+    "now-body": "Uma transferência, concluída em minutos. Todo o seu saldo de **{amount}** fica publicamente visível na cadeia, e seu IP será associado a ela, a menos que você use ##NYM/Tor##.",
     "private-label": "Migrar com privacidade",
     "private-body": "Distribui as transferências ao longo de ~3 dias em quantias padrão, misturando-se com outros usuários. Requer abrir o app algumas vezes.",
     "coming-soon": "Em breve",
