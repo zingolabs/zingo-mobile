@@ -1112,4 +1112,29 @@ class RPCModule: NSObject {
       }
   }
 
+  private static func probeLegJson(_ leg: ProbeLeg) -> [String: Any] {
+    ["ok": leg.ok, "detail": leg.detail, "millis": leg.millis]
+  }
+
+  // The Connection Doctor's paired probe (user-invoked diagnostic). The FFI
+  // returns structured reports; they cross the React Native bridge as JSON,
+  // the bridge's own boundary format.
+  @objc(probeServerProcess:resolve:reject:)
+  func probeServerProcess(_ uri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          let reports = try probeServer(uri: uri)
+          let rendered: [[String: Any]] = reports.map { report in
+            [
+              "host": report.host,
+              "clearnet": RPCModule.probeLegJson(report.clearnet),
+              "mixnet": report.mixnet.map(RPCModule.probeLegJson) ?? NSNull(),
+            ]
+          }
+          let data = try JSONSerialization.data(withJSONObject: rendered)
+          return String(data: data, encoding: .utf8) ?? "[]"
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
 }

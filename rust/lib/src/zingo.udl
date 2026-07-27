@@ -279,4 +279,21 @@ namespace zingo {
   string mixnet_bootstrap_detail();
 
   string mixnet_ip_correlation_disclaimer();
+
+  [Throws=ZingolibError]
+  sequence<ProbeReport> probe_server(
+    string uri
+  );
+};
+
+dictionary ProbeLeg {
+  boolean ok;
+  string detail;
+  u64 millis;
+};
+
+dictionary ProbeReport {
+  string host;
+  ProbeLeg clearnet;
+  ProbeLeg? mixnet;
 };

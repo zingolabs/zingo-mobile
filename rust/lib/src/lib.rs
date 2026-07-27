@@ -3194,3 +3194,61 @@ pub fn mixnet_bootstrap_detail() -> Result<String, ZingolibError> {
 pub fn mixnet_ip_correlation_disclaimer() -> String {
     zingolib::nym::IP_CORRELATION_DISCLAIMER.to_string()
 }
+
+/// Per-probe bound. A dead route answers by timing out; this keeps one
+/// unreachable server from stalling the whole Doctor run.
+const CONNECTION_PROBE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(15);
+
+/// One timed leg of a paired probe, structured across the FFI.
+pub struct ProbeLeg {
+    pub ok: bool,
+    /// The one-line success summary (chain and height) or the failure detail.
+    pub detail: String,
+    pub millis: u64,
+}
+
+/// One target's paired probe: the clearnet leg always runs; the mixnet leg
+/// is `None` when the proxy was not ready to carry it.
+pub struct ProbeReport {
+    pub host: String,
+    pub clearnet: ProbeLeg,
+    pub mixnet: Option<ProbeLeg>,
+}
+
+fn probe_leg(leg: &zingolib::nym::probe::ProbeLeg) -> ProbeLeg {
+    let (ok, detail) = match &leg.outcome {
+        Ok(summary) => (true, summary.clone()),
+        Err(failure) => (false, failure.clone()),
+    };
+    ProbeLeg {
+        ok,
+        detail,
+        millis: leg.millis,
+    }
+}
+
+/// One Connection Doctor probe (the nym-diagnostics plan, Workstream A):
+/// a paired clearnet/mixnet `GetLightdInfo` round trip against `uri`, each
+/// leg timed. A user-invoked diagnostic: the clearnet leg contacts the
+/// target from the real IP, and nothing here is an automatic path. No
+/// wallet lock is held across the probe.
+pub fn probe_server(uri: String) -> Result<Vec<ProbeReport>, ZingolibError> {
+    let target: http::Uri = uri
+        .parse()
+        .map_err(|_| ZingolibError::InvalidInput(format!("unparseable server uri: {uri}")))?;
+    with_initialized_lightclient_read(|lightclient| {
+        RT.block_on(async move {
+            let probes = lightclient
+                .probe_broadcast_indexers(Some(target), CONNECTION_PROBE_TIMEOUT)
+                .await;
+            Ok(probes
+                .iter()
+                .map(|probe| ProbeReport {
+                    host: probe.host.clone(),
+                    clearnet: probe_leg(&probe.clearnet),
+                    mixnet: probe.mixnet.as_ref().map(probe_leg),
+                })
+                .collect())
+        })
+    })
+}

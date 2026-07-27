@@ -144,6 +144,10 @@ interface RPCModuleAPI {
   mixnetModeInfo(): Promise<string>;
   mixnetBootstrapDetailInfo(): Promise<string>;
   mixnetIpCorrelationDisclaimerInfo(): Promise<string>;
+  // The Connection Doctor's paired clearnet/mixnet probe of one server
+  // (user-invoked diagnostic; the clearnet leg contacts the target from the
+  // real IP). Resolves a JSON array of per-target probe reports.
+  probeServerProcess(uri: string): Promise<string>;
 }
 
 export default NativeModules.RPCModule as RPCModuleAPI;
