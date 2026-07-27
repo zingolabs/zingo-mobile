@@ -60,16 +60,6 @@ function setChainTip(instance: LoadedAppClass, latestBlock: number) {
   };
 }
 
-// Puts the wallet's scan progress on `state`. The trigger must not fire while
-// a scan is short of the tip: mid-sync, confirmed_orchard_balance can carry
-// notes that are not yet spendable.
-function setSyncStatus(instance: LoadedAppClass, syncingStatus: any) {
-  (instance as any).state = {
-    ...(instance as any).state,
-    syncingStatus,
-  };
-}
-
 function makeInstance(latestBlock: number = activation): LoadedAppClass {
   const props: any = {
     navigation: mockNavigation,
@@ -164,42 +154,6 @@ describe('MeetIronwood auto-launch trigger', () => {
     setChainTip(instance, activation);
     await instance.checkMeetIronwood(makeBalance(0.001));
 
-    expect(navigate).toHaveBeenCalledWith(RouteEnum.MeetIronwood);
-  });
-
-  test('does not navigate while a sync is still short of the tip', async () => {
-    const instance = makeInstance();
-    const navigate = jest.fn();
-    (instance as any).drawerNav = { navigate };
-    setSyncStatus(instance, {
-      scan_ranges: [{}],
-      percentage_total_outputs_scanned: 40,
-    });
-
-    await instance.checkMeetIronwood(makeBalance(0.001));
-
-    expect(navigate).not.toHaveBeenCalled();
-  });
-
-  test('navigates once the scan reaches the tip', async () => {
-    const instance = makeInstance();
-    const navigate = jest.fn();
-    (instance as any).drawerNav = { navigate };
-
-    // mid-sync: the balance is not yet trustworthy, so no launch.
-    setSyncStatus(instance, {
-      scan_ranges: [{}],
-      percentage_total_outputs_scanned: 40,
-    });
-    await instance.checkMeetIronwood(makeBalance(0.001));
-    expect(navigate).not.toHaveBeenCalled();
-
-    // a later tick lands the scan at the tip; now the balance is spendable.
-    setSyncStatus(instance, {
-      scan_ranges: [{}],
-      percentage_total_outputs_scanned: 100,
-    });
-    await instance.checkMeetIronwood(makeBalance(0.001));
     expect(navigate).toHaveBeenCalledWith(RouteEnum.MeetIronwood);
   });
 

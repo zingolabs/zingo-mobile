@@ -18,7 +18,6 @@ export {
   routeRescheduleParts,
   routeStartMigration,
 } from './utils/migrationRouting';
-export { scanInProgress } from './utils/syncProgress';
 export {
   cancelIronwoodMigration,
   changeServer,
