@@ -34,6 +34,7 @@ import {
   loadExistingWallet,
   parseAddress,
   reconcileMigration,
+  scanInProgress,
   setConfigWalletToProd,
 } from '../walletBackend';
 import {
@@ -1249,10 +1250,21 @@ export class LoadedAppClass extends Component<
       );
       return;
     }
-    // zingolib's confirmed_orchard_balance sums only unspent, confirmed,
-    // non-dust notes (each note must exceed the ZIP-317 marginal fee of
-    // 5000 zats), so a positive value means the wallet holds at least one
-    // spendable non-dust Orchard note.
+    // The balance is only trustworthy once the scan reaches the tip. Mid-sync,
+    // zingolib reports a note as confirmed the moment it is scanned, before its
+    // witness is built up to a spendable anchor, so confirmed_orchard_balance
+    // can carry funds the wallet cannot yet spend. Launching then drops the
+    // user into a migration for an amount with no spendable notes behind it,
+    // and the send errors out when it tries to assemble the transaction and
+    // cannot source them. Wait out the scan; setSyncingStatus re-runs this on
+    // every tick, so it fires the moment sync completes.
+    if (scanInProgress(this.state.syncingStatus)) {
+      console.log('meet ironwood: sync still in progress');
+      return;
+    }
+    // Scan at the tip: confirmed_orchard_balance now reflects witnessed,
+    // spendable, non-dust notes (each above the ZIP-317 marginal fee of 5000
+    // zats). A positive value means at least one migratable note.
     if (!totalBalance || totalBalance.confirmedOrchardBalance <= 0) {
       console.log(
         'meet ironwood: no spendable non-dust orchard funds',
