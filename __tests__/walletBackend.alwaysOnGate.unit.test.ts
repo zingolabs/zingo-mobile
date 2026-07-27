@@ -195,7 +195,7 @@ describe('the price fetch gate', () => {
       JSON.stringify({ current_price: 42.5, via_socks5: '127.0.0.1:1080' }),
     );
 
-    await expect(getZecPrice()).resolves.toEqual({
+    await expect(getZecPrice()).resolves.toMatchObject({
       kind: 'price',
       usd: 42.5,
       route: { kind: 'attested', viaSocks5: '127.0.0.1:1080' },

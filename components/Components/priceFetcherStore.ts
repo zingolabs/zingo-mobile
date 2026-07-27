@@ -101,6 +101,10 @@ async function doFetch(): Promise<void> {
       d.setZecPrice(0, 0);
     },
     gateRefusal: o => geminiSnackbar(o.error),
+    timedOut: o =>
+      geminiSnackbar(
+        `timed out after ${Math.round(o.afterMs / 1000)}s`,
+      ),
     ffiRejection: o => geminiSnackbar(o.message),
     oracleError: o => geminiSnackbar(o.error),
     malformedPayload: o =>
