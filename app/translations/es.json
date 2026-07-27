@@ -189,7 +189,8 @@
     "email-error-title": "Error al abrir el cliente de correo electrónico",
     "email-error-body": "Ingresa a los Ajustes de tu dispositivo y configura una aplicación de correo predeterminada para enviar el reporte.",
     "migration-title": "Migración de la billetera",
-    "migration-body": "Estamos migrando tu billetera al nuevo sistema de sincronización. Mantén tu dispositivo conectado a la corriente y al wifi.\n\nTu saldo cambiará a medida que avance la migración. ¡No te preocupes, tus fondos están seguros!"
+    "migration-body": "Estamos migrando tu billetera al nuevo sistema de sincronización. Mantén tu dispositivo conectado a la corriente y al wifi.\n\nTu saldo cambiará a medida que avance la migración. ¡No te preocupes, tus fondos están seguros!",
+    "connectiondoctor": "Doctor de Conexión"
   },
   "rpc": {
     "walletnotfound-error": "Error: No se encuentra ningún monedero.",
@@ -757,6 +758,22 @@
       "El aviso de derechos de autor anterior y este aviso de permiso se incluirán en todas las copias o partes sustanciales del Software.",
       "EL SOFTWARE SE PROPORCIONA 'TAL CUAL', SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN DETERMINADO Y NO VIOLACIÓN. EN NINGÚN CASO LOS AUTORES O LOS TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMACIÓN, DAÑOS U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O DE CUALQUIER OTRO TIPO, QUE SURJA DE, FUERA DE O EN RELACIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN EL SOFTWARE."
     ]
+  },
+  "connectiondoctor": {
+    "title": "Doctor de Conexión",
+    "title-acc": "Pantalla del Doctor de Conexión",
+    "intro": "Prueba cada servidor conocido por clearnet y, cuando el Modo Mixnet está listo, por la mixnet. Cada prueba contacta al servidor desde tu IP real. Copia el reporte terminado en tu solicitud de soporte.",
+    "run": "Ejecutar el Doctor",
+    "running": "Probando servidores...",
+    "clearnet": "clearnet",
+    "mixnet": "mixnet",
+    "mixnet-not-carried": "mixnet: no realizada (proxy no listo)",
+    "probe-failed": "prueba fallida:",
+    "payload-unusable": "respuesta inutilizable:",
+    "copy-report": "Copiar reporte",
+    "report-copied": "Reporte copiado al portapapeles.",
+    "leg-ok": "ok",
+    "leg-failed": "FALLÓ"
   },
   "scanner": {
     "text": "Escanea una Clave de Visualización Totalmente Unificada",

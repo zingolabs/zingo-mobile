@@ -189,7 +189,8 @@
     "email-error-title": "Error opening email client",
     "email-error-body": "Go to your device's Settings and set a default email application to send the report.",
     "migration-title": "Wallet migration",
-    "migration-body": "We are migrating your wallet to the new synchronization system. Keep your device connected to power and WiFi.\n\nYour balance will change as the migration progresses. Don't worry, your funds are safe!"
+    "migration-body": "We are migrating your wallet to the new synchronization system. Keep your device connected to power and WiFi.\n\nYour balance will change as the migration progresses. Don't worry, your funds are safe!",
+    "connectiondoctor": "Connection Doctor"
   },
   "rpc": {
     "walletnotfound-error": "Error: Couldn't find any wallet.",
@@ -757,6 +758,22 @@
       "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
       "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
     ]
+  },
+  "connectiondoctor": {
+    "title": "Connection Doctor",
+    "title-acc": "Connection Doctor screen",
+    "intro": "Probes every known server over clearnet and, when Mixnet Mode is ready, over the mixnet. Each probe contacts the server from your real IP. Copy the finished report into your support request.",
+    "run": "Run the Doctor",
+    "running": "Probing servers...",
+    "clearnet": "clearnet",
+    "mixnet": "mixnet",
+    "mixnet-not-carried": "mixnet: not carried (proxy not ready)",
+    "probe-failed": "probe failed:",
+    "payload-unusable": "probe payload unusable:",
+    "copy-report": "Copy report",
+    "report-copied": "Report copied to the clipboard.",
+    "leg-ok": "ok",
+    "leg-failed": "FAILED"
   },
   "scanner": {
     "text": "Scan a Unified Full Viewing Key",

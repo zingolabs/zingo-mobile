@@ -189,7 +189,8 @@
     "email-error-title": "Error ao abrir o cliente de e-mail",
     "email-error-body": "Acesse as configurações do seu dispositivo e defina um aplicativo de e-mail padrão para enviar o relatório.",
     "migration-title": "Migração de carteira",
-    "migration-body": "Estamos migrando sua carteira para o novo sistema de sincronização. Mantenha seu dispositivo conectado à energia e ao Wi-Fi.\n\nSeu saldo mudará conforme a migração avança. Não se preocupe, seus fundos estão seguros!"
+    "migration-body": "Estamos migrando sua carteira para o novo sistema de sincronização. Mantenha seu dispositivo conectado à energia e ao Wi-Fi.\n\nSeu saldo mudará conforme a migração avança. Não se preocupe, seus fundos estão seguros!",
+    "connectiondoctor": "Doutor de Conexão"
   },
   "rpc": {
     "walletnotfound-error": "Error: não foi possível encontrar nenhuma carteira.",
@@ -757,6 +758,22 @@
       "O aviso de direitos autorais acima e este aviso de permissão serão incluídos em todas as cópias ou partes substanciais do Software.",
       "O SOFTWARE É FORNECIDO 'COMO ESTÁ', SEM GARANTIA ALGUMA, SEJA EXPRESSA OU IMPLÍCITA, MAS NÃO SE LIMITANDO ÀS GARANTIAS DE COMERCIALIZAÇÃO, ADEQUAÇÃO A UM DETERMINADO FIM E SEM VIOLAÇÕES. EM HIPÓTESE ALGUMA OS AUTORES OU DETENTORES DE DIREITOS AUTORAIS SERÃO RESPONSÁVEIS POR QUALQUER RECLAMAÇÃO, DANOS OU OUTRAS RESPONSABILIDADES, SEJA EM UMA AÇÃO DE CONTRATO, ATO ILÍCITO OU DE OUTRA FORMA, DECORRENTE A ALGO RELACIONADO A CONEXÃO, A USABILIDADE OU OUTRAS NEGOCIAÇÕES NO SOFTWARE."
     ]
+  },
+  "connectiondoctor": {
+    "title": "Doutor de Conexão",
+    "title-acc": "Tela do Doutor de Conexão",
+    "intro": "Testa cada servidor conhecido pela clearnet e, quando o Modo Mixnet está pronto, pela mixnet. Cada teste contata o servidor a partir do seu IP real. Copie o relatório concluído no seu pedido de suporte.",
+    "run": "Executar o Doutor",
+    "running": "Testando servidores...",
+    "clearnet": "clearnet",
+    "mixnet": "mixnet",
+    "mixnet-not-carried": "mixnet: não realizada (proxy não pronto)",
+    "probe-failed": "teste falhou:",
+    "payload-unusable": "resposta inutilizável:",
+    "copy-report": "Copiar relatório",
+    "report-copied": "Relatório copiado para a área de transferência.",
+    "leg-ok": "ok",
+    "leg-failed": "FALHOU"
   },
   "scanner": {
     "text": "Faça o Scan de uma Chave de Visualização Unificada completa",
