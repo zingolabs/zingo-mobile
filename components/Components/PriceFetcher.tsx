@@ -37,7 +37,14 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   onManualFetch,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode } = context;
+  const {
+    translate,
+    zecPrice,
+    addLastSnackbar,
+    mode,
+    setBackgroundError,
+    zingolibVersion,
+  } = context;
   const { colors } = useTheme() as ThemeType;
   const bg = backgroundColor ?? colors.card;
 
@@ -47,7 +54,13 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   // Feed the shared store the latest context-bound callbacks (identical across
   // instances, so the last writer wins harmlessly).
   useEffect(() => {
-    priceFetcherStore.setDeps({ setZecPrice, translate, addLastSnackbar });
+    priceFetcherStore.setDeps({
+      setZecPrice,
+      translate,
+      addLastSnackbar,
+      setBackgroundError,
+      zingolibVersion,
+    });
   });
 
   const onPressFetchAlert = () => {
