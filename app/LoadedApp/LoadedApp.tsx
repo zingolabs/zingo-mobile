@@ -140,6 +140,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '../walletBackend/enums/RPCValueTransfersStatusEnum';
 
 const About = React.lazy(() => import('../../components/About'));
+const ConnectionDoctor = React.lazy(
+  () => import('../../components/ConnectionDoctor'),
+);
 const Seed = React.lazy(() => import('../../components/Seed'));
 const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
@@ -1668,6 +1671,9 @@ export class LoadedAppClass extends Component<
     if (item === MenuItemEnum.About) {
       this.drawerNav?.navigate(RouteEnum.About);
       return;
+    } else if (item === MenuItemEnum.ConnectionDoctor) {
+      this.drawerNav?.navigate(RouteEnum.ConnectionDoctor);
+      return;
     } else if (item === MenuItemEnum.Rescan) {
       this.drawerNav?.navigate(RouteEnum.Rescan);
       return;
@@ -2501,6 +2507,10 @@ export class LoadedAppClass extends Component<
                     <RootNavigator.Screen
                       name={RouteEnum.About}
                       component={About}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.ConnectionDoctor}
+                      component={ConnectionDoctor}
                     />
                     <RootNavigator.Screen name={RouteEnum.Rescan}>
                       {props => <Rescan {...props} doRescan={this.doRescan} />}

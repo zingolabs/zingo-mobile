@@ -17,6 +17,7 @@ export enum RouteEnum {
   Messages = 'Messages',
   Settings = 'Settings',
   About = 'About',
+  ConnectionDoctor = 'Connection Doctor',
   Rescan = 'Rescan',
   Insight = 'Insight',
   Computing = 'Computing',

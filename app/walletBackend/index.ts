@@ -16,6 +16,14 @@ export {
 } from './transforms/zecPriceFailureTransform';
 export { routeStartMigration } from './utils/migrationRouting';
 export { scanInProgress } from './utils/syncProgress';
+export type { ServerProbeOutcome } from './utils/connectionProbe';
+export {
+  interpretServerProbe,
+  matchServerProbeOutcome,
+  probeServer,
+} from './utils/connectionProbe';
+export type { DoctorRun } from './transforms/connectionDoctorReport';
+export { connectionDoctorReport } from './transforms/connectionDoctorReport';
 export {
   cancelIronwoodMigration,
   changeServer,

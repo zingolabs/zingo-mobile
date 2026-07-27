@@ -44,6 +44,7 @@ const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.ChangeWallet]: 'menu.changewallet',
   [MenuItemEnum.LoadWalletFromSeed]: 'menu.loadwalletfromseed',
   [MenuItemEnum.RestoreWalletBackup]: 'menu.restorebackupwallet',
+  [MenuItemEnum.ConnectionDoctor]: 'menu.connectiondoctor',
 };
 
 type LoadedAppOptionsPanelHostProps = {
@@ -163,6 +164,19 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
           <WalletSeedIcon width={28} height={28} />
         ),
         onPress: () => dispatch(MenuItemEnum.WalletSeedUfvk),
+      });
+    }
+
+    // The Connection Doctor is a debug-build diagnostic surface (the
+    // nym-diagnostics plan, Workstream A): present in the debug-signed APKs
+    // handed to reporters, hidden from stock release flavors.
+    if (__DEV__) {
+      list.push({
+        id: MenuItemEnum.ConnectionDoctor,
+        testID: MENU_TEST_IDS[MenuItemEnum.ConnectionDoctor],
+        label: translate('loadedapp.connectiondoctor') as string,
+        icon: <SyncRescanReportIcon width={30} height={30} />,
+        onPress: () => dispatch(MenuItemEnum.ConnectionDoctor),
       });
     }
 
