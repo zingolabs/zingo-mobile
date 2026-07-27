@@ -20,6 +20,7 @@ COPY lib/ /opt/zingo/rust/lib/
 COPY Cargo.lock /opt/zingo/rust/Cargo.lock
 COPY Cargo.toml /opt/zingo/rust/Cargo.toml
 COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
+COPY workbench/ /opt/zingo/rust/workbench/
 
 RUN rustup default stable
 

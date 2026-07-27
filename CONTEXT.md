@@ -59,6 +59,12 @@ One bucket-modulus span of anchor heights (144 blocks, ~3h provisionally)
 during which a batch may be sent. UI-facing term.
 _Avoid_: bucket, epoch
 
+**Boundary**:
+The block that opens a window, and the height every part sent in that window
+anchors to. Sharing one anchor is what keeps a send free of per-wallet timing
+information. A window can only carry notes that already existed at its
+boundary, so a batch of freshly split notes waits for the next one.
+
 **Cadence** (retired):
 Formerly the user-chosen parts-per-window count (`per_bucket`). The ZIP 318
 Poisson schedule draws every broadcast delay itself, so there is no cadence
@@ -71,6 +77,12 @@ a user-facing notification at the window's random target time (leads to the
 execute screen). In UI copy the notification is a **reminder**; a batch is
 **due** at its target time, never "send by" (lateness is designed-for, not a
 deadline miss).
+
+**Anchored**:
+A note is anchored once the chain has advanced far enough past its
+confirmation that the wallet will spend it. A round's outputs are mined some
+blocks before they are anchored, and in that gap the note set shows neither the
+round's inputs nor its outputs, so planning over it is wrong.
 
 **Slid**:
 A part whose window became unwitnessable and which moved itself to a coming

@@ -3,7 +3,11 @@ import {
   parseNumberFloatToStringLocale,
   parseStringLocaleToNumberFloat,
 } from './localeNumber';
-import { format as dateFnsFormat, differenceInMinutes } from 'date-fns';
+import {
+  format as dateFnsFormat,
+  differenceInMinutes,
+  formatDistanceStrict,
+} from 'date-fns';
 import type { Locale } from 'date-fns';
 import {
   enUS,
@@ -479,6 +483,13 @@ export default class Utils {
 
   static diffInMinutes(from: Date, to: Date): number {
     return differenceInMinutes(from, to);
+  }
+
+  // Localized rough duration ("2 hours", "45 minutes") for a span in ms.
+  static formatDurationMs(ms: number, language: LanguageEnum): string {
+    return formatDistanceStrict(0, ms, {
+      locale: Utils.getDateFnsLocale(language),
+    });
   }
 
   /**

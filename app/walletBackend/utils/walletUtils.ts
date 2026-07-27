@@ -457,6 +457,7 @@ export async function continueNoteSplitting(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.continueNoteSplittingProcess());
 }
 
+
 // The private migration's progress, arranged for direct rendering (parseable
 // as RPCMigrationStatusType). `phase` is null when no migration is in
 // progress. ZIP 318 requires showing its `orchard_confirmed_spendable`
