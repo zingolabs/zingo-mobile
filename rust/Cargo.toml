@@ -3,20 +3,18 @@ members = ["lib", "android", "ios", "zingomobile_utils", "workbench"]
 resolver = "2"
 
 [workspace.dependencies]
-# TEMPORARY pin (send-over-nym step 4, zingolib#2505): the mixnet attach seam
-# rides zingolib's `nym_mobile_adoption` branch until PR #2470 merges into
-# feat/ironwood. `fix/ironwood-split-mobile` (zingolib#2509) is now merged
-# into `nym_mobile_adoption`, so this one branch carries both the mixnet seam
-# and the mobile split APIs. On every merge from feat/ironwood-privacy-path
-# (PR #1187) this pin wins the conflict: keep `nym_mobile_adoption` and
-# `cargo update` to its head rather than adopting 1187's branch pin. Revert
-# all three branches to "feat/ironwood" before this branch's PR merges. The
-# `nym` feature enables the Mixnet Mode surface.
-zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "nym_mobile_adoption", features = [
+# zingolib#2527 (`nym_mobile_adoption`) merged into zingolib dev on
+# 2026-07-27 and the branch was deleted, so dev is now the one branch
+# carrying the mixnet seam and the mobile split APIs. This pin wins every
+# merge conflict: keep `dev` and `cargo update` to its head rather than
+# adopting another branch's pin (see docs/agents/nym-diagnostics-plan.md,
+# "The pin collaboration protocol"). The `nym` feature enables the Mixnet
+# Mode surface.
+zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "dev", features = [
     "nym",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "nym_mobile_adoption" }
-zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "nym_mobile_adoption" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "dev" }
+zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "dev" }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
 zingomobile_utils = { path = "zingomobile_utils" }
 
