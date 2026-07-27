@@ -843,6 +843,8 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
+
+
 // For large crates we prevent `MethodTooLargeException` (see #2340)
 // N.B. the name of the extension is very misleading, since it is 
 // rather `InterfaceTooLargeException`, caused by too many methods 
@@ -959,6 +961,8 @@ fun uniffi_zingo_checksum_func_plan_ironwood_migration(
 fun uniffi_zingo_checksum_func_plan_orchard_drain(
 ): Short
 fun uniffi_zingo_checksum_func_poll_sync(
+): Short
+fun uniffi_zingo_checksum_func_probe_server(
 ): Short
 fun uniffi_zingo_checksum_func_reconcile_migration(
 ): Short
@@ -1136,6 +1140,8 @@ fun uniffi_zingo_fn_func_plan_ironwood_migration(uniffi_out_err: UniffiRustCallS
 fun uniffi_zingo_fn_func_plan_orchard_drain(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_poll_sync(uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_zingo_fn_func_probe_server(`uri`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_reconcile_migration(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1446,6 +1452,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zingo_checksum_func_poll_sync() != 35296.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_zingo_checksum_func_probe_server() != 39171.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_zingo_checksum_func_reconcile_migration() != 36661.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1619,6 +1628,29 @@ public object FfiConverterULong: FfiConverter<ULong, Long> {
 /**
  * @suppress
  */
+public object FfiConverterBoolean: FfiConverter<Boolean, Byte> {
+    override fun lift(value: Byte): Boolean {
+        return value.toInt() != 0
+    }
+
+    override fun read(buf: ByteBuffer): Boolean {
+        return lift(buf.get())
+    }
+
+    override fun lower(value: Boolean): Byte {
+        return if (value) 1.toByte() else 0.toByte()
+    }
+
+    override fun allocationSize(value: Boolean) = 1UL
+
+    override fun write(value: Boolean, buf: ByteBuffer) {
+        buf.put(lower(value))
+    }
+}
+
+/**
+ * @suppress
+ */
 public object FfiConverterString: FfiConverter<String, RustBuffer.ByValue> {
     // Note: we don't inherit from FfiConverterRustBuffer, because we use a
     // special encoding when lowering/lifting.  We can use `RustBuffer.len` to
@@ -1689,6 +1721,78 @@ public object FfiConverterByteArray: FfiConverterRustBuffer<ByteArray> {
     override fun write(value: ByteArray, buf: ByteBuffer) {
         buf.putInt(value.size)
         buf.put(value)
+    }
+}
+
+
+
+data class ProbeLeg (
+    var `ok`: kotlin.Boolean, 
+    var `detail`: kotlin.String, 
+    var `millis`: kotlin.ULong
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeProbeLeg: FfiConverterRustBuffer<ProbeLeg> {
+    override fun read(buf: ByteBuffer): ProbeLeg {
+        return ProbeLeg(
+            FfiConverterBoolean.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterULong.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: ProbeLeg) = (
+            FfiConverterBoolean.allocationSize(value.`ok`) +
+            FfiConverterString.allocationSize(value.`detail`) +
+            FfiConverterULong.allocationSize(value.`millis`)
+    )
+
+    override fun write(value: ProbeLeg, buf: ByteBuffer) {
+            FfiConverterBoolean.write(value.`ok`, buf)
+            FfiConverterString.write(value.`detail`, buf)
+            FfiConverterULong.write(value.`millis`, buf)
+    }
+}
+
+
+
+data class ProbeReport (
+    var `host`: kotlin.String, 
+    var `clearnet`: ProbeLeg, 
+    var `mixnet`: ProbeLeg?
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeProbeReport: FfiConverterRustBuffer<ProbeReport> {
+    override fun read(buf: ByteBuffer): ProbeReport {
+        return ProbeReport(
+            FfiConverterString.read(buf),
+            FfiConverterTypeProbeLeg.read(buf),
+            FfiConverterOptionalTypeProbeLeg.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: ProbeReport) = (
+            FfiConverterString.allocationSize(value.`host`) +
+            FfiConverterTypeProbeLeg.allocationSize(value.`clearnet`) +
+            FfiConverterOptionalTypeProbeLeg.allocationSize(value.`mixnet`)
+    )
+
+    override fun write(value: ProbeReport, buf: ByteBuffer) {
+            FfiConverterString.write(value.`host`, buf)
+            FfiConverterTypeProbeLeg.write(value.`clearnet`, buf)
+            FfiConverterOptionalTypeProbeLeg.write(value.`mixnet`, buf)
     }
 }
 
@@ -1902,6 +2006,66 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
         } else {
             buf.put(1)
             FfiConverterByteArray.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterOptionalTypeProbeLeg: FfiConverterRustBuffer<ProbeLeg?> {
+    override fun read(buf: ByteBuffer): ProbeLeg? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterTypeProbeLeg.read(buf)
+    }
+
+    override fun allocationSize(value: ProbeLeg?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterTypeProbeLeg.allocationSize(value)
+        }
+    }
+
+    override fun write(value: ProbeLeg?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterTypeProbeLeg.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeProbeReport: FfiConverterRustBuffer<List<ProbeReport>> {
+    override fun read(buf: ByteBuffer): List<ProbeReport> {
+        val len = buf.getInt()
+        return List<ProbeReport>(len) {
+            FfiConverterTypeProbeReport.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<ProbeReport>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeProbeReport.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<ProbeReport>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeProbeReport.write(it, buf)
         }
     }
 }
@@ -2409,6 +2573,16 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_poll_sync(
         _status)
+}
+    )
+    }
+    
+
+    @Throws(ZingolibException::class) fun `probeServer`(`uri`: kotlin.String): List<ProbeReport> {
+            return FfiConverterSequenceTypeProbeReport.lift(
+    uniffiRustCallWithError(ZingolibException) { _status ->
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_probe_server(
+        FfiConverterString.lower(`uri`),_status)
 }
     )
     }

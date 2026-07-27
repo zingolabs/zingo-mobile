@@ -237,5 +237,9 @@ RCT_EXTERN_METHOD(executeDuePartsStatusProcess:
 RCT_EXTERN_METHOD(cancelIronwoodMigrationProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(probeServerProcess:
+    (NSString)uri
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

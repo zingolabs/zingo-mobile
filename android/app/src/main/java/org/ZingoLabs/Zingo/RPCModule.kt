@@ -12,6 +12,8 @@ import com.facebook.react.bridge.Promise
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import org.json.JSONArray
+import org.json.JSONObject
 import org.ZingoLabs.Zingo.Constants.*
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext) {
@@ -865,6 +867,33 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "mixnet_ip_correlation_disclaimer") {
             uniffi.zingo.initLogging()
             uniffi.zingo.mixnetIpCorrelationDisclaimer()
+        }
+    }
+
+    private fun probeLegJson(leg: uniffi.zingo.ProbeLeg): JSONObject =
+        JSONObject()
+            .put("ok", leg.ok)
+            .put("detail", leg.detail)
+            .put("millis", leg.millis.toLong())
+
+    // The Connection Doctor's paired probe (user-invoked diagnostic). The
+    // FFI returns structured reports; they cross the React Native bridge as
+    // JSON, the bridge's own boundary format.
+    @ReactMethod
+    fun probeServerProcess(uri: String, promise: Promise) {
+        FfiOutcome.settling(promise, "probe_server") {
+            uniffi.zingo.initLogging()
+            val reports = uniffi.zingo.probeServer(uri)
+            val rendered = JSONArray()
+            for (report in reports) {
+                rendered.put(
+                    JSONObject()
+                        .put("host", report.host)
+                        .put("clearnet", probeLegJson(report.clearnet))
+                        .put("mixnet", report.mixnet?.let { probeLegJson(it) } ?: JSONObject.NULL)
+                )
+            }
+            rendered.toString()
         }
     }
 
