@@ -11,7 +11,6 @@ import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
-import { showConfirm } from '../../app/showConfirm';
 import Utils from '../../app/utils';
 
 type MigrationStrategyProps = NativeStackScreenProps<
@@ -19,10 +18,10 @@ type MigrationStrategyProps = NativeStackScreenProps<
   RouteEnum.MigrationStrategy
 >;
 
-// The two migration paths ZIP 318 offers: the immediate drain ('now') and
-// the private two-phase path ('private': split notes, then send batches
-// inside scheduled windows).
-type StrategyOption = 'now' | 'private';
+// Migration choices: opt out entirely ('none', the default), the immediate
+// drain ('now'), or the private two-phase path ('private': split notes, then
+// send batches inside scheduled windows — not shippable yet).
+type StrategyOption = 'none' | 'now' | 'private';
 
 // Renders a translated string, bolding the spans wrapped in `**` so a single
 // translation keeps its natural word order per language.
@@ -162,32 +161,14 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, totalBalance, info } = context;
   const { colors } = useTheme() as ThemeType;
-  const [selected, setSelected] = useState<StrategyOption>('private');
+  const [selected, setSelected] = useState<StrategyOption>('none');
 
   // Leaving the migration flow returns to Home. Reset (not goBack) so the
   // one-way onboarding/migration stack isn't left underneath to return to.
+  // Migration is opt-in, so the X exits straight away without a confirm.
   const closeMigration = useCallback(() => {
     navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
   }, [navigation]);
-
-  // The X asks first: exiting here strands the user's Orchard funds until they
-  // come back and migrate, so confirm before dropping out of the flow.
-  const onClose = useCallback(() => {
-    showConfirm({
-      title: translate('migrationstrategy.close-confirm-title') as string,
-      message: translate('migrationstrategy.close-confirm-message') as string,
-      // Inverted emphasis: we'd rather the user stay, so Cancel is the filled
-      // Primary (the obvious tap) and Exit is a de-emphasized Ghost.
-      buttons: [
-        {
-          text: translate('migrationstrategy.close-confirm-exit') as string,
-          onPress: closeMigration,
-          style: 'ghost',
-        },
-        { text: translate('cancel') as string, style: 'default' },
-      ],
-    });
-  }, [translate, closeMigration]);
 
   // Orchard balance shown so the user sees what would cross the pool boundary
   // (and become publicly visible) on the immediate path.
@@ -203,10 +184,10 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Escape hatch: confirm, then exit the migration flow to Home. */}
+      {/* Escape hatch: exit the migration flow back to Home. */}
       <TouchableOpacity
         testID="migrationstrategy.close"
-        onPress={onClose}
+        onPress={closeMigration}
         accessibilityLabel={translate('migrationstrategy.close') as string}
         hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
         style={{
@@ -247,10 +228,10 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
         />
 
         <OptionCard
-          title={translate('migrationstrategy.private-label') as string}
-          body={translate('migrationstrategy.private-body') as string}
-          selected={selected === 'private'}
-          onPress={() => setSelected('private')}
+          title={translate('migrationstrategy.none-label') as string}
+          body={translate('migrationstrategy.none-body') as string}
+          selected={selected === 'none'}
+          onPress={() => setSelected('none')}
           colors={colors}
         />
         <View style={{ height: 14 }} />
@@ -260,6 +241,16 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           selected={selected === 'now'}
           onPress={() => setSelected('now')}
           colors={colors}
+        />
+        <View style={{ height: 14 }} />
+        <OptionCard
+          title={translate('migrationstrategy.private-label') as string}
+          body={translate('migrationstrategy.private-body') as string}
+          selected={selected === 'private'}
+          onPress={() => {}}
+          colors={colors}
+          disabled={true}
+          badge={translate('migrationstrategy.coming-soon') as string}
         />
       </ScrollView>
 
@@ -283,13 +274,13 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           testID="migrationstrategy.start"
           type={ButtonTypeEnum.Primary}
           title={translate('migrationstrategy.start') as string}
-          onPress={() =>
-            navigation.navigate(
-              selected === 'private'
-                ? RouteEnum.MigrationSplitPlan
-                : RouteEnum.MigrationTransactions,
-            )
-          }
+          onPress={() => {
+            if (selected === 'now') {
+              navigation.navigate(RouteEnum.MigrationTransactions);
+            } else {
+              closeMigration();
+            }
+          }}
           twoButtons={true}
         />
       </View>
