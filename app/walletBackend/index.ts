@@ -11,7 +11,9 @@ export type { FfiResult } from './ffi';
 export type { ZecPriceOutcome } from './utils/walletUtils';
 export { matchZecPriceOutcome } from './utils/walletUtils';
 export { routeStartMigration } from './utils/migrationRouting';
+export { scanInProgress } from './utils/syncProgress';
 export {
+  cancelIronwoodMigration,
   changeServer,
   checkMyAddress,
   continueNoteSplitting,
