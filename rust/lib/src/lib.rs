@@ -331,11 +331,11 @@ lazy_static! {
 // Live progress of the in-flight immediate Orchard->Ironwood drain, held in a
 // side channel *outside* the LIGHTCLIENT lock. `drain_orchard_to_ironwood`
 // holds LIGHTCLIENT.write() for its whole `block_on`, so a `drain_status` poll
-// that read the lightclient would deadlock behind it. Instead the drain stashes
-// a cloned `ImmediateMigrationProgressHandle` (an independent
+// that read the lightclient would deadlock behind it. Instead the immediate
+// migration stashes a cloned `ImmediateMigrationProgressHandle` (an independent
 // Arc<Mutex<Option<ImmediateMigrationStatus>>>) here; the poller reads only
-// this global and never contends for the drain's wallet/lightclient lock.
-// `None` between drains.
+// this global and never contends for the migration's wallet/lightclient lock.
+// `None` between runs.
 lazy_static! {
     static ref DRAIN_PROGRESS: RwLock<Option<zingolib::lightclient::migrate::ImmediateMigrationProgressHandle>> =
         RwLock::new(None);
@@ -2467,13 +2467,12 @@ pub fn plan_orchard_drain() -> Result<String, ZingolibError> {
 /// crossing the pool boundary is visible on-chain, so the caller must have
 /// disclosed that. Mirror of `confirm`'s broadcast phase.
 ///
-/// Uses zingolib's `quick_immediate_migration`, the send-shaped mobile entry
-/// point. It pauses our continuous background sync internally, plans against
-/// current wallet state, builds and transmits every drain transaction, then
-/// restores sync before it returns (`resume_sync: true`). No self-sync, no
-/// reconcile loop, matching `send`/`shield`. The older
-/// `migrate_immediately_presynced` (guard parameter) is a Rust-internal form
-/// and no longer crosses the FFI.
+/// Uses zingolib's `quick_immediate_migration`, the send-shaped mobile entry point. It pauses
+/// our continuous background sync internally, plans against current wallet
+/// state, builds and transmits every drain transaction, then restores sync
+/// before it returns (`resume_sync: true`). No self-sync, no reconcile loop,
+/// matching `send`/`shield`. The older `drain_orchard_to_ironwood_presynced`
+/// (guard parameter) is a Rust-internal form and no longer crosses the FFI.
 ///
 /// Returns, on success, `{ txids: [..], migrated, fee, residual }` (values in
 /// zatoshis). Notes worth at most the sweep minimum are left behind and
@@ -2760,25 +2759,25 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                     ),
                 }
             };
-            let next_wakes = status
-                .next_wakes
+            let upcoming_windows = status
+                .upcoming_windows
                 .iter()
-                .map(|wake| {
+                .map(|window| {
                     object! {
-                        "bucket_index" => wake.bucket_index,
-                        "boundary" => u32::from(wake.boundary),
-                        "part_ids" => wake
+                        "bucket_index" => window.bucket_index,
+                        "boundary" => u32::from(window.boundary),
+                        "part_ids" => window
                             .part_ids
                             .iter()
                             .map(|id| id.0)
                             .collect::<Vec<_>>(),
-                        "denominations" => wake
+                        "denominations" => window
                             .part_ids
                             .iter()
                             .map(|id| denoms_by_id.get(&id.0).copied().unwrap_or(0))
                             .collect::<Vec<_>>(),
-                        "estimated_unix_time" => wake.estimated_unix_time,
-                        "estimated_target_unix_time" => wake.estimated_target_unix_time,
+                        "window_opens_unix_time" => window.window_opens_unix_time,
+                        "latest_target_unix_time" => window.latest_target_unix_time,
                     }
                 })
                 .collect::<Vec<_>>();
@@ -2809,7 +2808,7 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                 "value_total" => status.value_total,
                 "value_migrated" => status.value_migrated,
                 "bucket_modulus" => bucket_modulus,
-                "next_wakes" => next_wakes,
+                "upcoming_windows" => upcoming_windows,
                 "due_now" => due_now,
             }
             .pretty(2))

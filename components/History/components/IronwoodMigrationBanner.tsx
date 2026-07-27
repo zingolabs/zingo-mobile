@@ -253,10 +253,11 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     )} ${currencyName}`;
 
     // A batch is ready to send exactly when the backend reports a due batch:
-    // the window the chain is currently inside, which upcoming_windows cannot
-    // carry. upcoming_windows stays the source for the "waiting N blocks"
-    // countdown to the next scheduled window.
-    const wakes: RPCBroadcastWindowType[] = migration.upcoming_windows ?? [];
+    // the window the chain is currently inside, which next_wakes cannot carry.
+    // next_wakes stays the source for the "waiting N blocks" countdown to the
+    // next scheduled window.
+    const height = info?.latestBlock ?? 0;
+    const wakes: RPCWakePointType[] = migration.upcoming_windows ?? [];
     const nextWake = wakes[0];
     const blocksUntil = nextWake ? Math.max(0, nextWake.boundary - height) : 0;
     const ready = migration.due_now != null;

@@ -94,7 +94,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
     });
   }, [navigation]);
 
-  const wakes = useMemo(() => status?.next_wakes ?? [], [status]);
+  const wakes = useMemo(() => status?.upcoming_windows ?? [], [status]);
 
   const onConfirm = useCallback(async () => {
     if (confirming) {
@@ -106,7 +106,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
       await armBatchReminders(
         wakes.map((wake: RPCWakePointType, i: number) => ({
           id: String(wake.bucket_index),
-          timestampMs: wake.estimated_target_unix_time * 1000,
+          timestampMs: wake.latest_target_unix_time * 1000,
           title: (
             translate('migrationschedule.reminder-title') as string
           ).replace('{n}', String(i + 1)),
@@ -222,7 +222,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
                 {(translate('migrationschedule.due') as string).replace(
                   '{time}',
                   Utils.formatDate(
-                    wake.estimated_target_unix_time * 1000,
+                    wake.latest_target_unix_time * 1000,
                     'EEE, MMM d · HH:mm',
                     language,
                   ),
