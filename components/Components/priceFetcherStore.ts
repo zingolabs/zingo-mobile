@@ -1,7 +1,10 @@
 import { useEffect, useReducer } from 'react';
+import { TranslateType } from '../../app/AppState';
+import { createAlert } from '../../app/createAlert';
+import { sendEmail } from '../../app/sendEmail';
 import {
   getZecPrice,
-  matchZecPriceOutcome,
+  zecPriceFailureReport,
   ZecPriceOutcome,
 } from '../../app/walletBackend';
 
@@ -32,8 +35,10 @@ const MIN_VISIBLE_MS = 800;
 
 type Deps = {
   setZecPrice: (price: number, date: number) => void;
-  translate: (key: string) => unknown;
+  translate: (key: string) => TranslateType;
   addLastSnackbar: (message: string) => void;
+  setBackgroundError: (title: string, error: string) => void;
+  zingolibVersion: string;
 };
 
 let started = false;
@@ -59,11 +64,54 @@ function scheduleAuto(): void {
   clearAuto();
   if (listeners.size === 0 || !started) return;
   autoTimer = setTimeout(() => {
-    doFetch().catch(() => {});
+    doFetch(false).catch(() => {});
   }, PRICE_AUTO_REFRESH_MS);
 }
 
-async function doFetch(): Promise<void> {
+/**
+ * Surfaces one failed fetch. A user-initiated failure gets the full
+ * [`zecPriceFailureReport`] in an alert whose Support button emails the
+ * report with device and version info, the channel a tester forwards to
+ * the developers. The 60 s auto-refresh keeps to a snackbar carrying the
+ * report's first detail line, since a modal firing on a timer would
+ * interrupt whatever the user is doing.
+ *
+ * Exported for its unit test; the store is its only production caller.
+ */
+export async function surfacePriceFailure(
+  outcome: ZecPriceOutcome,
+  userInitiated: boolean,
+  d: Pick<
+    Deps,
+    'translate' | 'addLastSnackbar' | 'setBackgroundError' | 'zingolibVersion'
+  >,
+): Promise<void> {
+  const report = zecPriceFailureReport(outcome);
+  if (report === null) {
+    return;
+  }
+  const title =
+    outcome.kind === 'malformedPayload'
+      ? (d.translate('info.errorrpcmodule') as string)
+      : (d.translate('info.errorgemini') as string);
+  if (userInitiated) {
+    await createAlert(
+      d.setBackgroundError,
+      d.addLastSnackbar,
+      title,
+      report,
+      false,
+      d.translate,
+      sendEmail,
+      d.zingolibVersion,
+    );
+  } else {
+    const detail = report.split('\n')[1] ?? report;
+    d.addLastSnackbar(`${title} - ${detail}`);
+  }
+}
+
+async function doFetch(userInitiated: boolean): Promise<void> {
   const now = Date.now();
   // Anti-spam gate: ignore while a fetch is in flight or inside the 5 s
   // cooldown. The auto timer (60 s) never trips this; rapid taps do.
@@ -84,34 +132,18 @@ async function doFetch(): Promise<void> {
     outcome = await getZecPrice();
   }
 
-  // Exhaustive by construction: the handler record must name every
-  // ZecPriceOutcome arm, so adding an arm fails compilation here, by
-  // name, until this store decides how to render it.
-  const geminiSnackbar = (detail: string) =>
-    d.addLastSnackbar(
-      `${d.translate('info.errorgemini') as string} - ${detail}`,
-    );
-  matchZecPriceOutcome(outcome, {
-    price: o => {
-      d.setZecPrice(o.usd, Date.now());
-      started = true;
-    },
-    noData: () => {
-      geminiSnackbar('');
+  // Per-arm rendering lives in zecPriceFailureReport, which is exhaustive
+  // by construction: a new ZecPriceOutcome arm fails compilation there
+  // until it declares its report.
+  if (outcome.kind === 'price') {
+    d.setZecPrice(outcome.usd, Date.now());
+    started = true;
+  } else {
+    if (outcome.kind === 'noData') {
       d.setZecPrice(0, 0);
-    },
-    gateRefusal: o => geminiSnackbar(o.error),
-    timedOut: o =>
-      geminiSnackbar(
-        `timed out after ${Math.round(o.afterMs / 1000)}s`,
-      ),
-    ffiRejection: o => geminiSnackbar(o.message),
-    oracleError: o => geminiSnackbar(o.error),
-    malformedPayload: o =>
-      d.addLastSnackbar(
-        `${d.translate('info.errorrpcmodule') as string} - ${o.detail}`,
-      ),
-  });
+    }
+    await surfacePriceFailure(outcome, userInitiated, d);
+  }
 
   // Floor the visible loading time so the CTA/ring state doesn't flash by.
   const elapsed = Date.now() - now;
@@ -131,9 +163,9 @@ export const priceFetcherStore = {
   setDeps(d: Deps): void {
     deps = d;
   },
-  /** User- or timer-initiated fetch. No-ops while loading / cooling down. */
+  /** User-initiated fetch. No-ops while loading / cooling down. */
   fetch(): void {
-    doFetch().catch(() => {});
+    doFetch(true).catch(() => {});
   },
   hasStarted(): boolean {
     return started;

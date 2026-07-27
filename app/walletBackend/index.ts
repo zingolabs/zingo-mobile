@@ -10,6 +10,10 @@ import WalletBackend from './WalletBackend';
 export type { FfiResult } from './ffi';
 export type { ZecPriceOutcome } from './utils/walletUtils';
 export { matchZecPriceOutcome } from './utils/walletUtils';
+export {
+  PRICE_FAILURE_HEADLINE,
+  zecPriceFailureReport,
+} from './transforms/zecPriceFailureTransform';
 export { routeStartMigration } from './utils/migrationRouting';
 export { scanInProgress } from './utils/syncProgress';
 export {
