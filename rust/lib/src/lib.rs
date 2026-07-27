@@ -184,6 +184,10 @@ fn ffi_error(e: LightClientError) -> ZingolibError {
             MigrationError::PreSignedUnavailable
             | MigrationError::NoteSplittingRequired
             | MigrationError::DifferentAccount
+            // CadenceFixed is unreachable from this app: the cadence surface
+            // is retired and nothing calls reschedule_parts. Mapped for
+            // exhaustiveness only.
+            | MigrationError::CadenceFixed
             | MigrationError::IronwoodEraTooYoung { .. } => ZingolibError::Migration(text),
             MigrationError::SplitDidNotConverge(_)
             | MigrationError::SplitTransactionFailed(_)
@@ -1968,20 +1972,35 @@ pub fn get_total_spends_to_address() -> Result<String, ZingolibError> {
 pub fn zec_price() -> Result<String, ZingolibError> {
     with_initialized_lightclient(|lightclient| {
         RT.block_on(async move {
-            // The LightClient method rather than the wallet directly: it
-            // owns the Mixnet Mode routing policy for the price fetch. The
-            // payload carries the route attestation with the price, so the
-            // app layer holds per-fetch evidence — absence of a failure is
-            // never the only signal.
-            let fetch = lightclient
-                .update_current_price()
-                .await
-                .map_err(ffi_error)?;
-            Ok(object! {
-                "current_price" => fetch.usd,
-                "via_socks5" => fetch.via_socks5,
+            // mixnet_route is the shared fail-closed resolver (ADR 0011):
+            // the proxy when Ready, clearnet only on a deliberate toggle-off,
+            // a refusal while bootstrapping or dead. The mixnet leg's payload
+            // carries the route attestation, so the app layer holds per-fetch
+            // evidence; the clearnet leg has no tunnel to attest and omits
+            // the field.
+            match lightclient
+                .mixnet_route()
+                .map_err(|not_ready| ffi_error(LightClientError::from(not_ready)))?
+            {
+                zingolib::nym::MixnetRoute::Mixnet(_) => {
+                    let fetch = lightclient
+                        .update_current_price_over_mixnet()
+                        .await
+                        .map_err(ffi_error)?;
+                    Ok(object! {
+                        "current_price" => fetch.usd,
+                        "via_socks5" => fetch.via_socks5,
+                    }
+                    .pretty(2))
+                }
+                zingolib::nym::MixnetRoute::Clearnet => {
+                    let usd = lightclient
+                        .update_current_price()
+                        .await
+                        .map_err(ffi_error)?;
+                    Ok(object! { "current_price" => usd }.pretty(2))
+                }
             }
-            .pretty(2))
         })
     })
 }
@@ -2564,7 +2583,6 @@ fn migration_phase_json(phase: &MigrationPhase) -> json::JsonValue {
         MigrationPhase::NoteSplitting {
             round,
             pending_txids,
-            queued,
         } => object! {
             "kind" => "note_splitting",
             "round" => *round,
@@ -2572,10 +2590,6 @@ fn migration_phase_json(phase: &MigrationPhase) -> json::JsonValue {
                 .iter()
                 .map(|txid| txid.to_string())
                 .collect::<Vec<_>>(),
-            // Split transactions drawn onto the ZIP 318 preparation
-            // schedule but not yet due; the next call transmits the due
-            // ones or reports the earliest due height.
-            "queued" => queued.len(),
         },
         MigrationPhase::PartsScheduled => object! { "kind" => "parts_scheduled" },
         MigrationPhase::Complete { residual } => object! {
@@ -2653,7 +2667,14 @@ pub fn start_ironwood_migration(plan_hash_hex: String) -> Result<String, Zingoli
             .ok_or_else(|| ZingolibError::InvalidInput("invalid plan hash".to_string()))?;
         RT.block_on(async move {
             lightclient
-                .start_ironwood_migration(AccountId::ZERO, SigningStrategy::LazyAtBoundary, hash)
+                // per_bucket None: there is no cadence chooser — the ZIP 318
+                // Poisson schedule draws every broadcast delay itself.
+                .start_ironwood_migration(
+                    AccountId::ZERO,
+                    SigningStrategy::LazyAtBoundary,
+                    hash,
+                    None,
+                )
                 .await
                 .map_err(ffi_error)?;
             Ok(object! { "started" => true }.pretty(2))
@@ -2698,10 +2719,6 @@ pub fn continue_note_splitting() -> Result<String, ZingolibError> {
                         .iter()
                         .map(|txid| txid.to_string())
                         .collect::<Vec<_>>(),
-                },
-                SplitStep::AwaitingSchedule { next_due } => object! {
-                    "step" => "awaiting_schedule",
-                    "next_due" => u32::from(next_due),
                 },
                 SplitStep::SplittingComplete => object! {
                     "step" => "splitting_complete",
