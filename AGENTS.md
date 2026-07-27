@@ -131,3 +131,10 @@ without losing meaning, the "so" was decorative. Delete it.
 ### Tooling
 
 - No heredocs (<< EOF, << 'EOF') in bash or other shell scripts. They're hard to read, break on escaping, and bury content that should be its own file. Use a real file, a templating step, or printf with explicit lines instead.
+
+## Pending plans
+
+Coordinated work ready for implementation lives in `docs/agents/`.
+Current: `docs/agents/nym-diagnostics-plan.md`, the Connection Doctor
+debug APK for Nym connectivity triage (issue #1221) and the pin
+collaboration protocol for agents updating the zingolib pin.
