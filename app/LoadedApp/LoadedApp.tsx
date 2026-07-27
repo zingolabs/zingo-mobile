@@ -34,6 +34,7 @@ import {
   loadExistingWallet,
   parseAddress,
   reconcileMigration,
+  scanInProgress,
   setConfigWalletToProd,
 } from '../walletBackend';
 import {
@@ -1256,16 +1257,8 @@ export class LoadedAppClass extends Component<
     // user into a migration for an amount with no spendable notes behind it,
     // and the send errors out when it tries to assemble the transaction and
     // cannot source them. Wait out the scan; setSyncingStatus re-runs this on
-    // every tick, so it fires the moment sync completes. Mirrors
-    // SyncCoordinator's in-refresh test.
-    const ss = this.state.syncingStatus;
-    const scanInProgress =
-      !!ss.scan_ranges &&
-      ss.scan_ranges.length > 0 &&
-      (ss.percentage_total_outputs_scanned ??
-        ss.percentage_total_blocks_scanned ??
-        0) < 100;
-    if (scanInProgress) {
+    // every tick, so it fires the moment sync completes.
+    if (scanInProgress(this.state.syncingStatus)) {
       console.log('meet ironwood: sync still in progress');
       return;
     }
