@@ -34,7 +34,6 @@ import {
   loadExistingWallet,
   parseAddress,
   reconcileMigration,
-  scanInProgress,
   setConfigWalletToProd,
 } from '../walletBackend';
 import {
@@ -76,7 +75,6 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
-  isIronwoodActive,
 } from '../AppState';
 import Utils from '../utils';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
@@ -1274,82 +1272,6 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ totalBalance });
     }
-    this.checkMeetIronwood(totalBalance);
-  };
-
-  // Launched at most once per wallet-load session; balance updates arrive
-  // every poll, so re-entries after the first launch bail out immediately.
-  private meetIronwoodLaunched = false;
-
-  checkMeetIronwood = async (totalBalance: TotalBalanceClass | null) => {
-    if (this.meetIronwoodLaunched) {
-      return;
-    }
-    // There is nowhere to migrate to until NU6.3 activates on the connected
-    // chain. Checked against the server's tip on every call rather than once,
-    // so a wallet that is running while the fork lands picks it up on the next
-    // sync tick without a restart.
-    if (!isIronwoodActive(this.state.info)) {
-      console.log(
-        'meet ironwood: not activated on this chain yet',
-        this.state.info?.chainName,
-        this.state.info?.latestBlock,
-      );
-      return;
-    }
-    // The balance is only trustworthy once the scan reaches the tip. Mid-sync,
-    // zingolib reports a note as confirmed the moment it is scanned, before its
-    // witness is built up to a spendable anchor, so confirmed_orchard_balance
-    // can carry funds the wallet cannot yet spend. Launching then drops the
-    // user into a migration for an amount with no spendable notes behind it,
-    // and the send errors out when it tries to assemble the transaction and
-    // cannot source them. Wait out the scan; setSyncingStatus re-runs this on
-    // every tick, so it fires the moment sync completes.
-    if (scanInProgress(this.state.syncingStatus)) {
-      console.log('meet ironwood: sync still in progress');
-      return;
-    }
-    // Scan at the tip: confirmed_orchard_balance now reflects witnessed,
-    // spendable, non-dust notes (each above the ZIP-317 marginal fee of 5000
-    // zats). A positive value means at least one migratable note.
-    if (!totalBalance || totalBalance.confirmedOrchardBalance <= 0) {
-      console.log(
-        'meet ironwood: no spendable non-dust orchard funds',
-        totalBalance?.confirmedOrchardBalance,
-      );
-      return;
-    }
-    if (!GlobalConst.ironwoodOnboardEveryLoad) {
-      const seen = (await SettingsFileImpl.readSettings()).ironwoodOnboardSeen;
-      if (seen) {
-        return;
-      }
-    }
-    // only if the App is in the foreground.
-    const background = await AsyncStorage.getItem(GlobalConst.background);
-    if (background !== GlobalConst.no) {
-      console.log('meet ironwood: app in background');
-      return;
-    }
-    // don't stack on top of the basic-mode seed modal; retry on a later
-    // sync tick instead.
-    if (this.state.isSeedViewModalOpen || this.meetIronwoodLaunched) {
-      return;
-    }
-    // the inner navigator may not be captured yet on the very first balance
-    // fetch; leave `meetIronwoodLaunched` false so the next tick retries.
-    if (!this.drawerNav) {
-      console.log('meet ironwood: navigator not ready yet');
-      return;
-    }
-    this.meetIronwoodLaunched = true;
-    console.log('meet ironwood: launching onboarding');
-    // `ironwoodOnboardSeen` is written by the onboarding screen itself, not
-    // here — launching is not seeing. A crash or a kill between this navigate
-    // and the user reading anything leaves the flag unset, so the onboarding
-    // comes back on the next load instead of being silently spent.
-    // `meetIronwoodLaunched` still keeps it to one launch per session.
-    this.drawerNav.navigate(RouteEnum.MeetIronwood);
   };
 
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
@@ -1359,11 +1281,6 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ syncingStatus });
     }
-    // balances are only refetched when the wallet needs saving, so the
-    // balance callback can fire exactly once per session; retrying here on
-    // every sync tick means a transient bail (navigator not captured yet,
-    // seed modal open, app backgrounded) doesn't lose the launch forever.
-    this.checkMeetIronwood(this.state.totalBalance);
   };
 
   setIsSeedViewModalOpen = (value: boolean) => {

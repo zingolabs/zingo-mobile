@@ -44,6 +44,7 @@ import {
   ScreenEnum,
   RouteEnum,
   SendPageStateClass,
+  isIronwoodActive,
 } from '../../../app/AppState';
 import { RPCAddressKindEnum } from '../../../app/walletBackend/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/walletBackend/enums/RPCReceiversEnum';
@@ -323,7 +324,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         RPCReceiversEnum.orchardRPCReceiver,
       )
     ) {
-      return translate('send.private') as string;
+      // Post-NU6.3 the Orchard pool is legacy. Spending an Orchard note drains
+      // it through the Orchard->Ironwood turnstile, which reveals the value
+      // moved, so an otherwise-private all-Orchard send is no longer private
+      // once Ironwood is active.
+      return isIronwoodActive(info)
+        ? (translate('send.amountrevealed') as string)
+        : (translate('send.private') as string);
     }
 
     // Private -> sapling to sapling (ZA or UA with sapling receiver and NO orchard receiver)
@@ -404,6 +411,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     calculatedFee,
+    info,
     sendPageState.toaddr.amount,
     sendPageState.toaddr.to,
     server.chainName,
