@@ -241,5 +241,9 @@ RCT_EXTERN_METHOD(probeServerProcess:
     (NSString)uri
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(probeSyncServerProcess:
+    (NSString)uri
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

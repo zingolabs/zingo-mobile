@@ -12,3 +12,9 @@ import { callFfi, decodeFfiJson, FfiJsonDecode } from '../ffi';
 export async function probeServer(uri: string): Promise<FfiJsonDecode> {
   return decodeFfiJson(await callFfi(RPCModule.probeServerProcess(uri)));
 }
+
+// The staged sync-path probe: tcp-connect, tls-channel, grpc-info, each
+// timed, stopping at the first typed failure. Same user-invoked-only rule.
+export async function probeSyncServer(uri: string): Promise<FfiJsonDecode> {
+  return decodeFfiJson(await callFfi(RPCModule.probeSyncServerProcess(uri)));
+}

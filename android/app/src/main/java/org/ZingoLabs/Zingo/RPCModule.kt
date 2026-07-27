@@ -870,11 +870,38 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    private fun probeFailureJson(failure: uniffi.zingo.ProbeFailure): JSONObject =
+        JSONObject()
+            .put("stage", failure.stage)
+            .put("target", failure.target)
+            .put("cause_chain", JSONArray(failure.causeChain))
+
+    private fun probeSuccessJson(success: uniffi.zingo.ProbeSuccessData): JSONObject =
+        JSONObject()
+            .put("chain", success.chain)
+            .put("height", success.height.toLong())
+
+    // Each sealed outcome crosses the bridge as a kind-discriminated object,
+    // the JSON spelling of the FFI's exhaustive enums.
     private fun probeLegJson(leg: uniffi.zingo.ProbeLeg): JSONObject =
         JSONObject()
-            .put("ok", leg.ok)
-            .put("detail", leg.detail)
             .put("millis", leg.millis.toLong())
+            .put(
+                "outcome",
+                when (val outcome = leg.outcome) {
+                    is uniffi.zingo.ProbeLegOutcome.Answered ->
+                        JSONObject().put("kind", "answered").put("info", probeSuccessJson(outcome.info))
+                    is uniffi.zingo.ProbeLegOutcome.Failed ->
+                        JSONObject().put("kind", "failed").put("failure", probeFailureJson(outcome.failure))
+                }
+            )
+
+    private fun mixnetLegJson(mixnet: uniffi.zingo.MixnetLeg): JSONObject =
+        when (mixnet) {
+            is uniffi.zingo.MixnetLeg.Probed ->
+                JSONObject().put("kind", "probed").put("leg", probeLegJson(mixnet.leg))
+            is uniffi.zingo.MixnetLeg.NotCarried -> JSONObject().put("kind", "notCarried")
+        }
 
     // The Connection Doctor's paired probe (user-invoked diagnostic). The
     // FFI returns structured reports; they cross the React Native bridge as
@@ -890,10 +917,51 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     JSONObject()
                         .put("host", report.host)
                         .put("clearnet", probeLegJson(report.clearnet))
-                        .put("mixnet", report.mixnet?.let { probeLegJson(it) } ?: JSONObject.NULL)
+                        .put("mixnet", mixnetLegJson(report.mixnet))
                 )
             }
             rendered.toString()
+        }
+    }
+
+    // The Connection Doctor's staged sync-path probe: tcp-connect,
+    // tls-channel, grpc-info, each timed, stopping at the first typed
+    // failure. Needs no initialized client and holds no wallet lock.
+    @ReactMethod
+    fun probeSyncServerProcess(uri: String, promise: Promise) {
+        FfiOutcome.settling(promise, "probe_sync_server") {
+            uniffi.zingo.initLogging()
+            val probe = uniffi.zingo.probeSyncServer(uri)
+            val stages = JSONArray()
+            for (stage in probe.stages) {
+                stages.put(
+                    JSONObject()
+                        .put("step", stage.step)
+                        .put("millis", stage.millis.toLong())
+                        .put(
+                            "outcome",
+                            when (val outcome = stage.outcome) {
+                                is uniffi.zingo.SyncStageOutcome.Passed ->
+                                    JSONObject().put("kind", "passed")
+                                is uniffi.zingo.SyncStageOutcome.Failed ->
+                                    JSONObject().put("kind", "failed").put("failure", probeFailureJson(outcome.failure))
+                            }
+                        )
+                )
+            }
+            JSONObject()
+                .put("server", probe.server)
+                .put("stages", stages)
+                .put(
+                    "verdict",
+                    when (val verdict = probe.verdict) {
+                        is uniffi.zingo.SyncServerVerdict.Reachable ->
+                            JSONObject().put("kind", "reachable").put("info", probeSuccessJson(verdict.info))
+                        is uniffi.zingo.SyncServerVerdict.Stopped ->
+                            JSONObject().put("kind", "stopped")
+                    }
+                )
+                .toString()
         }
     }
 

@@ -845,6 +845,8 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
+
+
 // For large crates we prevent `MethodTooLargeException` (see #2340)
 // N.B. the name of the extension is very misleading, since it is 
 // rather `InterfaceTooLargeException`, caused by too many methods 
@@ -963,6 +965,8 @@ fun uniffi_zingo_checksum_func_plan_orchard_drain(
 fun uniffi_zingo_checksum_func_poll_sync(
 ): Short
 fun uniffi_zingo_checksum_func_probe_server(
+): Short
+fun uniffi_zingo_checksum_func_probe_sync_server(
 ): Short
 fun uniffi_zingo_checksum_func_reconcile_migration(
 ): Short
@@ -1142,6 +1146,8 @@ fun uniffi_zingo_fn_func_plan_orchard_drain(uniffi_out_err: UniffiRustCallStatus
 fun uniffi_zingo_fn_func_poll_sync(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_probe_server(`uri`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_zingo_fn_func_probe_sync_server(`uri`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_reconcile_migration(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1455,6 +1461,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zingo_checksum_func_probe_server() != 39171.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_zingo_checksum_func_probe_sync_server() != 48155.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_zingo_checksum_func_reconcile_migration() != 36661.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1628,29 +1637,6 @@ public object FfiConverterULong: FfiConverter<ULong, Long> {
 /**
  * @suppress
  */
-public object FfiConverterBoolean: FfiConverter<Boolean, Byte> {
-    override fun lift(value: Byte): Boolean {
-        return value.toInt() != 0
-    }
-
-    override fun read(buf: ByteBuffer): Boolean {
-        return lift(buf.get())
-    }
-
-    override fun lower(value: Boolean): Byte {
-        return if (value) 1.toByte() else 0.toByte()
-    }
-
-    override fun allocationSize(value: Boolean) = 1UL
-
-    override fun write(value: Boolean, buf: ByteBuffer) {
-        buf.put(lower(value))
-    }
-}
-
-/**
- * @suppress
- */
 public object FfiConverterString: FfiConverter<String, RustBuffer.ByValue> {
     // Note: we don't inherit from FfiConverterRustBuffer, because we use a
     // special encoding when lowering/lifting.  We can use `RustBuffer.len` to
@@ -1726,10 +1712,45 @@ public object FfiConverterByteArray: FfiConverterRustBuffer<ByteArray> {
 
 
 
+data class ProbeFailure (
+    var `stage`: kotlin.String, 
+    var `target`: kotlin.String, 
+    var `causeChain`: List<kotlin.String>
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeProbeFailure: FfiConverterRustBuffer<ProbeFailure> {
+    override fun read(buf: ByteBuffer): ProbeFailure {
+        return ProbeFailure(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterSequenceString.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: ProbeFailure) = (
+            FfiConverterString.allocationSize(value.`stage`) +
+            FfiConverterString.allocationSize(value.`target`) +
+            FfiConverterSequenceString.allocationSize(value.`causeChain`)
+    )
+
+    override fun write(value: ProbeFailure, buf: ByteBuffer) {
+            FfiConverterString.write(value.`stage`, buf)
+            FfiConverterString.write(value.`target`, buf)
+            FfiConverterSequenceString.write(value.`causeChain`, buf)
+    }
+}
+
+
+
 data class ProbeLeg (
-    var `ok`: kotlin.Boolean, 
-    var `detail`: kotlin.String, 
-    var `millis`: kotlin.ULong
+    var `millis`: kotlin.ULong, 
+    var `outcome`: ProbeLegOutcome
 ) {
     
     companion object
@@ -1741,22 +1762,19 @@ data class ProbeLeg (
 public object FfiConverterTypeProbeLeg: FfiConverterRustBuffer<ProbeLeg> {
     override fun read(buf: ByteBuffer): ProbeLeg {
         return ProbeLeg(
-            FfiConverterBoolean.read(buf),
-            FfiConverterString.read(buf),
             FfiConverterULong.read(buf),
+            FfiConverterTypeProbeLegOutcome.read(buf),
         )
     }
 
     override fun allocationSize(value: ProbeLeg) = (
-            FfiConverterBoolean.allocationSize(value.`ok`) +
-            FfiConverterString.allocationSize(value.`detail`) +
-            FfiConverterULong.allocationSize(value.`millis`)
+            FfiConverterULong.allocationSize(value.`millis`) +
+            FfiConverterTypeProbeLegOutcome.allocationSize(value.`outcome`)
     )
 
     override fun write(value: ProbeLeg, buf: ByteBuffer) {
-            FfiConverterBoolean.write(value.`ok`, buf)
-            FfiConverterString.write(value.`detail`, buf)
             FfiConverterULong.write(value.`millis`, buf)
+            FfiConverterTypeProbeLegOutcome.write(value.`outcome`, buf)
     }
 }
 
@@ -1765,7 +1783,7 @@ public object FfiConverterTypeProbeLeg: FfiConverterRustBuffer<ProbeLeg> {
 data class ProbeReport (
     var `host`: kotlin.String, 
     var `clearnet`: ProbeLeg, 
-    var `mixnet`: ProbeLeg?
+    var `mixnet`: MixnetLeg
 ) {
     
     companion object
@@ -1779,22 +1797,388 @@ public object FfiConverterTypeProbeReport: FfiConverterRustBuffer<ProbeReport> {
         return ProbeReport(
             FfiConverterString.read(buf),
             FfiConverterTypeProbeLeg.read(buf),
-            FfiConverterOptionalTypeProbeLeg.read(buf),
+            FfiConverterTypeMixnetLeg.read(buf),
         )
     }
 
     override fun allocationSize(value: ProbeReport) = (
             FfiConverterString.allocationSize(value.`host`) +
             FfiConverterTypeProbeLeg.allocationSize(value.`clearnet`) +
-            FfiConverterOptionalTypeProbeLeg.allocationSize(value.`mixnet`)
+            FfiConverterTypeMixnetLeg.allocationSize(value.`mixnet`)
     )
 
     override fun write(value: ProbeReport, buf: ByteBuffer) {
             FfiConverterString.write(value.`host`, buf)
             FfiConverterTypeProbeLeg.write(value.`clearnet`, buf)
-            FfiConverterOptionalTypeProbeLeg.write(value.`mixnet`, buf)
+            FfiConverterTypeMixnetLeg.write(value.`mixnet`, buf)
     }
 }
+
+
+
+data class ProbeSuccessData (
+    var `chain`: kotlin.String, 
+    var `height`: kotlin.ULong
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeProbeSuccessData: FfiConverterRustBuffer<ProbeSuccessData> {
+    override fun read(buf: ByteBuffer): ProbeSuccessData {
+        return ProbeSuccessData(
+            FfiConverterString.read(buf),
+            FfiConverterULong.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: ProbeSuccessData) = (
+            FfiConverterString.allocationSize(value.`chain`) +
+            FfiConverterULong.allocationSize(value.`height`)
+    )
+
+    override fun write(value: ProbeSuccessData, buf: ByteBuffer) {
+            FfiConverterString.write(value.`chain`, buf)
+            FfiConverterULong.write(value.`height`, buf)
+    }
+}
+
+
+
+data class SyncProbeStage (
+    var `step`: kotlin.String, 
+    var `millis`: kotlin.ULong, 
+    var `outcome`: SyncStageOutcome
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeSyncProbeStage: FfiConverterRustBuffer<SyncProbeStage> {
+    override fun read(buf: ByteBuffer): SyncProbeStage {
+        return SyncProbeStage(
+            FfiConverterString.read(buf),
+            FfiConverterULong.read(buf),
+            FfiConverterTypeSyncStageOutcome.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: SyncProbeStage) = (
+            FfiConverterString.allocationSize(value.`step`) +
+            FfiConverterULong.allocationSize(value.`millis`) +
+            FfiConverterTypeSyncStageOutcome.allocationSize(value.`outcome`)
+    )
+
+    override fun write(value: SyncProbeStage, buf: ByteBuffer) {
+            FfiConverterString.write(value.`step`, buf)
+            FfiConverterULong.write(value.`millis`, buf)
+            FfiConverterTypeSyncStageOutcome.write(value.`outcome`, buf)
+    }
+}
+
+
+
+data class SyncServerProbe (
+    var `server`: kotlin.String, 
+    var `stages`: List<SyncProbeStage>, 
+    var `verdict`: SyncServerVerdict
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeSyncServerProbe: FfiConverterRustBuffer<SyncServerProbe> {
+    override fun read(buf: ByteBuffer): SyncServerProbe {
+        return SyncServerProbe(
+            FfiConverterString.read(buf),
+            FfiConverterSequenceTypeSyncProbeStage.read(buf),
+            FfiConverterTypeSyncServerVerdict.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: SyncServerProbe) = (
+            FfiConverterString.allocationSize(value.`server`) +
+            FfiConverterSequenceTypeSyncProbeStage.allocationSize(value.`stages`) +
+            FfiConverterTypeSyncServerVerdict.allocationSize(value.`verdict`)
+    )
+
+    override fun write(value: SyncServerProbe, buf: ByteBuffer) {
+            FfiConverterString.write(value.`server`, buf)
+            FfiConverterSequenceTypeSyncProbeStage.write(value.`stages`, buf)
+            FfiConverterTypeSyncServerVerdict.write(value.`verdict`, buf)
+    }
+}
+
+
+
+sealed class MixnetLeg {
+    
+    data class Probed(
+        val `leg`: ProbeLeg) : MixnetLeg() {
+        companion object
+    }
+    
+    object NotCarried : MixnetLeg()
+    
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMixnetLeg : FfiConverterRustBuffer<MixnetLeg>{
+    override fun read(buf: ByteBuffer): MixnetLeg {
+        return when(buf.getInt()) {
+            1 -> MixnetLeg.Probed(
+                FfiConverterTypeProbeLeg.read(buf),
+                )
+            2 -> MixnetLeg.NotCarried
+            else -> throw RuntimeException("invalid enum value, something is very wrong!!")
+        }
+    }
+
+    override fun allocationSize(value: MixnetLeg) = when(value) {
+        is MixnetLeg.Probed -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeProbeLeg.allocationSize(value.`leg`)
+            )
+        }
+        is MixnetLeg.NotCarried -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+            )
+        }
+    }
+
+    override fun write(value: MixnetLeg, buf: ByteBuffer) {
+        when(value) {
+            is MixnetLeg.Probed -> {
+                buf.putInt(1)
+                FfiConverterTypeProbeLeg.write(value.`leg`, buf)
+                Unit
+            }
+            is MixnetLeg.NotCarried -> {
+                buf.putInt(2)
+                Unit
+            }
+        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
+    }
+}
+
+
+
+
+
+sealed class ProbeLegOutcome {
+    
+    data class Answered(
+        val `info`: ProbeSuccessData) : ProbeLegOutcome() {
+        companion object
+    }
+    
+    data class Failed(
+        val `failure`: ProbeFailure) : ProbeLegOutcome() {
+        companion object
+    }
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeProbeLegOutcome : FfiConverterRustBuffer<ProbeLegOutcome>{
+    override fun read(buf: ByteBuffer): ProbeLegOutcome {
+        return when(buf.getInt()) {
+            1 -> ProbeLegOutcome.Answered(
+                FfiConverterTypeProbeSuccessData.read(buf),
+                )
+            2 -> ProbeLegOutcome.Failed(
+                FfiConverterTypeProbeFailure.read(buf),
+                )
+            else -> throw RuntimeException("invalid enum value, something is very wrong!!")
+        }
+    }
+
+    override fun allocationSize(value: ProbeLegOutcome) = when(value) {
+        is ProbeLegOutcome.Answered -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeProbeSuccessData.allocationSize(value.`info`)
+            )
+        }
+        is ProbeLegOutcome.Failed -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeProbeFailure.allocationSize(value.`failure`)
+            )
+        }
+    }
+
+    override fun write(value: ProbeLegOutcome, buf: ByteBuffer) {
+        when(value) {
+            is ProbeLegOutcome.Answered -> {
+                buf.putInt(1)
+                FfiConverterTypeProbeSuccessData.write(value.`info`, buf)
+                Unit
+            }
+            is ProbeLegOutcome.Failed -> {
+                buf.putInt(2)
+                FfiConverterTypeProbeFailure.write(value.`failure`, buf)
+                Unit
+            }
+        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
+    }
+}
+
+
+
+
+
+sealed class SyncServerVerdict {
+    
+    data class Reachable(
+        val `info`: ProbeSuccessData) : SyncServerVerdict() {
+        companion object
+    }
+    
+    object Stopped : SyncServerVerdict()
+    
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeSyncServerVerdict : FfiConverterRustBuffer<SyncServerVerdict>{
+    override fun read(buf: ByteBuffer): SyncServerVerdict {
+        return when(buf.getInt()) {
+            1 -> SyncServerVerdict.Reachable(
+                FfiConverterTypeProbeSuccessData.read(buf),
+                )
+            2 -> SyncServerVerdict.Stopped
+            else -> throw RuntimeException("invalid enum value, something is very wrong!!")
+        }
+    }
+
+    override fun allocationSize(value: SyncServerVerdict) = when(value) {
+        is SyncServerVerdict.Reachable -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeProbeSuccessData.allocationSize(value.`info`)
+            )
+        }
+        is SyncServerVerdict.Stopped -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+            )
+        }
+    }
+
+    override fun write(value: SyncServerVerdict, buf: ByteBuffer) {
+        when(value) {
+            is SyncServerVerdict.Reachable -> {
+                buf.putInt(1)
+                FfiConverterTypeProbeSuccessData.write(value.`info`, buf)
+                Unit
+            }
+            is SyncServerVerdict.Stopped -> {
+                buf.putInt(2)
+                Unit
+            }
+        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
+    }
+}
+
+
+
+
+
+sealed class SyncStageOutcome {
+    
+    object Passed : SyncStageOutcome()
+    
+    
+    data class Failed(
+        val `failure`: ProbeFailure) : SyncStageOutcome() {
+        companion object
+    }
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeSyncStageOutcome : FfiConverterRustBuffer<SyncStageOutcome>{
+    override fun read(buf: ByteBuffer): SyncStageOutcome {
+        return when(buf.getInt()) {
+            1 -> SyncStageOutcome.Passed
+            2 -> SyncStageOutcome.Failed(
+                FfiConverterTypeProbeFailure.read(buf),
+                )
+            else -> throw RuntimeException("invalid enum value, something is very wrong!!")
+        }
+    }
+
+    override fun allocationSize(value: SyncStageOutcome) = when(value) {
+        is SyncStageOutcome.Passed -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+            )
+        }
+        is SyncStageOutcome.Failed -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeProbeFailure.allocationSize(value.`failure`)
+            )
+        }
+    }
+
+    override fun write(value: SyncStageOutcome, buf: ByteBuffer) {
+        when(value) {
+            is SyncStageOutcome.Passed -> {
+                buf.putInt(1)
+                Unit
+            }
+            is SyncStageOutcome.Failed -> {
+                buf.putInt(2)
+                FfiConverterTypeProbeFailure.write(value.`failure`, buf)
+                Unit
+            }
+        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
+    }
+}
+
+
 
 
 
@@ -2016,28 +2400,24 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
 /**
  * @suppress
  */
-public object FfiConverterOptionalTypeProbeLeg: FfiConverterRustBuffer<ProbeLeg?> {
-    override fun read(buf: ByteBuffer): ProbeLeg? {
-        if (buf.get().toInt() == 0) {
-            return null
-        }
-        return FfiConverterTypeProbeLeg.read(buf)
-    }
-
-    override fun allocationSize(value: ProbeLeg?): ULong {
-        if (value == null) {
-            return 1UL
-        } else {
-            return 1UL + FfiConverterTypeProbeLeg.allocationSize(value)
+public object FfiConverterSequenceString: FfiConverterRustBuffer<List<kotlin.String>> {
+    override fun read(buf: ByteBuffer): List<kotlin.String> {
+        val len = buf.getInt()
+        return List<kotlin.String>(len) {
+            FfiConverterString.read(buf)
         }
     }
 
-    override fun write(value: ProbeLeg?, buf: ByteBuffer) {
-        if (value == null) {
-            buf.put(0)
-        } else {
-            buf.put(1)
-            FfiConverterTypeProbeLeg.write(value, buf)
+    override fun allocationSize(value: List<kotlin.String>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterString.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<kotlin.String>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterString.write(it, buf)
         }
     }
 }
@@ -2066,6 +2446,34 @@ public object FfiConverterSequenceTypeProbeReport: FfiConverterRustBuffer<List<P
         buf.putInt(value.size)
         value.iterator().forEach {
             FfiConverterTypeProbeReport.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeSyncProbeStage: FfiConverterRustBuffer<List<SyncProbeStage>> {
+    override fun read(buf: ByteBuffer): List<SyncProbeStage> {
+        val len = buf.getInt()
+        return List<SyncProbeStage>(len) {
+            FfiConverterTypeSyncProbeStage.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<SyncProbeStage>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeSyncProbeStage.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<SyncProbeStage>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeSyncProbeStage.write(it, buf)
         }
     }
 }
@@ -2582,6 +2990,16 @@ public object FfiConverterSequenceTypeProbeReport: FfiConverterRustBuffer<List<P
             return FfiConverterSequenceTypeProbeReport.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_probe_server(
+        FfiConverterString.lower(`uri`),_status)
+}
+    )
+    }
+    
+
+    @Throws(ZingolibException::class) fun `probeSyncServer`(`uri`: kotlin.String): SyncServerProbe {
+            return FfiConverterTypeSyncServerProbe.lift(
+    uniffiRustCallWithError(ZingolibException) { _status ->
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_probe_sync_server(
         FfiConverterString.lower(`uri`),_status)
 }
     )

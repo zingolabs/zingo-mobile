@@ -1111,8 +1111,34 @@ class RPCModule: NSObject {
       }
   }
 
+  private static func probeFailureJson(_ failure: ProbeFailure) -> [String: Any] {
+    ["stage": failure.stage, "target": failure.target, "cause_chain": failure.causeChain]
+  }
+
+  private static func probeSuccessJson(_ success: ProbeSuccessData) -> [String: Any] {
+    ["chain": success.chain, "height": success.height]
+  }
+
+  // Each exhaustive FFI enum crosses the bridge as a kind-discriminated
+  // object, the JSON spelling of its arms.
   private static func probeLegJson(_ leg: ProbeLeg) -> [String: Any] {
-    ["ok": leg.ok, "detail": leg.detail, "millis": leg.millis]
+    let outcome: [String: Any]
+    switch leg.outcome {
+    case let .answered(info):
+      outcome = ["kind": "answered", "info": probeSuccessJson(info)]
+    case let .failed(failure):
+      outcome = ["kind": "failed", "failure": probeFailureJson(failure)]
+    }
+    return ["millis": leg.millis, "outcome": outcome]
+  }
+
+  private static func mixnetLegJson(_ mixnet: MixnetLeg) -> [String: Any] {
+    switch mixnet {
+    case let .probed(leg):
+      return ["kind": "probed", "leg": probeLegJson(leg)]
+    case .notCarried:
+      return ["kind": "notCarried"]
+    }
   }
 
   // The Connection Doctor's paired probe (user-invoked diagnostic). The FFI
@@ -1127,11 +1153,46 @@ class RPCModule: NSObject {
             [
               "host": report.host,
               "clearnet": RPCModule.probeLegJson(report.clearnet),
-              "mixnet": report.mixnet.map(RPCModule.probeLegJson) ?? NSNull(),
+              "mixnet": RPCModule.mixnetLegJson(report.mixnet),
             ]
           }
           let data = try JSONSerialization.data(withJSONObject: rendered)
           return String(data: data, encoding: .utf8) ?? "[]"
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  // The Connection Doctor's staged sync-path probe: tcp-connect,
+  // tls-channel, grpc-info, each timed, stopping at the first typed
+  // failure. Needs no initialized client and holds no wallet lock.
+  @objc(probeSyncServerProcess:resolve:reject:)
+  func probeSyncServerProcess(_ uri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          let probe = try probeSyncServer(uri: uri)
+          let verdict: [String: Any]
+          switch probe.verdict {
+          case let .reachable(info):
+            verdict = ["kind": "reachable", "info": RPCModule.probeSuccessJson(info)]
+          case .stopped:
+            verdict = ["kind": "stopped"]
+          }
+          let rendered: [String: Any] = [
+            "server": probe.server,
+            "stages": probe.stages.map { stage -> [String: Any] in
+              let outcome: [String: Any]
+              switch stage.outcome {
+              case .passed:
+                outcome = ["kind": "passed"]
+              case let .failed(failure):
+                outcome = ["kind": "failed", "failure": RPCModule.probeFailureJson(failure)]
+              }
+              return ["step": stage.step, "millis": stage.millis, "outcome": outcome]
+            },
+            "verdict": verdict,
+          ]
+          let data = try JSONSerialization.data(withJSONObject: rendered)
+          return String(data: data, encoding: .utf8) ?? "{}"
         }.settle(resolve: resolve, reject: reject)
       }
   }

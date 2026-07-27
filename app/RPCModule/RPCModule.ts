@@ -148,6 +148,10 @@ interface RPCModuleAPI {
   // (user-invoked diagnostic; the clearnet leg contacts the target from the
   // real IP). Resolves a JSON array of per-target probe reports.
   probeServerProcess(uri: string): Promise<string>;
+  // The Doctor's staged sync-path probe of one server: tcp-connect,
+  // tls-channel, grpc-info, each timed, stopping at the first typed
+  // failure. Resolves the JSON staged report.
+  probeSyncServerProcess(uri: string): Promise<string>;
 }
 
 export default NativeModules.RPCModule as RPCModuleAPI;

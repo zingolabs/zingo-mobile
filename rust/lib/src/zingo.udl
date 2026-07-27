@@ -284,16 +284,67 @@ namespace zingo {
   sequence<ProbeReport> probe_server(
     string uri
   );
+
+  [Throws=ZingolibError]
+  SyncServerProbe probe_sync_server(
+    string uri
+  );
+};
+
+dictionary ProbeFailure {
+  string stage;
+  string target;
+  sequence<string> cause_chain;
+};
+
+dictionary ProbeSuccessData {
+  string chain;
+  u64 height;
+};
+
+[Enum]
+interface ProbeLegOutcome {
+  Answered(ProbeSuccessData info);
+  Failed(ProbeFailure failure);
 };
 
 dictionary ProbeLeg {
-  boolean ok;
-  string detail;
   u64 millis;
+  ProbeLegOutcome outcome;
+};
+
+[Enum]
+interface MixnetLeg {
+  Probed(ProbeLeg leg);
+  NotCarried();
 };
 
 dictionary ProbeReport {
   string host;
   ProbeLeg clearnet;
-  ProbeLeg? mixnet;
+  MixnetLeg mixnet;
+};
+
+[Enum]
+interface SyncStageOutcome {
+  Passed();
+  Failed(ProbeFailure failure);
+};
+
+dictionary SyncProbeStage {
+  string step;
+  u64 millis;
+  SyncStageOutcome outcome;
+};
+
+[Enum]
+interface SyncServerVerdict {
+  Reachable(ProbeSuccessData info);
+  Stopped();
+};
+
+dictionary SyncServerProbe {
+  string server;
+  sequence<SyncProbeStage> stages;
+  SyncServerVerdict verdict;
 };
