@@ -2279,7 +2279,7 @@ dependencies = [
 [[package]]
 name = "pepper-sync"
 version = "0.5.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#44ec7e0701791ad898a9430f2a3c83c3261c3846"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#b5de9bca0ea2b2527d0f30e7423ee362de3219fb"
 dependencies = [
  "bip32",
  "byteorder",
@@ -5122,7 +5122,7 @@ source = "git+https://github.com/zingolabs/infrastructure.git?rev=537f84d3d81b22
 [[package]]
 name = "zingo-memo"
 version = "0.1.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#44ec7e0701791ad898a9430f2a3c83c3261c3846"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#b5de9bca0ea2b2527d0f30e7423ee362de3219fb"
 dependencies = [
  "zcash_address 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "zcash_encoding",
@@ -5147,7 +5147,7 @@ dependencies = [
 [[package]]
 name = "zingo-netutils"
 version = "5.0.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#44ec7e0701791ad898a9430f2a3c83c3261c3846"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#b5de9bca0ea2b2527d0f30e7423ee362de3219fb"
 dependencies = [
  "http",
  "hyper-util",
@@ -5165,7 +5165,7 @@ dependencies = [
 [[package]]
 name = "zingo-price"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#44ec7e0701791ad898a9430f2a3c83c3261c3846"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#b5de9bca0ea2b2527d0f30e7423ee362de3219fb"
 dependencies = [
  "byteorder",
  "reqwest",
@@ -5180,7 +5180,7 @@ dependencies = [
 [[package]]
 name = "zingo-status"
 version = "0.2.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#44ec7e0701791ad898a9430f2a3c83c3261c3846"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#b5de9bca0ea2b2527d0f30e7423ee362de3219fb"
 dependencies = [
  "byteorder",
  "zcash_protocol 0.10.0",
@@ -5203,7 +5203,7 @@ source = "git+https://github.com/zingolabs/infrastructure.git?rev=537f84d3d81b22
 [[package]]
 name = "zingolib"
 version = "5.0.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#44ec7e0701791ad898a9430f2a3c83c3261c3846"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#b5de9bca0ea2b2527d0f30e7423ee362de3219fb"
 dependencies = [
  "append-only-vec",
  "bech32",
@@ -5262,7 +5262,7 @@ dependencies = [
 [[package]]
 name = "zingolib_testutils"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#44ec7e0701791ad898a9430f2a3c83c3261c3846"
+source = "git+https://github.com/zingolabs/zingolib?branch=nym_mobile_adoption#b5de9bca0ea2b2527d0f30e7423ee362de3219fb"
 dependencies = [
  "http",
  "nonempty",
