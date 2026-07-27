@@ -23,7 +23,8 @@ type MigrationStrategyProps = NativeStackScreenProps<
 // send batches inside scheduled windows — not shippable yet).
 type StrategyOption = 'none' | 'now' | 'private';
 
-// Renders a translated string, bolding the spans wrapped in `**` so a single
+// Renders a translated string, bolding `**…**` spans in `highlight` and
+// `##…##` spans in `accent` (falling back to `highlight`), so a single
 // translation keeps its natural word order per language.
 const BoldSplitText: React.FunctionComponent<{
   text: string;
@@ -32,17 +33,37 @@ const BoldSplitText: React.FunctionComponent<{
   fontSize: number;
   lineHeight: number;
   marginBottom?: number;
-}> = ({ text, color, highlight, fontSize, lineHeight, marginBottom = 0 }) => (
+  accent?: string;
+}> = ({
+  text,
+  color,
+  highlight,
+  fontSize,
+  lineHeight,
+  marginBottom = 0,
+  accent,
+}) => (
   <Text style={{ color, fontSize, lineHeight, marginBottom }}>
-    {text.split('**').map((part: string, i: number) =>
-      i % 2 === 1 ? (
-        <Text key={i} style={{ color: highlight, fontWeight: '700' }}>
-          {part}
-        </Text>
-      ) : (
-        <Text key={i}>{part}</Text>
-      ),
-    )}
+    {text.split(/(\*\*[^*]+\*\*|##[^#]+##)/g).map((part: string, i: number) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return (
+          <Text key={i} style={{ color: highlight, fontWeight: '700' }}>
+            {part.slice(2, -2)}
+          </Text>
+        );
+      }
+      if (part.startsWith('##') && part.endsWith('##')) {
+        return (
+          <Text
+            key={i}
+            style={{ color: accent ?? highlight, fontWeight: '700' }}
+          >
+            {part.slice(2, -2)}
+          </Text>
+        );
+      }
+      return <Text key={i}>{part}</Text>;
+    })}
   </Text>
 );
 
@@ -85,6 +106,7 @@ type OptionCardProps = {
   colors: ThemeType['colors'];
   disabled?: boolean;
   badge?: string;
+  accent?: string;
 };
 
 const OptionCard: React.FunctionComponent<OptionCardProps> = ({
@@ -95,6 +117,7 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
   colors,
   disabled = false,
   badge,
+  accent,
 }) => (
   <TouchableOpacity
     activeOpacity={disabled ? 1 : 0.8}
@@ -149,6 +172,7 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
       text={body}
       color={colors.placeholder}
       highlight={colors.text}
+      accent={accent}
       fontSize={14}
       lineHeight={21}
     />
@@ -241,6 +265,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           selected={selected === 'now'}
           onPress={() => setSelected('now')}
           colors={colors}
+          accent={colors.warning.primary}
         />
         <View style={{ height: 14 }} />
         <OptionCard

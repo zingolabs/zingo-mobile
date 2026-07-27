@@ -456,7 +456,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   // ----- Default variant -----
   return (
     <Animated.View
-      style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 18 }}
+      style={{ paddingHorizontal: 12, paddingTop: 0, paddingBottom: 18 }}
       layout={bannerLayout()}
       exiting={bannerExit()}
     >

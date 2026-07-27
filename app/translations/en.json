@@ -849,7 +849,7 @@
     "none-label": "Do not migrate",
     "none-body": "Keep your funds where they are for now. You can start migrating later from the home screen.",
     "now-label": "Migrate now",
-    "now-body": "One transfer, done in minutes. Your full balance of **{amount}** becomes publicly visible on-chain.",
+    "now-body": "One transfer, done in minutes. Your full balance of **{amount}** becomes publicly visible on-chain, and your IP will be associated with it unless you use ##NYM/Tor##.",
     "private-label": "Migrate privately",
     "private-body": "Spreads transfers over ~3 days in standard amounts, blending with other users. Requires opening the app a few times.",
     "coming-soon": "Coming soon",
