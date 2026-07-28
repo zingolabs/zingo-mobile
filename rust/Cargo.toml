@@ -3,23 +3,23 @@ members = ["lib", "android", "ios", "zingomobile_utils", "workbench"]
 resolver = "2"
 
 [workspace.dependencies]
-# TEMPORARY pin: zingolib `price_sources` — the three-source price race
-# (Gemini, Kraken, CoinGecko; first success wins), stacked one commit atop
-# `attach_retune` (zingolib#2569, the top of the #2568/#2567/#2561 stack:
-# the attach retune, the typed MixnetTiming record, and the death report
-# with its latch moment) — until the stack and the race merge into
+# TEMPORARY pin: zingolib#2571 (`indexer_census`, the endpoint census —
+# the sole source of truth for indexers — stacked one commit atop
+# `price_sources` and the #2569/#2568/#2567/#2561 stack:
+# the price race, attach retune, MixnetTiming, and the death report) —
+# until the stack merges into
 # zingolib dev; revert to `dev` then. This pin wins every merge conflict:
-# keep `price_sources` and `cargo update` to its head rather than adopting
+# keep `indexer_census` and `cargo update` to its head rather than adopting
 # another branch's pin (see docs/agents/nym-diagnostics-plan.md, "The pin
 # collaboration protocol"). The `nym` feature enables the Mixnet Mode
 # surface.
-zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "price_sources", features = [
+zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "indexer_census", features = [
     "nym",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "price_sources" }
-zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "price_sources" }
-zingo-net-diag = { git = "https://github.com/zingolabs/zingolib", branch = "price_sources" }
-zingo-price = { git = "https://github.com/zingolabs/zingolib", branch = "price_sources" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "indexer_census" }
+zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "indexer_census" }
+zingo-net-diag = { git = "https://github.com/zingolabs/zingolib", branch = "indexer_census" }
+zingo-price = { git = "https://github.com/zingolabs/zingolib", branch = "indexer_census" }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
 zingomobile_utils = { path = "zingomobile_utils" }
 
