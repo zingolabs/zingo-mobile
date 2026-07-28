@@ -460,7 +460,8 @@
       "unknown": "Mixnet kullanılamıyor"
     },
     "send-blocked": "Mixnet hazır olana kadar gönderim duraklatıldı",
-    "reenable": "Mixnet'i yeniden etkinleştir"
+    "reenable": "Mixnet'i yeniden etkinleştir",
+    "bootstrap-patience": "Bağlantı süresi en fazla"
   },
   "pricefetcher": {
     "updated-mixnet": "Fiyat mixnet üzerinden güncellendi",

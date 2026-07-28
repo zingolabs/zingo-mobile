@@ -849,6 +849,8 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
+
+
 // For large crates we prevent `MethodTooLargeException` (see #2340)
 // N.B. the name of the extension is very misleading, since it is 
 // rather `InterfaceTooLargeException`, caused by too many methods 
@@ -950,11 +952,13 @@ fun uniffi_zingo_checksum_func_migration_status(
 ): Short
 fun uniffi_zingo_checksum_func_mixnet_bootstrap_detail(
 ): Short
-fun uniffi_zingo_checksum_func_mixnet_death_detail(
+fun uniffi_zingo_checksum_func_mixnet_death_report(
 ): Short
 fun uniffi_zingo_checksum_func_mixnet_ip_correlation_disclaimer(
 ): Short
 fun uniffi_zingo_checksum_func_mixnet_mode(
+): Short
+fun uniffi_zingo_checksum_func_mixnet_timing(
 ): Short
 fun uniffi_zingo_checksum_func_parse_address(
 ): Short
@@ -1133,11 +1137,13 @@ fun uniffi_zingo_fn_func_migration_status(uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_mixnet_bootstrap_detail(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_mixnet_death_detail(uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_zingo_fn_func_mixnet_death_report(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_mixnet_ip_correlation_disclaimer(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_mixnet_mode(uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_zingo_fn_func_mixnet_timing(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_parse_address(`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1440,13 +1446,16 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zingo_checksum_func_mixnet_bootstrap_detail() != 12980.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_zingo_checksum_func_mixnet_death_detail() != 24752.toShort()) {
+    if (lib.uniffi_zingo_checksum_func_mixnet_death_report() != 46072.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_mixnet_ip_correlation_disclaimer() != 47567.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_mixnet_mode() != 29476.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_zingo_checksum_func_mixnet_timing() != 41478.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_parse_address() != 37603.toShort()) {
@@ -1716,6 +1725,70 @@ public object FfiConverterByteArray: FfiConverterRustBuffer<ByteArray> {
     override fun write(value: ByteArray, buf: ByteBuffer) {
         buf.putInt(value.size)
         buf.put(value)
+    }
+}
+
+
+
+data class MixnetDeathReport (
+    var `ageMillis`: kotlin.ULong, 
+    var `detail`: ProbeFailure?
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMixnetDeathReport: FfiConverterRustBuffer<MixnetDeathReport> {
+    override fun read(buf: ByteBuffer): MixnetDeathReport {
+        return MixnetDeathReport(
+            FfiConverterULong.read(buf),
+            FfiConverterOptionalTypeProbeFailure.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MixnetDeathReport) = (
+            FfiConverterULong.allocationSize(value.`ageMillis`) +
+            FfiConverterOptionalTypeProbeFailure.allocationSize(value.`detail`)
+    )
+
+    override fun write(value: MixnetDeathReport, buf: ByteBuffer) {
+            FfiConverterULong.write(value.`ageMillis`, buf)
+            FfiConverterOptionalTypeProbeFailure.write(value.`detail`, buf)
+    }
+}
+
+
+
+data class MixnetTiming (
+    var `attachReadinessBudgetMillis`: kotlin.ULong, 
+    var `mixnetRoundTripBoundMillis`: kotlin.ULong
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMixnetTiming: FfiConverterRustBuffer<MixnetTiming> {
+    override fun read(buf: ByteBuffer): MixnetTiming {
+        return MixnetTiming(
+            FfiConverterULong.read(buf),
+            FfiConverterULong.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MixnetTiming) = (
+            FfiConverterULong.allocationSize(value.`attachReadinessBudgetMillis`) +
+            FfiConverterULong.allocationSize(value.`mixnetRoundTripBoundMillis`)
+    )
+
+    override fun write(value: MixnetTiming, buf: ByteBuffer) {
+            FfiConverterULong.write(value.`attachReadinessBudgetMillis`, buf)
+            FfiConverterULong.write(value.`mixnetRoundTripBoundMillis`, buf)
     }
 }
 
@@ -2409,6 +2482,38 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
 /**
  * @suppress
  */
+public object FfiConverterOptionalTypeMixnetDeathReport: FfiConverterRustBuffer<MixnetDeathReport?> {
+    override fun read(buf: ByteBuffer): MixnetDeathReport? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterTypeMixnetDeathReport.read(buf)
+    }
+
+    override fun allocationSize(value: MixnetDeathReport?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterTypeMixnetDeathReport.allocationSize(value)
+        }
+    }
+
+    override fun write(value: MixnetDeathReport?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterTypeMixnetDeathReport.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
 public object FfiConverterOptionalTypeProbeFailure: FfiConverterRustBuffer<ProbeFailure?> {
     override fun read(buf: ByteBuffer): ProbeFailure? {
         if (buf.get().toInt() == 0) {
@@ -2948,10 +3053,10 @@ public object FfiConverterSequenceTypeSyncProbeStage: FfiConverterRustBuffer<Lis
     }
     
 
-    @Throws(ZingolibException::class) fun `mixnetDeathDetail`(): ProbeFailure? {
-            return FfiConverterOptionalTypeProbeFailure.lift(
+    @Throws(ZingolibException::class) fun `mixnetDeathReport`(): MixnetDeathReport? {
+            return FfiConverterOptionalTypeMixnetDeathReport.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
-    UniffiLib.INSTANCE.uniffi_zingo_fn_func_mixnet_death_detail(
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_mixnet_death_report(
         _status)
 }
     )
@@ -2971,6 +3076,15 @@ public object FfiConverterSequenceTypeSyncProbeStage: FfiConverterRustBuffer<Lis
             return FfiConverterString.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_mixnet_mode(
+        _status)
+}
+    )
+    }
+    
+ fun `mixnetTiming`(): MixnetTiming {
+            return FfiConverterTypeMixnetTiming.lift(
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_mixnet_timing(
         _status)
 }
     )

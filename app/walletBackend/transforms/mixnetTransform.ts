@@ -45,7 +45,31 @@ export type MixnetDetailReport =
  */
 export type MixnetDeathReport =
   | { readonly kind: 'none' }
-  | { readonly kind: 'died'; readonly death: ProbeFailure }
+  | {
+      readonly kind: 'died';
+      /**
+       * How long ago the death latched, from the wallet's clamped
+       * staleness math — a stepping clock reads as zero, never negative.
+       * Each poll carries a fresh age.
+       */
+      readonly ageMillis: number;
+      /** The typed cause; null for a causeless death (a closed pipe). */
+      readonly death: ProbeFailure | null;
+    }
+  | { readonly kind: 'failure'; readonly failure: MixnetFailure };
+
+/**
+ * The wallet's temporal calibration for the mixnet transport, or the
+ * call's failure. The budget is the honest upper bound on "Connecting to
+ * mixnet…", read from the same constants the wallet's gates run on, so
+ * the app never pins a stale copy of its patience.
+ */
+export type MixnetTimingReport =
+  | {
+      readonly kind: 'timing';
+      readonly attachReadinessBudgetMillis: number;
+      readonly mixnetRoundTripBoundMillis: number;
+    }
   | { readonly kind: 'failure'; readonly failure: MixnetFailure };
 
 /**
@@ -155,13 +179,14 @@ export function transformMixnetDetail(dataReply: string): MixnetDetailReport {
 }
 
 /**
- * Transforms the DATA channel of a `mixnet_death_detail` reply into a
+ * Transforms the DATA channel of a `mixnet_death_report` reply into a
  * validated report. Absence crosses named (`kind: "none"`), never as a bare
- * null, and the record itself must validate as the typed failure shape.
+ * null; a present report must carry a numeric age, and its cause, when one
+ * crossed, must validate as the typed failure shape.
  *
  * Pure function — no side effects. Total over every string input.
  */
-export function transformMixnetDeathDetail(
+export function transformMixnetDeathReport(
   dataReply: string,
 ): MixnetDeathReport {
   const malformed: MixnetDeathReport = {
@@ -172,13 +197,52 @@ export function transformMixnetDeathDetail(
   if (parsedReply === null || typeof parsedReply !== 'object') {
     return malformed;
   }
-  const payload = parsedReply as { kind?: unknown; failure?: unknown };
+  const payload = parsedReply as {
+    kind?: unknown;
+    age_millis?: unknown;
+    failure?: unknown;
+  };
   if (payload.kind === 'none') {
     return { kind: 'none' };
   }
-  if (payload.kind === 'detail') {
+  if (payload.kind === 'report' && typeof payload.age_millis === 'number') {
+    if (payload.failure === undefined) {
+      return { kind: 'died', ageMillis: payload.age_millis, death: null };
+    }
     const death = probeFailure(payload.failure);
-    return death === null ? malformed : { kind: 'died', death };
+    return death === null
+      ? malformed
+      : { kind: 'died', ageMillis: payload.age_millis, death };
   }
   return malformed;
+}
+
+/**
+ * Transforms the DATA channel of a `mixnet_timing` reply into a validated
+ * report: both bounds must cross as numbers.
+ *
+ * Pure function — no side effects. Total over every string input.
+ */
+export function transformMixnetTiming(dataReply: string): MixnetTimingReport {
+  const parsedReply: unknown = parseJsonOrNull(dataReply);
+  if (parsedReply !== null && typeof parsedReply === 'object') {
+    const payload = parsedReply as {
+      attach_readiness_budget_millis?: unknown;
+      mixnet_round_trip_bound_millis?: unknown;
+    };
+    if (
+      typeof payload.attach_readiness_budget_millis === 'number' &&
+      typeof payload.mixnet_round_trip_bound_millis === 'number'
+    ) {
+      return {
+        kind: 'timing',
+        attachReadinessBudgetMillis: payload.attach_readiness_budget_millis,
+        mixnetRoundTripBoundMillis: payload.mixnet_round_trip_bound_millis,
+      };
+    }
+  }
+  return {
+    kind: 'failure',
+    failure: { reason: 'malformedPayload', payload: dataReply },
+  };
 }

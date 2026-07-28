@@ -143,7 +143,8 @@ interface RPCModuleAPI {
   disableMixnet(): Promise<string>;
   mixnetModeInfo(): Promise<string>;
   mixnetBootstrapDetailInfo(): Promise<string>;
-  mixnetDeathDetailInfo(): Promise<string>;
+  mixnetDeathReportInfo(): Promise<string>;
+  mixnetTimingInfo(): Promise<string>;
   mixnetIpCorrelationDisclaimerInfo(): Promise<string>;
   // The Connection Doctor's paired clearnet/mixnet probe of one server
   // (user-invoked diagnostic; the clearnet leg contacts the target from the

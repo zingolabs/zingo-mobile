@@ -3,10 +3,12 @@ import {
   MixnetDeathReport,
   MixnetDetailReport,
   MixnetStatusReport,
+  MixnetTimingReport,
   describeRejection,
-  transformMixnetDeathDetail,
+  transformMixnetDeathReport,
   transformMixnetDetail,
   transformMixnetStatus,
+  transformMixnetTiming,
 } from '../transforms/mixnetTransform';
 
 // The effectful edge of the Mixnet Mode surface. Each function makes one
@@ -70,12 +72,26 @@ export async function getMixnetBootstrapDetail(): Promise<MixnetDetailReport> {
 }
 
 /**
- * Why the transport died, as the typed failure record, while the mode is
- * `died` and the watcher held a cause; `none` in every other mode.
+ * The latched death read whole — a fresh clamped age each poll and, when
+ * the watcher held one, the typed cause — while the mode is `died`;
+ * `none` in every other mode.
  */
-export async function getMixnetDeathDetail(): Promise<MixnetDeathReport> {
+export async function getMixnetDeathReport(): Promise<MixnetDeathReport> {
   try {
-    return transformMixnetDeathDetail(await RPCModule.mixnetDeathDetailInfo());
+    return transformMixnetDeathReport(await RPCModule.mixnetDeathReportInfo());
+  } catch (thrown: unknown) {
+    return { kind: 'failure', failure: describeRejection(thrown) };
+  }
+}
+
+/**
+ * The wallet's temporal calibration for the mixnet transport: the honest
+ * upper bound on "Connecting to mixnet…" and the per-attempt round-trip
+ * bound, from the same constants the wallet's gates run on.
+ */
+export async function getMixnetTiming(): Promise<MixnetTimingReport> {
+  try {
+    return transformMixnetTiming(await RPCModule.mixnetTimingInfo());
   } catch (thrown: unknown) {
     return { kind: 'failure', failure: describeRejection(thrown) };
   }

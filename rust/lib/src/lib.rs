@@ -3320,17 +3320,46 @@ pub fn mixnet_bootstrap_detail() -> Result<String, ZingolibError> {
     })
 }
 
-/// Why the transport died, while Mixnet Mode is `died` and the watcher held
-/// a typed cause. Crosses fielded (the probes' ProbeFailure dictionary), so
-/// a `died` verdict carries its stage, target, and cause chain without
-/// anyone parsing prose; None outside the `died` mode.
-pub fn mixnet_death_detail() -> Result<Option<ProbeFailure>, ZingolibError> {
+/// The latched death read whole, while Mixnet Mode is `died`: how long ago
+/// it latched and, when the watcher held one, the typed cause (the probes'
+/// ProbeFailure dictionary). The age is computed wallet-side through
+/// `DeathReport::age`, which absorbs a stepping system clock, so consumers
+/// never subtract timestamps; each poll reads a fresh age. None outside
+/// the `died` mode; a causeless death (a spawned child's closed pipe)
+/// carries an age and no detail.
+pub fn mixnet_death_report() -> Result<Option<MixnetDeathReport>, ZingolibError> {
     with_initialized_lightclient_read(|lightclient| {
         Ok(lightclient
-            .mixnet_death_detail()
-            .as_ref()
-            .map(probe_failure))
+            .mixnet_death_report()
+            .map(|report| MixnetDeathReport {
+                age_millis: report
+                    .age(std::time::SystemTime::now())
+                    .as_millis()
+                    .try_into()
+                    .unwrap_or(u64::MAX),
+                detail: report.detail.as_ref().map(probe_failure),
+            }))
     })
+}
+
+/// The wallet's temporal calibration for the mixnet transport, so the app
+/// paces its connect patience from the same source of truth as the gates
+/// (zingolib#2569) instead of pinning copies across the FFI. Infallible:
+/// the record is compiled-in constants, no wallet needed.
+pub fn mixnet_timing() -> MixnetTiming {
+    let timing = zingolib::nym::mixnet_timing();
+    MixnetTiming {
+        attach_readiness_budget_millis: timing
+            .attach_readiness_budget
+            .as_millis()
+            .try_into()
+            .unwrap_or(u64::MAX),
+        mixnet_round_trip_bound_millis: timing
+            .mixnet_round_trip_bound
+            .as_millis()
+            .try_into()
+            .unwrap_or(u64::MAX),
+    }
 }
 
 /// The canonical IP-correlation disclaimer (ZIP-0318): Mixnet Mode covers only
@@ -3353,6 +3382,23 @@ pub struct ProbeFailure {
     pub stage: String,
     pub target: String,
     pub cause_chain: Vec<String>,
+}
+
+/// The latched death, aged at read time. `age_millis` comes from the
+/// wallet's clamped staleness math (zingolib#2569), so a stepping clock
+/// reads as zero, never as an error or a negative; `detail` is absent for
+/// a causeless death (a spawned child's closed pipe).
+pub struct MixnetDeathReport {
+    pub age_millis: u64,
+    pub detail: Option<ProbeFailure>,
+}
+
+/// The wallet's temporal calibration for the mixnet transport, in millis
+/// (the FFI's duration convention, matching the probes). Field names match
+/// the zingolib constants they carry.
+pub struct MixnetTiming {
+    pub attach_readiness_budget_millis: u64,
+    pub mixnet_round_trip_bound_millis: u64,
 }
 
 /// What a successful probe proves, as fields.
