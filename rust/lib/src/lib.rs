@@ -11,6 +11,7 @@ use log::Level;
 
 use std::any::Any;
 use std::backtrace::Backtrace;
+use std::collections::VecDeque;
 use std::num::NonZeroU32;
 use std::panic::{self, PanicHookInfo, UnwindSafe};
 use std::path::PathBuf;
@@ -350,6 +351,21 @@ lazy_static! {
         RwLock::new(None);
 }
 
+// The mixnet state as last observed by an FFI call that already held the
+// lightclient (store_client, enable/attach/disable, and the app's
+// mixnet_mode poll). The price surface plans its route from this snapshot
+// and never touches the LIGHTCLIENT lock (ADR 0005), accepting
+// poll-interval staleness. `None` until a wallet initializes.
+static MIXNET_SNAPSHOT: Lazy<Mutex<Option<MixnetSnapshot>>> = Lazy::new(|| Mutex::new(None));
+
+// Price observations awaiting a piggyback write into the wallet, outside
+// every wallet lock. Persistence is best-effort by design (ADR 0005): an
+// observation reaches the wallet only if some other operation takes the
+// write lock while it is buffered, and the window is bounded — the oldest
+// observation is dropped when the 1001st arrives.
+static PENDING_PRICE_OBSERVATIONS: Lazy<Mutex<VecDeque<zingo_price::Price>>> =
+    Lazy::new(|| Mutex::new(VecDeque::new()));
+
 lazy_static! {
     pub static ref RT: Runtime = tokio::runtime::Runtime::new().unwrap();
 }
@@ -371,12 +387,14 @@ where
 }
 
 fn reset_lightclient() {
+    clear_mixnet_snapshot();
     with_lightclient_write(|slot| {
         *slot = None;
     });
 }
 
 fn store_client(lightclient: LightClient) -> Result<(), ZingolibError> {
+    refresh_mixnet_snapshot(&lightclient);
     with_lightclient_write(|slot| {
         *slot = Some(lightclient);
     });
@@ -1969,47 +1987,234 @@ pub fn get_total_spends_to_address() -> Result<String, ZingolibError> {
     })
 }
 
+// ----- Price surface (lock-free; ADR 0005) -----
+
+/// One observation of the mixnet state, taken by a caller that already
+/// held the lightclient for its own reasons.
+#[derive(Clone)]
+struct MixnetSnapshot {
+    mode: zingolib::nym::MixnetMode,
+    socks5_addr: Option<String>,
+}
+
+/// The bound on [`PENDING_PRICE_OBSERVATIONS`].
+const PRICE_OBSERVATION_CAP: usize = 1000;
+
+/// Admit one observation into the bounded window, dropping the oldest
+/// when the window would exceed [`PRICE_OBSERVATION_CAP`]. Pure; the
+/// caller owns the locking.
+fn admit_price_observation(
+    mut window: VecDeque<zingo_price::Price>,
+    observation: zingo_price::Price,
+) -> VecDeque<zingo_price::Price> {
+    if window.len() == PRICE_OBSERVATION_CAP {
+        window.pop_front();
+    }
+    window.push_back(observation);
+    window
+}
+
+/// Everything a price fetch can do, planned purely from the snapshot.
+/// Exhaustive by construction: both fetch legs live in zingolib's
+/// [`MixnetRoute`](zingolib::nym::MixnetRoute), both refusals in
+/// [`MixnetNotReady`](zingolib::nym::MixnetNotReady), so a new mixnet
+/// state must pass through `resolve_route` before this compiles.
+enum PriceFetchPlan {
+    /// No wallet has initialized this process.
+    RefuseUninitialized,
+    /// The fail-closed refusal (ADR 0011), naming the actual state.
+    Refuse(zingolib::nym::MixnetNotReady),
+    /// Fetch over the resolved route.
+    Fetch(zingolib::nym::MixnetRoute),
+}
+
+fn plan_price_fetch(snapshot: Option<MixnetSnapshot>) -> PriceFetchPlan {
+    match snapshot {
+        None => PriceFetchPlan::RefuseUninitialized,
+        Some(observed) => match zingolib::nym::resolve_route(observed.mode, observed.socks5_addr) {
+            Ok(route) => PriceFetchPlan::Fetch(route),
+            Err(not_ready) => PriceFetchPlan::Refuse(not_ready),
+        },
+    }
+}
+
+fn snapshot_mutex_recovered<'a>(
+    mutex: &'a Mutex<Option<MixnetSnapshot>>,
+) -> std::sync::MutexGuard<'a, Option<MixnetSnapshot>> {
+    mutex
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+}
+
+fn refresh_mixnet_snapshot(lightclient: &LightClient) {
+    *snapshot_mutex_recovered(&MIXNET_SNAPSHOT) = Some(MixnetSnapshot {
+        mode: lightclient.mixnet_mode(),
+        socks5_addr: lightclient.mixnet_socks5_addr(),
+    });
+}
+
+fn clear_mixnet_snapshot() {
+    *snapshot_mutex_recovered(&MIXNET_SNAPSHOT) = None;
+}
+
+/// Buffer a fetched price for a later piggyback write. Best-effort on
+/// every axis (ADR 0005): a poisoned buffer is recovered, not propagated,
+/// because losing an observation is within the surface's contract.
+fn buffer_price_observation(observation: zingo_price::Price) {
+    let mut pending = PENDING_PRICE_OBSERVATIONS
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    let window = std::mem::take(&mut *pending);
+    *pending = admit_price_observation(window, observation);
+}
+
+/// Fetch the current ZEC/USD price without ever touching the LIGHTCLIENT
+/// lock (ADR 0005). The route comes from [`MIXNET_SNAPSHOT`] — the
+/// fail-closed resolver (ADR 0011) over the last observed mixnet state:
+/// the proxy when Ready, clearnet only on a deliberate toggle-off, a
+/// refusal while bootstrapping or dead. The mixnet leg's payload carries
+/// the route attestation; the clearnet leg attests its route too, so the
+/// app can tell a deliberate clearnet fetch from a payload predating the
+/// attestation entirely.
+///
+/// A successful fetch does NOT persist the price. The observation lands
+/// in a bounded in-memory window and reaches the wallet only when some
+/// other operation takes the write lock while it is buffered; it may be
+/// lost. That trade is the point: the price surface can never again
+/// freeze the FFI behind a slow tunnel.
+/// Run the planned fetch over its route, buffer the observation, and
+/// render the payload with its route attestation: `via_socks5` for the
+/// mixnet leg, `via_clearnet` for the deliberate toggle-off, so the app
+/// can tell either from a payload predating the attestation entirely.
+fn fetch_planned_price(route: zingolib::nym::MixnetRoute) -> Result<String, ZingolibError> {
+    let price = RT
+        .block_on(zingo_price::fetch_current_price(route.socks5_proxy()))
+        .map_err(|e| {
+            ffi_error(LightClientError::from(
+                zingolib::wallet::error::PriceError::from(e),
+            ))
+        })?;
+    buffer_price_observation(price);
+    let mut payload = object! { "current_price" => price.price_usd };
+    match route {
+        zingolib::nym::MixnetRoute::Mixnet(addr) => payload["via_socks5"] = addr.into(),
+        zingolib::nym::MixnetRoute::Clearnet => payload["via_clearnet"] = true.into(),
+    }
+    Ok(payload.pretty(2))
+}
+
+/// Fetch the current ZEC/USD price without ever touching the LIGHTCLIENT
+/// lock (ADR 0005). The route is planned purely from the last observed
+/// mixnet state under the fail-closed policy (ADR 0011).
+///
+/// A successful fetch does NOT persist the price. The observation lands
+/// in a bounded in-memory window and reaches the wallet only when some
+/// other operation takes the write lock while it is buffered; it may be
+/// lost. That trade is the point: the price surface can never again
+/// freeze the FFI behind a slow tunnel.
 pub fn zec_price() -> Result<String, ZingolibError> {
-    with_initialized_lightclient(|lightclient| {
-        RT.block_on(async move {
-            // mixnet_route is the shared fail-closed resolver (ADR 0011):
-            // the proxy when Ready, clearnet only on a deliberate toggle-off,
-            // a refusal while bootstrapping or dead. The mixnet leg's payload
-            // carries the route attestation, so the app layer holds per-fetch
-            // evidence; the clearnet leg has no tunnel to attest and omits
-            // the field.
-            match lightclient
-                .mixnet_route()
-                .map_err(|not_ready| ffi_error(LightClientError::from(not_ready)))?
-            {
-                zingolib::nym::MixnetRoute::Mixnet(_) => {
-                    let fetch = lightclient
-                        .update_current_price_over_mixnet()
-                        .await
-                        .map_err(ffi_error)?;
-                    Ok(object! {
-                        "current_price" => fetch.usd,
-                        "via_socks5" => fetch.via_socks5,
-                    }
-                    .pretty(2))
-                }
-                zingolib::nym::MixnetRoute::Clearnet => {
-                    let usd = lightclient
-                        .update_current_price()
-                        .await
-                        .map_err(ffi_error)?;
-                    // The clearnet leg attests its route too: without this
-                    // marker the app cannot tell a deliberate clearnet fetch
-                    // from a payload predating the attestation entirely.
-                    Ok(object! {
-                        "current_price" => usd,
-                        "via_clearnet" => true,
-                    }
-                    .pretty(2))
-                }
-            }
-        })
+    with_panic_guard(|| {
+        match plan_price_fetch(snapshot_mutex_recovered(&MIXNET_SNAPSHOT).clone()) {
+            PriceFetchPlan::RefuseUninitialized => Err(ZingolibError::LightclientNotInitialized),
+            PriceFetchPlan::Refuse(not_ready) => Err(ffi_error(LightClientError::from(not_ready))),
+            PriceFetchPlan::Fetch(route) => fetch_planned_price(route),
+        }
     })
+}
+
+/// The price surface's lock-freedom contract (ADR 0005): a price fetch
+/// never obtains the LIGHTCLIENT lock, so a fetch through a half-dead
+/// tunnel cannot freeze the rest of the FFI. Each test holds the write
+/// lock for its whole duration; the price surface must settle anyway.
+#[cfg(test)]
+mod price_lock_freedom_tests {
+    use super::*;
+    use std::time::Duration;
+
+    #[test]
+    fn zec_price_settles_while_the_lightclient_write_lock_is_held() {
+        let _write_lock_held_throughout = LIGHTCLIENT
+            .write()
+            .expect("this test is the first lock user in its process");
+
+        let (settled, observe) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let _ = settled.send(zec_price());
+        });
+
+        let outcome = observe
+            .recv_timeout(Duration::from_secs(3))
+            .expect("zec_price waited on the LIGHTCLIENT lock: the price fetch must plan and refuse (or fetch) without it");
+
+        // No wallet exists in this process, so the settled outcome is the
+        // typed uninitialized refusal — reached without the lock.
+        assert!(
+            matches!(outcome, Err(ZingolibError::LightclientNotInitialized)),
+            "expected the typed uninitialized refusal, got: {outcome:?}"
+        );
+    }
+
+    fn observation(time: u32) -> zingo_price::Price {
+        zingo_price::Price {
+            time,
+            price_usd: 1.0,
+        }
+    }
+
+    #[test]
+    fn the_observation_window_rotates_at_the_cap() {
+        let mut window = VecDeque::new();
+        for time in 0..PRICE_OBSERVATION_CAP as u32 + 1 {
+            window = admit_price_observation(window, observation(time));
+        }
+        assert_eq!(window.len(), PRICE_OBSERVATION_CAP);
+        // The 1001st observation displaced the oldest, nothing else.
+        assert_eq!(window.front().map(|p| p.time), Some(1));
+        assert_eq!(
+            window.back().map(|p| p.time),
+            Some(PRICE_OBSERVATION_CAP as u32)
+        );
+    }
+
+    #[test]
+    fn no_snapshot_plans_the_uninitialized_refusal() {
+        assert!(matches!(
+            plan_price_fetch(None),
+            PriceFetchPlan::RefuseUninitialized
+        ));
+    }
+
+    #[test]
+    fn each_mixnet_state_plans_its_fail_closed_arm() {
+        use zingolib::nym::{MixnetMode, MixnetNotReady, MixnetRoute};
+        let snapshot = |mode, socks5_addr: Option<&str>| {
+            Some(MixnetSnapshot {
+                mode,
+                socks5_addr: socks5_addr.map(str::to_string),
+            })
+        };
+        assert!(matches!(
+            plan_price_fetch(snapshot(MixnetMode::Off, None)),
+            PriceFetchPlan::Fetch(MixnetRoute::Clearnet)
+        ));
+        assert!(matches!(
+            plan_price_fetch(snapshot(MixnetMode::Ready, Some("127.0.0.1:1080"))),
+            PriceFetchPlan::Fetch(MixnetRoute::Mixnet(addr)) if addr == "127.0.0.1:1080"
+        ));
+        // Ready without an address yet is still a bootstrapping refusal.
+        assert!(matches!(
+            plan_price_fetch(snapshot(MixnetMode::Ready, None)),
+            PriceFetchPlan::Refuse(MixnetNotReady::Bootstrapping)
+        ));
+        assert!(matches!(
+            plan_price_fetch(snapshot(MixnetMode::Bootstrapping, None)),
+            PriceFetchPlan::Refuse(MixnetNotReady::Bootstrapping)
+        ));
+        assert!(matches!(
+            plan_price_fetch(snapshot(MixnetMode::Died, None)),
+            PriceFetchPlan::Refuse(MixnetNotReady::Died)
+        ));
+    }
 }
 
 pub fn remove_transaction(txid: String) -> Result<String, ZingolibError> {
@@ -3051,6 +3256,7 @@ pub fn attach_mixnet(socks5_addr: String) -> Result<String, ZingolibError> {
                 .attach_mixnet(&socks5_addr)
                 .await
                 .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
+            refresh_mixnet_snapshot(lightclient);
             Ok(
                 object! { "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()) }
                     .pretty(2),
@@ -3069,6 +3275,7 @@ pub fn enable_mixnet(proxy_path: String) -> Result<String, ZingolibError> {
                 .enable_mixnet(std::path::Path::new(&proxy_path))
                 .await
                 .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
+            refresh_mixnet_snapshot(lightclient);
             Ok(
                 object! { "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()) }
                     .pretty(2),
@@ -3083,6 +3290,7 @@ pub fn disable_mixnet() -> Result<String, ZingolibError> {
     with_initialized_lightclient(|lightclient| {
         Ok(RT.block_on(async move {
             lightclient.disable_mixnet().await;
+            refresh_mixnet_snapshot(lightclient);
             object! { "mixnet_mode" => "off" }.pretty(2)
         }))
     })
@@ -3093,6 +3301,10 @@ pub fn disable_mixnet() -> Result<String, ZingolibError> {
 /// [`attach_mixnet`] or [`enable_mixnet`] to recover).
 pub fn mixnet_mode() -> Result<String, ZingolibError> {
     with_initialized_lightclient_read(|lightclient| {
+        // The app polls this; each poll refreshes the price surface's
+        // route snapshot, which is how Ready/Died transitions reach the
+        // lock-free zec_price (ADR 0005).
+        refresh_mixnet_snapshot(lightclient);
         let mut status = object! {
             "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()),
         };

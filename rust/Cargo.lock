@@ -5110,6 +5110,7 @@ dependencies = [
  "zcash_protocol 0.10.0",
  "zingo-net-diag",
  "zingo-netutils 5.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "zingo-price",
  "zingo_common_components",
  "zingolib",
  "zip32",
