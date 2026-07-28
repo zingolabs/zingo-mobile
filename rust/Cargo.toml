@@ -3,19 +3,20 @@ members = ["lib", "android", "ios", "zingomobile_utils", "workbench"]
 resolver = "2"
 
 [workspace.dependencies]
-# TEMPORARY pin: zingolib#2561 (`net_diag_taxonomy`, the fielded
-# network-failure taxonomy the Connection Doctor consumes) until it merges
-# into zingolib dev; revert to `dev` then. This pin wins every merge
-# conflict: keep `net_diag_taxonomy` and `cargo update` to its head rather
-# than adopting another branch's pin (see docs/agents/nym-diagnostics-plan.md,
-# "The pin collaboration protocol"). The `nym` feature enables the Mixnet
-# Mode surface.
-zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "net_diag_taxonomy", features = [
+# TEMPORARY pin: zingolib#2568 (`socks5_typed_timeout`, stacked on
+# #2565/#2561 — the death-detail accessor and the typed elapsed bounds the
+# mixnet died surface consumes) until the stack merges into zingolib dev;
+# revert to `dev` then. This pin wins every merge conflict: keep
+# `socks5_typed_timeout` and `cargo update` to its head rather than adopting
+# another branch's pin (see docs/agents/nym-diagnostics-plan.md, "The pin
+# collaboration protocol"). The `nym` feature enables the Mixnet Mode
+# surface.
+zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "socks5_typed_timeout", features = [
     "nym",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "net_diag_taxonomy" }
-zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "net_diag_taxonomy" }
-zingo-net-diag = { git = "https://github.com/zingolabs/zingolib", branch = "net_diag_taxonomy" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "socks5_typed_timeout" }
+zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "socks5_typed_timeout" }
+zingo-net-diag = { git = "https://github.com/zingolabs/zingolib", branch = "socks5_typed_timeout" }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
 zingomobile_utils = { path = "zingomobile_utils" }
 
