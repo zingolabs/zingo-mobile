@@ -462,6 +462,11 @@
     "send-blocked": "El envío está pausado hasta que la mixnet esté lista",
     "reenable": "Reactivar mixnet"
   },
+  "pricefetcher": {
+    "updated-mixnet": "Precio actualizado a través de la mixnet",
+    "updated-clearnet": "Precio actualizado por la red abierta",
+    "updated": "Precio actualizado"
+  },
   "header": {
     "lastupdate": "Última actualización:"
   },

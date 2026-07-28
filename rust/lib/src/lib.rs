@@ -1998,7 +1998,14 @@ pub fn zec_price() -> Result<String, ZingolibError> {
                         .update_current_price()
                         .await
                         .map_err(ffi_error)?;
-                    Ok(object! { "current_price" => usd }.pretty(2))
+                    // The clearnet leg attests its route too: without this
+                    // marker the app cannot tell a deliberate clearnet fetch
+                    // from a payload predating the attestation entirely.
+                    Ok(object! {
+                        "current_price" => usd,
+                        "via_clearnet" => true,
+                    }
+                    .pretty(2))
                 }
             }
         })

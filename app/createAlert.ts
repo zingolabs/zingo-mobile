@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { Alert } from 'react-native';
 import { GlobalConst, TranslateType } from './AppState';
 import { SnackbarDurationEnum } from './AppState/enums/SnackbarDurationEnum';
@@ -50,6 +51,15 @@ export const createAlert = async (
                   title,
                   sanitizedError,
                 ),
+            },
+            {
+              // Native alert text cannot be selected, so without this button
+              // the report's only way out is the Support email.
+              text: translate('copy') as string,
+              onPress: () => {
+                Clipboard.setString(`${title}\n${sanitizedError}`);
+                addLastSnackbar(translate('txtcopied') as string);
+              },
             },
             { text: translate('cancel') as string, style: 'cancel' },
           ],

@@ -462,6 +462,11 @@
     "send-blocked": "Sending is paused until the mixnet is ready",
     "reenable": "Re-enable mixnet"
   },
+  "pricefetcher": {
+    "updated-mixnet": "Price updated over the mixnet",
+    "updated-clearnet": "Price updated over clearnet",
+    "updated": "Price updated"
+  },
   "header": {
     "lastupdate": "Last update:"
   },

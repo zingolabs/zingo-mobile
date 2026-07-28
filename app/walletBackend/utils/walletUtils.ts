@@ -49,14 +49,16 @@ import {
  *   or a non-numeric price) — the payload travels for diagnosis.
  */
 /**
- * Whether — and through which tunnel — a successful price fetch attested
- * its route. Absence is not a bare null: it has exactly one producer, a
- * native layer that predates the attestation, and consumers must name
- * that case to handle it. Absence of a failure is never the only signal
- * that the covered path ran.
+ * Which route a successful price fetch attested. `attested` is the mixnet
+ * tunnel (with its local SOCKS5 endpoint), `clearnet` is the deliberate
+ * per-session consent path. Absence of both markers is not a bare null: it
+ * has exactly one producer, a native layer that predates the attestation,
+ * and consumers must name that case to handle it. Absence of a failure is
+ * never the only signal that the covered path ran.
  */
 export type PriceRouteAttestation =
   | { readonly kind: 'attested'; readonly viaSocks5: string }
+  | { readonly kind: 'clearnet' }
   | { readonly kind: 'preAttestationNativeLayer' };
 
 export type ZecPriceOutcome =
@@ -196,7 +198,9 @@ export function classifyPriceFetch(raw: RawPriceFetch): ZecPriceOutcome {
       const route: PriceRouteAttestation =
         payload.via_socks5 !== undefined
           ? { kind: 'attested', viaSocks5: payload.via_socks5 }
-          : { kind: 'preAttestationNativeLayer' };
+          : payload.via_clearnet === true
+            ? { kind: 'clearnet' }
+            : { kind: 'preAttestationNativeLayer' };
       return { kind: 'price', usd: payload.current_price, route, elapsedMs };
     }
     default: {
@@ -218,7 +222,9 @@ export function describePriceOutcome(outcome: ZecPriceOutcome): string {
       `price fetch ok: ${o.usd} via ${
         o.route.kind === 'attested'
           ? o.route.viaSocks5
-          : 'PRE-ATTESTATION LAYER'
+          : o.route.kind === 'clearnet'
+            ? 'clearnet'
+            : 'PRE-ATTESTATION LAYER'
       } ${o.elapsedMs}ms`,
     noData: o => `price fetch: oracle returned no price data (${o.elapsedMs}ms)`,
     gateRefusal: () =>
