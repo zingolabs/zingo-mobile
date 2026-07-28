@@ -52,10 +52,6 @@ export type RPCMigrationStatusType = {
   phase: RPCMigrationPhaseType | null;
   parts_total: number;
   parts_confirmed: number;
-  // Parts submitted to the network but not yet mined: the sent, in-flight
-  // batch. Zero until a batch broadcasts, clearing into parts_confirmed as
-  // parts mine, so it distinguishes "batch sent, confirming" from "not sent".
-  parts_broadcast: number;
   value_total: number;
   value_migrated: number;
   // Window length in blocks (144 provisionally).

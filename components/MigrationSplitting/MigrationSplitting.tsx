@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   BackHandler,
   ScrollView,
   Text,
@@ -21,15 +22,17 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
-import ProgressBar from '../Migration/ProgressBar';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import useTrickleProgress from '../../app/hooks/useTrickleProgress';
-import { planIronwoodMigration, quickSplit } from '../../app/walletBackend';
-import { RPCSplitOutcomeType } from '../../app/walletBackend/types/RPCSplitOutcomeType';
-import { RPCMigrationPlanType } from '../../app/walletBackend/types/RPCMigrationPlanType';
+import {
+  continueNoteSplitting,
+  migrationStatus,
+} from '../../app/walletBackend';
+import { RPCSplitStepType } from '../../app/walletBackend/types/RPCSplitStepType';
+import { RPCMigrationStatusType } from '../../app/walletBackend/types/RPCMigrationStatusType';
 
 type MigrationSplittingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -43,15 +46,26 @@ const ZATS_PER_ZEC = 10 ** 8;
 // hammering the wallet.
 const POLL_MS = 15 * 1000;
 
-// Compact ZEC amount: trims trailing zeros so a 10 ZEC total reads "10" and a
-// dust total "0.01", matching the plan values.
+// Compact ZEC amount for the per-transaction output list: trims trailing zeros
+// so a 10 ZEC note reads "10" and a dust note "0.01", matching the plan values.
 const fmt = (zats: number): string =>
   `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
-// The transaction's total re-noted value, matching the plan's Amount row. The
-// individual note denominations stay off this screen.
-const outputsLabel = (outputs: number[]): string =>
-  fmt(outputs.reduce((sum, v) => sum + v, 0));
+// "10, 10, 1" with repeats collapsed to "10 (×2), 1".
+const outputsLabel = (outputs: number[]): string => {
+  const groups: { value: number; count: number }[] = [];
+  for (const v of outputs) {
+    const existing = groups.find(g => g.value === v);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      groups.push({ value: v, count: 1 });
+    }
+  }
+  return groups
+    .map(g => (g.count > 1 ? `${fmt(g.value)} (×${g.count})` : fmt(g.value)))
+    .join(', ');
+};
 
 // Round-granular truth is all the splitting API offers (there is no per-tx
 // build side channel like the drain's): a row is queued until its round
@@ -72,14 +86,13 @@ type StepState =
   | { kind: 'awaiting'; round: number; pending: number }
   | { kind: 'complete' };
 
-// Phase 1's interactive ceremony (ADR 0016): drives sync -> quick_split through
-// every round to `complete`, keeping the user present (like the drain:
-// keep-awake, hardware-back blocked). The terminal state is the "Split complete"
-// view whose button hands off to the Phase 2 cadence chooser. quick_split
-// persists no migration state — each call re-plans against current notes — so a
-// mid-round kill is recovered by re-entering this screen, which just calls
-// quick_split again; the fallback (`plan` absent) re-fetches the plan for the
-// row labels.
+// Phase 1's interactive ceremony: drives sync -> continue_note_splitting
+// through every round to SplittingComplete, keeping the user present (like
+// the drain: keep-awake, hardware-back blocked). The terminal state is the
+// "Split complete" view whose button unlocks the phase 2 cadence chooser.
+// If the app dies anyway, zingolib's persisted round state plus the home
+// banner bring the user back here — that is the rescue path (`plan` absent),
+// rendered coarsely from migration_status.
 const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
   navigation,
   route,
@@ -178,14 +191,32 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
     [updateCeilingFromRows],
   );
 
-  // The splitting loop (ADR 0016). One quick_split call per tick: it builds and
-  // broadcasts the next round (slow: Halo2 proving), reports that a prior round
-  // is still confirming, or reports completion. quick_split does not return a
-  // round index — it persists no state — so we count rounds locally as they
-  // broadcast. Between ticks the app's continuous background sync brings in the
-  // confirmations the next tick needs.
-  const roundRef = useRef(0);
+  const applyPending = useCallback(
+    (pending: string[]) => {
+      setRows(prev => {
+        const stillPending = new Set(pending);
+        const next = prev.map(row => {
+          if (
+            row.status === 'sent' &&
+            row.txid &&
+            !stillPending.has(row.txid)
+          ) {
+            return { ...row, status: 'confirmed' as TxStatus };
+          }
+          return row;
+        });
+        updateCeilingFromRows(next);
+        return next;
+      });
+    },
+    [updateCeilingFromRows],
+  );
 
+  // The splitting loop. One driver call per tick: it either builds and
+  // broadcasts the next round (slow: Halo2 proving), reports the pending
+  // round's remaining txids (fast), or reports completion. Between ticks the
+  // app's continuous background sync brings in the confirmations the next
+  // tick observes.
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | null = null;
@@ -198,17 +229,17 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
       if (cancelled) {
         return;
       }
-      const result = await quickSplit();
+      const stepResult = await continueNoteSplitting();
       if (cancelled) {
         return;
       }
       let failure: string | null = null;
-      let parsed: RPCSplitOutcomeType | null = null;
-      if (!result.ok) {
-        failure = result.error.message;
+      let parsed: RPCSplitStepType | null = null;
+      if (!stepResult.ok) {
+        failure = stepResult.error.message;
       } else {
         try {
-          parsed = JSON.parse(result.value) as RPCSplitOutcomeType;
+          parsed = JSON.parse(stepResult.value) as RPCSplitStepType;
           if (parsed.error) {
             failure = parsed.error;
           }
@@ -217,16 +248,16 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
         }
       }
       if (failure) {
-        // A transmit failure leaves every unsent note spendable; the retry
-        // button re-enters the same loop, which re-plans the remainder.
+        // Transmit failures leave a reconcilable state; the retry button
+        // re-enters the same loop.
         setErrorMsg(failure);
         return;
       }
-      if (!parsed || !parsed.outcome) {
-        setErrorMsg('Error: malformed splitting outcome');
+      if (!parsed || !parsed.step) {
+        setErrorMsg('Error: malformed splitting step');
         return;
       }
-      if (parsed.outcome === 'complete') {
+      if (parsed.step === 'splitting_complete') {
         setRows(prev =>
           prev.map(row => ({ ...row, status: 'confirmed' as TxStatus })),
         );
@@ -234,10 +265,9 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
         finish();
         return;
       }
-      if (parsed.outcome === 'round') {
-        const round = roundRef.current;
+      if (parsed.step === 'round_broadcast') {
+        const round = parsed.round ?? 0;
         applyBroadcast(round, parsed.txids ?? []);
-        roundRef.current = round + 1;
         setStep({
           kind: 'awaiting',
           round,
@@ -246,53 +276,56 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
         schedule(drive, POLL_MS);
         return;
       }
-      // awaiting_confirmation: a prior round has not confirmed yet; nothing was
-      // built or sent. Its rows stay `sent` and confirm when the next round
-      // broadcasts (or on `complete`). Sync and retry.
+      // awaiting_confirmation: pending lists what is still in flight; empty
+      // means confirmed but the anchor hasn't reached the outputs yet.
+      const pending = parsed.pending ?? [];
+      applyPending(pending);
       setStep(prev => ({
         kind: 'awaiting',
         round:
           prev.kind === 'awaiting' || prev.kind === 'broadcast'
             ? prev.round
             : 0,
-        pending: prev.kind === 'awaiting' ? prev.pending : 0,
+        pending: pending.length,
       }));
       schedule(drive, POLL_MS);
     };
 
-    // Fallback re-entry (no plan param): quick_split re-plans internally
-    // regardless, so this only re-fetches the plan for the row labels. An empty
-    // split_rounds means the notes are already fully split — hand straight to
-    // the terminal state.
+    // Rescue re-entry (no plan param): learn where the migration stands
+    // before driving, so an already-scheduled migration lands directly on
+    // the terminal state instead of an empty working view.
     (async () => {
       if (!plan) {
-        const planResult = await planIronwoodMigration();
+        const statusResult = await migrationStatus();
         if (cancelled) {
           return;
         }
-        if (planResult.ok) {
+        if (statusResult.ok) {
           try {
-            const parsed = JSON.parse(planResult.value) as RPCMigrationPlanType;
-            if (!parsed.error && parsed.split_rounds) {
-              if (parsed.split_rounds.length === 0) {
-                setRows([]);
-                setStep({ kind: 'complete' });
-                finish();
-                return;
-              }
+            const status = JSON.parse(
+              statusResult.value,
+            ) as RPCMigrationStatusType;
+            if (
+              status.phase?.kind === 'parts_scheduled' ||
+              status.phase?.kind === 'complete'
+            ) {
+              setStep({ kind: 'complete' });
+              finish();
+              return;
+            }
+            if (status.phase?.kind === 'note_splitting') {
+              // Coarse rows: one per pending transaction, values unknown.
               setRows(
-                parsed.split_rounds.flatMap((round, r) =>
-                  round.map(tx => ({
-                    round: r,
-                    label: outputsLabel(tx.outputs),
-                    txid: null,
-                    status: 'queued' as TxStatus,
-                  })),
-                ),
+                (status.phase.pending_txids ?? []).map(txid => ({
+                  round: status.phase?.round ?? 0,
+                  label: '',
+                  txid,
+                  status: 'sent' as TxStatus,
+                })),
               );
             }
           } catch {
-            // Fall through to the driver, which re-plans regardless.
+            // Fall through to the driver, which re-derives everything.
           }
         }
       }
@@ -481,9 +514,12 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                   color: colors.primary,
                   fontSize: 12,
                   fontWeight: '600',
+                  letterSpacing: 1,
                 }}
               >
-                {translate('migrationsplitting.status-confirmed') as string}
+                {(
+                  translate('migrationsplitting.status-confirmed') as string
+                ).toUpperCase()}
               </Text>
             </View>
           ))}
@@ -630,19 +666,39 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                   color: meta.color,
                   fontSize: 12,
                   fontWeight: '600',
+                  letterSpacing: 1,
                 }}
               >
-                {translate(meta.key) as string}
+                {(translate(meta.key) as string).toUpperCase()}
               </Text>
             </View>
           );
         })}
       </ScrollView>
 
-      {/* Pinned above the hint. Splitting reports no discrete steps, so the
-          trickle keeps a continuous bar moving rather than counting pieces. */}
+      {/* Always-animated progress bar, pinned above the hint. */}
       <View style={{ paddingHorizontal: 24, paddingBottom: 28 }}>
-        <ProgressBar progress={trickle.progress} />
+        <View
+          style={{
+            width: '100%',
+            height: 6,
+            borderRadius: 3,
+            backgroundColor: colors.bottomSheetBorder,
+            overflow: 'hidden',
+          }}
+        >
+          <Animated.View
+            style={{
+              height: '100%',
+              borderRadius: 3,
+              backgroundColor: colors.primary,
+              width: trickle.progress.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+              }),
+            }}
+          />
+        </View>
         <Text
           style={{
             color: colors.placeholder,

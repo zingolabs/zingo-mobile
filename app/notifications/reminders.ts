@@ -8,16 +8,13 @@ import notifee, {
 const CHANNEL_ID = 'ironwood-migration';
 const REMINDER_PREFIX = 'ironwood-batch-';
 
-// One scheduled reminder per broadcast window: fires at the window's advisory
-// target time. The batch is already due from its boundary, so the target no
-// longer gates sending — it just paces the nudge so sends disperse across the
-// window (manual-execution mode, nothing is ever sent without the user opening
-// the app).
+// One scheduled reminder per broadcast window: fires at the window's random
+// target time, when every part of its batch is due (manual-execution mode —
+// nothing is ever sent without the user opening the app).
 export type BatchReminder = {
   // Stable per-window id (the bucket index), so re-arming replaces cleanly.
   id: string;
-  // When to fire, in ms since epoch: the window's advisory target, estimated
-  // from its block distance at the observed spacing.
+  // When to fire, in ms since epoch (the wake's estimated_target_unix_time).
   timestampMs: number;
   title: string;
   body: string;

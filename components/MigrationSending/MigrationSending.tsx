@@ -1,13 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { BackHandler, ScrollView, Text, View } from 'react-native';
+import { Animated, BackHandler, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
-import ProgressBar from '../Migration/ProgressBar';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
@@ -375,19 +374,39 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
                   color: meta.color,
                   fontSize: 12,
                   fontWeight: '600',
+                  letterSpacing: 1,
                 }}
               >
-                {translate(meta.key) as string}
+                {(translate(meta.key) as string).toUpperCase()}
               </Text>
             </View>
           );
         })}
       </ScrollView>
 
-      {/* Pinned above the hint. Proving reports no discrete steps, so the
-          trickle keeps a continuous bar moving rather than counting pieces. */}
+      {/* Always-animated progress bar, pinned above the hint. */}
       <View style={{ paddingHorizontal: 24, paddingBottom: 28 }}>
-        <ProgressBar progress={trickle.progress} />
+        <View
+          style={{
+            width: '100%',
+            height: 6,
+            borderRadius: 3,
+            backgroundColor: colors.bottomSheetBorder,
+            overflow: 'hidden',
+          }}
+        >
+          <Animated.View
+            style={{
+              height: '100%',
+              borderRadius: 3,
+              backgroundColor: colors.primary,
+              width: trickle.progress.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+              }),
+            }}
+          />
+        </View>
         <Text
           style={{
             color: colors.placeholder,

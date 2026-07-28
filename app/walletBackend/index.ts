@@ -65,7 +65,6 @@ export {
   parseAddress,
   planIronwoodMigration,
   planOrchardDrain,
-  quickSplit,
   reconcileMigration,
   removeTransaction,
   resolvedTrue,
@@ -77,10 +76,8 @@ export {
   setCryptoDefaultProvider,
   shieldConfirm,
   shieldPropose,
-  splitStatus,
   startIronwoodMigration,
   walletBackupExists,
   walletExists,
-  windowTimeline,
 } from './utils/walletUtils';
 export default WalletBackend;

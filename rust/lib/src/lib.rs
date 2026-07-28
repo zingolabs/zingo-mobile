@@ -59,8 +59,7 @@ use zingolib::wallet::keys::{
     unified::{ReceiverSelection, UnifiedKeyStore},
 };
 use zingolib::wallet::migration::{
-    MigrationParams, MigrationPhase, RecommendedAction, parts::PartState, parts::SigningStrategy,
-    split::plan_hash,
+    MigrationParams, MigrationPhase, RecommendedAction, parts::SigningStrategy, split::plan_hash,
 };
 
 use zingo_common_components::protocol::ActivationHeights;
@@ -85,6 +84,8 @@ pub enum ZingolibError {
     Rescan(String),
     #[error("Error: read: {0}")]
     Read(String),
+    #[error("Error: mixnet: {0}")]
+    Mixnet(String),
     #[error("Error: send: {0}")]
     Send(String),
     #[error("Error: shield: {0}")]
@@ -109,8 +110,6 @@ pub enum ZingolibError {
     MigrationSplit(String),
     #[error("Error: migration: {0}")]
     Migration(String),
-    #[error("Error: mixnet: {0}")]
-    Mixnet(String),
 }
 
 impl ZingolibError {
@@ -1619,19 +1618,10 @@ pub fn poll_sync() -> Result<String, ZingolibError> {
         PollReport::NoHandle => Ok("Sync task has not been launched.".to_string()),
         PollReport::NotReady => Ok("Sync task is not complete.".to_string()),
         PollReport::Ready(result) => match result {
-            Ok(sync_result) => {
-                // A bucket boundary's tree state is witnessable only while its
-                // checkpoint is retained, so the witness has to be taken on the
-                // sync that crosses it. `await_sync` does this for its own
-                // callers; we drive sync through the poll, so it falls here.
-                // No-op without a scheduled migration.
-                RT.block_on(lightclient.capture_migration_witnesses())
-                    .map_err(ffi_error)?;
-                Ok(json::object! {
-                    "sync_complete" => json::JsonValue::from(sync_result)
-                }
-                .pretty(2))
+            Ok(sync_result) => Ok(json::object! {
+                "sync_complete" => json::JsonValue::from(sync_result)
             }
+            .pretty(2)),
             Err(e) => Err(ZingolibError::sync(e)),
         },
     })
@@ -2766,7 +2756,7 @@ pub fn confirm() -> Result<String, ZingolibError> {
 ///
 /// Returns, on success, the drain plan as JSON:
 /// `{ transactions: [{ inputs: [u64], output: u64, fee: u64 }], migrated,
-/// fee, residual }` (all zatoshis). Each transaction spends its `inputs`
+/// fee, stranded }` (all zatoshis). Each transaction spends its `inputs`
 /// Orchard notes into a single Ironwood `output`; the fee is `sum(inputs) -
 /// output`. An empty `transactions` array means there is nothing worth
 /// migrating.
@@ -2826,9 +2816,9 @@ pub fn drain_orchard_to_ironwood() -> Result<String, ZingolibError> {
             *progress = Some(lightclient.immediate_migration_progress_handle());
         }
         let out = RT.block_on(async move {
-            // quick_immediate_migration holds the pause internally: it plans,
-            // builds, and transmits under one stable wallet state, then resumes
-            // sync on return. resume_sync: true is the normal case.
+            // quick_drain holds the pause internally: it plans, builds, and
+            // transmits under one stable wallet state, then resumes sync on
+            // return. resume_sync: true is the normal case.
             let summary = lightclient
                 .quick_immediate_migration(AccountId::ZERO, true)
                 .await
@@ -2933,8 +2923,8 @@ fn migration_phase_json(phase: &MigrationPhase) -> json::JsonValue {
 ///
 /// Returns, on success, the plan as JSON: `{ split_rounds:
 /// [[{ inputs: [u64], outputs: [u64], fee: u64 }]], parts: [u64], split_fee,
-/// parts_fee, residual, plan_hash }` (values in zatoshis, `plan_hash` in hex).
-/// Consent must disclose `residual`. Pass `plan_hash` back to
+/// parts_fee, stranded, plan_hash }` (values in zatoshis, `plan_hash` in hex).
+/// Consent must disclose `stranded`. Pass `plan_hash` back to
 /// `start_ironwood_migration` unchanged.
 pub fn plan_ironwood_migration() -> Result<String, ZingolibError> {
     with_initialized_lightclient_read(|lightclient| {
@@ -3070,8 +3060,7 @@ pub fn continue_note_splitting() -> Result<String, ZingolibError> {
 /// schedule screen renders each window's batch without a second call.
 /// `due_now` is the batch the client can broadcast this instant (`{ boundary,
 /// part_ids, denominations }`) or `null` when a send would build nothing; it
-/// carries the current window, which `upcoming_windows` (future windows only)
-/// omits.
+/// carries the current window, which `next_wakes` (future windows only) omits.
 pub fn migration_status() -> Result<String, ZingolibError> {
     with_initialized_lightclient_read(|lightclient| {
         RT.block_on(async move {
@@ -3148,45 +3137,6 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                 "due_now" => due_now,
             }
             .pretty(2))
-        })
-    })
-}
-
-/// The window calendar, for a schedule screen's grid, independent of any
-/// migration. The window the chain tip sits in is always present (zero tallies
-/// when nothing is scheduled there); every scheduled window, past and future,
-/// carries its confirmation progress. So the grid and its "you are here" render
-/// before consent, and the same call fills per-window progress afterwards.
-///
-/// Returns a JSON array of `{ bucket_index, boundary, close, is_current,
-/// parts_total, parts_confirmed, value_total, value_migrated }` (heights in
-/// blocks with `close` exclusive, values in zatoshis), earliest first. Returns
-/// JSON `null` when the wallet has never synced.
-pub fn window_timeline() -> Result<String, ZingolibError> {
-    with_initialized_lightclient_read(|lightclient| {
-        RT.block_on(async move {
-            let timeline = lightclient.window_timeline().await.map_err(ffi_error)?;
-            Ok(match timeline {
-                Some(windows) => {
-                    let reports = windows
-                        .iter()
-                        .map(|w| {
-                            object! {
-                                "bucket_index" => w.bucket_index,
-                                "boundary" => u32::from(w.boundary),
-                                "close" => u32::from(w.close),
-                                "is_current" => w.is_current,
-                                "parts_total" => w.parts_total,
-                                "parts_confirmed" => w.parts_confirmed,
-                                "value_total" => w.value_total,
-                                "value_migrated" => w.value_migrated,
-                            }
-                        })
-                        .collect::<Vec<_>>();
-                    json::JsonValue::from(reports).pretty(2)
-                }
-                None => json::JsonValue::Null.pretty(2),
-            })
         })
     })
 }
@@ -3302,7 +3252,7 @@ fn batch_report_json(report: &zingolib::lightclient::migrate::BatchReport) -> js
 ///
 /// Returns `{ outcomes: [{ part, denomination, result }], halted }`, where each
 /// `result` is `{ kind: "sent", txid }`, `{ kind: "slid" }`,
-/// `{ kind: "not_due", window_opens_unix_time }`, or `{ kind: "failed", error }`,
+/// `{ kind: "not_due", estimated_unix_time }`, or `{ kind: "failed", error }`,
 /// and `halted` is the error that stopped the batch early or `null`. An empty
 /// `outcomes` with `halted` null means nothing was owed. An infrastructure
 /// failure (offline, no migration in progress) throws typed.
@@ -3389,6 +3339,8 @@ pub fn cancel_ironwood_migration() -> Result<String, ZingolibError> {
     })
 }
 
+// ----- Mixnet Mode (Nym transport for the send and price surfaces) -----
+
 /// The Mixnet Mode tri-state-plus-died as the strings the app layer shows.
 fn mixnet_mode_string(mode: zingolib::nym::MixnetMode) -> &'static str {
     match mode {
@@ -3464,22 +3416,16 @@ pub fn mixnet_mode() -> Result<String, ZingolibError> {
         if let Some(addr) = lightclient.mixnet_socks5_addr() {
             status["socks5_addr"] = addr.into();
         }
+        Ok(status.pretty(2))
     })
 }
 
 /// The proxy's latest bootstrap progress line while Mixnet Mode is
 /// bootstrapping, so the app can narrate the connect race; empty otherwise.
 pub fn mixnet_bootstrap_detail() -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &*guard {
-            let detail = lightclient.mixnet_bootstrap_detail().unwrap_or_default();
-            Ok(object! { "detail" => detail }.pretty(2))
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
-        }
+    with_initialized_lightclient_read(|lightclient| {
+        let detail = lightclient.mixnet_bootstrap_detail().unwrap_or_default();
+        Ok(object! { "detail" => detail }.pretty(2))
     })
 }
 

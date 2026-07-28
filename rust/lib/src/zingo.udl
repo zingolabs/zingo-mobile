@@ -8,6 +8,7 @@ enum ZingolibError {
     "Sync",
     "Rescan",
     "Read",
+    "Mixnet",
     "Send",
     "Shield",
     "InvalidInput",
@@ -19,8 +20,7 @@ enum ZingolibError {
     "MigrationAlreadyInProgress",
     "MigrationConsentStale",
     "MigrationSplit",
-    "Migration",
-    "Mixnet"
+    "Migration"
 };
 
 namespace zingo {
