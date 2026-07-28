@@ -14,7 +14,8 @@ import {
 export type MixnetFailure =
   | { readonly reason: 'nativeRejection'; readonly message: string }
   | { readonly reason: 'malformedPayload'; readonly payload: string }
-  | { readonly reason: 'unrecognizedMode'; readonly claimed: string };
+  | { readonly reason: 'unrecognizedMode'; readonly claimed: string }
+  | { readonly reason: 'unconsentedOff' };
 
 /**
  * The validated outcome of a mixnet status call. A discriminated union so
@@ -36,6 +37,38 @@ export type MixnetStatusReport =
 export type MixnetDetailReport =
   | { readonly kind: 'detail'; readonly detail: string }
   | { readonly kind: 'failure'; readonly failure: MixnetFailure };
+
+/**
+ * Whether this session holds the user's deliberate clearnet consent.
+ * `off` from the wallet is trustworthy only under `disabledThisSession`:
+ * a never-attached wallet (and a silently recreated one) also reports
+ * `off`, and that must not open the send gate (zingo-mobile#1226).
+ */
+export type ClearnetConsent = 'none' | 'disabledThisSession';
+
+/**
+ * Vets a polled status against the session's consent. A polled `off`
+ * without consent is re-typed as the policy failure it actually is, so the
+ * derived view keeps sends blocked and offers re-enable instead of
+ * silently opening clearnet. Every other report passes through untouched;
+ * direct reports (an attach result, a disable result) are authoritative
+ * and are not vetted.
+ *
+ * Pure function — no side effects.
+ */
+export function vetPolledStatus(
+  status: MixnetStatusReport,
+  consent: ClearnetConsent,
+): MixnetStatusReport {
+  if (
+    status.kind === 'status' &&
+    status.mode === RPCMixnetModeEnum.off &&
+    consent === 'none'
+  ) {
+    return { kind: 'failure', failure: { reason: 'unconsentedOff' } };
+  }
+  return status;
+}
 
 /**
  * Converts a value thrown by the native bridge — the error channel — into
