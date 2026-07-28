@@ -153,3 +153,28 @@ describe('sendFailureMessage', () => {
     ).toBe(CONNECTION_REFUSED);
   });
 });
+
+/**
+ * The classification seam is mobile-owned (#1229): our own
+ * `ZingolibError::Mixnet` display prefix marks a mixnet refusal, so a
+ * zingolib rewording of the refusal prose cannot silently revert refusals
+ * to the switch-server-and-retry dance. The zingolib phrase stays as a
+ * secondary marker for texts wrapped under other variants by old builds.
+ */
+describe('the mobile-owned refusal marker (#1229)', () => {
+  it('classifies our own mixnet prefix as a refusal, whatever zingolib says inside', () => {
+    const reworded =
+      'Error: mixnet: the tunnel is not ready to carry this operation';
+    const failure = classifySendFailure(reworded);
+    expect(failure.kind).toBe('mixnetRefusal');
+    expect(retryOnAnotherServer(failure)).toBe(false);
+  });
+
+  it('the excluded-indexer exhaustion is a deliberate serverSuspect: switching servers changes eligibility', () => {
+    const exhaustion =
+      "Error: indexer: no eligible Broadcast Indexer remains after excluding the synchronization endpoint's host";
+    const failure = classifySendFailure(exhaustion);
+    expect(failure.kind).toBe('serverSuspect');
+    expect(retryOnAnotherServer(failure)).toBe(true);
+  });
+});

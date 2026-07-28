@@ -35,8 +35,19 @@ const DUPLICATE_NULLIFIER_MARKERS = [
 ] as const;
 
 /**
+ * The mobile-owned refusal marker (#1229): the display prefix of our own
+ * `ZingolibError::Mixnet`, minted in rust/lib/src/lib.rs. It survives any
+ * zingolib rewording, because both sides of it live in this repository.
+ */
+const OWNED_MIXNET_MARKER = 'Error: mixnet:';
+
+/**
  * Both fail-closed refusal texts (bootstrapping and died) carry this phrase;
- * no server or consensus error does.
+ * no server or consensus error does. Secondary to
+ * [`OWNED_MIXNET_MARKER`]: it still catches refusal texts that older
+ * builds wrapped under other variants, but it is zingolib's prose and a
+ * rewording there silently defeats it — which is why the owned marker
+ * exists.
  */
 const MIXNET_REFUSAL_MARKER = 'Nym mixnet';
 
@@ -54,7 +65,10 @@ export function classifySendFailure(error: string): SendFailureClass {
   if (error.includes('64: dust')) {
     return { kind: 'dust', error };
   }
-  if (error.includes(MIXNET_REFUSAL_MARKER)) {
+  if (
+    error.includes(OWNED_MIXNET_MARKER) ||
+    error.includes(MIXNET_REFUSAL_MARKER)
+  ) {
     return { kind: 'mixnetRefusal', error };
   }
   if (error.includes(INTERNAL_RPC_MARKER)) {
