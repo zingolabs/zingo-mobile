@@ -872,18 +872,35 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun mixnetDeathDetailInfo(promise: Promise) {
-        FfiOutcome.settling(promise, "mixnet_death_detail") {
+    fun mixnetDeathReportInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "mixnet_death_report") {
             uniffi.zingo.initLogging()
-            val detail = uniffi.zingo.mixnetDeathDetail()
+            val report = uniffi.zingo.mixnetDeathReport()
             // Absence crosses named, not null: outside `died` no record exists.
             (
-                if (detail == null) {
+                if (report == null) {
                     JSONObject().put("kind", "none")
                 } else {
-                    JSONObject().put("kind", "detail").put("failure", probeFailureJson(detail))
+                    JSONObject()
+                        .put("kind", "report")
+                        .put("age_millis", report.ageMillis.toLong())
+                        .apply {
+                            report.detail?.let { put("failure", probeFailureJson(it)) }
+                        }
                 }
             ).toString()
+        }
+    }
+
+    @ReactMethod
+    fun mixnetTimingInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "mixnet_timing") {
+            uniffi.zingo.initLogging()
+            val timing = uniffi.zingo.mixnetTiming()
+            JSONObject()
+                .put("attach_readiness_budget_millis", timing.attachReadinessBudgetMillis.toLong())
+                .put("mixnet_round_trip_bound_millis", timing.mixnetRoundTripBoundMillis.toLong())
+                .toString()
         }
     }
 

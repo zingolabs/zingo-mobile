@@ -460,7 +460,8 @@
       "unknown": "Mixnet indisponível"
     },
     "send-blocked": "O envio está pausado até a mixnet estar pronta",
-    "reenable": "Reativar mixnet"
+    "reenable": "Reativar mixnet",
+    "bootstrap-patience": "A conexão pode levar até"
   },
   "pricefetcher": {
     "updated-mixnet": "Preço atualizado pela mixnet",

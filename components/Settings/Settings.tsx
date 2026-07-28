@@ -69,7 +69,10 @@ import {
   BlockExplorerEnum,
 } from '../../app/AppState';
 import { getLatestBlockServerInfo } from '../../app/walletBackend';
-import { getMixnetIpCorrelationDisclaimer } from '../../app/walletBackend/utils/mixnetUtils';
+import {
+  getMixnetIpCorrelationDisclaimer,
+  getMixnetTiming,
+} from '../../app/walletBackend/utils/mixnetUtils';
 import { failureLines } from '../../app/walletBackend/transforms/connectionDoctorReport';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
@@ -262,6 +265,27 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     getMixnetIpCorrelationDisclaimer().then((text: string | null) => {
       if (alive) {
         setMixnetDisclaimer(text);
+      }
+    });
+    return () => {
+      alive = false;
+    };
+  }, [mixnetSupported]);
+
+  // The wallet's connect-patience budget (zingolib#2569): compiled-in
+  // constants, fetched once like the disclaimer, so the bootstrapping hint
+  // states the same bound the wallet's gate actually runs.
+  const [mixnetBudgetMillis, setMixnetBudgetMillis] = useState<number | null>(
+    null,
+  );
+  useEffect(() => {
+    if (!mixnetSupported) {
+      return;
+    }
+    let alive = true;
+    getMixnetTiming().then(timing => {
+      if (alive && timing.kind === 'timing') {
+        setMixnetBudgetMillis(timing.attachReadinessBudgetMillis);
       }
     });
     return () => {
@@ -1741,14 +1765,32 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                               'settings.nym-enhanced-privacy',
                             ) as string)}
                       </FadeText>
-                      {/* The typed cause of a died transport (stage, target,
-                          cause chain), so "connection lost" carries its why.
-                          Untranslated: taxonomy terms a support reply keys
-                          on, same as the Doctor's report lines. */}
-                      {mixnetView.deathDetail !== null && (
+                      {/* The bootstrapping patience hint: the wallet's own
+                          attach budget, so "Connecting…" states how long it
+                          may legitimately take before a died verdict. */}
+                      {mixnetView.statusKey === 'mixnet.status.bootstrapping' &&
+                        mixnetBudgetMillis !== null && (
+                          <View testID="settings.mixnet-patience">
+                            <FadeText>
+                              {`${translate('mixnet.bootstrap-patience') as string} ${Math.ceil(mixnetBudgetMillis / 1000)} s`}
+                            </FadeText>
+                          </View>
+                        )}
+                      {/* The typed cause and age of a died transport (stage,
+                          target, cause chain, and how long ago it latched),
+                          so "connection lost" carries its why and its when.
+                          Untranslated cause lines: taxonomy terms a support
+                          reply keys on, same as the Doctor's report lines.
+                          A causeless death still renders its age. */}
+                      {mixnetView.death.kind === 'reported' && (
                         <View testID="settings.mixnet-death-detail">
                           <FadeText>
-                            {failureLines(mixnetView.deathDetail).join('\n')}
+                            {[
+                              ...(mixnetView.death.detail !== null
+                                ? failureLines(mixnetView.death.detail)
+                                : []),
+                              `latched ${Math.round(mixnetView.death.ageMillis / 1000)} s ago`,
+                            ].join('\n')}
                           </FadeText>
                         </View>
                       )}

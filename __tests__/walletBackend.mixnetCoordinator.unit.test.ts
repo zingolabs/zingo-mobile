@@ -114,37 +114,53 @@ describe('deriveMixnetView', () => {
     ).toBe('none');
   });
 
-  it('carries the death detail only in the died state, and degrades to the bare verdict', () => {
-    const death = {
-      kind: 'died' as const,
-      death: {
-        stage: 'remote-tls',
-        target: 'gateway.example:443',
-        causeChain: ['handshake eof'],
-      },
+  it('names every death-evidence state: reported, unreported, and notDied', () => {
+    const cause = {
+      stage: 'remote-tls',
+      target: 'gateway.example:443',
+      causeChain: ['handshake eof'],
     };
+    const report = { kind: 'died' as const, ageMillis: 12_000, death: cause };
     const died = {
       kind: 'status' as const,
       mode: RPCMixnetModeEnum.died,
       socks5Addr: null,
     };
-    expect(deriveMixnetView(died, noDetail, death).deathDetail).toEqual(
-      death.death,
-    );
-    expect(deriveMixnetView(died, noDetail, null).deathDetail).toBeNull();
+    expect(deriveMixnetView(died, noDetail, report).death).toEqual({
+      kind: 'reported',
+      ageMillis: 12_000,
+      detail: cause,
+    });
+    // A causeless death still reports its age.
+    expect(
+      deriveMixnetView(died, noDetail, {
+        kind: 'died',
+        ageMillis: 7_000,
+        death: null,
+      }).death,
+    ).toEqual({ kind: 'reported', ageMillis: 7_000, detail: null });
+    // A failed or absent report is the named bare verdict, never nulls.
+    expect(deriveMixnetView(died, noDetail, null).death).toEqual({
+      kind: 'unreported',
+    });
     expect(
       deriveMixnetView(died, noDetail, {
         kind: 'failure',
         failure: { reason: 'nativeRejection', message: 'gone' },
-      }).deathDetail,
-    ).toBeNull();
+      }).death,
+    ).toEqual({ kind: 'unreported' });
+    // Evidence never leaks out of the died status.
     expect(
       deriveMixnetView(
-        { kind: 'status', mode: RPCMixnetModeEnum.ready, socks5Addr: '127.0.0.1:1' },
+        {
+          kind: 'status',
+          mode: RPCMixnetModeEnum.ready,
+          socks5Addr: '127.0.0.1:1',
+        },
         noDetail,
-        death,
-      ).deathDetail,
-    ).toBeNull();
+        report,
+      ).death,
+    ).toEqual({ kind: 'notDied' });
   });
 
   it('surfaces the narration only while bootstrapping', () => {

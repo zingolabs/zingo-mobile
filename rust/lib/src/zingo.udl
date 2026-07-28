@@ -279,7 +279,9 @@ namespace zingo {
   string mixnet_bootstrap_detail();
 
   [Throws=ZingolibError]
-  ProbeFailure? mixnet_death_detail();
+  MixnetDeathReport? mixnet_death_report();
+
+  MixnetTiming mixnet_timing();
 
   string mixnet_ip_correlation_disclaimer();
 
@@ -298,6 +300,16 @@ dictionary ProbeFailure {
   string stage;
   string target;
   sequence<string> cause_chain;
+};
+
+dictionary MixnetDeathReport {
+  u64 age_millis;
+  ProbeFailure? detail;
+};
+
+dictionary MixnetTiming {
+  u64 attach_readiness_budget_millis;
+  u64 mixnet_round_trip_bound_millis;
 };
 
 dictionary ProbeSuccessData {
