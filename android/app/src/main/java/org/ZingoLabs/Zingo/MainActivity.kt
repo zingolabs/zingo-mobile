@@ -32,7 +32,10 @@ class MainActivity : ReactActivity() {
                 WindowManager.LayoutParams.FLAG_SECURE
             )
             // Recents card background when FLAG_SECURE blanks the thumbnail.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // TaskDescription.Builder exists only from API 33; older devices
+            // keep the default blank card (a P-guard here crashed API 28-32
+            // at launch with NoClassDefFoundError).
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 setTaskDescription(
                     ActivityManager.TaskDescription.Builder()
                         .setBackgroundColor(Color.BLACK)
