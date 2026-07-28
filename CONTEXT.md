@@ -125,6 +125,61 @@ unconditionally at wallet initialization and cannot be disabled at runtime.
 Two network variants exist — `alwayson` first-runs on mainnet, and
 `alwaysontest` first-runs on testnet — installable side by side.
 
+## Indexers
+
+**Indexer**:
+A lightwalletd or zaino gRPC endpoint the wallet talks to. In UI copy:
+"server".
+
+**Operator**:
+The party running one or more indexer endpoints. Regional DNS variants of
+one operator (`eu.zec.rocks`, `zec.rocks`) are the same operator. Trust,
+diversity, and exclusion are all reckoned per operator, never per DNS name.
+
+**Sync Indexer**:
+The indexer the wallet synchronizes against. It necessarily learns the
+wallet's address set.
+
+**Broadcast Indexer**:
+An indexer drawn to receive one transaction broadcast. Also called a
+**witness**. A Broadcast Indexer is never the Sync Indexer: the operator
+that holds the address set must not also receive the broadcast. Exclusion
+is by operator.
+_Avoid_: relay, send server
+
+**Witness Rotation**:
+The policy of drawing each broadcast's witness uniformly from an
+operator-diverse pool, so accumulating knowledge of the wallet's sends
+spreads across parties instead of concentrating in one.
+
+**Operator diversity**:
+The requirement that indexer selection — for sync and for broadcast —
+pursue distinct operators, not merely distinct hostnames. A selection whose
+candidates collapse to one operator fails this even if it lists many URIs.
+
+## Price surface
+
+**Price observation**:
+One fetched ZEC/USD price point, held in memory awaiting a piggyback
+write. A price fetch produces an observation and a payload for the
+caller; it never promises durability.
+
+**Observation window**:
+The bounded in-memory buffer of price observations, capacity 1000.
+When the 1001st observation arrives the oldest is dropped.
+
+**Piggyback write**:
+Persistence that rides along with another operation already holding the
+wallet write lock. The price surface's only persistence path: if no such
+operation runs while an observation is buffered, the observation is lost,
+by contract.
+_Avoid_: drain (already means the immediate migration path)
+
+**Route snapshot**:
+The price surface's view of the mixnet state, as last observed by a call
+that held the wallet for its own reasons. May lag the live state by one
+poll interval; the fail-closed policy applies to the snapshot.
+
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.
