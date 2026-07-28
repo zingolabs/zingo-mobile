@@ -285,6 +285,8 @@ namespace zingo {
 
   string mixnet_ip_correlation_disclaimer();
 
+  sequence<IndexerEntry> indexer_census();
+
   [Throws=ZingolibError]
   sequence<ProbeReport> probe_server(
     string uri
@@ -310,6 +312,15 @@ dictionary MixnetDeathReport {
 dictionary MixnetTiming {
   u64 attach_readiness_budget_millis;
   u64 mixnet_round_trip_bound_millis;
+};
+
+dictionary IndexerEntry {
+  string uri;
+  string chain;
+  string operator;
+  string region_key;
+  boolean is_default;
+  boolean obsolete;
 };
 
 dictionary ProbeSuccessData {

@@ -3480,6 +3480,39 @@ pub fn mixnet_ip_correlation_disclaimer() -> String {
     zingolib::nym::IP_CORRELATION_DISCLAIMER.to_string()
 }
 
+/// One indexer census entry, fielded for the app's server list. `chain`
+/// carries the app's chain-name strings ("main"/"test"); `region_key` is
+/// the `settings.<key>` translation suffix, empty when unknown.
+pub struct IndexerEntry {
+    pub uri: String,
+    pub chain: String,
+    pub operator: String,
+    pub region_key: String,
+    pub is_default: bool,
+    pub obsolete: bool,
+}
+
+/// The indexer census (zingolib#2571): the sole source of truth for
+/// endpoints, read here so the app's server list is a projection of the
+/// same data the wallet's defaults and health gates run on. Infallible:
+/// compiled-in data, no wallet needed.
+pub fn indexer_census() -> Vec<IndexerEntry> {
+    zingolib::indexers::INDEXERS
+        .iter()
+        .map(|entry| IndexerEntry {
+            uri: entry.uri.to_string(),
+            chain: match entry.chain {
+                zingolib::indexers::IndexerChain::Main => "main".to_string(),
+                zingolib::indexers::IndexerChain::Test => "test".to_string(),
+            },
+            operator: entry.operator.to_string(),
+            region_key: entry.region_key.to_string(),
+            is_default: entry.default,
+            obsolete: entry.obsolete,
+        })
+        .collect()
+}
+
 /// Per-probe bound. A dead route answers by timing out; this keeps one
 /// unreachable server from stalling the whole Doctor run.
 const CONNECTION_PROBE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(15);

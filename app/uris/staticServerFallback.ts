@@ -1,6 +1,6 @@
 import { ServerUrisType, TranslateType, ChainNameEnum } from '../AppState';
 
-const serverUris = (
+const staticServerFallback = (
   translate: (key: string) => TranslateType | void,
 ): ServerUrisType[] => {
   return [
@@ -163,4 +163,4 @@ const serverUris = (
   ];
 };
 
-export default serverUris;
+export default staticServerFallback;

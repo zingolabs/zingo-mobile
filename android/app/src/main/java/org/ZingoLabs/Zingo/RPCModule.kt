@@ -43,7 +43,28 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 applicationContext.resources.getString(R.string.default_chain_name),
             "debuggableBuild" to
                 ((applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0),
+            // The indexer census (zingolib#2571), as a constant rather than
+            // a method: the app's server list is consulted at JS module
+            // load, before any async bridge call could resolve. Compiled-in
+            // data, so the synchronous read costs one JSON render.
+            "indexerCensus" to indexerCensusJson(),
         )
+    }
+
+    private fun indexerCensusJson(): String {
+        val census = JSONArray()
+        for (entry in uniffi.zingo.indexerCensus()) {
+            census.put(
+                JSONObject()
+                    .put("uri", entry.uri)
+                    .put("chain", entry.chain)
+                    .put("operator", entry.operator)
+                    .put("region_key", entry.regionKey)
+                    .put("is_default", entry.isDefault)
+                    .put("obsolete", entry.obsolete)
+            )
+        }
+        return census.toString()
     }
 
     private fun getDocumentDirectory(): String {
