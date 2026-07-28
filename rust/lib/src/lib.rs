@@ -2103,21 +2103,34 @@ fn buffer_price_observation(observation: zingo_price::Price) {
 /// render the payload with its route attestation: `via_socks5` for the
 /// mixnet leg, `via_clearnet` for the deliberate toggle-off, so the app
 /// can tell either from a payload predating the attestation entirely.
-fn fetch_planned_price(route: zingolib::nym::MixnetRoute) -> Result<String, ZingolibError> {
-    let price = RT
-        .block_on(zingo_price::fetch_current_price(route.socks5_proxy()))
-        .map_err(|e| {
-            ffi_error(LightClientError::from(
-                zingolib::wallet::error::PriceError::from(e),
-            ))
-        })?;
-    buffer_price_observation(price);
-    let mut payload = object! { "current_price" => price.price_usd };
+/// The payload for a won race: the price, the winning source's name, and
+/// the route attestation (`via_socks5` for the mixnet leg, `via_clearnet`
+/// for the deliberate toggle-off). Pure; the shell owns the fetch.
+fn raced_price_payload(
+    route: zingolib::nym::MixnetRoute,
+    raced: &zingo_price::RacedPrice,
+) -> String {
+    let mut payload = object! {
+        "current_price" => raced.price.price_usd,
+        "source" => raced.source.name(),
+    };
     match route {
         zingolib::nym::MixnetRoute::Mixnet(addr) => payload["via_socks5"] = addr.into(),
         zingolib::nym::MixnetRoute::Clearnet => payload["via_clearnet"] = true.into(),
     }
-    Ok(payload.pretty(2))
+    payload.pretty(2)
+}
+
+/// Race all three price sources over the planned route and report the
+/// first success (the losing legs cancel). An all-fail settles as one
+/// typed failure whose text names every source's cause chain, so the
+/// failure report stays diagnosable per operator.
+fn fetch_planned_price(route: zingolib::nym::MixnetRoute) -> Result<String, ZingolibError> {
+    let raced = RT
+        .block_on(zingo_price::race_current_price(route.socks5_proxy()))
+        .map_err(|failure| ZingolibError::Read(failure.to_string()))?;
+    buffer_price_observation(raced.price);
+    Ok(raced_price_payload(route, &raced))
 }
 
 /// Fetch the current ZEC/USD price without ever touching the LIGHTCLIENT
@@ -2263,6 +2276,40 @@ mod price_lock_freedom_tests {
             plan_price_fetch(snapshot(MixnetMode::Died, None)),
             PriceFetchPlan::Refuse(MixnetNotReady::Died)
         ));
+    }
+}
+
+/// The race payload contract: the winning source is named beside the
+/// route attestation, so the app knows both who answered and how the
+/// answer traveled.
+#[cfg(test)]
+mod price_payload_tests {
+    use super::*;
+
+    #[test]
+    fn the_payload_names_the_winning_source_and_its_route() {
+        let raced = zingo_price::RacedPrice {
+            price: zingo_price::Price {
+                time: 7,
+                price_usd: 42.5,
+            },
+            source: zingo_price::PriceSource::Kraken,
+        };
+
+        let mixnet = raced_price_payload(
+            zingolib::nym::MixnetRoute::Mixnet("127.0.0.1:1080".to_string()),
+            &raced,
+        );
+        let parsed = json::parse(&mixnet).expect("the payload is JSON");
+        assert_eq!(parsed["source"].as_str(), Some("kraken"));
+        assert_eq!(parsed["via_socks5"].as_str(), Some("127.0.0.1:1080"));
+        assert_eq!(parsed["current_price"].as_f32(), Some(42.5));
+
+        let clearnet = raced_price_payload(zingolib::nym::MixnetRoute::Clearnet, &raced);
+        let parsed = json::parse(&clearnet).expect("the payload is JSON");
+        assert_eq!(parsed["source"].as_str(), Some("kraken"));
+        assert_eq!(parsed["via_clearnet"].as_bool(), Some(true));
+        assert!(parsed["via_socks5"].is_null());
     }
 }
 

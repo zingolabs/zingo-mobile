@@ -180,6 +180,15 @@ The price surface's view of the mixnet state, as last observed by a call
 that held the wallet for its own reasons. May lag the live state by one
 poll interval; the fail-closed policy applies to the snapshot.
 
+**Price source**:
+An operator the wallet asks for the ZEC/USD price: Gemini and Kraken
+(medians of recent trades) or CoinGecko (an aggregator's spot value).
+
+**Price race**:
+One fetch asking every price source concurrently and reporting the first
+success; the losing requests are cancelled. Only a race in which every
+source fails is a fetch failure, and that failure names each source.
+
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.
