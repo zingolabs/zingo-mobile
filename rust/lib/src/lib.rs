@@ -2200,33 +2200,6 @@ pub fn zec_price() -> Result<String, ZingolibError> {
     })
 }
 
-/// Shared scaffolding for the price-surface tests: the serialization
-/// guard and the offline fixture wallet. Sibling of the private helpers
-/// in lock_discipline_tests.rs; unify them when that suite lands.
-#[cfg(test)]
-mod price_test_support {
-    use super::*;
-
-    static PRICE_TEST_SERIAL: Mutex<()> = Mutex::new(());
-
-    pub(crate) fn serialized() -> std::sync::MutexGuard<'static, ()> {
-        PRICE_TEST_SERIAL
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner())
-    }
-
-    pub(crate) fn init_offline_wallet() {
-        init_new(
-            String::new(),
-            0,
-            "main".to_string(),
-            "Medium".to_string(),
-            1,
-        )
-        .expect("the offline Indexerless wallet must initialize");
-    }
-}
-
 /// The price surface's lock-freedom contract (ADR 0005): a price fetch
 /// never obtains the LIGHTCLIENT lock, so a fetch through a half-dead
 /// tunnel cannot freeze the rest of the FFI. Each test holds the write
@@ -2238,7 +2211,7 @@ mod price_lock_freedom_tests {
 
     #[test]
     fn zec_price_settles_while_the_lightclient_write_lock_is_held() {
-        let _serial = price_test_support::serialized();
+        let _serial = lock_discipline_tests::serialized();
         // No wallet: the plan must be the uninitialized refusal, reached
         // (and settled) without the lock. reset_lightclient clears both
         // the client and the route snapshot a sibling test may have left.
@@ -2370,8 +2343,8 @@ mod price_piggyback_tests {
 
     #[test]
     fn a_write_lock_acquisition_carries_buffered_observations_into_the_wallet() {
-        let _serial = price_test_support::serialized();
-        price_test_support::init_offline_wallet();
+        let _serial = lock_discipline_tests::serialized();
+        lock_discipline_tests::init_offline_wallet();
         buffer_price_observation(zingo_price::Price {
             time: 7,
             price_usd: 1.25,
