@@ -152,6 +152,13 @@ The policy of drawing each broadcast's witness uniformly from an
 operator-diverse pool, so accumulating knowledge of the wallet's sends
 spreads across parties instead of concentrating in one.
 
+**Census** (of indexers):
+The one authoritative list of indexer endpoints, held in zingolib and
+consumed everywhere an indexer is defaulted, selected, probed, or
+health-checked. Refreshes on release cadence, never over the network at
+runtime. Server selection consults only the census.
+_Avoid_: registry (that names the retired live fetch), server list (ambiguous)
+
 **Operator diversity**:
 The requirement that indexer selection — for sync and for broadcast —
 pursue distinct operators, not merely distinct hostnames. A selection whose

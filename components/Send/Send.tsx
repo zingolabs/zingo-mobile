@@ -72,7 +72,7 @@ import {
   SecurityType,
   ScreenEnum,
 } from '../../app/AppState';
-import { parseZcashURI, serverUris, fetchServerList } from '../../app/uris';
+import { parseZcashURI, serverUris } from '../../app/uris';
 import {
   getSpendableBalanceWithAddress,
   parseAddress,
@@ -986,37 +986,25 @@ const Send: React.FunctionComponent<SendProps> = ({
         retryOnAnotherServer(failure) &&
         selectServer !== SelectServerEnum.custom
       ) {
-        // Pick a working server, same pattern as boot/recovery: the live
-        // registry first (best, excluding the failed server, no probe), then
-        // the static list ranked by latency (also excluding the failed one).
+        // Pick a working server from the census ranked by latency, excluding
+        // the failed one (ADR 0007: no live registry).
         let fasterServer: ServerType = {} as ServerType;
-        const live = await fetchServerList(server.chainName);
-        const liveCandidates = live.filter(
-          (s: ServerUrisType) => s.uri !== server.uri,
+        const serverChecked = await selectingServer(
+          serverUris(translate).filter(
+            (s: ServerUrisType) =>
+              !s.obsolete &&
+              s.chainName === server.chainName &&
+              s.uri !== server.uri,
+          ),
         );
-        if (liveCandidates.length > 0) {
+        if (serverChecked && serverChecked.latency) {
           fasterServer = {
-            uri: liveCandidates[0].uri,
-            chainName: liveCandidates[0].chainName,
+            uri: serverChecked.uri,
+            chainName: serverChecked.chainName,
           };
         } else {
-          const serverChecked = await selectingServer(
-            serverUris(translate).filter(
-              (s: ServerUrisType) =>
-                !s.obsolete &&
-                s.chainName === server.chainName &&
-                s.uri !== server.uri,
-            ),
-          );
-          if (serverChecked && serverChecked.latency) {
-            fasterServer = {
-              uri: serverChecked.uri,
-              chainName: serverChecked.chainName,
-            };
-          } else {
-            fasterServer = server;
-            // likely a connection problem — all servers unreachable / timeout.
-          }
+          fasterServer = server;
+          // likely a connection problem — all servers unreachable / timeout.
         }
         if (fasterServer.uri !== server.uri) {
           await setServerOption(fasterServer, selectServer, false, true);

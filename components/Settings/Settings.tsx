@@ -39,7 +39,7 @@ import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import {
   checkServerURI,
-  fetchServerList,
+
   parseServerURI,
   serverUris,
 } from '../../app/uris';
@@ -640,38 +640,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customServerUri, customServerChainName]);
 
-  // Fetch BOTH public chains' server lists ONCE, when the screen opens, and keep
-  // them for the whole life of the server BS — no refresh on chain switch or
-  // picker open. Each list falls back to the static `serverUris` entries (that
-  // chain only, obsolete excluded) if its live request fails.
+  // Both public chains' picker lists come from the census — active entries
+  // only — computed once when the screen opens (ADR 0007: no live registry;
+  // opening Settings must not beacon anyone).
   useEffect(() => {
-    const toItems = (list: ServerUrisType[]) =>
-      list.map((item: ServerUrisType) => ({
-        label: (item.region ? item.region + ' ' : '') + item.uri,
-        value: item.uri,
-      }));
-    const staticFor = (chain: ChainNameEnum) =>
-      toItems(
-        serverUris(translate).filter(
-          (s: ServerUrisType) => !s.obsolete && s.chainName === chain,
-        ),
-      );
-    (async () => {
-      const [mainLive, testLive] = await Promise.all([
-        fetchServerList(ChainNameEnum.mainChainName),
-        fetchServerList(ChainNameEnum.testChainName),
-      ]);
-      setMainServerList(
-        mainLive.length > 0
-          ? toItems(mainLive)
-          : staticFor(ChainNameEnum.mainChainName),
-      );
-      setTestServerList(
-        testLive.length > 0
-          ? toItems(testLive)
-          : staticFor(ChainNameEnum.testChainName),
-      );
-    })();
+    const censusFor = (chain: ChainNameEnum) =>
+      serverUris(translate)
+        .filter((s: ServerUrisType) => !s.obsolete && s.chainName === chain)
+        .map((item: ServerUrisType) => ({
+          label: (item.region ? item.region + ' ' : '') + item.uri,
+          value: item.uri,
+        }));
+    setMainServerList(censusFor(ChainNameEnum.mainChainName));
+    setTestServerList(censusFor(ChainNameEnum.testChainName));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // once, for the whole screen life
 
