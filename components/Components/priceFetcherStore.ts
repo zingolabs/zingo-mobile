@@ -111,6 +111,24 @@ export async function surfacePriceFailure(
   }
 }
 
+/**
+ * The single-flight retry gate, exhaustive over the outcome union (ADR
+ * 0004): a new arm fails compilation here until it declares its retry
+ * policy. The one immediate retry is reserved for attempts that settled
+ * natively. A `timedOut` attempt's native call may still be in flight,
+ * so a retry would stack a second call behind it, and a fail-closed
+ * `gateRefusal` is never retried.
+ */
+const RETRY_WHEN: { [K in ZecPriceOutcome['kind']]: boolean } = {
+  price: false,
+  noData: true,
+  oracleError: true,
+  malformedPayload: true,
+  ffiRejection: true,
+  timedOut: false,
+  gateRefusal: false,
+};
+
 async function doFetch(userInitiated: boolean): Promise<void> {
   const now = Date.now();
   // Anti-spam gate: ignore while a fetch is in flight or inside the 5 s
@@ -126,9 +144,9 @@ async function doFetch(userInitiated: boolean): Promise<void> {
   if (cooldownTimer) clearTimeout(cooldownTimer);
   cooldownTimer = setTimeout(emit, COOLDOWN_MS);
 
-  // first attempt, and one retry on anything but a real price
+  // first attempt, and one retry only when the attempt settled natively
   let outcome: ZecPriceOutcome = await getZecPrice();
-  if (outcome.kind !== 'price') {
+  if (RETRY_WHEN[outcome.kind]) {
     outcome = await getZecPrice();
   }
 
