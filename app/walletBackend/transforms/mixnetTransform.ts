@@ -3,6 +3,7 @@ import {
   RPCMixnetDetailType,
   RPCMixnetStatusType,
 } from '../types/RPCMixnetType';
+import { ProbeFailure, probeFailure } from '../utils/serverProbeOutcome';
 
 /**
  * Why a mixnet call failed, as a compile-time-enforced type
@@ -35,6 +36,16 @@ export type MixnetStatusReport =
  */
 export type MixnetDetailReport =
   | { readonly kind: 'detail'; readonly detail: string }
+  | { readonly kind: 'failure'; readonly failure: MixnetFailure };
+
+/**
+ * The validated outcome of a death-detail call: no record (every mode but
+ * `died`), the typed cause of the death (the probes' failure record — one
+ * taxonomy shape everywhere), or the call's own failure.
+ */
+export type MixnetDeathReport =
+  | { readonly kind: 'none' }
+  | { readonly kind: 'died'; readonly death: ProbeFailure }
   | { readonly kind: 'failure'; readonly failure: MixnetFailure };
 
 /**
@@ -141,4 +152,33 @@ export function transformMixnetDetail(dataReply: string): MixnetDetailReport {
   const narrationLine =
     typeof detailPayload.detail === 'string' ? detailPayload.detail : '';
   return { kind: 'detail', detail: narrationLine };
+}
+
+/**
+ * Transforms the DATA channel of a `mixnet_death_detail` reply into a
+ * validated report. Absence crosses named (`kind: "none"`), never as a bare
+ * null, and the record itself must validate as the typed failure shape.
+ *
+ * Pure function — no side effects. Total over every string input.
+ */
+export function transformMixnetDeathDetail(
+  dataReply: string,
+): MixnetDeathReport {
+  const malformed: MixnetDeathReport = {
+    kind: 'failure',
+    failure: { reason: 'malformedPayload', payload: dataReply },
+  };
+  const parsedReply: unknown = parseJsonOrNull(dataReply);
+  if (parsedReply === null || typeof parsedReply !== 'object') {
+    return malformed;
+  }
+  const payload = parsedReply as { kind?: unknown; failure?: unknown };
+  if (payload.kind === 'none') {
+    return { kind: 'none' };
+  }
+  if (payload.kind === 'detail') {
+    const death = probeFailure(payload.failure);
+    return death === null ? malformed : { kind: 'died', death };
+  }
+  return malformed;
 }

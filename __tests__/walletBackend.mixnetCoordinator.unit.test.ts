@@ -111,6 +111,39 @@ describe('deriveMixnetView', () => {
     ).toBe('none');
   });
 
+  it('carries the death detail only in the died state, and degrades to the bare verdict', () => {
+    const death = {
+      kind: 'died' as const,
+      death: {
+        stage: 'remote-tls',
+        target: 'gateway.example:443',
+        causeChain: ['handshake eof'],
+      },
+    };
+    const died = {
+      kind: 'status' as const,
+      mode: RPCMixnetModeEnum.died,
+      socks5Addr: null,
+    };
+    expect(deriveMixnetView(died, noDetail, death).deathDetail).toEqual(
+      death.death,
+    );
+    expect(deriveMixnetView(died, noDetail, null).deathDetail).toBeNull();
+    expect(
+      deriveMixnetView(died, noDetail, {
+        kind: 'failure',
+        failure: { reason: 'nativeRejection', message: 'gone' },
+      }).deathDetail,
+    ).toBeNull();
+    expect(
+      deriveMixnetView(
+        { kind: 'status', mode: RPCMixnetModeEnum.ready, socks5Addr: '127.0.0.1:1' },
+        noDetail,
+        death,
+      ).deathDetail,
+    ).toBeNull();
+  });
+
   it('surfaces the narration only while bootstrapping', () => {
     const narration = { kind: 'detail' as const, detail: 'attempt 2/10' };
     expect(

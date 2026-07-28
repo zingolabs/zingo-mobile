@@ -166,7 +166,12 @@ function asRecord(value: unknown): Record<string, unknown> | null {
     : null;
 }
 
-function probeFailure(value: unknown): ProbeFailure | null {
+/**
+ * Validates an untrusted bridge value as the typed probe-failure record.
+ * Exported for the mixnet death-detail transform, which carries the same
+ * record (one failure shape everywhere the taxonomy crosses the bridge).
+ */
+export function probeFailure(value: unknown): ProbeFailure | null {
   const failure = asRecord(value);
   if (
     failure === null ||

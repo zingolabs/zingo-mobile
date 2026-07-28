@@ -847,6 +847,8 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
+
+
 // For large crates we prevent `MethodTooLargeException` (see #2340)
 // N.B. the name of the extension is very misleading, since it is 
 // rather `InterfaceTooLargeException`, caused by too many methods 
@@ -947,6 +949,8 @@ fun uniffi_zingo_checksum_func_init_new(
 fun uniffi_zingo_checksum_func_migration_status(
 ): Short
 fun uniffi_zingo_checksum_func_mixnet_bootstrap_detail(
+): Short
+fun uniffi_zingo_checksum_func_mixnet_death_detail(
 ): Short
 fun uniffi_zingo_checksum_func_mixnet_ip_correlation_disclaimer(
 ): Short
@@ -1128,6 +1132,8 @@ fun uniffi_zingo_fn_func_init_new(`serveruri`: RustBuffer.ByValue,`birthday`: In
 fun uniffi_zingo_fn_func_migration_status(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_mixnet_bootstrap_detail(uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_zingo_fn_func_mixnet_death_detail(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_mixnet_ip_correlation_disclaimer(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1432,6 +1438,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_mixnet_bootstrap_detail() != 12980.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_zingo_checksum_func_mixnet_death_detail() != 24752.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_mixnet_ip_correlation_disclaimer() != 47567.toShort()) {
@@ -2400,6 +2409,38 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
 /**
  * @suppress
  */
+public object FfiConverterOptionalTypeProbeFailure: FfiConverterRustBuffer<ProbeFailure?> {
+    override fun read(buf: ByteBuffer): ProbeFailure? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterTypeProbeFailure.read(buf)
+    }
+
+    override fun allocationSize(value: ProbeFailure?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterTypeProbeFailure.allocationSize(value)
+        }
+    }
+
+    override fun write(value: ProbeFailure?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterTypeProbeFailure.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
 public object FfiConverterSequenceString: FfiConverterRustBuffer<List<kotlin.String>> {
     override fun read(buf: ByteBuffer): List<kotlin.String> {
         val len = buf.getInt()
@@ -2901,6 +2942,16 @@ public object FfiConverterSequenceTypeSyncProbeStage: FfiConverterRustBuffer<Lis
             return FfiConverterString.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_mixnet_bootstrap_detail(
+        _status)
+}
+    )
+    }
+    
+
+    @Throws(ZingolibException::class) fun `mixnetDeathDetail`(): ProbeFailure? {
+            return FfiConverterOptionalTypeProbeFailure.lift(
+    uniffiRustCallWithError(ZingolibException) { _status ->
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_mixnet_death_detail(
         _status)
 }
     )

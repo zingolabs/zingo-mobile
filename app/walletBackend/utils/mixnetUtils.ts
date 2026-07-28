@@ -1,8 +1,10 @@
 import RPCModule from '../../RPCModule';
 import {
+  MixnetDeathReport,
   MixnetDetailReport,
   MixnetStatusReport,
   describeRejection,
+  transformMixnetDeathDetail,
   transformMixnetDetail,
   transformMixnetStatus,
 } from '../transforms/mixnetTransform';
@@ -62,6 +64,18 @@ export async function getMixnetStatus(): Promise<MixnetStatusReport> {
 export async function getMixnetBootstrapDetail(): Promise<MixnetDetailReport> {
   try {
     return transformMixnetDetail(await RPCModule.mixnetBootstrapDetailInfo());
+  } catch (thrown: unknown) {
+    return { kind: 'failure', failure: describeRejection(thrown) };
+  }
+}
+
+/**
+ * Why the transport died, as the typed failure record, while the mode is
+ * `died` and the watcher held a cause; `none` in every other mode.
+ */
+export async function getMixnetDeathDetail(): Promise<MixnetDeathReport> {
+  try {
+    return transformMixnetDeathDetail(await RPCModule.mixnetDeathDetailInfo());
   } catch (thrown: unknown) {
     return { kind: 'failure', failure: describeRejection(thrown) };
   }

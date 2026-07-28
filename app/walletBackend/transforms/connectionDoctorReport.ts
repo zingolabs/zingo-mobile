@@ -31,7 +31,13 @@ export type DoctorRun =
  */
 export const DOCTOR_REPORT_HEADLINE = 'zingo connection doctor report';
 
-function failureLines(failure: ProbeFailure): string[] {
+/**
+ * The one renderer for a typed failure record: the stage and target, then
+ * the cause chain indented. Exported so every surface showing a
+ * `ProbeFailure` (the Doctor, the mixnet death detail) prints the same
+ * shape.
+ */
+export function failureLines(failure: ProbeFailure): string[] {
   return [
     `failed at ${failure.stage} to ${failure.target}`,
     ...failure.causeChain.map(cause => `  - ${cause}`),

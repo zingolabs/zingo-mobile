@@ -3112,6 +3112,19 @@ pub fn mixnet_bootstrap_detail() -> Result<String, ZingolibError> {
     })
 }
 
+/// Why the transport died, while Mixnet Mode is `died` and the watcher held
+/// a typed cause. Crosses fielded (the probes' ProbeFailure dictionary), so
+/// a `died` verdict carries its stage, target, and cause chain without
+/// anyone parsing prose; None outside the `died` mode.
+pub fn mixnet_death_detail() -> Result<Option<ProbeFailure>, ZingolibError> {
+    with_initialized_lightclient_read(|lightclient| {
+        Ok(lightclient
+            .mixnet_death_detail()
+            .as_ref()
+            .map(probe_failure))
+    })
+}
+
 /// The canonical IP-correlation disclaimer (ZIP-0318): Mixnet Mode covers only
 /// transaction broadcast and price-fetch, and synchronization still exposes
 /// the client IP to the sync indexer. One constant from zingolib so every

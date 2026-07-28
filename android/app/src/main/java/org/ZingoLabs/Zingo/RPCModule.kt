@@ -872,6 +872,22 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun mixnetDeathDetailInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "mixnet_death_detail") {
+            uniffi.zingo.initLogging()
+            val detail = uniffi.zingo.mixnetDeathDetail()
+            // Absence crosses named, not null: outside `died` no record exists.
+            (
+                if (detail == null) {
+                    JSONObject().put("kind", "none")
+                } else {
+                    JSONObject().put("kind", "detail").put("failure", probeFailureJson(detail))
+                }
+            ).toString()
+        }
+    }
+
+    @ReactMethod
     fun mixnetIpCorrelationDisclaimerInfo(promise: Promise) {
         FfiOutcome.settling(promise, "mixnet_ip_correlation_disclaimer") {
             uniffi.zingo.initLogging()

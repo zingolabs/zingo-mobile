@@ -31,6 +31,7 @@ import {
   attachMixnet,
   disableMixnet,
   getMixnetBootstrapDetail,
+  getMixnetDeathDetail,
   getMixnetStatus,
 } from '../utils/mixnetUtils';
 import { recordMixnetTransportReady } from '../utils/mixnetGate';
@@ -217,6 +218,10 @@ export class MixnetCoordinator {
     const narration = this.isBootstrapping()
       ? await getMixnetBootstrapDetail()
       : null;
-    this.onChange(deriveMixnetView(status, narration));
+    const death =
+      status.kind === 'status' && status.mode === RPCMixnetModeEnum.died
+        ? await getMixnetDeathDetail()
+        : null;
+    this.onChange(deriveMixnetView(status, narration, death));
   }
 }
