@@ -2279,7 +2279,7 @@ dependencies = [
 [[package]]
 name = "pepper-sync"
 version = "0.5.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=attach_retune#2d78c1be3d9c2f7e212765a22a9b7599421dd46f"
+source = "git+https://github.com/zingolabs/zingolib?branch=price_sources#47e44b79e2737806f814acde4764f7bb41ab9af5"
 dependencies = [
  "bip32",
  "byteorder",
@@ -2309,7 +2309,7 @@ dependencies = [
  "zcash_protocol 0.10.0",
  "zcash_transparent 0.9.0",
  "zingo-memo",
- "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=attach_retune)",
+ "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=price_sources)",
  "zingo-status",
  "zip32",
 ]
@@ -5124,7 +5124,7 @@ source = "git+https://github.com/zingolabs/infrastructure.git?rev=537f84d3d81b22
 [[package]]
 name = "zingo-memo"
 version = "0.1.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=attach_retune#2d78c1be3d9c2f7e212765a22a9b7599421dd46f"
+source = "git+https://github.com/zingolabs/zingolib?branch=price_sources#47e44b79e2737806f814acde4764f7bb41ab9af5"
 dependencies = [
  "zcash_address 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "zcash_encoding",
@@ -5135,7 +5135,7 @@ dependencies = [
 [[package]]
 name = "zingo-net-diag"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=attach_retune#2d78c1be3d9c2f7e212765a22a9b7599421dd46f"
+source = "git+https://github.com/zingolabs/zingolib?branch=price_sources#47e44b79e2737806f814acde4764f7bb41ab9af5"
 
 [[package]]
 name = "zingo-netutils"
@@ -5154,7 +5154,7 @@ dependencies = [
 [[package]]
 name = "zingo-netutils"
 version = "5.0.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=attach_retune#2d78c1be3d9c2f7e212765a22a9b7599421dd46f"
+source = "git+https://github.com/zingolabs/zingolib?branch=price_sources#47e44b79e2737806f814acde4764f7bb41ab9af5"
 dependencies = [
  "http",
  "hyper-util",
@@ -5172,9 +5172,10 @@ dependencies = [
 [[package]]
 name = "zingo-price"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=attach_retune#2d78c1be3d9c2f7e212765a22a9b7599421dd46f"
+source = "git+https://github.com/zingolabs/zingolib?branch=price_sources#47e44b79e2737806f814acde4764f7bb41ab9af5"
 dependencies = [
  "byteorder",
+ "futures",
  "reqwest",
  "rust_decimal",
  "rustls 0.23.42",
@@ -5188,7 +5189,7 @@ dependencies = [
 [[package]]
 name = "zingo-status"
 version = "0.2.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=attach_retune#2d78c1be3d9c2f7e212765a22a9b7599421dd46f"
+source = "git+https://github.com/zingolabs/zingolib?branch=price_sources#47e44b79e2737806f814acde4764f7bb41ab9af5"
 dependencies = [
  "byteorder",
  "zcash_protocol 0.10.0",
@@ -5211,7 +5212,7 @@ source = "git+https://github.com/zingolabs/infrastructure.git?rev=537f84d3d81b22
 [[package]]
 name = "zingolib"
 version = "5.0.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=attach_retune#2d78c1be3d9c2f7e212765a22a9b7599421dd46f"
+source = "git+https://github.com/zingolabs/zingolib?branch=price_sources#47e44b79e2737806f814acde4764f7bb41ab9af5"
 dependencies = [
  "append-only-vec",
  "bech32",
@@ -5260,7 +5261,7 @@ dependencies = [
  "zcash_transparent 0.9.0",
  "zingo-memo",
  "zingo-net-diag",
- "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=attach_retune)",
+ "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=price_sources)",
  "zingo-price",
  "zingo-status",
  "zingo_common_components",
@@ -5271,7 +5272,7 @@ dependencies = [
 [[package]]
 name = "zingolib_testutils"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=attach_retune#2d78c1be3d9c2f7e212765a22a9b7599421dd46f"
+source = "git+https://github.com/zingolabs/zingolib?branch=price_sources#47e44b79e2737806f814acde4764f7bb41ab9af5"
 dependencies = [
  "http",
  "nonempty",
@@ -5283,7 +5284,7 @@ dependencies = [
  "zcash_local_net",
  "zcash_primitives 0.29.0",
  "zcash_protocol 0.10.0",
- "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=attach_retune)",
+ "zingo-netutils 5.0.1 (git+https://github.com/zingolabs/zingolib?branch=price_sources)",
  "zingo_common_components",
  "zingo_test_vectors",
  "zingolib",
