@@ -91,7 +91,17 @@ protocol keeps them from colliding:
    (`:app:compileAlwaysonReleaseKotlin` covers the flavors). Native
    `.so` rebuilds are required only when shipped rust changed;
    test-only upstream commits need no rebuild and the commit body says
-   so.
+   so. The staged proxy shim is part of the floor: when the bump
+   touches `zingo-netutils`, rebuild the bundle in zingolib and
+   restage (`consume-android-shim`, which stamps
+   `jniLibs/shim-provenance.txt` with the source revision); otherwise
+   run `attest-android-shim`, which proves `zingo-netutils` unchanged
+   between the staged revision and the new pin before recording the
+   attestation. The gradle gate `verifyShimProvenance` fails any APK
+   assembly whose staged shim satisfies neither, so a stale shim
+   binary cannot ride a pin bump again (it did once: the `.so` built
+   hours before zingolib ADR 0021's TLS fix rode three bumps
+   undetected and fail-closed every mixnet enable).
 4. **Upstream milestones are announced in the design doc.** The
    zingolib agent marks landed milestones (taxonomy crate, price
    timeout, lock release, sync-path probes, clearnet test gate) in
