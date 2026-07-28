@@ -462,6 +462,11 @@
     "send-blocked": "Mixnet hazır olana kadar gönderim duraklatıldı",
     "reenable": "Mixnet'i yeniden etkinleştir"
   },
+  "pricefetcher": {
+    "updated-mixnet": "Fiyat mixnet üzerinden güncellendi",
+    "updated-clearnet": "Fiyat açık ağ üzerinden güncellendi",
+    "updated": "Fiyat güncellendi"
+  },
   "header": {
     "lastupdate": "Son güncelleme:"
   },

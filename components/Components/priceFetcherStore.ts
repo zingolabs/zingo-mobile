@@ -138,6 +138,19 @@ async function doFetch(userInitiated: boolean): Promise<void> {
   if (outcome.kind === 'price') {
     d.setZecPrice(outcome.usd, Date.now());
     started = true;
+    // A user asking for the price is also asking which route carried it
+    // (the route attestation is the point of ZIP-318's price coverage), so
+    // a manual fetch names its transport and duration. The auto-refresh
+    // stays silent on success, as before.
+    if (userInitiated) {
+      const label =
+        outcome.route.kind === 'attested'
+          ? (d.translate('pricefetcher.updated-mixnet') as string)
+          : outcome.route.kind === 'clearnet'
+            ? (d.translate('pricefetcher.updated-clearnet') as string)
+            : (d.translate('pricefetcher.updated') as string);
+      d.addLastSnackbar(`${label} (${(outcome.elapsedMs / 1000).toFixed(1)} s)`);
+    }
   } else {
     if (outcome.kind === 'noData') {
       d.setZecPrice(0, 0);
