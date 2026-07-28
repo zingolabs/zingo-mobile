@@ -407,11 +407,36 @@ fn store_client(lightclient: LightClient) -> Result<(), ZingolibError> {
     Ok(())
 }
 
+/// The piggyback write (ADR 0005): pending price observations are carried
+/// into the wallet by whatever operation next obtains the write lock for
+/// its own reasons. Recording goes through the wallet's public
+/// `price_list`; it cannot set `save_required` (pub(crate) in zingolib),
+/// so the observations reach disk with the next operation that dirties
+/// the wallet — within the surface's best-effort contract.
+fn drain_price_observations_into(lightclient: &LightClient) {
+    let drained: Vec<zingo_price::Price> = {
+        let mut pending = PENDING_PRICE_OBSERVATIONS
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        pending.drain(..).collect()
+    };
+    if drained.is_empty() {
+        return;
+    }
+    RT.block_on(async {
+        let mut wallet = lightclient.wallet().write().await;
+        for observation in drained {
+            wallet.price_list.record_current_price(observation);
+        }
+    });
+}
+
 /// Runs `f` against the initialized global lightclient, under the panic
 /// guard, with the two infrastructure failures mapped to their typed
 /// variants: a poisoned lock is `LightclientLockPoisoned` (unlike
 /// `with_lightclient_write`, which recovers), and an absent client is
-/// `LightclientNotInitialized`.
+/// `LightclientNotInitialized`. Acquiring the write lock also carries any
+/// pending price observations into the wallet (the piggyback write).
 fn with_initialized_lightclient<T, F>(f: F) -> Result<T, ZingolibError>
 where
     F: FnOnce(&mut LightClient) -> Result<T, ZingolibError> + UnwindSafe,
@@ -421,7 +446,10 @@ where
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         match &mut *guard {
-            Some(lightclient) => f(lightclient),
+            Some(lightclient) => {
+                drain_price_observations_into(lightclient);
+                f(lightclient)
+            }
             None => Err(ZingolibError::LightclientNotInitialized),
         }
     })
@@ -2159,6 +2187,33 @@ pub fn zec_price() -> Result<String, ZingolibError> {
     })
 }
 
+/// Shared scaffolding for the price-surface tests: the serialization
+/// guard and the offline fixture wallet. Sibling of the private helpers
+/// in lock_discipline_tests.rs; unify them when that suite lands.
+#[cfg(test)]
+mod price_test_support {
+    use super::*;
+
+    static PRICE_TEST_SERIAL: Mutex<()> = Mutex::new(());
+
+    pub(crate) fn serialized() -> std::sync::MutexGuard<'static, ()> {
+        PRICE_TEST_SERIAL
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
+    pub(crate) fn init_offline_wallet() {
+        init_new(
+            String::new(),
+            0,
+            "main".to_string(),
+            "Medium".to_string(),
+            1,
+        )
+        .expect("the offline Indexerless wallet must initialize");
+    }
+}
+
 /// The price surface's lock-freedom contract (ADR 0005): a price fetch
 /// never obtains the LIGHTCLIENT lock, so a fetch through a half-dead
 /// tunnel cannot freeze the rest of the FFI. Each test holds the write
@@ -2170,9 +2225,14 @@ mod price_lock_freedom_tests {
 
     #[test]
     fn zec_price_settles_while_the_lightclient_write_lock_is_held() {
+        let _serial = price_test_support::serialized();
+        // No wallet: the plan must be the uninitialized refusal, reached
+        // (and settled) without the lock. reset_lightclient clears both
+        // the client and the route snapshot a sibling test may have left.
+        reset_lightclient();
         let _write_lock_held_throughout = LIGHTCLIENT
             .write()
-            .expect("this test is the first lock user in its process");
+            .expect("no serialized test leaves the lock poisoned");
 
         let (settled, observe) = std::sync::mpsc::channel();
         std::thread::spawn(move || {
@@ -2251,6 +2311,43 @@ mod price_lock_freedom_tests {
             plan_price_fetch(snapshot(MixnetMode::Died, None)),
             PriceFetchPlan::Refuse(MixnetNotReady::Died)
         ));
+    }
+}
+
+/// The piggyback half of ADR 0005: buffered price observations reach the
+/// wallet when any operation obtains the write lock for its own reasons,
+/// and never by the price fetch's own hand.
+#[cfg(test)]
+mod price_piggyback_tests {
+    use super::*;
+
+    #[test]
+    fn a_write_lock_acquisition_carries_buffered_observations_into_the_wallet() {
+        let _serial = price_test_support::serialized();
+        price_test_support::init_offline_wallet();
+        buffer_price_observation(zingo_price::Price {
+            time: 7,
+            price_usd: 1.25,
+        });
+
+        // Any write-lock operation carries the pending observations in;
+        // this closure itself does nothing.
+        with_initialized_lightclient(|_| Ok(())).expect("initialized above");
+
+        let recorded = with_initialized_lightclient(|lightclient| {
+            Ok(RT.block_on(async { lightclient.wallet().read().await.price_list.current_price() }))
+        })
+        .expect("initialized above")
+        .expect("the observation must ride the piggyback write into the wallet");
+        assert_eq!(recorded.time, 7);
+        assert_eq!(recorded.price_usd, 1.25);
+        assert!(
+            PENDING_PRICE_OBSERVATIONS
+                .lock()
+                .expect("unpoisoned")
+                .is_empty(),
+            "a carried observation leaves the window"
+        );
     }
 }
 
