@@ -17,3 +17,18 @@ export function flavorDefaultChainName(): ChainNameEnum {
     ? ChainNameEnum.testChainName
     : ChainNameEnum.mainChainName;
 }
+
+/**
+ * True when the installed APK carries the FLAG_DEBUGGABLE bit, i.e. a
+ * debug-signed build. The embedded JS bundle is always built with
+ * `--dev false`, so `__DEV__` is false in any APK that runs without
+ * Metro; debug-only surfaces handed to reporters (the Connection
+ * Doctor) gate on this constant instead. Platforms without the
+ * constant (iOS, older natives) report false.
+ */
+export function isDebuggableBuild(): boolean {
+  return (
+    (NativeModules.RPCModule as { debuggableBuild?: boolean } | undefined)
+      ?.debuggableBuild === true
+  );
+}

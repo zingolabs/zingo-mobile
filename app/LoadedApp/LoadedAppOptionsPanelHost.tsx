@@ -11,6 +11,7 @@ import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../AppState';
 import { sendEmail } from '../sendEmail';
 import { walletBackupExists } from '../walletBackend';
 import { getZingoLogo, getZingoName } from '../utils/ZingoAppData';
+import { isDebuggableBuild } from '../utils/flavor';
 import { advancedTheme, basicTheme } from '../../App';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';
@@ -169,8 +170,10 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
 
     // The Connection Doctor is a debug-build diagnostic surface (the
     // nym-diagnostics plan, Workstream A): present in the debug-signed APKs
-    // handed to reporters, hidden from stock release flavors.
-    if (__DEV__) {
+    // handed to reporters, hidden from stock release flavors. `__DEV__`
+    // covers Metro sessions; `isDebuggableBuild` covers a standalone
+    // debug-signed APK, whose embedded bundle is built with `--dev false`.
+    if (__DEV__ || isDebuggableBuild()) {
       list.push({
         id: MenuItemEnum.ConnectionDoctor,
         testID: MENU_TEST_IDS[MenuItemEnum.ConnectionDoctor],

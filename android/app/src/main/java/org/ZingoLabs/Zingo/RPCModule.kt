@@ -1,6 +1,7 @@
 package org.ZingoLabs.Zingo
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.util.Log
 import android.util.Base64
 import androidx.security.crypto.EncryptedFile
@@ -29,11 +30,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
      * per-flavor res string because BuildConfig generation is deliberately
      * disabled for build reproducibility; the app reads it only when no
      * persisted server setting exists yet.
+     *
+     * `debuggableBuild` reports the APK's actual FLAG_DEBUGGABLE bit, read
+     * from ApplicationInfo rather than BuildConfig (same reproducibility
+     * rule as above). The bundled JS is built with `--dev false` for every
+     * variant of this app, so `__DEV__` cannot tell a debug-signed handoff
+     * APK from a release one; this constant can.
      */
     override fun getConstants(): Map<String, Any> {
         return mapOf(
             "defaultChainName" to
                 applicationContext.resources.getString(R.string.default_chain_name),
+            "debuggableBuild" to
+                ((applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0),
         )
     }
 
