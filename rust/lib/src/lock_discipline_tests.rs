@@ -61,11 +61,26 @@ fn answer_under_held_read_lock(
     json::parse(&answer).expect("the endpoint answers well-formed JSON")
 }
 
+/// The serialized fixture: takes the guard, builds the offline wallet, and
+/// keeps the guard alive for the caller's scope.
+fn fixture() -> std::sync::MutexGuard<'static, ()> {
+    let serial = serialized();
+    init_offline_wallet();
+    serial
+}
+
+/// [`fixture`] + [`answer_under_held_read_lock`] in one call, for the tests
+/// that need nothing between wallet setup and the endpoint's answer.
+fn fixture_answer(
+    endpoint: impl FnOnce() -> Result<String, ZingolibError> + Send + 'static,
+) -> json::JsonValue {
+    let _serial = fixture();
+    answer_under_held_read_lock(endpoint)
+}
+
 #[test]
 fn value_transfers_answer_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_value_transfers);
+    let answer = fixture_answer(get_value_transfers);
     // A fresh wallet has no history, and the empty list still arrives
     // under its named key.
     assert!(
@@ -76,9 +91,7 @@ fn value_transfers_answer_beside_a_held_read_guard() {
 
 #[test]
 fn status_sync_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(status_sync);
+    let answer = fixture_answer(status_sync);
     // A never-synced wallet reports an empty scan plan with zero progress.
     assert!(
         answer["scan_ranges"].is_array() && answer["scan_ranges"].is_empty(),
@@ -93,9 +106,7 @@ fn status_sync_answers_beside_a_held_read_guard() {
 
 #[test]
 fn seed_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_seed);
+    let answer = fixture_answer(get_seed);
     // The NewSeed fixture carries a 24-word mnemonic, its Library Birthday,
     // and the wallet's own chain.
     assert_eq!(
@@ -114,9 +125,7 @@ fn seed_answers_beside_a_held_read_guard() {
 
 #[test]
 fn ufvk_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_ufvk);
+    let answer = fixture_answer(get_ufvk);
     // The seed wallet's spending key views down to a mainnet UFVK.
     assert!(
         answer["ufvk"]
@@ -143,8 +152,7 @@ fn fixture_unified_address() -> String {
 
 #[test]
 fn messages_answer_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
+    let _fixture = fixture();
     let own_address = fixture_unified_address();
     let answer = answer_under_held_read_lock(move || get_messages(own_address));
     // No history means no messages, still under the named key.
@@ -156,9 +164,7 @@ fn messages_answer_beside_a_held_read_guard() {
 
 #[test]
 fn balance_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_balance);
+    let answer = fixture_answer(get_balance);
     // Every pool balance of the fresh wallet is zero, and all four pools
     // (including Ironwood) report.
     let mut fields = 0;
@@ -179,9 +185,7 @@ fn balance_answers_beside_a_held_read_guard() {
 
 #[test]
 fn total_memobytes_answer_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_total_memobytes_to_address);
+    let answer = fixture_answer(get_total_memobytes_to_address);
     // No sends yet, so the per-address tally is an empty object.
     assert!(
         answer.is_object() && answer.is_empty(),
@@ -191,9 +195,7 @@ fn total_memobytes_answer_beside_a_held_read_guard() {
 
 #[test]
 fn total_value_to_address_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_total_value_to_address);
+    let answer = fixture_answer(get_total_value_to_address);
     // No sends yet, so the per-address tally is an empty object.
     assert!(
         answer.is_object() && answer.is_empty(),
@@ -203,9 +205,7 @@ fn total_value_to_address_answers_beside_a_held_read_guard() {
 
 #[test]
 fn total_spends_to_address_answer_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_total_spends_to_address);
+    let answer = fixture_answer(get_total_spends_to_address);
     // No sends yet, so the per-address tally is an empty object.
     assert!(
         answer.is_object() && answer.is_empty(),
@@ -215,8 +215,7 @@ fn total_spends_to_address_answer_beside_a_held_read_guard() {
 
 #[test]
 fn spendable_balance_with_address_refuses_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
+    let _fixture = fixture();
     // A never-synced wallet cannot propose, so the endpoint's correct
     // answer is the typed Send refusal, still delivered beside the guard.
     let outcome = outcome_under_held_read_lock(|| {
@@ -236,9 +235,7 @@ fn spendable_balance_with_address_refuses_beside_a_held_read_guard() {
 
 #[test]
 fn spendable_balance_total_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_spendable_balance_total);
+    let answer = fixture_answer(get_spendable_balance_total);
     // A fresh wallet holds nothing spendable.
     assert_eq!(
         answer["spendable_balance"].as_u64(),
@@ -249,8 +246,7 @@ fn spendable_balance_total_answers_beside_a_held_read_guard() {
 
 #[test]
 fn check_my_address_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
+    let _fixture = fixture();
     let own_address = fixture_unified_address();
     let expected_encoding = own_address.clone();
     let answer = answer_under_held_read_lock(move || check_my_address(own_address));
@@ -279,9 +275,7 @@ fn check_my_address_answers_beside_a_held_read_guard() {
 
 #[test]
 fn wallet_kind_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(wallet_kind);
+    let answer = fixture_answer(wallet_kind);
     // The offline fixture is a NewSeed wallet, so its kind is the mnemonic
     // one with every receiver present.
     assert_eq!(
@@ -300,9 +294,7 @@ fn wallet_kind_answers_beside_a_held_read_guard() {
 
 #[test]
 fn unified_addresses_answer_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_unified_addresses);
+    let answer = fixture_answer(get_unified_addresses);
     // A fresh wallet derives exactly one unified address, Orchard-only,
     // for account 0.
     assert_eq!(answer.len(), 1, "one derived address: {answer}");
@@ -319,9 +311,7 @@ fn unified_addresses_answer_beside_a_held_read_guard() {
 
 #[test]
 fn transparent_addresses_answer_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_transparent_addresses);
+    let answer = fixture_answer(get_transparent_addresses);
     // A fresh wallet derives exactly one external transparent address for
     // account 0.
     assert_eq!(answer.len(), 1, "one derived address: {answer}");
@@ -338,9 +328,7 @@ fn transparent_addresses_answer_beside_a_held_read_guard() {
 
 #[test]
 fn wallet_save_required_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_wallet_save_required);
+    let answer = fixture_answer(get_wallet_save_required);
     // A freshly created wallet has never been saved, so a save is required.
     assert_eq!(
         answer["save_required"].as_bool(),
@@ -351,9 +339,7 @@ fn wallet_save_required_answers_beside_a_held_read_guard() {
 
 #[test]
 fn config_wallet_performance_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_config_wallet_performance);
+    let answer = fixture_answer(get_config_wallet_performance);
     // The fixture initializes with the Medium performance level.
     assert_eq!(
         answer["performance_level"].as_str(),
@@ -364,9 +350,7 @@ fn config_wallet_performance_answers_beside_a_held_read_guard() {
 
 #[test]
 fn wallet_version_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_wallet_version);
+    let answer = fixture_answer(get_wallet_version);
     // A freshly created wallet reads back at the version it was written
     // with, so the two versions agree and are positive.
     let current = answer["current_version"].as_u32();
@@ -383,9 +367,7 @@ fn wallet_version_answers_beside_a_held_read_guard() {
 
 #[test]
 fn latest_block_wallet_answers_beside_a_held_read_guard() {
-    let _serial = serialized();
-    init_offline_wallet();
-    let answer = answer_under_held_read_lock(get_latest_block_wallet);
+    let answer = fixture_answer(get_latest_block_wallet);
     // A fresh offline wallet has no last known chain height, which this
     // endpoint reports as 0.
     assert_eq!(
