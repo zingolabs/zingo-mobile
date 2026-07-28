@@ -70,6 +70,7 @@ import {
 } from '../../app/AppState';
 import { getLatestBlockServerInfo } from '../../app/walletBackend';
 import { getMixnetIpCorrelationDisclaimer } from '../../app/walletBackend/utils/mixnetUtils';
+import { failureLines } from '../../app/walletBackend/transforms/connectionDoctorReport';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -1740,6 +1741,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                               'settings.nym-enhanced-privacy',
                             ) as string)}
                       </FadeText>
+                      {/* The typed cause of a died transport (stage, target,
+                          cause chain), so "connection lost" carries its why.
+                          Untranslated: taxonomy terms a support reply keys
+                          on, same as the Doctor's report lines. */}
+                      {mixnetView.deathDetail !== null && (
+                        <View testID="settings.mixnet-death-detail">
+                          <FadeText>
+                            {failureLines(mixnetView.deathDetail).join('\n')}
+                          </FadeText>
+                        </View>
+                      )}
                     </View>
                     <TouchableOpacity
                       testID="settings.mixnet-toggle"

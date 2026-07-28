@@ -1,8 +1,10 @@
 import { RPCMixnetModeEnum } from '../enums/RPCMixnetModeEnum';
 import {
+  MixnetDeathReport,
   MixnetDetailReport,
   MixnetStatusReport,
 } from './mixnetTransform';
+import { ProbeFailure } from '../utils/serverProbeOutcome';
 
 /**
  * What the user may do about the current mixnet state: nothing, wait for
@@ -22,6 +24,13 @@ export type MixnetView = {
   readonly statusKey: string;
   readonly socks5Addr: string | null;
   readonly narration: string | null;
+  /**
+   * Why the transport died — the typed net-diag record — while the status
+   * is `died` and the watcher held a cause; null in every other state, so
+   * a screen showing "connection lost" can also show the stage, target,
+   * and cause chain instead of a bare verdict.
+   */
+  readonly deathDetail: ProbeFailure | null;
   readonly sendBlocked: boolean;
   readonly recovery: MixnetRecoveryAction;
 };
@@ -35,6 +44,7 @@ export const INITIAL_MIXNET_VIEW: MixnetView = {
   statusKey: 'mixnet.status.bootstrapping',
   socks5Addr: null,
   narration: null,
+  deathDetail: null,
   sendBlocked: true,
   recovery: 'wait',
 };
@@ -51,6 +61,7 @@ export const INITIAL_MIXNET_VIEW: MixnetView = {
 export function deriveMixnetView(
   status: MixnetStatusReport,
   detail: MixnetDetailReport | null,
+  death: MixnetDeathReport | null = null,
 ): MixnetView {
   const narration =
     detail !== null && detail.kind === 'detail' && detail.detail !== ''
@@ -62,6 +73,7 @@ export function deriveMixnetView(
       statusKey: 'mixnet.status.unknown',
       socks5Addr: null,
       narration: null,
+      deathDetail: null,
       sendBlocked: true,
       recovery: 'reenable',
     };
@@ -73,6 +85,7 @@ export function deriveMixnetView(
         statusKey: 'mixnet.status.off',
         socks5Addr: null,
         narration: null,
+        deathDetail: null,
         sendBlocked: false,
         recovery: 'reenable',
       };
@@ -81,6 +94,7 @@ export function deriveMixnetView(
         statusKey: 'mixnet.status.bootstrapping',
         socks5Addr: null,
         narration,
+        deathDetail: null,
         sendBlocked: true,
         recovery: 'wait',
       };
@@ -89,6 +103,7 @@ export function deriveMixnetView(
         statusKey: 'mixnet.status.ready',
         socks5Addr: status.socks5Addr,
         narration: null,
+        deathDetail: null,
         sendBlocked: false,
         recovery: 'none',
       };
@@ -97,6 +112,10 @@ export function deriveMixnetView(
         statusKey: 'mixnet.status.died',
         socks5Addr: null,
         narration: null,
+        // A death report that failed or is absent degrades to the bare
+        // verdict, never blocks it: the detail is evidence, not policy.
+        deathDetail:
+          death !== null && death.kind === 'died' ? death.death : null,
         sendBlocked: true,
         recovery: 'reenable',
       };
