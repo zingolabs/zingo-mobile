@@ -30,7 +30,7 @@ serde_json = { workspace = true }
 zip32 = { workspace = true }
 thiserror = { workspace = true }
 once_cell = { workspace = true }
-zingo-price = { git = "https://github.com/zingolabs/zingolib", branch = "socks5_typed_timeout", version = "0.1.0" }
+zingo-price = { workspace = true }
 
 [build-dependencies]
 uniffi_build = { workspace = true, features = ["builtin-bindgen"] }
