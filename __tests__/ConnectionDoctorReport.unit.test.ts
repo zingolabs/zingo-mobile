@@ -64,6 +64,9 @@ describe('connectionDoctorReport', () => {
       },
     ]);
     expect(report).toContain('### https://lwd1.zcash-infra.com:9067');
+    // The staged section names its transport: the sync path is always
+    // clearnet, and unlabeled stage lines were misread as mixnet results.
+    expect(report).toContain('sync-path probe (clearnet):');
     expect(report).toContain('- tcp-connect: ok in 45 ms');
     expect(report).toContain(
       '- tls-channel: FAILED in 15000 ms — failed at remote-tls to lwd1.zcash-infra.com:9067',

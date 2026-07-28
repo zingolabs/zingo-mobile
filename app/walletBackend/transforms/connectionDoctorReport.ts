@@ -109,7 +109,11 @@ function pairedLines(outcome: ServerProbeOutcome): string[] {
  * screen's rows so the user copies exactly what they saw.
  */
 export function doctorRunLines(run: DoctorRun): string[] {
-  const lines = syncLines(run.sync);
+  // The sync path never rides the mixnet (ZIP-318: only broadcast and
+  // price-fetch are covered), so every staged line is a clearnet fact.
+  // The heading says so, because bare stage lines were misread as mixnet
+  // results in the field; the paired section already names its transports.
+  const lines = ['sync-path probe (clearnet):', ...syncLines(run.sync)];
   if (run.kind === 'currentServer') {
     lines.push('covered-surface probe (paired):');
     lines.push(...pairedLines(run.paired));
