@@ -42,6 +42,15 @@ import {
  */
 export type StartMixnetTransport = () => Promise<string>;
 
+/**
+ * Whether a publication is still the latest one issued. Pure. A
+ * publication that awaited a native narration fetch may resolve after a
+ * newer immediate one; only the latest may reach the screen (#1228).
+ */
+export function isCurrentPublication(seq: number, latest: number): boolean {
+  return seq === latest;
+}
+
 /** How often the coordinator polls while the transport is bootstrapping. */
 export const BOOTSTRAP_POLL_MILLIS = 2_000;
 
@@ -135,19 +144,31 @@ export class MixnetCoordinator {
     );
   }
 
+  private publishSeq: number = 0;
+
   private publish(status: MixnetStatusReport): void {
     const wasBootstrapping = this.isBootstrapping();
     this.lastStatus = status;
-    this.publishView(status);
+    this.publishSeq += 1;
+    this.publishView(status, this.publishSeq);
     if (this.pollTimerID !== undefined && wasBootstrapping !== this.isBootstrapping()) {
       this.schedulePolling();
     }
   }
 
-  private async publishView(status: MixnetStatusReport): Promise<void> {
+  private async publishView(
+    status: MixnetStatusReport,
+    seq: number,
+  ): Promise<void> {
     const narration = this.isBootstrapping()
       ? await getMixnetBootstrapDetail()
       : null;
+    // The narration await opened a gap; a newer publication may have
+    // superseded this one meanwhile, and stale state must not reach the
+    // screen (#1228).
+    if (!isCurrentPublication(seq, this.publishSeq)) {
+      return;
+    }
     this.onChange(deriveMixnetView(status, narration));
   }
 }
