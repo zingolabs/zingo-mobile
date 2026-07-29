@@ -11,6 +11,7 @@ use log::Level;
 
 use std::any::Any;
 use std::backtrace::Backtrace;
+use std::collections::VecDeque;
 use std::num::NonZeroU32;
 use std::panic::{self, PanicHookInfo, UnwindSafe};
 use std::path::PathBuf;
@@ -58,8 +59,7 @@ use zingolib::wallet::keys::{
     unified::{ReceiverSelection, UnifiedKeyStore},
 };
 use zingolib::wallet::migration::{
-    MigrationParams, MigrationPhase, RecommendedAction, parts::PartState, parts::SigningStrategy,
-    split::plan_hash,
+    MigrationParams, MigrationPhase, RecommendedAction, parts::SigningStrategy, split::plan_hash,
 };
 
 use zingo_common_components::protocol::ActivationHeights;
@@ -84,6 +84,8 @@ pub enum ZingolibError {
     Rescan(String),
     #[error("Error: read: {0}")]
     Read(String),
+    #[error("Error: mixnet: {0}")]
+    Mixnet(String),
     #[error("Error: send: {0}")]
     Send(String),
     #[error("Error: shield: {0}")]
@@ -104,14 +106,10 @@ pub enum ZingolibError {
     MigrationAlreadyInProgress,
     #[error("Error: consent stale: {0}")]
     MigrationConsentStale(String),
-    #[error("Error: cadence fixed: {0}")]
-    MigrationCadenceFixed(String),
     #[error("Error: note splitting: {0}")]
     MigrationSplit(String),
     #[error("Error: migration: {0}")]
     Migration(String),
-    #[error("Error: mixnet: {0}")]
-    Mixnet(String),
 }
 
 impl ZingolibError {
@@ -128,12 +126,27 @@ impl ZingolibError {
     }
 }
 
+/// Renders an error with its full `source` chain, deepest cause last.
+/// Display alone truncates: the price fetch's UnknownIssuer root cause hid
+/// for a whole debugging session under three layers of "request failed" —
+/// the chain is the diagnostic, so the FFI text carries all of it.
+fn error_chain_text(e: &dyn std::error::Error) -> String {
+    let mut text = e.to_string();
+    let mut source = e.source();
+    while let Some(cause) = source {
+        text.push_str(": ");
+        text.push_str(&cause.to_string());
+        source = cause.source();
+    }
+    text
+}
+
 /// The one pure funnel from zingolib's error taxonomy to the FFI's typed
 /// variants. Exhaustive at every level on purpose: a new zingolib variant
 /// fails compilation here instead of degrading to prose in the data channel.
 fn ffi_error(e: LightClientError) -> ZingolibError {
     use zingolib::lightclient::error::MigrationError;
-    let text = e.to_string();
+    let text = error_chain_text(&e);
     match e {
         LightClientError::SyncLaunchError
         | LightClientError::SyncNotRunning
@@ -173,11 +186,14 @@ fn ffi_error(e: LightClientError) -> ZingolibError {
             MigrationError::NoMigration => ZingolibError::MigrationNotInProgress,
             MigrationError::AlreadyInProgress => ZingolibError::MigrationAlreadyInProgress,
             MigrationError::ConsentStale => ZingolibError::MigrationConsentStale(text),
-            MigrationError::CadenceFixed => ZingolibError::MigrationCadenceFixed(text),
             MigrationError::ScheduledMigrationExists => ZingolibError::MigrationAlreadyInProgress,
             MigrationError::PreSignedUnavailable
             | MigrationError::NoteSplittingRequired
             | MigrationError::DifferentAccount
+            // CadenceFixed is unreachable from this app: the cadence surface
+            // is retired and nothing calls reschedule_parts. Mapped for
+            // exhaustiveness only.
+            | MigrationError::CadenceFixed
             | MigrationError::IronwoodEraTooYoung { .. } => ZingolibError::Migration(text),
             MigrationError::SplitDidNotConverge(_)
             | MigrationError::SplitTransactionFailed(_)
@@ -319,11 +335,11 @@ lazy_static! {
 // Live progress of the in-flight immediate Orchard->Ironwood drain, held in a
 // side channel *outside* the LIGHTCLIENT lock. `drain_orchard_to_ironwood`
 // holds LIGHTCLIENT.write() for its whole `block_on`, so a `drain_status` poll
-// that read the lightclient would deadlock behind it. Instead the drain stashes
-// a cloned `ImmediateMigrationProgressHandle` (an independent
+// that read the lightclient would deadlock behind it. Instead the immediate
+// migration stashes a cloned `ImmediateMigrationProgressHandle` (an independent
 // Arc<Mutex<Option<ImmediateMigrationStatus>>>) here; the poller reads only
-// this global and never contends for the drain's wallet/lightclient lock.
-// `None` between drains.
+// this global and never contends for the migration's wallet/lightclient lock.
+// `None` between runs.
 lazy_static! {
     static ref DRAIN_PROGRESS: RwLock<Option<zingolib::lightclient::migrate::ImmediateMigrationProgressHandle>> =
         RwLock::new(None);
@@ -340,15 +356,20 @@ lazy_static! {
         RwLock::new(None);
 }
 
-// Live progress of the in-flight Phase 1 note-splitting round, the split-path
-// counterpart to DRAIN_PROGRESS. `quick_split` holds LIGHTCLIENT.write() for
-// its whole `block_on`, so a `split_status` poll reads this cloned
-// `SplitProgressHandle` (an independent Arc) instead of the lightclient. `None`
-// between rounds.
-lazy_static! {
-    static ref SPLIT_PROGRESS: RwLock<Option<zingolib::lightclient::migrate::SplitProgressHandle>> =
-        RwLock::new(None);
-}
+// The mixnet state as last observed by an FFI call that already held the
+// lightclient (store_client, enable/attach/disable, and the app's
+// mixnet_mode poll). The price surface plans its route from this snapshot
+// and never touches the LIGHTCLIENT lock (ADR 0005), accepting
+// poll-interval staleness. `None` until a wallet initializes.
+static MIXNET_SNAPSHOT: Lazy<Mutex<Option<MixnetSnapshot>>> = Lazy::new(|| Mutex::new(None));
+
+// Price observations awaiting a piggyback write into the wallet, outside
+// every wallet lock. Persistence is best-effort by design (ADR 0005): an
+// observation reaches the wallet only if some other operation takes the
+// write lock while it is buffered, and the window is bounded — the oldest
+// observation is dropped when the 1001st arrives.
+static PENDING_PRICE_OBSERVATIONS: Lazy<Mutex<VecDeque<zingo_price::Price>>> =
+    Lazy::new(|| Mutex::new(VecDeque::new()));
 
 lazy_static! {
     pub static ref RT: Runtime = tokio::runtime::Runtime::new().unwrap();
@@ -371,23 +392,50 @@ where
 }
 
 fn reset_lightclient() {
+    clear_mixnet_snapshot();
     with_lightclient_write(|slot| {
         *slot = None;
     });
 }
 
 fn store_client(lightclient: LightClient) -> Result<(), ZingolibError> {
+    refresh_mixnet_snapshot(&lightclient);
     with_lightclient_write(|slot| {
         *slot = Some(lightclient);
     });
     Ok(())
 }
 
+/// The piggyback write (ADR 0005): pending price observations are carried
+/// into the wallet by whatever operation next obtains the write lock for
+/// its own reasons. Recording goes through the wallet's public
+/// `price_list`; it cannot set `save_required` (pub(crate) in zingolib),
+/// so the observations reach disk with the next operation that dirties
+/// the wallet — within the surface's best-effort contract.
+fn drain_price_observations_into(lightclient: &LightClient) {
+    let drained: Vec<zingo_price::Price> = {
+        let mut pending = PENDING_PRICE_OBSERVATIONS
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        pending.drain(..).collect()
+    };
+    if drained.is_empty() {
+        return;
+    }
+    RT.block_on(async {
+        let mut wallet = lightclient.wallet().write().await;
+        for observation in drained {
+            wallet.price_list.record_current_price(observation);
+        }
+    });
+}
+
 /// Runs `f` against the initialized global lightclient, under the panic
 /// guard, with the two infrastructure failures mapped to their typed
 /// variants: a poisoned lock is `LightclientLockPoisoned` (unlike
 /// `with_lightclient_write`, which recovers), and an absent client is
-/// `LightclientNotInitialized`.
+/// `LightclientNotInitialized`. Acquiring the write lock also carries any
+/// pending price observations into the wallet (the piggyback write).
 fn with_initialized_lightclient<T, F>(f: F) -> Result<T, ZingolibError>
 where
     F: FnOnce(&mut LightClient) -> Result<T, ZingolibError> + UnwindSafe,
@@ -397,7 +445,10 @@ where
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         match &mut *guard {
-            Some(lightclient) => f(lightclient),
+            Some(lightclient) => {
+                drain_price_observations_into(lightclient);
+                f(lightclient)
+            }
             None => Err(ZingolibError::LightclientNotInitialized),
         }
     })
@@ -1277,11 +1328,6 @@ mod error_funnel_tests {
                 "MigrationConsentStale",
             ),
             (
-                LightClientError::MigrationError(MigrationError::CadenceFixed),
-                |e| matches!(e, ZingolibError::MigrationCadenceFixed(_)),
-                "MigrationCadenceFixed",
-            ),
-            (
                 LightClientError::MigrationError(MigrationError::PreSignedUnavailable),
                 |e| matches!(e, ZingolibError::Migration(_)),
                 "Migration",
@@ -1572,19 +1618,10 @@ pub fn poll_sync() -> Result<String, ZingolibError> {
         PollReport::NoHandle => Ok("Sync task has not been launched.".to_string()),
         PollReport::NotReady => Ok("Sync task is not complete.".to_string()),
         PollReport::Ready(result) => match result {
-            Ok(sync_result) => {
-                // A bucket boundary's tree state is witnessable only while its
-                // checkpoint is retained, so the witness has to be taken on the
-                // sync that crosses it. `await_sync` does this for its own
-                // callers; we drive sync through the poll, so it falls here.
-                // No-op without a scheduled migration.
-                RT.block_on(lightclient.capture_migration_witnesses())
-                    .map_err(ffi_error)?;
-                Ok(json::object! {
-                    "sync_complete" => json::JsonValue::from(sync_result)
-                }
-                .pretty(2))
+            Ok(sync_result) => Ok(json::object! {
+                "sync_complete" => json::JsonValue::from(sync_result)
             }
+            .pretty(2)),
             Err(e) => Err(ZingolibError::sync(e)),
         },
     })
@@ -2005,16 +2042,323 @@ pub fn get_total_spends_to_address() -> Result<String, ZingolibError> {
     })
 }
 
+// ----- Price surface (lock-free; ADR 0005) -----
+
+/// One observation of the mixnet state, taken by a caller that already
+/// held the lightclient for its own reasons.
+#[derive(Clone)]
+struct MixnetSnapshot {
+    mode: zingolib::nym::MixnetMode,
+    socks5_addr: Option<String>,
+}
+
+/// The bound on [`PENDING_PRICE_OBSERVATIONS`].
+const PRICE_OBSERVATION_CAP: usize = 1000;
+
+/// Admit one observation into the bounded window, dropping the oldest
+/// when the window would exceed [`PRICE_OBSERVATION_CAP`]. Pure; the
+/// caller owns the locking.
+fn admit_price_observation(
+    mut window: VecDeque<zingo_price::Price>,
+    observation: zingo_price::Price,
+) -> VecDeque<zingo_price::Price> {
+    if window.len() == PRICE_OBSERVATION_CAP {
+        window.pop_front();
+    }
+    window.push_back(observation);
+    window
+}
+
+/// Everything a price fetch can do, planned purely from the snapshot.
+/// Exhaustive by construction: both fetch legs live in zingolib's
+/// [`MixnetRoute`](zingolib::nym::MixnetRoute), both refusals in
+/// [`MixnetNotReady`](zingolib::nym::MixnetNotReady), so a new mixnet
+/// state must pass through `resolve_route` before this compiles.
+enum PriceFetchPlan {
+    /// No wallet has initialized this process.
+    RefuseUninitialized,
+    /// The fail-closed refusal (ADR 0011), naming the actual state.
+    Refuse(zingolib::nym::MixnetNotReady),
+    /// Fetch over the resolved route.
+    Fetch(zingolib::nym::MixnetRoute),
+}
+
+fn plan_price_fetch(snapshot: Option<MixnetSnapshot>) -> PriceFetchPlan {
+    match snapshot {
+        None => PriceFetchPlan::RefuseUninitialized,
+        Some(observed) => match zingolib::nym::resolve_route(observed.mode, observed.socks5_addr) {
+            Ok(route) => PriceFetchPlan::Fetch(route),
+            Err(not_ready) => PriceFetchPlan::Refuse(not_ready),
+        },
+    }
+}
+
+fn snapshot_mutex_recovered<'a>(
+    mutex: &'a Mutex<Option<MixnetSnapshot>>,
+) -> std::sync::MutexGuard<'a, Option<MixnetSnapshot>> {
+    mutex
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+}
+
+fn refresh_mixnet_snapshot(lightclient: &LightClient) {
+    *snapshot_mutex_recovered(&MIXNET_SNAPSHOT) = Some(MixnetSnapshot {
+        mode: lightclient.mixnet_mode(),
+        socks5_addr: lightclient.mixnet_socks5_addr(),
+    });
+}
+
+fn clear_mixnet_snapshot() {
+    *snapshot_mutex_recovered(&MIXNET_SNAPSHOT) = None;
+}
+
+/// Buffer a fetched price for a later piggyback write. Best-effort on
+/// every axis (ADR 0005): a poisoned buffer is recovered, not propagated,
+/// because losing an observation is within the surface's contract.
+fn buffer_price_observation(observation: zingo_price::Price) {
+    let mut pending = PENDING_PRICE_OBSERVATIONS
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    let window = std::mem::take(&mut *pending);
+    *pending = admit_price_observation(window, observation);
+}
+
+/// Fetch the current ZEC/USD price without ever touching the LIGHTCLIENT
+/// lock (ADR 0005). The route comes from [`MIXNET_SNAPSHOT`] — the
+/// fail-closed resolver (ADR 0011) over the last observed mixnet state:
+/// the proxy when Ready, clearnet only on a deliberate toggle-off, a
+/// refusal while bootstrapping or dead. The mixnet leg's payload carries
+/// the route attestation; the clearnet leg attests its route too, so the
+/// app can tell a deliberate clearnet fetch from a payload predating the
+/// attestation entirely.
+///
+/// A successful fetch does NOT persist the price. The observation lands
+/// in a bounded in-memory window and reaches the wallet only when some
+/// other operation takes the write lock while it is buffered; it may be
+/// lost. That trade is the point: the price surface can never again
+/// freeze the FFI behind a slow tunnel.
+/// Run the planned fetch over its route, buffer the observation, and
+/// render the payload with its route attestation: `via_socks5` for the
+/// mixnet leg, `via_clearnet` for the deliberate toggle-off, so the app
+/// can tell either from a payload predating the attestation entirely.
+/// The payload for a won race: the price, the winning source's name, and
+/// the route attestation (`via_socks5` for the mixnet leg, `via_clearnet`
+/// for the deliberate toggle-off). Pure; the shell owns the fetch.
+fn raced_price_payload(
+    route: zingolib::nym::MixnetRoute,
+    raced: &zingo_price::RacedPrice,
+) -> String {
+    let mut payload = object! {
+        "current_price" => raced.price.price_usd,
+        "source" => raced.source.name(),
+    };
+    match route {
+        zingolib::nym::MixnetRoute::Mixnet(addr) => payload["via_socks5"] = addr.into(),
+        zingolib::nym::MixnetRoute::Clearnet => payload["via_clearnet"] = true.into(),
+    }
+    payload.pretty(2)
+}
+
+/// Race all three price sources over the planned route and report the
+/// first success (the losing legs cancel). An all-fail settles as one
+/// typed failure whose text names every source's cause chain, so the
+/// failure report stays diagnosable per operator.
+fn fetch_planned_price(route: zingolib::nym::MixnetRoute) -> Result<String, ZingolibError> {
+    let raced = RT
+        .block_on(zingo_price::race_current_price(route.socks5_proxy()))
+        .map_err(|failure| ZingolibError::Read(failure.to_string()))?;
+    buffer_price_observation(raced.price);
+    Ok(raced_price_payload(route, &raced))
+}
+
+/// Fetch the current ZEC/USD price without ever touching the LIGHTCLIENT
+/// lock (ADR 0005). The route is planned purely from the last observed
+/// mixnet state under the fail-closed policy (ADR 0011).
+///
+/// A successful fetch does NOT persist the price. The observation lands
+/// in a bounded in-memory window and reaches the wallet only when some
+/// other operation takes the write lock while it is buffered; it may be
+/// lost. That trade is the point: the price surface can never again
+/// freeze the FFI behind a slow tunnel.
 pub fn zec_price() -> Result<String, ZingolibError> {
-    with_initialized_lightclient(|lightclient| {
-        RT.block_on(async move {
-            let price = lightclient
-                .update_current_price()
-                .await
-                .map_err(ffi_error)?;
-            Ok(object! { "current_price" => price }.pretty(2))
-        })
+    with_panic_guard(|| {
+        match plan_price_fetch(snapshot_mutex_recovered(&MIXNET_SNAPSHOT).clone()) {
+            PriceFetchPlan::RefuseUninitialized => Err(ZingolibError::LightclientNotInitialized),
+            PriceFetchPlan::Refuse(not_ready) => Err(ffi_error(LightClientError::from(not_ready))),
+            PriceFetchPlan::Fetch(route) => fetch_planned_price(route),
+        }
     })
+}
+
+/// The price surface's lock-freedom contract (ADR 0005): a price fetch
+/// never obtains the LIGHTCLIENT lock, so a fetch through a half-dead
+/// tunnel cannot freeze the rest of the FFI. Each test holds the write
+/// lock for its whole duration; the price surface must settle anyway.
+#[cfg(test)]
+mod price_lock_freedom_tests {
+    use super::*;
+    use std::time::Duration;
+
+    #[test]
+    fn zec_price_settles_while_the_lightclient_write_lock_is_held() {
+        let _serial = lock_discipline_tests::serialized();
+        // No wallet: the plan must be the uninitialized refusal, reached
+        // (and settled) without the lock. reset_lightclient clears both
+        // the client and the route snapshot a sibling test may have left.
+        reset_lightclient();
+        let _write_lock_held_throughout = LIGHTCLIENT
+            .write()
+            .expect("no serialized test leaves the lock poisoned");
+
+        let (settled, observe) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let _ = settled.send(zec_price());
+        });
+
+        let outcome = observe
+            .recv_timeout(Duration::from_secs(3))
+            .expect("zec_price waited on the LIGHTCLIENT lock: the price fetch must plan and refuse (or fetch) without it");
+
+        // No wallet exists in this process, so the settled outcome is the
+        // typed uninitialized refusal — reached without the lock.
+        assert!(
+            matches!(outcome, Err(ZingolibError::LightclientNotInitialized)),
+            "expected the typed uninitialized refusal, got: {outcome:?}"
+        );
+    }
+
+    fn observation(time: u32) -> zingo_price::Price {
+        zingo_price::Price {
+            time,
+            price_usd: 1.0,
+        }
+    }
+
+    #[test]
+    fn the_observation_window_rotates_at_the_cap() {
+        let mut window = VecDeque::new();
+        for time in 0..PRICE_OBSERVATION_CAP as u32 + 1 {
+            window = admit_price_observation(window, observation(time));
+        }
+        assert_eq!(window.len(), PRICE_OBSERVATION_CAP);
+        // The 1001st observation displaced the oldest, nothing else.
+        assert_eq!(window.front().map(|p| p.time), Some(1));
+        assert_eq!(
+            window.back().map(|p| p.time),
+            Some(PRICE_OBSERVATION_CAP as u32)
+        );
+    }
+
+    #[test]
+    fn no_snapshot_plans_the_uninitialized_refusal() {
+        assert!(matches!(
+            plan_price_fetch(None),
+            PriceFetchPlan::RefuseUninitialized
+        ));
+    }
+
+    #[test]
+    fn each_mixnet_state_plans_its_fail_closed_arm() {
+        use zingolib::nym::{MixnetMode, MixnetNotReady, MixnetRoute};
+        let snapshot = |mode, socks5_addr: Option<&str>| {
+            Some(MixnetSnapshot {
+                mode,
+                socks5_addr: socks5_addr.map(str::to_string),
+            })
+        };
+        assert!(matches!(
+            plan_price_fetch(snapshot(MixnetMode::Off, None)),
+            PriceFetchPlan::Fetch(MixnetRoute::Clearnet)
+        ));
+        assert!(matches!(
+            plan_price_fetch(snapshot(MixnetMode::Ready, Some("127.0.0.1:1080"))),
+            PriceFetchPlan::Fetch(MixnetRoute::Mixnet(addr)) if addr == "127.0.0.1:1080"
+        ));
+        // Ready without an address yet is still a bootstrapping refusal.
+        assert!(matches!(
+            plan_price_fetch(snapshot(MixnetMode::Ready, None)),
+            PriceFetchPlan::Refuse(MixnetNotReady::Bootstrapping)
+        ));
+        assert!(matches!(
+            plan_price_fetch(snapshot(MixnetMode::Bootstrapping, None)),
+            PriceFetchPlan::Refuse(MixnetNotReady::Bootstrapping)
+        ));
+        assert!(matches!(
+            plan_price_fetch(snapshot(MixnetMode::Died, None)),
+            PriceFetchPlan::Refuse(MixnetNotReady::Died)
+        ));
+    }
+}
+
+/// The race payload contract: the winning source is named beside the
+/// route attestation, so the app knows both who answered and how the
+/// answer traveled.
+#[cfg(test)]
+mod price_payload_tests {
+    use super::*;
+
+    #[test]
+    fn the_payload_names_the_winning_source_and_its_route() {
+        let raced = zingo_price::RacedPrice {
+            price: zingo_price::Price {
+                time: 7,
+                price_usd: 42.5,
+            },
+            source: zingo_price::PriceSource::Kraken,
+        };
+
+        let mixnet = raced_price_payload(
+            zingolib::nym::MixnetRoute::Mixnet("127.0.0.1:1080".to_string()),
+            &raced,
+        );
+        let parsed = json::parse(&mixnet).expect("the payload is JSON");
+        assert_eq!(parsed["source"].as_str(), Some("kraken"));
+        assert_eq!(parsed["via_socks5"].as_str(), Some("127.0.0.1:1080"));
+        assert_eq!(parsed["current_price"].as_f32(), Some(42.5));
+
+        let clearnet = raced_price_payload(zingolib::nym::MixnetRoute::Clearnet, &raced);
+        let parsed = json::parse(&clearnet).expect("the payload is JSON");
+        assert_eq!(parsed["source"].as_str(), Some("kraken"));
+        assert_eq!(parsed["via_clearnet"].as_bool(), Some(true));
+        assert!(parsed["via_socks5"].is_null());
+    }
+}
+
+/// The piggyback half of ADR 0005: buffered price observations reach the
+/// wallet when any operation obtains the write lock for its own reasons,
+/// and never by the price fetch's own hand.
+#[cfg(test)]
+mod price_piggyback_tests {
+    use super::*;
+
+    #[test]
+    fn a_write_lock_acquisition_carries_buffered_observations_into_the_wallet() {
+        let _serial = lock_discipline_tests::serialized();
+        lock_discipline_tests::init_offline_wallet();
+        buffer_price_observation(zingo_price::Price {
+            time: 7,
+            price_usd: 1.25,
+        });
+
+        // Any write-lock operation carries the pending observations in;
+        // this closure itself does nothing.
+        with_initialized_lightclient(|_| Ok(())).expect("initialized above");
+
+        let recorded = with_initialized_lightclient(|lightclient| {
+            Ok(RT.block_on(async { lightclient.wallet().read().await.price_list.current_price() }))
+        })
+        .expect("initialized above")
+        .expect("the observation must ride the piggyback write into the wallet");
+        assert_eq!(recorded.time, 7);
+        assert_eq!(recorded.price_usd, 1.25);
+        assert!(
+            PENDING_PRICE_OBSERVATIONS
+                .lock()
+                .expect("unpoisoned")
+                .is_empty(),
+            "a carried observation leaves the window"
+        );
+    }
 }
 
 pub fn remove_transaction(txid: String) -> Result<String, ZingolibError> {
@@ -2412,7 +2756,7 @@ pub fn confirm() -> Result<String, ZingolibError> {
 ///
 /// Returns, on success, the drain plan as JSON:
 /// `{ transactions: [{ inputs: [u64], output: u64, fee: u64 }], migrated,
-/// fee, residual }` (all zatoshis). Each transaction spends its `inputs`
+/// fee, stranded }` (all zatoshis). Each transaction spends its `inputs`
 /// Orchard notes into a single Ironwood `output`; the fee is `sum(inputs) -
 /// output`. An empty `transactions` array means there is nothing worth
 /// migrating.
@@ -2451,13 +2795,12 @@ pub fn plan_orchard_drain() -> Result<String, ZingolibError> {
 /// crossing the pool boundary is visible on-chain, so the caller must have
 /// disclosed that. Mirror of `confirm`'s broadcast phase.
 ///
-/// Uses zingolib's `quick_immediate_migration`, the send-shaped mobile entry
-/// point. It pauses our continuous background sync internally, plans against
-/// current wallet state, builds and transmits every drain transaction, then
-/// restores sync before it returns (`resume_sync: true`). No self-sync, no
-/// reconcile loop, matching `send`/`shield`. The older
-/// `migrate_immediately_presynced` (guard parameter) is a Rust-internal form
-/// and no longer crosses the FFI.
+/// Uses zingolib's `quick_immediate_migration`, the send-shaped mobile entry point. It pauses
+/// our continuous background sync internally, plans against current wallet
+/// state, builds and transmits every drain transaction, then restores sync
+/// before it returns (`resume_sync: true`). No self-sync, no reconcile loop,
+/// matching `send`/`shield`. The older `drain_orchard_to_ironwood_presynced`
+/// (guard parameter) is a Rust-internal form and no longer crosses the FFI.
 ///
 /// Returns, on success, `{ txids: [..], migrated, fee, residual }` (values in
 /// zatoshis). Notes worth at most the sweep minimum are left behind and
@@ -2473,9 +2816,9 @@ pub fn drain_orchard_to_ironwood() -> Result<String, ZingolibError> {
             *progress = Some(lightclient.immediate_migration_progress_handle());
         }
         let out = RT.block_on(async move {
-            // quick_immediate_migration holds the pause internally: it plans,
-            // builds, and transmits under one stable wallet state, then resumes
-            // sync on return. resume_sync: true is the normal case.
+            // quick_drain holds the pause internally: it plans, builds, and
+            // transmits under one stable wallet state, then resumes sync on
+            // return. resume_sync: true is the normal case.
             let summary = lightclient
                 .quick_immediate_migration(AccountId::ZERO, true)
                 .await
@@ -2580,8 +2923,8 @@ fn migration_phase_json(phase: &MigrationPhase) -> json::JsonValue {
 ///
 /// Returns, on success, the plan as JSON: `{ split_rounds:
 /// [[{ inputs: [u64], outputs: [u64], fee: u64 }]], parts: [u64], split_fee,
-/// parts_fee, residual, plan_hash }` (values in zatoshis, `plan_hash` in hex).
-/// Consent must disclose `residual`. Pass `plan_hash` back to
+/// parts_fee, stranded, plan_hash }` (values in zatoshis, `plan_hash` in hex).
+/// Consent must disclose `stranded`. Pass `plan_hash` back to
 /// `start_ironwood_migration` unchanged.
 pub fn plan_ironwood_migration() -> Result<String, ZingolibError> {
     with_initialized_lightclient_read(|lightclient| {
@@ -2628,28 +2971,26 @@ pub fn plan_ironwood_migration() -> Result<String, ZingolibError> {
 /// state. Nothing is broadcast here; `continue_note_splitting` drives the
 /// rounds afterwards.
 ///
-/// `per_bucket` caps how many parts share one broadcast window; `null` keeps
-/// zingolib's default, and `reschedule_parts` can change it any time before
-/// the first part is signed. Signing is always `LazyAtBoundary` (the only
+/// The broadcast cadence is not a parameter: the ZIP 318 Poisson schedule
+/// draws every delay itself. Signing is always `LazyAtBoundary` (the only
 /// sound strategy while ZIP 244 commits the anchor into the signature hash).
 ///
 /// Returns `{ started: true }`; failure throws typed — notably
 /// `MigrationConsentStale` when the wallet's notes changed since planning
 /// (replan and re-show).
-pub fn start_ironwood_migration(
-    plan_hash_hex: String,
-    per_bucket: Option<u32>,
-) -> Result<String, ZingolibError> {
+pub fn start_ironwood_migration(plan_hash_hex: String) -> Result<String, ZingolibError> {
     with_initialized_lightclient(|lightclient| {
         let hash = hex_to_hash32(&plan_hash_hex)
             .ok_or_else(|| ZingolibError::InvalidInput("invalid plan hash".to_string()))?;
         RT.block_on(async move {
             lightclient
+                // per_bucket None: there is no cadence chooser — the ZIP 318
+                // Poisson schedule draws every broadcast delay itself.
                 .start_ironwood_migration(
                     AccountId::ZERO,
                     SigningStrategy::LazyAtBoundary,
                     hash,
-                    per_bucket,
+                    None,
                 )
                 .await
                 .map_err(ffi_error)?;
@@ -2705,177 +3046,41 @@ pub fn continue_note_splitting() -> Result<String, ZingolibError> {
     })
 }
 
-/// Executes one round of Phase 1 note splitting as a send-shaped call — the
-/// mobile entry point for the private path's splitting, the counterpart to
-/// `quick_immediate_migration` for the immediate path (ADR 0016). Unlike the old
-/// `start_ironwood_migration` + `continue_note_splitting` driver it persists no
-/// migration state: it pauses sync internally, plans against current confirmed
-/// notes, builds and transmits one round, then restores sync before it returns
-/// (`resume_sync: true`). Each call re-plans, and "a round is still in flight"
-/// is derived from the wallet's pending transactions, not a stored phase.
-///
-/// One call does one round. Loop it — sync to confirmation between calls —
-/// until `complete`, then run `start_ironwood_migration` for Phase 2 (the notes
-/// are fully split by then, so it binds and schedules the parts at once).
-/// Refuses with `MigrationAlreadyInProgress` while a scheduled migration is
-/// active. Preview with `plan_ironwood_migration`; poll `split_status` for
-/// per-transaction progress.
-///
-/// Returns one of:
-/// `{ outcome: "round", txids: [..] }` (sync until they confirm, then call
-/// again), `{ outcome: "awaiting_confirmation" }` (a prior round has not
-/// confirmed yet — sync and retry, no double-broadcast), or
-/// `{ outcome: "complete" }` (every note is part-ready).
-pub fn quick_split() -> Result<String, ZingolibError> {
-    with_initialized_lightclient(|lightclient| {
-        // Arm the SPLIT_PROGRESS side channel before the block_on: we hold
-        // LIGHTCLIENT.write() for the whole round, so a concurrent
-        // `split_status` poll must read this handle (an independent Arc). It
-        // reads idle (`null`) until the round arms it after planning.
-        if let Ok(mut progress) = SPLIT_PROGRESS.write() {
-            *progress = Some(lightclient.split_progress_handle());
-        }
-        let out = RT.block_on(async move {
-            let outcome = lightclient
-                .quick_split(AccountId::ZERO, true)
-                .await
-                .map_err(ffi_error)?;
-            use zingolib::lightclient::migrate::SplitOutcome;
-            Ok(match outcome {
-                SplitOutcome::Round { txids } => object! {
-                    "outcome" => "round",
-                    "txids" => txids
-                        .iter()
-                        .map(|txid| txid.to_string())
-                        .collect::<Vec<_>>(),
-                },
-                SplitOutcome::AwaitingConfirmation => object! {
-                    "outcome" => "awaiting_confirmation",
-                },
-                SplitOutcome::Complete => object! {
-                    "outcome" => "complete",
-                },
-            }
-            .pretty(2))
-        });
-        if let Ok(mut progress) = SPLIT_PROGRESS.write() {
-            *progress = None;
-        }
-        out
-    })
-}
-
-/// A snapshot of the in-flight splitting round's progress, for rendering
-/// "built i/N" then "sent i/N" within a `quick_split` call. The Phase 1 mirror
-/// of `drain_status`: reads the SPLIT_PROGRESS side channel only, never
-/// LIGHTCLIENT, so it stays responsive while `quick_split` holds the lock.
-///
-/// Returns, while a round runs: `{ total, built, sent, phase }` where `phase` is
-/// `"building"` or `"transmitting"` and the counts are `0..=total`. Returns JSON
-/// `null` when no round is in flight.
-pub fn split_status() -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let status = {
-            let progress = SPLIT_PROGRESS
-                .read()
-                .map_err(|_| ZingolibError::SideChannelPoisoned)?;
-            progress.as_ref().and_then(|handle| handle.status())
-        };
-        Ok(match status {
-            Some(s) => {
-                use zingolib::lightclient::migrate::SplitPhase;
-                object! {
-                    "total" => s.total,
-                    "built" => s.built,
-                    "sent" => s.sent,
-                    "phase" => match s.phase {
-                        SplitPhase::Building => "building",
-                        SplitPhase::Transmitting => "transmitting",
-                    },
-                }
-                .pretty(2)
-            }
-            None => json::JsonValue::Null.pretty(2),
-        })
-    })
-}
-
-/// Sets how many parts share each broadcast window and re-buckets every part
-/// under the new cadence with fresh randomization. Callable any time between
-/// consent and the first signed part; afterwards it fails typed with
-/// `MigrationCadenceFixed`. After a successful call the old schedule is void:
-/// re-read `migration_status` and re-arm the platform scheduler.
-///
-/// Returns `{ rescheduled: true }`; failure throws typed.
-pub fn reschedule_parts(per_bucket: u32) -> Result<String, ZingolibError> {
-    with_initialized_lightclient(|lightclient| {
-        RT.block_on(async move {
-            lightclient
-                .reschedule_parts(per_bucket)
-                .await
-                .map_err(ffi_error)?;
-            Ok(object! { "rescheduled" => true }.pretty(2))
-        })
-    })
-}
-
 /// The migration's progress, arranged for direct rendering. ZIP 318 requires
 /// showing `orchard_confirmed_spendable` (the Orchard-pool figure
 /// specifically) while a migration is in flight.
 ///
 /// Returns `{ orchard_confirmed_spendable, phase, parts_total,
-/// parts_confirmed, parts_broadcast, value_total, value_migrated,
-/// per_bucket, bucket_modulus,
-/// upcoming_windows: [{ bucket_index, boundary, part_ids, denominations,
-/// window_opens_unix_time, latest_target_unix_time }], due_now }`.
-/// `parts_broadcast` counts parts submitted but not yet mined (the sent,
-/// in-flight batch); they sit outside `upcoming_windows` and `due_now` and
-/// clear into the confirmed figures as parts mine. `phase` is `null`
+/// parts_confirmed, value_total, value_migrated, bucket_modulus,
+/// next_wakes: [{ bucket_index, boundary, part_ids, denominations,
+/// estimated_unix_time, estimated_target_unix_time }], due_now }`. `phase` is `null`
 /// when no migration is in progress, else `{ kind }` with per-kind fields
 /// (`round`/`pending_txids` while note splitting, `residual` when complete).
 /// `denominations` (zatoshis) mirror `part_ids` element-for-element, so a
 /// schedule screen renders each window's batch without a second call.
 /// `due_now` is the batch the client can broadcast this instant (`{ boundary,
 /// part_ids, denominations }`) or `null` when a send would build nothing; it
-/// carries the current window, which `upcoming_windows` (future windows only)
-/// omits.
+/// carries the current window, which `next_wakes` (future windows only) omits.
 pub fn migration_status() -> Result<String, ZingolibError> {
     with_initialized_lightclient_read(|lightclient| {
         RT.block_on(async move {
             let status = lightclient.migration_status().await.map_err(ffi_error)?;
-            // Join each window's part ids to their denominations (and
-            // pick up the effective cadence) from the persisted
-            // migration state; BroadcastWindow alone carries only ids.
-            let (denoms_by_id, per_bucket, bucket_modulus, parts_broadcast) = {
+            // Join each wake's part ids to their denominations from the
+            // persisted migration state; WakePoint alone carries only ids.
+            let (denoms_by_id, bucket_modulus) = {
                 let wallet = lightclient.wallet().read().await;
                 match &wallet.migration {
-                    Some(state) => {
-                        // Parts submitted to the network but not yet mined: the
-                        // sent, in-flight batch. The confirmed figures gate on
-                        // mining, so without this a client cannot tell "batch
-                        // sent, confirming" from "batch never sent" (both leave
-                        // due_now null and parts_confirmed unchanged).
-                        let parts_broadcast = state
+                    Some(state) => (
+                        state
                             .parts
                             .iter()
-                            .filter(|part| matches!(part.state, PartState::Broadcast))
-                            .count() as u32;
-                        (
-                            state
-                                .parts
-                                .iter()
-                                .map(|part| (part.id.0, part.denomination))
-                                .collect::<std::collections::HashMap<_, _>>(),
-                            Some(state.params.k_max),
-                            state.params.bucket_modulus,
-                            parts_broadcast,
-                        )
-                    }
+                            .map(|part| (part.id.0, part.denomination))
+                            .collect::<std::collections::HashMap<_, _>>(),
+                        state.params.bucket_modulus,
+                    ),
                     None => (
                         std::collections::HashMap::new(),
-                        None,
                         MigrationParams::provisional(wallet.chain_type()).bucket_modulus,
-                        0,
                     ),
                 }
             };
@@ -2901,7 +3106,7 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                     }
                 })
                 .collect::<Vec<_>>();
-            // The window the chain is currently inside, which upcoming_windows
+            // The window the chain is currently inside, which next_wakes
             // structurally omits (it lists future windows only). `null` when a
             // send this instant would build nothing, so the client's Send
             // action gates on it being present.
@@ -2925,54 +3130,13 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                 },
                 "parts_total" => status.parts_total,
                 "parts_confirmed" => status.parts_confirmed,
-                "parts_broadcast" => parts_broadcast,
                 "value_total" => status.value_total,
                 "value_migrated" => status.value_migrated,
-                "per_bucket" => per_bucket,
                 "bucket_modulus" => bucket_modulus,
                 "upcoming_windows" => upcoming_windows,
                 "due_now" => due_now,
             }
             .pretty(2))
-        })
-    })
-}
-
-/// The window calendar, for a schedule screen's grid, independent of any
-/// migration. The window the chain tip sits in is always present (zero tallies
-/// when nothing is scheduled there); every scheduled window, past and future,
-/// carries its confirmation progress. So the grid and its "you are here" render
-/// before consent, and the same call fills per-window progress afterwards.
-///
-/// Returns a JSON array of `{ bucket_index, boundary, close, is_current,
-/// parts_total, parts_confirmed, value_total, value_migrated }` (heights in
-/// blocks with `close` exclusive, values in zatoshis), earliest first. Returns
-/// JSON `null` when the wallet has never synced.
-pub fn window_timeline() -> Result<String, ZingolibError> {
-    with_initialized_lightclient_read(|lightclient| {
-        RT.block_on(async move {
-            let timeline = lightclient.window_timeline().await.map_err(ffi_error)?;
-            Ok(match timeline {
-                Some(windows) => {
-                    let reports = windows
-                        .iter()
-                        .map(|w| {
-                            object! {
-                                "bucket_index" => w.bucket_index,
-                                "boundary" => u32::from(w.boundary),
-                                "close" => u32::from(w.close),
-                                "is_current" => w.is_current,
-                                "parts_total" => w.parts_total,
-                                "parts_confirmed" => w.parts_confirmed,
-                                "value_total" => w.value_total,
-                                "value_migrated" => w.value_migrated,
-                            }
-                        })
-                        .collect::<Vec<_>>();
-                    json::JsonValue::from(reports).pretty(2)
-                }
-                None => json::JsonValue::Null.pretty(2),
-            })
         })
     })
 }
@@ -3088,7 +3252,7 @@ fn batch_report_json(report: &zingolib::lightclient::migrate::BatchReport) -> js
 ///
 /// Returns `{ outcomes: [{ part, denomination, result }], halted }`, where each
 /// `result` is `{ kind: "sent", txid }`, `{ kind: "slid" }`,
-/// `{ kind: "not_due", window_opens_unix_time }`, or `{ kind: "failed", error }`,
+/// `{ kind: "not_due", estimated_unix_time }`, or `{ kind: "failed", error }`,
 /// and `halted` is the error that stopped the batch early or `null`. An empty
 /// `outcomes` with `halted` null means nothing was owed. An infrastructure
 /// failure (offline, no migration in progress) throws typed.
@@ -3175,6 +3339,8 @@ pub fn cancel_ironwood_migration() -> Result<String, ZingolibError> {
     })
 }
 
+// ----- Mixnet Mode (Nym transport for the send and price surfaces) -----
+
 /// The Mixnet Mode tri-state-plus-died as the strings the app layer shows.
 fn mixnet_mode_string(mode: zingolib::nym::MixnetMode) -> &'static str {
     match mode {
@@ -3189,24 +3355,18 @@ fn mixnet_mode_string(mode: zingolib::nym::MixnetMode) -> &'static str {
 /// (the UniFFI proxy shim's address). Readiness is validated by a data round
 /// trip; poll [`mixnet_mode`] for `bootstrapping` -> `ready`, or `died`.
 pub fn attach_mixnet(socks5_addr: String) -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let mut guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &mut *guard {
-            RT.block_on(async move {
-                lightclient
-                    .attach_mixnet(&socks5_addr)
-                    .await
-                    .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
-                Ok(
-                    object! { "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()) }
-                        .pretty(2),
-                )
-            })
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
-        }
+    with_initialized_lightclient(|lightclient| {
+        RT.block_on(async move {
+            lightclient
+                .attach_mixnet(&socks5_addr)
+                .await
+                .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
+            refresh_mixnet_snapshot(lightclient);
+            Ok(
+                object! { "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()) }
+                    .pretty(2),
+            )
+        })
     })
 }
 
@@ -3214,42 +3374,30 @@ pub fn attach_mixnet(socks5_addr: String) -> Result<String, ZingolibError> {
 /// `proxy_path` (the exec fallback; Android-attached and iOS builds use
 /// [`attach_mixnet`] instead).
 pub fn enable_mixnet(proxy_path: String) -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let mut guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &mut *guard {
-            RT.block_on(async move {
-                lightclient
-                    .enable_mixnet(std::path::Path::new(&proxy_path))
-                    .await
-                    .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
-                Ok(
-                    object! { "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()) }
-                        .pretty(2),
-                )
-            })
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
-        }
+    with_initialized_lightclient(|lightclient| {
+        RT.block_on(async move {
+            lightclient
+                .enable_mixnet(std::path::Path::new(&proxy_path))
+                .await
+                .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
+            refresh_mixnet_snapshot(lightclient);
+            Ok(
+                object! { "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()) }
+                    .pretty(2),
+            )
+        })
     })
 }
 
 /// Disable Mixnet Mode: the user's deliberate per-session consent to
 /// clearnet for the send and price surfaces.
 pub fn disable_mixnet() -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let mut guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &mut *guard {
-            Ok(RT.block_on(async move {
-                lightclient.disable_mixnet().await;
-                object! { "mixnet_mode" => "off" }.pretty(2)
-            }))
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
-        }
+    with_initialized_lightclient(|lightclient| {
+        Ok(RT.block_on(async move {
+            lightclient.disable_mixnet().await;
+            refresh_mixnet_snapshot(lightclient);
+            object! { "mixnet_mode" => "off" }.pretty(2)
+        }))
     })
 }
 
@@ -3257,38 +3405,70 @@ pub fn disable_mixnet() -> Result<String, ZingolibError> {
 /// SOCKS5 address), or `died` (unconsented proxy loss; sends refuse — run
 /// [`attach_mixnet`] or [`enable_mixnet`] to recover).
 pub fn mixnet_mode() -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &*guard {
-            let mut status = object! {
-                "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()),
-            };
-            if let Some(addr) = lightclient.mixnet_socks5_addr() {
-                status["socks5_addr"] = addr.into();
-            }
-            Ok(status.pretty(2))
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
+    with_initialized_lightclient_read(|lightclient| {
+        // The app polls this; each poll refreshes the price surface's
+        // route snapshot, which is how Ready/Died transitions reach the
+        // lock-free zec_price (ADR 0005).
+        refresh_mixnet_snapshot(lightclient);
+        let mut status = object! {
+            "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()),
+        };
+        if let Some(addr) = lightclient.mixnet_socks5_addr() {
+            status["socks5_addr"] = addr.into();
         }
+        Ok(status.pretty(2))
     })
 }
 
 /// The proxy's latest bootstrap progress line while Mixnet Mode is
 /// bootstrapping, so the app can narrate the connect race; empty otherwise.
 pub fn mixnet_bootstrap_detail() -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &*guard {
-            let detail = lightclient.mixnet_bootstrap_detail().unwrap_or_default();
-            Ok(object! { "detail" => detail }.pretty(2))
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
-        }
+    with_initialized_lightclient_read(|lightclient| {
+        let detail = lightclient.mixnet_bootstrap_detail().unwrap_or_default();
+        Ok(object! { "detail" => detail }.pretty(2))
     })
+}
+
+/// The latched death read whole, while Mixnet Mode is `died`: how long ago
+/// it latched and, when the watcher held one, the typed cause (the probes'
+/// ProbeFailure dictionary). The age is computed wallet-side through
+/// `DeathReport::age`, which absorbs a stepping system clock, so consumers
+/// never subtract timestamps; each poll reads a fresh age. None outside
+/// the `died` mode; a causeless death (a spawned child's closed pipe)
+/// carries an age and no detail.
+pub fn mixnet_death_report() -> Result<Option<MixnetDeathReport>, ZingolibError> {
+    with_initialized_lightclient_read(|lightclient| {
+        Ok(lightclient
+            .mixnet_death_report()
+            .map(|report| MixnetDeathReport {
+                age_millis: report
+                    .age(std::time::SystemTime::now())
+                    .as_millis()
+                    .try_into()
+                    .unwrap_or(u64::MAX),
+                detail: report.detail.as_ref().map(probe_failure),
+            }))
+    })
+}
+
+/// The wallet's temporal calibration for the mixnet transport, so the app
+/// paces its connect patience from the same source of truth as the gates
+/// (zingolib#2569) instead of pinning copies across the FFI. Infallible:
+/// the record is compiled-in constants, no wallet needed.
+pub fn mixnet_timing() -> MixnetTiming {
+    let timing = zingolib::nym::mixnet_timing();
+    MixnetTiming {
+        attach_readiness_budget_millis: timing
+            .attach_readiness_budget
+            .as_millis()
+            .try_into()
+            .unwrap_or(u64::MAX),
+        mixnet_round_trip_bound_millis: timing
+            .mixnet_round_trip_bound
+            .as_millis()
+            .try_into()
+            .unwrap_or(u64::MAX),
+    }
 }
 
 /// The canonical IP-correlation disclaimer (ZIP-0318): Mixnet Mode covers only
@@ -3298,4 +3478,233 @@ pub fn mixnet_bootstrap_detail() -> Result<String, ZingolibError> {
 /// has no failure path.
 pub fn mixnet_ip_correlation_disclaimer() -> String {
     zingolib::nym::IP_CORRELATION_DISCLAIMER.to_string()
+}
+
+/// One indexer census entry, fielded for the app's server list. `chain`
+/// carries the app's chain-name strings ("main"/"test"); `region_key` is
+/// the `settings.<key>` translation suffix, empty when unknown.
+pub struct IndexerEntry {
+    pub uri: String,
+    pub chain: String,
+    pub operator: String,
+    pub region_key: String,
+    pub is_default: bool,
+    pub obsolete: bool,
+}
+
+/// The indexer census (zingolib#2571): the sole source of truth for
+/// endpoints, read here so the app's server list is a projection of the
+/// same data the wallet's defaults and health gates run on. Infallible:
+/// compiled-in data, no wallet needed.
+pub fn indexer_census() -> Vec<IndexerEntry> {
+    zingolib::indexers::INDEXERS
+        .iter()
+        .map(|entry| IndexerEntry {
+            uri: entry.uri.to_string(),
+            chain: match entry.chain {
+                zingolib::indexers::IndexerChain::Main => "main".to_string(),
+                zingolib::indexers::IndexerChain::Test => "test".to_string(),
+            },
+            operator: entry.operator.to_string(),
+            region_key: entry.region_key.to_string(),
+            is_default: entry.default,
+            obsolete: entry.obsolete,
+        })
+        .collect()
+}
+
+/// Per-probe bound. A dead route answers by timing out; this keeps one
+/// unreachable server from stalling the whole Doctor run.
+const CONNECTION_PROBE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(15);
+
+/// The typed failure record of one probe stage or leg (zingolib's net-diag
+/// taxonomy), structured across the FFI: the kebab-case stage, the target,
+/// and the cause chain as a vector, never a concatenated string.
+pub struct ProbeFailure {
+    pub stage: String,
+    pub target: String,
+    pub cause_chain: Vec<String>,
+}
+
+/// The latched death, aged at read time. `age_millis` comes from the
+/// wallet's clamped staleness math (zingolib#2569), so a stepping clock
+/// reads as zero, never as an error or a negative; `detail` is absent for
+/// a causeless death (a spawned child's closed pipe).
+pub struct MixnetDeathReport {
+    pub age_millis: u64,
+    pub detail: Option<ProbeFailure>,
+}
+
+/// The wallet's temporal calibration for the mixnet transport, in millis
+/// (the FFI's duration convention, matching the probes). Field names match
+/// the zingolib constants they carry.
+pub struct MixnetTiming {
+    pub attach_readiness_budget_millis: u64,
+    pub mixnet_round_trip_bound_millis: u64,
+}
+
+/// What a successful probe proves, as fields.
+pub struct ProbeSuccessData {
+    pub chain: String,
+    pub height: u64,
+}
+
+/// The exhaustive outcome of one probe leg. No booleans, no optional
+/// pairs: a leg either answered or failed, and each arm carries its
+/// evidence.
+pub enum ProbeLegOutcome {
+    Answered { info: ProbeSuccessData },
+    Failed { failure: ProbeFailure },
+}
+
+/// One timed leg of a paired probe.
+pub struct ProbeLeg {
+    pub millis: u64,
+    pub outcome: ProbeLegOutcome,
+}
+
+/// The mixnet side of a paired probe. Absence has exactly one producer —
+/// the proxy was not ready to carry the leg — and it is named, never null.
+pub enum MixnetLeg {
+    Probed { leg: ProbeLeg },
+    NotCarried,
+}
+
+/// One target's paired probe: the clearnet leg always runs.
+pub struct ProbeReport {
+    pub host: String,
+    pub clearnet: ProbeLeg,
+    pub mixnet: MixnetLeg,
+}
+
+/// The exhaustive outcome of one staged sync-probe stage.
+pub enum SyncStageOutcome {
+    Passed,
+    Failed { failure: ProbeFailure },
+}
+
+/// One timed stage of the staged sync-path probe. The run stops at the
+/// first failure, so a stage that does not appear was never reached.
+pub struct SyncProbeStage {
+    pub step: String,
+    pub millis: u64,
+    pub outcome: SyncStageOutcome,
+}
+
+/// The staged probe's verdict: every stage passed and the server answered
+/// with its identity, or the run stopped at the failing stage the `stages`
+/// vector already carries.
+pub enum SyncServerVerdict {
+    Reachable { info: ProbeSuccessData },
+    Stopped,
+}
+
+/// The staged sync-path probe's report for one server.
+pub struct SyncServerProbe {
+    pub server: String,
+    pub stages: Vec<SyncProbeStage>,
+    pub verdict: SyncServerVerdict,
+}
+
+fn probe_failure(failure: &zingo_net_diag::NetOpFailure) -> ProbeFailure {
+    ProbeFailure {
+        stage: failure.stage.to_string(),
+        target: failure.target.clone(),
+        cause_chain: failure.cause_chain.clone(),
+    }
+}
+
+fn probe_success(success: &zingolib::nym::probe::ProbeSuccess) -> ProbeSuccessData {
+    ProbeSuccessData {
+        chain: success.chain.clone(),
+        height: success.height,
+    }
+}
+
+fn probe_leg(leg: &zingolib::nym::probe::ProbeLeg) -> ProbeLeg {
+    ProbeLeg {
+        millis: leg.millis,
+        outcome: match &leg.outcome {
+            Ok(success) => ProbeLegOutcome::Answered {
+                info: probe_success(success),
+            },
+            Err(failure) => ProbeLegOutcome::Failed {
+                failure: probe_failure(failure),
+            },
+        },
+    }
+}
+
+/// One Connection Doctor probe (the nym-diagnostics plan, Workstream A):
+/// a paired clearnet/mixnet `GetLightdInfo` round trip against `uri`, each
+/// leg timed. A user-invoked diagnostic: the clearnet leg contacts the
+/// target from the real IP, and nothing here is an automatic path. No
+/// wallet lock is held across the probe.
+pub fn probe_server(uri: String) -> Result<Vec<ProbeReport>, ZingolibError> {
+    let target: http::Uri = uri
+        .parse()
+        .map_err(|_| ZingolibError::InvalidInput(format!("unparseable server uri: {uri}")))?;
+    with_initialized_lightclient_read(|lightclient| {
+        RT.block_on(async move {
+            let probes = lightclient
+                .probe_broadcast_indexers(Some(target), CONNECTION_PROBE_TIMEOUT)
+                .await;
+            Ok(probes
+                .iter()
+                .map(|probe| ProbeReport {
+                    host: probe.host.clone(),
+                    clearnet: probe_leg(&probe.clearnet),
+                    mixnet: probe.mixnet.as_ref().map_or(MixnetLeg::NotCarried, |leg| {
+                        MixnetLeg::Probed {
+                            leg: probe_leg(leg),
+                        }
+                    }),
+                })
+                .collect())
+        })
+    })
+}
+
+/// The staged sync-path probe (the nym-diagnostics plan, Workstream A item
+/// 1, upstream at zingolib#2561): walks one server through tcp-connect,
+/// tls-channel, and grpc-info, each stage bounded and timed, stopping at
+/// the first typed failure. Runs against the ordinary synchronization path
+/// with no tunnel, no wallet, and no lock, so it needs no initialized
+/// client. A user-invoked diagnostic contacting the target from the real
+/// IP.
+pub fn probe_sync_server(uri: String) -> Result<SyncServerProbe, ZingolibError> {
+    let target: http::Uri = uri
+        .parse()
+        .map_err(|_| ZingolibError::InvalidInput(format!("unparseable server uri: {uri}")))?;
+    let probe = RT.block_on(zingolib::nym::probe::probe_sync_server(
+        &target,
+        CONNECTION_PROBE_TIMEOUT,
+    ));
+    Ok(SyncServerProbe {
+        server: probe.server.clone(),
+        stages: probe
+            .stages
+            .iter()
+            .map(|stage| SyncProbeStage {
+                step: stage.step.to_string(),
+                millis: stage.millis,
+                outcome: stage
+                    .failure
+                    .as_ref()
+                    .map_or(SyncStageOutcome::Passed, |failure| {
+                        SyncStageOutcome::Failed {
+                            failure: probe_failure(failure),
+                        }
+                    }),
+            })
+            .collect(),
+        verdict: probe
+            .info
+            .as_ref()
+            .map_or(SyncServerVerdict::Stopped, |info| {
+                SyncServerVerdict::Reachable {
+                    info: probe_success(info),
+                }
+            }),
+    })
 }

@@ -39,7 +39,7 @@ import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import {
   checkServerURI,
-  fetchServerList,
+
   parseServerURI,
   serverUris,
 } from '../../app/uris';
@@ -69,7 +69,11 @@ import {
   BlockExplorerEnum,
 } from '../../app/AppState';
 import { getLatestBlockServerInfo } from '../../app/walletBackend';
-import { getMixnetIpCorrelationDisclaimer } from '../../app/walletBackend/utils/mixnetUtils';
+import {
+  getMixnetIpCorrelationDisclaimer,
+  getMixnetTiming,
+} from '../../app/walletBackend/utils/mixnetUtils';
+import { failureLines } from '../../app/walletBackend/transforms/connectionDoctorReport';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -261,6 +265,27 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     getMixnetIpCorrelationDisclaimer().then((text: string | null) => {
       if (alive) {
         setMixnetDisclaimer(text);
+      }
+    });
+    return () => {
+      alive = false;
+    };
+  }, [mixnetSupported]);
+
+  // The wallet's connect-patience budget (zingolib#2569): compiled-in
+  // constants, fetched once like the disclaimer, so the bootstrapping hint
+  // states the same bound the wallet's gate actually runs.
+  const [mixnetBudgetMillis, setMixnetBudgetMillis] = useState<number | null>(
+    null,
+  );
+  useEffect(() => {
+    if (!mixnetSupported) {
+      return;
+    }
+    let alive = true;
+    getMixnetTiming().then(timing => {
+      if (alive && timing.kind === 'timing') {
+        setMixnetBudgetMillis(timing.attachReadinessBudgetMillis);
       }
     });
     return () => {
@@ -615,38 +640,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customServerUri, customServerChainName]);
 
-  // Fetch BOTH public chains' server lists ONCE, when the screen opens, and keep
-  // them for the whole life of the server BS — no refresh on chain switch or
-  // picker open. Each list falls back to the static `serverUris` entries (that
-  // chain only, obsolete excluded) if its live request fails.
+  // Both public chains' picker lists come from the census — active entries
+  // only — computed once when the screen opens (ADR 0007: no live registry;
+  // opening Settings must not beacon anyone).
   useEffect(() => {
-    const toItems = (list: ServerUrisType[]) =>
-      list.map((item: ServerUrisType) => ({
-        label: (item.region ? item.region + ' ' : '') + item.uri,
-        value: item.uri,
-      }));
-    const staticFor = (chain: ChainNameEnum) =>
-      toItems(
-        serverUris(translate).filter(
-          (s: ServerUrisType) => !s.obsolete && s.chainName === chain,
-        ),
-      );
-    (async () => {
-      const [mainLive, testLive] = await Promise.all([
-        fetchServerList(ChainNameEnum.mainChainName),
-        fetchServerList(ChainNameEnum.testChainName),
-      ]);
-      setMainServerList(
-        mainLive.length > 0
-          ? toItems(mainLive)
-          : staticFor(ChainNameEnum.mainChainName),
-      );
-      setTestServerList(
-        testLive.length > 0
-          ? toItems(testLive)
-          : staticFor(ChainNameEnum.testChainName),
-      );
-    })();
+    const censusFor = (chain: ChainNameEnum) =>
+      serverUris(translate)
+        .filter((s: ServerUrisType) => !s.obsolete && s.chainName === chain)
+        .map((item: ServerUrisType) => ({
+          label: (item.region ? item.region + ' ' : '') + item.uri,
+          value: item.uri,
+        }));
+    setMainServerList(censusFor(ChainNameEnum.mainChainName));
+    setTestServerList(censusFor(ChainNameEnum.testChainName));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // once, for the whole screen life
 
@@ -1740,6 +1746,35 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                               'settings.nym-enhanced-privacy',
                             ) as string)}
                       </FadeText>
+                      {/* The bootstrapping patience hint: the wallet's own
+                          attach budget, so "Connecting…" states how long it
+                          may legitimately take before a died verdict. */}
+                      {mixnetView.statusKey === 'mixnet.status.bootstrapping' &&
+                        mixnetBudgetMillis !== null && (
+                          <View testID="settings.mixnet-patience">
+                            <FadeText>
+                              {`${translate('mixnet.bootstrap-patience') as string} ${Math.ceil(mixnetBudgetMillis / 1000)} s`}
+                            </FadeText>
+                          </View>
+                        )}
+                      {/* The typed cause and age of a died transport (stage,
+                          target, cause chain, and how long ago it latched),
+                          so "connection lost" carries its why and its when.
+                          Untranslated cause lines: taxonomy terms a support
+                          reply keys on, same as the Doctor's report lines.
+                          A causeless death still renders its age. */}
+                      {mixnetView.death.kind === 'reported' && (
+                        <View testID="settings.mixnet-death-detail">
+                          <FadeText>
+                            {[
+                              ...(mixnetView.death.detail !== null
+                                ? failureLines(mixnetView.death.detail)
+                                : []),
+                              `latched ${Math.round(mixnetView.death.ageMillis / 1000)} s ago`,
+                            ].join('\n')}
+                          </FadeText>
+                        </View>
+                      )}
                     </View>
                     <TouchableOpacity
                       testID="settings.mixnet-toggle"

@@ -1,6 +1,7 @@
 package org.ZingoLabs.Zingo
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.util.Log
 import android.util.Base64
 import androidx.security.crypto.EncryptedFile
@@ -12,6 +13,8 @@ import com.facebook.react.bridge.Promise
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import org.json.JSONArray
+import org.json.JSONObject
 import org.ZingoLabs.Zingo.Constants.*
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext) {
@@ -19,6 +22,49 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     override fun getName(): String {
         return "RPCModule"
+    }
+
+    /**
+     * `defaultChainName` is the chain a first run of this flavor defaults
+     * to ("main" everywhere except the testnet alpha flavor). Carried as a
+     * per-flavor res string because BuildConfig generation is deliberately
+     * disabled for build reproducibility; the app reads it only when no
+     * persisted server setting exists yet.
+     *
+     * `debuggableBuild` reports the APK's actual FLAG_DEBUGGABLE bit, read
+     * from ApplicationInfo rather than BuildConfig (same reproducibility
+     * rule as above). The bundled JS is built with `--dev false` for every
+     * variant of this app, so `__DEV__` cannot tell a debug-signed handoff
+     * APK from a release one; this constant can.
+     */
+    override fun getConstants(): Map<String, Any> {
+        return mapOf(
+            "defaultChainName" to
+                applicationContext.resources.getString(R.string.default_chain_name),
+            "debuggableBuild" to
+                ((applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0),
+            // The indexer census (zingolib#2571), as a constant rather than
+            // a method: the app's server list is consulted at JS module
+            // load, before any async bridge call could resolve. Compiled-in
+            // data, so the synchronous read costs one JSON render.
+            "indexerCensus" to indexerCensusJson(),
+        )
+    }
+
+    private fun indexerCensusJson(): String {
+        val census = JSONArray()
+        for (entry in uniffi.zingo.indexerCensus()) {
+            census.put(
+                JSONObject()
+                    .put("uri", entry.uri)
+                    .put("chain", entry.chain)
+                    .put("operator", entry.operator)
+                    .put("region_key", entry.regionKey)
+                    .put("is_default", entry.isDefault)
+                    .put("obsolete", entry.obsolete)
+            )
+        }
+        return census.toString()
     }
 
     private fun getDocumentDirectory(): String {
@@ -847,10 +893,138 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun mixnetDeathReportInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "mixnet_death_report") {
+            uniffi.zingo.initLogging()
+            val report = uniffi.zingo.mixnetDeathReport()
+            // Absence crosses named, not null: outside `died` no record exists.
+            (
+                if (report == null) {
+                    JSONObject().put("kind", "none")
+                } else {
+                    JSONObject()
+                        .put("kind", "report")
+                        .put("age_millis", report.ageMillis.toLong())
+                        .apply {
+                            report.detail?.let { put("failure", probeFailureJson(it)) }
+                        }
+                }
+            ).toString()
+        }
+    }
+
+    @ReactMethod
+    fun mixnetTimingInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "mixnet_timing") {
+            uniffi.zingo.initLogging()
+            val timing = uniffi.zingo.mixnetTiming()
+            JSONObject()
+                .put("attach_readiness_budget_millis", timing.attachReadinessBudgetMillis.toLong())
+                .put("mixnet_round_trip_bound_millis", timing.mixnetRoundTripBoundMillis.toLong())
+                .toString()
+        }
+    }
+
+    @ReactMethod
     fun mixnetIpCorrelationDisclaimerInfo(promise: Promise) {
         FfiOutcome.settling(promise, "mixnet_ip_correlation_disclaimer") {
             uniffi.zingo.initLogging()
             uniffi.zingo.mixnetIpCorrelationDisclaimer()
+        }
+    }
+
+    private fun probeFailureJson(failure: uniffi.zingo.ProbeFailure): JSONObject =
+        JSONObject()
+            .put("stage", failure.stage)
+            .put("target", failure.target)
+            .put("cause_chain", JSONArray(failure.causeChain))
+
+    private fun probeSuccessJson(success: uniffi.zingo.ProbeSuccessData): JSONObject =
+        JSONObject()
+            .put("chain", success.chain)
+            .put("height", success.height.toLong())
+
+    // Each sealed outcome crosses the bridge as a kind-discriminated object,
+    // the JSON spelling of the FFI's exhaustive enums.
+    private fun probeLegJson(leg: uniffi.zingo.ProbeLeg): JSONObject =
+        JSONObject()
+            .put("millis", leg.millis.toLong())
+            .put(
+                "outcome",
+                when (val outcome = leg.outcome) {
+                    is uniffi.zingo.ProbeLegOutcome.Answered ->
+                        JSONObject().put("kind", "answered").put("info", probeSuccessJson(outcome.info))
+                    is uniffi.zingo.ProbeLegOutcome.Failed ->
+                        JSONObject().put("kind", "failed").put("failure", probeFailureJson(outcome.failure))
+                }
+            )
+
+    private fun mixnetLegJson(mixnet: uniffi.zingo.MixnetLeg): JSONObject =
+        when (mixnet) {
+            is uniffi.zingo.MixnetLeg.Probed ->
+                JSONObject().put("kind", "probed").put("leg", probeLegJson(mixnet.leg))
+            is uniffi.zingo.MixnetLeg.NotCarried -> JSONObject().put("kind", "notCarried")
+        }
+
+    // The Connection Doctor's paired probe (user-invoked diagnostic). The
+    // FFI returns structured reports; they cross the React Native bridge as
+    // JSON, the bridge's own boundary format.
+    @ReactMethod
+    fun probeServerProcess(uri: String, promise: Promise) {
+        FfiOutcome.settling(promise, "probe_server") {
+            uniffi.zingo.initLogging()
+            val reports = uniffi.zingo.probeServer(uri)
+            val rendered = JSONArray()
+            for (report in reports) {
+                rendered.put(
+                    JSONObject()
+                        .put("host", report.host)
+                        .put("clearnet", probeLegJson(report.clearnet))
+                        .put("mixnet", mixnetLegJson(report.mixnet))
+                )
+            }
+            rendered.toString()
+        }
+    }
+
+    // The Connection Doctor's staged sync-path probe: tcp-connect,
+    // tls-channel, grpc-info, each timed, stopping at the first typed
+    // failure. Needs no initialized client and holds no wallet lock.
+    @ReactMethod
+    fun probeSyncServerProcess(uri: String, promise: Promise) {
+        FfiOutcome.settling(promise, "probe_sync_server") {
+            uniffi.zingo.initLogging()
+            val probe = uniffi.zingo.probeSyncServer(uri)
+            val stages = JSONArray()
+            for (stage in probe.stages) {
+                stages.put(
+                    JSONObject()
+                        .put("step", stage.step)
+                        .put("millis", stage.millis.toLong())
+                        .put(
+                            "outcome",
+                            when (val outcome = stage.outcome) {
+                                is uniffi.zingo.SyncStageOutcome.Passed ->
+                                    JSONObject().put("kind", "passed")
+                                is uniffi.zingo.SyncStageOutcome.Failed ->
+                                    JSONObject().put("kind", "failed").put("failure", probeFailureJson(outcome.failure))
+                            }
+                        )
+                )
+            }
+            JSONObject()
+                .put("server", probe.server)
+                .put("stages", stages)
+                .put(
+                    "verdict",
+                    when (val verdict = probe.verdict) {
+                        is uniffi.zingo.SyncServerVerdict.Reachable ->
+                            JSONObject().put("kind", "reachable").put("info", probeSuccessJson(verdict.info))
+                        is uniffi.zingo.SyncServerVerdict.Stopped ->
+                            JSONObject().put("kind", "stopped")
+                    }
+                )
+                .toString()
         }
     }
 
@@ -1017,17 +1191,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // `perBucket` crosses the bridge as a string (the module's numeric-arg
-    // convention); empty means "keep zingolib's default cadence", and a
-    // malformed value rejects as InvalidInput, matching the iOS bridge.
     @ReactMethod
-    fun startIronwoodMigrationProcess(planHashHex: String, perBucket: String, promise: Promise) {
+    fun startIronwoodMigrationProcess(planHashHex: String, promise: Promise) {
         FfiOutcome.settling(promise, "start_ironwood_migration") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.startIronwoodMigration(
-                planHashHex,
-                FfiArgs.optionalU32(perBucket, "per_bucket")
-            )
+            uniffi.zingo.startIronwoodMigration(planHashHex)
         }
     }
 
@@ -1042,47 +1210,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // Phase 1 splitting round (ADR 0016). Proves and broadcasts, so like the
-    // drain it runs long and holds the lightclient; settling launches on
-    // Dispatchers.IO, which keeps it off the main queue and lets status polls
-    // through.
-    @ReactMethod
-    fun quickSplitProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "quick_split") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.quickSplit()
-        }
-    }
-
-    // Polled concurrently while quickSplitProcess runs; the native splitStatus()
-    // reads a side channel, never the lightclient lock the round holds, so the
-    // poll returns immediately.
-    @ReactMethod
-    fun splitStatusProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "split_status") {
-            uniffi.zingo.splitStatus()
-        }
-    }
-
-    @ReactMethod
-    fun reschedulePartsProcess(perBucket: String, promise: Promise) {
-        FfiOutcome.settling(promise, "reschedule_parts") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.rescheduleParts(FfiArgs.requiredU32(perBucket, "per_bucket"))
-        }
-    }
-
     @ReactMethod
     fun migrationStatusProcess(promise: Promise) {
         FfiOutcome.settling(promise, "migration_status") {
             uniffi.zingo.migrationStatus()
-        }
-    }
-
-    @ReactMethod
-    fun windowTimelineProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "window_timeline") {
-            uniffi.zingo.windowTimeline()
         }
     }
 

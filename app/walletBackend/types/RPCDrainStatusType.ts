@@ -3,7 +3,7 @@
 // native call means no drain is running (before it starts, or once it has
 // finished); otherwise the counts are 0..=total and advance as the drain
 // builds then broadcasts.
-export type RPCDrainStatusPhase = 'building' | 'transmitting';
+type RPCDrainStatusPhase = 'building' | 'transmitting';
 
 export type RPCDrainStatusType = {
   // Total transactions in the plan (N), fixed for the whole drain.

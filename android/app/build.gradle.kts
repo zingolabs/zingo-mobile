@@ -158,6 +158,8 @@ android {
             // MainActivity for releases) keeps prod safe by default — any
             // future flavor MUST define this bool or compile will fail.
             resValue("bool", "enforce_privacy_controls", "true")
+            resValue("bool", "mixnet_always_on", "false")
+            resValue("string", "default_chain_name", "main")
         }
         create("beta") {
             dimension = "channel"
@@ -166,6 +168,32 @@ android {
             versionName = "2.0.21" // beta override
             resValue("string", "app_name", "Zingo Beta")
             resValue("bool", "enforce_privacy_controls", "false")
+            resValue("bool", "mixnet_always_on", "false")
+            resValue("string", "default_chain_name", "main")
+        }
+        // The silent alpha APKs (CONTEXT.md: "Always On"): Mixnet Mode runs
+        // with the stock UX — the app never projects a mixnet view, so no
+        // toggle, banner, or disclaimer renders, and a fail-closed refusal
+        // surfaces as a plain send error. The transport policy itself is
+        // unchanged (forced on at wallet load, fail-closed); only the UI
+        // projection is suppressed, keyed off the mixnet_always_on bool.
+        // The pair differs only in the chain the first run defaults to;
+        // distinct application ids let both install beside prod and beta.
+        create("alwayson") {
+            dimension = "channel"
+            applicationIdSuffix = ".AlwaysOn"
+            resValue("string", "app_name", "Zingo Alpha")
+            resValue("bool", "enforce_privacy_controls", "false")
+            resValue("bool", "mixnet_always_on", "true")
+            resValue("string", "default_chain_name", "main")
+        }
+        create("alwaysontest") {
+            dimension = "channel"
+            applicationIdSuffix = ".AlwaysOnTest"
+            resValue("string", "app_name", "Zingo Alpha Test")
+            resValue("bool", "enforce_privacy_controls", "false")
+            resValue("bool", "mixnet_always_on", "true")
+            resValue("string", "default_chain_name", "test")
         }
     }
 
@@ -402,3 +430,46 @@ dependencies {
     // encrypted file storage
     implementation("androidx.security:security-crypto:1.0.0")
 }
+
+// The staged Nym proxy shim (`jniLibs/<abi>/libzingo_nym_proxy_ffi.so`) is a
+// binary build product with nothing else tying it to the zingolib pin: the
+// UniFFI checksums guard only the interface and the golden contract test only
+// the wire format, so a behavior change upstream (the ADR 0021 TLS fix) once
+// rode three pin bumps inside a stale `.so` undetected. This gate refuses to
+// package a shim whose provenance (stamped by workbench's
+// `consume-android-shim`, extended by `attest-android-shim`) neither matches
+// the locked zingolib revision nor carries an attestation for it. A build
+// with no staged shim passes: a shim-less APK degrades fail-closed by design.
+val verifyShimProvenance = tasks.register("verifyShimProvenance") {
+    val jniLibs = layout.projectDirectory.dir("src/main/jniLibs").asFile
+    val cargoLock = rootProject.projectDir.resolve("../rust/Cargo.lock")
+    doLast {
+        val staged = jniLibs.listFiles().orEmpty().any {
+            it.isDirectory && it.resolve("libzingo_nym_proxy_ffi.so").isFile
+        }
+        if (!staged) return@doLast
+        val provenance = jniLibs.resolve("shim-provenance.txt")
+        check(provenance.isFile) {
+            "a Nym proxy shim is staged in jniLibs but has no provenance record; " +
+                "restage it with `cargo run -p workbench --bin consume-android-shim`"
+        }
+        val lines = provenance.readLines()
+        val builtFrom = lines.firstOrNull { it.startsWith("built_from=") }
+            ?.substringAfter("=")
+        checkNotNull(builtFrom) { "malformed ${provenance.name}: no built_from line" }
+        val attested = lines.filter { it.startsWith("attested=") }
+            .map { it.substringAfter("=") }
+        val pinned = Regex(
+            "name = \"zingolib\"\\nversion = [^\\n]*\\nsource = \"[^\"]*#([0-9a-f]{40})\""
+        ).find(cargoLock.readText())?.groupValues?.get(1)
+        checkNotNull(pinned) { "cannot find the zingolib git revision in rust/Cargo.lock" }
+        check(builtFrom == pinned || pinned in attested) {
+            "the staged Nym proxy shim was built from zingolib $builtFrom but the " +
+                "manifest pins $pinned; rebuild the bundle in zingolib and restage " +
+                "(consume-android-shim), or, if zingo-netutils is unchanged between " +
+                "the revisions, run `cargo run -p workbench --bin attest-android-shim`"
+        }
+    }
+}
+tasks.matching { it.name.startsWith("merge") && it.name.endsWith("JniLibFolders") }
+    .configureEach { dependsOn(verifyShimProvenance) }

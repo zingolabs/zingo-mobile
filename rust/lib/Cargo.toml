@@ -7,6 +7,7 @@ edition = "2024"
 [dependencies]
 zingolib = { workspace = true }
 pepper-sync = { workspace = true }
+zingo-net-diag = { workspace = true }
 
 zcash_keys = { workspace = true }
 zcash_address = { workspace = true }
@@ -29,6 +30,7 @@ serde_json = { workspace = true }
 zip32 = { workspace = true }
 thiserror = { workspace = true }
 once_cell = { workspace = true }
+zingo-price = { workspace = true }
 
 [build-dependencies]
 uniffi_build = { workspace = true, features = ["builtin-bindgen"] }

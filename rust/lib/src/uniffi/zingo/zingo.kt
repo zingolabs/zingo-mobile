@@ -851,6 +851,8 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
+
+
 // For large crates we prevent `MethodTooLargeException` (see #2340)
 // N.B. the name of the extension is very misleading, since it is 
 // rather `InterfaceTooLargeException`, caused by too many methods 
@@ -936,6 +938,8 @@ fun uniffi_zingo_checksum_func_get_wallet_version(
 ): Short
 fun uniffi_zingo_checksum_func_get_zennies_for_zingo_donation_address(
 ): Short
+fun uniffi_zingo_checksum_func_indexer_census(
+): Short
 fun uniffi_zingo_checksum_func_info_server(
 ): Short
 fun uniffi_zingo_checksum_func_init_from_b64(
@@ -952,9 +956,13 @@ fun uniffi_zingo_checksum_func_migration_status(
 ): Short
 fun uniffi_zingo_checksum_func_mixnet_bootstrap_detail(
 ): Short
+fun uniffi_zingo_checksum_func_mixnet_death_report(
+): Short
 fun uniffi_zingo_checksum_func_mixnet_ip_correlation_disclaimer(
 ): Short
 fun uniffi_zingo_checksum_func_mixnet_mode(
+): Short
+fun uniffi_zingo_checksum_func_mixnet_timing(
 ): Short
 fun uniffi_zingo_checksum_func_parse_address(
 ): Short
@@ -968,13 +976,13 @@ fun uniffi_zingo_checksum_func_plan_orchard_drain(
 ): Short
 fun uniffi_zingo_checksum_func_poll_sync(
 ): Short
-fun uniffi_zingo_checksum_func_quick_split(
+fun uniffi_zingo_checksum_func_probe_server(
+): Short
+fun uniffi_zingo_checksum_func_probe_sync_server(
 ): Short
 fun uniffi_zingo_checksum_func_reconcile_migration(
 ): Short
 fun uniffi_zingo_checksum_func_remove_transaction(
-): Short
-fun uniffi_zingo_checksum_func_reschedule_parts(
 ): Short
 fun uniffi_zingo_checksum_func_run_rescan(
 ): Short
@@ -994,15 +1002,11 @@ fun uniffi_zingo_checksum_func_set_option_wallet(
 ): Short
 fun uniffi_zingo_checksum_func_shield(
 ): Short
-fun uniffi_zingo_checksum_func_split_status(
-): Short
 fun uniffi_zingo_checksum_func_start_ironwood_migration(
 ): Short
 fun uniffi_zingo_checksum_func_status_sync(
 ): Short
 fun uniffi_zingo_checksum_func_wallet_kind(
-): Short
-fun uniffi_zingo_checksum_func_window_timeline(
 ): Short
 fun uniffi_zingo_checksum_func_zec_price(
 ): Short
@@ -1121,6 +1125,8 @@ fun uniffi_zingo_fn_func_get_wallet_version(uniffi_out_err: UniffiRustCallStatus
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_get_zennies_for_zingo_donation_address(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
+fun uniffi_zingo_fn_func_indexer_census(uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_info_server(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_init_from_b64(`datab64`: RustBuffer.ByValue,`serveruri`: RustBuffer.ByValue,`chainhint`: RustBuffer.ByValue,`performancelevel`: RustBuffer.ByValue,`minconfirmations`: Int,uniffi_out_err: UniffiRustCallStatus, 
@@ -1137,9 +1143,13 @@ fun uniffi_zingo_fn_func_migration_status(uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_mixnet_bootstrap_detail(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
+fun uniffi_zingo_fn_func_mixnet_death_report(uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_mixnet_ip_correlation_disclaimer(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_mixnet_mode(uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_zingo_fn_func_mixnet_timing(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_parse_address(`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1153,13 +1163,13 @@ fun uniffi_zingo_fn_func_plan_orchard_drain(uniffi_out_err: UniffiRustCallStatus
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_poll_sync(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_quick_split(uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_zingo_fn_func_probe_server(`uri`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_zingo_fn_func_probe_sync_server(`uri`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_reconcile_migration(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_remove_transaction(`txid`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_reschedule_parts(`perBucket`: Int,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_run_rescan(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1179,15 +1189,11 @@ fun uniffi_zingo_fn_func_set_option_wallet(uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_shield(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_split_status(uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_start_ironwood_migration(`planHashHex`: RustBuffer.ByValue,`perBucket`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_zingo_fn_func_start_ironwood_migration(`planHashHex`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_status_sync(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_wallet_kind(uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_window_timeline(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_zec_price(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1422,6 +1428,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zingo_checksum_func_get_zennies_for_zingo_donation_address() != 46203.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_zingo_checksum_func_indexer_census() != 59054.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_zingo_checksum_func_info_server() != 9708.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1446,10 +1455,16 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zingo_checksum_func_mixnet_bootstrap_detail() != 12980.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_zingo_checksum_func_mixnet_death_report() != 46072.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_zingo_checksum_func_mixnet_ip_correlation_disclaimer() != 47567.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_mixnet_mode() != 29476.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_zingo_checksum_func_mixnet_timing() != 41478.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_parse_address() != 37603.toShort()) {
@@ -1470,16 +1485,16 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zingo_checksum_func_poll_sync() != 35296.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_zingo_checksum_func_quick_split() != 1449.toShort()) {
+    if (lib.uniffi_zingo_checksum_func_probe_server() != 39171.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_zingo_checksum_func_probe_sync_server() != 48155.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_reconcile_migration() != 36661.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_remove_transaction() != 54006.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_zingo_checksum_func_reschedule_parts() != 2084.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_run_rescan() != 52086.toShort()) {
@@ -1509,19 +1524,13 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zingo_checksum_func_shield() != 33728.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_zingo_checksum_func_split_status() != 31456.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_zingo_checksum_func_start_ironwood_migration() != 47149.toShort()) {
+    if (lib.uniffi_zingo_checksum_func_start_ironwood_migration() != 47665.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_status_sync() != 2462.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_wallet_kind() != 56355.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_zingo_checksum_func_window_timeline() != 7109.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_zec_price() != 16513.toShort()) {
@@ -1655,6 +1664,29 @@ public object FfiConverterULong: FfiConverter<ULong, Long> {
 /**
  * @suppress
  */
+public object FfiConverterBoolean: FfiConverter<Boolean, Byte> {
+    override fun lift(value: Byte): Boolean {
+        return value.toInt() != 0
+    }
+
+    override fun read(buf: ByteBuffer): Boolean {
+        return lift(buf.get())
+    }
+
+    override fun lower(value: Boolean): Byte {
+        return if (value) 1.toByte() else 0.toByte()
+    }
+
+    override fun allocationSize(value: Boolean) = 1UL
+
+    override fun write(value: Boolean, buf: ByteBuffer) {
+        buf.put(lower(value))
+    }
+}
+
+/**
+ * @suppress
+ */
 public object FfiConverterString: FfiConverter<String, RustBuffer.ByValue> {
     // Note: we don't inherit from FfiConverterRustBuffer, because we use a
     // special encoding when lowering/lifting.  We can use `RustBuffer.len` to
@@ -1730,6 +1762,588 @@ public object FfiConverterByteArray: FfiConverterRustBuffer<ByteArray> {
 
 
 
+data class IndexerEntry (
+    var `uri`: kotlin.String, 
+    var `chain`: kotlin.String, 
+    var `operator`: kotlin.String, 
+    var `regionKey`: kotlin.String, 
+    var `isDefault`: kotlin.Boolean, 
+    var `obsolete`: kotlin.Boolean
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeIndexerEntry: FfiConverterRustBuffer<IndexerEntry> {
+    override fun read(buf: ByteBuffer): IndexerEntry {
+        return IndexerEntry(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterBoolean.read(buf),
+            FfiConverterBoolean.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: IndexerEntry) = (
+            FfiConverterString.allocationSize(value.`uri`) +
+            FfiConverterString.allocationSize(value.`chain`) +
+            FfiConverterString.allocationSize(value.`operator`) +
+            FfiConverterString.allocationSize(value.`regionKey`) +
+            FfiConverterBoolean.allocationSize(value.`isDefault`) +
+            FfiConverterBoolean.allocationSize(value.`obsolete`)
+    )
+
+    override fun write(value: IndexerEntry, buf: ByteBuffer) {
+            FfiConverterString.write(value.`uri`, buf)
+            FfiConverterString.write(value.`chain`, buf)
+            FfiConverterString.write(value.`operator`, buf)
+            FfiConverterString.write(value.`regionKey`, buf)
+            FfiConverterBoolean.write(value.`isDefault`, buf)
+            FfiConverterBoolean.write(value.`obsolete`, buf)
+    }
+}
+
+
+
+data class MixnetDeathReport (
+    var `ageMillis`: kotlin.ULong, 
+    var `detail`: ProbeFailure?
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMixnetDeathReport: FfiConverterRustBuffer<MixnetDeathReport> {
+    override fun read(buf: ByteBuffer): MixnetDeathReport {
+        return MixnetDeathReport(
+            FfiConverterULong.read(buf),
+            FfiConverterOptionalTypeProbeFailure.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MixnetDeathReport) = (
+            FfiConverterULong.allocationSize(value.`ageMillis`) +
+            FfiConverterOptionalTypeProbeFailure.allocationSize(value.`detail`)
+    )
+
+    override fun write(value: MixnetDeathReport, buf: ByteBuffer) {
+            FfiConverterULong.write(value.`ageMillis`, buf)
+            FfiConverterOptionalTypeProbeFailure.write(value.`detail`, buf)
+    }
+}
+
+
+
+data class MixnetTiming (
+    var `attachReadinessBudgetMillis`: kotlin.ULong, 
+    var `mixnetRoundTripBoundMillis`: kotlin.ULong
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMixnetTiming: FfiConverterRustBuffer<MixnetTiming> {
+    override fun read(buf: ByteBuffer): MixnetTiming {
+        return MixnetTiming(
+            FfiConverterULong.read(buf),
+            FfiConverterULong.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MixnetTiming) = (
+            FfiConverterULong.allocationSize(value.`attachReadinessBudgetMillis`) +
+            FfiConverterULong.allocationSize(value.`mixnetRoundTripBoundMillis`)
+    )
+
+    override fun write(value: MixnetTiming, buf: ByteBuffer) {
+            FfiConverterULong.write(value.`attachReadinessBudgetMillis`, buf)
+            FfiConverterULong.write(value.`mixnetRoundTripBoundMillis`, buf)
+    }
+}
+
+
+
+data class ProbeFailure (
+    var `stage`: kotlin.String, 
+    var `target`: kotlin.String, 
+    var `causeChain`: List<kotlin.String>
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeProbeFailure: FfiConverterRustBuffer<ProbeFailure> {
+    override fun read(buf: ByteBuffer): ProbeFailure {
+        return ProbeFailure(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterSequenceString.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: ProbeFailure) = (
+            FfiConverterString.allocationSize(value.`stage`) +
+            FfiConverterString.allocationSize(value.`target`) +
+            FfiConverterSequenceString.allocationSize(value.`causeChain`)
+    )
+
+    override fun write(value: ProbeFailure, buf: ByteBuffer) {
+            FfiConverterString.write(value.`stage`, buf)
+            FfiConverterString.write(value.`target`, buf)
+            FfiConverterSequenceString.write(value.`causeChain`, buf)
+    }
+}
+
+
+
+data class ProbeLeg (
+    var `millis`: kotlin.ULong, 
+    var `outcome`: ProbeLegOutcome
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeProbeLeg: FfiConverterRustBuffer<ProbeLeg> {
+    override fun read(buf: ByteBuffer): ProbeLeg {
+        return ProbeLeg(
+            FfiConverterULong.read(buf),
+            FfiConverterTypeProbeLegOutcome.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: ProbeLeg) = (
+            FfiConverterULong.allocationSize(value.`millis`) +
+            FfiConverterTypeProbeLegOutcome.allocationSize(value.`outcome`)
+    )
+
+    override fun write(value: ProbeLeg, buf: ByteBuffer) {
+            FfiConverterULong.write(value.`millis`, buf)
+            FfiConverterTypeProbeLegOutcome.write(value.`outcome`, buf)
+    }
+}
+
+
+
+data class ProbeReport (
+    var `host`: kotlin.String, 
+    var `clearnet`: ProbeLeg, 
+    var `mixnet`: MixnetLeg
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeProbeReport: FfiConverterRustBuffer<ProbeReport> {
+    override fun read(buf: ByteBuffer): ProbeReport {
+        return ProbeReport(
+            FfiConverterString.read(buf),
+            FfiConverterTypeProbeLeg.read(buf),
+            FfiConverterTypeMixnetLeg.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: ProbeReport) = (
+            FfiConverterString.allocationSize(value.`host`) +
+            FfiConverterTypeProbeLeg.allocationSize(value.`clearnet`) +
+            FfiConverterTypeMixnetLeg.allocationSize(value.`mixnet`)
+    )
+
+    override fun write(value: ProbeReport, buf: ByteBuffer) {
+            FfiConverterString.write(value.`host`, buf)
+            FfiConverterTypeProbeLeg.write(value.`clearnet`, buf)
+            FfiConverterTypeMixnetLeg.write(value.`mixnet`, buf)
+    }
+}
+
+
+
+data class ProbeSuccessData (
+    var `chain`: kotlin.String, 
+    var `height`: kotlin.ULong
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeProbeSuccessData: FfiConverterRustBuffer<ProbeSuccessData> {
+    override fun read(buf: ByteBuffer): ProbeSuccessData {
+        return ProbeSuccessData(
+            FfiConverterString.read(buf),
+            FfiConverterULong.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: ProbeSuccessData) = (
+            FfiConverterString.allocationSize(value.`chain`) +
+            FfiConverterULong.allocationSize(value.`height`)
+    )
+
+    override fun write(value: ProbeSuccessData, buf: ByteBuffer) {
+            FfiConverterString.write(value.`chain`, buf)
+            FfiConverterULong.write(value.`height`, buf)
+    }
+}
+
+
+
+data class SyncProbeStage (
+    var `step`: kotlin.String, 
+    var `millis`: kotlin.ULong, 
+    var `outcome`: SyncStageOutcome
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeSyncProbeStage: FfiConverterRustBuffer<SyncProbeStage> {
+    override fun read(buf: ByteBuffer): SyncProbeStage {
+        return SyncProbeStage(
+            FfiConverterString.read(buf),
+            FfiConverterULong.read(buf),
+            FfiConverterTypeSyncStageOutcome.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: SyncProbeStage) = (
+            FfiConverterString.allocationSize(value.`step`) +
+            FfiConverterULong.allocationSize(value.`millis`) +
+            FfiConverterTypeSyncStageOutcome.allocationSize(value.`outcome`)
+    )
+
+    override fun write(value: SyncProbeStage, buf: ByteBuffer) {
+            FfiConverterString.write(value.`step`, buf)
+            FfiConverterULong.write(value.`millis`, buf)
+            FfiConverterTypeSyncStageOutcome.write(value.`outcome`, buf)
+    }
+}
+
+
+
+data class SyncServerProbe (
+    var `server`: kotlin.String, 
+    var `stages`: List<SyncProbeStage>, 
+    var `verdict`: SyncServerVerdict
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeSyncServerProbe: FfiConverterRustBuffer<SyncServerProbe> {
+    override fun read(buf: ByteBuffer): SyncServerProbe {
+        return SyncServerProbe(
+            FfiConverterString.read(buf),
+            FfiConverterSequenceTypeSyncProbeStage.read(buf),
+            FfiConverterTypeSyncServerVerdict.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: SyncServerProbe) = (
+            FfiConverterString.allocationSize(value.`server`) +
+            FfiConverterSequenceTypeSyncProbeStage.allocationSize(value.`stages`) +
+            FfiConverterTypeSyncServerVerdict.allocationSize(value.`verdict`)
+    )
+
+    override fun write(value: SyncServerProbe, buf: ByteBuffer) {
+            FfiConverterString.write(value.`server`, buf)
+            FfiConverterSequenceTypeSyncProbeStage.write(value.`stages`, buf)
+            FfiConverterTypeSyncServerVerdict.write(value.`verdict`, buf)
+    }
+}
+
+
+
+sealed class MixnetLeg {
+    
+    data class Probed(
+        val `leg`: ProbeLeg) : MixnetLeg() {
+        companion object
+    }
+    
+    object NotCarried : MixnetLeg()
+    
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMixnetLeg : FfiConverterRustBuffer<MixnetLeg>{
+    override fun read(buf: ByteBuffer): MixnetLeg {
+        return when(buf.getInt()) {
+            1 -> MixnetLeg.Probed(
+                FfiConverterTypeProbeLeg.read(buf),
+                )
+            2 -> MixnetLeg.NotCarried
+            else -> throw RuntimeException("invalid enum value, something is very wrong!!")
+        }
+    }
+
+    override fun allocationSize(value: MixnetLeg) = when(value) {
+        is MixnetLeg.Probed -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeProbeLeg.allocationSize(value.`leg`)
+            )
+        }
+        is MixnetLeg.NotCarried -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+            )
+        }
+    }
+
+    override fun write(value: MixnetLeg, buf: ByteBuffer) {
+        when(value) {
+            is MixnetLeg.Probed -> {
+                buf.putInt(1)
+                FfiConverterTypeProbeLeg.write(value.`leg`, buf)
+                Unit
+            }
+            is MixnetLeg.NotCarried -> {
+                buf.putInt(2)
+                Unit
+            }
+        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
+    }
+}
+
+
+
+
+
+sealed class ProbeLegOutcome {
+    
+    data class Answered(
+        val `info`: ProbeSuccessData) : ProbeLegOutcome() {
+        companion object
+    }
+    
+    data class Failed(
+        val `failure`: ProbeFailure) : ProbeLegOutcome() {
+        companion object
+    }
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeProbeLegOutcome : FfiConverterRustBuffer<ProbeLegOutcome>{
+    override fun read(buf: ByteBuffer): ProbeLegOutcome {
+        return when(buf.getInt()) {
+            1 -> ProbeLegOutcome.Answered(
+                FfiConverterTypeProbeSuccessData.read(buf),
+                )
+            2 -> ProbeLegOutcome.Failed(
+                FfiConverterTypeProbeFailure.read(buf),
+                )
+            else -> throw RuntimeException("invalid enum value, something is very wrong!!")
+        }
+    }
+
+    override fun allocationSize(value: ProbeLegOutcome) = when(value) {
+        is ProbeLegOutcome.Answered -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeProbeSuccessData.allocationSize(value.`info`)
+            )
+        }
+        is ProbeLegOutcome.Failed -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeProbeFailure.allocationSize(value.`failure`)
+            )
+        }
+    }
+
+    override fun write(value: ProbeLegOutcome, buf: ByteBuffer) {
+        when(value) {
+            is ProbeLegOutcome.Answered -> {
+                buf.putInt(1)
+                FfiConverterTypeProbeSuccessData.write(value.`info`, buf)
+                Unit
+            }
+            is ProbeLegOutcome.Failed -> {
+                buf.putInt(2)
+                FfiConverterTypeProbeFailure.write(value.`failure`, buf)
+                Unit
+            }
+        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
+    }
+}
+
+
+
+
+
+sealed class SyncServerVerdict {
+    
+    data class Reachable(
+        val `info`: ProbeSuccessData) : SyncServerVerdict() {
+        companion object
+    }
+    
+    object Stopped : SyncServerVerdict()
+    
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeSyncServerVerdict : FfiConverterRustBuffer<SyncServerVerdict>{
+    override fun read(buf: ByteBuffer): SyncServerVerdict {
+        return when(buf.getInt()) {
+            1 -> SyncServerVerdict.Reachable(
+                FfiConverterTypeProbeSuccessData.read(buf),
+                )
+            2 -> SyncServerVerdict.Stopped
+            else -> throw RuntimeException("invalid enum value, something is very wrong!!")
+        }
+    }
+
+    override fun allocationSize(value: SyncServerVerdict) = when(value) {
+        is SyncServerVerdict.Reachable -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeProbeSuccessData.allocationSize(value.`info`)
+            )
+        }
+        is SyncServerVerdict.Stopped -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+            )
+        }
+    }
+
+    override fun write(value: SyncServerVerdict, buf: ByteBuffer) {
+        when(value) {
+            is SyncServerVerdict.Reachable -> {
+                buf.putInt(1)
+                FfiConverterTypeProbeSuccessData.write(value.`info`, buf)
+                Unit
+            }
+            is SyncServerVerdict.Stopped -> {
+                buf.putInt(2)
+                Unit
+            }
+        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
+    }
+}
+
+
+
+
+
+sealed class SyncStageOutcome {
+    
+    object Passed : SyncStageOutcome()
+    
+    
+    data class Failed(
+        val `failure`: ProbeFailure) : SyncStageOutcome() {
+        companion object
+    }
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeSyncStageOutcome : FfiConverterRustBuffer<SyncStageOutcome>{
+    override fun read(buf: ByteBuffer): SyncStageOutcome {
+        return when(buf.getInt()) {
+            1 -> SyncStageOutcome.Passed
+            2 -> SyncStageOutcome.Failed(
+                FfiConverterTypeProbeFailure.read(buf),
+                )
+            else -> throw RuntimeException("invalid enum value, something is very wrong!!")
+        }
+    }
+
+    override fun allocationSize(value: SyncStageOutcome) = when(value) {
+        is SyncStageOutcome.Passed -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+            )
+        }
+        is SyncStageOutcome.Failed -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeProbeFailure.allocationSize(value.`failure`)
+            )
+        }
+    }
+
+    override fun write(value: SyncStageOutcome, buf: ByteBuffer) {
+        when(value) {
+            is SyncStageOutcome.Passed -> {
+                buf.putInt(1)
+                Unit
+            }
+            is SyncStageOutcome.Failed -> {
+                buf.putInt(2)
+                FfiConverterTypeProbeFailure.write(value.`failure`, buf)
+                Unit
+            }
+        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
+    }
+}
+
+
+
+
+
 
 
 sealed class ZingolibException(message: String): kotlin.Exception(message) {
@@ -1749,6 +2363,8 @@ sealed class ZingolibException(message: String): kotlin.Exception(message) {
         class Rescan(message: String) : ZingolibException(message)
         
         class Read(message: String) : ZingolibException(message)
+        
+        class Mixnet(message: String) : ZingolibException(message)
         
         class Send(message: String) : ZingolibException(message)
         
@@ -1770,13 +2386,9 @@ sealed class ZingolibException(message: String): kotlin.Exception(message) {
         
         class MigrationConsentStale(message: String) : ZingolibException(message)
         
-        class MigrationCadenceFixed(message: String) : ZingolibException(message)
-        
         class MigrationSplit(message: String) : ZingolibException(message)
         
         class Migration(message: String) : ZingolibException(message)
-        
-        class Mixnet(message: String) : ZingolibException(message)
         
 
     companion object ErrorHandler : UniffiRustCallStatusErrorHandler<ZingolibException> {
@@ -1799,20 +2411,19 @@ public object FfiConverterTypeZingolibError : FfiConverterRustBuffer<ZingolibExc
             6 -> ZingolibException.Sync(FfiConverterString.read(buf))
             7 -> ZingolibException.Rescan(FfiConverterString.read(buf))
             8 -> ZingolibException.Read(FfiConverterString.read(buf))
-            9 -> ZingolibException.Send(FfiConverterString.read(buf))
-            10 -> ZingolibException.Shield(FfiConverterString.read(buf))
-            11 -> ZingolibException.InvalidInput(FfiConverterString.read(buf))
-            12 -> ZingolibException.Wallet(FfiConverterString.read(buf))
-            13 -> ZingolibException.Indexer(FfiConverterString.read(buf))
-            14 -> ZingolibException.Offline(FfiConverterString.read(buf))
-            15 -> ZingolibException.SideChannelPoisoned(FfiConverterString.read(buf))
-            16 -> ZingolibException.MigrationNotInProgress(FfiConverterString.read(buf))
-            17 -> ZingolibException.MigrationAlreadyInProgress(FfiConverterString.read(buf))
-            18 -> ZingolibException.MigrationConsentStale(FfiConverterString.read(buf))
-            19 -> ZingolibException.MigrationCadenceFixed(FfiConverterString.read(buf))
+            9 -> ZingolibException.Mixnet(FfiConverterString.read(buf))
+            10 -> ZingolibException.Send(FfiConverterString.read(buf))
+            11 -> ZingolibException.Shield(FfiConverterString.read(buf))
+            12 -> ZingolibException.InvalidInput(FfiConverterString.read(buf))
+            13 -> ZingolibException.Wallet(FfiConverterString.read(buf))
+            14 -> ZingolibException.Indexer(FfiConverterString.read(buf))
+            15 -> ZingolibException.Offline(FfiConverterString.read(buf))
+            16 -> ZingolibException.SideChannelPoisoned(FfiConverterString.read(buf))
+            17 -> ZingolibException.MigrationNotInProgress(FfiConverterString.read(buf))
+            18 -> ZingolibException.MigrationAlreadyInProgress(FfiConverterString.read(buf))
+            19 -> ZingolibException.MigrationConsentStale(FfiConverterString.read(buf))
             20 -> ZingolibException.MigrationSplit(FfiConverterString.read(buf))
             21 -> ZingolibException.Migration(FfiConverterString.read(buf))
-            22 -> ZingolibException.Mixnet(FfiConverterString.read(buf))
             else -> throw RuntimeException("invalid error enum value, something is very wrong!!")
         }
         
@@ -1856,47 +2467,47 @@ public object FfiConverterTypeZingolibError : FfiConverterRustBuffer<ZingolibExc
                 buf.putInt(8)
                 Unit
             }
-            is ZingolibException.Send -> {
+            is ZingolibException.Mixnet -> {
                 buf.putInt(9)
                 Unit
             }
-            is ZingolibException.Shield -> {
+            is ZingolibException.Send -> {
                 buf.putInt(10)
                 Unit
             }
-            is ZingolibException.InvalidInput -> {
+            is ZingolibException.Shield -> {
                 buf.putInt(11)
                 Unit
             }
-            is ZingolibException.Wallet -> {
+            is ZingolibException.InvalidInput -> {
                 buf.putInt(12)
                 Unit
             }
-            is ZingolibException.Indexer -> {
+            is ZingolibException.Wallet -> {
                 buf.putInt(13)
                 Unit
             }
-            is ZingolibException.Offline -> {
+            is ZingolibException.Indexer -> {
                 buf.putInt(14)
                 Unit
             }
-            is ZingolibException.SideChannelPoisoned -> {
+            is ZingolibException.Offline -> {
                 buf.putInt(15)
                 Unit
             }
-            is ZingolibException.MigrationNotInProgress -> {
+            is ZingolibException.SideChannelPoisoned -> {
                 buf.putInt(16)
                 Unit
             }
-            is ZingolibException.MigrationAlreadyInProgress -> {
+            is ZingolibException.MigrationNotInProgress -> {
                 buf.putInt(17)
                 Unit
             }
-            is ZingolibException.MigrationConsentStale -> {
+            is ZingolibException.MigrationAlreadyInProgress -> {
                 buf.putInt(18)
                 Unit
             }
-            is ZingolibException.MigrationCadenceFixed -> {
+            is ZingolibException.MigrationConsentStale -> {
                 buf.putInt(19)
                 Unit
             }
@@ -1908,45 +2519,9 @@ public object FfiConverterTypeZingolibError : FfiConverterRustBuffer<ZingolibExc
                 buf.putInt(21)
                 Unit
             }
-            is ZingolibException.Mixnet -> {
-                buf.putInt(22)
-                Unit
-            }
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
     }
 
-}
-
-
-
-
-/**
- * @suppress
- */
-public object FfiConverterOptionalUInt: FfiConverterRustBuffer<kotlin.UInt?> {
-    override fun read(buf: ByteBuffer): kotlin.UInt? {
-        if (buf.get().toInt() == 0) {
-            return null
-        }
-        return FfiConverterUInt.read(buf)
-    }
-
-    override fun allocationSize(value: kotlin.UInt?): ULong {
-        if (value == null) {
-            return 1UL
-        } else {
-            return 1UL + FfiConverterUInt.allocationSize(value)
-        }
-    }
-
-    override fun write(value: kotlin.UInt?, buf: ByteBuffer) {
-        if (value == null) {
-            buf.put(0)
-        } else {
-            buf.put(1)
-            FfiConverterUInt.write(value, buf)
-        }
-    }
 }
 
 
@@ -1977,6 +2552,182 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
         } else {
             buf.put(1)
             FfiConverterByteArray.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterOptionalTypeMixnetDeathReport: FfiConverterRustBuffer<MixnetDeathReport?> {
+    override fun read(buf: ByteBuffer): MixnetDeathReport? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterTypeMixnetDeathReport.read(buf)
+    }
+
+    override fun allocationSize(value: MixnetDeathReport?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterTypeMixnetDeathReport.allocationSize(value)
+        }
+    }
+
+    override fun write(value: MixnetDeathReport?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterTypeMixnetDeathReport.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterOptionalTypeProbeFailure: FfiConverterRustBuffer<ProbeFailure?> {
+    override fun read(buf: ByteBuffer): ProbeFailure? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterTypeProbeFailure.read(buf)
+    }
+
+    override fun allocationSize(value: ProbeFailure?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterTypeProbeFailure.allocationSize(value)
+        }
+    }
+
+    override fun write(value: ProbeFailure?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterTypeProbeFailure.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceString: FfiConverterRustBuffer<List<kotlin.String>> {
+    override fun read(buf: ByteBuffer): List<kotlin.String> {
+        val len = buf.getInt()
+        return List<kotlin.String>(len) {
+            FfiConverterString.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<kotlin.String>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterString.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<kotlin.String>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterString.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeIndexerEntry: FfiConverterRustBuffer<List<IndexerEntry>> {
+    override fun read(buf: ByteBuffer): List<IndexerEntry> {
+        val len = buf.getInt()
+        return List<IndexerEntry>(len) {
+            FfiConverterTypeIndexerEntry.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<IndexerEntry>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeIndexerEntry.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<IndexerEntry>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeIndexerEntry.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeProbeReport: FfiConverterRustBuffer<List<ProbeReport>> {
+    override fun read(buf: ByteBuffer): List<ProbeReport> {
+        val len = buf.getInt()
+        return List<ProbeReport>(len) {
+            FfiConverterTypeProbeReport.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<ProbeReport>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeProbeReport.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<ProbeReport>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeProbeReport.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeSyncProbeStage: FfiConverterRustBuffer<List<SyncProbeStage>> {
+    override fun read(buf: ByteBuffer): List<SyncProbeStage> {
+        val len = buf.getInt()
+        return List<SyncProbeStage>(len) {
+            FfiConverterTypeSyncProbeStage.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<SyncProbeStage>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeSyncProbeStage.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<SyncProbeStage>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeSyncProbeStage.write(it, buf)
         }
     }
 }
@@ -2329,6 +3080,15 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     )
     }
     
+ fun `indexerCensus`(): List<IndexerEntry> {
+            return FfiConverterSequenceTypeIndexerEntry.lift(
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_indexer_census(
+        _status)
+}
+    )
+    }
+    
 
     @Throws(ZingolibException::class) fun `infoServer`(): kotlin.String {
             return FfiConverterString.lift(
@@ -2409,6 +3169,16 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     )
     }
     
+
+    @Throws(ZingolibException::class) fun `mixnetDeathReport`(): MixnetDeathReport? {
+            return FfiConverterOptionalTypeMixnetDeathReport.lift(
+    uniffiRustCallWithError(ZingolibException) { _status ->
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_mixnet_death_report(
+        _status)
+}
+    )
+    }
+    
  fun `mixnetIpCorrelationDisclaimer`(): kotlin.String {
             return FfiConverterString.lift(
     uniffiRustCall() { _status ->
@@ -2423,6 +3193,15 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
             return FfiConverterString.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_mixnet_mode(
+        _status)
+}
+    )
+    }
+    
+ fun `mixnetTiming`(): MixnetTiming {
+            return FfiConverterTypeMixnetTiming.lift(
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_mixnet_timing(
         _status)
 }
     )
@@ -2489,11 +3268,21 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     }
     
 
-    @Throws(ZingolibException::class) fun `quickSplit`(): kotlin.String {
-            return FfiConverterString.lift(
+    @Throws(ZingolibException::class) fun `probeServer`(`uri`: kotlin.String): List<ProbeReport> {
+            return FfiConverterSequenceTypeProbeReport.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
-    UniffiLib.INSTANCE.uniffi_zingo_fn_func_quick_split(
-        _status)
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_probe_server(
+        FfiConverterString.lower(`uri`),_status)
+}
+    )
+    }
+    
+
+    @Throws(ZingolibException::class) fun `probeSyncServer`(`uri`: kotlin.String): SyncServerProbe {
+            return FfiConverterTypeSyncServerProbe.lift(
+    uniffiRustCallWithError(ZingolibException) { _status ->
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_probe_sync_server(
+        FfiConverterString.lower(`uri`),_status)
 }
     )
     }
@@ -2514,16 +3303,6 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_remove_transaction(
         FfiConverterString.lower(`txid`),_status)
-}
-    )
-    }
-    
-
-    @Throws(ZingolibException::class) fun `rescheduleParts`(`perBucket`: kotlin.UInt): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCallWithError(ZingolibException) { _status ->
-    UniffiLib.INSTANCE.uniffi_zingo_fn_func_reschedule_parts(
-        FfiConverterUInt.lower(`perBucket`),_status)
 }
     )
     }
@@ -2619,21 +3398,11 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     }
     
 
-    @Throws(ZingolibException::class) fun `splitStatus`(): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCallWithError(ZingolibException) { _status ->
-    UniffiLib.INSTANCE.uniffi_zingo_fn_func_split_status(
-        _status)
-}
-    )
-    }
-    
-
-    @Throws(ZingolibException::class) fun `startIronwoodMigration`(`planHashHex`: kotlin.String, `perBucket`: kotlin.UInt?): kotlin.String {
+    @Throws(ZingolibException::class) fun `startIronwoodMigration`(`planHashHex`: kotlin.String): kotlin.String {
             return FfiConverterString.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_start_ironwood_migration(
-        FfiConverterString.lower(`planHashHex`),FfiConverterOptionalUInt.lower(`perBucket`),_status)
+        FfiConverterString.lower(`planHashHex`),_status)
 }
     )
     }
@@ -2653,16 +3422,6 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
             return FfiConverterString.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_wallet_kind(
-        _status)
-}
-    )
-    }
-    
-
-    @Throws(ZingolibException::class) fun `windowTimeline`(): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCallWithError(ZingolibException) { _status ->
-    UniffiLib.INSTANCE.uniffi_zingo_fn_func_window_timeline(
         _status)
 }
     )

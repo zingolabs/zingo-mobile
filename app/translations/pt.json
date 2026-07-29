@@ -156,6 +156,7 @@
     "support": "E-mail de suporte do {name}",
     "changeservernew-error": "Error ao tentar alterar para um novo servidor: ",
     "readingwallet-error": "Error ao tentar ler a carteira com o novo servidor:",
+    "recoveryinfo-error": "Não foi possível ler as informações de recuperação da carteira, portanto nada foi armazenado neste dispositivo. A configuração foi desativada novamente.",
     "differentchain-error": "Você está mudando para um servidor com uma rede diferente, você não terá mais acesso a essa carteira sem suas frases de recuperação.",
     "serverchain-mismatch": "O servidor informa uma rede diferente da selecionada. Verifique o seletor de rede e tente novamente.",
     "changingwallet-label": "Error ao Alterar a Carteira",
@@ -188,7 +189,8 @@
     "email-error-title": "Error ao abrir o cliente de e-mail",
     "email-error-body": "Acesse as configurações do seu dispositivo e defina um aplicativo de e-mail padrão para enviar o relatório.",
     "migration-title": "Migração de carteira",
-    "migration-body": "Estamos migrando sua carteira para o novo sistema de sincronização. Mantenha seu dispositivo conectado à energia e ao Wi-Fi.\n\nSeu saldo mudará conforme a migração avança. Não se preocupe, seus fundos estão seguros!"
+    "migration-body": "Estamos migrando sua carteira para o novo sistema de sincronização. Mantenha seu dispositivo conectado à energia e ao Wi-Fi.\n\nSeu saldo mudará conforme a migração avança. Não se preocupe, seus fundos estão seguros!",
+    "connectiondoctor": "Doutor de Conexão"
   },
   "rpc": {
     "walletnotfound-error": "Error: não foi possível encontrar nenhuma carteira.",
@@ -458,7 +460,13 @@
       "unknown": "Mixnet indisponível"
     },
     "send-blocked": "O envio está pausado até a mixnet estar pronta",
-    "reenable": "Reativar mixnet"
+    "reenable": "Reativar mixnet",
+    "bootstrap-patience": "A conexão pode levar até"
+  },
+  "pricefetcher": {
+    "updated-mixnet": "Preço atualizado pela mixnet",
+    "updated-clearnet": "Preço atualizado pela rede aberta",
+    "updated": "Preço atualizado"
   },
   "header": {
     "lastupdate": "Última atualização:"
@@ -631,6 +639,7 @@
     },
     "verification-success": "Este endereço pertence a você e é seguro para receber fundos.",
     "verification-failure": "Este endereço não pertence a você.",
+    "verification-unavailable": "Não foi possível concluir a verificação. Tente novamente.",
     "add-tag": "Adicionar etiqueta"
   },
   "history": {
@@ -755,6 +764,22 @@
       "O aviso de direitos autorais acima e este aviso de permissão serão incluídos em todas as cópias ou partes substanciais do Software.",
       "O SOFTWARE É FORNECIDO 'COMO ESTÁ', SEM GARANTIA ALGUMA, SEJA EXPRESSA OU IMPLÍCITA, MAS NÃO SE LIMITANDO ÀS GARANTIAS DE COMERCIALIZAÇÃO, ADEQUAÇÃO A UM DETERMINADO FIM E SEM VIOLAÇÕES. EM HIPÓTESE ALGUMA OS AUTORES OU DETENTORES DE DIREITOS AUTORAIS SERÃO RESPONSÁVEIS POR QUALQUER RECLAMAÇÃO, DANOS OU OUTRAS RESPONSABILIDADES, SEJA EM UMA AÇÃO DE CONTRATO, ATO ILÍCITO OU DE OUTRA FORMA, DECORRENTE A ALGO RELACIONADO A CONEXÃO, A USABILIDADE OU OUTRAS NEGOCIAÇÕES NO SOFTWARE."
     ]
+  },
+  "connectiondoctor": {
+    "title": "Doutor de Conexão",
+    "title-acc": "Tela do Doutor de Conexão",
+    "intro": "Testa cada servidor conhecido pela clearnet e, quando o Modo Mixnet está pronto, pela mixnet. Cada teste contata o servidor a partir do seu IP real. Copie o relatório concluído no seu pedido de suporte.",
+    "run": "Executar o Doutor",
+    "running": "Testando servidores...",
+    "clearnet": "clearnet",
+    "mixnet": "mixnet",
+    "mixnet-not-carried": "mixnet: não realizada (proxy não pronto)",
+    "probe-failed": "teste falhou:",
+    "payload-unusable": "resposta inutilizável:",
+    "copy-report": "Copiar relatório",
+    "report-copied": "Relatório copiado para a área de transferência.",
+    "leg-ok": "ok",
+    "leg-failed": "FALHOU"
   },
   "scanner": {
     "text": "Faça o Scan de uma Chave de Visualização Unificada completa",
@@ -945,27 +970,6 @@
     "error-hint": "Nada foi perdido — você pode tentar de novo agora ou voltar depois pela tela inicial.",
     "retry": "Tentar de novo",
     "close": "Fechar"
-  },
-  "migrationcadence": {
-    "title": "Agende as transferências",
-    "intro": "Suas **{notes} notas** serão enviadas para a Ironwood em **lotes**. A blockchain é dividida em janelas de **{blocks} blocos** (~{hours}h); cada lote sai na sua própria janela.",
-    "how-many": "Quantos lotes?",
-    "fewer-title": "Menos lotes, maiores",
-    "fewer-body": "Termina antes. Mais notas visíveis juntas.",
-    "more-title": "Mais lotes, menores",
-    "more-body": "Demora mais. Melhor privacidade.",
-    "duration-hours": "Termina em cerca de {n} horas",
-    "duration-days": "Termina em cerca de {n} dias",
-    "disclosure": "Cada lote é enviado quando você abre o lembrete dele.",
-    "cadence-fixed": "O envio já começou. O cronograma dos lotes não pode mais mudar.",
-    "replanned": "Suas notas mudaram. Revise o cronograma atualizado.",
-    "review": "Revisar cronograma",
-    "dust-title": "Não resta nada para migrar",
-    "dust-body": "Os {amount} ZEC que restam na Orchard estão abaixo do valor que vale a pena mover. As taxas custariam mais do que ele carrega.",
-    "unconfirmed-title": "Suas notas ainda não estão confirmadas",
-    "unconfirmed-body": "As transações de divisão já estão na cadeia, mas a carteira não pode gastar as notas delas por mais um bloco ou dois. Tente de novo em alguns minutos.",
-    "back": "Voltar",
-    "retry": "Tentar de novo"
   },
   "migrationschedule": {
     "title": "Revisar e confirmar",

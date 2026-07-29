@@ -7,7 +7,6 @@ import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
-import SegmentedBar from '../Migration/SegmentedBar';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
@@ -51,9 +50,6 @@ const MigrationBatchSending: React.FunctionComponent<
 
   const [progress, setProgress] = useState<RPCBatchStatusType | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  // Every part skipped without sending (slid or not due): nothing broadcast,
-  // nothing lost. Distinct from the error state because nothing failed.
-  const [notSendable, setNotSendable] = useState<boolean>(false);
 
   const goStatus = useCallback(() => {
     navigation.reset({
@@ -130,16 +126,9 @@ const MigrationBatchSending: React.FunctionComponent<
       const outcomes = report?.outcomes ?? [];
       const sent = outcomes.filter(o => o.result.kind === 'sent').length;
       if (outcomes.length === 0) {
-        // Reached with nothing actually due (the window has not opened yet, or
-        // every part already confirmed or slid to a later window); the monitor
-        // will show why.
+        // Reached with nothing actually due (e.g. targets still ahead); the
+        // monitor will show why.
         addLastSnackbar(translate('migrationbatchsending.nothing') as string);
-      } else if (sent === 0) {
-        // The batch was due but no part could be built (typically the sync is
-        // short of the anchor). Bouncing straight back reads as a silent
-        // failure, so hold here and say what happened.
-        setNotSendable(true);
-        return;
       } else {
         addLastSnackbar(
           (translate('migrationbatchsending.success') as string)
@@ -156,43 +145,6 @@ const MigrationBatchSending: React.FunctionComponent<
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ----- Not sendable yet -----
-  if (notSendable) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-          padding: 24,
-          justifyContent: 'center',
-        }}
-      >
-        <BoldText style={{ fontSize: 20, marginBottom: 12, textAlign: 'center' }}>
-          {translate('migrationbatchsending.slid-title') as string}
-        </BoldText>
-        <Text
-          style={{
-            color: colors.placeholder,
-            fontSize: 14,
-            lineHeight: 21,
-            textAlign: 'center',
-            marginBottom: 28,
-          }}
-        >
-          {translate('migrationbatchsending.slid-body') as string}
-        </Text>
-        <View style={{ alignItems: 'center' }}>
-          <Button
-            testID="migrationbatchsending.slid-back"
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationbatchsending.back') as string}
-            onPress={goStatus}
-          />
-        </View>
-      </View>
-    );
-  }
 
   // ----- Error state -----
   if (errorMsg) {
@@ -232,6 +184,7 @@ const MigrationBatchSending: React.FunctionComponent<
 
   const total = progress?.total ?? denominations.length;
   const done = progress?.resolved ?? 0;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   const progressLine =
     total > 0
       ? (translate('migrationbatchsending.progress') as string)
@@ -297,13 +250,23 @@ const MigrationBatchSending: React.FunctionComponent<
           </View>
         )}
 
-        {/* One segment per part in the batch, matching the chips above it. */}
-        <View style={{ marginBottom: 14 }}>
-          <SegmentedBar
-            segments={total}
-            progress={total > 0 ? done / total : 0}
-            active={done < total ? done : undefined}
-            activeColor={colors.syncing}
+        {/* Progress bar */}
+        <View
+          style={{
+            height: 6,
+            borderRadius: 3,
+            backgroundColor: colors.bottomSheetBorder,
+            overflow: 'hidden',
+            marginBottom: 14,
+          }}
+        >
+          <View
+            style={{
+              width: `${pct}%`,
+              height: '100%',
+              borderRadius: 3,
+              backgroundColor: colors.primary,
+            }}
           />
         </View>
 

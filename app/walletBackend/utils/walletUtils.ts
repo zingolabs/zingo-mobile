@@ -12,49 +12,279 @@
  */
 import { WalletType, GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
-import { callFfi, FfiResult } from '../ffi';
+import {
+  callFfi,
+  decodeFfiJson,
+  FfiErrorCode,
+  FfiJsonDecode,
+  FfiResult,
+} from '../ffi';
+import {
+  COVERED_SURFACE_REFUSAL,
+  coveredSurfacePermitted,
+} from './mixnetGate';
 import { RPCZecPriceType } from '../types/RPCZecPriceType';
-import { RPCSeedType } from '../types/RPCSeedType';
+import {
+  WalletFetchOutcome,
+  interpretWalletFetchResult,
+} from './walletFetchOutcome';
 
 /**
- * Fetches the current ZEC/USD price from the zingolib price oracle.
- *
- * Price sentinel values:
- *   0   — initial/default (no price data yet)
- *  -1   — error inside zingolib (a typed FFI rejection, or an oracle error)
- *  -2   — malformed/empty success payload
- *  > 0  — real USD price
+ * The typed outcome of a price fetch, enumerated over the real ways the
+ * surface fails (ADR 0002: errors are types; the sendFailureTransform
+ * precedent). The legacy sentinel numbers (0 / -1 / -2) collapsed four
+ * genuinely different failures into one bucket; each arm here is grounded
+ * in a distinct producer:
+ * - `price`: the oracle answered with a usable USD price.
+ * - `noData`: the oracle answered, but carries no price yet.
+ * - `gateRefusal`: the always-on fail-closed gate refused before any
+ *   network touch — the transport is not `ready`.
+ * - `ffiRejection`: the typed error channel rejected; `code` names the
+ *   ZingolibError variant ('Read' is zingolib's oracle leg — over the
+ *   mixnet in the always-on flavors; 'Mixnet' is the wallet's own
+ *   fail-closed verdict; 'Unknown' is a bridge anomaly).
+ * - `oracleError`: the data channel resolved, and the payload itself
+ *   reports the oracle failed.
+ * - `malformedPayload`: the resolution is unusable (empty, unparseable,
+ *   or a non-numeric price) — the payload travels for diagnosis.
  */
-export async function getZecPrice(): Promise<{
-  price: number;
-  error: string;
-}> {
-  const result = await callFfi(RPCModule.zecPriceInfo());
-  if (!result.ok) {
-    return { price: -1, error: result.error.message };
-  }
-  if (!result.value) {
-    return { price: -2, error: 'Internal Error fetching price' };
-  }
-  try {
-    const resultJSON: RPCZecPriceType = JSON.parse(result.value);
-    if (resultJSON.error) {
-      return { price: -1, error: resultJSON.error };
+/**
+ * Which route a successful price fetch attested. `attested` is the mixnet
+ * tunnel (with its local SOCKS5 endpoint), `clearnet` is the deliberate
+ * per-session consent path. Absence of both markers is not a bare null: it
+ * has exactly one producer, a native layer that predates the attestation,
+ * and consumers must name that case to handle it. Absence of a failure is
+ * never the only signal that the covered path ran.
+ */
+export type PriceRouteAttestation =
+  | { readonly kind: 'attested'; readonly viaSocks5: string }
+  | { readonly kind: 'clearnet' }
+  | { readonly kind: 'preAttestationNativeLayer' };
+
+export type ZecPriceOutcome =
+  | {
+      readonly kind: 'price';
+      readonly usd: number;
+      readonly route: PriceRouteAttestation;
+      readonly elapsedMs: number;
     }
-    if (!resultJSON.current_price) {
-      // if no exists the field or is empty
-      return { price: 0, error: '' };
+  | { readonly kind: 'noData'; readonly elapsedMs: number }
+  | { readonly kind: 'gateRefusal'; readonly error: string }
+  | { readonly kind: 'timedOut'; readonly afterMs: number }
+  | {
+      readonly kind: 'ffiRejection';
+      readonly code: FfiErrorCode;
+      readonly message: string;
+      readonly elapsedMs: number;
     }
-    if (isNaN(resultJSON.current_price)) {
+  | {
+      readonly kind: 'oracleError';
+      readonly error: string;
+      readonly elapsedMs: number;
+    }
+  | {
+      readonly kind: 'malformedPayload';
+      readonly payload: string;
+      readonly detail: string;
+      readonly elapsedMs: number;
+    };
+
+/**
+ * One handler per [`ZecPriceOutcome`] arm, each receiving its narrowed
+ * variant. Exhaustive by construction: a new arm fails compilation at
+ * every handler record, by name, until the consumer decides what that
+ * arm means for it — no default case to forget.
+ */
+export type ZecPriceOutcomeHandlers<R> = {
+  [K in ZecPriceOutcome['kind']]: (
+    outcome: Extract<ZecPriceOutcome, { kind: K }>,
+  ) => R;
+};
+
+/**
+ * Dispatches an outcome to its arm's handler. The assertion is safe by
+ * construction — the discriminant selects exactly the handler declared
+ * for it — and exists only because TypeScript cannot yet correlate a
+ * union-keyed record access with its argument.
+ */
+export function matchZecPriceOutcome<R>(
+  outcome: ZecPriceOutcome,
+  handlers: ZecPriceOutcomeHandlers<R>,
+): R {
+  return (handlers[outcome.kind] as (o: ZecPriceOutcome) => R)(outcome);
+}
+
+/**
+ * The watchdog bound on a price fetch. The UI never waits longer than
+ * this: the race resolves `timedOut` and the spinner is released, whatever
+ * the native call is doing underneath (an on-device hang ran ~5 minutes to
+ * `tls handshake eof` before this bound existed).
+ */
+export const PRICE_FETCH_TIMEOUT_MS = 25_000;
+
+/**
+ * The raw result of one raced fetch attempt — the pure classifier's whole
+ * input. `settled` carries the decoded FFI resolution and how long it
+ * took; `watchdogTimedOut` is the 25-second bound firing first. Nothing
+ * else can happen: callFfi never throws (rejections become the typed
+ * FfiResult), so this union is total over the attempt by construction.
+ */
+export type RawPriceFetch =
+  | {
+      readonly kind: 'settled';
+      readonly decoded: FfiJsonDecode;
+      readonly elapsedMs: number;
+    }
+  | { readonly kind: 'watchdogTimedOut'; readonly afterMs: number };
+
+/**
+ * The pure, total classification of a fetch attempt: every arm of
+ * [`RawPriceFetch`] and every shape of payload lands in exactly one
+ * [`ZecPriceOutcome`] arm. No effects, no clock, no logging — fully
+ * unit-testable without mocks; the effect shell around it supplies the
+ * elapsed time and renders the log line separately.
+ */
+export function classifyPriceFetch(raw: RawPriceFetch): ZecPriceOutcome {
+  if (raw.kind === 'watchdogTimedOut') {
+    return { kind: 'timedOut', afterMs: raw.afterMs };
+  }
+  const { decoded, elapsedMs } = raw;
+  switch (decoded.kind) {
+    case 'ffiRejection':
       return {
-        price: -1,
-        error: `Error fetching price ${resultJSON.current_price}`,
+        kind: 'ffiRejection',
+        code: decoded.code,
+        message: decoded.message,
+        elapsedMs,
       };
+    case 'emptyPayload':
+      return {
+        kind: 'malformedPayload',
+        payload: '',
+        detail: 'empty payload',
+        elapsedMs,
+      };
+    case 'malformedPayload':
+      return {
+        kind: 'malformedPayload',
+        payload: decoded.payload,
+        detail: decoded.detail,
+        elapsedMs,
+      };
+    case 'json': {
+      if (typeof decoded.value !== 'object' || decoded.value === null) {
+        return {
+          kind: 'malformedPayload',
+          payload: decoded.raw,
+          detail: 'non-object payload',
+          elapsedMs,
+        };
+      }
+      const payload = decoded.value as RPCZecPriceType;
+      if (payload.error) {
+        return { kind: 'oracleError', error: payload.error, elapsedMs };
+      }
+      if (!payload.current_price) {
+        return { kind: 'noData', elapsedMs };
+      }
+      if (isNaN(payload.current_price)) {
+        return {
+          kind: 'malformedPayload',
+          payload: decoded.raw,
+          detail: `non-numeric price ${payload.current_price}`,
+          elapsedMs,
+        };
+      }
+      const route: PriceRouteAttestation =
+        payload.via_socks5 !== undefined
+          ? { kind: 'attested', viaSocks5: payload.via_socks5 }
+          : payload.via_clearnet === true
+            ? { kind: 'clearnet' }
+            : { kind: 'preAttestationNativeLayer' };
+      return { kind: 'price', usd: payload.current_price, route, elapsedMs };
     }
-    return { price: resultJSON.current_price, error: '' };
-  } catch (error) {
-    return { price: -2, error: `Critical Error fetching price ${error}` };
+    default: {
+      const unhandled: never = decoded;
+      throw new Error(`unhandled decode: ${JSON.stringify(unhandled)}`);
+    }
   }
+}
+
+/**
+ * The one log line per attempt, pure, exhaustive over the outcome via the
+ * handler record (ADR 0004) — including success and the gate refusal, so
+ * absence of a line always means "no attempt finished", never "it worked"
+ * and never "it was refused".
+ */
+export function describePriceOutcome(outcome: ZecPriceOutcome): string {
+  return matchZecPriceOutcome(outcome, {
+    price: o =>
+      `price fetch ok: ${o.usd} via ${
+        o.route.kind === 'attested'
+          ? o.route.viaSocks5
+          : o.route.kind === 'clearnet'
+            ? 'clearnet'
+            : 'PRE-ATTESTATION LAYER'
+      } ${o.elapsedMs}ms`,
+    noData: o => `price fetch: oracle returned no price data (${o.elapsedMs}ms)`,
+    gateRefusal: () =>
+      'price fetch refused: mixnet transport not ready (fail-closed gate)',
+    timedOut: o =>
+      `price fetch timed out: watchdog fired after ${o.afterMs}ms ` +
+      '(the native call may still be running and holding the wallet lock)',
+    ffiRejection: o =>
+      `price fetch failed: ffi rejection ${o.code} (${o.elapsedMs}ms) ${o.message}`,
+    oracleError: o =>
+      `price fetch failed: oracle error (${o.elapsedMs}ms) ${o.error}`,
+    malformedPayload: o =>
+      `price fetch failed: ${o.detail} (${o.elapsedMs}ms) payload: ${o.payload}`,
+  });
+}
+
+/**
+ * Fetches the current ZEC/USD price and classifies the outcome. This is
+ * the thin effect shell: the fail-closed gate check, one raced native
+ * call, the pure classifier, and one log line per attempt — all decision
+ * logic lives in [`classifyPriceFetch`].
+ */
+export async function getZecPrice(): Promise<ZecPriceOutcome> {
+  // The always-on flavors' fail-closed gate: the price fetch reaches a CEX
+  // over HTTPS, so while the mixnet transport is not ready it must refuse
+  // rather than hand the exchange an IP-to-wallet correlation.
+  if (!coveredSurfacePermitted()) {
+    const refused: ZecPriceOutcome = {
+      kind: 'gateRefusal',
+      error: COVERED_SURFACE_REFUSAL,
+    };
+    console.log(describePriceOutcome(refused));
+    return refused;
+  }
+  const startedAt = Date.now();
+  let watchdog: ReturnType<typeof setTimeout> | undefined;
+  const raw = await Promise.race<RawPriceFetch>([
+    callFfi(RPCModule.zecPriceInfo()).then(result => ({
+      kind: 'settled' as const,
+      decoded: decodeFfiJson(result),
+      elapsedMs: Date.now() - startedAt,
+    })),
+    new Promise<RawPriceFetch>(resolve => {
+      watchdog = setTimeout(
+        () =>
+          resolve({
+            kind: 'watchdogTimedOut',
+            afterMs: PRICE_FETCH_TIMEOUT_MS,
+          }),
+        PRICE_FETCH_TIMEOUT_MS,
+      );
+    }),
+  ]).finally(() => {
+    if (watchdog !== undefined) {
+      clearTimeout(watchdog);
+    }
+  });
+  const outcome = classifyPriceFetch(raw);
+  console.log(describePriceOutcome(outcome));
+  return outcome;
 }
 
 // ---------------------------------------------------------------------------
@@ -315,24 +545,16 @@ export async function planIronwoodMigration(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.planIronwoodMigrationProcess());
 }
 
-// Phase 2 of the private migration. Called once quickSplit reports `complete`
-// (ADR 0016): the notes are fully split by then, so this binds the parts to
-// their notes and schedules them at once. Consent is captured post-split, so
-// `planHashHex` is the hash of a fresh planIronwoodMigration read taken here,
-// not the pre-split one. `perBucket` null keeps zingolib's default cadence
-// (changeable later via rescheduleParts, until the first part is signed). The
-// success value is `{ started: true }` JSON; a stale consent rejects with code
-// MigrationConsentStale.
+// Records the user's consent to the exact plan they were shown (its
+// `plan_hash` from planIronwoodMigration) and persists the migration state.
+// Nothing is broadcast; continueNoteSplitting drives the rounds afterwards.
+// The broadcast cadence is not a parameter: the ZIP 318 schedule draws every
+// delay itself. The success value is `{ started: true }` JSON; a stale
+// consent rejects with code MigrationConsentStale.
 export async function startIronwoodMigration(
   planHashHex: string,
-  perBucket: number | null,
 ): Promise<FfiResult<string>> {
-  return callFfi(
-    RPCModule.startIronwoodMigrationProcess(
-      planHashHex,
-      perBucket === null ? '' : String(perBucket),
-    ),
-  );
+  return callFfi(RPCModule.startIronwoodMigrationProcess(planHashHex));
 }
 
 // Drives one step of note splitting: proves and broadcasts the next round of
@@ -344,38 +566,6 @@ export async function continueNoteSplitting(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.continueNoteSplittingProcess());
 }
 
-// Phase 1 note splitting, the send-shaped replacement for the stateful
-// startIronwoodMigration + continueNoteSplitting driver (ADR 0016). One call
-// does one round: it pauses sync, plans against current notes, builds and
-// broadcasts the round, and persists no migration state. Long-running like
-// drainOrchard (Halo2 proving), dispatched on the concurrent pool. Loop it —
-// sync to confirmation between calls — until the outcome is `complete`, then
-// call startIronwoodMigration for Phase 2. The success value is raw JSON
-// (parseable as RPCSplitOutcomeType).
-export async function quickSplit(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.quickSplitProcess());
-}
-
-// Snapshot of the in-flight splitting round's progress, for rendering
-// "built i/N" then "sent i/N". Mirrors the native `splitStatusProcess`; safe to
-// poll concurrently with a running `quickSplit` (native reads a side channel,
-// not the lightclient lock). The success value is raw JSON: `null` when no round
-// is running, otherwise `{ total, built, sent, phase }` (parseable as
-// RPCSplitStatusType).
-export async function splitStatus(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.splitStatusProcess());
-}
-
-// Sets the Phase 2 cadence (parts per broadcast window) and re-buckets every
-// part with fresh randomization. Callable any time between consent and the
-// first signed part; afterwards rejects with code MigrationCadenceFixed.
-// After success the old schedule is void: re-read migrationStatus and re-arm
-// the reminders. The success value is `{ rescheduled: true }` JSON.
-export async function rescheduleParts(
-  perBucket: number,
-): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.reschedulePartsProcess(String(perBucket)));
-}
 
 // The private migration's progress, arranged for direct rendering (parseable
 // as RPCMigrationStatusType). `phase` is null when no migration is in
@@ -383,15 +573,6 @@ export async function rescheduleParts(
 // figure while one is.
 export async function migrationStatus(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.migrationStatusProcess());
-}
-
-// The window calendar for a schedule grid (parseable as RPCWindowTimelineType):
-// every scheduled window past and future plus always the window the tip sits
-// in, so "you are here" and the grid render even before consent. The success
-// value is raw JSON `null` when the wallet has never synced, otherwise an array
-// of window reports. Offline-safe; never syncs.
-export async function windowTimeline(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.windowTimelineProcess());
 }
 
 // Classifies every part against the local chain view, applies what is safe
@@ -512,16 +693,12 @@ export async function checkMyAddress(
 // error, parse error) we conservatively return false — better to show an
 // external address as external than mislabel a stranger's as own.
 export async function isWalletAddress(address: string): Promise<boolean> {
-  const check = await checkMyAddress(address);
-  if (!check.ok || !check.value) {
-    return false;
-  }
-  try {
-    const parsed: { is_wallet_address?: boolean } = JSON.parse(check.value);
-    return parsed.is_wallet_address === true;
-  } catch (error) {
-    return false;
-  }
+  const decoded = decodeFfiJson(await checkMyAddress(address));
+  return (
+    decoded.kind === 'json' &&
+    (decoded.value as { is_wallet_address?: unknown } | null)
+      ?.is_wallet_address === true
+  );
 }
 
 // True iff a wallet backup file exists on disk. zingolib reports the answer
@@ -555,56 +732,41 @@ export async function shieldConfirm(): Promise<FfiResult<string>> {
 }
 
 /**
- * Returns the wallet's secret material for the backup/seed display screens.
+ * Fetches the wallet's secret material and names the outcome.
  *
- * readOnly = true  → returns { birthday, ufvk } (viewing-key wallets only)
- * readOnly = false → returns { birthday, seed } (full wallet)
- * Returns null on any error.
+ * readOnly = true  → the wallet is { birthday, ufvk } (viewing-key wallets)
+ * readOnly = false → the wallet is { birthday, seed } (full wallet)
+ *
+ * Callers that store or display the material must switch on the outcome:
+ * every non-`complete` arm is a distinct failure, and none of them is a
+ * wallet. See [`WalletFetchOutcome`].
+ */
+export async function fetchWalletOutcome(
+  readOnly: boolean,
+): Promise<WalletFetchOutcome> {
+  const result = await callFfi(
+    readOnly ? RPCModule.getUfvkInfo() : RPCModule.getSeedInfo(),
+  );
+  const outcome = interpretWalletFetchResult(result, readOnly);
+  if (outcome.kind !== 'complete') {
+    console.log(
+      `${readOnly ? 'ufvk' : 'seed'} fetch failed:`,
+      outcome.kind,
+      outcome.kind === 'ffiRejection' ? outcome.message : '',
+    );
+  }
+  return outcome;
+}
+
+/**
+ * Presence-only view of [`fetchWalletOutcome`]: the wallet when the fetch
+ * produced one, null otherwise. Callers that must react to failure — or
+ * must not mistake "no key material" for a usable wallet — take the
+ * outcome instead.
  */
 export async function fetchWallet(
   readOnly: boolean,
 ): Promise<WalletType | null> {
-  if (readOnly) {
-    // only viewing key & birthday
-    const result = await callFfi(RPCModule.getUfvkInfo());
-    if (!result.ok || !result.value) {
-      return null;
-    }
-    try {
-      const RPCufvk: WalletType = JSON.parse(result.value);
-
-      const wallet: WalletType = {} as WalletType;
-      if (RPCufvk.birthday) {
-        wallet.birthday = RPCufvk.birthday;
-      }
-      if (RPCufvk.ufvk) {
-        wallet.ufvk = RPCufvk.ufvk;
-      }
-
-      return wallet;
-    } catch (error) {
-      return null;
-    }
-  } else {
-    // only seed & birthday
-    const result = await callFfi(RPCModule.getSeedInfo());
-    if (!result.ok || !result.value) {
-      return null;
-    }
-    try {
-      const RPCseed: RPCSeedType = JSON.parse(result.value);
-
-      const wallet: WalletType = {} as WalletType;
-      if (RPCseed.seed_phrase) {
-        wallet.seed = RPCseed.seed_phrase;
-      }
-      if (RPCseed.birthday) {
-        wallet.birthday = RPCseed.birthday;
-      }
-
-      return wallet;
-    } catch (error) {
-      return null;
-    }
-  }
+  const outcome = await fetchWalletOutcome(readOnly);
+  return outcome.kind === 'complete' ? outcome.wallet : null;
 }

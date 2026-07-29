@@ -20,7 +20,7 @@ import RegText from './RegText';
 import { ThemeType } from '../../app/types';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 
-export type SelectBottomSheetItem = {
+type SelectBottomSheetItem = {
   label: string;
   value: string;
 };

@@ -1,5 +1,5 @@
 /**
- * The private-migration wrapper family (zingo-mobile#1187): all eleven
+ * The private-migration wrapper family (zingo-mobile#1187): all nine
  * walletUtils wrappers around the ZIP 318 bridge methods share one typed
  * FFI contract, so one table exercises them all:
  *   - a resolution passes through verbatim as { ok: true }, even when it
@@ -24,10 +24,7 @@ import {
   executeDuePartsStatus,
   migrationStatus,
   planIronwoodMigration,
-  quickSplit,
   reconcileMigration,
-  rescheduleParts,
-  splitStatus,
   startIronwoodMigration,
 } from '../app/walletBackend/utils/walletUtils';
 
@@ -51,19 +48,10 @@ const wrapperCases: WrapperCase[] = [
   { wrapper: planIronwoodMigration, callArgs: [], expectedBridgeArgs: [] },
   {
     wrapper: startIronwoodMigration,
-    // A null cadence crosses as the empty string ("keep zingolib's default").
-    callArgs: [consentPlanHash, null],
-    expectedBridgeArgs: [consentPlanHash, ''],
-  },
-  {
-    wrapper: startIronwoodMigration,
-    callArgs: [consentPlanHash, 4],
-    expectedBridgeArgs: [consentPlanHash, '4'],
+    callArgs: [consentPlanHash],
+    expectedBridgeArgs: [consentPlanHash],
   },
   { wrapper: continueNoteSplitting, callArgs: [], expectedBridgeArgs: [] },
-  { wrapper: quickSplit, callArgs: [], expectedBridgeArgs: [] },
-  { wrapper: splitStatus, callArgs: [], expectedBridgeArgs: [] },
-  { wrapper: rescheduleParts, callArgs: [8], expectedBridgeArgs: ['8'] },
   { wrapper: migrationStatus, callArgs: [], expectedBridgeArgs: [] },
   { wrapper: reconcileMigration, callArgs: [], expectedBridgeArgs: [] },
   { wrapper: executeDueParts, callArgs: [2000], expectedBridgeArgs: ['2000'] },

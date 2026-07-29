@@ -62,6 +62,20 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         return "NymTransportModule"
     }
 
+    /**
+     * `mixnetAlwaysOn` is the "Always On" flavor's flag (CONTEXT.md: the
+     * silent alpha APK). The app layer reads it once at startup to withhold
+     * the Mixnet Mode UI projection; the transport policy is flavor-blind.
+     * Carried as a per-flavor res bool because BuildConfig generation is
+     * deliberately disabled for build reproducibility.
+     */
+    override fun getConstants(): Map<String, Any> {
+        return mapOf(
+            "mixnetAlwaysOn" to
+                reactApplicationContext.resources.getBoolean(R.bool.mixnet_always_on),
+        )
+    }
+
     companion object {
         // One proxy per app process, shared across React context reloads.
         private val handleLock = Any()

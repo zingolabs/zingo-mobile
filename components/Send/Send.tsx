@@ -72,7 +72,7 @@ import {
   SecurityType,
   ScreenEnum,
 } from '../../app/AppState';
-import { parseZcashURI, serverUris, fetchServerList } from '../../app/uris';
+import { parseZcashURI, serverUris } from '../../app/uris';
 import {
   getSpendableBalanceWithAddress,
   parseAddress,
@@ -84,6 +84,11 @@ import {
   sendFailureMessage,
 } from '../../app/walletBackend/transforms/sendFailureTransform';
 import Utils from '../../app/utils';
+import {
+  applySendFieldUpdates,
+  SendFields,
+  SendFieldUpdate,
+} from './sendFieldUpdates';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -507,13 +512,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                       Utils.getZenniesDonationAmount(),
                     )
                   : 0);
-              updateToField(
-                null,
-                Utils.parseNumberFloatToStringLocale(newAmount, 8),
-                null,
-                null,
-                null,
-              );
+              updateToField([
+                {
+                  field: 'amount',
+                  value: Utils.parseNumberFloatToStringLocale(newAmount, 8),
+                },
+              ]);
               setProposeSendLastError('');
             }
           }
@@ -619,99 +623,78 @@ const Send: React.FunctionComponent<SendProps> = ({
     ],
   );
 
-  const updateToField = async (
-    addressPar: string | null,
-    amountPar: string | null,
-    amountCurrencyPar: string | null,
-    memoPar: string | null,
-    includeUAMemoPar: boolean | null,
-  ) => {
-    if (addressPar !== null) {
-      //Alert.alert('', addressPar);
-      //setAddressText(addressPar);
-      // Attempt to parse as URI if it starts with zcash
-      if (
-        addressPar.toLowerCase().startsWith(GlobalConst.zcash) ||
-        addressPar.toLowerCase().includes(':')
-      ) {
-        const { error, target } = await parseZcashURI(
-          addressPar,
-          translate,
-          server,
-        );
+  const updateToField = async (updates: readonly SendFieldUpdate[]) => {
+    let effective = updates;
+    const addressUpdate = updates.find(
+      (u): u is Extract<SendFieldUpdate, { field: 'address' }> =>
+        u.field === 'address',
+    );
+    // A URI-shaped address needs the async parser and can abort the whole
+    // batch on error, so it is handled here rather than in the pure core.
+    if (
+      addressUpdate &&
+      (addressUpdate.value.toLowerCase().startsWith(GlobalConst.zcash) ||
+        addressUpdate.value.toLowerCase().includes(':'))
+    ) {
+      const { error, target } = await parseZcashURI(
+        addressUpdate.value,
+        translate,
+        server,
+      );
 
-        // Audit Issue H — surface the parser error and abort before any
-        // Send-state mutation. parseZcashURI now returns an empty target
-        // when error is non-empty, but the explicit guard keeps intent
-        // obvious here and protects against future contract changes.
-        if (error) {
-          addLastSnackbar(error);
-          return;
+      // Audit Issue H — surface the parser error and abort before any
+      // Send-state mutation. parseZcashURI now returns an empty target
+      // when error is non-empty, but the explicit guard keeps intent
+      // obvious here and protects against future contract changes.
+      if (error) {
+        addLastSnackbar(error);
+        return;
+      }
+
+      if (target) {
+        // The URI's fields are written verbatim: a URI amount replaces
+        // the ZEC amount without recomputing the fiat field.
+        if (target.address) {
+          setAddressText(target.address);
         }
-
-        if (target) {
-          // redo the to addresses
-          [target].forEach(tgt => {
-            if (tgt.address) {
-              setAddressText(tgt.address);
-            }
-            if (tgt.amount) {
-              setAmountText(
-                Utils.parseNumberFloatToStringLocale(tgt.amount, 8),
-              );
-            }
-            if (tgt.memoString) {
-              setMemoText(tgt.memoString);
-            }
-          });
+        if (target.amount) {
+          setAmountText(Utils.parseNumberFloatToStringLocale(target.amount, 8));
         }
-      } else {
-        setAddressText(addressPar.replace(/[ \t\n\r]+/g, '')); // Remove spaces
+        if (target.memoString) {
+          setMemoText(target.memoString);
+        }
       }
+      effective = updates.filter(u => u !== addressUpdate);
     }
 
-    if (amountPar !== null) {
-      const amountTemp = amountPar.substring(0, 20);
-      if (isNaN(Utils.parseStringLocaleToNumberFloat(amountTemp))) {
-        setAmountCurrencyText('');
-      } else if (amountTemp && zecPrice && zecPrice.zecPrice > 0) {
-        setAmountCurrencyText(
-          Utils.parseNumberFloatToStringLocale(
-            Utils.parseStringLocaleToNumberFloat(amountTemp) *
-              zecPrice.zecPrice,
-            2,
-          ),
-        );
-      } else {
-        setAmountCurrencyText('');
-      }
-      setAmountText(amountTemp);
+    const prev: SendFields = {
+      address: addressText,
+      amount: amountText,
+      amountCurrency: amountCurrencyText,
+      memo: memoText,
+      includeUAMemo: includeUAMemoBoolean,
+    };
+    const next = applySendFieldUpdates(
+      prev,
+      effective,
+      zecPrice ? zecPrice.zecPrice : 0,
+    );
+    // Write only the fields this batch changed: an untouched field must
+    // not be re-written from this call's render snapshot of the state.
+    if (next.address !== prev.address) {
+      setAddressText(next.address);
     }
-
-    if (amountCurrencyPar !== null) {
-      const amountCurrencyTemp = amountCurrencyPar.substring(0, 15);
-      if (isNaN(Utils.parseStringLocaleToNumberFloat(amountCurrencyTemp))) {
-        setAmountText('');
-      } else if (amountCurrencyTemp && zecPrice && zecPrice.zecPrice > 0) {
-        setAmountText(
-          Utils.parseNumberFloatToStringLocale(
-            Utils.parseStringLocaleToNumberFloat(amountCurrencyTemp) /
-              zecPrice.zecPrice,
-            8,
-          ),
-        );
-      } else {
-        setAmountText('');
-      }
-      setAmountCurrencyText(amountCurrencyTemp);
+    if (next.amount !== prev.amount) {
+      setAmountText(next.amount);
     }
-
-    if (memoPar !== null) {
-      setMemoText(memoPar);
+    if (next.amountCurrency !== prev.amountCurrency) {
+      setAmountCurrencyText(next.amountCurrency);
     }
-
-    if (includeUAMemoPar !== null) {
-      setIncludeUAMemoBoolean(includeUAMemoPar);
+    if (next.memo !== prev.memo) {
+      setMemoText(next.memo);
+    }
+    if (next.includeUAMemo !== prev.includeUAMemo) {
+      setIncludeUAMemoBoolean(next.includeUAMemo);
     }
   };
 
@@ -1003,37 +986,25 @@ const Send: React.FunctionComponent<SendProps> = ({
         retryOnAnotherServer(failure) &&
         selectServer !== SelectServerEnum.custom
       ) {
-        // Pick a working server, same pattern as boot/recovery: the live
-        // registry first (best, excluding the failed server, no probe), then
-        // the static list ranked by latency (also excluding the failed one).
+        // Pick a working server from the census ranked by latency, excluding
+        // the failed one (ADR 0007: no live registry).
         let fasterServer: ServerType = {} as ServerType;
-        const live = await fetchServerList(server.chainName);
-        const liveCandidates = live.filter(
-          (s: ServerUrisType) => s.uri !== server.uri,
+        const serverChecked = await selectingServer(
+          serverUris(translate).filter(
+            (s: ServerUrisType) =>
+              !s.obsolete &&
+              s.chainName === server.chainName &&
+              s.uri !== server.uri,
+          ),
         );
-        if (liveCandidates.length > 0) {
+        if (serverChecked && serverChecked.latency) {
           fasterServer = {
-            uri: liveCandidates[0].uri,
-            chainName: liveCandidates[0].chainName,
+            uri: serverChecked.uri,
+            chainName: serverChecked.chainName,
           };
         } else {
-          const serverChecked = await selectingServer(
-            serverUris(translate).filter(
-              (s: ServerUrisType) =>
-                !s.obsolete &&
-                s.chainName === server.chainName &&
-                s.uri !== server.uri,
-            ),
-          );
-          if (serverChecked && serverChecked.latency) {
-            fasterServer = {
-              uri: serverChecked.uri,
-              chainName: serverChecked.chainName,
-            };
-          } else {
-            fasterServer = server;
-            // likely a connection problem — all servers unreachable / timeout.
-          }
+          fasterServer = server;
+          // likely a connection problem — all servers unreachable / timeout.
         }
         if (fasterServer.uri !== server.uri) {
           await setServerOption(fasterServer, selectServer, false, true);
@@ -1072,7 +1043,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const setQrcodeModalShow = () => {
     navigation.navigate(RouteEnum.ScannerAddress, {
-      setAddress: (a: string) => updateToField(a, null, null, null, null),
+      setAddress: (a: string) =>
+        updateToField([{ field: 'address', value: a }]),
       active: true,
     });
   };
@@ -1349,7 +1321,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         }}
                         value={addressText}
                         onChangeText={(text: string) => {
-                          updateToField(text, null, null, null, null);
+                          updateToField([{ field: 'address', value: text }]);
                         }}
                         editable={true}
                       />
@@ -1365,7 +1337,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       {addressText && (
                         <TouchableOpacity
                           onPress={() => {
-                            updateToField('', null, null, null, null);
+                            updateToField([{ field: 'address', value: '' }]);
                           }}
                         >
                           <FontAwesomeIcon
@@ -1551,13 +1523,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           }}
                           value={amountText}
                           onChangeText={(text: string) =>
-                            updateToField(
-                              null,
-                              text.substring(0, 20),
-                              null,
-                              null,
-                              null,
-                            )
+                            updateToField([
+                              { field: 'amount', value: text.substring(0, 20) },
+                            ])
                           }
                           editable={true}
                           maxLength={20}
@@ -1581,13 +1549,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                           }}
                           value={amountCurrencyText}
                           onChangeText={(text: string) =>
-                            updateToField(
-                              null,
-                              null,
-                              text.substring(0, 15),
-                              null,
-                              null,
-                            )
+                            updateToField([
+                              {
+                                field: 'amountCurrency',
+                                value: text.substring(0, 15),
+                              },
+                            ])
                           }
                           editable={true}
                           maxLength={15}
@@ -1597,8 +1564,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <TouchableOpacity
                           onPress={() =>
                             inputZec
-                              ? updateToField(null, '', null, null, null)
-                              : updateToField(null, null, '', null, null)
+                              ? updateToField([{ field: 'amount', value: '' }])
+                              : updateToField([
+                                  { field: 'amountCurrency', value: '' },
+                                ])
                           }
                         >
                           <FontAwesomeIcon
@@ -1617,7 +1586,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                               maxAmount,
                               8,
                             );
-                            updateToField(null, maxStr, null, null, null);
+                            updateToField([
+                              { field: 'amount', value: maxStr },
+                            ]);
                             calculateFeeWithPropose(
                               maxStr,
                               addressText,
@@ -1939,24 +1910,22 @@ const Send: React.FunctionComponent<SendProps> = ({
                           }}
                           value={memoText}
                           onChangeText={(text: string) => {
-                            updateToField(
-                              null,
-                              !amountText && !!text ? '0' : null,
-                              null,
-                              text,
-                              null,
-                            );
+                            updateToField([
+                              ...(!amountText && !!text
+                                ? [{ field: 'amount', value: '0' } as const]
+                                : []),
+                              { field: 'memo', value: text },
+                            ]);
                           }}
                           onEndEditing={(
                             e: NativeSyntheticEvent<TextInputEndEditingEventData>,
                           ) => {
-                            updateToField(
-                              null,
-                              !amountText && !!e.nativeEvent.text ? '0' : null,
-                              null,
-                              e.nativeEvent.text,
-                              null,
-                            );
+                            updateToField([
+                              ...(!amountText && !!e.nativeEvent.text
+                                ? [{ field: 'amount', value: '0' } as const]
+                                : []),
+                              { field: 'memo', value: e.nativeEvent.text },
+                            ]);
                             calculateFeeWithPropose(
                               amountText,
                               addressText,
@@ -2011,7 +1980,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         {memoText && (
                           <TouchableOpacity
                             onPress={() => {
-                              updateToField(null, null, null, '', null);
+                              updateToField([{ field: 'memo', value: '' }]);
                             }}
                           >
                             <FontAwesomeIcon
@@ -2186,7 +2155,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       disabled={!sendButtonEnabled}
                       onPress={async () => {
                         setSendButtonEnabled(false);
-                        updateToField(null, null, null, memoText, null);
+                        updateToField([{ field: 'memo', value: memoText }]);
                         // donation - a Zenny is the minimum
                         if (
                           server.chainName === ChainNameEnum.mainChainName &&
@@ -2199,13 +2168,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                           addLastSnackbar(
                             `${translate('send.donation-minimum-message') as string}`,
                           );
-                          updateToField(
-                            null,
-                            Utils.getZenniesDonationAmount(),
-                            null,
-                            null,
-                            false,
-                          );
+                          updateToField([
+                            {
+                              field: 'amount',
+                              value: Utils.getZenniesDonationAmount(),
+                            },
+                            { field: 'includeUAMemo', value: false },
+                          ]);
                           return;
                         }
                         if (
@@ -2233,7 +2202,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                         // if the address is transparent - clean the memo field Just in Case.
                         if (!memoEnabled) {
                           setMemoText('');
-                          updateToField(null, null, null, '', false);
+                          updateToField([
+                            { field: 'memo', value: '' },
+                            { field: 'includeUAMemo', value: false },
+                          ]);
                         }
                         // Prefetch the parsed address for the Confirm screen
                         // so its Privacy Level badge renders without waiting on
@@ -2304,15 +2276,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                               update = true;
                             }
                             if (update) {
-                              updateToField(
-                                await Utils.getDonationAddress(
-                                  server.chainName,
-                                ),
-                                Utils.getDonationAmount(),
-                                null,
-                                Utils.getDonationMemo(translate),
-                                true,
-                              );
+                              updateToField([
+                                {
+                                  field: 'address',
+                                  value: await Utils.getDonationAddress(
+                                    server.chainName,
+                                  ),
+                                },
+                                {
+                                  field: 'amount',
+                                  value: Utils.getDonationAmount(),
+                                },
+                                {
+                                  field: 'memo',
+                                  value: Utils.getDonationMemo(translate),
+                                },
+                                { field: 'includeUAMemo', value: true },
+                              ]);
                             }
                           }}
                         >
@@ -2403,16 +2383,16 @@ const Send: React.FunctionComponent<SendProps> = ({
             setUpdatingToField(true);
             await ShowAddressAlertAsync(translate)
               .then(() => {
-                updateToField(itemValue, null, null, null, null);
+                updateToField([{ field: 'address', value: itemValue }]);
               })
               .catch(() => {
-                updateToField(addressText, null, null, null, null);
+                updateToField([{ field: 'address', value: addressText }]);
               });
             setTimeout(() => {
               setUpdatingToField(false);
             }, 500);
           } else if (addressText !== itemValue) {
-            updateToField(itemValue, null, null, null, null);
+            updateToField([{ field: 'address', value: itemValue }]);
           }
         }}
       />

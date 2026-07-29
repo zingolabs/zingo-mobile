@@ -37,6 +37,42 @@ const SHIPPED_ABIS: [&str; 4] = ["arm64-v8a", "armeabi-v7a", "x86", "x86_64"];
 
 const SHIM_SO: &str = "libzingo_nym_proxy_ffi.so";
 
+/// The staged shim's provenance record, beside the `.so`s. Written here on
+/// every staging (which discards any prior attestations — new binaries carry
+/// only their own pedigree), extended by `attest-android-shim`, and enforced
+/// by the app's `verifyShimProvenance` gradle gate before any APK packages a
+/// shim. The stale-shim incident of 2026-07-27 (a `.so` built hours before
+/// ADR 0021's TLS fix rode three pin bumps undetected) is what this closes.
+const PROVENANCE_FILE: &str = "shim-provenance.txt";
+
+fn git_stdout(dir: &Path, args: &[&str]) -> Result<String, String> {
+    let run = std::process::Command::new("git")
+        .arg("-C")
+        .arg(dir)
+        .args(args)
+        .output()
+        .map_err(|e| format!("cannot run git in {}: {e}", dir.display()))?;
+    if !run.status.success() {
+        return Err(format!(
+            "git {} failed in {}: {}",
+            args.join(" "),
+            dir.display(),
+            String::from_utf8_lossy(&run.stderr).trim()
+        ));
+    }
+    Ok(String::from_utf8_lossy(&run.stdout).trim().to_owned())
+}
+
+/// The zingolib revision the bundle was built from: the HEAD of the checkout
+/// the bundle tree lives in. A dirty checkout is recorded as such — a
+/// `+dirty` rev can never match a pin, so the gradle gate refuses it until
+/// the shim is rebuilt from a clean pinned checkout.
+fn bundle_source_rev(bundle: &Path) -> Result<String, String> {
+    let head = git_stdout(bundle, &["rev-parse", "HEAD"])?;
+    let clean = git_stdout(bundle, &["status", "--porcelain"])?.is_empty();
+    Ok(if clean { head } else { format!("{head}+dirty") })
+}
+
 /// Which shipped ABIs a bundle tree carries and which it lacks. Pure, so the
 /// partition is unit-testable without a real bundle on disk.
 fn partition_abis(has_so: impl Fn(&str) -> bool) -> (Vec<&'static str>, Vec<&'static str>) {
@@ -136,6 +172,14 @@ fn stage(bundle: &Path) -> Result<(), String> {
         ));
     }
     println!("refreshed {copied} Kotlin binding file(s) under android/app/src/main/java");
+
+    let rev = bundle_source_rev(bundle)?;
+    let provenance = root
+        .join("android/app/src/main/jniLibs")
+        .join(PROVENANCE_FILE);
+    std::fs::write(&provenance, format!("built_from={rev}\n"))
+        .map_err(|e| format!("cannot write {}: {e}", provenance.display()))?;
+    println!("stamped shim provenance: built_from={rev}");
     Ok(())
 }
 

@@ -8,6 +8,7 @@ enum ZingolibError {
     "Sync",
     "Rescan",
     "Read",
+    "Mixnet",
     "Send",
     "Shield",
     "InvalidInput",
@@ -18,10 +19,8 @@ enum ZingolibError {
     "MigrationNotInProgress",
     "MigrationAlreadyInProgress",
     "MigrationConsentStale",
-    "MigrationCadenceFixed",
     "MigrationSplit",
-    "Migration",
-    "Mixnet"
+    "Migration"
 };
 
 namespace zingo {
@@ -237,29 +236,14 @@ namespace zingo {
 
   [Throws=ZingolibError]
   string start_ironwood_migration(
-    string plan_hash_hex,
-    u32? per_bucket
+    string plan_hash_hex
   );
 
   [Throws=ZingolibError]
   string continue_note_splitting();
 
   [Throws=ZingolibError]
-  string quick_split();
-
-  [Throws=ZingolibError]
-  string split_status();
-
-  [Throws=ZingolibError]
-  string reschedule_parts(
-    u32 per_bucket
-  );
-
-  [Throws=ZingolibError]
   string migration_status();
-
-  [Throws=ZingolibError]
-  string window_timeline();
 
   [Throws=ZingolibError]
   string reconcile_migration();
@@ -294,5 +278,99 @@ namespace zingo {
   [Throws=ZingolibError]
   string mixnet_bootstrap_detail();
 
+  [Throws=ZingolibError]
+  MixnetDeathReport? mixnet_death_report();
+
+  MixnetTiming mixnet_timing();
+
   string mixnet_ip_correlation_disclaimer();
+
+  sequence<IndexerEntry> indexer_census();
+
+  [Throws=ZingolibError]
+  sequence<ProbeReport> probe_server(
+    string uri
+  );
+
+  [Throws=ZingolibError]
+  SyncServerProbe probe_sync_server(
+    string uri
+  );
+};
+
+dictionary ProbeFailure {
+  string stage;
+  string target;
+  sequence<string> cause_chain;
+};
+
+dictionary MixnetDeathReport {
+  u64 age_millis;
+  ProbeFailure? detail;
+};
+
+dictionary MixnetTiming {
+  u64 attach_readiness_budget_millis;
+  u64 mixnet_round_trip_bound_millis;
+};
+
+dictionary IndexerEntry {
+  string uri;
+  string chain;
+  string operator;
+  string region_key;
+  boolean is_default;
+  boolean obsolete;
+};
+
+dictionary ProbeSuccessData {
+  string chain;
+  u64 height;
+};
+
+[Enum]
+interface ProbeLegOutcome {
+  Answered(ProbeSuccessData info);
+  Failed(ProbeFailure failure);
+};
+
+dictionary ProbeLeg {
+  u64 millis;
+  ProbeLegOutcome outcome;
+};
+
+[Enum]
+interface MixnetLeg {
+  Probed(ProbeLeg leg);
+  NotCarried();
+};
+
+dictionary ProbeReport {
+  string host;
+  ProbeLeg clearnet;
+  MixnetLeg mixnet;
+};
+
+[Enum]
+interface SyncStageOutcome {
+  Passed();
+  Failed(ProbeFailure failure);
+};
+
+dictionary SyncProbeStage {
+  string step;
+  u64 millis;
+  SyncStageOutcome outcome;
+};
+
+[Enum]
+interface SyncServerVerdict {
+  Reachable(ProbeSuccessData info);
+  Stopped();
+};
+
+dictionary SyncServerProbe {
+  string server;
+  sequence<SyncProbeStage> stages;
+  SyncServerVerdict verdict;
 };

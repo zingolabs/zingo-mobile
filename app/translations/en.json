@@ -156,6 +156,7 @@
     "support": "{name} support email",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
+    "recoveryinfo-error": "Could not read the wallet recovery information, so nothing was stored on this device. The setting has been turned back off.",
     "differentchain-error": "You are changing to a server with a different chain, you will no longer have access to this wallet without the seed phrase.",
     "serverchain-mismatch": "The server reports a different chain than the one you selected. Check the chain selector and try again.",
     "changingwallet-label": "Error changing Wallet",
@@ -188,7 +189,8 @@
     "email-error-title": "Error opening email client",
     "email-error-body": "Go to your device's Settings and set a default email application to send the report.",
     "migration-title": "Wallet migration",
-    "migration-body": "We are migrating your wallet to the new synchronization system. Keep your device connected to power and WiFi.\n\nYour balance will change as the migration progresses. Don't worry, your funds are safe!"
+    "migration-body": "We are migrating your wallet to the new synchronization system. Keep your device connected to power and WiFi.\n\nYour balance will change as the migration progresses. Don't worry, your funds are safe!",
+    "connectiondoctor": "Connection Doctor"
   },
   "rpc": {
     "walletnotfound-error": "Error: Couldn't find any wallet.",
@@ -458,7 +460,13 @@
       "unknown": "Mixnet unavailable"
     },
     "send-blocked": "Sending is paused until the mixnet is ready",
-    "reenable": "Re-enable mixnet"
+    "reenable": "Re-enable mixnet",
+    "bootstrap-patience": "Connecting can take up to"
+  },
+  "pricefetcher": {
+    "updated-mixnet": "Price updated over the mixnet",
+    "updated-clearnet": "Price updated over clearnet",
+    "updated": "Price updated"
   },
   "header": {
     "lastupdate": "Last update:"
@@ -631,6 +639,7 @@
     },
     "verification-success": "This address belongs to you and is safe for receiving funds.",
     "verification-failure": "This address does not belong to you.",
+    "verification-unavailable": "The verification could not be completed. Please try again.",
     "add-tag": "Add tag"
   },
   "history": {
@@ -755,6 +764,22 @@
       "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
       "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
     ]
+  },
+  "connectiondoctor": {
+    "title": "Connection Doctor",
+    "title-acc": "Connection Doctor screen",
+    "intro": "Probes every known server over clearnet and, when Mixnet Mode is ready, over the mixnet. Each probe contacts the server from your real IP. Copy the finished report into your support request.",
+    "run": "Run the Doctor",
+    "running": "Probing servers...",
+    "clearnet": "clearnet",
+    "mixnet": "mixnet",
+    "mixnet-not-carried": "mixnet: not carried (proxy not ready)",
+    "probe-failed": "probe failed:",
+    "payload-unusable": "probe payload unusable:",
+    "copy-report": "Copy report",
+    "report-copied": "Report copied to the clipboard.",
+    "leg-ok": "ok",
+    "leg-failed": "FAILED"
   },
   "scanner": {
     "text": "Scan a Unified Full Viewing Key",
@@ -945,27 +970,6 @@
     "error-hint": "Nothing is lost — you can retry now or come back later from the home screen.",
     "retry": "Retry",
     "close": "Close"
-  },
-  "migrationcadence": {
-    "title": "Schedule transfers",
-    "intro": "Your **{notes} notes** will be sent to Ironwood in **batches**. The blockchain is divided into windows of **{blocks} blocks** (~{hours}h), each batch goes out in its own window.",
-    "how-many": "How many batches?",
-    "fewer-title": "Fewer, larger batches",
-    "fewer-body": "Done sooner. More notes visible together.",
-    "more-title": "More, smaller batches",
-    "more-body": "Takes longer. Better privacy.",
-    "duration-hours": "Finishes in about {n} hours",
-    "duration-days": "Finishes in about {n} days",
-    "disclosure": "Each batch sends when you open its reminder.",
-    "cadence-fixed": "Sending already began. The batch schedule can no longer change.",
-    "replanned": "Your notes changed. Review the updated schedule.",
-    "review": "Review schedule",
-    "dust-title": "Nothing left to migrate",
-    "dust-body": "The {amount} ZEC still in Orchard is below the amount worth moving. Fees would cost more than it carries.",
-    "unconfirmed-title": "Your notes aren't confirmed yet",
-    "unconfirmed-body": "The split transactions are on-chain, but the wallet can't spend their notes for another block or two. Try again in a few minutes.",
-    "back": "Back",
-    "retry": "Try again"
   },
   "migrationschedule": {
     "title": "Review & confirm",

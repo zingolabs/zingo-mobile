@@ -20,9 +20,11 @@ jest.mock('../app/RPCModule', () => {
 
 import RPCModule from '../app/RPCModule';
 import {
+  classifyPriceFetch,
   fetchWallet,
   getZecPrice,
   isWalletAddress,
+  PRICE_FETCH_TIMEOUT_MS,
   resolvedTrue,
   restoreExistingWalletBackup,
   walletBackupExists,
@@ -31,8 +33,14 @@ import {
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 
-const typedRejection = (code: string, message: string) =>
-  Promise.reject(Object.assign(new Error(message), { code }));
+const typedRejection = (code: string, message: string) => {
+  const rejection = Promise.reject(Object.assign(new Error(message), { code }));
+  // Mark handled immediately so a fake-timer flush in an unrelated test
+  // never reports it as an unhandled rejection; consumers still observe
+  // the rejection when they await.
+  rejection.catch(() => {});
+  return rejection;
+};
 
 describe('resolvedTrue collapses the native "true"/"false" protocol', () => {
   it('is true only for a successful, truthy, non-"false" resolution', () => {
@@ -91,22 +99,129 @@ describe('the existence probes contain rejections as false', () => {
   });
 });
 
-describe('getZecPrice maps outcomes to its documented sentinels', () => {
-  it.each([
-    ['a typed rejection', typedRejection('Indexer', 'oracle down'), -1],
-    ['an empty resolution', Promise.resolve(''), -2],
-    ['an { error } body', Promise.resolve('{"error":"no feed"}'), -1],
-    ['a body without a price', Promise.resolve('{}'), 0],
-    ['an unparseable body', Promise.resolve('not json'), -2],
-  ])('%s', async (_case, native, sentinel) => {
-    bridge.zecPriceInfo.mockReturnValueOnce(native);
-    const { price } = await getZecPrice();
-    expect(price).toBe(sentinel);
+describe('classifyPriceFetch is pure and total over every failure mode', () => {
+  const settled = (decoded: object) =>
+    ({ kind: 'settled', decoded, elapsedMs: 7 }) as Parameters<
+      typeof classifyPriceFetch
+    >[0];
+
+  it('the watchdog arm classifies as timedOut', () => {
+    expect(
+      classifyPriceFetch({ kind: 'watchdogTimedOut', afterMs: 25_000 }),
+    ).toEqual({ kind: 'timedOut', afterMs: 25_000 });
   });
 
-  it('a real price crosses the data channel', async () => {
-    bridge.zecPriceInfo.mockResolvedValueOnce('{"current_price": 42.5}');
-    await expect(getZecPrice()).resolves.toEqual({ price: 42.5, error: '' });
+  it('a typed rejection carries its variant code and timing through', () => {
+    expect(
+      classifyPriceFetch(
+        settled({ kind: 'ffiRejection', code: 'Indexer', message: 'down' }),
+      ),
+    ).toEqual({
+      kind: 'ffiRejection',
+      code: 'Indexer',
+      message: 'down',
+      elapsedMs: 7,
+    });
+  });
+
+  it('empty and unparseable payloads are malformed, payload preserved', () => {
+    expect(classifyPriceFetch(settled({ kind: 'emptyPayload' }))).toEqual({
+      kind: 'malformedPayload',
+      payload: '',
+      detail: 'empty payload',
+      elapsedMs: 7,
+    });
+    expect(
+      classifyPriceFetch(
+        settled({ kind: 'malformedPayload', payload: 'x', detail: 'bad' }),
+      ),
+    ).toEqual({
+      kind: 'malformedPayload',
+      payload: 'x',
+      detail: 'bad',
+      elapsedMs: 7,
+    });
+  });
+
+  it('an { error } body is the oracle reporting failure', () => {
+    expect(
+      classifyPriceFetch(
+        settled({ kind: 'json', value: { error: 'no feed' }, raw: '{}' }),
+      ),
+    ).toEqual({ kind: 'oracleError', error: 'no feed', elapsedMs: 7 });
+  });
+
+  it('a body without a price is noData, not an error', () => {
+    expect(
+      classifyPriceFetch(settled({ kind: 'json', value: {}, raw: '{}' })),
+    ).toEqual({ kind: 'noData', elapsedMs: 7 });
+  });
+
+  it('a non-object json payload is malformed', () => {
+    expect(
+      classifyPriceFetch(settled({ kind: 'json', value: 3, raw: '3' })),
+    ).toEqual({
+      kind: 'malformedPayload',
+      payload: '3',
+      detail: 'non-object payload',
+      elapsedMs: 7,
+    });
+  });
+
+  it('a real price carries its route attestation and timing', () => {
+    expect(
+      classifyPriceFetch(
+        settled({
+          kind: 'json',
+          value: { current_price: 42.5, via_socks5: '127.0.0.1:1080' },
+          raw: '',
+        }),
+      ),
+    ).toEqual({
+      kind: 'price',
+      usd: 42.5,
+      route: { kind: 'attested', viaSocks5: '127.0.0.1:1080' },
+      elapsedMs: 7,
+    });
+  });
+
+  it('a pre-attestation native layer is its own named case, never a bare null', () => {
+    expect(
+      classifyPriceFetch(
+        settled({ kind: 'json', value: { current_price: 42.5 }, raw: '' }),
+      ),
+    ).toEqual({
+      kind: 'price',
+      usd: 42.5,
+      route: { kind: 'preAttestationNativeLayer' },
+      elapsedMs: 7,
+    });
+  });
+});
+
+describe('getZecPrice, the effect shell', () => {
+  it('threads a real fetch through the classifier', async () => {
+    bridge.zecPriceInfo.mockResolvedValueOnce(
+      '{"current_price": 42.5, "via_socks5": "127.0.0.1:1080"}',
+    );
+    await expect(getZecPrice()).resolves.toMatchObject({
+      kind: 'price',
+      usd: 42.5,
+      route: { kind: 'attested', viaSocks5: '127.0.0.1:1080' },
+    });
+  });
+
+  it('the watchdog releases a hung native call as timedOut', async () => {
+    jest.useFakeTimers();
+    // The on-device hang this bounds: a native call that never settles.
+    bridge.zecPriceInfo.mockReturnValueOnce(new Promise(() => {}));
+    const pending = getZecPrice();
+    await jest.advanceTimersByTimeAsync(PRICE_FETCH_TIMEOUT_MS);
+    await expect(pending).resolves.toEqual({
+      kind: 'timedOut',
+      afterMs: PRICE_FETCH_TIMEOUT_MS,
+    });
+    jest.useRealTimers();
   });
 });
 

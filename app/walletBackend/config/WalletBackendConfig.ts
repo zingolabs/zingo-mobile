@@ -53,6 +53,13 @@ export type WalletBackendConfig = {
    * never started and no mixnet view is ever published.
    */
   mixnetSupported: boolean;
+  /**
+   * Whether this build is an always-on (silent alpha) flavor. True enables
+   * the backend-layer fail-closed send gate — sends refuse unless the
+   * transport is `ready` — and the coordinator's auto-recovery loop, both
+   * of which stand in for the mixnet UI those flavors withhold.
+   */
+  mixnetAlwaysOn: boolean;
   /** i18n helper — must be bound to the active locale in the consumer. */
   translate: (key: string) => TranslateType;
   /** Prevent device sleep while true (e.g. during active sync/send). */

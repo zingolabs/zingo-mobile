@@ -52,6 +52,7 @@ enum FfiOutcome {
     case .Sync(let message): return ("Sync", message)
     case .Rescan(let message): return ("Rescan", message)
     case .Read(let message): return ("Read", message)
+    case .Mixnet(let message): return ("Mixnet", message)
     case .Send(let message): return ("Send", message)
     case .Shield(let message): return ("Shield", message)
     case .InvalidInput(let message): return ("InvalidInput", message)
@@ -62,7 +63,6 @@ enum FfiOutcome {
     case .MigrationNotInProgress(let message): return ("MigrationNotInProgress", message)
     case .MigrationAlreadyInProgress(let message): return ("MigrationAlreadyInProgress", message)
     case .MigrationConsentStale(let message): return ("MigrationConsentStale", message)
-    case .MigrationCadenceFixed(let message): return ("MigrationCadenceFixed", message)
     case .MigrationSplit(let message): return ("MigrationSplit", message)
     case .Migration(let message): return ("Migration", message)
     case .Mixnet(let message): return ("Mixnet", message)
@@ -1038,17 +1038,11 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(startIronwoodMigrationProcess:perBucket:resolve:reject:)
-  func startIronwoodMigrationProcess(_ plan_hash_hex: String, perBucket per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(startIronwoodMigrationProcess:resolve:reject:)
+  func startIronwoodMigrationProcess(_ plan_hash_hex: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          // Empty string means "keep zingolib's default cadence" (the
-          // module's numeric-arg-as-string convention); anything else must
-          // parse as a u32 — a malformed value rejects as InvalidInput
-          // instead of silently keeping the default.
-          try startIronwoodMigration(
-            planHashHex: plan_hash_hex,
-            perBucket: FfiArgs.optionalU32(per_bucket, name: "per_bucket"))
+          try startIronwoodMigration(planHashHex: plan_hash_hex)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1064,56 +1058,11 @@ class RPCModule: NSObject {
       }
   }
 
-  // Proves and broadcasts one Phase 1 splitting round (ADR 0016), so like the
-  // drain it runs long; the global concurrent queue keeps it off the main
-  // thread.
-  @objc(quickSplitProcess:reject:)
-  func quickSplitProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try quickSplit()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Polled concurrently while `quickSplitProcess` runs; the native
-  // `splitStatus()` reads a side channel, never the lightclient lock the round
-  // holds, so the poll returns immediately.
-  @objc(splitStatusProcess:reject:)
-  func splitStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try splitStatus()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  @objc(reschedulePartsProcess:resolve:reject:)
-  func reschedulePartsProcess(_ per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          // `per_bucket` crosses as a string (numeric-arg convention); a
-          // malformed value rejects as InvalidInput — never an unsettled
-          // promise.
-          try rescheduleParts(perBucket: FfiArgs.requiredU32(per_bucket, name: "per_bucket"))
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   @objc(migrationStatusProcess:reject:)
   func migrationStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try migrationStatus()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  @objc(windowTimelineProcess:reject:)
-  func windowTimelineProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try windowTimeline()
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1159,6 +1108,92 @@ class RPCModule: NSObject {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try cancelIronwoodMigration()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  private static func probeFailureJson(_ failure: ProbeFailure) -> [String: Any] {
+    ["stage": failure.stage, "target": failure.target, "cause_chain": failure.causeChain]
+  }
+
+  private static func probeSuccessJson(_ success: ProbeSuccessData) -> [String: Any] {
+    ["chain": success.chain, "height": success.height]
+  }
+
+  // Each exhaustive FFI enum crosses the bridge as a kind-discriminated
+  // object, the JSON spelling of its arms.
+  private static func probeLegJson(_ leg: ProbeLeg) -> [String: Any] {
+    let outcome: [String: Any]
+    switch leg.outcome {
+    case let .answered(info):
+      outcome = ["kind": "answered", "info": probeSuccessJson(info)]
+    case let .failed(failure):
+      outcome = ["kind": "failed", "failure": probeFailureJson(failure)]
+    }
+    return ["millis": leg.millis, "outcome": outcome]
+  }
+
+  private static func mixnetLegJson(_ mixnet: MixnetLeg) -> [String: Any] {
+    switch mixnet {
+    case let .probed(leg):
+      return ["kind": "probed", "leg": probeLegJson(leg)]
+    case .notCarried:
+      return ["kind": "notCarried"]
+    }
+  }
+
+  // The Connection Doctor's paired probe (user-invoked diagnostic). The FFI
+  // returns structured reports; they cross the React Native bridge as JSON,
+  // the bridge's own boundary format.
+  @objc(probeServerProcess:resolve:reject:)
+  func probeServerProcess(_ uri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          let reports = try probeServer(uri: uri)
+          let rendered: [[String: Any]] = reports.map { report in
+            [
+              "host": report.host,
+              "clearnet": RPCModule.probeLegJson(report.clearnet),
+              "mixnet": RPCModule.mixnetLegJson(report.mixnet),
+            ]
+          }
+          let data = try JSONSerialization.data(withJSONObject: rendered)
+          return String(data: data, encoding: .utf8) ?? "[]"
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  // The Connection Doctor's staged sync-path probe: tcp-connect,
+  // tls-channel, grpc-info, each timed, stopping at the first typed
+  // failure. Needs no initialized client and holds no wallet lock.
+  @objc(probeSyncServerProcess:resolve:reject:)
+  func probeSyncServerProcess(_ uri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          let probe = try probeSyncServer(uri: uri)
+          let verdict: [String: Any]
+          switch probe.verdict {
+          case let .reachable(info):
+            verdict = ["kind": "reachable", "info": RPCModule.probeSuccessJson(info)]
+          case .stopped:
+            verdict = ["kind": "stopped"]
+          }
+          let rendered: [String: Any] = [
+            "server": probe.server,
+            "stages": probe.stages.map { stage -> [String: Any] in
+              let outcome: [String: Any]
+              switch stage.outcome {
+              case .passed:
+                outcome = ["kind": "passed"]
+              case let .failed(failure):
+                outcome = ["kind": "failed", "failure": RPCModule.probeFailureJson(failure)]
+              }
+              return ["step": stage.step, "millis": stage.millis, "outcome": outcome]
+            },
+            "verdict": verdict,
+          ]
+          let data = try JSONSerialization.data(withJSONObject: rendered)
+          return String(data: data, encoding: .utf8) ?? "{}"
         }.settle(resolve: resolve, reject: reject)
       }
   }

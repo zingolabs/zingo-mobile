@@ -66,6 +66,7 @@ export type AppDrawerParamList = {
   [RouteEnum.Messages]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
+  [RouteEnum.ConnectionDoctor]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Insight]: undefined;
   [RouteEnum.Computing]:
@@ -83,10 +84,7 @@ export type AppDrawerParamList = {
   // transaction rows match what the user accepted. Absent on banner-rescue
   // re-entry, where the screen renders coarsely from migrationStatus.
   [RouteEnum.MigrationSplitting]: { plan?: RPCMigrationPlanType } | undefined;
-  [RouteEnum.MigrationCadence]: undefined;
-  // The cadence the user picked, so Back from the review screen can restore
-  // the selection.
-  [RouteEnum.MigrationSchedule]: { perBucket: number };
+  [RouteEnum.MigrationSchedule]: undefined;
   // The in-flight "Migration underway" monitor: the landing after the schedule
   // is confirmed and the parts_scheduled banner's resume target. Reads
   // migrationStatus, so it needs no params.
@@ -107,17 +105,17 @@ export type AppDrawerParamList = {
   [RouteEnum.Seed]: SeedNavigationState | undefined;
 };
 
-export type AddressBookNavigationState = {
+type AddressBookNavigationState = {
   currentAddress: string;
   routeStack: RouteEnum;
 };
 
-export type AddressListNavigationState = {
+type AddressListNavigationState = {
   addressKind: AddressKindEnum;
   setIndex: (n: number) => void;
 };
 
-export type ScannerAddressNavigationState = {
+type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
   active: boolean;
   // When true the scanner returns the scanned string verbatim — no `zcash:`
@@ -126,19 +124,19 @@ export type ScannerAddressNavigationState = {
   raw?: boolean;
 };
 
-export type ScannerUfvkNavigationState = {
+type ScannerUfvkNavigationState = {
   setUfvkText: (k: string) => void;
   active: boolean;
 };
 
-export type ValueTransferDetailNavigationState = {
+type ValueTransferDetailNavigationState = {
   index: number;
   vt: ValueTransferType;
   valueTransfersSliced: ValueTransferType[];
   totalLength: number;
 };
 
-export type ConfirmNavigationState = {
+type ConfirmNavigationState = {
   calculatedFee: number;
   parseAddressInfoJSON: RPCParseAddressType;
   donationAmount: number;
@@ -154,10 +152,10 @@ export type ConfirmNavigationState = {
   nym: boolean;
 };
 
-export type UfvkNavigationState = {
+type UfvkNavigationState = {
   action: UfvkActionEnum;
 };
 
-export type SeedNavigationState = {
+type SeedNavigationState = {
   action: SeedActionEnum;
 };

@@ -112,26 +112,10 @@ interface RPCModuleAPI {
   drainStatusProcess(): Promise<string>;
 
   // Ironwood private migration (ZIP 318 note splitting + scheduled parts).
-  // Numeric arguments cross the bridge as strings; empty perBucket keeps
-  // zingolib's default cadence.
   planIronwoodMigrationProcess(): Promise<string>;
-  startIronwoodMigrationProcess(
-    planHashHex: string,
-    perBucket: string,
-  ): Promise<string>;
+  startIronwoodMigrationProcess(planHashHex: string): Promise<string>;
   continueNoteSplittingProcess(): Promise<string>;
-  // Phase 1 splitting, stateless and send-shaped (ADR 0016). One call per
-  // round; loop until the outcome is `complete`, then startIronwoodMigration.
-  quickSplitProcess(): Promise<string>;
-  // Live progress of the in-flight splitting round; safe to poll concurrently
-  // with quickSplitProcess (reads a native side channel, not the lightclient
-  // lock).
-  splitStatusProcess(): Promise<string>;
-  reschedulePartsProcess(perBucket: string): Promise<string>;
   migrationStatusProcess(): Promise<string>;
-  // The window calendar (past, current, future) for a schedule grid, valid
-  // with or without a migration; null before the wallet has ever synced.
-  windowTimelineProcess(): Promise<string>;
   reconcileMigrationProcess(): Promise<string>;
   // Phase-2 execute tap: sends a scheduled window's due batch. spacingMs (the
   // delay sequenced between the batch's sends) crosses as a string.
@@ -159,7 +143,17 @@ interface RPCModuleAPI {
   disableMixnet(): Promise<string>;
   mixnetModeInfo(): Promise<string>;
   mixnetBootstrapDetailInfo(): Promise<string>;
+  mixnetDeathReportInfo(): Promise<string>;
+  mixnetTimingInfo(): Promise<string>;
   mixnetIpCorrelationDisclaimerInfo(): Promise<string>;
+  // The Connection Doctor's paired clearnet/mixnet probe of one server
+  // (user-invoked diagnostic; the clearnet leg contacts the target from the
+  // real IP). Resolves a JSON array of per-target probe reports.
+  probeServerProcess(uri: string): Promise<string>;
+  // The Doctor's staged sync-path probe of one server: tcp-connect,
+  // tls-channel, grpc-info, each timed, stopping at the first typed
+  // failure. Resolves the JSON staged report.
+  probeSyncServerProcess(uri: string): Promise<string>;
 }
 
 export default NativeModules.RPCModule as RPCModuleAPI;

@@ -1,5 +1,12 @@
 import { useEffect, useReducer } from 'react';
-import { getZecPrice } from '../../app/walletBackend';
+import { TranslateType } from '../../app/AppState';
+import { createAlert } from '../../app/createAlert';
+import { sendEmail } from '../../app/sendEmail';
+import {
+  getZecPrice,
+  zecPriceFailureReport,
+  ZecPriceOutcome,
+} from '../../app/walletBackend';
 
 /**
  * Shared, singleton state for every <PriceFetcher/> on screen.
@@ -28,8 +35,10 @@ const MIN_VISIBLE_MS = 800;
 
 type Deps = {
   setZecPrice: (price: number, date: number) => void;
-  translate: (key: string) => unknown;
+  translate: (key: string) => TranslateType;
   addLastSnackbar: (message: string) => void;
+  setBackgroundError: (title: string, error: string) => void;
+  zingolibVersion: string;
 };
 
 let started = false;
@@ -55,11 +64,72 @@ function scheduleAuto(): void {
   clearAuto();
   if (listeners.size === 0 || !started) return;
   autoTimer = setTimeout(() => {
-    doFetch().catch(() => {});
+    doFetch(false).catch(() => {});
   }, PRICE_AUTO_REFRESH_MS);
 }
 
-async function doFetch(): Promise<void> {
+/**
+ * Surfaces one failed fetch. A user-initiated failure gets the full
+ * [`zecPriceFailureReport`] in an alert whose Support button emails the
+ * report with device and version info, the channel a tester forwards to
+ * the developers. The 60 s auto-refresh keeps to a snackbar carrying the
+ * report's first detail line, since a modal firing on a timer would
+ * interrupt whatever the user is doing.
+ *
+ * Exported for its unit test; the store is its only production caller.
+ */
+export async function surfacePriceFailure(
+  outcome: ZecPriceOutcome,
+  userInitiated: boolean,
+  d: Pick<
+    Deps,
+    'translate' | 'addLastSnackbar' | 'setBackgroundError' | 'zingolibVersion'
+  >,
+): Promise<void> {
+  const report = zecPriceFailureReport(outcome);
+  if (report === null) {
+    return;
+  }
+  const title =
+    outcome.kind === 'malformedPayload'
+      ? (d.translate('info.errorrpcmodule') as string)
+      : (d.translate('info.errorgemini') as string);
+  if (userInitiated) {
+    await createAlert(
+      d.setBackgroundError,
+      d.addLastSnackbar,
+      title,
+      report,
+      false,
+      d.translate,
+      sendEmail,
+      d.zingolibVersion,
+    );
+  } else {
+    const detail = report.split('\n')[1] ?? report;
+    d.addLastSnackbar(`${title} - ${detail}`);
+  }
+}
+
+/**
+ * The single-flight retry gate, exhaustive over the outcome union (ADR
+ * 0004): a new arm fails compilation here until it declares its retry
+ * policy. The one immediate retry is reserved for attempts that settled
+ * natively. A `timedOut` attempt's native call may still be in flight,
+ * so a retry would stack a second call behind it, and a fail-closed
+ * `gateRefusal` is never retried.
+ */
+const RETRY_WHEN: { [K in ZecPriceOutcome['kind']]: boolean } = {
+  price: false,
+  noData: true,
+  oracleError: true,
+  malformedPayload: true,
+  ffiRejection: true,
+  timedOut: false,
+  gateRefusal: false,
+};
+
+async function doFetch(userInitiated: boolean): Promise<void> {
   const now = Date.now();
   // Anti-spam gate: ignore while a fetch is in flight or inside the 5 s
   // cooldown. The auto timer (60 s) never trips this; rapid taps do.
@@ -74,32 +144,36 @@ async function doFetch(): Promise<void> {
   if (cooldownTimer) clearTimeout(cooldownTimer);
   cooldownTimer = setTimeout(emit, COOLDOWN_MS);
 
-  let price: number;
-  let error: string;
-  // first attempt
-  ({ price, error } = await getZecPrice());
-  // 0 initial · -1 Gemini/zingolib · -2 RPCModule · >0 real value
-  if (price <= 0) {
-    // second attempt
-    ({ price, error } = await getZecPrice());
+  // first attempt, and one retry only when the attempt settled natively
+  let outcome: ZecPriceOutcome = await getZecPrice();
+  if (RETRY_WHEN[outcome.kind]) {
+    outcome = await getZecPrice();
   }
 
-  if (price === -1) {
-    d.addLastSnackbar(
-      `${d.translate('info.errorgemini') as string} - ${error}`,
-    );
-  } else if (price === -2) {
-    d.addLastSnackbar(
-      `${d.translate('info.errorrpcmodule') as string} - ${error}`,
-    );
-  } else if (price <= 0) {
-    d.addLastSnackbar(
-      `${d.translate('info.errorgemini') as string} - ${error}`,
-    );
-    d.setZecPrice(price, 0);
-  } else {
-    d.setZecPrice(price, Date.now());
+  // Per-arm rendering lives in zecPriceFailureReport, which is exhaustive
+  // by construction: a new ZecPriceOutcome arm fails compilation there
+  // until it declares its report.
+  if (outcome.kind === 'price') {
+    d.setZecPrice(outcome.usd, Date.now());
     started = true;
+    // A user asking for the price is also asking which route carried it
+    // (the route attestation is the point of ZIP-318's price coverage), so
+    // a manual fetch names its transport and duration. The auto-refresh
+    // stays silent on success, as before.
+    if (userInitiated) {
+      const label =
+        outcome.route.kind === 'attested'
+          ? (d.translate('pricefetcher.updated-mixnet') as string)
+          : outcome.route.kind === 'clearnet'
+            ? (d.translate('pricefetcher.updated-clearnet') as string)
+            : (d.translate('pricefetcher.updated') as string);
+      d.addLastSnackbar(`${label} (${(outcome.elapsedMs / 1000).toFixed(1)} s)`);
+    }
+  } else {
+    if (outcome.kind === 'noData') {
+      d.setZecPrice(0, 0);
+    }
+    await surfacePriceFailure(outcome, userInitiated, d);
   }
 
   // Floor the visible loading time so the CTA/ring state doesn't flash by.
@@ -120,9 +194,9 @@ export const priceFetcherStore = {
   setDeps(d: Deps): void {
     deps = d;
   },
-  /** User- or timer-initiated fetch. No-ops while loading / cooling down. */
+  /** User-initiated fetch. No-ops while loading / cooling down. */
   fetch(): void {
-    doFetch().catch(() => {});
+    doFetch(true).catch(() => {});
   },
   hasStarted(): boolean {
     return started;

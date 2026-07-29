@@ -67,7 +67,7 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
 } from '../AppState';
-import { parseServerURI, serverUris, fetchServerList } from '../uris';
+import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { fetchWallet } from '../walletBackend';
 import { ThemeType } from '../types';
@@ -76,6 +76,7 @@ import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
+import { flavorDefaultChainName } from '../utils/flavor';
 import Utils from '../utils';
 import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
@@ -84,6 +85,7 @@ import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
+import { serverProbeVerdict } from '../serverProbeVerdict';
 import { isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
@@ -117,9 +119,17 @@ type LoadingAppProps = {
   toggleTheme: (mode: ModeEnum) => void;
 };
 
+// The flavor's chain decides the first-run default server (the testnet
+// alpha flavor starts on the testnet default); a persisted server setting
+// always overrides this.
+const flavorDefaultServer: ServerUrisType =
+  serverUris(() => {}).find(
+    (s: ServerUrisType) => s.chainName === flavorDefaultChainName() && s.default,
+  ) ?? serverUris(() => {})[0];
+
 const SERVER_DEFAULT_0: ServerType = {
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
+  uri: flavorDefaultServer.uri,
+  chainName: flavorDefaultServer.chainName,
 } as ServerType;
 
 const activationHeight = {
@@ -539,7 +549,7 @@ export class LoadingAppClass extends Component<
       walletExists: false,
       hasBackupWallet: false,
       customServerUri: '',
-      customServerChainName: ChainNameEnum.mainChainName,
+      customServerChainName: flavorDefaultChainName(),
       customServerOffline: false,
       customServerAuto: false,
       customServerCustom: false,
@@ -929,12 +939,15 @@ export class LoadingAppClass extends Component<
       : SERVER_DEFAULT_0;
   };
 
-  // Boot-time server selection driven by the persisted mode:
-  //  - auto: refetch the live list every launch and activate the best server;
-  //          if the registry is unreachable fall back to the static latency
-  //          probe (staying in auto).
-  //  - list: keep the user's server if it is still in the live list; if it has
-  //          vanished, switch to the best server and promote the mode to auto.
+  // Boot-time server selection driven by the persisted mode. Selection
+  // consults only the census (ADR 0007): the live hosh registry fetch is
+  // retired — it beaconed every boot and failure to one operator from the
+  // real IP, and let a remote list steer wallets onto chosen operators,
+  // against witness rotation and operator diversity.
+  //  - auto: probe the census's active servers by latency and take the best.
+  //  - list: keep the user's server while the census lists it as active; if
+  //          the census has retired it, switch to the best and promote the
+  //          mode to auto.
   //  - custom / offline: respected, never touched here.
   selectServerOnBoot = async (isConnected: boolean): Promise<boolean> => {
     const mode = this.state.selectServer;
@@ -947,50 +960,31 @@ export class LoadingAppClass extends Component<
         await SettingsFileImpl.writeSettings(SettingsNameEnum.server, s);
         return false;
       }
-      const list = await fetchServerList(chainName);
-      if (list.length > 0) {
-        const best: ServerType = {
-          uri: list[0].uri,
-          chainName: list[0].chainName,
-        };
-        this.setState({ server: best });
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
-        return true;
-      }
-      // Registry unreachable → current static latency probe, staying in auto.
-      // Silent: this is still boot-time selection.
       return await this.selectTheBestServer(false, SelectServerEnum.auto, true);
     }
 
     if (mode === SelectServerEnum.list) {
-      // Can't validate offline or with an unreachable registry: respect the
-      // stored server and stay in list mode.
+      // Can't validate offline: respect the stored server, stay in list mode.
       if (!isConnected) {
         return true;
       }
-      const list = await fetchServerList(chainName);
-      if (list.length === 0) {
-        return true;
-      }
-      const stillListed = list.some(
-        (s: ServerUrisType) => s.uri === this.state.server.uri,
+      const stillListed = serverUris(this.state.translate).some(
+        (s: ServerUrisType) =>
+          s.uri === this.state.server.uri &&
+          s.chainName === chainName &&
+          !s.obsolete,
       );
       if (stillListed) {
         return true;
       }
-      // The chosen server dropped off the list → activate the best one and
+      // The census retired the chosen server → activate the best one and
       // promote the mode to auto (it is no longer a manual list choice).
-      const best: ServerType = {
-        uri: list[0].uri,
-        chainName: list[0].chainName,
-      };
-      this.setState({ server: best, selectServer: SelectServerEnum.auto });
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
+      this.setState({ selectServer: SelectServerEnum.auto });
       await SettingsFileImpl.writeSettings(
         SettingsNameEnum.selectServer,
         SelectServerEnum.auto,
       );
-      return true;
+      return await this.selectTheBestServer(false, SelectServerEnum.auto, true);
     }
 
     // custom / offline: respected.
@@ -1019,8 +1013,12 @@ export class LoadingAppClass extends Component<
       ),
     );
     let fasterServer: ServerType = {} as ServerType;
-    if (server && server.latency) {
-      fasterServer = { uri: server.uri, chainName: server.chainName };
+    const bestVerdict = serverProbeVerdict(server);
+    if (bestVerdict.kind === 'reachable') {
+      fasterServer = {
+        uri: bestVerdict.server.uri,
+        chainName: bestVerdict.server.chainName,
+      };
     } else {
       fasterServer = actualServer;
       // likely here there is a internet/wifi conection problem
@@ -1061,35 +1059,10 @@ export class LoadingAppClass extends Component<
     return someServerIsWorking;
   };
 
-  // On a wallet/RPC failure with an unreachable server, pick the next one with
-  // the same pattern as boot: first the best from the live registry (excluding
-  // the failed server, no probe), then fall back to the static list ranked by
-  // latency (also excluding the failed server). The current mode is preserved.
+  // On a wallet/RPC failure with an unreachable server, pick the next one
+  // from the census ranked by latency, excluding the failed server, staying
+  // in the current mode (ADR 0007: no live registry).
   selectRecoveryServer = async (): Promise<boolean> => {
-    const actualServer = this.state.server;
-    const live = await fetchServerList(actualServer.chainName);
-    const liveCandidates = live.filter(
-      (s: ServerUrisType) => s.uri !== actualServer.uri,
-    );
-    if (liveCandidates.length > 0) {
-      const best: ServerType = {
-        uri: liveCandidates[0].uri,
-        chainName: liveCandidates[0].chainName,
-      };
-      this.setState({ server: best });
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
-      if (this.state.mode === ModeEnum.advanced) {
-        this.addLastSnackbar(
-          (this.state.translate('loadedapp.selectingserverbest') as string) +
-            ' ' +
-            best.uri,
-          SnackbarDurationEnum.long,
-        );
-      }
-      return true;
-    }
-    // Registry empty/unreachable → static list ranked by latency, excluding the
-    // failed server, staying in the current mode.
     return await this.selectTheBestServer(true, this.state.selectServer);
   };
 
@@ -1105,11 +1078,7 @@ export class LoadingAppClass extends Component<
       obsolete: false,
     } as ServerUrisType;
     const serverChecked = await selectingServer([s]);
-    if (serverChecked && serverChecked.latency) {
-      return true;
-    } else {
-      return false;
-    }
+    return serverProbeVerdict(serverChecked).kind === 'reachable';
   };
 
   walletErrorHandle = async (
@@ -1393,7 +1362,7 @@ export class LoadingAppClass extends Component<
         obsolete: false,
       } as ServerUrisType;
       const serverChecked = await selectingServer([cs]);
-      if (!serverChecked || !serverChecked.latency) {
+      if (serverProbeVerdict(serverChecked).kind !== 'reachable') {
         this.addLastSnackbar(
           (this.state.translate('loadedapp.changeservernew-error') as string) +
             uri,

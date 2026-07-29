@@ -156,6 +156,7 @@
     "support": "{name} destek mail",
     "changeservernew-error": "Error Sunucuyu yenisiyle değiştirmeye çalışırken bir hata oluştu ",
     "readingwallet-error": "Error Yeni sunucuyla cüzdanı okuma girişiminde hata oluştu:",
+    "recoveryinfo-error": "Cüzdan kurtarma bilgileri okunamadı, bu nedenle bu cihaza hiçbir şey kaydedilmedi. Ayar yeniden kapatıldı.",
     "differentchain-error": "Farklı bir zincire sahip bir sunucuya geçiyorsunuz, bu kurtarma ifadesi olmadan bu cüzdana artık erişiminiz olmayacak.",
     "serverchain-mismatch": "Sunucu seçtiğinizden farklı bir zincir bildiriyor. Zincir seçiciyi kontrol edip tekrar deneyin.",
     "changingwallet-label": "Error Cüzdan değiştirilirken bir hata oluştu",
@@ -188,7 +189,8 @@
     "email-error-title": "Error E-posta istemcisi açılırken bir hata oluştu",
     "email-error-body": "Raporu gönderebilmek için cihazınızın Ayarlar bölümüne gidin ve varsayılan bir e-posta uygulaması belirleyin.",
     "migration-title": "Cüzdan geçişi",
-    "migration-body": "Cüzdanınızı yeni senkronizasyon sistemine taşıyoruz. Cihazınızı güç ve Wi-Fi'a bağlı tutun.\n\nBakiyeniz, taşıma işlemi ilerledikçe değişecektir. Endişelenmeyin, paranız güvende!"
+    "migration-body": "Cüzdanınızı yeni senkronizasyon sistemine taşıyoruz. Cihazınızı güç ve Wi-Fi'a bağlı tutun.\n\nBakiyeniz, taşıma işlemi ilerledikçe değişecektir. Endişelenmeyin, paranız güvende!",
+    "connectiondoctor": "Bağlantı Doktoru"
   },
   "rpc": {
     "walletnotfound-error": "Error: Herhangi bir cüzdan bulunamadı.",
@@ -458,7 +460,13 @@
       "unknown": "Mixnet kullanılamıyor"
     },
     "send-blocked": "Mixnet hazır olana kadar gönderim duraklatıldı",
-    "reenable": "Mixnet'i yeniden etkinleştir"
+    "reenable": "Mixnet'i yeniden etkinleştir",
+    "bootstrap-patience": "Bağlantı süresi en fazla"
+  },
+  "pricefetcher": {
+    "updated-mixnet": "Fiyat mixnet üzerinden güncellendi",
+    "updated-clearnet": "Fiyat açık ağ üzerinden güncellendi",
+    "updated": "Fiyat güncellendi"
   },
   "header": {
     "lastupdate": "Son güncelleme:"
@@ -631,6 +639,7 @@
     },
     "verification-success": "Bu adres size aittir ve fon almak için güvenlidir.",
     "verification-failure": "Bu adres size ait değil.",
+    "verification-unavailable": "Doğrulama tamamlanamadı. Lütfen tekrar deneyin.",
     "add-tag": "Etiket ekle"
   },
   "history": {
@@ -755,6 +764,22 @@
       "Yukarıdaki telif hakkı bildirimi ve bu izin bildirimi, Yazılımın tüm kopyalarına veya önemli bölümlerine dahil edilmelidir",
       "YAZILIM, HERHANGİ BİR TÜRDE AÇIK VEYA ZIMNİ BİR GARANTİ OLMAKSIZIN, “OLDUĞU GİBİ” SAĞLANMAKTADIR. BU GARANTİLER, SINIRLI OLMAMAK KAYDIYLA, TİCARİ ELVERİŞLİLİK, BELİRLİ BİR AMACA UYGUNLUK VE İHLAL ETMEME GİBİ GARANTİLERİ DE KAPSAR. HİÇBİR DURUMDA, YAZARLAR VEYA TELİF HAKKI SAHİPLERİ, SÖZLEŞME, HAKSIZ FİİL VEYA BAŞKA BİR SEBEPLE, YAZILIMIN KULLANIMINDAN YA DA YAZILIMLA BAĞLANTILI DİĞER HUSUSLARDAN KAYNAKLANAN HİÇBİR TALEP, ZARAR VEYA BAŞKA BİR YÜKÜMLÜLÜKTEN SORUMLU TUTULAMAZ."
     ]
+  },
+  "connectiondoctor": {
+    "title": "Bağlantı Doktoru",
+    "title-acc": "Bağlantı Doktoru ekranı",
+    "intro": "Bilinen her sunucuyu clearnet üzerinden ve Mixnet Modu hazır olduğunda mixnet üzerinden yoklar. Her yoklama sunucuya gerçek IP adresinizden ulaşır. Biten raporu destek talebinize kopyalayın.",
+    "run": "Doktoru Çalıştır",
+    "running": "Sunucular yoklanıyor...",
+    "clearnet": "clearnet",
+    "mixnet": "mixnet",
+    "mixnet-not-carried": "mixnet: taşınmadı (proxy hazır değil)",
+    "probe-failed": "yoklama başarısız:",
+    "payload-unusable": "yanıt kullanılamaz:",
+    "copy-report": "Raporu kopyala",
+    "report-copied": "Rapor panoya kopyalandı.",
+    "leg-ok": "tamam",
+    "leg-failed": "BAŞARISIZ"
   },
   "scanner": {
     "text": "Birleştirilmiş Tam Görüntüleme Anahtarını Tara",
@@ -945,27 +970,6 @@
     "error-hint": "Hiçbir şey kaybolmadı — şimdi yeniden deneyebilir veya daha sonra ana ekrandan dönebilirsiniz.",
     "retry": "Yeniden dene",
     "close": "Kapat"
-  },
-  "migrationcadence": {
-    "title": "Aktarımları planlayın",
-    "intro": "**{notes} notunuz** Ironwood’a **gruplar** halinde gönderilecek. Blok zinciri **{blocks} bloklu** pencerelere bölünür (~{hours}sa), her grup kendi penceresinde gönderilir.",
-    "how-many": "Kaç grup?",
-    "fewer-title": "Daha az, daha büyük gruplar",
-    "fewer-body": "Daha erken biter. Birlikte görünen not sayısı artar.",
-    "more-title": "Daha çok, daha küçük gruplar",
-    "more-body": "Daha uzun sürer. Daha iyi gizlilik.",
-    "duration-hours": "Yaklaşık {n} saatte biter",
-    "duration-days": "Yaklaşık {n} günde biter",
-    "disclosure": "Her grup, hatırlatıcısını açtığınızda gönderilir.",
-    "cadence-fixed": "Gönderim zaten başladı. Grup takvimi artık değiştirilemez.",
-    "replanned": "Notlarınız değişti. Güncellenen takvimi gözden geçirin.",
-    "review": "Takvimi gözden geçir",
-    "dust-title": "Taşınacak bir şey kalmadı",
-    "dust-body": "Orchard’da kalan {amount} ZEC, taşımaya değer tutarın altında. Ücretler taşıdığından fazlasına mal olur.",
-    "unconfirmed-title": "Notlarınız henüz onaylanmadı",
-    "unconfirmed-body": "Bölme işlemleri zincirde, ancak cüzdan bir iki blok daha bu notları harcayamaz. Birkaç dakika sonra tekrar deneyin.",
-    "back": "Geri",
-    "retry": "Tekrar dene"
   },
   "migrationschedule": {
     "title": "Gözden geçir ve onayla",

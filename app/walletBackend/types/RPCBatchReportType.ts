@@ -6,20 +6,20 @@
 //   sent     -> accepted by the broadcast endpoint (`txid`).
 //   slid     -> its window boundary is no longer witnessable; reconciliation
 //               carries it to a coming window, nothing is lost.
-//   not_due  -> its random target is still ahead (`window_opens_unix_time`).
+//   not_due  -> its window has not opened yet (`window_opens_unix_time`).
 //   failed   -> submission failed and the batch halted here.
 //
 // `halted` is the error that stopped the batch early (null when it ran to
 // completion); parts without an outcome entry were not attempted and remain
 // due. `error` marks an infrastructure failure (offline, no migration) where
 // no batch ran at all.
-export type RPCPartSendResultType =
+type RPCPartSendResultType =
   | { kind: 'sent'; txid: string }
   | { kind: 'slid' }
   | { kind: 'not_due'; window_opens_unix_time: number }
   | { kind: 'failed'; error: string };
 
-export type RPCPartOutcomeType = {
+type RPCPartOutcomeType = {
   part: number;
   denomination: number;
   result: RPCPartSendResultType;

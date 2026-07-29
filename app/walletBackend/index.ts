@@ -7,18 +7,31 @@
  */
 import WalletBackend from './WalletBackend';
 
-export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
-export type {
-  CadencePlanRoute,
-  ReschedulePartsRoute,
-  StartMigrationRoute,
-} from './utils/migrationRouting';
+export type { FfiResult } from './ffi';
+export type { ZecPriceOutcome } from './utils/walletUtils';
+export { matchZecPriceOutcome } from './utils/walletUtils';
 export {
-  routeCadencePlan,
-  routeRescheduleParts,
-  routeStartMigration,
-} from './utils/migrationRouting';
+  PRICE_FAILURE_HEADLINE,
+  zecPriceFailureReport,
+} from './transforms/zecPriceFailureTransform';
+export { routeStartMigration } from './utils/migrationRouting';
 export { scanInProgress } from './utils/syncProgress';
+export type {
+  ServerProbeOutcome,
+  SyncProbeOutcome,
+} from './utils/serverProbeOutcome';
+export {
+  interpretServerProbe,
+  interpretSyncProbe,
+  matchServerProbeOutcome,
+  matchSyncProbeOutcome,
+} from './utils/serverProbeOutcome';
+export { probeServer, probeSyncServer } from './utils/connectionProbe';
+export type { DoctorRun } from './transforms/connectionDoctorReport';
+export {
+  connectionDoctorReport,
+  doctorRunLines,
+} from './transforms/connectionDoctorReport';
 export {
   cancelIronwoodMigration,
   changeServer,
@@ -28,12 +41,12 @@ export {
   createNewUnifiedAddress,
   createNewWallet,
   doSave,
-  doSaveBackup,
   drainOrchard,
   drainStatus,
   executeDueParts,
   executeDuePartsStatus,
   fetchWallet,
+  fetchWalletOutcome,
   getBalanceInfo,
   getDonationAddress,
   getLatestBlockServerInfo,
@@ -52,10 +65,8 @@ export {
   parseAddress,
   planIronwoodMigration,
   planOrchardDrain,
-  quickSplit,
   reconcileMigration,
   removeTransaction,
-  rescheduleParts,
   resolvedTrue,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
@@ -65,10 +76,8 @@ export {
   setCryptoDefaultProvider,
   shieldConfirm,
   shieldPropose,
-  splitStatus,
   startIronwoodMigration,
   walletBackupExists,
   walletExists,
-  windowTimeline,
 } from './utils/walletUtils';
 export default WalletBackend;
