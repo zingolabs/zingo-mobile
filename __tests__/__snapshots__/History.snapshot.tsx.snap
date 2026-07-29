@@ -693,40 +693,13 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           {
             "paddingBottom": 18,
             "paddingHorizontal": 12,
-            "paddingTop": 8,
+            "paddingTop": 0,
           }
         }
       >
         <View
           entering={AnimationBuilder {}}
         >
-          <View
-            style={
-              {
-                "backgroundColor": "#1A1200",
-                "borderColor": "#3D2A00",
-                "borderRadius": 10,
-                "borderWidth": 1,
-                "marginBottom": 10,
-                "paddingHorizontal": 14,
-                "paddingVertical": 12,
-              }
-            }
-          >
-            <Text
-              style={
-                {
-                  "color": "#888888",
-                  "fontSize": 13,
-                  "lineHeight": 19,
-                }
-              }
-            >
-              <Text>
-                text translated
-              </Text>
-            </Text>
-          </View>
           <View
             style={
               {
@@ -781,28 +754,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 >
                   text translated
                 </Text>
-                <View
-                  style={
-                    {
-                      "backgroundColor": "rgba(249, 157, 0, 0.15)",
-                      "borderRadius": 6,
-                      "marginLeft": 8,
-                      "paddingHorizontal": 8,
-                      "paddingVertical": 2,
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      {
-                        "color": "#F99D00",
-                        "fontSize": 12,
-                      }
-                    }
-                  >
-                    text translated
-                  </Text>
-                </View>
               </View>
               <Text
                 style={
@@ -1492,40 +1443,13 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           {
             "paddingBottom": 18,
             "paddingHorizontal": 12,
-            "paddingTop": 8,
+            "paddingTop": 0,
           }
         }
       >
         <View
           entering={AnimationBuilder {}}
         >
-          <View
-            style={
-              {
-                "backgroundColor": "#1A1200",
-                "borderColor": "#3D2A00",
-                "borderRadius": 10,
-                "borderWidth": 1,
-                "marginBottom": 10,
-                "paddingHorizontal": 14,
-                "paddingVertical": 12,
-              }
-            }
-          >
-            <Text
-              style={
-                {
-                  "color": "#888888",
-                  "fontSize": 13,
-                  "lineHeight": 19,
-                }
-              }
-            >
-              <Text>
-                text translated
-              </Text>
-            </Text>
-          </View>
           <View
             style={
               {
@@ -1580,28 +1504,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 >
                   text translated
                 </Text>
-                <View
-                  style={
-                    {
-                      "backgroundColor": "rgba(249, 157, 0, 0.15)",
-                      "borderRadius": 6,
-                      "marginLeft": 8,
-                      "paddingHorizontal": 8,
-                      "paddingVertical": 2,
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      {
-                        "color": "#F99D00",
-                        "fontSize": 12,
-                      }
-                    }
-                  >
-                    text translated
-                  </Text>
-                </View>
               </View>
               <Text
                 style={
