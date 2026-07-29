@@ -122,6 +122,11 @@ import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
 import { MessageList } from '../../components/Messages';
 import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
+import {
+  INITIAL_MIXNET_VIEW,
+  MixnetView,
+} from '../walletBackend/transforms/mixnetPresenter';
+import { startMixnetTransport } from '../walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
@@ -832,6 +837,16 @@ export class LoadedAppClass extends Component<
       blockExplorer: props.blockExplorer,
       nym: props.nym,
 
+      // Mixnet Mode: fail-closed initial view where the policy runs
+      // (Android); null where the platform transport has not landed yet
+      // (iOS until the Mac-gated step), which leaves the send gate open.
+      mixnetView:
+        Platform.OS === GlobalConst.platformOSandroid
+          ? INITIAL_MIXNET_VIEW
+          : null,
+      disableMixnet: this.disableMixnet,
+      reenableMixnet: this.reenableMixnet,
+
       // state
       appStateStatus:
         Platform.OS === GlobalConst.platformOSios
@@ -861,6 +876,9 @@ export class LoadedAppClass extends Component<
       onZingolibVersionChanged: this.setZingolibVersion,
       onBirthdayChanged: this.setBirthday,
       onError: this.setLastError,
+      onMixnetViewChanged: this.setMixnetView,
+      startMixnetTransport: startMixnetTransport,
+      mixnetSupported: Platform.OS === GlobalConst.platformOSandroid,
       readOnly: props.readOnly,
       server: props.server,
       performanceLevel: props.performanceLevel,
@@ -1101,6 +1119,7 @@ export class LoadedAppClass extends Component<
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
+    this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
       try {
         if (
@@ -1240,6 +1259,22 @@ export class LoadedAppClass extends Component<
     this.setState({
       isSeedViewModalOpen: value,
     });
+  };
+
+  setMixnetView = (mixnetView: MixnetView) => {
+    if (!isEqual(this.state.mixnetView, mixnetView)) {
+      this.setState({ mixnetView });
+    }
+  };
+
+  // The user's deliberate per-session consent to clearnet.
+  disableMixnet = async (): Promise<void> => {
+    await this.rpc.disableMixnet();
+  };
+
+  // Recover a died or failed mixnet transport by starting it afresh.
+  reenableMixnet = async (): Promise<void> => {
+    await this.rpc.reenableMixnet();
   };
 
   setValueTransfersList = async (
@@ -2222,6 +2257,9 @@ export class LoadedAppClass extends Component<
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
       nym: this.state.nym,
+      mixnetView: this.state.mixnetView,
+      disableMixnet: this.disableMixnet,
+      reenableMixnet: this.reenableMixnet,
       foregroundEpoch: this.state.foregroundEpoch,
     };
 
