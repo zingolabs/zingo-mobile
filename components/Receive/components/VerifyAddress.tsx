@@ -20,7 +20,10 @@ import { checkMyAddress } from '../../../app/walletBackend';
 import { parseZcashURI } from '../../../app/uris';
 import TextInputAddress from '../../Components/TextInputAddress';
 import FadeText from '../../Components/FadeText';
-import { RPCCheckAddressType } from '../../../app/walletBackend/types/RPCCheckAddressType';
+import {
+  CheckAddressVerdict,
+  interpretCheckAddressResult,
+} from './checkAddressVerdict';
 import { VerifyCheckIcon } from '../../Components/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '../../Components/Icons/VerifyXIcon';
 
@@ -42,26 +45,28 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
 
   const [address, setAddress] = useState<string>('');
   const [errorAddress, setErrorAddress] = useState<string>('');
-  const [verifyOK, setVerifyOK] = useState<boolean | null>(null);
+  const [verdict, setVerdict] = useState<CheckAddressVerdict>({
+    kind: 'unattempted',
+  });
 
   const verifyAddress = async () => {
-    try {
-      const verifyAddressResult = await checkMyAddress(address);
-      if (!verifyAddressResult.ok) {
-        addLastSnackbar(
-          verifyAddressResult.error.message,
-          SnackbarDurationEnum.short,
-        );
-        setErrorAddress(verifyAddressResult.error.message);
-      } else {
-        const verifyAddressJSON: RPCCheckAddressType = await JSON.parse(
-          verifyAddressResult.value,
-        );
-        setVerifyOK(verifyAddressJSON.is_wallet_address);
-      }
-    } catch (error) {
-      console.log(`Critical Error new address ${error}`);
+    const result = interpretCheckAddressResult(await checkMyAddress(address));
+
+    // A failed check must never reach the verdict rows: rendering "this
+    // address does not belong to you" when the backend never answered is a
+    // confident false negative on a verification screen.
+    if (result.kind === 'ffiRejection') {
+      console.log(`Error new address ${result.code} ${result.message}`);
+      addLastSnackbar(result.message, SnackbarDurationEnum.short);
+      setErrorAddress(result.message);
+    } else if (result.kind === 'malformed') {
+      console.log(`Internal Error new address ${result.reason}`);
+      addLastSnackbar(
+        translate('receive.verification-unavailable') as string,
+        SnackbarDurationEnum.short,
+      );
     }
+    setVerdict(result);
 
     Keyboard.dismiss();
   };
@@ -128,7 +133,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           <FadeText style={{ color: colors.primary }}>{errorAddress}</FadeText>
         </View>
       )}
-      {verifyOK !== null && (
+      {(verdict.kind === 'mine' || verdict.kind === 'notMine') && (
         <View
           style={{
             flexGrow: 1,
@@ -138,7 +143,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             marginVertical: 5,
           }}
         >
-          {verifyOK ? (
+          {verdict.kind === 'mine' ? (
             <View
               style={{
                 flexDirection: 'row',

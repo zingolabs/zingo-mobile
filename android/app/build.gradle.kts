@@ -158,6 +158,8 @@ android {
             // MainActivity for releases) keeps prod safe by default — any
             // future flavor MUST define this bool or compile will fail.
             resValue("bool", "enforce_privacy_controls", "true")
+            resValue("bool", "mixnet_always_on", "false")
+            resValue("string", "default_chain_name", "main")
         }
         create("beta") {
             dimension = "channel"
@@ -166,6 +168,32 @@ android {
             versionName = "2.0.21" // beta override
             resValue("string", "app_name", "Zingo Beta")
             resValue("bool", "enforce_privacy_controls", "false")
+            resValue("bool", "mixnet_always_on", "false")
+            resValue("string", "default_chain_name", "main")
+        }
+        // The silent alpha APKs (CONTEXT.md: "Always On"): Mixnet Mode runs
+        // with the stock UX — the app never projects a mixnet view, so no
+        // toggle, banner, or disclaimer renders, and a fail-closed refusal
+        // surfaces as a plain send error. The transport policy itself is
+        // unchanged (forced on at wallet load, fail-closed); only the UI
+        // projection is suppressed, keyed off the mixnet_always_on bool.
+        // The pair differs only in the chain the first run defaults to;
+        // distinct application ids let both install beside prod and beta.
+        create("alwayson") {
+            dimension = "channel"
+            applicationIdSuffix = ".AlwaysOn"
+            resValue("string", "app_name", "Zingo Alpha")
+            resValue("bool", "enforce_privacy_controls", "false")
+            resValue("bool", "mixnet_always_on", "true")
+            resValue("string", "default_chain_name", "main")
+        }
+        create("alwaysontest") {
+            dimension = "channel"
+            applicationIdSuffix = ".AlwaysOnTest"
+            resValue("string", "app_name", "Zingo Alpha Test")
+            resValue("bool", "enforce_privacy_controls", "false")
+            resValue("bool", "mixnet_always_on", "true")
+            resValue("string", "default_chain_name", "test")
         }
     }
 

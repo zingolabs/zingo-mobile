@@ -100,6 +100,31 @@ and completion-time vocabulary on "residual")
 The single user approval of an exact plan hash before anything is signed or
 sent. Covers the whole migration, both phases.
 
+## Mixnet Mode
+
+**Mixnet Mode**:
+Routing the send (transaction broadcast) and price-fetch surfaces over the
+Nym mixnet. Synchronization is never covered; the IP-correlation disclaimer
+(ZIP-0318) states that boundary. Modes: `off`, `bootstrapping`, `ready`,
+`died`.
+
+**Fail-closed**:
+The policy that when Mixnet Mode is anything but `off`, a covered surface
+that cannot reach the mixnet refuses rather than falling back to clearnet.
+A refusal is not a server error and is never retried.
+
+**Silent alpha APK**:
+An alpha build of the app that routes the covered surfaces over Nym with
+the stock (pre-Mixnet-Mode) UX/UI — no toggle, no banners, no disclaimer
+screen. Its purpose is isolating transport behavior from UI work.
+_Avoid_: silent mode (it is a build, not a runtime mode)
+
+**Always On** (build flavor):
+The build flavors that produce the silent alpha APKs: Mixnet Mode is enabled
+unconditionally at wallet initialization and cannot be disabled at runtime.
+Two network variants exist — `alwayson` first-runs on mainnet, and
+`alwaysontest` first-runs on testnet — installable side by side.
+
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.

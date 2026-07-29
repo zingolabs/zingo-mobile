@@ -35,6 +35,7 @@ import {
   getMixnetBootstrapDetail,
   getMixnetStatus,
 } from '../utils/mixnetUtils';
+import { recordMixnetTransportReady } from '../utils/mixnetGate';
 
 /**
  * Starts the platform-hosted mixnet transport and yields its local SOCKS5
@@ -57,11 +58,19 @@ export const BOOTSTRAP_POLL_MILLIS = 2_000;
 /** How often the coordinator polls outside of bootstrapping. */
 export const STEADY_POLL_MILLIS = 30_000;
 
+/**
+ * How long an auto-recovering coordinator waits after a failure, `died`, or
+ * unconsented `off` before starting the transport afresh.
+ */
+export const RECOVERY_RETRY_MILLIS = 60_000;
+
 export class MixnetCoordinator {
   private readonly startTransport: StartMixnetTransport;
   private readonly onChange: (view: MixnetView) => void;
+  private readonly autoRecover: boolean;
 
   private pollTimerID?: ReturnType<typeof setInterval>;
+  private recoveryTimerID?: ReturnType<typeof setTimeout>;
   private pollLock: boolean = false;
   private lastStatus: MixnetStatusReport | null = null;
   // The consent bit belongs to the coordinator, not the wallet: the wallet
@@ -69,12 +78,21 @@ export class MixnetCoordinator {
   // session, and only the former is consent (#1226).
   private consent: ClearnetConsent = 'none';
 
+  /**
+   * `autoRecover` is the always-on flavors' recovery path: with the mixnet
+   * UI withheld there is no human re-enable, so a failure, a `died`
+   * transport, or an unconsented `off` schedules a fresh
+   * [`ensureForConnectedSession`] after [`RECOVERY_RETRY_MILLIS`]. Stock
+   * builds leave it false: there, recovery is the user's deliberate act.
+   */
   constructor(
     startTransport: StartMixnetTransport,
     onChange: (view: MixnetView) => void,
+    autoRecover: boolean = false,
   ) {
     this.startTransport = startTransport;
     this.onChange = onChange;
+    this.autoRecover = autoRecover;
   }
 
   /**
@@ -90,6 +108,9 @@ export class MixnetCoordinator {
       const socks5Addr = await this.startTransport();
       this.publish(await attachMixnet(socks5Addr));
     } catch (thrown: unknown) {
+      // Dev diagnostic: the failure view the screens render carries no
+      // detail, and the silent alpha flavors render nothing at all.
+      console.log('mixnet enable failed:', thrown);
       this.publish({ kind: 'failure', failure: describeRejection(thrown) });
     }
     this.schedulePolling();
@@ -106,12 +127,40 @@ export class MixnetCoordinator {
     await this.ensureForConnectedSession();
   }
 
-  /** Stops polling; the coordinator publishes nothing further. */
+  /** Stops polling and recovery; the coordinator publishes nothing further. */
   stop(): void {
+    this.clearPollTimer();
+    if (this.recoveryTimerID !== undefined) {
+      clearTimeout(this.recoveryTimerID);
+      this.recoveryTimerID = undefined;
+    }
+    // A stopped coordinator can vouch for nothing: fail closed.
+    recordMixnetTransportReady(false);
+  }
+
+  /**
+   * Clears only the poll interval. `schedulePolling` reschedules through
+   * this rather than [`stop`]: a reschedule must not close the fail-closed
+   * gate or cancel a pending recovery attempt.
+   */
+  private clearPollTimer(): void {
     if (this.pollTimerID !== undefined) {
       clearInterval(this.pollTimerID);
       this.pollTimerID = undefined;
     }
+  }
+
+  /**
+   * Whether the last observed transport state permits a fail-closed send:
+   * only a live `ready` report qualifies. The always-on send gate consults
+   * this; the stock flavors gate through the view's `sendBlocked` instead.
+   */
+  isReady(): boolean {
+    return (
+      this.lastStatus !== null &&
+      this.lastStatus.kind === 'status' &&
+      this.lastStatus.mode === RPCMixnetModeEnum.ready
+    );
   }
 
   private async pollOnce(): Promise<void> {
@@ -127,7 +176,7 @@ export class MixnetCoordinator {
   }
 
   private schedulePolling(): void {
-    this.stop();
+    this.clearPollTimer();
     const cadence = this.isBootstrapping()
       ? BOOTSTRAP_POLL_MILLIS
       : STEADY_POLL_MILLIS;
@@ -149,11 +198,39 @@ export class MixnetCoordinator {
   private publish(status: MixnetStatusReport): void {
     const wasBootstrapping = this.isBootstrapping();
     this.lastStatus = status;
+    // Mirror readiness into the module gate for the detached price path.
+    recordMixnetTransportReady(this.isReady());
     this.publishSeq += 1;
     this.publishView(status, this.publishSeq);
     if (this.pollTimerID !== undefined && wasBootstrapping !== this.isBootstrapping()) {
       this.schedulePolling();
     }
+    this.maybeScheduleRecovery();
+  }
+
+  /**
+   * The always-on recovery loop: a failure report, a `died` transport, or
+   * an unconsented `off` (an enable that never succeeded — always-on has
+   * no consent path to `off`) schedules one fresh enable attempt. A failed
+   * attempt publishes a failure and thereby schedules the next, so the
+   * loop persists at [`RECOVERY_RETRY_MILLIS`] until the transport is up.
+   */
+  private maybeScheduleRecovery(): void {
+    if (!this.autoRecover || this.recoveryTimerID !== undefined) {
+      return;
+    }
+    const needsRecovery =
+      this.lastStatus !== null &&
+      (this.lastStatus.kind === 'failure' ||
+        this.lastStatus.mode === RPCMixnetModeEnum.off ||
+        this.lastStatus.mode === RPCMixnetModeEnum.died);
+    if (!needsRecovery) {
+      return;
+    }
+    this.recoveryTimerID = setTimeout(() => {
+      this.recoveryTimerID = undefined;
+      this.ensureForConnectedSession();
+    }, RECOVERY_RETRY_MILLIS);
   }
 
   private async publishView(

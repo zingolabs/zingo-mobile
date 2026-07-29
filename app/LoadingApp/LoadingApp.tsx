@@ -76,6 +76,7 @@ import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
+import { flavorDefaultChainName } from '../utils/flavor';
 import Utils from '../utils';
 import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
@@ -84,6 +85,7 @@ import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
+import { serverProbeVerdict } from '../serverProbeVerdict';
 import { isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
@@ -117,9 +119,17 @@ type LoadingAppProps = {
   toggleTheme: (mode: ModeEnum) => void;
 };
 
+// The flavor's chain decides the first-run default server (the testnet
+// alpha flavor starts on the testnet default); a persisted server setting
+// always overrides this.
+const flavorDefaultServer: ServerUrisType =
+  serverUris(() => {}).find(
+    (s: ServerUrisType) => s.chainName === flavorDefaultChainName() && s.default,
+  ) ?? serverUris(() => {})[0];
+
 const SERVER_DEFAULT_0: ServerType = {
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
+  uri: flavorDefaultServer.uri,
+  chainName: flavorDefaultServer.chainName,
 } as ServerType;
 
 const activationHeight = {
@@ -539,7 +549,7 @@ export class LoadingAppClass extends Component<
       walletExists: false,
       hasBackupWallet: false,
       customServerUri: '',
-      customServerChainName: ChainNameEnum.mainChainName,
+      customServerChainName: flavorDefaultChainName(),
       customServerOffline: false,
       customServerAuto: false,
       customServerCustom: false,
@@ -1019,8 +1029,12 @@ export class LoadingAppClass extends Component<
       ),
     );
     let fasterServer: ServerType = {} as ServerType;
-    if (server && server.latency) {
-      fasterServer = { uri: server.uri, chainName: server.chainName };
+    const bestVerdict = serverProbeVerdict(server);
+    if (bestVerdict.kind === 'reachable') {
+      fasterServer = {
+        uri: bestVerdict.server.uri,
+        chainName: bestVerdict.server.chainName,
+      };
     } else {
       fasterServer = actualServer;
       // likely here there is a internet/wifi conection problem
@@ -1105,11 +1119,7 @@ export class LoadingAppClass extends Component<
       obsolete: false,
     } as ServerUrisType;
     const serverChecked = await selectingServer([s]);
-    if (serverChecked && serverChecked.latency) {
-      return true;
-    } else {
-      return false;
-    }
+    return serverProbeVerdict(serverChecked).kind === 'reachable';
   };
 
   walletErrorHandle = async (
@@ -1393,7 +1403,7 @@ export class LoadingAppClass extends Component<
         obsolete: false,
       } as ServerUrisType;
       const serverChecked = await selectingServer([cs]);
-      if (!serverChecked || !serverChecked.latency) {
+      if (serverProbeVerdict(serverChecked).kind !== 'reachable') {
         this.addLastSnackbar(
           (this.state.translate('loadedapp.changeservernew-error') as string) +
             uri,

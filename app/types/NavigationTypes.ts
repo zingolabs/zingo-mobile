@@ -104,17 +104,17 @@ export type AppDrawerParamList = {
   [RouteEnum.Seed]: SeedNavigationState | undefined;
 };
 
-export type AddressBookNavigationState = {
+type AddressBookNavigationState = {
   currentAddress: string;
   routeStack: RouteEnum;
 };
 
-export type AddressListNavigationState = {
+type AddressListNavigationState = {
   addressKind: AddressKindEnum;
   setIndex: (n: number) => void;
 };
 
-export type ScannerAddressNavigationState = {
+type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
   active: boolean;
   // When true the scanner returns the scanned string verbatim — no `zcash:`
@@ -123,19 +123,19 @@ export type ScannerAddressNavigationState = {
   raw?: boolean;
 };
 
-export type ScannerUfvkNavigationState = {
+type ScannerUfvkNavigationState = {
   setUfvkText: (k: string) => void;
   active: boolean;
 };
 
-export type ValueTransferDetailNavigationState = {
+type ValueTransferDetailNavigationState = {
   index: number;
   vt: ValueTransferType;
   valueTransfersSliced: ValueTransferType[];
   totalLength: number;
 };
 
-export type ConfirmNavigationState = {
+type ConfirmNavigationState = {
   calculatedFee: number;
   parseAddressInfoJSON: RPCParseAddressType;
   donationAmount: number;
@@ -151,10 +151,10 @@ export type ConfirmNavigationState = {
   nym: boolean;
 };
 
-export type UfvkNavigationState = {
+type UfvkNavigationState = {
   action: UfvkActionEnum;
 };
 
-export type SeedNavigationState = {
+type SeedNavigationState = {
   action: SeedActionEnum;
 };

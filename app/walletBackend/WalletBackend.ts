@@ -19,6 +19,7 @@ import { WalletBackendConfig } from './config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';
 import { MixnetCoordinator } from './modules/MixnetCoordinator';
+import { COVERED_SURFACE_REFUSAL } from './utils/mixnetGate';
 import { SyncCoordinator } from './modules/SyncCoordinator';
 import { TransactionService } from './modules/TransactionService';
 import { WalletLifecycleService } from './modules/WalletLifecycleService';
@@ -43,6 +44,7 @@ export default class WalletBackend {
     this.mixnetCoordinator = new MixnetCoordinator(
       config.startMixnetTransport,
       config.onMixnetViewChanged,
+      config.mixnetAlwaysOn,
     );
     // Wire the sync-restart callback after SyncCoordinator exists
     this.dataService.onSyncError = async () => {
@@ -93,6 +95,21 @@ export default class WalletBackend {
 
   // Transactions
   async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
+    // The always-on flavors' fail-closed gate (CONTEXT.md: Fail-closed).
+    // Those builds withhold the mixnet UI, so the view-level send gate the
+    // stock flavors rely on never renders — and a failed enable leaves the
+    // wallet's mode at `off`, where zingolib itself would broadcast over
+    // clearnet. The backend therefore refuses here unless the transport is
+    // `ready`. The message carries the "Nym mixnet" marker so
+    // classifySendFailure files it as mixnetRefusal: never a server
+    // problem, never retried elsewhere.
+    if (
+      this.config.mixnetSupported &&
+      this.config.mixnetAlwaysOn &&
+      !this.mixnetCoordinator.isReady()
+    ) {
+      throw new Error(COVERED_SURFACE_REFUSAL);
+    }
     return this.transactionService.sendTransaction(sendJson);
   }
 

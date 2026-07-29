@@ -7,12 +7,12 @@
  */
 import WalletBackend from './WalletBackend';
 
-export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
-export type { StartMigrationRoute } from './utils/migrationRouting';
+export type { FfiResult } from './ffi';
+export type { ZecPriceOutcome } from './utils/walletUtils';
+export { matchZecPriceOutcome } from './utils/walletUtils';
 export { routeStartMigration } from './utils/migrationRouting';
 export { scanInProgress } from './utils/syncProgress';
 export {
-  cancelIronwoodMigration,
   changeServer,
   checkMyAddress,
   continueNoteSplitting,
@@ -20,12 +20,12 @@ export {
   createNewUnifiedAddress,
   createNewWallet,
   doSave,
-  doSaveBackup,
   drainOrchard,
   drainStatus,
   executeDueParts,
   executeDuePartsStatus,
   fetchWallet,
+  fetchWalletOutcome,
   getBalanceInfo,
   getDonationAddress,
   getLatestBlockServerInfo,

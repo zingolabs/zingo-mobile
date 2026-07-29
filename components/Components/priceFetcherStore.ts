@@ -1,5 +1,9 @@
 import { useEffect, useReducer } from 'react';
-import { getZecPrice } from '../../app/walletBackend';
+import {
+  getZecPrice,
+  matchZecPriceOutcome,
+  ZecPriceOutcome,
+} from '../../app/walletBackend';
 
 /**
  * Shared, singleton state for every <PriceFetcher/> on screen.
@@ -74,33 +78,36 @@ async function doFetch(): Promise<void> {
   if (cooldownTimer) clearTimeout(cooldownTimer);
   cooldownTimer = setTimeout(emit, COOLDOWN_MS);
 
-  let price: number;
-  let error: string;
-  // first attempt
-  ({ price, error } = await getZecPrice());
-  // 0 initial · -1 Gemini/zingolib · -2 RPCModule · >0 real value
-  if (price <= 0) {
-    // second attempt
-    ({ price, error } = await getZecPrice());
+  // first attempt, and one retry on anything but a real price
+  let outcome: ZecPriceOutcome = await getZecPrice();
+  if (outcome.kind !== 'price') {
+    outcome = await getZecPrice();
   }
 
-  if (price === -1) {
+  // Exhaustive by construction: the handler record must name every
+  // ZecPriceOutcome arm, so adding an arm fails compilation here, by
+  // name, until this store decides how to render it.
+  const geminiSnackbar = (detail: string) =>
     d.addLastSnackbar(
-      `${d.translate('info.errorgemini') as string} - ${error}`,
+      `${d.translate('info.errorgemini') as string} - ${detail}`,
     );
-  } else if (price === -2) {
-    d.addLastSnackbar(
-      `${d.translate('info.errorrpcmodule') as string} - ${error}`,
-    );
-  } else if (price <= 0) {
-    d.addLastSnackbar(
-      `${d.translate('info.errorgemini') as string} - ${error}`,
-    );
-    d.setZecPrice(price, 0);
-  } else {
-    d.setZecPrice(price, Date.now());
-    started = true;
-  }
+  matchZecPriceOutcome(outcome, {
+    price: o => {
+      d.setZecPrice(o.usd, Date.now());
+      started = true;
+    },
+    noData: () => {
+      geminiSnackbar('');
+      d.setZecPrice(0, 0);
+    },
+    gateRefusal: o => geminiSnackbar(o.error),
+    ffiRejection: o => geminiSnackbar(o.message),
+    oracleError: o => geminiSnackbar(o.error),
+    malformedPayload: o =>
+      d.addLastSnackbar(
+        `${d.translate('info.errorrpcmodule') as string} - ${o.detail}`,
+      ),
+  });
 
   // Floor the visible loading time so the CTA/ring state doesn't flash by.
   const elapsed = Date.now() - now;

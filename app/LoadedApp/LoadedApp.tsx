@@ -26,7 +26,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import WalletBackend, { fetchWallet } from '../walletBackend';
+import WalletBackend, { fetchWalletOutcome } from '../walletBackend';
 import {
   changeServer,
   doSave,
@@ -126,7 +126,11 @@ import {
   INITIAL_MIXNET_VIEW,
   MixnetView,
 } from '../walletBackend/transforms/mixnetPresenter';
-import { startMixnetTransport } from '../walletBackend/utils/nymTransport';
+import {
+  isMixnetAlwaysOn,
+  startMixnetTransport,
+} from '../walletBackend/utils/nymTransport';
+import { flavorDefaultChainName } from '../utils/flavor';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
@@ -191,9 +195,17 @@ type LoadedAppProps = {
   toggleTheme: (mode: ModeEnum) => void;
 };
 
+// The flavor's chain decides the fallback default server (the testnet
+// alpha flavor falls back to the testnet default); persisted settings
+// always override this.
+const flavorDefaultServer =
+  serverUris(() => {}).find(
+    s => s.chainName === flavorDefaultChainName() && s.default,
+  ) ?? serverUris(() => {})[0];
+
 const SERVER_DEFAULT_0: ServerType = {
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
+  uri: flavorDefaultServer.uri,
+  chainName: flavorDefaultServer.chainName,
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
@@ -837,8 +849,11 @@ export class LoadedAppClass extends Component<
       // Mixnet Mode: fail-closed initial view where the policy runs
       // (Android); null where the platform transport has not landed yet
       // (iOS until the Mac-gated step), which leaves the send gate open.
+      // The "always on" flavor (the silent alpha APK) also starts null and
+      // stays null — publications are withheld below — so the stock UI
+      // renders while the forced-on transport policy runs unchanged.
       mixnetView:
-        Platform.OS === GlobalConst.platformOSandroid
+        Platform.OS === GlobalConst.platformOSandroid && !isMixnetAlwaysOn()
           ? INITIAL_MIXNET_VIEW
           : null,
       disableMixnet: this.disableMixnet,
@@ -873,9 +888,25 @@ export class LoadedAppClass extends Component<
       onZingolibVersionChanged: this.setZingolibVersion,
       onBirthdayChanged: this.setBirthday,
       onError: this.setLastError,
-      onMixnetViewChanged: this.setMixnetView,
+      // In the "always on" flavor the view is withheld from the context, so
+      // every mixnet surface (Settings section, banners, the Send gate)
+      // stays on its stock rendering and a fail-closed refusal arrives as a
+      // plain typed send error. The coordinator still runs the forced-on
+      // policy, and the view lands in the dev log instead — the silent
+      // flavors keep the UI stock, not the diagnostics.
+      onMixnetViewChanged: isMixnetAlwaysOn()
+        ? (view: MixnetView) => {
+            console.log(
+              'mixnet (silent):',
+              view.statusKey,
+              view.socks5Addr ?? '',
+              view.narration ?? '',
+            );
+          }
+        : this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
       mixnetSupported: Platform.OS === GlobalConst.platformOSandroid,
+      mixnetAlwaysOn: isMixnetAlwaysOn(),
       readOnly: props.readOnly,
       server: props.server,
       performanceLevel: props.performanceLevel,
@@ -1901,9 +1932,21 @@ export class LoadedAppClass extends Component<
     if (!value) {
       await removeRecoveryWalletInfo();
     } else {
-      const wallet = await fetchWallet(this.state.readOnly);
-      if (wallet) {
-        await createUpdateRecoveryWalletInfo(wallet);
+      const outcome = await fetchWalletOutcome(this.state.readOnly);
+      if (outcome.kind === 'complete') {
+        await createUpdateRecoveryWalletInfo(outcome.wallet);
+      } else {
+        // Nothing was stored, so the setting must not claim otherwise:
+        // revert the toggle and tell the user instead of silently leaving
+        // an enabled switch with no backup behind it.
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.recoveryWalletInfoOnDevice,
+          false,
+        );
+        this.setState({ recoveryWalletInfoOnDevice: false });
+        this.addLastSnackbar(
+          this.state.translate('loadedapp.recoveryinfo-error') as string,
+        );
       }
     }
   };

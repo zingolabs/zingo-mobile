@@ -52,6 +52,7 @@ enum FfiOutcome {
     case .Sync(let message): return ("Sync", message)
     case .Rescan(let message): return ("Rescan", message)
     case .Read(let message): return ("Read", message)
+    case .Mixnet(let message): return ("Mixnet", message)
     case .Send(let message): return ("Send", message)
     case .Shield(let message): return ("Shield", message)
     case .InvalidInput(let message): return ("InvalidInput", message)

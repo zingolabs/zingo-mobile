@@ -17,6 +17,7 @@ const FFI_ERROR_CODES = [
   'Sync',
   'Rescan',
   'Read',
+  'Mixnet',
   'Send',
   'Shield',
   'InvalidInput',
@@ -71,5 +72,50 @@ export async function callFfi(
     return { ok: true, value: await call };
   } catch (rejection) {
     return { ok: false, error: toFfiError(rejection) };
+  }
+}
+
+/**
+ * The transport-level decode every JSON-carrying native surface shares,
+ * written once: a settled FfiResult either yields parsed JSON or exactly
+ * one named transport failure. Domain interpreters (price, wallet fetch,
+ * address check) start from the `json` arm and add only their own payload
+ * validation — none of them re-implements the rejection / empty /
+ * unparseable triage. `raw` travels with the JSON so a consumer that
+ * rejects the payload for domain reasons can still report it verbatim.
+ */
+export type FfiJsonDecode =
+  | {
+      readonly kind: 'ffiRejection';
+      readonly code: FfiErrorCode;
+      readonly message: string;
+    }
+  | { readonly kind: 'emptyPayload' }
+  | {
+      readonly kind: 'malformedPayload';
+      readonly payload: string;
+      readonly detail: string;
+    }
+  | { readonly kind: 'json'; readonly value: unknown; readonly raw: string };
+
+export function decodeFfiJson(result: FfiResult<string>): FfiJsonDecode {
+  if (!result.ok) {
+    return {
+      kind: 'ffiRejection',
+      code: result.error.code,
+      message: result.error.message,
+    };
+  }
+  if (!result.value) {
+    return { kind: 'emptyPayload' };
+  }
+  try {
+    return { kind: 'json', value: JSON.parse(result.value), raw: result.value };
+  } catch (error) {
+    return {
+      kind: 'malformedPayload',
+      payload: result.value,
+      detail: String(error),
+    };
   }
 }
