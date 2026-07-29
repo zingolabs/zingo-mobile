@@ -9,6 +9,7 @@
     "start": "react-native start",
     "test": "jest --verbose",
     "lint": "eslint . --fix",
+    "lint:android": "node scripts/android_lint.mjs",
     "depcheck": "depcheck",
     "prettier": "prettier './**/*.{js,jsx,ts,tsx}' -w",
     "coverage": "jest --coverage",

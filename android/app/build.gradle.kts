@@ -235,6 +235,15 @@ android {
         }
     }
 
+    lint {
+        abortOnError = true
+        // lintVital (the pass release assembly runs) only checks FATAL issues,
+        // so an ERROR-severity NewApi violation shipped a prod crash on API
+        // 28-32 devices. Promoting it means release builds fail on it too,
+        // not just the dedicated lint job.
+        fatal += "NewApi"
+    }
+
     testOptions {
         unitTests.all {
             // The golden wire-contract pins for the nym proxy shim

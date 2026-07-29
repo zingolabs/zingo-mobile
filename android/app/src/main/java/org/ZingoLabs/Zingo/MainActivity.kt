@@ -32,7 +32,10 @@ class MainActivity : ReactActivity() {
                 WindowManager.LayoutParams.FLAG_SECURE
             )
             // Recents card background when FLAG_SECURE blanks the thumbnail.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // Builder and setBackgroundColor both landed in API 33; below
+            // that the background is not settable through public API, so
+            // leave the card at the system default.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 setTaskDescription(
                     ActivityManager.TaskDescription.Builder()
                         .setBackgroundColor(Color.BLACK)
