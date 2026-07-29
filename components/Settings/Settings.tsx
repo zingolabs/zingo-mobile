@@ -566,8 +566,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setSelectedServerActive(null);
       return;
     }
-    const parsed = parseServerURI(customServerUri, translate);
-    if (parsed.toLowerCase().startsWith(GlobalConst.error)) {
+    const parsed = parseServerURI(customServerUri);
+    if (parsed.kind === 'error') {
       setCheckingServer(false);
       setSelectedInfo(
         buildSelectedInfo(customServerUri, 0, customServerChainName),
@@ -575,7 +575,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setSelectedServerActive(false);
       return;
     }
-    updateSelectedInfo(parsed, customServerChainName);
+    updateSelectedInfo(parsed.uri, customServerChainName);
   };
 
   // Debounced custom-server check: each keystroke restarts the timer
@@ -794,16 +794,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       serverContext.uri !== serverUriParsed &&
       selectServer !== SelectServerEnum.offline
     ) {
-      const resultUri = parseServerURI(serverUriParsed, translate);
-      if (resultUri && resultUri.toLowerCase().startsWith(GlobalConst.error)) {
+      const parsedServer = parseServerURI(serverUriParsed);
+      if (parsedServer.kind === 'error') {
         // Surface the parser's specific message (bad URI, plaintext
         // HTTP not allowed, etc.) instead of the generic "fill out a
         // valid Server URI" snackbar so the user can fix the input.
-        addLastSnackbar(resultUri);
+        addLastSnackbar(translate(parsedServer.errorKey) as string);
         return;
       }
-      if (serverUriParsed !== resultUri) {
-        serverUriParsed = resultUri;
+      if (serverUriParsed !== parsedServer.uri) {
+        serverUriParsed = parsedServer.uri;
         if (selectServer === SelectServerEnum.auto) {
           setAutoServerUri(serverUriParsed);
         } else if (selectServer === SelectServerEnum.list) {

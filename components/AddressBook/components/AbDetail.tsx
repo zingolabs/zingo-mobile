@@ -187,21 +187,17 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       swapChain === GlobalConst.zecSwapChain &&
       addr.toLowerCase().startsWith(GlobalConst.zcash)
     ) {
-      const { error: errorTarget, target } = await parseZcashURI(
-        addr,
-        translate,
-        server,
-      );
+      const parsed = await parseZcashURI(addr, server);
 
       // Audit Issue H — surface the parser error and abort before any
-      // address-state mutation. parseZcashURI returns an empty target
-      // when error is non-empty, but the explicit guard keeps intent
-      // obvious here and protects against future contract changes.
-      if (errorTarget) {
-        setError(errorTarget);
+      // address-state mutation. A failure result carries no target, so a
+      // malformed URI cannot reach the state updates below.
+      if (parsed.kind === 'error') {
+        setError(Utils.renderErrorKeyed(parsed, translate));
         return;
       }
 
+      const target = parsed.target;
       if (target) {
         // redo the to addresses
         [target].forEach(tgt => {

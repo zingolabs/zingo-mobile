@@ -1,7 +1,6 @@
 import {
   TotalBalanceClass,
   InfoType,
-  TranslateType,
   ValueTransferType,
   UnifiedAddressClass,
   TransparentAddressClass,
@@ -37,8 +36,6 @@ export type WalletBackendConfig = {
   onBirthdayChanged: (birthday: number) => void;
   /** Called on any non-fatal RPC error; display or log in the consumer. */
   onError: (error: string) => void;
-  /** i18n helper — must be bound to the active locale in the consumer. */
-  translate: (key: string) => TranslateType;
   /** Prevent device sleep while true (e.g. during active sync/send). */
   keepAwake: (keep: boolean) => void;
   /** When true, only the UFVK is available; no seed phrase operations. */

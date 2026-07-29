@@ -1358,19 +1358,17 @@ export class LoadingAppClass extends Component<
       });
       this.customServerModalRef.current?.dismiss();
     } else {
-      const uri: string = parseServerURI(
-        this.state.customServerUri,
-        this.state.translate,
-      );
+      const parsed = parseServerURI(this.state.customServerUri);
       const chainName = this.state.customServerChainName;
-      if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
+      if (parsed.kind === 'error') {
         // Surface the parser's specific message (bad URI, plaintext
         // HTTP not allowed, etc.) instead of the generic "fill out a
         // valid Server URI" snackbar so the user can fix the input.
-        this.addLastSnackbar(uri);
+        this.addLastSnackbar(this.state.translate(parsed.errorKey) as string);
         this.setState({ actionButtonsDisabled: false });
         return;
       }
+      const uri = parsed.uri;
 
       this.addLastSnackbar(
         this.state.translate('loadedapp.tryingnewserver') as string,
