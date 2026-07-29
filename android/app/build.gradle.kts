@@ -236,15 +236,6 @@ android {
     }
 
     testOptions {
-        unitTests.all {
-            // The golden wire-contract pins for the nym proxy shim
-            // (GoldenWireContractTest); the canonical copies live in
-            // zingolib's zingo-netutils/nym-proxy-ffi/test-data/golden.
-            it.systemProperty(
-                "zingo.golden.dir",
-                layout.projectDirectory.dir("src/test/golden").asFile.absolutePath
-            )
-        }
         managedDevices {
             val pixel2api29 = localDevices.create("pixel2api29_x86") {
                 device = "Pixel 2"

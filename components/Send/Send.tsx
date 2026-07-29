@@ -78,11 +78,6 @@ import {
   parseAddress,
   sendPropose,
 } from '../../app/walletBackend';
-import {
-  classifySendFailure,
-  retryOnAnotherServer,
-  sendFailureMessage,
-} from '../../app/walletBackend/transforms/sendFailureTransform';
 import Utils from '../../app/utils';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
@@ -172,8 +167,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     zingolibVersion,
     setPrivacyOption,
     nym: nymContext,
-    mixnetView,
-    reenableMixnet,
   } = context;
   const { colors } = useTheme() as ThemeType;
   const screenName = ScreenEnum.Send;
@@ -869,12 +862,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         maxAmount > 0 &&
         !(
           !memoEnabled && Utils.parseStringLocaleToNumberFloat(amountText) === 0
-        ) &&
-        // Mixnet Mode fail-closed verdict: while the transport is
-        // bootstrapping, died, or unknowable, sending stays blocked; only
-        // `ready` or the user's explicit clearnet consent (`off`) opens it.
-        // Null means the platform runs no mixnet policy yet (iOS).
-        (mixnetView === null || !mixnetView.sendBlocked),
+        ),
     );
   }, [
     memoEnabled,
@@ -884,7 +872,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     validMemo,
     fee,
     maxAmount,
-    mixnetView,
   ]);
 
   useEffect(() => {
@@ -979,6 +966,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     navigation.navigate(RouteEnum.Computing);
 
+    let error = '';
+    let customError: string | undefined;
     try {
       await sendTransaction(sendPageStatePar);
 
@@ -993,16 +982,16 @@ const Send: React.FunctionComponent<SendProps> = ({
       navigation.navigate(RouteEnum.Computing, { phase: 'created' });
       return;
     } catch (err1) {
-      let failure = classifySendFailure(err1 as string);
+      error = err1 as string;
 
-      // The transform decides which families a server switch can plausibly
-      // help; the wallet's own verdicts (dust, duplicate nullifier, a
-      // fail-closed mixnet refusal) are excluded there. If the user selected
-      // a `custom` server, we cannot change it regardless.
-      if (
-        retryOnAnotherServer(failure) &&
-        selectServer !== SelectServerEnum.custom
-      ) {
+      customError = interceptCustomError(error);
+
+      // in this point the App is failing, there is two possibilities:
+      // 1. Server Error
+      // 2. Another type of Error
+      // here is worth it to try again with the best working server...
+      // if the user selected a `custom` server, then we cannot change it.
+      if (!customError && selectServer !== SelectServerEnum.custom) {
         // Pick a working server, same pattern as boot/recovery: the live
         // registry first (best, excluding the failed server, no probe), then
         // the static list ranked by latency (also excluding the failed one).
@@ -1053,14 +1042,31 @@ const Send: React.FunctionComponent<SendProps> = ({
           navigation.navigate(RouteEnum.Computing, { phase: 'created' });
           return;
         } catch (err2) {
-          failure = classifySendFailure(err2 as string);
+          error = err2 as string;
+
+          customError = interceptCustomError(error);
         }
       }
+    }
 
-      navigation.navigate(RouteEnum.Computing, {
-        phase: 'failed',
-        errorMessage: sendFailureMessage(failure, translate),
-      });
+    navigation.navigate(RouteEnum.Computing, {
+      phase: 'failed',
+      errorMessage: customError ? customError : error,
+    });
+  };
+
+  const interceptCustomError = (error: string) => {
+    // these error are not server related.
+    if (
+      error.includes('18: bad-txns-sapling-duplicate-nullifier') ||
+      error.includes('18: bad-txns-sprout-duplicate-nullifier') ||
+      error.includes('18: bad-txns-orchard-duplicate-nullifier')
+    ) {
+      // bad-txns-xxxxxxxxx-duplicate-nullifier (3 errors)
+      return translate('send.duplicate-nullifier-error') as string;
+    } else if (error.includes('64: dust')) {
+      // dust
+      return translate('send.dust-error') as string;
     }
   };
 
@@ -2110,32 +2116,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                   marginVertical: 0,
                 }}
               >
-                {mixnetView !== null && mixnetView.sendBlocked && (
-                  <View
-                    style={{
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      marginBottom: 10,
-                    }}
-                    testID="send.mixnet-blocked"
-                  >
-                    <FadeText style={{ textAlign: 'center' }}>
-                      {`${translate('mixnet.send-blocked') as string} (${translate(mixnetView.statusKey) as string})`}
-                    </FadeText>
-                    {mixnetView.narration !== null && (
-                      <FadeText style={{ textAlign: 'center' }}>
-                        {mixnetView.narration}
-                      </FadeText>
-                    )}
-                    {mixnetView.recovery === 'reenable' && (
-                      <TouchableOpacity onPress={() => reenableMixnet()}>
-                        <RegText color={colors.primary}>
-                          {translate('mixnet.reenable') as string}
-                        </RegText>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )}
                 <View
                   style={{
                     flexGrow: 1,

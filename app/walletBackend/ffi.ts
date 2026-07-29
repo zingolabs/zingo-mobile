@@ -30,7 +30,6 @@ const FFI_ERROR_CODES = [
   'MigrationCadenceFixed',
   'MigrationSplit',
   'Migration',
-  'Mixnet',
 ] as const;
 
 export type FfiErrorCode = (typeof FFI_ERROR_CODES)[number] | 'Unknown';

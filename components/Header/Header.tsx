@@ -127,7 +127,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     setZecPrice,
     backgroundSyncInfo,
     nym,
-    mixnetView,
   } = context;
 
   const translate = translateProp ?? context.translate;
@@ -212,7 +211,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             viewSyncStatus={viewSyncStatus}
             opacityValue={opacityValue}
             nym={nym}
-            mixnetView={mixnetView}
             backgroundSyncInfo={backgroundSyncInfo}
             translate={translate}
             privacy={privacy}

@@ -847,7 +847,6 @@ class FfiOutcomeTests: XCTestCase {
         (ZingolibError.MigrationCadenceFixed(message: "boom"), "MigrationCadenceFixed"),
         (ZingolibError.MigrationSplit(message: "boom"), "MigrationSplit"),
         (ZingolibError.Migration(message: "boom"), "Migration"),
-        (ZingolibError.Mixnet(message: "boom"), "Mixnet"),
     ]
 
     func testResolvedValuesPassThroughUnclassified() {

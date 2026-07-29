@@ -25,7 +25,6 @@ import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
-import { MixnetView } from '../walletBackend/transforms/mixnetPresenter';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -144,15 +143,6 @@ export default interface AppContextLoaded {
   blockExplorer: BlockExplorerEnum;
   nym: boolean;
   setNymOption: (value: boolean) => Promise<void>;
-
-  // Mixnet Mode (send-over-nym step 5). The screen-facing projection of the
-  // per-session policy, or null on a platform whose transport has not
-  // landed (iOS until the Mac-gated step) — screens render nothing and the
-  // send gate stays open when null. Disable is the deliberate per-session
-  // clearnet consent; re-enable recovers a died or failed transport.
-  mixnetView: MixnetView | null;
-  disableMixnet: () => Promise<void>;
-  reenableMixnet: () => Promise<void>;
   setModeOption: (value: string) => Promise<void>;
   setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
 

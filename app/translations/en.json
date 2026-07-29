@@ -449,17 +449,6 @@
     "nym-network": "NYM Network",
     "nym-enhanced-privacy": "Enhanced Privacy"
   },
-  "mixnet": {
-    "status": {
-      "off": "Mixnet off (clearnet)",
-      "bootstrapping": "Connecting to mixnet…",
-      "ready": "Mixnet ready",
-      "died": "Mixnet connection lost",
-      "unknown": "Mixnet unavailable"
-    },
-    "send-blocked": "Sending is paused until the mixnet is ready",
-    "reenable": "Re-enable mixnet"
-  },
   "header": {
     "lastupdate": "Last update:"
   },

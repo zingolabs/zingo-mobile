@@ -18,7 +18,6 @@ import { SendJsonToTypeType, ServerType, TranslateType } from '../AppState';
 import { WalletBackendConfig } from './config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';
-import { MixnetCoordinator } from './modules/MixnetCoordinator';
 import { SyncCoordinator } from './modules/SyncCoordinator';
 import { TransactionService } from './modules/TransactionService';
 import { WalletLifecycleService } from './modules/WalletLifecycleService';
@@ -29,21 +28,11 @@ export default class WalletBackend {
   private syncCoordinator: SyncCoordinator;
   private transactionService: TransactionService;
   private walletLifecycle: WalletLifecycleService;
-  private mixnetCoordinator: MixnetCoordinator;
-  // The forced-on policy runs once per WalletBackend instance (one loaded
-  // session): configure() is re-run on every server or wallet change, and
-  // each transport start is a full mixnet re-bootstrap, so repeats are for
-  // the user's deliberate re-enable only.
-  private mixnetEnsured: boolean = false;
 
   constructor(config: WalletBackendConfig) {
     this.config = config;
     this.dataService = new DataService(config);
     this.syncCoordinator = new SyncCoordinator(config, this.dataService);
-    this.mixnetCoordinator = new MixnetCoordinator(
-      config.startMixnetTransport,
-      config.onMixnetViewChanged,
-    );
     // Wire the sync-restart callback after SyncCoordinator exists
     this.dataService.onSyncError = async () => {
       await this.syncCoordinator.clearTimers();
@@ -61,13 +50,6 @@ export default class WalletBackend {
 
   // Sync lifecycle
   async configure() {
-    if (this.config.mixnetSupported && !this.mixnetEnsured) {
-      this.mixnetEnsured = true;
-      // Deliberately not awaited: the mixnet bootstrap takes tens of
-      // seconds and must not delay sync configuration. The coordinator
-      // never rejects — failures arrive as the typed failure view.
-      this.mixnetCoordinator.ensureForConnectedSession();
-    }
     return this.syncCoordinator.configure();
   }
   async clearTimers() {
@@ -94,22 +76,6 @@ export default class WalletBackend {
   // Transactions
   async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
     return this.transactionService.sendTransaction(sendJson);
-  }
-
-  // Mixnet Mode (send-over-nym step 5). Disable is the user's deliberate
-  // per-session clearnet consent; re-enable recovers a died or failed
-  // transport by starting it afresh. Both publish through
-  // onMixnetViewChanged.
-  async disableMixnet() {
-    return this.mixnetCoordinator.disable();
-  }
-  async reenableMixnet() {
-    return this.mixnetCoordinator.reenable();
-  }
-  // Stops the mixnet status polling (app teardown only — this is not the
-  // clearnet consent path; the transport itself is left to the platform).
-  stopMixnetPolling() {
-    this.mixnetCoordinator.stop();
   }
 
   // Wallet lifecycle

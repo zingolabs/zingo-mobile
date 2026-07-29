@@ -801,59 +801,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // Mixnet Mode (send-over-nym). Out-of-band error settlement per
-    // FfiOutcome (zingo-mobile#1151, audit Issues Q and R): the resolved
-    // value is always data, a typed ZingolibException rejects, and nothing
-    // is ever encoded as error prose inside the success channel.
-
-    @ReactMethod
-    fun attachMixnet(socks5Addr: String, promise: Promise) {
-        FfiOutcome.settling(promise, "attach_mixnet") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.attachMixnet(socks5Addr)
-        }
-    }
-
-    @ReactMethod
-    fun enableMixnet(proxyPath: String, promise: Promise) {
-        FfiOutcome.settling(promise, "enable_mixnet") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.enableMixnet(proxyPath)
-        }
-    }
-
-    @ReactMethod
-    fun disableMixnet(promise: Promise) {
-        FfiOutcome.settling(promise, "disable_mixnet") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.disableMixnet()
-        }
-    }
-
-    @ReactMethod
-    fun mixnetModeInfo(promise: Promise) {
-        FfiOutcome.settling(promise, "mixnet_mode") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.mixnetMode()
-        }
-    }
-
-    @ReactMethod
-    fun mixnetBootstrapDetailInfo(promise: Promise) {
-        FfiOutcome.settling(promise, "mixnet_bootstrap_detail") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.mixnetBootstrapDetail()
-        }
-    }
-
-    @ReactMethod
-    fun mixnetIpCorrelationDisclaimerInfo(promise: Promise) {
-        FfiOutcome.settling(promise, "mixnet_ip_correlation_disclaimer") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.mixnetIpCorrelationDisclaimer()
-        }
-    }
-
     @ReactMethod
     fun getSpendableBalanceWithAddressInfo(address: String, zennies: String, promise: Promise) {
         FfiOutcome.settling(promise, "get_spendable_balance_with_address") {
