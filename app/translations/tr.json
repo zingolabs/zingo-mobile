@@ -451,7 +451,8 @@
   },
   "mixnet": {
     "status": {
-      "off": "Mixnet kapalı (açık ağ)",
+      "unattached": "Mixnet bağlı değil",
+      "switched-off": "Mixnet kapalı (açık ağ)",
       "bootstrapping": "Mixnet'e bağlanılıyor…",
       "ready": "Mixnet hazır",
       "died": "Mixnet bağlantısı koptu",

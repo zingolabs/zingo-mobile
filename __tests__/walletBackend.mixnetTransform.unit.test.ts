@@ -29,8 +29,11 @@ describe('describeRejection', () => {
 });
 
 describe('parseMixnetMode', () => {
-  it('accepts each of the four modes exactly', () => {
-    expect(parseMixnetMode('off')).toBe(RPCMixnetModeEnum.off);
+  it('accepts each of the five modes exactly', () => {
+    expect(parseMixnetMode('unattached')).toBe(RPCMixnetModeEnum.unattached);
+    expect(parseMixnetMode('switched_off')).toBe(
+      RPCMixnetModeEnum.switchedOff,
+    );
     expect(parseMixnetMode('bootstrapping')).toBe(
       RPCMixnetModeEnum.bootstrapping,
     );
@@ -45,6 +48,13 @@ describe('parseMixnetMode', () => {
     expect(parseMixnetMode(undefined)).toBeNull();
     expect(parseMixnetMode(3)).toBeNull();
     expect(parseMixnetMode({ mode: 'ready' })).toBeNull();
+  });
+
+  it('rejects the retired off token: it conflated consent with absence', () => {
+    // The five-state decomposition split `off` into `unattached` and
+    // `switched_off`; a parser that still accepted it would quietly
+    // reunify them (the zingolib mint pins the same rejection).
+    expect(parseMixnetMode('off')).toBeNull();
   });
 });
 
@@ -63,7 +73,8 @@ describe('transformMixnetStatus', () => {
 
   it('reports every non-ready mode with a null address', () => {
     const nonReadyModes: readonly RPCMixnetModeEnum[] = [
-      RPCMixnetModeEnum.off,
+      RPCMixnetModeEnum.unattached,
+      RPCMixnetModeEnum.switchedOff,
       RPCMixnetModeEnum.bootstrapping,
       RPCMixnetModeEnum.died,
     ];

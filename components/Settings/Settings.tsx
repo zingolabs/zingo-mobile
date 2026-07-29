@@ -1744,8 +1744,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     <TouchableOpacity
                       testID="settings.mixnet-toggle"
                       onPress={() => {
-                        if (mixnetView.sendBlocked === false &&
-                            mixnetView.statusKey === 'mixnet.status.off') {
+                        if (
+                          mixnetView.statusKey === 'mixnet.status.switched-off'
+                        ) {
+                          // Leaving the consented clearnet: revoke by
+                          // re-enabling the mixnet.
                           reenableMixnet();
                         } else if (
                           mixnetView.statusKey === 'mixnet.status.ready' ||
@@ -1753,12 +1756,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         ) {
                           disableMixnet();
                         } else {
-                          // died / unknown: the only way up is a fresh start.
+                          // unattached / died / unknown: the only way up is
+                          // a fresh start.
                           reenableMixnet();
                         }
                       }}
                     >
-                      {mixnetView.statusKey === 'mixnet.status.off' ? (
+                      {mixnetView.statusKey === 'mixnet.status.switched-off' ? (
                         <SwitchOff width={40} height={19} />
                       ) : (
                         <NymSwitchOn width={40} height={19} />

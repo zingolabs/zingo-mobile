@@ -30,16 +30,33 @@ async function flushPromises(): Promise<void> {
 describe('deriveMixnetView', () => {
   const noDetail = null;
 
-  it('blocks sending in every state except off and ready', () => {
+  it('blocks sending in every state except switched_off and ready', () => {
     const blocked = (view: MixnetView) => view.sendBlocked;
     expect(
       blocked(
         deriveMixnetView(
-          { kind: 'status', mode: RPCMixnetModeEnum.off, socks5Addr: null },
+          {
+            kind: 'status',
+            mode: RPCMixnetModeEnum.switchedOff,
+            socks5Addr: null,
+          },
           noDetail,
         ),
       ),
     ).toBe(false);
+    // The unattached ground state carries no consent: absence blocks.
+    expect(
+      blocked(
+        deriveMixnetView(
+          {
+            kind: 'status',
+            mode: RPCMixnetModeEnum.unattached,
+            socks5Addr: null,
+          },
+          noDetail,
+        ),
+      ),
+    ).toBe(true);
     expect(
       blocked(
         deriveMixnetView(
@@ -194,7 +211,7 @@ describe('MixnetCoordinator', () => {
     coordinator.stop();
   });
 
-  it('keeps sends blocked when the first poll after a transport failure reports off (#1226)', async () => {
+  it('keeps sends blocked when the first poll after a transport failure reports unattached (#1226)', async () => {
     const startTransport = jest
       .fn()
       .mockRejectedValue(new Error('shim missing'));
@@ -205,10 +222,11 @@ describe('MixnetCoordinator', () => {
     await coordinator.ensureForConnectedSession();
     await flushPromises();
 
-    // The wallet was never attached, so its default mode is `off` — the
-    // same string a deliberate disable produces. The poll must not read
-    // it as consent.
-    mockedBridge.mixnetModeInfo.mockResolvedValue(statusPayload('off'));
+    // The wallet was never attached, so it reports the `unattached`
+    // ground state — the five-state wallet distinguishes it from the
+    // deliberate `switched_off`, so no app-side consent bit is needed:
+    // absence blocks by itself.
+    mockedBridge.mixnetModeInfo.mockResolvedValue(statusPayload('unattached'));
     jest.advanceTimersByTime(STEADY_POLL_MILLIS);
     await flushPromises();
 
@@ -230,7 +248,7 @@ describe('MixnetCoordinator', () => {
         releaseNarration = resolve;
       }),
     );
-    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
+    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('switched_off'));
     const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
     const published: MixnetView[] = [];
     const coordinator = new MixnetCoordinator(startTransport, view =>
@@ -244,14 +262,14 @@ describe('MixnetCoordinator', () => {
     await flushPromises();
 
     const latest = published[published.length - 1];
-    expect(latest.statusKey).toBe('mixnet.status.off');
+    expect(latest.statusKey).toBe('mixnet.status.switched-off');
     expect(latest.sendBlocked).toBe(false);
     coordinator.stop();
   });
 
-  it('a poll reporting off after a deliberate disable keeps clearnet consent (#1226)', async () => {
+  it('a poll reporting switched_off after a deliberate disable keeps clearnet consent (#1226)', async () => {
     mockedBridge.attachMixnet.mockResolvedValue(statusPayload('ready', '127.0.0.1:1080'));
-    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
+    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('switched_off'));
     const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
     const published: MixnetView[] = [];
     const coordinator = new MixnetCoordinator(startTransport, view =>
@@ -261,18 +279,21 @@ describe('MixnetCoordinator', () => {
     await coordinator.disable();
     await flushPromises();
 
-    mockedBridge.mixnetModeInfo.mockResolvedValue(statusPayload('off'));
+    // The wallet records the consent itself: a later poll keeps
+    // reporting `switched_off`, and the view stays consented with no
+    // app-side vetting.
+    mockedBridge.mixnetModeInfo.mockResolvedValue(statusPayload('switched_off'));
     jest.advanceTimersByTime(STEADY_POLL_MILLIS);
     await flushPromises();
 
     const latest = published[published.length - 1];
-    expect(latest.statusKey).toBe('mixnet.status.off');
+    expect(latest.statusKey).toBe('mixnet.status.switched-off');
     expect(latest.sendBlocked).toBe(false);
     coordinator.stop();
   });
 
-  it('disable publishes the deliberate off, with sending unblocked as consent', async () => {
-    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
+  it('disable publishes the deliberate switched_off, with sending unblocked as consent', async () => {
+    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('switched_off'));
     const published: MixnetView[] = [];
     const coordinator = new MixnetCoordinator(
       jest.fn().mockResolvedValue('127.0.0.1:1080'),
@@ -283,7 +304,7 @@ describe('MixnetCoordinator', () => {
     await flushPromises();
 
     expect(published).toHaveLength(1);
-    expect(published[0].statusKey).toBe('mixnet.status.off');
+    expect(published[0].statusKey).toBe('mixnet.status.switched-off');
     expect(published[0].sendBlocked).toBe(false);
     coordinator.stop();
   });

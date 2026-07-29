@@ -125,6 +125,7 @@ import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
 import {
   INITIAL_MIXNET_VIEW,
   MixnetView,
+  PLATFORM_UNAVAILABLE_MIXNET_VIEW,
 } from '../walletBackend/transforms/mixnetPresenter';
 import { startMixnetTransport } from '../walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
@@ -837,13 +838,15 @@ export class LoadedAppClass extends Component<
       blockExplorer: props.blockExplorer,
       nym: props.nym,
 
-      // Mixnet Mode: fail-closed initial view where the policy runs
-      // (Android); null where the platform transport has not landed yet
-      // (iOS until the Mac-gated step), which leaves the send gate open.
+      // Mixnet Mode: fail-closed everywhere (#1235). Android gets the
+      // bootstrapping view its coordinator will replace; a platform whose
+      // transport has not landed yet (iOS until the framework attach)
+      // gets the blocked platform-unavailable view. Neither leaves the
+      // send gate open.
       mixnetView:
         Platform.OS === GlobalConst.platformOSandroid
           ? INITIAL_MIXNET_VIEW
-          : null,
+          : PLATFORM_UNAVAILABLE_MIXNET_VIEW,
       disableMixnet: this.disableMixnet,
       reenableMixnet: this.reenableMixnet,
 

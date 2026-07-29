@@ -16,7 +16,7 @@ export type MixnetRecoveryAction = 'none' | 'wait' | 'reenable';
  * translation key (`mixnet.status.*`), never display English; `narration`
  * is the live bootstrap line when one exists; `sendBlocked` is the
  * fail-closed verdict a send screen must respect — `true` in every state
- * except an explicit `off` (deliberate clearnet consent) or `ready`.
+ * except `switched_off` (deliberate clearnet consent) or `ready`.
  */
 export type MixnetView = {
   readonly statusKey: string;
@@ -37,6 +37,21 @@ export const INITIAL_MIXNET_VIEW: MixnetView = {
   narration: null,
   sendBlocked: true,
   recovery: 'wait',
+};
+
+/**
+ * The view for a platform whose mixnet transport has not landed yet (iOS
+ * until the framework attach ships). Fail-closed (zingo-mobile#1235): a
+ * platform with no mixnet and no recorded clearnet consent must block
+ * sends, exactly as an unknowable transport does. Recovery is `none`
+ * because re-enable cannot start a transport the platform does not have.
+ */
+export const PLATFORM_UNAVAILABLE_MIXNET_VIEW: MixnetView = {
+  statusKey: 'mixnet.status.unknown',
+  socks5Addr: null,
+  narration: null,
+  sendBlocked: true,
+  recovery: 'none',
 };
 
 /**
@@ -68,9 +83,20 @@ export function deriveMixnetView(
   }
 
   switch (status.mode) {
-    case RPCMixnetModeEnum.off:
+    case RPCMixnetModeEnum.unattached:
+      // The ground state: no transport and no consent. The wallet itself
+      // distinguishes this from the deliberate switch-off now, so absence
+      // never opens the send gate (the #1226 conflation, retired).
       return {
-        statusKey: 'mixnet.status.off',
+        statusKey: 'mixnet.status.unattached',
+        socks5Addr: null,
+        narration: null,
+        sendBlocked: true,
+        recovery: 'reenable',
+      };
+    case RPCMixnetModeEnum.switchedOff:
+      return {
+        statusKey: 'mixnet.status.switched-off',
         socks5Addr: null,
         narration: null,
         sendBlocked: false,

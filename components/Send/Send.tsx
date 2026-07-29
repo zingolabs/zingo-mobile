@@ -870,11 +870,13 @@ const Send: React.FunctionComponent<SendProps> = ({
         !(
           !memoEnabled && Utils.parseStringLocaleToNumberFloat(amountText) === 0
         ) &&
-        // Mixnet Mode fail-closed verdict: while the transport is
-        // bootstrapping, died, or unknowable, sending stays blocked; only
-        // `ready` or the user's explicit clearnet consent (`off`) opens it.
-        // Null means the platform runs no mixnet policy yet (iOS).
-        (mixnetView === null || !mixnetView.sendBlocked),
+        // Mixnet Mode fail-closed verdict (#1235): only `ready` or the
+        // user's recorded clearnet consent (`switched_off`) opens the
+        // gate. A null view is unknowable and blocks, exactly as
+        // bootstrapping, died, and platform-unavailable do; absence is
+        // never consent.
+        mixnetView !== null &&
+        !mixnetView.sendBlocked,
     );
   }, [
     memoEnabled,

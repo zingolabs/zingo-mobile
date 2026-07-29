@@ -3,16 +3,16 @@ members = ["lib", "android", "ios", "zingomobile_utils", "workbench"]
 resolver = "2"
 
 [workspace.dependencies]
-# TEMPORARY pin (send-over-nym step 4, zingolib#2505): the mixnet attach seam
-# was built against zingolib's `nym_mobile_adoption` branch, since deleted.
-# Pinned by rev to that branch's head so the arc still resolves and builds;
-# later stacked PRs advance the pin along zingolib's own history. The `nym`
-# feature enables the Mixnet Mode surface.
-zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "dev", features = [
+# Pinned by rev, never branch (ADR 0024 decision 7). The rev is the
+# convergence stack's phase1-dep-funnel head, carrying the five-state
+# Mixnet Mode wire mint, the session driver, the mixnet-only price rule,
+# and the netutils funnel. Later PRs advance the pin along zingolib's own
+# history. The `nym` feature enables the Mixnet Mode surface.
+zingolib = { git = "https://github.com/zingolabs/zingolib", rev = "5c02b2ed8f79151aed79e9e5c133d4011527ec60", features = [
     "nym",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "dev" }
-zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "dev" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib", rev = "5c02b2ed8f79151aed79e9e5c133d4011527ec60" }
+zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", rev = "5c02b2ed8f79151aed79e9e5c133d4011527ec60" }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
 zingomobile_utils = { path = "zingomobile_utils" }
 
@@ -30,7 +30,10 @@ zcash_keys = { version = "0.15.0", features = [
 zcash_protocol = "0.10.0"
 
 zingo_common_components = "0.4.0"
-zingo-netutils = { version = "5.0.1", features = ["globally-public-transparent"] }
+# No direct zingo-netutils dependency: the app funnels through zingolib's
+# re-exports (zingolib::netutils, ADR 0024 decision 7). This retires the
+# crates.io duplicate copy that compiled without the SOCKS5 capability
+# (zingo-mobile#1236, zingolib#2566).
 zip32 = "0.2.0"
 uniffi = "0.29"
 tokio = "1"

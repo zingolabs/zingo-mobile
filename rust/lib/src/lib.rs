@@ -39,7 +39,7 @@ use tokio::runtime::Runtime;
 use zcash_address::ZcashAddress;
 use zcash_protocol::memo::MemoBytes;
 use zcash_protocol::value::Zatoshis;
-use zingo_netutils::{GrpcIndexer, Indexer};
+use zingolib::netutils::{GrpcIndexer, Indexer};
 use zingolib::config::{
     ChainType, ClientConfig, DEFAULT_INDEXER_URI, DEFAULT_INDEXER_URI_TESTNET, WalletConfig,
     construct_indexer_uri, lib_birthday,
@@ -2008,11 +2008,18 @@ pub fn get_total_spends_to_address() -> Result<String, ZingolibError> {
 pub fn zec_price() -> Result<String, ZingolibError> {
     with_initialized_lightclient(|lightclient| {
         RT.block_on(async move {
-            let price = lightclient
+            // Mixnet-only price (ADR 0011, amendment 2026-07-28): the fetch
+            // succeeds only in Ready and returns the tunnel endpoint it
+            // traveled through as per-fetch route evidence.
+            let fetch = lightclient
                 .update_current_price()
                 .await
                 .map_err(ffi_error)?;
-            Ok(object! { "current_price" => price }.pretty(2))
+            Ok(object! {
+                "current_price" => fetch.usd,
+                "via_socks5" => fetch.via_socks5,
+            }
+            .pretty(2))
         })
     })
 }
@@ -3175,16 +3182,6 @@ pub fn cancel_ironwood_migration() -> Result<String, ZingolibError> {
     })
 }
 
-/// The Mixnet Mode tri-state-plus-died as the strings the app layer shows.
-fn mixnet_mode_string(mode: zingolib::nym::MixnetMode) -> &'static str {
-    match mode {
-        zingolib::nym::MixnetMode::Off => "off",
-        zingolib::nym::MixnetMode::Bootstrapping => "bootstrapping",
-        zingolib::nym::MixnetMode::Ready => "ready",
-        zingolib::nym::MixnetMode::Died => "died",
-    }
-}
-
 /// Attach Mixnet Mode to an already-running, platform-hosted SOCKS5 endpoint
 /// (the UniFFI proxy shim's address). Readiness is validated by a data round
 /// trip; poll [`mixnet_mode`] for `bootstrapping` -> `ready`, or `died`.
@@ -3200,7 +3197,7 @@ pub fn attach_mixnet(socks5_addr: String) -> Result<String, ZingolibError> {
                     .await
                     .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
                 Ok(
-                    object! { "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()) }
+                    object! { "mixnet_mode" => lightclient.mixnet_mode().as_str() }
                         .pretty(2),
                 )
             })
@@ -3225,7 +3222,7 @@ pub fn enable_mixnet(proxy_path: String) -> Result<String, ZingolibError> {
                     .await
                     .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
                 Ok(
-                    object! { "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()) }
+                    object! { "mixnet_mode" => lightclient.mixnet_mode().as_str() }
                         .pretty(2),
                 )
             })
@@ -3245,7 +3242,10 @@ pub fn disable_mixnet() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 lightclient.disable_mixnet().await;
-                object! { "mixnet_mode" => "off" }.pretty(2)
+                // The mint's token for the deliberate disable is
+                // "switched_off"; rendering the actual mode keeps this
+                // truthful if the semantics ever move again.
+                object! { "mixnet_mode" => lightclient.mixnet_mode().as_str() }.pretty(2)
             }))
         } else {
             Err(ZingolibError::LightclientNotInitialized)
@@ -3263,7 +3263,7 @@ pub fn mixnet_mode() -> Result<String, ZingolibError> {
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
         if let Some(lightclient) = &*guard {
             let mut status = object! {
-                "mixnet_mode" => mixnet_mode_string(lightclient.mixnet_mode()),
+                "mixnet_mode" => lightclient.mixnet_mode().as_str(),
             };
             if let Some(addr) = lightclient.mixnet_socks5_addr() {
                 status["socks5_addr"] = addr.into();
