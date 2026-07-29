@@ -687,156 +687,143 @@ exports[`Component History - test History currency USD, privacy high & mode adva
       pointerEvents="box-none"
     >
       <View
-        exiting={AnimationBuilder {}}
-        layout={AnimationBuilder {}}
         style={
           {
             "paddingBottom": 18,
             "paddingHorizontal": 12,
-            "paddingTop": 0,
+            "paddingTop": 8,
           }
         }
       >
         <View
-          entering={AnimationBuilder {}}
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "#031124",
+              "borderColor": "#05234C",
+              "borderRadius": 12,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 14,
+            }
+          }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#031124",
-                "borderColor": "#05234C",
-                "borderRadius": 12,
-                "borderWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingHorizontal": 16,
-                "paddingVertical": 14,
+                "flex": 1,
+                "marginRight": 12,
               }
             }
           >
             <View
               style={
                 {
-                  "flex": 1,
-                  "marginRight": 12,
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "marginBottom": 6,
                 }
               }
             >
               <View
                 style={
                   {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "marginBottom": 6,
+                    "backgroundColor": "#F99D00",
+                    "borderRadius": 5,
+                    "height": 9,
+                    "marginRight": 8,
+                    "width": 9,
                   }
                 }
-              >
-                <View
-                  style={
-                    {
-                      "backgroundColor": "#F99D00",
-                      "borderRadius": 5,
-                      "height": 9,
-                      "marginRight": 8,
-                      "width": 9,
-                    }
-                  }
-                />
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontSize": 15,
-                      "fontWeight": "700",
-                    }
-                  }
-                >
-                  text translated
-                </Text>
-              </View>
+              />
               <Text
                 style={
                   {
-                    "color": "#888888",
-                    "fontSize": 13,
+                    "color": "#c3c3c3",
+                    "fontSize": 15,
+                    "fontWeight": "700",
                   }
                 }
               >
                 text translated
-                 
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontWeight": "700",
-                    }
-                  }
-                >
-                  0.6000
-                </Text>
-                 
-                ZEC
               </Text>
             </View>
-            <View
-              accessibilityState={
+            <Text
+              style={
                 {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
+                  "color": "#888888",
+                  "fontSize": 13,
                 }
               }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              testID="ironwoodbanner.start"
             >
-              <View
+              text translated
+               
+              <Text
                 style={
-                  [
-                    {
-                      "backgroundColor": "#18bd18",
-                      "borderRadius": 24,
-                      "paddingHorizontal": 22,
-                      "paddingVertical": 10,
-                    },
-                    {},
-                  ]
+                  {
+                    "color": "#c3c3c3",
+                    "fontWeight": "700",
+                  }
                 }
               >
-                <Text
-                  style={
-                    {
-                      "color": "#011401",
-                      "fontSize": 15,
-                      "fontWeight": "700",
-                    }
-                  }
-                >
-                  text translated
-                </Text>
-              </View>
-            </View>
+                0.6000
+              </Text>
+               
+              ZEC
+            </Text>
+          </View>
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "backgroundColor": "#18bd18",
+                "borderRadius": 24,
+                "opacity": 1,
+                "paddingHorizontal": 22,
+                "paddingVertical": 10,
+              }
+            }
+            testID="ironwoodbanner.start"
+          >
+            <Text
+              style={
+                {
+                  "color": "#011401",
+                  "fontSize": 15,
+                  "fontWeight": "700",
+                }
+              }
+            >
+              text translated
+            </Text>
           </View>
         </View>
       </View>
@@ -1437,156 +1424,143 @@ exports[`Component History - test History no currency, privacy normal & mode bas
       pointerEvents="box-none"
     >
       <View
-        exiting={AnimationBuilder {}}
-        layout={AnimationBuilder {}}
         style={
           {
             "paddingBottom": 18,
             "paddingHorizontal": 12,
-            "paddingTop": 0,
+            "paddingTop": 8,
           }
         }
       >
         <View
-          entering={AnimationBuilder {}}
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "#031124",
+              "borderColor": "#05234C",
+              "borderRadius": 12,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 14,
+            }
+          }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#031124",
-                "borderColor": "#05234C",
-                "borderRadius": 12,
-                "borderWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingHorizontal": 16,
-                "paddingVertical": 14,
+                "flex": 1,
+                "marginRight": 12,
               }
             }
           >
             <View
               style={
                 {
-                  "flex": 1,
-                  "marginRight": 12,
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "marginBottom": 6,
                 }
               }
             >
               <View
                 style={
                   {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "marginBottom": 6,
+                    "backgroundColor": "#F99D00",
+                    "borderRadius": 5,
+                    "height": 9,
+                    "marginRight": 8,
+                    "width": 9,
                   }
                 }
-              >
-                <View
-                  style={
-                    {
-                      "backgroundColor": "#F99D00",
-                      "borderRadius": 5,
-                      "height": 9,
-                      "marginRight": 8,
-                      "width": 9,
-                    }
-                  }
-                />
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontSize": 15,
-                      "fontWeight": "700",
-                    }
-                  }
-                >
-                  text translated
-                </Text>
-              </View>
+              />
               <Text
                 style={
                   {
-                    "color": "#888888",
-                    "fontSize": 13,
+                    "color": "#c3c3c3",
+                    "fontSize": 15,
+                    "fontWeight": "700",
                   }
                 }
               >
                 text translated
-                 
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontWeight": "700",
-                    }
-                  }
-                >
-                  0.6000
-                </Text>
-                 
-                ZEC
               </Text>
             </View>
-            <View
-              accessibilityState={
+            <Text
+              style={
                 {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
+                  "color": "#888888",
+                  "fontSize": 13,
                 }
               }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              testID="ironwoodbanner.start"
             >
-              <View
+              text translated
+               
+              <Text
                 style={
-                  [
-                    {
-                      "backgroundColor": "#18bd18",
-                      "borderRadius": 24,
-                      "paddingHorizontal": 22,
-                      "paddingVertical": 10,
-                    },
-                    {},
-                  ]
+                  {
+                    "color": "#c3c3c3",
+                    "fontWeight": "700",
+                  }
                 }
               >
-                <Text
-                  style={
-                    {
-                      "color": "#011401",
-                      "fontSize": 15,
-                      "fontWeight": "700",
-                    }
-                  }
-                >
-                  text translated
-                </Text>
-              </View>
-            </View>
+                0.6000
+              </Text>
+               
+              ZEC
+            </Text>
+          </View>
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "backgroundColor": "#18bd18",
+                "borderRadius": 24,
+                "opacity": 1,
+                "paddingHorizontal": 22,
+                "paddingVertical": 10,
+              }
+            }
+            testID="ironwoodbanner.start"
+          >
+            <Text
+              style={
+                {
+                  "color": "#011401",
+                  "fontSize": 15,
+                  "fontWeight": "700",
+                }
+              }
+            >
+              text translated
+            </Text>
           </View>
         </View>
       </View>
