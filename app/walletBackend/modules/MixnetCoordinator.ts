@@ -20,8 +20,10 @@
  */
 import { RPCMixnetModeEnum } from '../enums/RPCMixnetModeEnum';
 import {
+  ClearnetConsent,
   MixnetStatusReport,
   describeRejection,
+  vetPolledStatus,
 } from '../transforms/mixnetTransform';
 import {
   MixnetView,
@@ -40,6 +42,15 @@ import {
  */
 export type StartMixnetTransport = () => Promise<string>;
 
+/**
+ * Whether a publication is still the latest one issued. Pure. A
+ * publication that awaited a native narration fetch may resolve after a
+ * newer immediate one; only the latest may reach the screen (#1228).
+ */
+export function isCurrentPublication(seq: number, latest: number): boolean {
+  return seq === latest;
+}
+
 /** How often the coordinator polls while the transport is bootstrapping. */
 export const BOOTSTRAP_POLL_MILLIS = 2_000;
 
@@ -53,6 +64,10 @@ export class MixnetCoordinator {
   private pollTimerID?: ReturnType<typeof setInterval>;
   private pollLock: boolean = false;
   private lastStatus: MixnetStatusReport | null = null;
+  // The consent bit belongs to the coordinator, not the wallet: the wallet
+  // reports `off` both for a deliberate disable and for a never-attached
+  // session, and only the former is consent (#1226).
+  private consent: ClearnetConsent = 'none';
 
   constructor(
     startTransport: StartMixnetTransport,
@@ -70,6 +85,7 @@ export class MixnetCoordinator {
    * re-enable — never a silent fall-through to clearnet.
    */
   async ensureForConnectedSession(): Promise<void> {
+    this.consent = 'none';
     try {
       const socks5Addr = await this.startTransport();
       this.publish(await attachMixnet(socks5Addr));
@@ -81,6 +97,7 @@ export class MixnetCoordinator {
 
   /** The user's deliberate per-session consent to clearnet. */
   async disable(): Promise<void> {
+    this.consent = 'disabledThisSession';
     this.publish(await disableMixnet());
   }
 
@@ -103,7 +120,7 @@ export class MixnetCoordinator {
     }
     this.pollLock = true;
     try {
-      this.publish(await getMixnetStatus());
+      this.publish(vetPolledStatus(await getMixnetStatus(), this.consent));
     } finally {
       this.pollLock = false;
     }
@@ -127,19 +144,31 @@ export class MixnetCoordinator {
     );
   }
 
+  private publishSeq: number = 0;
+
   private publish(status: MixnetStatusReport): void {
     const wasBootstrapping = this.isBootstrapping();
     this.lastStatus = status;
-    this.publishView(status);
+    this.publishSeq += 1;
+    this.publishView(status, this.publishSeq);
     if (this.pollTimerID !== undefined && wasBootstrapping !== this.isBootstrapping()) {
       this.schedulePolling();
     }
   }
 
-  private async publishView(status: MixnetStatusReport): Promise<void> {
+  private async publishView(
+    status: MixnetStatusReport,
+    seq: number,
+  ): Promise<void> {
     const narration = this.isBootstrapping()
       ? await getMixnetBootstrapDetail()
       : null;
+    // The narration await opened a gap; a newer publication may have
+    // superseded this one meanwhile, and stale state must not reach the
+    // screen (#1228).
+    if (!isCurrentPublication(seq, this.publishSeq)) {
+      return;
+    }
     this.onChange(deriveMixnetView(status, narration));
   }
 }

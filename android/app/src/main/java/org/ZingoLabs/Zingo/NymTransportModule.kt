@@ -31,6 +31,31 @@ import uniffi.zingo_nym_proxy_ffi.ProxyDeathReason
  * rejected start, sends stay blocked, and the app survives to offer
  * re-enable or the clearnet consent path.
  */
+/**
+ * The identity decision for a proxy death report (zingo-mobile#1227): a
+ * death may clear only the handle its observer was started for. A closed
+ * union so the observer must render both verdicts.
+ */
+internal sealed interface HandleDeathVerdict {
+    /** The stored handle is the one that died; clear it. */
+    data object ClearStored : HandleDeathVerdict
+
+    /** The stored handle is a replacement (or absent); leave it running. */
+    data object RetainStored : HandleDeathVerdict
+}
+
+/**
+ * Pure: the stored handle is cleared only when it is identically the one
+ * the reporting observer watched. Reference identity is the contract —
+ * every start stores the exact instance it created.
+ */
+internal fun <T : Any> verdictOnDeath(stored: T?, watched: T?): HandleDeathVerdict =
+    if (stored != null && stored === watched) {
+        HandleDeathVerdict.ClearStored
+    } else {
+        HandleDeathVerdict.RetainStored
+    }
+
 class NymTransportModule internal constructor(reactContext: ReactApplicationContext?) :
     ReactContextBaseJavaModule(reactContext) {
     override fun getName(): String {
@@ -41,12 +66,6 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         // One proxy per app process, shared across React context reloads.
         private val handleLock = Any()
         private var handle: MixnetProxyHandle? = null
-
-        private fun clearHandle() {
-            synchronized(handleLock) {
-                handle = null
-            }
-        }
     }
 
     /**
@@ -54,10 +73,23 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
      * stored handle (its endpoint is dead, so it must not be stopped or
      * reused). Recovery stays with the user-driven re-enable; the wallet's
      * own liveness probe lands the `died` mode the app is already polling.
+     *
+     * Identity-checked (#1227): the observer speaks only for the handle it
+     * was started with, so a dying predecessor's late report cannot wipe a
+     * fresh replacement. `watched` is assigned inside the same
+     * `handleLock` section that stores the started handle, and `onDeath`
+     * takes the lock, so a death can never observe a half-started state.
      */
     private class HandleClearingObserver : ProxyDeathObserver {
+        var watched: MixnetProxyHandle? = null
+
         override fun onDeath(reason: ProxyDeathReason) {
-            clearHandle()
+            synchronized(handleLock) {
+                when (verdictOnDeath(handle, watched)) {
+                    HandleDeathVerdict.ClearStored -> handle = null
+                    HandleDeathVerdict.RetainStored -> Unit
+                }
+            }
         }
     }
 
@@ -78,7 +110,9 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
             guardingLinkage {
                 synchronized(handleLock) {
                     handle?.stop()
-                    val started = MixnetProxyHandle.start(HandleClearingObserver())
+                    val observer = HandleClearingObserver()
+                    val started = MixnetProxyHandle.start(observer)
+                    observer.watched = started
                     handle = started
                     val endpoint = started.socks5Endpoint()
                     "${endpoint.host}:${endpoint.port}"

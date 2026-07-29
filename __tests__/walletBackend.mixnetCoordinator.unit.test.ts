@@ -1,5 +1,8 @@
 import { RPCMixnetModeEnum } from '../app/walletBackend/enums/RPCMixnetModeEnum';
-import { MixnetCoordinator } from '../app/walletBackend/modules/MixnetCoordinator';
+import {
+  MixnetCoordinator,
+  STEADY_POLL_MILLIS,
+} from '../app/walletBackend/modules/MixnetCoordinator';
 import { deriveMixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
 import { MixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
 
@@ -188,6 +191,83 @@ describe('MixnetCoordinator', () => {
     expect(published[0].sendBlocked).toBe(true);
     expect(published[0].recovery).toBe('reenable');
     expect(mockedBridge.attachMixnet).not.toHaveBeenCalled();
+    coordinator.stop();
+  });
+
+  it('keeps sends blocked when the first poll after a transport failure reports off (#1226)', async () => {
+    const startTransport = jest
+      .fn()
+      .mockRejectedValue(new Error('shim missing'));
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(startTransport, view =>
+      published.push(view),
+    );
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+
+    // The wallet was never attached, so its default mode is `off` — the
+    // same string a deliberate disable produces. The poll must not read
+    // it as consent.
+    mockedBridge.mixnetModeInfo.mockResolvedValue(statusPayload('off'));
+    jest.advanceTimersByTime(STEADY_POLL_MILLIS);
+    await flushPromises();
+
+    const latest = published[published.length - 1];
+    expect(latest.sendBlocked).toBe(true);
+    expect(latest.recovery).toBe('reenable');
+    coordinator.stop();
+  });
+
+  it('a stale bootstrapping publication cannot overwrite a newer view (#1228)', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('bootstrapping'),
+    );
+    // The narration fetch hangs until the test releases it, modeling a
+    // slow native call racing a user action.
+    let releaseNarration!: (payload: string) => void;
+    mockedBridge.mixnetBootstrapDetailInfo.mockReturnValue(
+      new Promise<string>(resolve => {
+        releaseNarration = resolve;
+      }),
+    );
+    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
+    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(startTransport, view =>
+      published.push(view),
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await coordinator.disable();
+    await flushPromises();
+    releaseNarration(JSON.stringify({ detail: 'connecting to a gateway' }));
+    await flushPromises();
+
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.off');
+    expect(latest.sendBlocked).toBe(false);
+    coordinator.stop();
+  });
+
+  it('a poll reporting off after a deliberate disable keeps clearnet consent (#1226)', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('ready', '127.0.0.1:1080'));
+    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
+    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(startTransport, view =>
+      published.push(view),
+    );
+    await coordinator.ensureForConnectedSession();
+    await coordinator.disable();
+    await flushPromises();
+
+    mockedBridge.mixnetModeInfo.mockResolvedValue(statusPayload('off'));
+    jest.advanceTimersByTime(STEADY_POLL_MILLIS);
+    await flushPromises();
+
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.off');
+    expect(latest.sendBlocked).toBe(false);
     coordinator.stop();
   });
 
