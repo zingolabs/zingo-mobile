@@ -843,14 +843,6 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
-
-
-
-
-
-
-
-
 // For large crates we prevent `MethodTooLargeException` (see #2340)
 // N.B. the name of the extension is very misleading, since it is 
 // rather `InterfaceTooLargeException`, caused by too many methods 
@@ -968,13 +960,9 @@ fun uniffi_zingo_checksum_func_plan_orchard_drain(
 ): Short
 fun uniffi_zingo_checksum_func_poll_sync(
 ): Short
-fun uniffi_zingo_checksum_func_quick_split(
-): Short
 fun uniffi_zingo_checksum_func_reconcile_migration(
 ): Short
 fun uniffi_zingo_checksum_func_remove_transaction(
-): Short
-fun uniffi_zingo_checksum_func_reschedule_parts(
 ): Short
 fun uniffi_zingo_checksum_func_run_rescan(
 ): Short
@@ -994,15 +982,11 @@ fun uniffi_zingo_checksum_func_set_option_wallet(
 ): Short
 fun uniffi_zingo_checksum_func_shield(
 ): Short
-fun uniffi_zingo_checksum_func_split_status(
-): Short
 fun uniffi_zingo_checksum_func_start_ironwood_migration(
 ): Short
 fun uniffi_zingo_checksum_func_status_sync(
 ): Short
 fun uniffi_zingo_checksum_func_wallet_kind(
-): Short
-fun uniffi_zingo_checksum_func_window_timeline(
 ): Short
 fun uniffi_zingo_checksum_func_zec_price(
 ): Short
@@ -1153,13 +1137,9 @@ fun uniffi_zingo_fn_func_plan_orchard_drain(uniffi_out_err: UniffiRustCallStatus
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_poll_sync(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_quick_split(uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_reconcile_migration(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_remove_transaction(`txid`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_reschedule_parts(`perBucket`: Int,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_run_rescan(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1179,15 +1159,11 @@ fun uniffi_zingo_fn_func_set_option_wallet(uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_shield(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_split_status(uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_start_ironwood_migration(`planHashHex`: RustBuffer.ByValue,`perBucket`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_zingo_fn_func_start_ironwood_migration(`planHashHex`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_status_sync(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_wallet_kind(uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_window_timeline(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_zec_price(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1470,16 +1446,10 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zingo_checksum_func_poll_sync() != 35296.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_zingo_checksum_func_quick_split() != 1449.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
     if (lib.uniffi_zingo_checksum_func_reconcile_migration() != 36661.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_remove_transaction() != 54006.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_zingo_checksum_func_reschedule_parts() != 2084.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_run_rescan() != 52086.toShort()) {
@@ -1509,19 +1479,13 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zingo_checksum_func_shield() != 33728.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_zingo_checksum_func_split_status() != 31456.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_zingo_checksum_func_start_ironwood_migration() != 47149.toShort()) {
+    if (lib.uniffi_zingo_checksum_func_start_ironwood_migration() != 47665.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_status_sync() != 2462.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_wallet_kind() != 56355.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_zingo_checksum_func_window_timeline() != 7109.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_zec_price() != 16513.toShort()) {
@@ -1770,8 +1734,6 @@ sealed class ZingolibException(message: String): kotlin.Exception(message) {
         
         class MigrationConsentStale(message: String) : ZingolibException(message)
         
-        class MigrationCadenceFixed(message: String) : ZingolibException(message)
-        
         class MigrationSplit(message: String) : ZingolibException(message)
         
         class Migration(message: String) : ZingolibException(message)
@@ -1809,10 +1771,9 @@ public object FfiConverterTypeZingolibError : FfiConverterRustBuffer<ZingolibExc
             16 -> ZingolibException.MigrationNotInProgress(FfiConverterString.read(buf))
             17 -> ZingolibException.MigrationAlreadyInProgress(FfiConverterString.read(buf))
             18 -> ZingolibException.MigrationConsentStale(FfiConverterString.read(buf))
-            19 -> ZingolibException.MigrationCadenceFixed(FfiConverterString.read(buf))
-            20 -> ZingolibException.MigrationSplit(FfiConverterString.read(buf))
-            21 -> ZingolibException.Migration(FfiConverterString.read(buf))
-            22 -> ZingolibException.Mixnet(FfiConverterString.read(buf))
+            19 -> ZingolibException.MigrationSplit(FfiConverterString.read(buf))
+            20 -> ZingolibException.Migration(FfiConverterString.read(buf))
+            21 -> ZingolibException.Mixnet(FfiConverterString.read(buf))
             else -> throw RuntimeException("invalid error enum value, something is very wrong!!")
         }
         
@@ -1896,57 +1857,21 @@ public object FfiConverterTypeZingolibError : FfiConverterRustBuffer<ZingolibExc
                 buf.putInt(18)
                 Unit
             }
-            is ZingolibException.MigrationCadenceFixed -> {
+            is ZingolibException.MigrationSplit -> {
                 buf.putInt(19)
                 Unit
             }
-            is ZingolibException.MigrationSplit -> {
+            is ZingolibException.Migration -> {
                 buf.putInt(20)
                 Unit
             }
-            is ZingolibException.Migration -> {
-                buf.putInt(21)
-                Unit
-            }
             is ZingolibException.Mixnet -> {
-                buf.putInt(22)
+                buf.putInt(21)
                 Unit
             }
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
     }
 
-}
-
-
-
-
-/**
- * @suppress
- */
-public object FfiConverterOptionalUInt: FfiConverterRustBuffer<kotlin.UInt?> {
-    override fun read(buf: ByteBuffer): kotlin.UInt? {
-        if (buf.get().toInt() == 0) {
-            return null
-        }
-        return FfiConverterUInt.read(buf)
-    }
-
-    override fun allocationSize(value: kotlin.UInt?): ULong {
-        if (value == null) {
-            return 1UL
-        } else {
-            return 1UL + FfiConverterUInt.allocationSize(value)
-        }
-    }
-
-    override fun write(value: kotlin.UInt?, buf: ByteBuffer) {
-        if (value == null) {
-            buf.put(0)
-        } else {
-            buf.put(1)
-            FfiConverterUInt.write(value, buf)
-        }
-    }
 }
 
 
@@ -2489,16 +2414,6 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     }
     
 
-    @Throws(ZingolibException::class) fun `quickSplit`(): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCallWithError(ZingolibException) { _status ->
-    UniffiLib.INSTANCE.uniffi_zingo_fn_func_quick_split(
-        _status)
-}
-    )
-    }
-    
-
     @Throws(ZingolibException::class) fun `reconcileMigration`(): kotlin.String {
             return FfiConverterString.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
@@ -2514,16 +2429,6 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_remove_transaction(
         FfiConverterString.lower(`txid`),_status)
-}
-    )
-    }
-    
-
-    @Throws(ZingolibException::class) fun `rescheduleParts`(`perBucket`: kotlin.UInt): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCallWithError(ZingolibException) { _status ->
-    UniffiLib.INSTANCE.uniffi_zingo_fn_func_reschedule_parts(
-        FfiConverterUInt.lower(`perBucket`),_status)
 }
     )
     }
@@ -2619,21 +2524,11 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     }
     
 
-    @Throws(ZingolibException::class) fun `splitStatus`(): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCallWithError(ZingolibException) { _status ->
-    UniffiLib.INSTANCE.uniffi_zingo_fn_func_split_status(
-        _status)
-}
-    )
-    }
-    
-
-    @Throws(ZingolibException::class) fun `startIronwoodMigration`(`planHashHex`: kotlin.String, `perBucket`: kotlin.UInt?): kotlin.String {
+    @Throws(ZingolibException::class) fun `startIronwoodMigration`(`planHashHex`: kotlin.String): kotlin.String {
             return FfiConverterString.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_start_ironwood_migration(
-        FfiConverterString.lower(`planHashHex`),FfiConverterOptionalUInt.lower(`perBucket`),_status)
+        FfiConverterString.lower(`planHashHex`),_status)
 }
     )
     }
@@ -2653,16 +2548,6 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
             return FfiConverterString.lift(
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_wallet_kind(
-        _status)
-}
-    )
-    }
-    
-
-    @Throws(ZingolibException::class) fun `windowTimeline`(): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCallWithError(ZingolibException) { _status ->
-    UniffiLib.INSTANCE.uniffi_zingo_fn_func_window_timeline(
         _status)
 }
     )
