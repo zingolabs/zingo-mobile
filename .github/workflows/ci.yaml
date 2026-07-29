@@ -34,6 +34,14 @@ jobs:
     with:
       fail-all: true
 
+  # Static analysis of the app module. NewApi is the one that matters here:
+  # nothing else in CI catches a call above minSdk, and those only surface
+  # as a crash on a user's older device.
+  android-lint:
+    uses: ./.github/workflows/android-lint.yaml
+    with:
+      fail-all: true
+
   # The plain-JVM bridge-contract tests (FfiOutcome, FfiArgs): the only
   # executable tests of the Kotlin bridge, so they gate the PR alongside
   # the compile check.
@@ -122,6 +130,7 @@ jobs:
     uses: ./.github/workflows/ios-build.yaml
     needs:
       - android-kotlin-compile
+      - android-lint
       - android-unit-test
       - jest-test
       - rust-shear
