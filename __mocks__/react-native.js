@@ -54,6 +54,9 @@ jest.mock('react-native', () => {
     confirmProcess: jest.fn(() => '{}'),
     getZenniesDonationAddress: jest.fn(() => '{}'),
   };
+  RN.NativeModules.ScreenSecurity = {
+    setSecure: jest.fn(() => Promise.resolve(true)),
+  };
   RN.View = jest.fn();
   RN.RefreshControl = jest.fn(() => null);
 

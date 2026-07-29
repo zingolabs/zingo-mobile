@@ -34,6 +34,7 @@ import {
 import Header from '../../../components/Header';
 import Utils from '../../utils';
 import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
+import { useSecureScreen } from '../../hooks/useSecureScreen';
 import { showConfirm } from '../../showConfirm';
 
 type TextsType = {
@@ -66,6 +67,9 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   const screenName = ScreenEnum.Seed;
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // First view of a freshly created seed — same treatment as Seed.tsx.
+  const secured = useSecureScreen();
 
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
   const [expandSeed, setExpandSeed] = useState<boolean>(true);
@@ -273,6 +277,10 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [colors, mode, texts, translate],
   );
+
+  if (!secured) {
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
 
   return (
     <View

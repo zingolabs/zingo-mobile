@@ -151,13 +151,6 @@ android {
         create("prod") {
             dimension = "channel"
             resValue("string", "app_name", "Zingo")
-            // Privacy/anti-tamper controls from the Least Authority audit.
-            // Prod enforces them; beta disables them so testers can take
-            // screenshots, record video, and so screen-recorder overlays
-            // don't drop touches. Toggling per-flavor (instead of editing
-            // MainActivity for releases) keeps prod safe by default — any
-            // future flavor MUST define this bool or compile will fail.
-            resValue("bool", "enforce_privacy_controls", "true")
         }
         create("beta") {
             dimension = "channel"
@@ -165,7 +158,6 @@ android {
             versionCode = 320 // beta override
             versionName = "2.0.21" // beta override
             resValue("string", "app_name", "Zingo Beta")
-            resValue("bool", "enforce_privacy_controls", "false")
         }
     }
 

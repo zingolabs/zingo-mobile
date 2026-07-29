@@ -39,6 +39,7 @@ import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
+import { useSecureScreen } from '../../app/hooks/useSecureScreen';
 import {
   ModeEnum,
   ChainNameEnum,
@@ -103,6 +104,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const screenName = ScreenEnum.Seed;
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Seed phrase, birthday and UFVK are on screen here — the only place in
+  // the app where FLAG_SECURE is warranted.
+  const secured = useSecureScreen();
 
   // Audit Issue D — single source of truth for the seed/UFVK biometric
   // gate. Lives inside Seed.tsx so every navigation path (header, menu,
@@ -543,7 +548,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     ],
   );
 
-  if (!authPassed) {
+  if (!authPassed || !secured) {
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   }
 
