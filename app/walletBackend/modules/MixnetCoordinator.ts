@@ -54,10 +54,10 @@ export function isCurrentPublication(seq: number, latest: number): boolean {
 }
 
 /** How often the coordinator polls while the transport is bootstrapping. */
-const BOOTSTRAP_POLL_MILLIS = 2_000;
+export const BOOTSTRAP_POLL_MILLIS = 2_000;
 
 /** How often the coordinator polls outside of bootstrapping. */
-const STEADY_POLL_MILLIS = 30_000;
+export const STEADY_POLL_MILLIS = 30_000;
 
 /**
  * How long an auto-recovering coordinator waits after a failure, `died`, or
