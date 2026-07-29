@@ -84,7 +84,6 @@ class FfiOutcomeTest {
         "plan_ironwood_migration" to (ZingolibException.Migration("boom") to "Migration"),
         "start_ironwood_migration" to (ZingolibException.MigrationConsentStale("boom") to "MigrationConsentStale"),
         "continue_note_splitting" to (ZingolibException.MigrationSplit("boom") to "MigrationSplit"),
-        "reschedule_parts" to (ZingolibException.MigrationCadenceFixed("boom") to "MigrationCadenceFixed"),
         "migration_status" to (ZingolibException.MigrationNotInProgress("boom") to "MigrationNotInProgress"),
         "reconcile_migration" to (ZingolibException.MigrationAlreadyInProgress("boom") to "MigrationAlreadyInProgress"),
         "execute_due_parts" to (ZingolibException.Offline("boom") to "Offline"),

@@ -315,24 +315,16 @@ export async function planIronwoodMigration(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.planIronwoodMigrationProcess());
 }
 
-// Phase 2 of the private migration. Called once quickSplit reports `complete`
-// (ADR 0016): the notes are fully split by then, so this binds the parts to
-// their notes and schedules them at once. Consent is captured post-split, so
-// `planHashHex` is the hash of a fresh planIronwoodMigration read taken here,
-// not the pre-split one. `perBucket` null keeps zingolib's default cadence
-// (changeable later via rescheduleParts, until the first part is signed). The
-// success value is `{ started: true }` JSON; a stale consent rejects with code
-// MigrationConsentStale.
+// Records the user's consent to the exact plan they were shown (its
+// `plan_hash` from planIronwoodMigration) and persists the migration state.
+// Nothing is broadcast; continueNoteSplitting drives the rounds afterwards.
+// The broadcast cadence is not a parameter: the ZIP 318 schedule draws every
+// delay itself. The success value is `{ started: true }` JSON; a stale
+// consent rejects with code MigrationConsentStale.
 export async function startIronwoodMigration(
   planHashHex: string,
-  perBucket: number | null,
 ): Promise<FfiResult<string>> {
-  return callFfi(
-    RPCModule.startIronwoodMigrationProcess(
-      planHashHex,
-      perBucket === null ? '' : String(perBucket),
-    ),
-  );
+  return callFfi(RPCModule.startIronwoodMigrationProcess(planHashHex));
 }
 
 // Drives one step of note splitting: proves and broadcasts the next round of
@@ -344,38 +336,6 @@ export async function continueNoteSplitting(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.continueNoteSplittingProcess());
 }
 
-// Phase 1 note splitting, the send-shaped replacement for the stateful
-// startIronwoodMigration + continueNoteSplitting driver (ADR 0016). One call
-// does one round: it pauses sync, plans against current notes, builds and
-// broadcasts the round, and persists no migration state. Long-running like
-// drainOrchard (Halo2 proving), dispatched on the concurrent pool. Loop it —
-// sync to confirmation between calls — until the outcome is `complete`, then
-// call startIronwoodMigration for Phase 2. The success value is raw JSON
-// (parseable as RPCSplitOutcomeType).
-export async function quickSplit(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.quickSplitProcess());
-}
-
-// Snapshot of the in-flight splitting round's progress, for rendering
-// "built i/N" then "sent i/N". Mirrors the native `splitStatusProcess`; safe to
-// poll concurrently with a running `quickSplit` (native reads a side channel,
-// not the lightclient lock). The success value is raw JSON: `null` when no round
-// is running, otherwise `{ total, built, sent, phase }` (parseable as
-// RPCSplitStatusType).
-export async function splitStatus(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.splitStatusProcess());
-}
-
-// Sets the Phase 2 cadence (parts per broadcast window) and re-buckets every
-// part with fresh randomization. Callable any time between consent and the
-// first signed part; afterwards rejects with code MigrationCadenceFixed.
-// After success the old schedule is void: re-read migrationStatus and re-arm
-// the reminders. The success value is `{ rescheduled: true }` JSON.
-export async function rescheduleParts(
-  perBucket: number,
-): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.reschedulePartsProcess(String(perBucket)));
-}
 
 // The private migration's progress, arranged for direct rendering (parseable
 // as RPCMigrationStatusType). `phase` is null when no migration is in
@@ -383,15 +343,6 @@ export async function rescheduleParts(
 // figure while one is.
 export async function migrationStatus(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.migrationStatusProcess());
-}
-
-// The window calendar for a schedule grid (parseable as RPCWindowTimelineType):
-// every scheduled window past and future plus always the window the tip sits
-// in, so "you are here" and the grid render even before consent. The success
-// value is raw JSON `null` when the wallet has never synced, otherwise an array
-// of window reports. Offline-safe; never syncs.
-export async function windowTimeline(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.windowTimelineProcess());
 }
 
 // Classifies every part against the local chain view, applies what is safe

@@ -1,16 +1,12 @@
 /**
  * The consent screens' routing contract (zingo-mobile#1151): the special
- * routes — resume an existing migration, replan on stale consent, review
- * the standing schedule on a fixed cadence — are reachable only from
- * typed rejection codes, never from error prose. A resolved payload
- * carrying the legacy { error } JSON shape is a generic failure.
+ * routes — resume an existing migration, replan on stale consent — are
+ * reachable only from typed rejection codes, never from error prose. A
+ * resolved payload carrying the legacy { error } JSON shape is a generic
+ * failure.
  */
 import { FfiResult } from '../app/walletBackend/ffi';
-import {
-  routeCadencePlan,
-  routeRescheduleParts,
-  routeStartMigration,
-} from '../app/walletBackend/utils/migrationRouting';
+import { routeStartMigration } from '../app/walletBackend/utils/migrationRouting';
 
 const rejected = (code: string, message = 'boom'): FfiResult<string> => ({
   ok: false,
@@ -66,63 +62,3 @@ describe('routeStartMigration', () => {
   });
 });
 
-describe('routeRescheduleParts', () => {
-  it('proceeds on a clean reschedule', () => {
-    expect(routeRescheduleParts({ ok: true, value: '{}' })).toEqual({
-      kind: 'proceed',
-    });
-  });
-
-  it('lets the standing schedule stand on a fixed cadence', () => {
-    expect(routeRescheduleParts(rejected('MigrationCadenceFixed'))).toEqual({
-      kind: 'schedule-stands',
-    });
-  });
-
-  it('surfaces any other rejection as an error with its message', () => {
-    expect(
-      routeRescheduleParts(rejected('MigrationNotInProgress', 'none')),
-    ).toEqual({ kind: 'error', message: 'none' });
-  });
-
-  it('never routes on prose: a resolved body naming the cadence error is a generic failure', () => {
-    const legacy: FfiResult<string> = {
-      ok: true,
-      value: '{"error":"cadence is fixed"}',
-    };
-    expect(routeRescheduleParts(legacy)).toEqual({
-      kind: 'error',
-      message: 'cadence is fixed',
-    });
-  });
-});
-
-describe('routeCadencePlan', () => {
-  it('offers the choice when the plan carries notes', () => {
-    expect(routeCadencePlan({ parts: [100, 100, 50], residual: 7 })).toEqual({
-      kind: 'choose',
-      parts: 3,
-    });
-  });
-
-  it('reports dust when nothing but residual is left', () => {
-    expect(routeCadencePlan({ parts: [], residual: 4200 })).toEqual({
-      kind: 'dust',
-      residual: 4200,
-    });
-  });
-
-  // The planner saw no notes at all, which after a split means its outputs
-  // are mined but not yet spendable at the anchor.
-  it('reports unconfirmed when the plan is empty of everything', () => {
-    expect(
-      routeCadencePlan({ split_rounds: [], parts: [], residual: 0 }),
-    ).toEqual({ kind: 'unconfirmed' });
-  });
-
-  it('treats absent fields as an empty plan', () => {
-    expect(routeCadencePlan({ plan_hash: 'ab12' })).toEqual({
-      kind: 'unconfirmed',
-    });
-  });
-});

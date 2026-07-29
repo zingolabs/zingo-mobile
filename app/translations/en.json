@@ -946,27 +946,6 @@
     "retry": "Retry",
     "close": "Close"
   },
-  "migrationcadence": {
-    "title": "Schedule transfers",
-    "intro": "Your **{notes} notes** will be sent to Ironwood in **batches**. The blockchain is divided into windows of **{blocks} blocks** (~{hours}h), each batch goes out in its own window.",
-    "how-many": "How many batches?",
-    "fewer-title": "Fewer, larger batches",
-    "fewer-body": "Done sooner. More notes visible together.",
-    "more-title": "More, smaller batches",
-    "more-body": "Takes longer. Better privacy.",
-    "duration-hours": "Finishes in about {n} hours",
-    "duration-days": "Finishes in about {n} days",
-    "disclosure": "Each batch sends when you open its reminder.",
-    "cadence-fixed": "Sending already began. The batch schedule can no longer change.",
-    "replanned": "Your notes changed. Review the updated schedule.",
-    "review": "Review schedule",
-    "dust-title": "Nothing left to migrate",
-    "dust-body": "The {amount} ZEC still in Orchard is below the amount worth moving. Fees would cost more than it carries.",
-    "unconfirmed-title": "Your notes aren't confirmed yet",
-    "unconfirmed-body": "The split transactions are on-chain, but the wallet can't spend their notes for another block or two. Try again in a few minutes.",
-    "back": "Back",
-    "retry": "Try again"
-  },
   "migrationschedule": {
     "title": "Review & confirm",
     "intro": "Confirming sends the first batch now and schedules a **reminder for each later batch**. When a reminder arrives, open the app and send that batch.",

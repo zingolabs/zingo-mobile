@@ -1017,17 +1017,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // `perBucket` crosses the bridge as a string (the module's numeric-arg
-    // convention); empty means "keep zingolib's default cadence", and a
-    // malformed value rejects as InvalidInput, matching the iOS bridge.
     @ReactMethod
-    fun startIronwoodMigrationProcess(planHashHex: String, perBucket: String, promise: Promise) {
+    fun startIronwoodMigrationProcess(planHashHex: String, promise: Promise) {
         FfiOutcome.settling(promise, "start_ironwood_migration") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.startIronwoodMigration(
-                planHashHex,
-                FfiArgs.optionalU32(perBucket, "per_bucket")
-            )
+            uniffi.zingo.startIronwoodMigration(planHashHex)
         }
     }
 
@@ -1061,14 +1055,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun splitStatusProcess(promise: Promise) {
         FfiOutcome.settling(promise, "split_status") {
             uniffi.zingo.splitStatus()
-        }
-    }
-
-    @ReactMethod
-    fun reschedulePartsProcess(perBucket: String, promise: Promise) {
-        FfiOutcome.settling(promise, "reschedule_parts") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.rescheduleParts(FfiArgs.requiredU32(perBucket, "per_bucket"))
         }
     }
 
