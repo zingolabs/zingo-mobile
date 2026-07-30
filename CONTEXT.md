@@ -102,14 +102,14 @@ sent. Covers the whole migration, both phases.
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.
-Jest, rust-shear, js-depcheck, android-dependency-analysis, the Android
+Jest, rust-shear, js-depcheck, andr-dependency-analysis, the Android
 Kotlin compile, the Android JVM unit tests, the Android build chain, and
 the Android integration buckets are blocking checks.
 
 **Advisory stage** — a PR CI job that records its result without
-affecting the pull request verdict. The per-PR iOS pipeline and the
-per-PR builds of the non-emulator ABIs are advisory stages; ci-nightly
-remains the enforced gate for both.
+affecting the pull request verdict. No PR stage currently runs in
+advisory mode: every job's failure fails its run. ci-nightly remains
+the enforced gate for the device ABIs and iOS.
 
 **Verdict path** — the longest chain of blocking checks; its wall-clock
 length is the time from push to PR verdict. Advisory stages are never on

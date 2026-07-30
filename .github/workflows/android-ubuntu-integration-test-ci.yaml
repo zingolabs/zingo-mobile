@@ -372,7 +372,7 @@ jobs:
         run: |
           cargo run -p workbench --bin ci-gate -- \
             --artifact "android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}" \
-            --upstream "Android APK build" \
+            --upstream "Andr APK build" \
             --timeout-secs 2700 \
             --poll-secs 20
 

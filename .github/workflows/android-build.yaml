@@ -15,15 +15,9 @@ on:
         required: false
         type: boolean
         default: false
-      # Advisory (see CONTEXT.md): when true, failures here are recorded
-      # without failing the caller's run.
-      advisory:
-        required: false
-        type: boolean
-        default: false
-      # Runner label for the native build job. The advisory device-ABI
-      # builds pass a standard runner to stay off the
-      # zingo-android-native-16 pool, whose cap is sized to one run.
+      # Runner label for the native build job. The device-ABI builds
+      # pass a standard runner to keep off the zingo-android-native-16
+      # pool, whose cap is sized to one run.
       runner:
         required: false
         type: string
@@ -38,7 +32,6 @@ jobs:
   android-check-build-cache:
     name: Check build cache
     runs-on: ubuntu-24.04
-    continue-on-error: ${{ inputs.advisory }}
     outputs:
       native-cache-found: ${{ steps.native-set-cache-found.outputs.native-cache-found }}
       kotlin-cache-found: ${{ steps.kotlin-set-cache-found.outputs.kotlin-cache-found }}
@@ -92,7 +85,6 @@ jobs:
     needs: android-check-build-cache
     if: ${{ needs.android-check-build-cache.outputs.native-cache-found != 'true' || needs.android-check-build-cache.outputs.kotlin-cache-found != 'true' }}
     runs-on: ${{ inputs.runner }}
-    continue-on-error: ${{ inputs.advisory }}
     container:
       image: zingodevops/android_builder:018
     env:
@@ -252,7 +244,6 @@ jobs:
     name: Cache native rust
     needs: android-build
     runs-on: ubuntu-24.04
-    continue-on-error: ${{ inputs.advisory }}
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
