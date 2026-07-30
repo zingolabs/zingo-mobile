@@ -78,8 +78,10 @@ jobs:
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
 
-  # PR CI covers the primary target only (x86_64 / API 34). The full ABI
-  # matrix, the x86 / API 29 lane, and the whole iOS pipeline — whose
+  # PR CI executes tests on the emulator ABI (x86_64 / API 34), not the
+  # device ABIs: KVM accelerates an AVD only when the guest matches the
+  # x86_64 host, so arm64-v8a and armeabi-v7a can never run on hosted
+  # runners. The x86 / API 29 emulator lane and the iOS pipeline — whose
   # macOS-runner queue dominated PR wall-clock — run on ci-nightly.
   android-build:
     strategy:
@@ -91,6 +93,24 @@ jobs:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
       fail-all: true
+
+  # The other three ABIs cross-compile per PR as an advisory stage:
+  # proof that the Rust code still builds for the device ABIs and 32-bit
+  # x86 without waiting for ci-nightly, kept off the verdict path (no
+  # downstream needs-edge, advisory). Standard runners keep these off
+  # the zingo-android-native-16 pool; the per-arch caches make them
+  # no-ops on pushes that leave the Rust inputs untouched.
+  android-build-other-abis:
+    strategy:
+      matrix:
+        arch: [ x86, arm64-v8a, armeabi-v7a ]
+    uses: ./.github/workflows/android-build.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      arch: ${{ matrix.arch }}
+      runner: ubuntu-24.04
+      advisory: true
 
   android-apk-build:
     uses: ./.github/workflows/android-apk-build.yaml
