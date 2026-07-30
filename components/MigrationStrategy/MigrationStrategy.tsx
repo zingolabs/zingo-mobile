@@ -284,7 +284,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           flexDirection: 'row',
           justifyContent: 'space-evenly',
           alignItems: 'center',
-          paddingBottom: 24,
+          paddingVertical: 24,
           paddingHorizontal: 24,
         }}
       >

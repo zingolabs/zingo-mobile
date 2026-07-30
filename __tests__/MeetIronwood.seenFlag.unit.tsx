@@ -75,6 +75,7 @@ jest.mock('react-native-gesture-handler', () => {
     __esModule: true,
     Gesture: { Pan: () => pan },
     GestureDetector: ({ children }: { children: React.ReactNode }) => children,
+    ScrollView: jest.requireActual('react-native').ScrollView,
   };
 });
 
