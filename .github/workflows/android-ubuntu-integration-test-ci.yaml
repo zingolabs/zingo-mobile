@@ -144,7 +144,7 @@ jobs:
   # with the build path. ci-nightly keeps its needs-edge, so there the
   # gate opens instantly.
   android-ubuntu-integration-test-ci:
-    name: Android Ubuntu Integration test
+    name: ${{ matrix.bucket.name }}
     needs:
       - android-ubuntu-integration-test-ci-avd-cache
     runs-on: ubuntu-24.04
