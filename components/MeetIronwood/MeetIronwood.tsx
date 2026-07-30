@@ -7,7 +7,11 @@ import React, {
   useState,
 } from 'react';
 import { BackHandler, Text, useWindowDimensions, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  ScrollView,
+} from 'react-native-gesture-handler';
 import Animated, {
   cancelAnimation,
   Extrapolation,
@@ -306,7 +310,12 @@ const Phase1Graphic: React.FunctionComponent<{
         style={{ width: 104, flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}
       >
         {Array.from({ length: sources }, (_, i: number) => (
-          <MiniCard key={i} size={30} color={ORCHARD_ACCENT} fill={ORCHARD_BG} />
+          <MiniCard
+            key={i}
+            size={30}
+            color={ORCHARD_ACCENT}
+            fill={ORCHARD_BG}
+          />
         ))}
       </View>
     )}
@@ -641,14 +650,14 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           entering={FadeInUp.duration(420)
             .withInitialValues({ opacity: 0, transform: [{ translateY: 14 }] })
             .reduceMotion(ReduceMotion.System)}
-          style={{ marginTop: 24, overflow: 'hidden' }}
+          style={{ flex: 1, marginTop: 24, overflow: 'hidden' }}
         >
           <Animated.View
             style={[
               {
+                flex: 1,
                 flexDirection: 'row',
                 width: width * STEP_COUNT,
-                alignItems: 'flex-start',
               },
               stripStyle,
             ]}
@@ -661,10 +670,6 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           </Animated.View>
         </Animated.View>
       </GestureDetector>
-
-      {/* Spacer pushes the pager down so the dots + buttons sit at the bottom
-          at a fixed level, independent of each page's content height. */}
-      <View style={{ flex: 1 }} />
 
       <Animated.View
         entering={FadeInUp.duration(420)
@@ -765,8 +770,15 @@ const PagerPage: React.FunctionComponent<PagerPageProps> = ({
     };
   });
   return (
-    <Animated.View style={[{ width, paddingHorizontal: 30 }, style]}>
-      {children}
+    <Animated.View style={[{ width }, style]}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 30, paddingBottom: 12 }}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        {children}
+      </ScrollView>
     </Animated.View>
   );
 };
