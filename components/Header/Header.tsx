@@ -120,7 +120,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     shieldingAmount,
     selectServer,
     setZecPrice,
-    backgroundSyncInfo,
     nym,
     mixnetView,
   } = context;
@@ -208,7 +207,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             opacityValue={opacityValue}
             nym={nym}
             mixnetView={mixnetView}
-            backgroundSyncInfo={backgroundSyncInfo}
             translate={translate}
             privacy={privacy}
             noPrivacy={noPrivacy}

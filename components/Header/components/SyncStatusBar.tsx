@@ -1,7 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Animated, TouchableOpacity, View } from 'react-native';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../../app/theme';
 import {
   faCheck,
@@ -18,11 +22,9 @@ import {
   SnackbarDurationEnum,
   TranslateType,
 } from '../../../app/AppState';
-import BackgroundType from '../../../app/AppState/types/BackgroundType';
 import NetInfoType from '../../../app/AppState/types/NetInfoType';
 import { MixnetView } from '../../../app/walletBackend/transforms/mixnetPresenter';
 import FadeText from '../../Components/FadeText';
-import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
 import NymOn from '../../../assets/img/nym-on.svg';
 import PrivacyToggle from './PrivacyToggle';
 
@@ -37,7 +39,6 @@ type SyncStatusBarProps = {
   opacityValue: Animated.Value;
   nym: boolean;
   mixnetView: MixnetView | null;
-  backgroundSyncInfo: BackgroundType;
   translate: (key: string) => TranslateType;
   privacy: boolean;
   noPrivacy: boolean | undefined;
@@ -59,7 +60,6 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
     opacityValue,
     nym,
     mixnetView,
-    backgroundSyncInfo,
     translate,
     privacy,
     noPrivacy,
@@ -392,30 +392,6 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               addLastSnackbar={addLastSnackbar}
               translate={translate}
             />
-          )}
-
-        {!noSyncingStatus &&
-          !!backgroundSyncInfo.error &&
-          mode === ModeEnum.advanced && (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: 0,
-                marginHorizontal: 5,
-                padding: 0,
-                minWidth: 25,
-                minHeight: 25,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate(RouteEnum.SyncReport);
-                }}
-              >
-                <TriangleAlert color={colors.fgWarning} size={20} />
-              </TouchableOpacity>
-            </View>
           )}
       </View>
     );

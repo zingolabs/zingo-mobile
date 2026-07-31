@@ -1744,8 +1744,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     <TouchableOpacity
                       testID="settings.mixnet-toggle"
                       onPress={() => {
-                        if (mixnetView.sendBlocked === false &&
-                            mixnetView.statusKey === 'mixnet.status.off') {
+                        if (
+                          mixnetView.sendBlocked === false &&
+                          mixnetView.statusKey === 'mixnet.status.off'
+                        ) {
                           reenableMixnet();
                         } else if (
                           mixnetView.statusKey === 'mixnet.status.ready' ||

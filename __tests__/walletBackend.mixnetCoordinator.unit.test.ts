@@ -150,9 +150,7 @@ describe('MixnetCoordinator', () => {
   });
 
   it('forced-on: starts the transport, attaches, and publishes the view', async () => {
-    mockedBridge.attachMixnet.mockResolvedValue(
-      statusPayload('bootstrapping'),
-    );
+    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('bootstrapping'));
     mockedBridge.mixnetBootstrapDetailInfo.mockResolvedValue(
       JSON.stringify({ detail: 'attempt 1/10' }),
     );
@@ -219,9 +217,7 @@ describe('MixnetCoordinator', () => {
   });
 
   it('a stale bootstrapping publication cannot overwrite a newer view (#1228)', async () => {
-    mockedBridge.attachMixnet.mockResolvedValue(
-      statusPayload('bootstrapping'),
-    );
+    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('bootstrapping'));
     // The narration fetch hangs until the test releases it, modeling a
     // slow native call racing a user action.
     let releaseNarration!: (payload: string) => void;
@@ -250,7 +246,9 @@ describe('MixnetCoordinator', () => {
   });
 
   it('a poll reporting off after a deliberate disable keeps clearnet consent (#1226)', async () => {
-    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('ready', '127.0.0.1:1080'));
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
     mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
     const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
     const published: MixnetView[] = [];

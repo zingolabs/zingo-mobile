@@ -298,7 +298,10 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
         )
       : nextWake
         ? (translate('migrationstatus.next-opens') as string)
-            .replace('{blocks}', String(Math.max(0, nextWake.boundary - height)))
+            .replace(
+              '{blocks}',
+              String(Math.max(0, nextWake.boundary - height)),
+            )
             .replace(
               '{time}',
               // The block count is exact; the wall-clock it covers is the
