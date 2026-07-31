@@ -23,7 +23,7 @@ exports[`TransparentWarning - snapshot TransparentWarning renders correctly 1`] 
       <Text
         style={
           {
-            "color": "#ffffff",
+            "color": "#c3c3c3",
             "fontSize": 16,
             "marginBottom": 12,
           }

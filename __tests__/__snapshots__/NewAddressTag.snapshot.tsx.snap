@@ -82,7 +82,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderColor": "#ffffff",
+            "borderColor": "#888888",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -165,7 +165,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
           style={
             {
               "alignItems": "center",
-              "borderColor": "#ffffff",
+              "borderColor": "#888888",
               "borderRadius": 12,
               "borderWidth": 1,
               "columnGap": 10,
@@ -344,7 +344,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
                   },
                   {
                     "backgroundColor": "#011401",
-                    "borderColor": "#ffffff",
+                    "borderColor": "#888888",
                   },
                 ]
               }

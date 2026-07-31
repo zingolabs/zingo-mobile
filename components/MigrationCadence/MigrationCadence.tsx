@@ -7,13 +7,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import StepperHeader from '../Migration/StepperHeader';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
+import { AppTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import {
@@ -74,7 +75,7 @@ type PresetCardProps = {
   duration: string;
   selected: boolean;
   onPress: () => void;
-  colors: ThemeType['colors'];
+  colors: AppTheme['colors'];
 };
 
 const PresetCard: React.FunctionComponent<PresetCardProps> = ({
@@ -91,8 +92,8 @@ const PresetCard: React.FunctionComponent<PresetCardProps> = ({
     onPress={onPress}
     style={{
       borderWidth: 1.5,
-      borderColor: selected ? colors.primary : colors.bottomSheetBorder,
-      backgroundColor: colors.bottomSheetBackground,
+      borderColor: selected ? colors.borderAccent : colors.bottomSheetBorder,
+      backgroundColor: colors.bgSurface,
       borderRadius: 14,
       padding: 18,
       marginBottom: 14,
@@ -106,18 +107,18 @@ const PresetCard: React.FunctionComponent<PresetCardProps> = ({
         marginBottom: 8,
       }}
     >
-      <Text style={{ color: colors.text, fontSize: 17, fontWeight: '700' }}>
+      <Text style={{ color: colors.fgDefault, fontSize: 17, fontWeight: '700' }}>
         {title}
       </Text>
       <Text
-        style={{ color: colors.placeholder, fontSize: 16, fontWeight: '600' }}
+        style={{ color: colors.fgMuted, fontSize: 16, fontWeight: '600' }}
       >
         ~{batches}
       </Text>
     </View>
     <Text
       style={{
-        color: colors.placeholder,
+        color: colors.fgMuted,
         fontSize: 14,
         lineHeight: 21,
         marginBottom: 6,
@@ -125,7 +126,7 @@ const PresetCard: React.FunctionComponent<PresetCardProps> = ({
     >
       {body}
     </Text>
-    <Text style={{ color: colors.text, fontSize: 13, fontWeight: '600' }}>
+    <Text style={{ color: colors.fgDefault, fontSize: 13, fontWeight: '600' }}>
       {duration}
     </Text>
   </TouchableOpacity>
@@ -144,7 +145,7 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
   const [plan, setPlan] = useState<RPCMigrationPlanType | null>(null);
@@ -254,18 +255,18 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
       <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bgCanvas,
           alignItems: 'center',
           justifyContent: 'center',
           padding: 24,
         }}
       >
         {loading ? (
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.fgAccent} />
         ) : (
           <Text
             style={{
-              color: colors.placeholder,
+              color: colors.fgMuted,
               fontSize: 14,
               textAlign: 'center',
             }}
@@ -285,7 +286,7 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   if (planRoute && planRoute.kind !== 'choose') {
     const dust = planRoute.kind === 'dust';
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <StepperHeader splitDone={true} sendActive={true} />
         <View
           style={{
@@ -308,7 +309,7 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
           </BoldText>
           <Text
             style={{
-              color: colors.placeholder,
+              color: colors.fgMuted,
               fontSize: 15,
               lineHeight: 22,
               textAlign: 'center',
@@ -350,7 +351,7 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
     .replace('{hours}', windowHours);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <StepperHeader splitDone={true} sendActive={true} />
       <ScrollView
         style={{ flex: 1 }}
@@ -365,7 +366,7 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
         </BoldText>
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 15,
             lineHeight: 22,
             marginBottom: 24,
@@ -373,7 +374,7 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
         >
           {intro.split('**').map((part: string, i: number) =>
             i % 2 === 1 ? (
-              <Text key={i} style={{ color: colors.text, fontWeight: '700' }}>
+              <Text key={i} style={{ color: colors.fgDefault, fontWeight: '700' }}>
                 {part}
               </Text>
             ) : (
@@ -414,7 +415,7 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
         />
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 13,
             lineHeight: 19,
             marginTop: 10,

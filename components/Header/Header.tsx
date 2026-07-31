@@ -2,12 +2,8 @@
 import { faChevronLeft, faSnowflake } from '@fortawesome/free-solid-svg-icons';
 import BurgerIcon from '../../assets/img/options/burger.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import React, { useContext, useEffect } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -31,7 +27,6 @@ import {
   UfvkActionEnum,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
-import { ThemeType } from '../../app/types';
 import { getZingoLogo } from '../../app/utils/ZingoAppData';
 import { useShieldFunds } from '../../app/hooks/useShieldFunds';
 import { useSyncStatus } from '../../app/hooks/useSyncStatus';
@@ -135,7 +130,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const mode = modeProp ?? context.mode;
   const privacy = privacyProp !== undefined ? privacyProp : context.privacy;
 
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   // Fade the entire screen header out when the Options panel is open so
   // its content doesn't shine through the (fading-in) panel overlay.
@@ -196,7 +191,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            backgroundColor: colors.card,
+            backgroundColor: colors.bgCanvas,
             paddingTop: 0,
             paddingBottom: 10,
             minHeight: 50,
@@ -301,14 +296,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     <FontAwesomeIcon
                       icon={faSnowflake}
                       size={20}
-                      color={colors.zingo}
+                      color={colors.fgMuted}
                     />
                   </TouchableOpacity>
                 ) : (
                   <FontAwesomeIcon
                     icon={faSnowflake}
                     size={20}
-                    color={colors.zingo}
+                    color={colors.fgMuted}
                   />
                 )}
               </>
@@ -381,13 +376,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   style={{ marginHorizontal: 10 }}
                   size={24}
                   icon={faChevronLeft}
-                  color={colors.primary}
+                  color={colors.fgAccent}
                 />
               </TouchableOpacity>
               <BoldText
                 testID={testID}
                 style={{
-                  color: colors.money,
+                  color: colors.fgDefault,
                   fontSize: 18,
                   paddingHorizontal: 5,
                 }}
@@ -402,7 +397,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               <BoldText
                 testID={testID}
                 style={{
-                  color: colors.money,
+                  color: colors.fgDefault,
                   fontSize: 18,
                   paddingHorizontal: 5,
                   textAlign: 'center',

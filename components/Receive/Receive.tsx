@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faChevronDown,
@@ -20,7 +20,7 @@ import SelectBottomSheet from '../Components/SelectBottomSheet';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '../Components/SingleAddress';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import BoldText from '../Components/BoldText';
@@ -87,7 +87,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     addLastSnackbar,
     setPrivacyOption,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Receive;
 
   const [index, setIndex] = useState<number>(0);
@@ -318,7 +318,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           paddingTop: 8,
           paddingBottom: 6,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -355,7 +355,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             hitSlop={8}
             style={{ paddingHorizontal: 14, paddingVertical: 4 }}
           >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
           </Pressable>
         </View>
       </View>
@@ -465,7 +465,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             keyboardBlurBehavior={'restore'}
             android_keyboardInputMode={'adjustResize'}
             backgroundStyle={{
-              backgroundColor: colors.bottomSheetBackground,
+              backgroundColor: colors.bgSurface,
               borderTopLeftRadius: 40,
               borderTopRightRadius: 40,
             }}
@@ -479,7 +479,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   paddingTop: 8,
                   paddingBottom: 6,
                   paddingHorizontal: 16,
-                  backgroundColor: colors.bottomSheetBackground,
+                  backgroundColor: colors.bgSurface,
                   borderTopLeftRadius: 40,
                   borderTopRightRadius: 40,
                   borderTopWidth: 1,
@@ -517,7 +517,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                         <FontAwesomeIcon
                           icon={faChevronDown}
                           size={14}
-                          color={colors.zingo}
+                          color={colors.fgMuted}
                           style={{ marginRight: 8 }}
                         />
                         <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
@@ -552,7 +552,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                       <FontAwesomeIcon
                         icon={faPlus}
                         size={18}
-                        color={colors.zingo}
+                        color={colors.fgMuted}
                       />
                     </Pressable>
                   ) : (
@@ -592,7 +592,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }}
         handleComponent={renderModalHandle}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -600,7 +600,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       >
         <BottomSheetView
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
           }}
         >

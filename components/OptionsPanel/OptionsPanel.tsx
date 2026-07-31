@@ -10,12 +10,11 @@ import {
   View,
 } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 
 import BoldText from '../Components/BoldText';
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
-import { ThemeType } from '../../app/types';
 
 import ChevronsUp from '../../assets/img/options/chevrons-up.svg';
 import XSocial from '../../assets/img/options/x.svg';
@@ -86,7 +85,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   mode,
   onClose,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   // Caption under the social row — set when the user taps X / GitHub so
   // they can read (and re-copy) the URL just placed on the clipboard.
   // Cleared when a different social with no URL is tapped (e.g. mail).
@@ -138,7 +137,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       {/* Header */}
       <View
         style={{
@@ -267,7 +266,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
           <View
             style={{
               borderWidth: 1,
-              borderColor: colors.zingo,
+              borderColor: colors.borderMuted,
               borderRadius: 10,
               padding: 10,
               flexDirection: 'row',
@@ -298,7 +297,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                   flex: 1,
                   fontWeight: 'bold',
                   fontSize: 16,
-                  color: colors.text,
+                  color: colors.fgDefault,
                 }}
               >
                 {mode.walletName + '   '}

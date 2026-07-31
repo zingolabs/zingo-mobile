@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../../app/types';
+import { useTheme } from '../../../app/theme';
 
 type ExpandedAddressProps = {
   address: string;
@@ -19,12 +18,12 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
   title: _title,
   button,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   return (
     <View
       style={{
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
       }}
     >
       <View
@@ -32,7 +31,7 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
           width: '90%',
           padding: 16,
           borderRadius: 8,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           alignSelf: 'center',
         }}
       >

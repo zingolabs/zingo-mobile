@@ -7,7 +7,7 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 
 import {
   AddressBookFileClass,
@@ -17,7 +17,6 @@ import {
   ScreenEnum,
   SnackbarDurationEnum,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
@@ -48,7 +47,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [label, setLabel] = useState<string>('');
   const [type, setType] = useState<AddressUnifiedTypeEnum>(
@@ -133,7 +132,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   return (
     <View
       style={{
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
       }}
     >
       <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
@@ -155,7 +154,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
               flexGrow: 1,
               borderWidth: 1,
               borderRadius: 12,
-              borderColor: colors.border,
+              borderColor: colors.borderMuted,
               minWidth: 48,
               minHeight: 48,
               maxHeight: 150,
@@ -165,7 +164,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           >
             <TextInput
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontWeight: '600',
                 fontSize: 14,
                 flex: 1,
@@ -174,7 +173,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 backgroundColor: 'transparent',
               }}
               placeholder={translate('addressbook.label-placeholder') as string}
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor={colors.fgMuted}
               value={label}
               onChangeText={(text: string) => setLabel(text)}
               maxLength={50}
@@ -185,7 +184,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                   style={{ marginRight: 10 }}
                   size={20}
                   icon={faXmark}
-                  color={colors.primaryDisabled}
+                  color={colors.fgAccentDisabled}
                 />
               </TouchableOpacity>
             )}
@@ -217,7 +216,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                     flexDirection: 'row',
                     borderWidth: 1,
                     borderRadius: 5,
-                    borderColor: colors.text,
+                    borderColor: colors.fgDefault,
                     backgroundColor: '#303d4f',
                     minWidth: 48,
                     minHeight: 48,
@@ -228,7 +227,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 >
                   <RegText
                     style={{
-                      color: colors.text,
+                      color: colors.fgDefault,
                       fontWeight: '600',
                       marginLeft: 20,
                       backgroundColor: 'transparent',
@@ -247,7 +246,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                   <FontAwesomeIcon
                     size={12}
                     icon={faChevronDown}
-                    color={colors.text}
+                    color={colors.fgDefault}
                     style={{ marginRight: 20 }}
                   />
                 </View>

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCheck,
@@ -17,7 +17,6 @@ import {
 
 import BoldText from './BoldText';
 import RegText from './RegText';
-import { ThemeType } from '../../app/types';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 
 export type SelectBottomSheetItem = {
@@ -47,7 +46,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
     { title, items, value, onChange, testID, searchable, searchPlaceholder },
     ref,
   ) => {
-    const { colors } = useTheme() as ThemeType;
+    const { colors } = useTheme();
     const keyboardHeight = useKeyboardHeight();
     const [query, setQuery] = useState<string>('');
 
@@ -100,7 +99,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
             paddingTop: 8,
             paddingBottom: 6,
             paddingHorizontal: 16,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
             borderTopWidth: 1,
@@ -136,7 +135,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
               hitSlop={8}
               style={{ paddingHorizontal: 14, paddingVertical: 4 }}
             >
-              <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+              <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
             </Pressable>
           </View>
         </View>
@@ -147,7 +146,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
     const list = (
       <BottomSheetScrollView
         testID={testID}
-        style={{ backgroundColor: colors.bottomSheetBackground }}
+        style={{ backgroundColor: colors.bgSurface }}
         contentContainerStyle={{
           paddingBottom:
             searchable && keyboardHeight > 0 ? keyboardHeight + 20 : 30,
@@ -174,7 +173,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
               <RegText
                 style={{
                   fontSize: 16,
-                  color: selected ? colors.primary : colors.text,
+                  color: selected ? colors.fgAccent : colors.fgDefault,
                   fontWeight: selected ? '600' : '400',
                 }}
               >
@@ -184,7 +183,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                 <FontAwesomeIcon
                   icon={faCheck}
                   size={16}
-                  color={colors.primary}
+                  color={colors.fgAccent}
                 />
               )}
             </Pressable>
@@ -218,7 +217,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
         onChange={onSheetChange}
         handleComponent={searchable ? null : renderHandle}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -230,7 +229,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
               style={{
                 paddingTop: 8,
                 paddingHorizontal: 16,
-                backgroundColor: colors.bottomSheetBackground,
+                backgroundColor: colors.bgSurface,
                 borderTopLeftRadius: 40,
                 borderTopRightRadius: 40,
                 borderTopWidth: 1,
@@ -252,7 +251,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                 <View style={{ width: 48 }} />
                 <BoldText
                   numberOfLines={1}
-                  style={{ flex: 1, textAlign: 'center', color: colors.text }}
+                  style={{ flex: 1, textAlign: 'center', color: colors.fgDefault }}
                 >
                   {title}
                 </BoldText>
@@ -265,7 +264,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                   <FontAwesomeIcon
                     icon={faXmark}
                     size={20}
-                    color={colors.text}
+                    color={colors.fgDefault}
                   />
                 </Pressable>
               </View>
@@ -274,25 +273,25 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                 style={[
                   styles.searchRow,
                   {
-                    backgroundColor: colors.background,
-                    borderColor: colors.border,
+                    backgroundColor: colors.bgCanvas,
+                    borderColor: colors.borderMuted,
                   },
                 ]}
               >
                 <FontAwesomeIcon
                   icon={faMagnifyingGlass}
                   size={14}
-                  color={colors.placeholder}
+                  color={colors.fgMuted}
                 />
                 <TextInput
                   value={query}
                   onChangeText={setQuery}
                   placeholder={searchPlaceholder}
-                  placeholderTextColor={colors.placeholder}
+                  placeholderTextColor={colors.fgMuted}
                   autoCapitalize="none"
                   autoCorrect={false}
                   spellCheck={false}
-                  style={[styles.searchInput, { color: colors.text }]}
+                  style={[styles.searchInput, { color: colors.fgDefault }]}
                   testID={testID ? `${testID}.search` : undefined}
                 />
                 {query.length > 0 && (
@@ -304,7 +303,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                     <FontAwesomeIcon
                       icon={faXmark}
                       size={14}
-                      color={colors.placeholder}
+                      color={colors.fgMuted}
                     />
                   </Pressable>
                 )}

@@ -1,12 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Animated, TouchableOpacity, View } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import {
   faCheck,
   faCloudDownload,
@@ -25,7 +21,6 @@ import {
 import BackgroundType from '../../../app/AppState/types/BackgroundType';
 import NetInfoType from '../../../app/AppState/types/NetInfoType';
 import { MixnetView } from '../../../app/walletBackend/transforms/mixnetPresenter';
-import { ThemeType } from '../../../app/types';
 import FadeText from '../../Components/FadeText';
 import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
 import NymOn from '../../../assets/img/nym-on.svg';
@@ -73,7 +68,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
     noBalance,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
-    const { colors } = useTheme() as ThemeType;
+    const { colors } = useTheme();
 
     return (
       <View
@@ -105,7 +100,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       alignItems: 'center',
                       justifyContent: 'center',
                       padding: 1,
-                      borderColor: colors.primary,
+                      borderColor: colors.borderAccent,
                       borderWidth: 1,
                       borderRadius: 10,
                       minWidth: 25,
@@ -123,7 +118,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                     >
                       <FontAwesomeIcon
                         icon={faCheck}
-                        color={colors.primary}
+                        color={colors.fgAccent}
                         size={16}
                       />
                       {viewSyncStatus && (
@@ -140,7 +135,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       alignItems: 'center',
                       justifyContent: 'center',
                       padding: 1,
-                      borderColor: colors.syncing,
+                      borderColor: colors.borderSyncing,
                       borderWidth: 1,
                       borderRadius: 10,
                       minWidth: 25,
@@ -166,7 +161,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                         >
                           <FontAwesomeIcon
                             icon={faPlay}
-                            color={colors.syncing}
+                            color={colors.fgSyncing}
                             size={16}
                           />
                           {viewSyncStatus && (
@@ -201,7 +196,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                           >
                             <FontAwesomeIcon
                               icon={faPlay}
-                              color={colors.syncing}
+                              color={colors.fgSyncing}
                               size={16}
                             />
                             {viewSyncStatus && (
@@ -234,7 +229,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       alignItems: 'center',
                       justifyContent: 'center',
                       padding: 1,
-                      borderColor: colors.primaryDisabled,
+                      borderColor: colors.borderAccentDisabled,
                       borderWidth: 1,
                       borderRadius: 10,
                       minWidth: 25,
@@ -257,7 +252,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       >
                         <FontAwesomeIcon
                           icon={faWifi}
-                          color={colors.primaryDisabled}
+                          color={colors.fgAccentDisabled}
                           size={16}
                         />
                       </View>
@@ -310,7 +305,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               marginHorizontal: 2.5,
               paddingHorizontal: 5,
               paddingVertical: 1,
-              borderColor: colors.zingo,
+              borderColor: colors.borderMuted,
               borderWidth: 1,
               borderRadius: 10,
               minWidth: 25,
@@ -361,7 +356,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               marginHorizontal: 2.5,
               paddingHorizontal: 5,
               paddingVertical: 1,
-              borderColor: colors.zingo,
+              borderColor: colors.borderMuted,
               borderWidth: 1,
               borderRadius: 10,
               minWidth: 25,
@@ -418,7 +413,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                   navigation.navigate(RouteEnum.SyncReport);
                 }}
               >
-                <TriangleAlert color={colors.warning.primary} size={20} />
+                <TriangleAlert color={colors.fgWarning} size={20} />
               </TouchableOpacity>
             </View>
           )}

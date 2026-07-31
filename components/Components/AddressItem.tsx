@@ -15,13 +15,8 @@ import {
   SelectServerEnum,
   ScreenEnum,
 } from '../../app/AppState';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
@@ -62,7 +57,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     selectServer,
     setSendPageState,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [expandAddress, setExpandAddress] = useState<boolean>(false);
   const [expandContact, setExpandContact] = useState<boolean>(false);
@@ -103,7 +98,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   return (
     <>
       {loading ? (
-        <ActivityIndicator size="small" color={colors.primary} />
+        <ActivityIndicator size="small" color={colors.fgAccent} />
       ) : (
         <View
           style={{
@@ -220,7 +215,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                   style={{ marginTop: 3 }}
                   size={20}
                   icon={faUserPlus}
-                  color={colors.primary}
+                  color={colors.fgAccent}
                 />
               </View>
             </TouchableOpacity>
@@ -231,7 +226,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 style={{ marginTop: 3 }}
                 size={24}
                 icon={faUserPlus}
-                color={colors.primary}
+                color={colors.fgAccent}
               />
             </TouchableOpacity>
           )}
@@ -264,7 +259,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                   style={{ marginTop: 3 }}
                   size={24}
                   icon={faPaperPlane}
-                  color={colors.primary}
+                  color={colors.fgAccent}
                 />
               </TouchableOpacity>
             )}

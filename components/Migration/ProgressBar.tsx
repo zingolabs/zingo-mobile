@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 
-import { ThemeType } from '../../app/types';
 
 type ProgressBarProps = {
   // 0..1, driven frame for frame. Phases that report continuously have nothing
@@ -23,7 +22,7 @@ const ProgressBar: React.FunctionComponent<ProgressBarProps> = ({
   color,
   height = 6,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   return (
     <View
@@ -38,7 +37,7 @@ const ProgressBar: React.FunctionComponent<ProgressBarProps> = ({
         style={[
           StyleSheet.absoluteFillObject,
           {
-            backgroundColor: color ?? colors.primary,
+            backgroundColor: color ?? colors.bgAccent,
             transformOrigin: 'left',
             transform: [{ scaleX: progress }],
           },

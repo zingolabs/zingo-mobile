@@ -9,8 +9,7 @@ import {
   useCodeScanner,
 } from 'react-native-vision-camera';
 import { Text } from 'react-native-svg';
-import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
+import { useTheme } from '../../app/theme';
 import { View } from 'react-native';
 
 type ScannerProps = {
@@ -24,7 +23,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({
   onRead,
   onClose,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
 
@@ -48,7 +47,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
     >
       {!hasPermission || device == null ? (

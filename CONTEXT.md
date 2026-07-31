@@ -99,6 +99,75 @@ What remains when the migration completes; disclosed on completion.
 The single user approval of an exact plan hash before anything is signed or
 sent. Covers the whole migration, both phases.
 
+## Theme tokens
+
+Vocabulary of the semantic color layer in `app/theme`. A color is always
+referred to by its token, never by value.
+
+**Token**:
+A named color role, the unit of the palette. Its name is a surface prefix
+plus a role, flat camelCase: `bgCanvas`, `fgMuted`, `borderAccent`.
+_Avoid_: color constant, hex, variable
+
+**Surface**:
+Which part of a rendered element a token paints: `bg` (fills), `fg` (text
+and glyphs), `border` (strokes). Unqualified "surface" always means this
+axis; the raised-panel role is always written out as `bgSurface`.
+
+**Role**:
+The meaning half of a token name — what the color is *for* (Canvas, Muted,
+Accent, Danger), as opposed to which surface carries it.
+
+**Family**:
+The tokens sharing one role across surfaces, e.g. the accent family
+`fgAccent`/`borderAccent`/`bgAccent`. Families migrate, change, and are
+discussed as units.
+
+**Canvas**:
+The screen's base plane (`bgCanvas`).
+_Avoid_: background (ambiguous — every `bg` token is a background)
+
+**Chrome**:
+Navigation furniture — tab bar, side menu (`bgChrome`).
+
+**Muted**:
+The de-emphasized neutral for secondary text, subtle borders, and quiet
+fills. Mode-dependent.
+_Avoid_: grey, placeholder, zingo (dead legacy names)
+
+**Accent**:
+The brand color a mode selects — green in advanced, steel blue in basic.
+One value across its three surface tokens today; the split exists so text
+and fill can diverge later.
+_Avoid_: primary, brand color
+
+**Emphasis**:
+The stronger sibling of a status role: `fgDangerEmphasis` is the red for
+destructive actions, while bare `fgDanger` is the orange of danger body
+copy. Named by traffic, deliberately against design-system convention —
+here the bare name is the common case, not the loud one.
+
+**Component token**:
+A token named after a component instead of a role. Exactly one exists,
+`bottomSheetBorder`; a second one needs a reason the map's role set cannot
+express.
+
+**Mode**:
+`advanced` or `basic`. One theme exists; the mode selects the accent and
+the muted neutral, and gates feature visibility.
+_Avoid_: theme (for a mode), dark/light (no light mode exists)
+
+**Overlay**:
+The mode-dependent slice of the palette (the accent and accent-disabled
+families, `bgSecondaryDisabled`, and the muted trio). Everything else is
+the shared **base**. "Edit the overlay" means a per-mode change; "edit the
+base" changes both modes at once.
+
+**Legacy name**:
+The pre-migration vocabulary: `primary`, `secondary`, `text`, `money`,
+`zingo`, `placeholder`, `border`, `card`, and friends. Dead — use only
+when reading history.
+
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.

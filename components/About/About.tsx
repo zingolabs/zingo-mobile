@@ -2,14 +2,14 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import DetailLine from '../Components/DetailLine';
@@ -23,7 +23,7 @@ type AboutProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.About>;
 const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const { zingolibVersion, translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.About;
 
   const [containerH, setContainerH] = useState<number>(0);
@@ -51,7 +51,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -77,7 +77,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -102,7 +102,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -128,7 +128,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -140,7 +140,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',

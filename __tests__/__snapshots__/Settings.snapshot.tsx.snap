@@ -2193,7 +2193,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#888888"
           icon={
             {
               "icon": [
@@ -2308,7 +2308,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#888888"
           icon={
             {
               "icon": [
@@ -2424,7 +2424,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#888888"
           icon={
             {
               "icon": [
@@ -2540,7 +2540,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#888888"
           icon={
             {
               "icon": [
