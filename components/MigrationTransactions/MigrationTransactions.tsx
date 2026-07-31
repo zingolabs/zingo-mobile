@@ -414,7 +414,6 @@ const MigrationTransactions: React.FunctionComponent<
             />
           </Card>
         ))}
-
       </ScrollView>
 
       <View

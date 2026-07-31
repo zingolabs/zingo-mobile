@@ -14,7 +14,8 @@ interface NymTransportModuleAPI {
   stopMixnetTransport(): Promise<null>;
 }
 
-const NymTransportModule = NativeModules.NymTransportModule as NymTransportModuleAPI;
+const NymTransportModule =
+  NativeModules.NymTransportModule as NymTransportModuleAPI;
 
 /**
  * The injected `StartMixnetTransport` seam for the coordinator: (re)start

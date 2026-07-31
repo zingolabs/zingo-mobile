@@ -465,9 +465,7 @@ export async function getTotalSpendsToAddress(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.getTotalSpendsToAddressInfo());
 }
 
-export async function getTotalMemobytesToAddress(): Promise<
-  FfiResult<string>
-> {
+export async function getTotalMemobytesToAddress(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.getTotalMemobytesToAddressInfo());
 }
 

@@ -25,10 +25,7 @@ import {
   describeRejection,
   vetPolledStatus,
 } from '../transforms/mixnetTransform';
-import {
-  MixnetView,
-  deriveMixnetView,
-} from '../transforms/mixnetPresenter';
+import { MixnetView, deriveMixnetView } from '../transforms/mixnetPresenter';
 import {
   attachMixnet,
   disableMixnet,
@@ -151,7 +148,10 @@ export class MixnetCoordinator {
     this.lastStatus = status;
     this.publishSeq += 1;
     this.publishView(status, this.publishSeq);
-    if (this.pollTimerID !== undefined && wasBootstrapping !== this.isBootstrapping()) {
+    if (
+      this.pollTimerID !== undefined &&
+      wasBootstrapping !== this.isBootstrapping()
+    ) {
       this.schedulePolling();
     }
   }
