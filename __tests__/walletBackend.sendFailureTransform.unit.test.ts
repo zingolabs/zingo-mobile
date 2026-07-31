@@ -127,9 +127,9 @@ describe('sendFailureMessage', () => {
   const translate = (key: string): unknown => `t(${key})`;
 
   it('translates the wallet verdicts', () => {
-    expect(
-      sendFailureMessage(classifySendFailure('64: dust'), translate),
-    ).toBe('t(send.dust-error)');
+    expect(sendFailureMessage(classifySendFailure('64: dust'), translate)).toBe(
+      't(send.dust-error)',
+    );
     expect(
       sendFailureMessage(
         classifySendFailure('18: bad-txns-orchard-duplicate-nullifier'),

@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { ActivityIndicator, BackHandler, ScrollView, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  BackHandler,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
@@ -11,7 +17,10 @@ import SegmentedBar from '../Migration/SegmentedBar';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
-import { executeDueParts, executeDuePartsStatus } from '../../app/walletBackend';
+import {
+  executeDueParts,
+  executeDuePartsStatus,
+} from '../../app/walletBackend';
 import { RPCBatchReportType } from '../../app/walletBackend/types/RPCBatchReportType';
 import { RPCBatchStatusType } from '../../app/walletBackend/types/RPCBatchStatusType';
 
@@ -168,7 +177,9 @@ const MigrationBatchSending: React.FunctionComponent<
           justifyContent: 'center',
         }}
       >
-        <BoldText style={{ fontSize: 20, marginBottom: 12, textAlign: 'center' }}>
+        <BoldText
+          style={{ fontSize: 20, marginBottom: 12, textAlign: 'center' }}
+        >
           {translate('migrationbatchsending.slid-title') as string}
         </BoldText>
         <Text
@@ -205,7 +216,9 @@ const MigrationBatchSending: React.FunctionComponent<
           justifyContent: 'center',
         }}
       >
-        <BoldText style={{ fontSize: 20, marginBottom: 12, textAlign: 'center' }}>
+        <BoldText
+          style={{ fontSize: 20, marginBottom: 12, textAlign: 'center' }}
+        >
           {translate('migrationbatchsending.error-title') as string}
         </BoldText>
         <Text
@@ -252,7 +265,9 @@ const MigrationBatchSending: React.FunctionComponent<
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
         scrollEnabled={false}
       >
-        <BoldText style={{ fontSize: 22, marginBottom: 10, textAlign: 'center' }}>
+        <BoldText
+          style={{ fontSize: 22, marginBottom: 10, textAlign: 'center' }}
+        >
           {translate('migrationbatchsending.title') as string}
         </BoldText>
         <Text

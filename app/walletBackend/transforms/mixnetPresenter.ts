@@ -1,8 +1,5 @@
 import { RPCMixnetModeEnum } from '../enums/RPCMixnetModeEnum';
-import {
-  MixnetDetailReport,
-  MixnetStatusReport,
-} from './mixnetTransform';
+import { MixnetDetailReport, MixnetStatusReport } from './mixnetTransform';
 
 /**
  * What the user may do about the current mixnet state: nothing, wait for

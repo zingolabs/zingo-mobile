@@ -16,4 +16,12 @@ module.exports = [
     ],
   },
   ...compat.extends('@react-native'),
+  {
+    files: ['**/*.mjs'],
+    languageOptions: {
+      parser: require('espree'),
+      ecmaVersion: 2022,
+      sourceType: 'module',
+    },
+  },
 ];
