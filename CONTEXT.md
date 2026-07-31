@@ -130,3 +130,11 @@ from an upstream job in the same run, instead of a `needs:` edge between
 the jobs. It lets a job front-load work that does not depend on the
 artifact, and it must abort promptly with a clear message when the
 upstream job that produces the artifact concludes without success.
+
+## Build identity
+
+**Build descriptor** — the string `get_version()` reports: a zingolib
+part and a zingo-mobile part (`zl_…-zm_…`), each derived from git
+describe against that repo's release tags. The commit count and
+5-character hash fields are elided when a part sits exactly on its
+release tag, and `_dirty` marks a part built from an uncommitted tree.

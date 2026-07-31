@@ -22,6 +22,10 @@ COPY Cargo.toml /opt/zingo/rust/Cargo.toml
 COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
 COPY workbench/ /opt/zingo/rust/workbench/
 
+# The build context has no .git; the host passes git describe output through.
+ARG ZINGO_MOBILE_GIT_DESCRIBE
+ENV ZINGO_MOBILE_GIT_DESCRIBE=${ZINGO_MOBILE_GIT_DESCRIBE}
+
 RUN rustup default stable
 
 RUN cargo install --force --locked bindgen-cli
