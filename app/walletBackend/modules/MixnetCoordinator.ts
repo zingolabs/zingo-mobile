@@ -20,10 +20,8 @@
  */
 import { RPCMixnetModeEnum } from '../enums/RPCMixnetModeEnum';
 import {
-  ClearnetConsent,
   MixnetStatusReport,
   describeRejection,
-  vetPolledStatus,
 } from '../transforms/mixnetTransform';
 import {
   MixnetView,
@@ -64,10 +62,6 @@ export class MixnetCoordinator {
   private pollTimerID?: ReturnType<typeof setInterval>;
   private pollLock: boolean = false;
   private lastStatus: MixnetStatusReport | null = null;
-  // The consent bit belongs to the coordinator, not the wallet: the wallet
-  // reports `off` both for a deliberate disable and for a never-attached
-  // session, and only the former is consent (#1226).
-  private consent: ClearnetConsent = 'none';
 
   constructor(
     startTransport: StartMixnetTransport,
@@ -85,7 +79,6 @@ export class MixnetCoordinator {
    * re-enable — never a silent fall-through to clearnet.
    */
   async ensureForConnectedSession(): Promise<void> {
-    this.consent = 'none';
     try {
       const socks5Addr = await this.startTransport();
       this.publish(await attachMixnet(socks5Addr));
@@ -95,9 +88,13 @@ export class MixnetCoordinator {
     this.schedulePolling();
   }
 
-  /** The user's deliberate per-session consent to clearnet. */
+  /**
+   * The user's deliberate per-session consent to clearnet. The wallet
+   * itself records it as `switched_off`, distinct from the unattached
+   * ground state, so no app-side consent bit exists anymore (the #1226
+   * defense retired in favor of the wallet's five-state backstop).
+   */
   async disable(): Promise<void> {
-    this.consent = 'disabledThisSession';
     this.publish(await disableMixnet());
   }
 
@@ -120,7 +117,7 @@ export class MixnetCoordinator {
     }
     this.pollLock = true;
     try {
-      this.publish(vetPolledStatus(await getMixnetStatus(), this.consent));
+      this.publish(await getMixnetStatus());
     } finally {
       this.pollLock = false;
     }

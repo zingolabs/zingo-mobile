@@ -14,8 +14,7 @@ import {
 export type MixnetFailure =
   | { readonly reason: 'nativeRejection'; readonly message: string }
   | { readonly reason: 'malformedPayload'; readonly payload: string }
-  | { readonly reason: 'unrecognizedMode'; readonly claimed: string }
-  | { readonly reason: 'unconsentedOff' };
+  | { readonly reason: 'unrecognizedMode'; readonly claimed: string };
 
 /**
  * The validated outcome of a mixnet status call. A discriminated union so
@@ -39,38 +38,6 @@ export type MixnetDetailReport =
   | { readonly kind: 'failure'; readonly failure: MixnetFailure };
 
 /**
- * Whether this session holds the user's deliberate clearnet consent.
- * `off` from the wallet is trustworthy only under `disabledThisSession`:
- * a never-attached wallet (and a silently recreated one) also reports
- * `off`, and that must not open the send gate (zingo-mobile#1226).
- */
-export type ClearnetConsent = 'none' | 'disabledThisSession';
-
-/**
- * Vets a polled status against the session's consent. A polled `off`
- * without consent is re-typed as the policy failure it actually is, so the
- * derived view keeps sends blocked and offers re-enable instead of
- * silently opening clearnet. Every other report passes through untouched;
- * direct reports (an attach result, a disable result) are authoritative
- * and are not vetted.
- *
- * Pure function — no side effects.
- */
-export function vetPolledStatus(
-  status: MixnetStatusReport,
-  consent: ClearnetConsent,
-): MixnetStatusReport {
-  if (
-    status.kind === 'status' &&
-    status.mode === RPCMixnetModeEnum.off &&
-    consent === 'none'
-  ) {
-    return { kind: 'failure', failure: { reason: 'unconsentedOff' } };
-  }
-  return status;
-}
-
-/**
  * Converts a value thrown by the native bridge — the error channel — into
  * the typed failure. Never inspects the data channel.
  *
@@ -86,13 +53,17 @@ export function describeRejection(thrown: unknown): MixnetFailure {
  * Validates an untrusted value as a Mixnet Mode.
  *
  * Pure function — no side effects. Returns `null` for anything that is not
- * exactly one of the four mode strings, so an unknown future mode degrades
- * to an explicit failure instead of a misread state.
+ * exactly one of the five mode strings, so an unknown future mode degrades
+ * to an explicit failure instead of a misread state. The retired token
+ * `off` is rejected on purpose: accepting it would reunify consent with
+ * absence, the conflation the five states exist to prevent.
  */
 export function parseMixnetMode(candidate: unknown): RPCMixnetModeEnum | null {
   switch (candidate) {
-    case RPCMixnetModeEnum.off:
-      return RPCMixnetModeEnum.off;
+    case RPCMixnetModeEnum.unattached:
+      return RPCMixnetModeEnum.unattached;
+    case RPCMixnetModeEnum.switchedOff:
+      return RPCMixnetModeEnum.switchedOff;
     case RPCMixnetModeEnum.bootstrapping:
       return RPCMixnetModeEnum.bootstrapping;
     case RPCMixnetModeEnum.ready:

@@ -451,7 +451,8 @@
   },
   "mixnet": {
     "status": {
-      "off": "Mixnet off (clearnet)",
+      "unattached": "Mixnet not connected",
+      "switched-off": "Mixnet off (clearnet)",
       "bootstrapping": "Connecting to mixnet…",
       "ready": "Mixnet ready",
       "died": "Mixnet connection lost",
