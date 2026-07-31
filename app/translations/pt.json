@@ -946,27 +946,6 @@
     "retry": "Tentar de novo",
     "close": "Fechar"
   },
-  "migrationcadence": {
-    "title": "Agende as transferências",
-    "intro": "Suas **{notes} notas** serão enviadas para a Ironwood em **lotes**. A blockchain é dividida em janelas de **{blocks} blocos** (~{hours}h); cada lote sai na sua própria janela.",
-    "how-many": "Quantos lotes?",
-    "fewer-title": "Menos lotes, maiores",
-    "fewer-body": "Termina antes. Mais notas visíveis juntas.",
-    "more-title": "Mais lotes, menores",
-    "more-body": "Demora mais. Melhor privacidade.",
-    "duration-hours": "Termina em cerca de {n} horas",
-    "duration-days": "Termina em cerca de {n} dias",
-    "disclosure": "Cada lote é enviado quando você abre o lembrete dele.",
-    "cadence-fixed": "O envio já começou. O cronograma dos lotes não pode mais mudar.",
-    "replanned": "Suas notas mudaram. Revise o cronograma atualizado.",
-    "review": "Revisar cronograma",
-    "dust-title": "Não resta nada para migrar",
-    "dust-body": "Os {amount} ZEC que restam na Orchard estão abaixo do valor que vale a pena mover. As taxas custariam mais do que ele carrega.",
-    "unconfirmed-title": "Suas notas ainda não estão confirmadas",
-    "unconfirmed-body": "As transações de divisão já estão na cadeia, mas a carteira não pode gastar as notas delas por mais um bloco ou dois. Tente de novo em alguns minutos.",
-    "back": "Voltar",
-    "retry": "Tentar de novo"
-  },
   "migrationschedule": {
     "title": "Revisar e confirmar",
     "intro": "Confirmar envia o primeiro lote agora e agenda um **lembrete para cada lote seguinte**. Quando um lembrete chegar, abra o app e envie aquele lote.",

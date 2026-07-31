@@ -62,7 +62,6 @@ enum FfiOutcome {
     case .MigrationNotInProgress(let message): return ("MigrationNotInProgress", message)
     case .MigrationAlreadyInProgress(let message): return ("MigrationAlreadyInProgress", message)
     case .MigrationConsentStale(let message): return ("MigrationConsentStale", message)
-    case .MigrationCadenceFixed(let message): return ("MigrationCadenceFixed", message)
     case .MigrationSplit(let message): return ("MigrationSplit", message)
     case .Migration(let message): return ("Migration", message)
     case .Mixnet(let message): return ("Mixnet", message)
@@ -1038,17 +1037,11 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(startIronwoodMigrationProcess:perBucket:resolve:reject:)
-  func startIronwoodMigrationProcess(_ plan_hash_hex: String, perBucket per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(startIronwoodMigrationProcess:resolve:reject:)
+  func startIronwoodMigrationProcess(_ plan_hash_hex: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          // Empty string means "keep zingolib's default cadence" (the
-          // module's numeric-arg-as-string convention); anything else must
-          // parse as a u32 — a malformed value rejects as InvalidInput
-          // instead of silently keeping the default.
-          try startIronwoodMigration(
-            planHashHex: plan_hash_hex,
-            perBucket: FfiArgs.optionalU32(per_bucket, name: "per_bucket"))
+          try startIronwoodMigration(planHashHex: plan_hash_hex)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1064,56 +1057,11 @@ class RPCModule: NSObject {
       }
   }
 
-  // Proves and broadcasts one Phase 1 splitting round (ADR 0016), so like the
-  // drain it runs long; the global concurrent queue keeps it off the main
-  // thread.
-  @objc(quickSplitProcess:reject:)
-  func quickSplitProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try quickSplit()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Polled concurrently while `quickSplitProcess` runs; the native
-  // `splitStatus()` reads a side channel, never the lightclient lock the round
-  // holds, so the poll returns immediately.
-  @objc(splitStatusProcess:reject:)
-  func splitStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try splitStatus()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  @objc(reschedulePartsProcess:resolve:reject:)
-  func reschedulePartsProcess(_ per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          // `per_bucket` crosses as a string (numeric-arg convention); a
-          // malformed value rejects as InvalidInput — never an unsettled
-          // promise.
-          try rescheduleParts(perBucket: FfiArgs.requiredU32(per_bucket, name: "per_bucket"))
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   @objc(migrationStatusProcess:reject:)
   func migrationStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try migrationStatus()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  @objc(windowTimelineProcess:reject:)
-  func windowTimelineProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try windowTimeline()
         }.settle(resolve: resolve, reject: reject)
       }
   }

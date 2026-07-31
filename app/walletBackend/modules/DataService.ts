@@ -20,7 +20,6 @@ import {
   ValueTransferType,
   UnifiedAddressClass,
   TransparentAddressClass,
-  foldBlockSpacing,
 } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { RPCUnifiedAddressType } from '../types/RPCUnifiedAddressType';
@@ -45,13 +44,6 @@ export class DataService {
   lastWalletBlockHeight: number = 0;
   lastServerBlockHeight: number = 0;
   walletBirthday: number = 0;
-
-  // Block-spacing observation: the last (height, wall-clock) pair a server
-  // reading moved from, and the EMA the samples fold into. Null until two
-  // readings at different heights land.
-  blockTimeBaseHeight: number = 0;
-  blockTimeBaseMs: number = 0;
-  secondsPerBlock: number | null = null;
 
   fetchWalletHeightLock: boolean = false;
   fetchWalletBirthdaySeedUfvkLock: boolean = false;
@@ -295,11 +287,6 @@ export class DataService {
         ironwoodActivationHeight: infoJSON.ironwood_activation_height ?? null,
       };
 
-      this.observeBlockSpacing(info.latestBlock, Date.now());
-      if (this.secondsPerBlock !== null) {
-        info.secondsPerBlock = this.secondsPerBlock;
-      }
-
       this.config.onInfoChanged(info);
       this.lastServerBlockHeight = info.latestBlock;
     } catch (error) {
@@ -309,32 +296,6 @@ export class DataService {
     } finally {
       this.fetchInfoAndServerHeightLock = false;
     }
-  }
-
-  // One sample per height change: the wall-clock gap since the last reading
-  // that moved, divided by how many blocks it moved. A rewound tip (server
-  // restart) just re-bases; foldBlockSpacing rejects artifact samples (staged
-  // jumps, paused miners) but the base advances regardless, so one artifact
-  // never pollutes the next sample.
-  private observeBlockSpacing(height: number, nowMs: number): void {
-    if (height <= 0) {
-      return;
-    }
-    if (this.blockTimeBaseHeight === 0 || height < this.blockTimeBaseHeight) {
-      this.blockTimeBaseHeight = height;
-      this.blockTimeBaseMs = nowMs;
-      return;
-    }
-    if (height === this.blockTimeBaseHeight) {
-      return;
-    }
-    const sample =
-      (nowMs - this.blockTimeBaseMs) /
-      1000 /
-      (height - this.blockTimeBaseHeight);
-    this.blockTimeBaseHeight = height;
-    this.blockTimeBaseMs = nowMs;
-    this.secondsPerBlock = foldBlockSpacing(this.secondsPerBlock, sample);
   }
 
   async fetchZingolibVersion(): Promise<void> {

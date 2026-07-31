@@ -946,27 +946,6 @@
     "retry": "Yeniden dene",
     "close": "Kapat"
   },
-  "migrationcadence": {
-    "title": "Aktarımları planlayın",
-    "intro": "**{notes} notunuz** Ironwood’a **gruplar** halinde gönderilecek. Blok zinciri **{blocks} bloklu** pencerelere bölünür (~{hours}sa), her grup kendi penceresinde gönderilir.",
-    "how-many": "Kaç grup?",
-    "fewer-title": "Daha az, daha büyük gruplar",
-    "fewer-body": "Daha erken biter. Birlikte görünen not sayısı artar.",
-    "more-title": "Daha çok, daha küçük gruplar",
-    "more-body": "Daha uzun sürer. Daha iyi gizlilik.",
-    "duration-hours": "Yaklaşık {n} saatte biter",
-    "duration-days": "Yaklaşık {n} günde biter",
-    "disclosure": "Her grup, hatırlatıcısını açtığınızda gönderilir.",
-    "cadence-fixed": "Gönderim zaten başladı. Grup takvimi artık değiştirilemez.",
-    "replanned": "Notlarınız değişti. Güncellenen takvimi gözden geçirin.",
-    "review": "Takvimi gözden geçir",
-    "dust-title": "Taşınacak bir şey kalmadı",
-    "dust-body": "Orchard’da kalan {amount} ZEC, taşımaya değer tutarın altında. Ücretler taşıdığından fazlasına mal olur.",
-    "unconfirmed-title": "Notlarınız henüz onaylanmadı",
-    "unconfirmed-body": "Bölme işlemleri zincirde, ancak cüzdan bir iki blok daha bu notları harcayamaz. Birkaç dakika sonra tekrar deneyin.",
-    "back": "Geri",
-    "retry": "Tekrar dene"
-  },
   "migrationschedule": {
     "title": "Gözden geçir ve onayla",
     "intro": "Onaylamak ilk grubu şimdi gönderir ve **sonraki her grup için bir hatırlatıcı** planlar. Hatırlatıcı geldiğinde uygulamayı açın ve o grubu gönderin.",

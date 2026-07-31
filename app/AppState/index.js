@@ -58,12 +58,6 @@ import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 import { isIronwoodActive } from './const/IronwoodActivation';
-import {
-  TARGET_BLOCK_SPACING_SECONDS,
-  foldBlockSpacing,
-  windowTargetHeight,
-  estimatedTimestampMs,
-} from './const/BlockTime';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -132,8 +126,4 @@ export {
   BlockExplorerEnum,
   GlobalConst,
   isIronwoodActive,
-  TARGET_BLOCK_SPACING_SECONDS,
-  foldBlockSpacing,
-  windowTargetHeight,
-  estimatedTimestampMs,
 };

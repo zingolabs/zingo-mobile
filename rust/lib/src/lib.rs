@@ -58,7 +58,7 @@ use zingolib::wallet::keys::{
     unified::{ReceiverSelection, UnifiedKeyStore},
 };
 use zingolib::wallet::migration::{
-    MigrationParams, MigrationPhase, RecommendedAction, parts::PartState, parts::SigningStrategy,
+    MigrationParams, MigrationPhase, RecommendedAction, parts::SigningStrategy,
     split::plan_hash,
 };
 
@@ -104,8 +104,6 @@ pub enum ZingolibError {
     MigrationAlreadyInProgress,
     #[error("Error: consent stale: {0}")]
     MigrationConsentStale(String),
-    #[error("Error: cadence fixed: {0}")]
-    MigrationCadenceFixed(String),
     #[error("Error: note splitting: {0}")]
     MigrationSplit(String),
     #[error("Error: migration: {0}")]
@@ -173,11 +171,14 @@ fn ffi_error(e: LightClientError) -> ZingolibError {
             MigrationError::NoMigration => ZingolibError::MigrationNotInProgress,
             MigrationError::AlreadyInProgress => ZingolibError::MigrationAlreadyInProgress,
             MigrationError::ConsentStale => ZingolibError::MigrationConsentStale(text),
-            MigrationError::CadenceFixed => ZingolibError::MigrationCadenceFixed(text),
             MigrationError::ScheduledMigrationExists => ZingolibError::MigrationAlreadyInProgress,
             MigrationError::PreSignedUnavailable
             | MigrationError::NoteSplittingRequired
             | MigrationError::DifferentAccount
+            // CadenceFixed is unreachable from this app: the cadence surface
+            // is retired and nothing calls reschedule_parts. Mapped for
+            // exhaustiveness only.
+            | MigrationError::CadenceFixed
             | MigrationError::IronwoodEraTooYoung { .. } => ZingolibError::Migration(text),
             MigrationError::SplitDidNotConverge(_)
             | MigrationError::SplitTransactionFailed(_)
@@ -319,11 +320,11 @@ lazy_static! {
 // Live progress of the in-flight immediate Orchard->Ironwood drain, held in a
 // side channel *outside* the LIGHTCLIENT lock. `drain_orchard_to_ironwood`
 // holds LIGHTCLIENT.write() for its whole `block_on`, so a `drain_status` poll
-// that read the lightclient would deadlock behind it. Instead the drain stashes
-// a cloned `ImmediateMigrationProgressHandle` (an independent
+// that read the lightclient would deadlock behind it. Instead the immediate
+// migration stashes a cloned `ImmediateMigrationProgressHandle` (an independent
 // Arc<Mutex<Option<ImmediateMigrationStatus>>>) here; the poller reads only
-// this global and never contends for the drain's wallet/lightclient lock.
-// `None` between drains.
+// this global and never contends for the migration's wallet/lightclient lock.
+// `None` between runs.
 lazy_static! {
     static ref DRAIN_PROGRESS: RwLock<Option<zingolib::lightclient::migrate::ImmediateMigrationProgressHandle>> =
         RwLock::new(None);
@@ -1275,11 +1276,6 @@ mod error_funnel_tests {
                 LightClientError::MigrationError(MigrationError::ConsentStale),
                 |e| matches!(e, ZingolibError::MigrationConsentStale(_)),
                 "MigrationConsentStale",
-            ),
-            (
-                LightClientError::MigrationError(MigrationError::CadenceFixed),
-                |e| matches!(e, ZingolibError::MigrationCadenceFixed(_)),
-                "MigrationCadenceFixed",
             ),
             (
                 LightClientError::MigrationError(MigrationError::PreSignedUnavailable),
@@ -2451,13 +2447,12 @@ pub fn plan_orchard_drain() -> Result<String, ZingolibError> {
 /// crossing the pool boundary is visible on-chain, so the caller must have
 /// disclosed that. Mirror of `confirm`'s broadcast phase.
 ///
-/// Uses zingolib's `quick_immediate_migration`, the send-shaped mobile entry
-/// point. It pauses our continuous background sync internally, plans against
-/// current wallet state, builds and transmits every drain transaction, then
-/// restores sync before it returns (`resume_sync: true`). No self-sync, no
-/// reconcile loop, matching `send`/`shield`. The older
-/// `migrate_immediately_presynced` (guard parameter) is a Rust-internal form
-/// and no longer crosses the FFI.
+/// Uses zingolib's `quick_immediate_migration`, the send-shaped mobile entry point. It pauses
+/// our continuous background sync internally, plans against current wallet
+/// state, builds and transmits every drain transaction, then restores sync
+/// before it returns (`resume_sync: true`). No self-sync, no reconcile loop,
+/// matching `send`/`shield`. The older `drain_orchard_to_ironwood_presynced`
+/// (guard parameter) is a Rust-internal form and no longer crosses the FFI.
 ///
 /// Returns, on success, `{ txids: [..], migrated, fee, residual }` (values in
 /// zatoshis). Notes worth at most the sweep minimum are left behind and
@@ -2628,28 +2623,26 @@ pub fn plan_ironwood_migration() -> Result<String, ZingolibError> {
 /// state. Nothing is broadcast here; `continue_note_splitting` drives the
 /// rounds afterwards.
 ///
-/// `per_bucket` caps how many parts share one broadcast window; `null` keeps
-/// zingolib's default, and `reschedule_parts` can change it any time before
-/// the first part is signed. Signing is always `LazyAtBoundary` (the only
+/// The broadcast cadence is not a parameter: the ZIP 318 Poisson schedule
+/// draws every delay itself. Signing is always `LazyAtBoundary` (the only
 /// sound strategy while ZIP 244 commits the anchor into the signature hash).
 ///
 /// Returns `{ started: true }`; failure throws typed — notably
 /// `MigrationConsentStale` when the wallet's notes changed since planning
 /// (replan and re-show).
-pub fn start_ironwood_migration(
-    plan_hash_hex: String,
-    per_bucket: Option<u32>,
-) -> Result<String, ZingolibError> {
+pub fn start_ironwood_migration(plan_hash_hex: String) -> Result<String, ZingolibError> {
     with_initialized_lightclient(|lightclient| {
         let hash = hex_to_hash32(&plan_hash_hex)
             .ok_or_else(|| ZingolibError::InvalidInput("invalid plan hash".to_string()))?;
         RT.block_on(async move {
             lightclient
+                // per_bucket None: there is no cadence chooser — the ZIP 318
+                // Poisson schedule draws every broadcast delay itself.
                 .start_ironwood_migration(
                     AccountId::ZERO,
                     SigningStrategy::LazyAtBoundary,
                     hash,
-                    per_bucket,
+                    None,
                 )
                 .await
                 .map_err(ffi_error)?;
@@ -2705,132 +2698,14 @@ pub fn continue_note_splitting() -> Result<String, ZingolibError> {
     })
 }
 
-/// Executes one round of Phase 1 note splitting as a send-shaped call — the
-/// mobile entry point for the private path's splitting, the counterpart to
-/// `quick_immediate_migration` for the immediate path (ADR 0016). Unlike the old
-/// `start_ironwood_migration` + `continue_note_splitting` driver it persists no
-/// migration state: it pauses sync internally, plans against current confirmed
-/// notes, builds and transmits one round, then restores sync before it returns
-/// (`resume_sync: true`). Each call re-plans, and "a round is still in flight"
-/// is derived from the wallet's pending transactions, not a stored phase.
-///
-/// One call does one round. Loop it — sync to confirmation between calls —
-/// until `complete`, then run `start_ironwood_migration` for Phase 2 (the notes
-/// are fully split by then, so it binds and schedules the parts at once).
-/// Refuses with `MigrationAlreadyInProgress` while a scheduled migration is
-/// active. Preview with `plan_ironwood_migration`; poll `split_status` for
-/// per-transaction progress.
-///
-/// Returns one of:
-/// `{ outcome: "round", txids: [..] }` (sync until they confirm, then call
-/// again), `{ outcome: "awaiting_confirmation" }` (a prior round has not
-/// confirmed yet — sync and retry, no double-broadcast), or
-/// `{ outcome: "complete" }` (every note is part-ready).
-pub fn quick_split() -> Result<String, ZingolibError> {
-    with_initialized_lightclient(|lightclient| {
-        // Arm the SPLIT_PROGRESS side channel before the block_on: we hold
-        // LIGHTCLIENT.write() for the whole round, so a concurrent
-        // `split_status` poll must read this handle (an independent Arc). It
-        // reads idle (`null`) until the round arms it after planning.
-        if let Ok(mut progress) = SPLIT_PROGRESS.write() {
-            *progress = Some(lightclient.split_progress_handle());
-        }
-        let out = RT.block_on(async move {
-            let outcome = lightclient
-                .quick_split(AccountId::ZERO, true)
-                .await
-                .map_err(ffi_error)?;
-            use zingolib::lightclient::migrate::SplitOutcome;
-            Ok(match outcome {
-                SplitOutcome::Round { txids } => object! {
-                    "outcome" => "round",
-                    "txids" => txids
-                        .iter()
-                        .map(|txid| txid.to_string())
-                        .collect::<Vec<_>>(),
-                },
-                SplitOutcome::AwaitingConfirmation => object! {
-                    "outcome" => "awaiting_confirmation",
-                },
-                SplitOutcome::Complete => object! {
-                    "outcome" => "complete",
-                },
-            }
-            .pretty(2))
-        });
-        if let Ok(mut progress) = SPLIT_PROGRESS.write() {
-            *progress = None;
-        }
-        out
-    })
-}
-
-/// A snapshot of the in-flight splitting round's progress, for rendering
-/// "built i/N" then "sent i/N" within a `quick_split` call. The Phase 1 mirror
-/// of `drain_status`: reads the SPLIT_PROGRESS side channel only, never
-/// LIGHTCLIENT, so it stays responsive while `quick_split` holds the lock.
-///
-/// Returns, while a round runs: `{ total, built, sent, phase }` where `phase` is
-/// `"building"` or `"transmitting"` and the counts are `0..=total`. Returns JSON
-/// `null` when no round is in flight.
-pub fn split_status() -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let status = {
-            let progress = SPLIT_PROGRESS
-                .read()
-                .map_err(|_| ZingolibError::SideChannelPoisoned)?;
-            progress.as_ref().and_then(|handle| handle.status())
-        };
-        Ok(match status {
-            Some(s) => {
-                use zingolib::lightclient::migrate::SplitPhase;
-                object! {
-                    "total" => s.total,
-                    "built" => s.built,
-                    "sent" => s.sent,
-                    "phase" => match s.phase {
-                        SplitPhase::Building => "building",
-                        SplitPhase::Transmitting => "transmitting",
-                    },
-                }
-                .pretty(2)
-            }
-            None => json::JsonValue::Null.pretty(2),
-        })
-    })
-}
-
-/// Sets how many parts share each broadcast window and re-buckets every part
-/// under the new cadence with fresh randomization. Callable any time between
-/// consent and the first signed part; afterwards it fails typed with
-/// `MigrationCadenceFixed`. After a successful call the old schedule is void:
-/// re-read `migration_status` and re-arm the platform scheduler.
-///
-/// Returns `{ rescheduled: true }`; failure throws typed.
-pub fn reschedule_parts(per_bucket: u32) -> Result<String, ZingolibError> {
-    with_initialized_lightclient(|lightclient| {
-        RT.block_on(async move {
-            lightclient
-                .reschedule_parts(per_bucket)
-                .await
-                .map_err(ffi_error)?;
-            Ok(object! { "rescheduled" => true }.pretty(2))
-        })
-    })
-}
-
 /// The migration's progress, arranged for direct rendering. ZIP 318 requires
 /// showing `orchard_confirmed_spendable` (the Orchard-pool figure
 /// specifically) while a migration is in flight.
 ///
 /// Returns `{ orchard_confirmed_spendable, phase, parts_total,
-/// parts_confirmed, parts_broadcast, value_total, value_migrated,
-/// per_bucket, bucket_modulus,
-/// upcoming_windows: [{ bucket_index, boundary, part_ids, denominations,
-/// window_opens_unix_time, latest_target_unix_time }], due_now }`.
-/// `parts_broadcast` counts parts submitted but not yet mined (the sent,
-/// in-flight batch); they sit outside `upcoming_windows` and `due_now` and
-/// clear into the confirmed figures as parts mine. `phase` is `null`
+/// parts_confirmed, value_total, value_migrated, bucket_modulus,
+/// next_wakes: [{ bucket_index, boundary, part_ids, denominations,
+/// estimated_unix_time, estimated_target_unix_time }], due_now }`. `phase` is `null`
 /// when no migration is in progress, else `{ kind }` with per-kind fields
 /// (`round`/`pending_txids` while note splitting, `residual` when complete).
 /// `denominations` (zatoshis) mirror `part_ids` element-for-element, so a
@@ -2843,39 +2718,22 @@ pub fn migration_status() -> Result<String, ZingolibError> {
     with_initialized_lightclient_read(|lightclient| {
         RT.block_on(async move {
             let status = lightclient.migration_status().await.map_err(ffi_error)?;
-            // Join each window's part ids to their denominations (and
-            // pick up the effective cadence) from the persisted
-            // migration state; BroadcastWindow alone carries only ids.
-            let (denoms_by_id, per_bucket, bucket_modulus, parts_broadcast) = {
+            // Join each wake's part ids to their denominations from the
+            // persisted migration state; WakePoint alone carries only ids.
+            let (denoms_by_id, bucket_modulus) = {
                 let wallet = lightclient.wallet().read().await;
                 match &wallet.migration {
-                    Some(state) => {
-                        // Parts submitted to the network but not yet mined: the
-                        // sent, in-flight batch. The confirmed figures gate on
-                        // mining, so without this a client cannot tell "batch
-                        // sent, confirming" from "batch never sent" (both leave
-                        // due_now null and parts_confirmed unchanged).
-                        let parts_broadcast = state
+                    Some(state) => (
+                        state
                             .parts
                             .iter()
-                            .filter(|part| matches!(part.state, PartState::Broadcast))
-                            .count() as u32;
-                        (
-                            state
-                                .parts
-                                .iter()
-                                .map(|part| (part.id.0, part.denomination))
-                                .collect::<std::collections::HashMap<_, _>>(),
-                            Some(state.params.k_max),
-                            state.params.bucket_modulus,
-                            parts_broadcast,
-                        )
-                    }
+                            .map(|part| (part.id.0, part.denomination))
+                            .collect::<std::collections::HashMap<_, _>>(),
+                        state.params.bucket_modulus,
+                    ),
                     None => (
                         std::collections::HashMap::new(),
-                        None,
                         MigrationParams::provisional(wallet.chain_type()).bucket_modulus,
-                        0,
                     ),
                 }
             };
@@ -2901,7 +2759,7 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                     }
                 })
                 .collect::<Vec<_>>();
-            // The window the chain is currently inside, which upcoming_windows
+            // The window the chain is currently inside, which next_wakes
             // structurally omits (it lists future windows only). `null` when a
             // send this instant would build nothing, so the client's Send
             // action gates on it being present.
@@ -2925,10 +2783,8 @@ pub fn migration_status() -> Result<String, ZingolibError> {
                 },
                 "parts_total" => status.parts_total,
                 "parts_confirmed" => status.parts_confirmed,
-                "parts_broadcast" => parts_broadcast,
                 "value_total" => status.value_total,
                 "value_migrated" => status.value_migrated,
-                "per_bucket" => per_bucket,
                 "bucket_modulus" => bucket_modulus,
                 "upcoming_windows" => upcoming_windows,
                 "due_now" => due_now,
