@@ -48,11 +48,17 @@ export type WalletBackendConfig = {
    */
   startMixnetTransport: StartMixnetTransport;
   /**
-   * Whether this platform runs the Mixnet Mode policy. False on iOS until
-   * the Mac-gated step lands its native transport; the coordinator is then
-   * never started and no mixnet view is ever published.
+   * Whether this platform runs the Mixnet Mode policy. Android and iOS both
+   * host the native transport, so it is on for each; tests inject false to
+   * keep the coordinator unstarted and publish no mixnet view.
    */
   mixnetSupported: boolean;
+  /**
+   * The persisted user setting (default false, sticky). When true, the
+   * coordinator auto-starts Mixnet Mode at wallet load; the runtime toggle
+   * (setNymOption) drives enable/disable thereafter.
+   */
+  nymEnabled: boolean;
   /** i18n helper — must be bound to the active locale in the consumer. */
   translate: (key: string) => TranslateType;
   /** Prevent device sleep while true (e.g. during active sync/send). */

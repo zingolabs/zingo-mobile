@@ -37,6 +37,20 @@ export const INITIAL_MIXNET_VIEW: MixnetView = {
 };
 
 /**
+ * The initial view when Mixnet Mode is disabled (the persisted `nym` setting
+ * is off): clearnet, sends ungated. Mirrors the `off` case of
+ * {@link deriveMixnetView} so the pre-coordinator view matches the first
+ * publication. The coordinator republishes on any change.
+ */
+export const OFF_MIXNET_VIEW: MixnetView = {
+  statusKey: 'mixnet.status.off',
+  socks5Addr: null,
+  narration: null,
+  sendBlocked: false,
+  recovery: 'reenable',
+};
+
+/**
  * Derives the screen-facing view from the typed reports.
  *
  * Pure function — no side effects. The fail-closed invariant lives here in

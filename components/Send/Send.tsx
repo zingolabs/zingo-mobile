@@ -45,10 +45,6 @@ import SelectBottomSheet from '../Components/SelectBottomSheet';
 import { SvgXml } from 'react-native-svg';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import NymOn from '../../assets/img/nym-on.svg';
-import NymOff from '../../assets/img/nym-off.svg';
-import SwitchOn from '../../assets/img/nym-switch-on.svg';
-import SwitchOff from '../../assets/img/switch-off.svg';
 import Swap from '../../assets/img/swap.svg';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
@@ -171,7 +167,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     currency,
     zingolibVersion,
     setPrivacyOption,
-    nym: nymContext,
     mixnetView,
     reenableMixnet,
   } = context;
@@ -182,7 +177,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
   </svg>`;
 
-  const [nym, setNym] = useState<boolean>(nymContext);
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
@@ -716,10 +710,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   useEffect(() => {
-    setNym(nymContext);
-  }, [nymContext]);
-
-  useEffect(() => {
     const stillConf =
       (totalBalance ? totalBalance.totalOrchardBalance : 0) !==
         (totalBalance ? totalBalance.confirmedOrchardBalance : 0) ||
@@ -873,7 +863,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Mixnet Mode fail-closed verdict: while the transport is
         // bootstrapping, died, or unknowable, sending stays blocked; only
         // `ready` or the user's explicit clearnet consent (`off`) opens it.
-        // Null means the platform runs no mixnet policy yet (iOS).
+        // Null means no mixnet policy runs (mixnetSupported injected false).
         (mixnetView === null || !mixnetView.sendBlocked),
     );
   }, [
@@ -956,7 +946,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     clearToAddr();
     setSpendable(0);
     setSpendableBalanceLastError('');
-    setNym(nymContext);
   };
 
   const buildSendState = () => {
@@ -1169,7 +1158,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
       calculateFeeWithPropose: calculateFeeWithPropose,
       sendPageState: buildSendState(),
-      nym: nym,
+      nym: false,
     });
   };
 
@@ -2068,39 +2057,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                   </>
                 )}
               </View>
-              {/* NYM feature hidden for now — will be enabled in the future */}
-              {false && (
-                <TouchableOpacity
-                  onPress={() => setNym(!nym)}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginHorizontal: 20,
-                    marginTop: 15,
-                    marginBottom: 20,
-                  }}
-                >
-                  {nym ? (
-                    <NymOn width={22} height={22} />
-                  ) : (
-                    <NymOff width={22} height={22} />
-                  )}
-                  <View style={{ flex: 1, marginLeft: 10 }}>
-                    <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
-                      {translate('settings.nym-network') as string}
-                    </BoldText>
-                    <FadeText>
-                      {translate('settings.nym-enhanced-privacy') as string}
-                    </FadeText>
-                  </View>
-                  {nym ? (
-                    <SwitchOn width={40} height={19} />
-                  ) : (
-                    <SwitchOff width={40} height={19} />
-                  )}
-                </TouchableOpacity>
-              )}
-
               <View
                 style={{
                   flexGrow: 1,

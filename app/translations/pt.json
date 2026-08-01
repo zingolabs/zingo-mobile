@@ -445,9 +445,11 @@
     "walletkeyssaved": "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
     "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!",
     "value-language-tr": "Turco",
-    "nym-privacy-network": "Rede de Privacidade",
+    "nym-privacy-network": "Usar NYM para transmitir transações",
+    "nym-disable-warning": "Desativar o modo Mixnet envia suas transações e consultas de preço pela rede aberta. Seu endereço IP pode então ser vinculado à atividade da sua carteira.",
     "nym-network": "Rede NYM",
-    "nym-enhanced-privacy": "Privacidade Aprimorada"
+    "nym-enhanced-privacy": "Privacidade Aprimorada",
+    "nym-diagnostics": "Executar diagnóstico do mixnet"
   },
   "mixnet": {
     "status": {
@@ -459,6 +461,15 @@
     },
     "send-blocked": "O envio está pausado até a mixnet estar pronta",
     "reenable": "Reativar mixnet"
+  },
+  "mixnetdoctor": {
+    "title": "Doutor do Mixnet",
+    "title-acc": "Tela de diagnóstico do Doutor do Mixnet",
+    "intro": "Sonda o transporte mixnet a partir deste dispositivo e relata o que encontrou. Cada sondagem contata a rede a partir do seu IP real, então execute-a apenas quando precisar.",
+    "run": "Executar diagnóstico",
+    "running": "Executando…",
+    "copy-report": "Copiar relatório",
+    "report-copied": "Relatório copiado para a área de transferência"
   },
   "header": {
     "lastupdate": "Última atualização:"

@@ -69,7 +69,6 @@ import {
   BlockExplorerEnum,
 } from '../../app/AppState';
 import { getLatestBlockServerInfo } from '../../app/walletBackend';
-import { getMixnetIpCorrelationDisclaimer } from '../../app/walletBackend/utils/mixnetUtils';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -92,6 +91,7 @@ import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createAlert } from '../../app/createAlert';
+import { showConfirm } from '../../app/showConfirm';
 import { sendEmail } from '../../app/sendEmail';
 import NymOn from '../../assets/img/nym-on.svg';
 import NymOff from '../../assets/img/nym-off.svg';
@@ -166,8 +166,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     blockExplorer: blockExplorerContext,
     nym: nymContext,
     mixnetView,
-    disableMixnet,
-    reenableMixnet,
     foregroundEpoch,
     readOnly,
     setPrivacyOption,
@@ -248,25 +246,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
-  // The canonical ZIP-0318 IP-correlation disclaimer, fetched once from the
-  // FFI wherever the Mixnet Mode section renders; null until it arrives (or
-  // when the native layer rejects, in which case nothing renders).
-  const [mixnetDisclaimer, setMixnetDisclaimer] = useState<string | null>(null);
-  const mixnetSupported = mixnetView !== null;
-  useEffect(() => {
-    if (!mixnetSupported) {
-      return;
-    }
-    let alive = true;
-    getMixnetIpCorrelationDisclaimer().then((text: string | null) => {
-      if (alive) {
-        setMixnetDisclaimer(text);
-      }
-    });
-    return () => {
-      alive = false;
-    };
-  }, [mixnetSupported]);
   const [listServerUri, setListServerUri] = useState<string>('');
   const [listServerChainName, setListServerChainName] = useState<string>('');
   const [customServerUri, setCustomServerUri] = useState<string>('');
@@ -1656,9 +1635,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 paddingBottom: 100,
               }}
             >
-              {/* NYM feature hidden for now — will be enabled in the future */}
-              {false && (
-                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+              {/* Mixnet Mode (send-over-nym): the single persisted toggle.
+                  On routes send + price over the Nym mixnet (fail-closed
+                  until ready); off is clearnet. Committed on save via
+                  setNymOption, which arms or disarms the coordinator. The
+                  switch shows the pending choice; the sub-line shows the live
+                  transport status once the mode is on. */}
+              {mixnetView !== null && (
+                <View
+                  style={{ marginHorizontal: 25, marginVertical: 15 }}
+                  testID="settings.mixnet"
+                >
                   <BoldText>
                     {translate('settings.nym-privacy-network') as string}
                   </BoldText>
@@ -1675,67 +1662,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       <NymOff width={22} height={22} />
                     )}
                     <View style={{ flex: 1, marginLeft: 10 }}>
-                      <BoldText
-                        style={{ color: nym ? '#07FF94' : colors.text }}
-                      >
+                      <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
                         {translate('settings.nym-network') as string}
                       </BoldText>
                       <FadeText>
-                        {translate('settings.nym-enhanced-privacy') as string}
-                      </FadeText>
-                    </View>
-                    <TouchableOpacity onPress={() => setNym(!nym)}>
-                      {nym ? (
-                        <NymSwitchOn width={40} height={19} />
-                      ) : (
-                        <SwitchOff width={40} height={19} />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
-
-              {/* Mixnet Mode (send-over-nym): a live per-session control,
-                  never persisted — forced on at wallet load, turning it off
-                  is this session's deliberate clearnet consent, and a died
-                  or failed transport recovers only through the re-enable
-                  here or on the send screen. Rendered only where the
-                  policy runs (mixnetView is null on platforms whose
-                  transport has not landed). */}
-              {mixnetView !== null && (
-                <View
-                  style={{ marginHorizontal: 25, marginVertical: 15 }}
-                  testID="settings.mixnet"
-                >
-                  <BoldText>
-                    {translate('settings.nym-privacy-network') as string}
-                  </BoldText>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      marginTop: 5,
-                    }}
-                  >
-                    {mixnetView.statusKey === 'mixnet.status.ready' ? (
-                      <NymOn width={22} height={22} />
-                    ) : (
-                      <NymOff width={22} height={22} />
-                    )}
-                    <View style={{ flex: 1, marginLeft: 10 }}>
-                      <BoldText
-                        style={{
-                          color:
-                            mixnetView.statusKey === 'mixnet.status.ready'
-                              ? '#07FF94'
-                              : colors.text,
-                        }}
-                      >
-                        {translate(mixnetView.statusKey) as string}
-                      </BoldText>
-                      <FadeText>
-                        {mixnetView.narration !== null
-                          ? mixnetView.narration
+                        {nymContext
+                          ? ((mixnetView.narration ??
+                              translate(mixnetView.statusKey)) as string)
                           : (translate(
                               'settings.nym-enhanced-privacy',
                             ) as string)}
@@ -1744,38 +1677,49 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     <TouchableOpacity
                       testID="settings.mixnet-toggle"
                       onPress={() => {
-                        if (
-                          mixnetView.sendBlocked === false &&
-                          mixnetView.statusKey === 'mixnet.status.off'
-                        ) {
-                          reenableMixnet();
-                        } else if (
-                          mixnetView.statusKey === 'mixnet.status.ready' ||
-                          mixnetView.statusKey === 'mixnet.status.bootstrapping'
-                        ) {
-                          disableMixnet();
-                        } else {
-                          // died / unknown: the only way up is a fresh start.
-                          reenableMixnet();
+                        // Enabling is immediate; disabling warns first, since
+                        // it drops send and price to the clearnet. Committed on
+                        // save.
+                        if (!nym) {
+                          setNym(true);
+                          return;
                         }
+                        showConfirm({
+                          title: translate(
+                            'settings.nym-privacy-network',
+                          ) as string,
+                          message: translate(
+                            'settings.nym-disable-warning',
+                          ) as string,
+                          buttons: [
+                            {
+                              text: translate('cancel') as string,
+                              style: 'cancel',
+                            },
+                            {
+                              text: translate('confirm') as string,
+                              onPress: () => setNym(false),
+                            },
+                          ],
+                        });
                       }}
                     >
-                      {mixnetView.statusKey === 'mixnet.status.off' ? (
-                        <SwitchOff width={40} height={19} />
-                      ) : (
+                      {nym ? (
                         <NymSwitchOn width={40} height={19} />
+                      ) : (
+                        <SwitchOff width={40} height={19} />
                       )}
                     </TouchableOpacity>
                   </View>
-                  {/* The canonical disclaimer renders verbatim (one string
-                      from zingolib, deliberately untranslated) so every
-                      frontend names the same residual exposure: sync stays
-                      on the ordinary connection even while the mode is on. */}
-                  {mixnetDisclaimer !== null && (
-                    <FadeText style={{ marginTop: 8 }}>
-                      {mixnetDisclaimer}
-                    </FadeText>
-                  )}
+                  <TouchableOpacity
+                    testID="settings.mixnet-doctor"
+                    style={{ marginTop: 10, alignSelf: 'flex-start' }}
+                    onPress={() => navigation.navigate(RouteEnum.MixnetDoctor)}
+                  >
+                    <RegText style={{ color: colors.zingo }}>
+                      {translate('settings.nym-diagnostics') as string}
+                    </RegText>
+                  </TouchableOpacity>
                 </View>
               )}
 

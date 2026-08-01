@@ -61,7 +61,11 @@ export default class WalletBackend {
 
   // Sync lifecycle
   async configure() {
-    if (this.config.mixnetSupported && !this.mixnetEnsured) {
+    if (
+      this.config.mixnetSupported &&
+      this.config.nymEnabled &&
+      !this.mixnetEnsured
+    ) {
       this.mixnetEnsured = true;
       // Deliberately not awaited: the mixnet bootstrap takes tens of
       // seconds and must not delay sync configuration. The coordinator
