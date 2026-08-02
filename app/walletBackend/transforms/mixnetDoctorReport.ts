@@ -65,6 +65,69 @@ function detailLine(detail: MixnetDetailReport, millis: number): string {
 }
 
 /**
+ * One row of the on-screen list: a label and its value. Distinct from the
+ * copied lines below, whose markdown must stay stable for pasting into an
+ * issue.
+ */
+export type MixnetDoctorRow = {
+  readonly label: string;
+  readonly value: string;
+};
+
+function statusRows(
+  status: MixnetStatusReport,
+  millis: number,
+): MixnetDoctorRow[] {
+  if (status.kind === 'failure') {
+    return [
+      { label: 'Status', value: 'failed' },
+      { label: 'Latency', value: `${millis} ms` },
+      { label: 'Cause', value: failureCause(status.failure) },
+    ];
+  }
+  const rows: MixnetDoctorRow[] = [
+    { label: 'Status', value: 'ok' },
+    { label: 'Latency', value: `${millis} ms` },
+    { label: 'Mode', value: status.mode },
+  ];
+  if (status.mode === RPCMixnetModeEnum.ready && status.socks5Addr !== null) {
+    rows.push({ label: 'Socks5', value: status.socks5Addr });
+  }
+  return rows;
+}
+
+function detailRows(
+  detail: MixnetDetailReport,
+  millis: number,
+): MixnetDoctorRow[] {
+  if (detail.kind === 'failure') {
+    return [
+      { label: 'Bootstrap', value: 'failed' },
+      { label: 'Latency', value: `${millis} ms` },
+      { label: 'Cause', value: failureCause(detail.failure) },
+    ];
+  }
+  const rows: MixnetDoctorRow[] = [
+    { label: 'Bootstrap', value: 'ok' },
+    { label: 'Latency', value: `${millis} ms` },
+  ];
+  if (detail.detail !== '') {
+    rows.push({ label: 'Detail', value: detail.detail });
+  }
+  return rows;
+}
+
+/** The run as labelled rows for the screen list, one value per row. */
+export function mixnetDoctorRows(run: MixnetDoctorRun): MixnetDoctorRow[] {
+  return [
+    { label: 'Server', value: run.serverUri },
+    { label: 'Chain', value: run.chainName },
+    ...statusRows(run.status, run.statusMillis),
+    ...detailRows(run.detail, run.detailMillis),
+  ];
+}
+
+/**
  * The run's body lines, shared by the on-screen rows and the copied markdown
  * so the user pastes exactly what they saw.
  */

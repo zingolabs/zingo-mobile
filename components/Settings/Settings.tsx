@@ -31,6 +31,7 @@ import {
   faInfoCircle,
   faXmark,
   faCheck,
+  faBug,
 } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
@@ -1635,25 +1636,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 paddingBottom: 100,
               }}
             >
-              {/* Mixnet Mode (send-over-nym): the single persisted toggle.
-                  On routes send + price over the Nym mixnet (fail-closed
-                  until ready); off is clearnet. Committed on save via
-                  setNymOption, which arms or disarms the coordinator. The
-                  switch shows the pending choice; the sub-line shows the live
-                  transport status once the mode is on. */}
               {mixnetView !== null && (
                 <View
-                  style={{ marginHorizontal: 25, marginVertical: 15 }}
+                  style={{ marginHorizontal: 25, marginTop: 15 }}
                   testID="settings.mixnet"
                 >
-                  <BoldText>
-                    {translate('settings.nym-privacy-network') as string}
-                  </BoldText>
                   <View
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
-                      marginTop: 5,
                     }}
                   >
                     {nym ? (
@@ -1662,16 +1653,37 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       <NymOff width={22} height={22} />
                     )}
                     <View style={{ flex: 1, marginLeft: 10 }}>
-                      <BoldText style={{ color: nym ? '#07FF94' : colors.text }}>
-                        {translate('settings.nym-network') as string}
-                      </BoldText>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <BoldText
+                          style={{ color: nym ? '#07FF94' : colors.text }}
+                        >
+                          {translate('settings.nym-network') as string}
+                        </BoldText>
+                        <TouchableOpacity
+                          testID="settings.mixnet-doctor"
+                          accessibilityLabel={
+                            translate('settings.nym-diagnostics') as string
+                          }
+                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                          onPress={() =>
+                            navigation.navigate(RouteEnum.MixnetDoctor)
+                          }
+                        >
+                          <FontAwesomeIcon
+                            icon={faBug}
+                            color={colors.zingo}
+                            size={16}
+                          />
+                        </TouchableOpacity>
+                      </View>
                       <FadeText>
-                        {nymContext
-                          ? ((mixnetView.narration ??
-                              translate(mixnetView.statusKey)) as string)
-                          : (translate(
-                              'settings.nym-enhanced-privacy',
-                            ) as string)}
+                        {translate('settings.nym-enhanced-privacy') as string}
                       </FadeText>
                     </View>
                     <TouchableOpacity
@@ -1685,9 +1697,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           return;
                         }
                         showConfirm({
-                          title: translate(
-                            'settings.nym-privacy-network',
-                          ) as string,
+                          title: translate('settings.nym-network') as string,
                           message: translate(
                             'settings.nym-disable-warning',
                           ) as string,
@@ -1711,15 +1721,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       )}
                     </TouchableOpacity>
                   </View>
-                  <TouchableOpacity
-                    testID="settings.mixnet-doctor"
-                    style={{ marginTop: 10, alignSelf: 'flex-start' }}
-                    onPress={() => navigation.navigate(RouteEnum.MixnetDoctor)}
-                  >
-                    <RegText style={{ color: colors.zingo }}>
-                      {translate('settings.nym-diagnostics') as string}
-                    </RegText>
-                  </TouchableOpacity>
                 </View>
               )}
 
