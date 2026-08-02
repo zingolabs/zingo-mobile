@@ -26,6 +26,7 @@ import NetInfoType from '../../../app/AppState/types/NetInfoType';
 import { MixnetView } from '../../../app/walletBackend/transforms/mixnetPresenter';
 import FadeText from '../../Components/FadeText';
 import NymOn from '../../../assets/img/nym-on.svg';
+import MixnetIcon, { mixnetPhase } from './MixnetIcon';
 import PrivacyToggle from './PrivacyToggle';
 
 type SyncStatusBarProps = {
@@ -69,6 +70,8 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
+    const phase =
+      mixnetView !== null ? mixnetPhase(mixnetView.statusKey) : null;
 
     return (
       <View
@@ -343,41 +346,27 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
 
         {/* Mixnet Mode (send-over-nym): the per-session transport status.
             Rendered only where the policy runs (mixnetView is null on
-            platforms whose transport has not landed). The mixnet icon alone
-            means ready; any other state carries its status text so a
-            not-ready transport is never mistaken for a working one. */}
-        {mixnetView !== null && (
+            platforms whose transport has not landed) and never in the `off`
+            state (deliberate clearnet: phase is null). A rotating green halo
+            means connecting, a bare icon means ready, a coral halo means the
+            transport was lost. Any non-ready state carries its status text so
+            a not-ready transport is never mistaken for a working one. */}
+        {mixnetView !== null && phase !== null && (
           <View
             testID="header.mixnet-status"
             style={{
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              margin: 0,
-              marginHorizontal: 2.5,
-              paddingHorizontal: 5,
-              paddingVertical: 1,
-              borderColor: colors.borderMuted,
-              borderWidth: 1,
-              borderRadius: 10,
-              minWidth: 25,
-              minHeight: 25,
+              gap: 4,
             }}
           >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                paddingHorizontal: 3,
-              }}
-            >
-              <NymOn width={14} height={14} />
-              {mixnetView.statusKey !== 'mixnet.status.ready' && (
-                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
-                  {translate(mixnetView.statusKey) as string}
-                </FadeText>
-              )}
-            </View>
+            <MixnetIcon phase={phase} />
+            {phase !== 'ready' && (
+              <FadeText style={{ fontSize: 10 }}>
+                {translate(mixnetView.statusKey) as string}
+              </FadeText>
+            )}
           </View>
         )}
 
