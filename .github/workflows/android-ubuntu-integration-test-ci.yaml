@@ -220,7 +220,7 @@ jobs:
           cache-workspaces: rust -> rust/target
 
       - name: Install nextest
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@v2.85.5
         with:
           tool: nextest
 
@@ -318,7 +318,7 @@ jobs:
           echo "Resolved zingolib rev: $REV"
 
       - name: Install cargo-make
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@v2.85.5
         with:
           tool: cargo-make
 

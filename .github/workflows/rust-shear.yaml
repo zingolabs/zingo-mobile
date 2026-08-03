@@ -20,7 +20,7 @@ jobs:
 
       # Pinned so a new shear release cannot fail CI on untouched code.
       - name: Install cargo-shear
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@v2.85.5
         with:
           tool: cargo-shear@1.13.2
 
