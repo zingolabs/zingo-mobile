@@ -141,7 +141,9 @@ describe('fetchWallet returns null on any failure', () => {
   });
 
   it('returns the viewing key material on success', async () => {
-    bridge.getUfvkInfo.mockResolvedValueOnce('{"ufvk":"uview1...","birthday":42}');
+    bridge.getUfvkInfo.mockResolvedValueOnce(
+      '{"ufvk":"uview1...","birthday":42}',
+    );
     await expect(fetchWallet(true)).resolves.toEqual({
       ufvk: 'uview1...',
       birthday: 42,

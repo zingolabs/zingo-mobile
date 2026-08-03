@@ -8,12 +8,12 @@ import {
 
 describe('describeRejection', () => {
   it('carries an Error message from the error channel', () => {
-    expect(describeRejection(new Error('attach_mixnet: endpoint dead'))).toEqual(
-      {
-        reason: 'nativeRejection',
-        message: 'attach_mixnet: endpoint dead',
-      },
-    );
+    expect(
+      describeRejection(new Error('attach_mixnet: endpoint dead')),
+    ).toEqual({
+      reason: 'nativeRejection',
+      message: 'attach_mixnet: endpoint dead',
+    });
   });
 
   it('stringifies non-Error throwables without throwing itself', () => {

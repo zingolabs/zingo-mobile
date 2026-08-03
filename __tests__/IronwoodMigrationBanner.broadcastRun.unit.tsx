@@ -15,10 +15,7 @@ import {
 import { InfoType } from '../app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
-import {
-  migrationStatus,
-  reconcileMigration,
-} from '../app/walletBackend';
+import { migrationStatus, reconcileMigration } from '../app/walletBackend';
 import { RPCMigrationStatusType } from '../app/walletBackend/types/RPCMigrationStatusType';
 
 jest.mock('../app/walletBackend', () => ({

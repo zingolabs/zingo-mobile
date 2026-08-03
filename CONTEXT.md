@@ -142,3 +142,10 @@ acceleration, which requires the guest to match the x86_64 host: x86_64
 and 32-bit x86 only. Calling one of these "primary" is wrong; an
 emulator ABI in a test lane reflects a hosting constraint, not which
 library matters most.
+## Build identity
+
+**Build descriptor** — the string `get_version()` reports: a zingolib
+part and a zingo-mobile part (`zl_…-zm_…`), each derived from git
+describe against that repo's release tags. The commit count and
+5-character hash fields are elided when a part sits exactly on its
+release tag, and `_dirty` marks a part built from an uncommitted tree.
