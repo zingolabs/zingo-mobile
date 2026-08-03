@@ -12,7 +12,7 @@ on:
 
 jobs:
   android-unit-test:
-    name: Android JVM unit tests
+    name: Andr JVM unit tests
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository

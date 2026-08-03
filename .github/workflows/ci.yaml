@@ -29,7 +29,7 @@ jobs:
   # Runs from t=0 with no dependencies: catches app-module Kotlin compile
   # breakage (e.g. classpath conflicts) in a few minutes, long before the
   # native builds and emulator jobs report.
-  android-kotlin-compile:
+  andr-kotlin-compile:
     uses: ./.github/workflows/android-kotlin-compile.yaml
     with:
       fail-all: true
@@ -37,7 +37,7 @@ jobs:
   # Static analysis of the app module. NewApi is the one that matters here:
   # nothing else in CI catches a call above minSdk, and those only surface
   # as a crash on a user's older device.
-  android-lint:
+  andr-lint:
     uses: ./.github/workflows/android-lint.yaml
     with:
       fail-all: true
@@ -45,7 +45,7 @@ jobs:
   # The plain-JVM bridge-contract tests (FfiOutcome, FfiArgs): the only
   # executable tests of the Kotlin bridge, so they gate the PR alongside
   # the compile check.
-  android-unit-test:
+  andr-unit-test:
     uses: ./.github/workflows/android-unit-test.yaml
     with:
       fail-all: true
@@ -66,7 +66,7 @@ jobs:
     with:
       fail-all: true
 
-  android-dependency-analysis:
+  andr-dependency-analysis:
     uses: ./.github/workflows/android-dependency-analysis.yaml
     secrets: inherit
     with:
@@ -78,10 +78,12 @@ jobs:
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
 
-  # PR CI covers the primary target only (x86_64 / API 34). The full ABI
-  # matrix, the x86 / API 29 lane, and the whole iOS pipeline — whose
+  # PR CI executes tests on the emulator ABI (x86_64 / API 34), not the
+  # device ABIs: KVM accelerates an AVD only when the guest matches the
+  # x86_64 host, so arm64-v8a and armeabi-v7a can never run on hosted
+  # runners. The x86 / API 29 emulator lane and the iOS pipeline — whose
   # macOS-runner queue dominated PR wall-clock — run on ci-nightly.
-  android-build:
+  andr-build:
     strategy:
       matrix:
         arch: [ x86_64 ]
@@ -92,20 +94,37 @@ jobs:
       arch: ${{ matrix.arch }}
       fail-all: true
 
-  android-apk-build:
+  # The other three ABIs cross-compile per PR: proof that the Rust code
+  # still builds for the device ABIs and 32-bit x86 without waiting for
+  # ci-nightly. They block like every other check. Standard runners keep
+  # these off the zingo-android-native-16 pool; the per-arch caches make
+  # them no-ops on pushes that leave the Rust inputs untouched.
+  andr-build-other-abis:
+    strategy:
+      matrix:
+        arch: [ x86, arm64-v8a, armeabi-v7a ]
+    uses: ./.github/workflows/android-build.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      arch: ${{ matrix.arch }}
+      runner: ubuntu-24.04
+      fail-all: true
+
+  andr-apk-build:
     uses: ./.github/workflows/android-apk-build.yaml
-    needs: [create-cache-key, android-build]
+    needs: [create-cache-key, andr-build]
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: x86_64
       fail-all: true
 
-  # Deliberately NO needs-edge on android-apk-build: the buckets start
+  # Deliberately NO needs-edge on andr-apk-build: the buckets start
   # at workflow launch, front-load all APK-independent setup, and hold
   # at the ci-gate artifact gate until the APK artifact lands (or abort
   # when the APK build concludes without success). This overlaps ~10
   # minutes of bucket setup with the build path.
-  android-ubuntu-integration-test-ci:
+  andr-ubu-integra-test-ci:
     strategy:
       matrix:
         config:
@@ -121,26 +140,24 @@ jobs:
       target: ${{ matrix.config.target }}
       fail-all: true
 
-  # iOS runs per-PR as a trailing, advisory stage: it starts only after
-  # every blocking check has passed, so the fast path's verdict is never
+  # iOS runs per-PR as a trailing stage: it starts only after every
+  # blocking check has passed, so the fast path's verdict is never
   # delayed by the macOS-runner queue and a red fast path skips iOS
-  # entirely. Advisory mode records iOS failures without failing the PR;
-  # ci-nightly remains the enforced iOS gate.
+  # entirely. Its failures fail the run like any other job.
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
     needs:
-      - android-kotlin-compile
-      - android-lint
-      - android-unit-test
+      - andr-kotlin-compile
+      - andr-lint
+      - andr-unit-test
       - jest-test
       - rust-shear
       - js-depcheck
-      - android-dependency-analysis
+      - andr-dependency-analysis
       - create-cache-key
-      - android-ubuntu-integration-test-ci
+      - andr-ubu-integra-test-ci
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      advisory: true
 
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
@@ -148,4 +165,3 @@ jobs:
     secrets: inherit
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      advisory: true
