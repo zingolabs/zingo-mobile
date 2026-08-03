@@ -33,7 +33,7 @@ jobs:
           java-version: '17'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       # The analysis compiles every variant's Kotlin, which needs the
       # generated uniffi bindings on the source path. The generated file is

@@ -228,7 +228,7 @@ jobs:
       # Maven dependency caching only — content-addressed, immutable, signed
       # by upstream. No build outputs are cached cross-run.
       - name: Gradle setup (Maven dep cache only)
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
         with:
           gradle-version: wrapper
           cache-read-only: true

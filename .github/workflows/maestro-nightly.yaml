@@ -45,7 +45,7 @@ jobs:
           java-version: '17'
 
       - name: Gradle setup cache
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
         with:
           gradle-version: wrapper
           cache-read-only: true

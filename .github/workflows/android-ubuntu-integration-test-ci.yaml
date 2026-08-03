@@ -82,7 +82,7 @@ jobs:
           java-version: '17'
 
       - name: Gradle setup cache (write-only)
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
         with:
           gradle-version: wrapper
           # Only the default branch seeds Gradle caches; PR refs write ~1 GiB
@@ -231,7 +231,7 @@ jobs:
           java-version: '17'
 
       - name: Gradle setup cache (read-only)
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
         with:
           gradle-version: wrapper
           cache-write-only: false

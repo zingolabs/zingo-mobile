@@ -33,7 +33,7 @@ jobs:
           java-version: '17'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       # Same script developers run locally, so a green CI lint and a green
       # local lint mean the same thing. It stages the checked-in UniFFI

@@ -33,7 +33,7 @@ jobs:
           java-version: '17'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       # The app module compiles the UniFFI bindings from
       # build/generated/source/uniffi/release/java. The full pipeline
