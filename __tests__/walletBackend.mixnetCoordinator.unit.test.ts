@@ -1,6 +1,7 @@
 import { RPCMixnetModeEnum } from '../app/walletBackend/enums/RPCMixnetModeEnum';
 import {
   MixnetCoordinator,
+  RECONNECT_BASE_MILLIS,
   STEADY_POLL_MILLIS,
 } from '../app/walletBackend/modules/MixnetCoordinator';
 import { deriveMixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
@@ -325,5 +326,106 @@ describe('MixnetCoordinator', () => {
 
     await jest.advanceTimersByTimeAsync(120_000);
     expect(mockedBridge.mixnetModeInfo).not.toHaveBeenCalled();
+  });
+
+  it('auto-reconnects after the transport dies, with no user action', async () => {
+    mockedBridge.attachMixnet
+      .mockResolvedValueOnce(statusPayload('died'))
+      .mockResolvedValueOnce(statusPayload('ready', '127.0.0.1:1080'));
+    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(startTransport, view =>
+      published.push(view),
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    expect(published[published.length - 1].statusKey).toBe(
+      'mixnet.status.died',
+    );
+
+    await jest.advanceTimersByTimeAsync(RECONNECT_BASE_MILLIS);
+    await flushPromises();
+
+    // The transport was restarted without the user touching anything.
+    expect(startTransport).toHaveBeenCalledTimes(2);
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.ready');
+    expect(latest.sendBlocked).toBe(false);
+    coordinator.stop();
+  });
+
+  it('flags the view as reconnecting from loss until recovery', async () => {
+    mockedBridge.attachMixnet
+      .mockResolvedValueOnce(statusPayload('died'))
+      .mockResolvedValueOnce(statusPayload('ready', '127.0.0.1:1080'));
+    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(startTransport, view =>
+      published.push(view),
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    // The transport died, so the cycle is active: reconnecting, not settled.
+    expect(published[published.length - 1].reconnecting).toBe(true);
+
+    await jest.advanceTimersByTimeAsync(RECONNECT_BASE_MILLIS);
+    await flushPromises();
+    // Recovered to ready: the cycle ends.
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.ready');
+    expect(latest.reconnecting).toBe(false);
+    coordinator.stop();
+  });
+
+  it('a deliberate disable stops the auto-reconnect loop', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('died'));
+    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
+    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(startTransport, view =>
+      published.push(view),
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    await coordinator.disable();
+    await flushPromises();
+
+    await jest.advanceTimersByTimeAsync(RECONNECT_BASE_MILLIS * 4);
+    await flushPromises();
+
+    // Only the initial start; disabling cancelled the pending reconnect.
+    expect(startTransport).toHaveBeenCalledTimes(1);
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.off');
+    expect(latest.sendBlocked).toBe(false);
+    coordinator.stop();
+  });
+
+  it('backs off exponentially while the transport stays down', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('died'));
+    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const coordinator = new MixnetCoordinator(startTransport, () => {});
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    expect(startTransport).toHaveBeenCalledTimes(1);
+
+    // First retry at the base delay.
+    await jest.advanceTimersByTimeAsync(RECONNECT_BASE_MILLIS);
+    await flushPromises();
+    expect(startTransport).toHaveBeenCalledTimes(2);
+
+    // The next retry is at 2x base, so another base tick alone fires nothing.
+    await jest.advanceTimersByTimeAsync(RECONNECT_BASE_MILLIS);
+    await flushPromises();
+    expect(startTransport).toHaveBeenCalledTimes(2);
+
+    await jest.advanceTimersByTimeAsync(RECONNECT_BASE_MILLIS);
+    await flushPromises();
+    expect(startTransport).toHaveBeenCalledTimes(3);
+    coordinator.stop();
   });
 });

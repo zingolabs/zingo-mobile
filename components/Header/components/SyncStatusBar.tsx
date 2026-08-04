@@ -72,7 +72,9 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme() as ThemeType;
     const phase =
-      mixnetView !== null ? mixnetPhase(mixnetView.statusKey) : null;
+      mixnetView !== null
+        ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
+        : null;
 
     return (
       <View
@@ -345,13 +347,12 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           </View>
         )}
 
-        {/* Mixnet Mode (send-over-nym): the per-session transport status.
-            Rendered only where the policy runs (mixnetView is null on
-            platforms whose transport has not landed) and never in the `off`
-            state (deliberate clearnet: phase is null). A rotating green halo
-            means connecting, a bare icon means ready, a coral halo means the
-            transport was lost. Any non-ready state carries its status text so
-            a not-ready transport is never mistaken for a working one. */}
+        {/* Mixnet Mode (send-over-nym): the per-session transport status,
+            icon-only. Rendered only where the policy runs (mixnetView is null
+            on platforms whose transport has not landed) and never in the `off`
+            state (deliberate clearnet: phase is null). A pulsing green halo
+            means connecting, a bare icon means ready, a coral halo means lost,
+            a traveling yellow arc means reconnecting. */}
         {mixnetView !== null && phase !== null && (
           <View
             testID="header.mixnet-status"
@@ -359,15 +360,9 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 4,
             }}
           >
             <MixnetIcon phase={phase} />
-            {phase !== 'ready' && (
-              <FadeText style={{ fontSize: 10 }}>
-                {translate(mixnetView.statusKey) as string}
-              </FadeText>
-            )}
           </View>
         )}
 

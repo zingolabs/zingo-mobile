@@ -21,6 +21,7 @@ export type MixnetView = {
   readonly narration: string | null;
   readonly sendBlocked: boolean;
   readonly recovery: MixnetRecoveryAction;
+  readonly reconnecting: boolean;
 };
 
 /**
@@ -34,6 +35,7 @@ export const INITIAL_MIXNET_VIEW: MixnetView = {
   narration: null,
   sendBlocked: true,
   recovery: 'wait',
+  reconnecting: false,
 };
 
 /**
@@ -48,6 +50,7 @@ export const OFF_MIXNET_VIEW: MixnetView = {
   narration: null,
   sendBlocked: false,
   recovery: 'reenable',
+  reconnecting: false,
 };
 
 /**
@@ -62,6 +65,7 @@ export const OFF_MIXNET_VIEW: MixnetView = {
 export function deriveMixnetView(
   status: MixnetStatusReport,
   detail: MixnetDetailReport | null,
+  reconnecting: boolean = false,
 ): MixnetView {
   const narration =
     detail !== null && detail.kind === 'detail' && detail.detail !== ''
@@ -75,6 +79,7 @@ export function deriveMixnetView(
       narration: null,
       sendBlocked: true,
       recovery: 'reenable',
+      reconnecting,
     };
   }
 
@@ -86,6 +91,7 @@ export function deriveMixnetView(
         narration: null,
         sendBlocked: false,
         recovery: 'reenable',
+        reconnecting: false,
       };
     case RPCMixnetModeEnum.bootstrapping:
       return {
@@ -94,6 +100,7 @@ export function deriveMixnetView(
         narration,
         sendBlocked: true,
         recovery: 'wait',
+        reconnecting,
       };
     case RPCMixnetModeEnum.ready:
       return {
@@ -102,6 +109,7 @@ export function deriveMixnetView(
         narration: null,
         sendBlocked: false,
         recovery: 'none',
+        reconnecting: false,
       };
     case RPCMixnetModeEnum.died:
       return {
@@ -110,6 +118,7 @@ export function deriveMixnetView(
         narration: null,
         sendBlocked: true,
         recovery: 'reenable',
+        reconnecting,
       };
   }
 }

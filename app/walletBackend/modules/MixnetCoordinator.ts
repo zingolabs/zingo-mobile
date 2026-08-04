@@ -5,8 +5,10 @@
  * connected session and never persisted — `ensureForConnectedSession`
  * runs at wallet load, starts the platform transport through the injected
  * seam, and attaches the wallet to its address. Turning it off is a
- * deliberate per-session consent (`disable`), and a `died` transport is
- * recovered only by an explicit re-enable (`reenable`), never silently.
+ * deliberate per-session consent (`disable`). A `died` or failed transport
+ * auto-recovers on an exponential backoff, never dropping to clearnet;
+ * `reenable` is the manual trigger for that same recovery. Only a deliberate
+ * disable stops the reconnect loop.
  *
  * The transport start is an injected seam (`StartMixnetTransport`) because
  * the platform owns it: on Android the UniFFI proxy shim (step 3 of the
@@ -54,6 +56,12 @@ export const BOOTSTRAP_POLL_MILLIS = 2_000;
 /** How often the coordinator polls outside of bootstrapping. */
 export const STEADY_POLL_MILLIS = 30_000;
 
+/** Delay before the first auto-reconnect attempt after the transport is lost. */
+export const RECONNECT_BASE_MILLIS = 3_000;
+
+/** Ceiling for the exponential auto-reconnect backoff. */
+export const RECONNECT_MAX_MILLIS = 60_000;
+
 export class MixnetCoordinator {
   private readonly startTransport: StartMixnetTransport;
   private readonly onChange: (view: MixnetView) => void;
@@ -61,6 +69,10 @@ export class MixnetCoordinator {
   private pollTimerID?: ReturnType<typeof setInterval>;
   private pollLock: boolean = false;
   private lastStatus: MixnetStatusReport | null = null;
+  private reconnectTimerID?: ReturnType<typeof setTimeout>;
+  private reconnectDelayMillis: number = RECONNECT_BASE_MILLIS;
+  private reconnecting: boolean = false;
+  private reconnectActive: boolean = false;
   // The consent bit belongs to the coordinator, not the wallet: the wallet
   // reports `off` both for a deliberate disable and for a never-attached
   // session, and only the former is consent (#1226).
@@ -95,6 +107,8 @@ export class MixnetCoordinator {
   /** The user's deliberate per-session consent to clearnet. */
   async disable(): Promise<void> {
     this.consent = 'disabledThisSession';
+    this.reconnectActive = false;
+    this.clearReconnect();
     this.publish(await disableMixnet());
   }
 
@@ -103,11 +117,66 @@ export class MixnetCoordinator {
     await this.ensureForConnectedSession();
   }
 
-  /** Stops polling; the coordinator publishes nothing further. */
+  /** Stops polling and reconnecting; the coordinator publishes nothing further. */
   stop(): void {
+    this.clearPolling();
+    this.clearReconnect();
+  }
+
+  private clearPolling(): void {
     if (this.pollTimerID !== undefined) {
       clearInterval(this.pollTimerID);
       this.pollTimerID = undefined;
+    }
+  }
+
+  // A transport is lost when it died or became unknowable while the user has
+  // not deliberately dropped to clearnet. Lost transports are auto-recovered;
+  // a consented `off` is not.
+  private isLost(status: MixnetStatusReport): boolean {
+    if (this.consent === 'disabledThisSession') {
+      return false;
+    }
+    return status.kind === 'failure' || status.mode === RPCMixnetModeEnum.died;
+  }
+
+  private scheduleReconnect(): void {
+    if (this.reconnectTimerID !== undefined || this.reconnecting) {
+      return;
+    }
+    this.reconnectTimerID = setTimeout(() => {
+      this.reconnectTimerID = undefined;
+      this.attemptReconnect();
+    }, this.reconnectDelayMillis);
+  }
+
+  private clearReconnect(): void {
+    if (this.reconnectTimerID !== undefined) {
+      clearTimeout(this.reconnectTimerID);
+      this.reconnectTimerID = undefined;
+    }
+    this.reconnectDelayMillis = RECONNECT_BASE_MILLIS;
+  }
+
+  private async attemptReconnect(): Promise<void> {
+    if (this.consent === 'disabledThisSession') {
+      return;
+    }
+    this.reconnecting = true;
+    try {
+      await this.ensureForConnectedSession();
+    } finally {
+      this.reconnecting = false;
+    }
+    // ensureForConnectedSession published while the reconnect lock was held,
+    // so publish() deferred the next-step decision to here: still lost → grow
+    // the backoff and retry; recovered → publish() already reset it.
+    if (this.lastStatus !== null && this.isLost(this.lastStatus)) {
+      this.reconnectDelayMillis = Math.min(
+        this.reconnectDelayMillis * 2,
+        RECONNECT_MAX_MILLIS,
+      );
+      this.scheduleReconnect();
     }
   }
 
@@ -124,7 +193,7 @@ export class MixnetCoordinator {
   }
 
   private schedulePolling(): void {
-    this.stop();
+    this.clearPolling();
     const cadence = this.isBootstrapping()
       ? BOOTSTRAP_POLL_MILLIS
       : STEADY_POLL_MILLIS;
@@ -145,6 +214,19 @@ export class MixnetCoordinator {
 
   private publish(status: MixnetStatusReport): void {
     const wasBootstrapping = this.isBootstrapping();
+    // Maintain the sticky recovery flag before publishing, so the view carries
+    // it. A settled state (ready, or a consented off) ends the cycle; a lost
+    // status starts one; bootstrapping leaves it as-is so a reconnect attempt
+    // stays flagged as it comes back up.
+    const settled =
+      status.kind === 'status' &&
+      (status.mode === RPCMixnetModeEnum.ready ||
+        status.mode === RPCMixnetModeEnum.off);
+    if (settled) {
+      this.reconnectActive = false;
+    } else if (this.isLost(status)) {
+      this.reconnectActive = true;
+    }
     this.lastStatus = status;
     this.publishSeq += 1;
     this.publishView(status, this.publishSeq);
@@ -153,6 +235,11 @@ export class MixnetCoordinator {
       wasBootstrapping !== this.isBootstrapping()
     ) {
       this.schedulePolling();
+    }
+    if (this.isLost(status)) {
+      this.scheduleReconnect();
+    } else {
+      this.clearReconnect();
     }
   }
 
@@ -169,6 +256,6 @@ export class MixnetCoordinator {
     if (!isCurrentPublication(seq, this.publishSeq)) {
       return;
     }
-    this.onChange(deriveMixnetView(status, narration));
+    this.onChange(deriveMixnetView(status, narration, this.reconnectActive));
   }
 }

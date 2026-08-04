@@ -150,7 +150,7 @@ const ConfirmBottomSheet: React.FC = () => {
       <BottomSheetView
         style={{
           backgroundColor: colors.bottomSheetBackground,
-          paddingHorizontal: 6,
+          paddingHorizontal: 20,
           paddingTop: 18,
           paddingBottom: 24,
         }}
@@ -158,9 +158,9 @@ const ConfirmBottomSheet: React.FC = () => {
         {!!options?.message && (
           <RegText
             style={{
-              fontSize: 15,
-              lineHeight: 22,
-              textAlign: 'center',
+              fontSize: 14,
+              lineHeight: 21,
+              textAlign: options.messageAlign ?? 'center',
               marginBottom: 20,
             }}
           >
