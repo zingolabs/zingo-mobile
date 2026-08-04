@@ -42,6 +42,11 @@ import { SvgXml } from 'react-native-svg';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import Swap from '../../assets/img/swap.svg';
+import NymOn from '../../assets/img/nym-on.svg';
+import NymOff from '../../assets/img/nym-off.svg';
+import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
+import SwitchOff from '../../assets/img/switch-off.svg';
+import { showConfirm } from '../../app/showConfirm';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
@@ -164,7 +169,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     zingolibVersion,
     setPrivacyOption,
     mixnetView,
-    reenableMixnet,
+    nym,
+    setNymOption,
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Send;
@@ -2058,31 +2064,62 @@ const Send: React.FunctionComponent<SendProps> = ({
                   marginVertical: 0,
                 }}
               >
-                {mixnetView !== null && mixnetView.sendBlocked && (
-                  <View
-                    style={{
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      marginBottom: 10,
+                {mixnetView !== null && (
+                  <TouchableOpacity
+                    testID="send.nym-toggle"
+                    onPress={() => {
+                      if (!nym) {
+                        setNymOption(true);
+                        return;
+                      }
+                      showConfirm({
+                        title: translate('settings.nym-network') as string,
+                        message: translate(
+                          'settings.nym-disable-warning',
+                        ) as string,
+                        messageAlign: 'left',
+                        buttons: [
+                          {
+                            text: translate('cancel') as string,
+                            style: 'cancel',
+                          },
+                          {
+                            text: translate('confirm') as string,
+                            onPress: () => setNymOption(false),
+                          },
+                        ],
+                      });
                     }}
-                    testID="send.mixnet-blocked"
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      alignSelf: 'stretch',
+                      marginHorizontal: 25,
+                      marginTop: 16,
+                      marginBottom: 28,
+                    }}
                   >
-                    <FadeText style={{ textAlign: 'center' }}>
-                      {`${translate('mixnet.send-blocked') as string} (${translate(mixnetView.statusKey) as string})`}
-                    </FadeText>
-                    {mixnetView.narration !== null && (
-                      <FadeText style={{ textAlign: 'center' }}>
-                        {mixnetView.narration}
+                    {nym ? (
+                      <NymOn width={22} height={22} />
+                    ) : (
+                      <NymOff width={22} height={22} />
+                    )}
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <BoldText
+                        style={{ color: nym ? '#07FF94' : colors.fgDefault }}
+                      >
+                        {translate('settings.nym-network') as string}
+                      </BoldText>
+                      <FadeText>
+                        {translate('settings.nym-enhanced-privacy') as string}
                       </FadeText>
+                    </View>
+                    {nym ? (
+                      <NymSwitchOn width={40} height={19} />
+                    ) : (
+                      <SwitchOff width={40} height={19} />
                     )}
-                    {mixnetView.recovery === 'reenable' && (
-                      <TouchableOpacity onPress={() => reenableMixnet()}>
-                        <RegText color={colors.fgAccent}>
-                          {translate('mixnet.reenable') as string}
-                        </RegText>
-                      </TouchableOpacity>
-                    )}
-                  </View>
+                  </TouchableOpacity>
                 )}
                 <View
                   style={{

@@ -1701,6 +1701,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           message: translate(
                             'settings.nym-disable-warning',
                           ) as string,
+                          messageAlign: 'left',
                           buttons: [
                             {
                               text: translate('cancel') as string,

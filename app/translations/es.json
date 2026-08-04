@@ -445,7 +445,7 @@
     "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
     "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!",
     "value-language-tr": "Turco",
-    "nym-disable-warning": "Desactivar el modo Mixnet enruta tus transacciones y consultas de precio por la red abierta. Tu dirección IP podría vincularse entonces con la actividad de tu billetera.",
+    "nym-disable-warning": "Desactivar el modo Mixnet enruta tus transacciones y consultas de precio por la red abierta y vincula tu actividad con tu dirección IP.",
     "nym-network": "Red NYM",
     "nym-enhanced-privacy": "Privacidad Mejorada",
     "nym-diagnostics": "Ejecutar diagnóstico de mixnet"
@@ -464,7 +464,7 @@
   "mixnetdoctor": {
     "title": "Doctor de Mixnet",
     "title-acc": "Pantalla de diagnóstico del Doctor de Mixnet",
-    "intro": "Sondea el transporte mixnet desde este dispositivo e informa lo que encontró. Cada sondeo contacta la red desde tu IP real, así que ejecútalo solo cuando lo necesites.",
+    "intro": "Comprueba si el mixnet es accesible desde tu dispositivo usando tu dirección IP real.",
     "run": "Ejecutar diagnóstico",
     "running": "Ejecutando…",
     "copy-report": "Copiar informe",

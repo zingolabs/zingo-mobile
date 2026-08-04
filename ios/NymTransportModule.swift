@@ -71,33 +71,41 @@ class NymTransportModule: NSObject {
     }
   }
 
+  // Proxy start/stop bootstraps and tears down the mixnet client, which can
+  // run for seconds. Offload to a background queue so it never occupies the
+  // module's method queue (mirrors RPCModule's FFI dispatch); the promise
+  // settles back on main.
   @objc(startMixnetTransport:reject:)
   func startMixnetTransport(_ resolve: @escaping RCTPromiseResolveBlock,
                             reject: @escaping RCTPromiseRejectBlock) {
-    NymTransportModule.handleLock.lock()
-    defer { NymTransportModule.handleLock.unlock() }
-    do {
-      NymTransportModule.handle?.stop()
-      let observer = HandleClearingObserver()
-      let started = try MixnetProxyHandle.start(observer: observer)
-      observer.watched = started
-      NymTransportModule.handle = started
-      let endpoint = started.socks5Endpoint()
-      let address = "\(endpoint.host):\(endpoint.port)"
-      DispatchQueue.main.async { resolve(address) }
-    } catch {
-      NSLog("[Native] nym start_mixnet_transport rejected. \(error)")
-      DispatchQueue.main.async { reject("start_mixnet_transport", "\(error)", error) }
+    DispatchQueue.global(qos: .userInitiated).async {
+      NymTransportModule.handleLock.lock()
+      defer { NymTransportModule.handleLock.unlock() }
+      do {
+        NymTransportModule.handle?.stop()
+        let observer = HandleClearingObserver()
+        let started = try MixnetProxyHandle.start(observer: observer)
+        observer.watched = started
+        NymTransportModule.handle = started
+        let endpoint = started.socks5Endpoint()
+        let address = "\(endpoint.host):\(endpoint.port)"
+        DispatchQueue.main.async { resolve(address) }
+      } catch {
+        NSLog("[Native] nym start_mixnet_transport rejected. \(error)")
+        DispatchQueue.main.async { reject("start_mixnet_transport", "\(error)", error) }
+      }
     }
   }
 
   @objc(stopMixnetTransport:reject:)
   func stopMixnetTransport(_ resolve: @escaping RCTPromiseResolveBlock,
                            reject: @escaping RCTPromiseRejectBlock) {
-    NymTransportModule.handleLock.lock()
-    NymTransportModule.handle?.stop()
-    NymTransportModule.handle = nil
-    NymTransportModule.handleLock.unlock()
-    DispatchQueue.main.async { resolve(nil) }
+    DispatchQueue.global(qos: .userInitiated).async {
+      NymTransportModule.handleLock.lock()
+      NymTransportModule.handle?.stop()
+      NymTransportModule.handle = nil
+      NymTransportModule.handleLock.unlock()
+      DispatchQueue.main.async { resolve(nil) }
+    }
   }
 }
