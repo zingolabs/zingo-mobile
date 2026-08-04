@@ -47,6 +47,7 @@ import NymOff from '../../assets/img/nym-off.svg';
 import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import { showConfirm } from '../../app/showConfirm';
+import MixnetIcon, { mixnetPhase } from '../Header/components/MixnetIcon';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
@@ -173,6 +174,20 @@ const Send: React.FunctionComponent<SendProps> = ({
     setNymOption,
   } = context;
   const { colors } = useTheme();
+
+  const [enabling, setEnabling] = useState<boolean>(false);
+  const nymPhase =
+    mixnetView !== null
+      ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
+      : null;
+  const nymLoading = enabling || nymPhase === 'connecting';
+  const nymOn = nym && !nymLoading;
+
+  useEffect(() => {
+    if (enabling && nymPhase !== null) {
+      setEnabling(false);
+    }
+  }, [enabling, nymPhase]);
   const screenName = ScreenEnum.Send;
   const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
   <svg viewBox="0 0 88.03 147.85">
@@ -2067,8 +2082,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                 {mixnetView !== null && (
                   <TouchableOpacity
                     testID="send.nym-toggle"
+                    disabled={nymLoading}
                     onPress={() => {
                       if (!nym) {
+                        setEnabling(true);
                         setNymOption(true);
                         return;
                       }
@@ -2097,16 +2114,19 @@ const Send: React.FunctionComponent<SendProps> = ({
                       marginHorizontal: 25,
                       marginTop: 16,
                       marginBottom: 28,
+                      opacity: nymLoading ? 0.4 : 1,
                     }}
                   >
-                    {nym ? (
+                    {nymLoading ? (
+                      <MixnetIcon phase="connecting" />
+                    ) : nymOn ? (
                       <NymOn width={22} height={22} />
                     ) : (
                       <NymOff width={22} height={22} />
                     )}
                     <View style={{ flex: 1, marginLeft: 10 }}>
                       <BoldText
-                        style={{ color: nym ? '#07FF94' : colors.fgDefault }}
+                        style={{ color: nymOn ? '#07FF94' : colors.fgDefault }}
                       >
                         {translate('settings.nym-network') as string}
                       </BoldText>
@@ -2114,7 +2134,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         {translate('settings.nym-enhanced-privacy') as string}
                       </FadeText>
                     </View>
-                    {nym ? (
+                    {nymOn ? (
                       <NymSwitchOn width={40} height={19} />
                     ) : (
                       <SwitchOff width={40} height={19} />
