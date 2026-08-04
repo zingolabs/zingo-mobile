@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
 import NymOn from '../../../assets/img/nym-on.svg';
@@ -17,6 +17,40 @@ const PERIMETER = 4 * (SIDE - 2 * RADIUS) + 2 * Math.PI * RADIUS;
 const LIT_ARC = PERIMETER * 0.32;
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
+
+const travel = new Animated.Value(0);
+let activeAnimators = 0;
+let sharedLoop: Animated.CompositeAnimation | null = null;
+
+function retainArc(): void {
+  activeAnimators += 1;
+  if (sharedLoop === null) {
+    travel.setValue(0);
+    sharedLoop = Animated.loop(
+      Animated.timing(travel, {
+        toValue: 1,
+        duration: 1100,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      }),
+    );
+    sharedLoop.start();
+  }
+}
+
+function releaseArc(): void {
+  activeAnimators -= 1;
+  if (activeAnimators <= 0) {
+    activeAnimators = 0;
+    sharedLoop?.stop();
+    sharedLoop = null;
+  }
+}
+
+const dashOffset = travel.interpolate({
+  inputRange: [0, 1],
+  outputRange: [0, -PERIMETER],
+});
 
 export type MixnetPhase = 'connecting' | 'ready' | 'lost' | 'reconnecting';
 
@@ -78,30 +112,15 @@ const HaloRect = ({ color }: { color: string }) => (
 );
 
 const MixnetIcon = ({ phase }: { phase: MixnetPhase }) => {
-  const travel = useRef(new Animated.Value(0)).current;
   const animating = phase === 'connecting' || phase === 'reconnecting';
 
   useEffect(() => {
     if (!animating) {
       return;
     }
-    travel.setValue(0);
-    const loop = Animated.loop(
-      Animated.timing(travel, {
-        toValue: 1,
-        duration: 1100,
-        easing: Easing.linear,
-        useNativeDriver: false,
-      }),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [animating, travel]);
-
-  const dashOffset = travel.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -PERIMETER],
-  });
+    retainArc();
+    return releaseArc;
+  }, [animating]);
 
   return (
     <View style={styles.container}>
