@@ -76,6 +76,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // decrypted with the wrong keyset). Instead we keep a plain binary .migrating
     // backup until the encrypted write is confirmed, then delete it.
     fun migrateFileIfNeeded(fileName: String) {
+        WalletFileCoordinator.withLock {
+            migrateFileIfNeededLocked(fileName)
+        }
+    }
+
+    private fun migrateFileIfNeededLocked(fileName: String) {
         val file = File(applicationContext.filesDir, fileName)
         val backupFile = File(applicationContext.filesDir, "$fileName.migrating")
 
@@ -165,6 +171,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     fun fileExists(fileName: String): Boolean {
+        return WalletFileCoordinator.withLock {
+            fileExistsLocked(fileName)
+        }
+    }
+
+    private fun fileExistsLocked(fileName: String): Boolean {
         // Check if a file already exists
         val file = File(applicationContext.filesDir, fileName)
         return if (file.exists()) {
@@ -352,6 +364,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     //   between (3)–(4): main != temp AND backup == temp → nothing to write
     // Idempotent — no-op when no temp file is present.
     fun completePendingSwap() {
+        WalletFileCoordinator.withLock {
+            completePendingSwapLocked()
+        }
+    }
+
+    private fun completePendingSwapLocked() {
         val tempFile = java.io.File(applicationContext.filesDir, WalletTempSwapFileName.value)
         if (!tempFile.exists()) return
         try {
@@ -391,21 +409,27 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun walletExists(promise: Promise) {
-        // Check if a wallet already exists.
-        // Write recovery runs first: a half-written save can leave main
-        // missing, which would make a pending swap unable to read main.
-        completePendingWrite()
-        completePendingSwap()
-        promise.resolve(fileExists(WalletFileName.value))
+        val exists = WalletFileCoordinator.withLock {
+            // Check if a wallet already exists.
+            // Write recovery runs first: a half-written save can leave main
+            // missing, which would make a pending swap unable to read main.
+            completePendingWrite()
+            completePendingSwap()
+            fileExists(WalletFileName.value)
+        }
+        promise.resolve(exists)
     }
 
     @ReactMethod
     fun walletBackupExists(promise: Promise) {
-        // Check if a wallet backup already exists. See walletExists for
-        // why write recovery runs before swap recovery.
-        completePendingWrite()
-        completePendingSwap()
-        promise.resolve(fileExists(WalletBackupFileName.value))
+        val exists = WalletFileCoordinator.withLock {
+            // Check if a wallet backup already exists. See walletExists for
+            // why write recovery runs before swap recovery.
+            completePendingWrite()
+            completePendingSwap()
+            fileExists(WalletBackupFileName.value)
+        }
+        promise.resolve(exists)
     }
 
     // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
@@ -414,6 +438,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // is unrepresentable, so no validator exists to disagree with the file
     // format, which stays base64 and is encoded only at this write site.
     fun saveWalletFile(): Boolean {
+        return WalletFileCoordinator.withLock {
+            saveWalletFileLocked()
+        }
+    }
+
+    private fun saveWalletFileLocked(): Boolean {
         return try {
             uniffi.zingo.initLogging()
 
@@ -433,6 +463,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     private fun saveWalletBackupFile(): Boolean {
+        return WalletFileCoordinator.withLock {
+            saveWalletBackupFileLocked()
+        }
+    }
+
+    private fun saveWalletBackupFileLocked(): Boolean {
         return try {
             val content = readFileAsB64(WalletFileName.value)
             writeEncryptedFileDurably(WalletBackupFileName.value, content)
@@ -662,6 +698,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // Throws on failure; callers own the error channel (a rejected promise
     // here, the worker's catch in BackgroundSyncWorker).
     fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
+        return WalletFileCoordinator.withLock {
+            loadExistingWalletNativeLocked(serveruri, chainhint, performancelevel, minconfirmations)
+        }
+    }
+
+    private fun loadExistingWalletNativeLocked(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
         // Migrate both files from old binary format to encrypted Base64 if needed.
         // Safe to call even if files don't exist or are already migrated.
         migrateFileIfNeeded(WalletFileName.value)
@@ -677,14 +719,20 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
-        try {
+        val restored = WalletFileCoordinator.withLock {
+            restoreExistingWalletBackupLocked()
+        }
+        promise.resolve(restored)
+    }
+
+    private fun restoreExistingWalletBackupLocked(): Boolean {
+        return try {
             val backup = readFileAsB64(WalletBackupFileName.value)
             // Check the content is correct before swapping it into place.
             // Stored encoded, so the guard is structural (zingo-mobile#1151).
             if (!WalletBackup.isRestorable(backup)) {
                 Log.e("MAIN", "[Native] backup restore: content failed validation")
-                promise.resolve(false)
-                return
+                return false
             }
             if (fileExists(WalletFileName.value)) {
                 // Audit Issue P (b) — durable swap via temp file. The original
@@ -721,34 +769,24 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 // duplicate copy as backup is far safer than none.
                 writeEncryptedFile(WalletFileName.value, backup)
             }
-            promise.resolve(true)
+            true
         } catch (e: FileNotFoundException) {
             Log.e("MAIN", "[Native] file not found during backup restore", e)
-            promise.resolve(false)
+            false
         } catch (e: Exception) {
             Log.e("MAIN", "[Native] Unexpected error during backup restore: $e")
-            promise.resolve(false)
+            false
         }
     }
 
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
-        // check first if the file exists
-        if (fileExists(WalletFileName.value)) {
-            promise.resolve(deleteFile(WalletFileName.value))
-        } else {
-            promise.resolve(false)
-        }
+        promise.resolve(durableWalletWrite.discard(WalletFileName.value))
     }
 
     @ReactMethod
     fun deleteExistingWalletBackup(promise: Promise) {
-        // check first if the file exists
-        if (fileExists(WalletBackupFileName.value)) {
-            promise.resolve(deleteFile((WalletBackupFileName.value)))
-        } else {
-            promise.resolve(false)
-        }
+        promise.resolve(durableWalletWrite.discard(WalletBackupFileName.value))
     }
 
     // saveWalletFile/saveWalletBackupFile still contain their own failures

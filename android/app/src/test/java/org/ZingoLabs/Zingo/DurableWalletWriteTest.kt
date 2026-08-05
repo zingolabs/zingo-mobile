@@ -1,6 +1,10 @@
 package org.ZingoLabs.Zingo
 
 import java.io.IOException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.thread
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -8,6 +12,82 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DurableWalletWriteTest {
+    @Test
+    fun recoveryWaitsForAnInFlightReplacementFromAnotherWriter() {
+        val store = Store(files = mutableMapOf("wallet.dat" to "old"))
+        val replacementStarted = CountDownLatch(1)
+        val allowReplacement = CountDownLatch(1)
+        val saveError = AtomicReference<Throwable>()
+        val savingWriter = writer(store) { fileName, content ->
+            if (fileName == "wallet.dat") {
+                replacementStarted.countDown()
+                if (!allowReplacement.await(5, TimeUnit.SECONDS)) {
+                    throw IOException("timed out waiting to replace $fileName")
+                }
+                store.files.remove(fileName)
+                throw IOException("write failed $fileName")
+            }
+            store.write(fileName, content)
+        }
+        val recoveringWriter = writer(store)
+
+        val saveThread = thread(start = true, name = "wallet-save") {
+            try {
+                savingWriter.save("wallet.dat", "new")
+            } catch (error: Throwable) {
+                saveError.set(error)
+            }
+        }
+        assertTrue(replacementStarted.await(5, TimeUnit.SECONDS))
+
+        val recoveryThread = thread(start = true, name = "wallet-recovery") {
+            recoveringWriter.complete(listOf("wallet.dat"))
+        }
+        assertThreadBlocked(recoveryThread)
+
+        allowReplacement.countDown()
+        saveThread.join(5_000)
+        recoveryThread.join(5_000)
+
+        assertFalse(saveThread.isAlive)
+        assertFalse(recoveryThread.isAlive)
+        assertTrue(saveError.get() is IOException)
+        assertEquals("old", store.files["wallet.dat"])
+        assertFalse(store.files.containsKey("wallet.dat.write.tmp"))
+    }
+
+    @Test
+    fun deleteRemovesTheRecoveryCopyBeforeTheTarget() {
+        val store = Store(
+            files = mutableMapOf(
+                "wallet.dat" to "new",
+                "wallet.dat.write.tmp" to "old",
+            ),
+        )
+
+        assertTrue(writer(store).discard("wallet.dat"))
+
+        assertFalse(store.files.containsKey("wallet.dat"))
+        assertFalse(store.files.containsKey("wallet.dat.write.tmp"))
+        assertTrue(store.events.indexOf("delete:wallet.dat.write.tmp") < store.events.indexOf("delete:wallet.dat"))
+    }
+
+    @Test
+    fun failedRecoveryCleanupKeepsTheTarget() {
+        val store = Store(
+            files = mutableMapOf(
+                "wallet.dat" to "new",
+                "wallet.dat.write.tmp" to "old",
+            ),
+        )
+        store.deleteFailures += "wallet.dat.write.tmp"
+
+        assertFalse(writer(store).discard("wallet.dat"))
+
+        assertEquals("new", store.files["wallet.dat"])
+        assertEquals("old", store.files["wallet.dat.write.tmp"])
+    }
+
     @Test
     fun saveStashesPreviousContentBeforeReplacement() {
         val store = Store(files = mutableMapOf("wallet.dat" to "old"))
@@ -149,15 +229,24 @@ class DurableWalletWriteTest {
         store: Store,
         errors: MutableList<Exception> = mutableListOf(),
         recovered: MutableList<Pair<String, String>> = mutableListOf(),
+        write: (String, String) -> Unit = store::write,
     ) = DurableWalletWrite(
         exists = store::exists,
         read = store::read,
-        write = store::write,
+        write = write,
         delete = store::delete,
         ensureDurable = store::ensureDurable,
         onRecovered = { fileName, tempName -> recovered += fileName to tempName },
         onRecoveryError = { _, error -> errors += error },
     )
+
+    private fun assertThreadBlocked(thread: Thread) {
+        val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
+        while (thread.isAlive && thread.state != Thread.State.BLOCKED && System.nanoTime() < deadline) {
+            Thread.yield()
+        }
+        assertEquals(Thread.State.BLOCKED, thread.state)
+    }
 
     private class Store(
         val files: MutableMap<String, String> = mutableMapOf(),
