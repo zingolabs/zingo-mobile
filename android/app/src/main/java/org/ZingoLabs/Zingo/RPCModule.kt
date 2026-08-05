@@ -28,6 +28,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             write = ::writeEncryptedFile,
             delete = ::deleteFile,
             ensureDurable = ::syncWalletFile,
+            onStashReadError = { fileName, error ->
+                Log.w("MAIN", "[$fileName] could not preserve unreadable wallet before replacement: $error")
+            },
             onRecovered = { fileName, tempName ->
                 Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
             },

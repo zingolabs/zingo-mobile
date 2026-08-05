@@ -125,20 +125,45 @@ class DurableWalletWriteTest {
     }
 
     @Test
+    fun saveReplacesAnUnreadableTargetWithoutARecoveryCopy() {
+        val store = Store(files = mutableMapOf("wallet.dat" to "torn"))
+        store.unreadable += "wallet.dat"
+        val stashReadErrors = mutableListOf<Pair<String, Exception>>()
+
+        writer(store, stashReadErrors = stashReadErrors).save("wallet.dat", "new")
+
+        assertEquals("new", store.files["wallet.dat"])
+        assertFalse(store.files.containsKey("wallet.dat.write.tmp"))
+        assertEquals(1, stashReadErrors.size)
+        assertEquals("wallet.dat", stashReadErrors.single().first)
+    }
+
+    @Test
     fun failedReplacementLeavesTheStashedCopy() {
         val store = Store(files = mutableMapOf("wallet.dat" to "old"))
-        store.writeFailures += "wallet.dat"
+        val durableWrite = writer(store) { fileName, content ->
+            if (fileName == "wallet.dat") {
+                store.files.remove(fileName)
+                throw IOException("write failed $fileName")
+            }
+            store.write(fileName, content)
+        }
 
         val error = try {
-            writer(store).save("wallet.dat", "new")
+            durableWrite.save("wallet.dat", "new")
             null
         } catch (e: IOException) {
             e
         }
 
         assertNotNull(error)
-        assertEquals("old", store.files["wallet.dat"])
+        assertFalse(store.files.containsKey("wallet.dat"))
         assertEquals("old", store.files["wallet.dat.write.tmp"])
+
+        writer(store).complete(listOf("wallet.dat"))
+
+        assertEquals("old", store.files["wallet.dat"])
+        assertFalse(store.files.containsKey("wallet.dat.write.tmp"))
     }
 
     @Test
@@ -229,6 +254,7 @@ class DurableWalletWriteTest {
         store: Store,
         errors: MutableList<Exception> = mutableListOf(),
         recovered: MutableList<Pair<String, String>> = mutableListOf(),
+        stashReadErrors: MutableList<Pair<String, Exception>> = mutableListOf(),
         write: (String, String) -> Unit = store::write,
     ) = DurableWalletWrite(
         exists = store::exists,
@@ -236,6 +262,7 @@ class DurableWalletWriteTest {
         write = write,
         delete = store::delete,
         ensureDurable = store::ensureDurable,
+        onStashReadError = { fileName, error -> stashReadErrors += fileName to error },
         onRecovered = { fileName, tempName -> recovered += fileName to tempName },
         onRecoveryError = { _, error -> errors += error },
     )

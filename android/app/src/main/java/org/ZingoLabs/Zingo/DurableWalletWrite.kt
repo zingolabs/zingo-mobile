@@ -19,13 +19,22 @@ internal class DurableWalletWrite(
     private val write: (String, String) -> Unit,
     private val delete: (String) -> Boolean,
     private val ensureDurable: (String) -> Unit,
+    private val onStashReadError: (String, Exception) -> Unit,
     private val onRecovered: (String, String) -> Unit,
     private val onRecoveryError: (String, Exception) -> Unit,
 ) {
     fun save(fileName: String, content: String) = WalletFileCoordinator.withLock {
         val tempName = "$fileName.write.tmp"
         if (exists(fileName)) {
-            write(tempName, read(fileName))
+            val previousContent = try {
+                read(fileName)
+            } catch (e: Exception) {
+                onStashReadError(fileName, e)
+                null
+            }
+            if (previousContent != null) {
+                write(tempName, previousContent)
+            }
         }
         write(fileName, content)
     }
