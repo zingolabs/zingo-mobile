@@ -1,8 +1,10 @@
 package org.ZingoLabs.Zingo
 
 import android.content.Context
-import android.util.Log
+import android.system.Os
+import android.system.OsConstants
 import android.util.Base64
+import android.util.Log
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
 import com.facebook.react.bridge.ReactApplicationContext
@@ -12,12 +14,28 @@ import com.facebook.react.bridge.Promise
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.io.RandomAccessFile
 import org.json.JSONArray
 import org.json.JSONObject
 import org.ZingoLabs.Zingo.Constants.*
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext) {
     private val applicationContext: Context = reactContext?.applicationContext ?: MainApplication.getAppContext()!!
+    private val durableWalletWrite by lazy {
+        DurableWalletWrite(
+            exists = ::fileExists,
+            read = ::readFileAsB64,
+            write = ::writeEncryptedFile,
+            delete = ::deleteFile,
+            ensureDurable = ::syncWalletFile,
+            onRecovered = { fileName, tempName ->
+                Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
+            },
+            onRecoveryError = { fileName, error ->
+                Log.e("MAIN", "[Native] completePendingWrite for $fileName failed: $error", error)
+            },
+        )
+    }
 
     override fun getName(): String {
         return "RPCModule"
@@ -171,7 +189,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     private fun deleteFile(fileName: String): Boolean {
         val file = applicationContext.getFileStreamPath(fileName)
-        return file!!.delete()
+        val deleted = file!!.delete()
+        if (deleted) {
+            syncDirectory(applicationContext.filesDir)
+        }
+        return deleted
     }
 
     private fun readEncryptedFile(fileName: String): String {
@@ -240,16 +262,42 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    private fun syncFile(file: File) {
+        RandomAccessFile(file, "rw").use { it.fd.sync() }
+    }
+
+    private fun syncDirectory(directory: File) {
+        val descriptor = Os.open(
+            directory.absolutePath,
+            OsConstants.O_RDONLY,
+            0,
+        )
+        try {
+            Os.fsync(descriptor)
+        } finally {
+            Os.close(descriptor)
+        }
+    }
+
+    private fun syncWalletFile(fileName: String) {
+        syncFile(File(applicationContext.filesDir, fileName))
+        syncDirectory(applicationContext.filesDir)
+    }
+
     private fun writeEncryptedFile(fileName: String, content: String) {
         // EncryptedFile keys its keyset in SharedPreferences by file path, so
         // temp-file-then-rename would decrypt with the wrong key. We delete the
         // existing file first (required by openFileOutput) and write directly to
         // the final name — the same keyset is reused on every write to that path.
         val file = File(applicationContext.filesDir, fileName)
-        file.delete()
+        if (file.delete()) {
+            syncDirectory(applicationContext.filesDir)
+        }
         buildEncryptedFile(fileName).openFileOutput().use { out ->
             out.write(content.toByteArray(Charsets.UTF_8))
         }
+        syncFile(file)
+        syncDirectory(applicationContext.filesDir)
     }
 
     // Audit Issue P (a) — durable wrapper around writeEncryptedFile.
@@ -264,67 +312,26 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // writeEncryptedFile call) BEFORE the destructive delete. If a crash
     // lands in the racy window of the inner write, `completePendingWrite`
     // at the next launch detects the temp and restores the original.
+    // The temp remains after a successful write until startup verifies the
+    // replacement, preserving the last known-good copy through a hard shutdown.
     //
     // Cost: one extra read + one extra write per save (≈3× I/O vs the
     // raw call). Saves happen on sync milestones, not on the hot path,
     // so the cost is acceptable. iOS doesn't need this — its `writeFile`
     // uses `String.write(toFile: atomically: true)` which is OS-atomic.
     private fun writeEncryptedFileDurably(fileName: String, content: String) {
-        val tempName = "$fileName.write.tmp"
-        if (fileExists(fileName)) {
-            try {
-                val previous = readFileAsB64(fileName)
-                writeEncryptedFile(tempName, previous)
-            } catch (e: Exception) {
-                // Original is unreadable already — saving new content over
-                // it can't make things worse. Proceed without temp protection
-                // for this single write.
-                Log.w("MAIN", "[$fileName] could not stash original to temp; durable write degraded to raw: $e")
-            }
-        }
-        writeEncryptedFile(fileName, content)
-        // Best-effort cleanup. If we crash before reaching here,
-        // completePendingWrite will see the orphan temp and clean it up
-        // (the target file is now valid).
-        try {
-            File(applicationContext.filesDir, tempName).delete()
-        } catch (e: Exception) {
-            Log.w("MAIN", "[$tempName] orphan temp cleanup failed: $e")
-        }
+        durableWalletWrite.save(fileName, content)
     }
 
     // Audit Issue P (a) — durable-write recovery.
     //
-    // If `writeEncryptedFileDurably` crashed between the inner delete and
-    // the inner write, the target file is missing and a temp file with
-    // the original content sits at "$fileName.write.tmp". Restore from
-    // the temp. If the target file is already valid, the temp is just a
-    // post-write cleanup orphan and gets deleted.
+    // If a crash or hard shutdown leaves the target missing or unreadable,
+    // restore it from "$fileName.write.tmp". A valid target is synced again
+    // before the retained temp is deleted.
     //
     // Idempotent — no-op when no temp files are present.
     fun completePendingWrite() {
-        for (fileName in listOf(WalletFileName.value, WalletBackupFileName.value)) {
-            val tempName = "$fileName.write.tmp"
-            if (!fileExists(tempName)) continue
-            try {
-                val targetReadable = fileExists(fileName) && try {
-                    readFileAsB64(fileName)
-                    true
-                } catch (_: Exception) {
-                    false
-                }
-                if (!targetReadable) {
-                    // Crash during the inner write — restore original from temp.
-                    val tempContent = readFileAsB64(tempName)
-                    writeEncryptedFile(fileName, tempContent)
-                    Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
-                }
-                deleteFile(tempName)
-            } catch (e: Exception) {
-                Log.e("MAIN", "[Native] completePendingWrite for $fileName failed: $e", e)
-                // Leave temp in place for diagnosis / next attempt.
-            }
-        }
+        durableWalletWrite.complete(listOf(WalletFileName.value, WalletBackupFileName.value))
     }
 
     // Audit Issue P (b) — wallet ↔ backup swap recovery.
