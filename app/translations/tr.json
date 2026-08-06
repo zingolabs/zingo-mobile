@@ -446,7 +446,7 @@
     "walletkeyswarning": "Bu, kurtarma ifadesi'inizi saklamak için denetlenmemiş kodun güvenliğine bağlı olan deneysel bir özelliktir. Lütfen önemli miktarda fon içeren seed'lerle kullanmayın!",
     "value-language-tr": "Türkçe",
     "nym-disable-warning": "Mixnet Modunu kapatmak işlemlerinizi ve fiyat sorgularınızı açık ağ üzerinden yönlendirir ve etkinliğinizi IP adresinizle ilişkilendirir.",
-    "nym-network": "NYM Ağı",
+    "nym-network": "NYM Mixnet",
     "nym-enhanced-privacy": "Gelişmiş Gizlilik",
     "nym-diagnostics": "Mixnet tanılamasını çalıştır"
   },
@@ -876,7 +876,12 @@
     "coming-soon": "Yakında",
     "back": "Geri",
     "start": "Kabul et",
-    "close": "Kapat"
+    "close": "Kapat",
+    "nym-gate-title": "NYM ile gizlilik",
+    "nym-gate-body": "IP adresiniz ile bakiyeniz arasındaki ilişkilendirmeyi önlemek için NYM mixnet kullanmanızı öneririz.",
+    "nym-gate-enable": "NYM’i etkinleştir",
+    "nym-gate-continue": "NYM olmadan devam et",
+    "nym-gate-connecting": "Bağlanıyor…"
   },
   "migrationsending": {
     "title": "İşlemler gönderiliyor",

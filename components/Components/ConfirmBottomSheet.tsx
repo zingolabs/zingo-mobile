@@ -159,7 +159,7 @@ const ConfirmBottomSheet: React.FC = () => {
             style={{
               fontSize: 14,
               lineHeight: 21,
-              textAlign: options.messageAlign ?? 'center',
+              textAlign: options.messageAlign ?? 'left',
               marginBottom: 20,
             }}
           >

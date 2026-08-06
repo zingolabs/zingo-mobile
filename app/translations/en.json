@@ -446,7 +446,7 @@
     "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
     "value-language-tr": "Turkish",
     "nym-disable-warning": "Turning off Mixnet Mode routes your transactions and price lookups over the clearnet and links your activity to your IP address.",
-    "nym-network": "NYM Network",
+    "nym-network": "NYM Mixnet",
     "nym-enhanced-privacy": "Enhanced Privacy",
     "nym-diagnostics": "Run mixnet diagnostics"
   },
@@ -876,7 +876,12 @@
     "coming-soon": "Coming soon",
     "back": "Back",
     "start": "Accept",
-    "close": "Close"
+    "close": "Close",
+    "nym-gate-title": "Privacy with NYM",
+    "nym-gate-body": "We recommend using the NYM mixnet to avoid correlation between your IP and your balance.",
+    "nym-gate-enable": "Enable NYM",
+    "nym-gate-continue": "Continue without NYM",
+    "nym-gate-connecting": "Connecting…"
   },
   "migrationsending": {
     "title": "Sending transactions",
