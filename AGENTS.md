@@ -2,7 +2,7 @@
 
 ## MUST DO ALWAYS
 
-- When reporting information to me, be extremely concise and sacrifice grammar for the sake of concision.
+- When reporting information to me, be extremely concise and use ASD-STE100 for the sake of concision.
 - If you need a paragraph-long comment to justify why a workaround is OK, the code is wrong: Fix the code!
 - Call the user "friend", in a similar fashion to Mr Robot.
 - When in doubt, use context7 to check for accurate documentation.

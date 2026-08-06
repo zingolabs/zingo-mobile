@@ -10,15 +10,9 @@ import {
 import { useOptionsPanel } from '../context/optionsPanel';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-// Open (going down): smooth ramp at both ends — the sheet eases out of
-// rest, moves visibly through the middle, and eases into the final
-// position.
-const OPEN_DURATION_MS = 250;
-const EASING_OPEN = Easing.inOut(Easing.cubic);
-// Close (coming back up): user said this already feels right — keep
-// `out` so the sheet decelerates into its resting snap point.
-const CLOSE_DURATION_MS = 500;
-const EASING_CLOSE = Easing.out(Easing.cubic);
+// Same feel both ways: start fast, decelerate into the resting position.
+export const SLIDE_DURATION_MS = 500;
+export const SLIDE_EASING = Easing.out(Easing.cubic);
 
 // Cross-fade with the OptionsPanel overlay on open. Phase 1 mirrors the
 // panel's fade-in delay (125ms); phase 2 mirrors its fade duration (125ms).
@@ -48,8 +42,8 @@ export function useOptionsPanelSheetSlide() {
 
   useEffect(() => {
     translateY.value = withTiming(isOpen ? SCREEN_HEIGHT : 0, {
-      duration: isOpen ? OPEN_DURATION_MS : CLOSE_DURATION_MS,
-      easing: isOpen ? EASING_OPEN : EASING_CLOSE,
+      duration: SLIDE_DURATION_MS,
+      easing: SLIDE_EASING,
     });
     if (isOpen) {
       opacity.value = withSequence(

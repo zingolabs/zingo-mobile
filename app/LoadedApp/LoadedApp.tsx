@@ -46,6 +46,7 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
+  ServerUrisType,
   SetServerResult,
   AddressBookFileClass,
   SecurityType,
@@ -81,7 +82,8 @@ import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import { AppTheme } from '../theme';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
-import { parseZcashURI, serverUris } from '../uris';
+import { parseZcashURI, serverUris, fetchServerList } from '../uris';
+import selectingServer from '../selectingServer';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
@@ -764,6 +766,7 @@ export class LoadedAppClass extends Component<
   LoadedAppClassState
 > {
   rpc: WalletBackend;
+  recoveringServer: boolean = false;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
@@ -875,6 +878,7 @@ export class LoadedAppClass extends Component<
       onZingolibVersionChanged: this.setZingolibVersion,
       onBirthdayChanged: this.setBirthday,
       onError: this.setLastError,
+      onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
       mixnetSupported: true,
@@ -1810,6 +1814,64 @@ export class LoadedAppClass extends Component<
       kind: 'error',
       message: Utils.humanizeChainTokens(openError, this.state.translate),
     };
+  };
+
+  // The runtime half of the old boot-time server rescue: after repeated
+  // sync-launch failures, silently activate a working server (live registry
+  // first, then the static list by latency) and reattach the client to it.
+  // Custom and offline modes are exempt: custom users opted out of automatic
+  // selection (Audit Issue S) and offline has no server at all.
+  recoverServer = async (): Promise<void> => {
+    if (
+      this.recoveringServer ||
+      !this.state.netInfo.isConnected ||
+      (this.state.selectServer !== SelectServerEnum.auto &&
+        this.state.selectServer !== SelectServerEnum.list)
+    ) {
+      return;
+    }
+    this.recoveringServer = true;
+    try {
+      const current = this.state.server;
+      const live = (await fetchServerList(current.chainName)).filter(
+        (s: ServerUrisType) => s.uri !== current.uri,
+      );
+      let picked: ServerUrisType | null = live.length > 0 ? live[0] : null;
+      if (!picked) {
+        picked = await selectingServer(
+          serverUris(this.state.translate).filter(
+            (s: ServerUrisType) =>
+              !s.obsolete &&
+              s.chainName === current.chainName &&
+              s.uri !== current.uri,
+          ),
+        );
+      }
+      if (!picked || !picked.uri) {
+        return;
+      }
+      const next: ServerType = {
+        uri: picked.uri,
+        chainName: picked.chainName,
+      };
+      const changed = await changeServer(next.uri);
+      if (!changed.ok) {
+        // The pick is dead too. Keep the current server; the failure streak
+        // rebuilds and this retries with the next candidate.
+        return;
+      }
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, next);
+      this.setState({ server: next });
+      this.rpc.setServer(next);
+      if (this.state.mode === ModeEnum.advanced) {
+        this.addLastSnackbar(
+          `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
+          SnackbarDurationEnum.long,
+        );
+      }
+    } finally {
+      this.recoveringServer = false;
+    }
   };
 
   setCurrencyOption = async (value: CurrencyEnum): Promise<void> => {
