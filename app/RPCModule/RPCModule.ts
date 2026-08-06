@@ -152,6 +152,8 @@ interface RPCModuleAPI {
   ): Promise<string>;
   setCryptoDefaultProvider(): Promise<string>;
 
+  setBroadcastCandidates(candidatesJson: string): Promise<string>;
+
   // Mixnet Mode (send-over-nym). Implemented by the native RPCModule on both
   // Android and iOS.
   attachMixnet(socks5Addr: string): Promise<string>;

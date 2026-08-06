@@ -132,6 +132,12 @@ const MigrationTransactions: React.FunctionComponent<
         if (parsed.error) {
           setErrorMsg(parsed.error);
         } else {
+          if (__DEV__) {
+            console.log(
+              '[migration] broadcast targets (sync operator excluded):',
+              parsed.broadcast_targets?.map(t => t.uri) ?? [],
+            );
+          }
           setPlan(parsed);
         }
       } catch (e) {

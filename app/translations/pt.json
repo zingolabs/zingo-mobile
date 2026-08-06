@@ -446,7 +446,7 @@
     "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!",
     "value-language-tr": "Turco",
     "nym-disable-warning": "Desativar o modo Mixnet envia suas transações e consultas de preço pela rede aberta e vincula sua atividade ao seu endereço IP.",
-    "nym-network": "Rede NYM",
+    "nym-network": "NYM Mixnet",
     "nym-enhanced-privacy": "Privacidade Aprimorada",
     "nym-diagnostics": "Executar diagnóstico do mixnet"
   },
@@ -876,7 +876,12 @@
     "coming-soon": "Em breve",
     "back": "Voltar",
     "start": "Aceitar",
-    "close": "Fechar"
+    "close": "Fechar",
+    "nym-gate-title": "Privacidade com NYM",
+    "nym-gate-body": "Recomendamos usar a mixnet NYM para evitar a correlação entre seu IP e seu saldo.",
+    "nym-gate-enable": "Ativar NYM",
+    "nym-gate-continue": "Continuar sem NYM",
+    "nym-gate-connecting": "Conectando…"
   },
   "migrationsending": {
     "title": "Enviando transações",
