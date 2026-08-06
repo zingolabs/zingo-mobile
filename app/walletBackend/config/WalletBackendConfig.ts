@@ -39,6 +39,12 @@ export type WalletBackendConfig = {
   onBirthdayChanged: (birthday: number) => void;
   /** Called on any non-fatal RPC error; display or log in the consumer. */
   onError: (error: string) => void;
+  /**
+   * Called after several consecutive sync-launch failures. The consumer owns
+   * the policy (e.g. silently activating a working server); the coordinator
+   * only reports the streak and resets its count.
+   */
+  onPersistentSyncFailure?: () => void;
   /** Called with each new screen-facing Mixnet Mode projection. */
   onMixnetViewChanged: (view: MixnetView) => void;
   /**

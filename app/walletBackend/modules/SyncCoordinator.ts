@@ -22,6 +22,12 @@ import { WalletBackendConfig } from '../config/WalletBackendConfig';
 import { DataService } from './DataService';
 import { doSave } from '../utils/walletUtils';
 
+// Consecutive failed sync launches before onPersistentSyncFailure fires.
+// Three failures span ~15 s of the 5 s tick: long enough to ride out a
+// one-off blip, short enough that a dead server gets replaced before the
+// user reaches for Settings.
+const PERSISTENT_SYNC_FAILURE_THRESHOLD = 3;
+
 export class SyncCoordinator {
   config: WalletBackendConfig;
   dataService: DataService;
@@ -32,6 +38,8 @@ export class SyncCoordinator {
   refreshSyncLock: boolean = false;
   fetchSyncStatusLock: boolean = false;
   fetchSyncPollLock: boolean = false;
+
+  syncLaunchFailures: number = 0;
 
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
 
@@ -232,12 +240,20 @@ export class SyncCoordinator {
           );
         }
         console.log('sync RUN', syncStr);
+        this.syncLaunchFailures = 0;
       }
     } catch (error) {
       // runSyncProcess and runRescanProcess reject on failure (typed FFI
       // errors); this catch owns the error path for both.
       console.log(`Critical Error sync/rescan run ${error}`);
       this.config.onError(`Error sync/rescan run: ${error}`);
+      if (!fullRescan) {
+        this.syncLaunchFailures += 1;
+        if (this.syncLaunchFailures >= PERSISTENT_SYNC_FAILURE_THRESHOLD) {
+          this.syncLaunchFailures = 0;
+          this.config.onPersistentSyncFailure?.();
+        }
+      }
     } finally {
       this.refreshSyncLock = false;
     }
