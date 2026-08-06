@@ -22,7 +22,8 @@ import * as Keychain from 'react-native-keychain';
  *   without explicitly setting `accessControl` the lib defaults to a
  *   prompt that only accepts BIOMETRIC_STRONG, which fails on
  *   passcode-only devices (e.g. Galaxy Tab A8) with
- *   `BIOMETRIC_ERROR_HW_UNAVAILABLE` (code 12).
+ *   `BIOMETRIC_ERROR_HW_UNAVAILABLE` (code 12). Both platforms now use the
+ *   `BIOMETRY_ANY_OR_DEVICE_PASSCODE` shape for the same reason.
  *
  * - `SILENT_SECURE`: no prompt. The data is encrypted at rest in the
  *   hardware-backed Keystore/Keychain but readable any time the device is
@@ -64,12 +65,18 @@ export function buildSetOptions(
   }
 
   // INTERACTIVE_AUTH
+  // iOS: `BIOMETRY_ANY_OR_DEVICE_PASSCODE` maps to
+  // `kSecAccessControlTouchIDAny|Or|DevicePasscode`. The `CurrentSet` variant
+  // this used to carry binds the entry to the biometric enrolment present when
+  // it was written, so re-enrolling Face ID leaves an entry the OS will not
+  // serve. The entry holds the string "1", so that strictness buys nothing,
+  // and it cost a user access to their wallet (issue #1266).
   const iosPart =
     Platform.OS === 'ios'
       ? {
           accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
           accessControl:
-            Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE,
+            Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
         }
       : {};
   // Android: `storage: AES_GCM` makes the underlying KeyStore key auth-
