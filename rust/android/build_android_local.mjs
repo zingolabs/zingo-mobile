@@ -148,6 +148,13 @@ if (!capture('cargo', ['ndk', '--version'])) {
 if (!capture('bindgen', ['--version'])) {
   missing.push('bindgen-cli: cargo install --force --locked bindgen-cli');
 }
+// lightwallet-protocol's `rebuild-proto` feature (enabled by both zingolib and
+// nym-host) runs tonic-prost-build, which shells out to protoc from PATH.
+if (!capture('protoc', ['--version'])) {
+  missing.push(
+    'protoc: apt install protobuf-compiler (Linux), brew install protobuf (macOS), winget install Google.Protobuf (Windows)',
+  );
+}
 
 const installedTargets = (
   capture('rustup', ['target', 'list', '--installed']) ?? ''
