@@ -14,6 +14,7 @@ import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
 import { checkMyAddress } from '../../../app/walletBackend';
 import { parseZcashURI } from '../../../app/uris';
+import Utils from '../../../app/utils';
 import TextInputAddress from '../../Components/TextInputAddress';
 import FadeText from '../../Components/FadeText';
 import { RPCCheckAddressType } from '../../../app/walletBackend/types/RPCCheckAddressType';
@@ -72,17 +73,17 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       addr.toLowerCase().startsWith(GlobalConst.zcash) ||
       addr.toLowerCase().includes(':')
     ) {
-      const { error, target } = await parseZcashURI(addr, translate, server);
+      const parsed = await parseZcashURI(addr, server);
 
       // Audit Issue H — surface the parser error and abort before any
-      // address-state mutation. parseZcashURI returns an empty target
-      // when error is non-empty, but the explicit guard keeps intent
-      // obvious here and protects against future contract changes.
-      if (error) {
-        addLastSnackbar(error);
+      // address-state mutation. A failure result carries no target, so a
+      // malformed URI cannot reach the state updates below.
+      if (parsed.kind === 'error') {
+        addLastSnackbar(Utils.renderErrorKeyed(parsed, translate));
         return;
       }
 
+      const target = parsed.target;
       if (target) {
         // redo the to addresses
         [target].forEach(tgt => {

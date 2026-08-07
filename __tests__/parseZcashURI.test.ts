@@ -15,10 +15,6 @@ import Utils from '../app/utils';
 
 const mockIsValidAddress = Utils.isValidAddress as jest.Mock;
 
-// Returns the translation key verbatim so each test can check which
-// branch the parser took without depending on the actual locale string.
-const keyEcho = (key: string) => key as never;
-
 const mainnetServer: ServerType = {
   uri: 'https://mainnet.lightwalletd.com:9067',
   chainName: ChainNameEnum.mainChainName,
@@ -27,10 +23,11 @@ const mainnetServer: ServerType = {
 const VALID_ADDR = 't1validAddrPlaceholderForUnitTestsOnly';
 const INVALID_ADDR = 'not-an-address';
 
-// Audit Issue H — parseZcashURI must guarantee that when `error` is
-// non-empty the returned `target` is empty, so callers cannot prefill
-// Send state with attacker-controlled values from a malformed URI.
-describe('parseZcashURI — Issue H: errors must yield empty target', () => {
+// Audit Issue H — a failure result carries no target at all, so callers
+// cannot prefill Send state with attacker-controlled values from a
+// malformed URI. Audit Issue R — the parser fails fast and reports an
+// ErrorKey, never locale prose.
+describe('parseZcashURI — Issue H: failures carry no target', () => {
   beforeEach(() => {
     mockIsValidAddress.mockReset();
     mockIsValidAddress.mockResolvedValue({
@@ -39,129 +36,113 @@ describe('parseZcashURI — Issue H: errors must yield empty target', () => {
     });
   });
 
-  test('valid path-as-address → target populated, no error', async () => {
-    const r = await parseZcashURI(
-      `zcash:${VALID_ADDR}`,
-      keyEcho,
-      mainnetServer,
-    );
-    expect(r.error).toBe('');
-    expect(r.target.address).toBe(VALID_ADDR);
+  test('valid path-as-address → paymentTarget populated', async () => {
+    const r = await parseZcashURI(`zcash:${VALID_ADDR}`, mainnetServer);
+    expect(r).toMatchObject({
+      kind: 'paymentTarget',
+      target: { address: VALID_ADDR },
+    });
   });
 
-  test('valid address + amount + memo → all populated, no error', async () => {
+  test('valid address + amount + memo → all populated', async () => {
     const memoB64 = Base64.encode('hello');
     const r = await parseZcashURI(
       `zcash:${VALID_ADDR}?amount=0.1&memo=${memoB64}`,
-      keyEcho,
       mainnetServer,
     );
-    expect(r.error).toBe('');
-    expect(r.target.address).toBe(VALID_ADDR);
-    expect(r.target.amount).toBe(0.1);
-    expect(r.target.memoString).toBe('hello');
+    expect(r).toMatchObject({
+      kind: 'paymentTarget',
+      target: { address: VALID_ADDR, amount: 0.1, memoString: 'hello' },
+    });
   });
 
-  test('invalid path-as-address → empty target, error present', async () => {
+  test('invalid path-as-address → error, and no target key at all', async () => {
     mockIsValidAddress.mockResolvedValue({
       isValid: false,
       onlyOrchardUA: '',
     });
-    const r = await parseZcashURI(
-      `zcash:${INVALID_ADDR}`,
-      keyEcho,
-      mainnetServer,
-    );
-    expect(r.error).not.toBe('');
-    expect(r.target.address).toBeUndefined();
-    expect(r.target.amount).toBeUndefined();
-    expect(r.target.memoString).toBeUndefined();
+    const r = await parseZcashURI(`zcash:${INVALID_ADDR}`, mainnetServer);
+    expect(r).toEqual({ kind: 'error', errorKey: 'uris.notvalid' });
+    expect(Object.keys(r)).not.toContain('target');
   });
 
-  test('invalid query-string address → empty target', async () => {
+  test('invalid query-string address → error', async () => {
     mockIsValidAddress.mockResolvedValue({
       isValid: false,
       onlyOrchardUA: '',
     });
     const r = await parseZcashURI(
       `zcash:?address=${INVALID_ADDR}`,
-      keyEcho,
       mainnetServer,
     );
-    expect(r.error).not.toBe('');
-    expect(r.target.address).toBeUndefined();
+    expect(r).toEqual({ kind: 'error', errorKey: 'uris.notvalid' });
   });
 
-  test('negative amount → empty target (address never leaks)', async () => {
+  test('negative amount → amount error with the offending value', async () => {
     const r = await parseZcashURI(
       `zcash:${VALID_ADDR}?amount=-1`,
-      keyEcho,
       mainnetServer,
     );
-    expect(r.error).not.toBe('');
-    expect(r.target.address).toBeUndefined();
-    expect(r.target.amount).toBeUndefined();
+    expect(r).toEqual({
+      kind: 'error',
+      errorKey: 'uris.amount',
+      param: '-1',
+    });
   });
 
-  test('amount above 21,000,000 cap → empty target', async () => {
+  test('amount above 21,000,000 cap → amount error', async () => {
     const r = await parseZcashURI(
       `zcash:${VALID_ADDR}?amount=21000001`,
-      keyEcho,
       mainnetServer,
     );
-    expect(r.error).not.toBe('');
-    expect(r.target.address).toBeUndefined();
+    expect(r).toMatchObject({ kind: 'error', errorKey: 'uris.amount' });
   });
 
-  test('unknown parameter → empty target', async () => {
-    const r = await parseZcashURI(
-      `zcash:${VALID_ADDR}?foo=bar`,
-      keyEcho,
-      mainnetServer,
-    );
-    expect(r.error).not.toBe('');
-    expect(r.target.address).toBeUndefined();
+  test('unknown parameter → noparameter error naming it', async () => {
+    const r = await parseZcashURI(`zcash:${VALID_ADDR}?foo=bar`, mainnetServer);
+    expect(r).toEqual({
+      kind: 'error',
+      errorKey: 'uris.noparameter',
+      param: 'foo',
+    });
   });
 
-  test('duplicate address (path + query both set address) → empty target', async () => {
+  test('duplicate address (path + query both set address) → error', async () => {
     const r = await parseZcashURI(
       `zcash:${VALID_ADDR}?address=${VALID_ADDR}`,
-      keyEcho,
       mainnetServer,
     );
-    expect(r.error).not.toBe('');
-    expect(r.target.address).toBeUndefined();
+    expect(r).toEqual({
+      kind: 'error',
+      errorKey: 'uris.duplicateparameter',
+      param: 'address',
+    });
   });
 
-  test('extra-dotted parameter (address.1.2) → empty target', async () => {
+  test('extra-dotted parameter (address.1.2) → error', async () => {
     const r = await parseZcashURI(
       `zcash:${VALID_ADDR}?address.1.2=${VALID_ADDR}`,
-      keyEcho,
       mainnetServer,
     );
-    expect(r.error).not.toBe('');
-    expect(r.target.address).toBeUndefined();
+    expect(r).toEqual({
+      kind: 'error',
+      errorKey: 'uris.notvalidparameter',
+      param: 'address.1.2',
+    });
   });
 
-  test('empty URI → baduri error, empty target', async () => {
-    const r = await parseZcashURI('', keyEcho, mainnetServer);
-    expect(r.error).toBe('uris.baduri');
-    expect(r.target.address).toBeUndefined();
+  test('empty URI → baduri error', async () => {
+    const r = await parseZcashURI('', mainnetServer);
+    expect(r).toEqual({ kind: 'error', errorKey: 'uris.baduri' });
   });
 
-  test('non-zcash protocol → baduri error, empty target', async () => {
-    const r = await parseZcashURI(
-      `bitcoin:${VALID_ADDR}`,
-      keyEcho,
-      mainnetServer,
-    );
-    expect(r.error).toBe('uris.baduri');
-    expect(r.target.address).toBeUndefined();
+  test('non-zcash protocol → baduri error', async () => {
+    const r = await parseZcashURI(`bitcoin:${VALID_ADDR}`, mainnetServer);
+    expect(r).toEqual({ kind: 'error', errorKey: 'uris.baduri' });
   });
 
-  test('zcash: without address but with amount → empty target', async () => {
-    const r = await parseZcashURI('zcash:?amount=1', keyEcho, mainnetServer);
-    expect(r.error).not.toBe('');
-    expect(r.target.address).toBeUndefined();
+  test('zcash: without address but with amount → noaddress error', async () => {
+    const r = await parseZcashURI('zcash:?amount=1', mainnetServer);
+    expect(r).toEqual({ kind: 'error', errorKey: 'uris.noaddress' });
   });
 });

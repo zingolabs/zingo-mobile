@@ -19,6 +19,7 @@ import ZecPriceType from './types/ZecPriceType';
 import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
 import { SetServerResult } from './types/SetServerResult';
+import { ErrorKeyed, Done, DONE } from './types/Result';
 import ValueTransferType from './types/ValueTransferType';
 import TransactionType from './types/TransactionType';
 import TxDetailType from './types/TxDetailType';
@@ -95,6 +96,9 @@ export {
   SecurityType,
   ServerUrisType,
   SetServerResult,
+  ErrorKeyed,
+  Done,
+  DONE,
   ValueTransferType,
   TransactionType,
   TxDetailType,

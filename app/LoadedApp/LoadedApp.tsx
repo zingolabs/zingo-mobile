@@ -871,7 +871,6 @@ export class LoadedAppClass extends Component<
       onAddressesChanged: this.setAllAddresses,
       onInfoChanged: this.setInfo,
       onSyncStatusChanged: this.setSyncingStatus,
-      translate: props.translate,
       keepAwake: this.keepAwake,
       onZingolibVersionChanged: this.setZingolibVersion,
       onBirthdayChanged: this.setBirthday,
@@ -1105,17 +1104,14 @@ export class LoadedAppClass extends Component<
 
   // Sync the externally-rebuilt `translate` (the outer functional
   // LoadedApp rebuilds its memoized translate on every language change)
-  // into both `state.translate` and the WalletBackend config. Without this,
-  // memoized children whose useMemo / React.memo deps include `translate`
-  // (notably the OptionsPanel grid built in LoadedAppOptionsPanelHost) keep
-  // the identity-stable closure captured at mount and render in the old
-  // language. WalletBackend sub-services (WalletLifecycleService etc.)
-  // would likewise keep returning localized error strings in the language
-  // the user had at app mount.
+  // into `state.translate`. Without this, memoized children whose
+  // useMemo / React.memo deps include `translate` (notably the
+  // OptionsPanel grid built in LoadedAppOptionsPanelHost) keep the
+  // identity-stable closure captured at mount and render in the old
+  // language.
   componentDidUpdate = (prevProps: LoadedAppClassProps) => {
     if (prevProps.translate !== this.props.translate) {
       this.setState({ translate: this.props.translate });
-      this.rpc.setTranslate(this.props.translate);
     }
   };
 
@@ -1153,21 +1149,19 @@ export class LoadedAppClass extends Component<
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
-      const { error, target } = await parseZcashURI(
-        url,
-        this.state.translate,
-        this.state.server,
-      );
+      const parsed = await parseZcashURI(url, this.state.server);
 
       // Audit Issue H — surface the parser error and abort before any
-      // Send-state mutation. parseZcashURI now returns an empty target
-      // when error is non-empty, but the explicit guard keeps intent
-      // obvious here and protects against future contract changes.
-      if (error) {
-        this.addLastSnackbar(error);
+      // Send-state mutation. A failure result carries no target, so a
+      // malformed URI cannot reach the state updates below.
+      if (parsed.kind === 'error') {
+        this.addLastSnackbar(
+          Utils.renderErrorKeyed(parsed, this.state.translate),
+        );
         return;
       }
 
+      const target = parsed.target;
       if (target) {
         let update = false;
         if (
@@ -1210,10 +1204,6 @@ export class LoadedAppClass extends Component<
 
           this.setSendPageState(newSendPageState);
         }
-      }
-      if (error) {
-        // Show the error message as a toast
-        this.addLastSnackbar(error);
       }
     }
   };
@@ -1980,21 +1970,17 @@ export class LoadedAppClass extends Component<
     // WALLET's own chain (walletChainName), not the server's — Offline has no
     // server chain, yet a mainnet wallet must still be backed up when it is
     // left. Testnet/regtest are never backed up.
-    let resultStr = '';
-    if (this.state.walletChainName === ChainNameEnum.mainChainName) {
-      // backup
-      resultStr = (await this.rpc.changeWallet()) as string;
-    } else {
-      // no backup
-      resultStr = (await this.rpc.changeWalletNoBackup()) as string;
-    }
+    const changed =
+      this.state.walletChainName === ChainNameEnum.mainChainName
+        ? await this.rpc.changeWallet() // backup
+        : await this.rpc.changeWalletNoBackup(); // no backup
 
-    if (resultStr) {
+    if (changed.kind === 'error') {
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
         this.state.translate('loadedapp.changingwallet-label') as string,
-        resultStr,
+        this.state.translate(changed.errorKey) as string,
         false,
         this.state.translate,
         sendEmail,
@@ -2008,14 +1994,14 @@ export class LoadedAppClass extends Component<
   };
 
   onClickOKRestoreBackup = async () => {
-    const resultStr = (await this.rpc.restoreBackup()) as string;
+    const restored = await this.rpc.restoreBackup();
 
-    if (resultStr) {
+    if (restored.kind === 'error') {
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
         this.state.translate('loadedapp.restoringwallet-label') as string,
-        resultStr,
+        this.state.translate(restored.errorKey) as string,
         false,
         this.state.translate,
         sendEmail,
@@ -2072,26 +2058,20 @@ export class LoadedAppClass extends Component<
 
       await this.rpc.fetchInfoAndServerHeight();
 
-      let resultStr2 = '';
       // Back up any MAINNET wallet being abandoned — keyed on the WALLET's own
       // chain (walletChainName), not the server's, so a mainnet wallet left
       // while Offline still gets backed up. Testnet/regtest are not backed up.
-      if (this.state.walletChainName === ChainNameEnum.mainChainName) {
-        // backup
-        resultStr2 = (await this.rpc.changeWallet()) as string;
-      } else {
-        // no backup
-        resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
-      }
+      const changed =
+        this.state.walletChainName === ChainNameEnum.mainChainName
+          ? await this.rpc.changeWallet() // backup
+          : await this.rpc.changeWalletNoBackup(); // no backup
 
-      // changeWallet/changeWalletNoBackup return '' on success or a
-      // translated error string — non-empty means failure, no sniffing.
-      if (resultStr2) {
+      if (changed.kind === 'error') {
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
           this.state.translate('loadedapp.changingwallet-label') as string,
-          resultStr2,
+          this.state.translate(changed.errorKey) as string,
           false,
           this.state.translate,
           sendEmail,

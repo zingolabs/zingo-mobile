@@ -1,5 +1,5 @@
 import Url from 'url-parse';
-import { GlobalConst, TranslateType } from '../AppState';
+import { ErrorKeyed, GlobalConst } from '../AppState';
 
 // Audit Issue G — plaintext http:// is only acceptable when the user is
 // pointing at a server running on the same device (local development,
@@ -15,12 +15,17 @@ const isLocalHost = (hostname: string): boolean => {
   return LOCAL_HOSTNAMES.has(cleaned.toLowerCase());
 };
 
-const parseServerURI = (
-  uri: string,
-  translate: (key: string) => TranslateType,
-): string => {
-  if (!uri || uri === '') {
-    return translate('uris.baduri') as string;
+export type ServerUriErrorKey = 'uris.baduri' | 'uris.error-http-not-allowed';
+
+// Audit Issue R — the error travels as an ErrorKey the display edge
+// translates, never as prose, so no locale can break the discrimination.
+export type ParseServerUriResult =
+  | { kind: 'canonicalUri'; uri: string }
+  | ErrorKeyed<ServerUriErrorKey>;
+
+const parseServerURI = (uri: string): ParseServerUriResult => {
+  if (!uri) {
+    return { kind: 'error', errorKey: 'uris.baduri' };
   }
 
   const parsedUri = new Url(uri, true);
@@ -31,7 +36,7 @@ const parseServerURI = (
     (parsedUri.protocol !== GlobalConst.http &&
       parsedUri.protocol !== GlobalConst.https)
   ) {
-    return translate('uris.baduri') as string;
+    return { kind: 'error', errorKey: 'uris.baduri' };
   }
 
   // Reject http:// for any non-local host — see audit Issue G.
@@ -39,7 +44,7 @@ const parseServerURI = (
     parsedUri.protocol === GlobalConst.http &&
     !isLocalHost(parsedUri.hostname)
   ) {
-    return translate('uris.error-http-not-allowed') as string;
+    return { kind: 'error', errorKey: 'uris.error-http-not-allowed' };
   }
 
   let port = parsedUri.port;
@@ -75,7 +80,10 @@ const parseServerURI = (
     }
   }
 
-  return `${parsedUri.protocol}//${parsedUri.hostname}:${port}`;
+  return {
+    kind: 'canonicalUri',
+    uri: `${parsedUri.protocol}//${parsedUri.hostname}:${port}`,
+  };
 };
 
 export default parseServerURI;

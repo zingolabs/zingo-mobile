@@ -1,7 +1,6 @@
 import {
   TotalBalanceClass,
   InfoType,
-  TranslateType,
   ValueTransferType,
   UnifiedAddressClass,
   TransparentAddressClass,

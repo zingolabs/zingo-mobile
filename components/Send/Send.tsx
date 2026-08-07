@@ -630,21 +630,17 @@ const Send: React.FunctionComponent<SendProps> = ({
         addressPar.toLowerCase().startsWith(GlobalConst.zcash) ||
         addressPar.toLowerCase().includes(':')
       ) {
-        const { error, target } = await parseZcashURI(
-          addressPar,
-          translate,
-          server,
-        );
+        const parsed = await parseZcashURI(addressPar, server);
 
         // Audit Issue H — surface the parser error and abort before any
-        // Send-state mutation. parseZcashURI now returns an empty target
-        // when error is non-empty, but the explicit guard keeps intent
-        // obvious here and protects against future contract changes.
-        if (error) {
-          addLastSnackbar(error);
+        // Send-state mutation. A failure result carries no target, so a
+        // malformed URI cannot reach the state updates below.
+        if (parsed.kind === 'error') {
+          addLastSnackbar(Utils.renderErrorKeyed(parsed, translate));
           return;
         }
 
+        const target = parsed.target;
         if (target) {
           // redo the to addresses
           [target].forEach(tgt => {
