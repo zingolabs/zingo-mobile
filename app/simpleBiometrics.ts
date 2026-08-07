@@ -4,7 +4,11 @@ import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { GlobalConst, TranslateType } from './AppState';
-import { buildGetOptions, buildSetOptions } from './utils/keychainOptions';
+import {
+  buildBaseOptions,
+  buildGetOptions,
+  buildSetOptions,
+} from './utils/keychainOptions';
 
 // Single biometric library: react-native-keychain. We use a "sentinel" entry
 // stored under a dedicated service to drive every biometric prompt — the lib
@@ -13,9 +17,40 @@ import { buildGetOptions, buildSetOptions } from './utils/keychainOptions';
 //   - drops react-native-biometrics (unmaintained since 2022, audit-backlog)
 //   - reuses the keychain's auth window across prompts (no double-prompts)
 //   - keeps simpleBiometrics() callers untouched (same signature/contract).
-const SENTINEL_SERVICE = 'zingo-biometric-sentinel';
+const SENTINEL_SERVICE = 'zingo-biometric-sentinel-v2';
 const SENTINEL_USERNAME = 'sentinel';
 const SENTINEL_VALUE = '1';
+
+// Issue #1266. v1 carried the BIOMETRY_CURRENT_SET access control, which no
+// device without an enrolled biometric can satisfy. Renaming the service is
+// what rebuilds the entry under the control keychainOptions now sets: at the
+// JS layer an entry the OS refuses to serve reads the same as a healthy one,
+// so keeping the name would leave upgraded devices on the broken entry.
+// Any future change to the INTERACTIVE_AUTH control needs a new name here.
+const SENTINEL_SERVICE_V1 = 'zingo-biometric-sentinel';
+
+// Issue #1266. An entry that exists but that the OS will never hand back looks,
+// at the JS layer, exactly like a user pressing Cancel. Both used to collapse
+// into `false`, and `false` sends the app to the locked screen whose only
+// action re-runs this same code, so the wallet became unreachable through a
+// gate that guards nothing (the entry holds the string "1"). Telling the two
+// apart is what allows a bad entry to be rebuilt instead of retried forever.
+type GateOutcome = 'authenticated' | 'declined' | 'broken';
+
+// The iOS bridge rejects with the OSStatus as the error code.
+const IOS_DECLINED = ['-128', '-25293']; // errSecUserCanceled, errSecAuthFailed
+
+// Android reports every failure as E_CRYPTO_FAILED and carries the real
+// BiometricPrompt code inside the message ("code: 13, msg: ..."). Lockout
+// belongs here: waving five bad faces at the prompt must not open the gate.
+const ANDROID_DECLINED = [
+  3, // ERROR_TIMEOUT
+  5, // ERROR_CANCELED
+  7, // ERROR_LOCKOUT
+  9, // ERROR_LOCKOUT_PERMANENT
+  10, // ERROR_USER_CANCELED
+  13, // ERROR_NEGATIVE_BUTTON
+];
 
 type simpleBiometricsProps = {
   translate: (key: string) => TranslateType;
@@ -41,6 +76,74 @@ const buildAuthPrompt = (
 // mapping. Any future Keychain call site should reuse one of the profiles
 // there instead of hand-rolling options.
 
+const failureCode = (e: unknown): string =>
+  typeof e === 'object' && e !== null && 'code' in e ? String(e.code) : '';
+
+const failureMessage = (e: unknown): string =>
+  e instanceof Error ? e.message : String(e);
+
+const describeFailure = (e: unknown): string => {
+  const code = failureCode(e);
+  return code ? `${code} ${failureMessage(e)}` : failureMessage(e);
+};
+
+const classifyFailure = (e: unknown): GateOutcome => {
+  if (Platform.OS === 'ios') {
+    return IOS_DECLINED.includes(failureCode(e)) ? 'declined' : 'broken';
+  }
+  const promptCode = Number(/code:\s*(-?\d+)/.exec(failureMessage(e))?.[1]);
+  return ANDROID_DECLINED.includes(promptCode) ? 'declined' : 'broken';
+};
+
+let lastFailure = '';
+
+/**
+ * Platform error behind the most recent refused gate, empty when the last
+ * attempt went through. The locked screen shows it so a bug report carries an
+ * OSStatus instead of "it just bounces back".
+ */
+export const getLastGateFailure = (): string => lastFailure;
+
+const attemptGate = async (
+  translate: (key: string) => TranslateType,
+  create: boolean,
+): Promise<GateOutcome> => {
+  try {
+    if (create) {
+      // On Android the AES_GCM key is user-auth required so the set itself
+      // drives the BiometricPrompt; on iOS the set is silent and the prompt
+      // comes from the read below.
+      await Keychain.setGenericPassword(
+        SENTINEL_USERNAME,
+        SENTINEL_VALUE,
+        buildSetOptions(
+          SENTINEL_SERVICE,
+          'INTERACTIVE_AUTH',
+          buildAuthPrompt(translate),
+        ),
+      );
+    }
+    const cred = await Keychain.getGenericPassword(
+      buildGetOptions(
+        SENTINEL_SERVICE,
+        'INTERACTIVE_AUTH',
+        buildAuthPrompt(translate),
+      ),
+    );
+    if (cred) {
+      lastFailure = '';
+      return 'authenticated';
+    }
+    // A resolved `false` means the entry was not found. No prompt can have
+    // been satisfied against an entry that is not there.
+    lastFailure = 'sentinel entry missing';
+    return 'broken';
+  } catch (e) {
+    lastFailure = describeFailure(e);
+    return classifyFailure(e);
+  }
+};
+
 /**
  * Triggers an OS biometric / device-credential prompt.
  *
@@ -48,8 +151,9 @@ const buildAuthPrompt = (
  * implementation so callers do not need to change:
  *   - true      → authenticated
  *   - false     → user cancelled or auth failed
- *   - undefined → device has no auth method at all; caller should proceed
- *                 rather than lock the user out of their own wallet.
+ *   - undefined → the gate cannot run on this device (no auth method, or a
+ *                 keychain entry the OS refuses to serve); caller should
+ *                 proceed rather than lock the user out of their own wallet.
  */
 const simpleBiometrics = async (
   props: simpleBiometricsProps,
@@ -68,38 +172,36 @@ const simpleBiometrics = async (
   }
 
   try {
+    // hasGenericPassword answers "an entry exists", never "an entry works".
+    // The iOS bridge resolves it to true on errSecInteractionNotAllowed, so
+    // use it to decide whether a create is worth paying for, not as proof.
     const has = await Keychain.hasGenericPassword({
       service: SENTINEL_SERVICE,
     });
     if (!has) {
-      // Lazy sentinel creation. On Android the AES_GCM key is user-auth
-      // required so the set itself drives the BiometricPrompt; on iOS the
-      // set is silent and the prompt comes from the get below.
-      await Keychain.setGenericPassword(
-        SENTINEL_USERNAME,
-        SENTINEL_VALUE,
-        buildSetOptions(
-          SENTINEL_SERVICE,
-          'INTERACTIVE_AUTH',
-          buildAuthPrompt(props.translate),
-        ),
-      );
+      // Nothing reads v1 from here on. The delete needs no prompt, and
+      // deleting an absent entry resolves, so it runs without a lookup.
+      await Keychain.resetGenericPassword({ service: SENTINEL_SERVICE_V1 });
     }
-    // Always exercise the access-controlled read so every call surfaces a
-    // prompt (or reuses a recent auth window if one is still valid).
-    const cred = await Keychain.getGenericPassword(
-      buildGetOptions(
-        SENTINEL_SERVICE,
-        'INTERACTIVE_AUTH',
-        buildAuthPrompt(props.translate),
-      ),
-    );
-    return !!cred;
+    let outcome = await attemptGate(props.translate, !has);
+
+    if (outcome === 'broken') {
+      await Keychain.resetGenericPassword(
+        buildBaseOptions(SENTINEL_SERVICE, 'INTERACTIVE_AUTH'),
+      );
+      outcome = await attemptGate(props.translate, true);
+    }
+
+    if (outcome === 'authenticated') {
+      return true;
+    }
+    return outcome === 'declined' ? false : undefined;
   } catch (e) {
-    // After canAuth=true the only ways here are user cancel or platform
-    // error. We treat both as "not authenticated" — same as the prior lib.
-    console.log('biometrics: prompt failed', e);
-    return false;
+    // hasGenericPassword and resetGenericPassword reject on an unexpected
+    // platform status. The user was never asked, so this is a gate we cannot
+    // run rather than an authentication anybody failed.
+    lastFailure = describeFailure(e);
+    return undefined;
   } finally {
     if (Platform.OS === 'android') {
       DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);

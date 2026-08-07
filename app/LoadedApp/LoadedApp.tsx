@@ -993,7 +993,9 @@ export class LoadedAppClass extends Component<
           // resultBio:
           // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
           // - false     -> user cancelled or failed the prompt
-          // - undefined -> device has no auth method at all; allow (cannot lock the user out)
+          // - undefined -> the gate cannot run here (no auth method, or a keychain
+          //                entry the OS refuses to serve); allow, since it guards
+          //                nothing and blocking locks the user out of the wallet
           if (resultBio === false) {
             this.navigateToLoadingApp({
               startingApp: true,

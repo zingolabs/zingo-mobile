@@ -23,6 +23,9 @@ COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
 COPY workbench/ /opt/zingo/rust/workbench/
 
 COPY nym-host/ /opt/zingo/rust/nym-host/
+# The build context has no .git; the host passes git describe output through.
+ARG ZINGO_MOBILE_GIT_DESCRIBE
+ENV ZINGO_MOBILE_GIT_DESCRIBE=${ZINGO_MOBILE_GIT_DESCRIBE}
 
 RUN rustup default stable
 

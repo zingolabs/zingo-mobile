@@ -102,13 +102,14 @@ sent. Covers the whole migration, both phases.
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.
-Jest, rust-shear, js-depcheck, android-dependency-analysis, the Android
+Jest, rust-shear, js-depcheck, andr-dependency-analysis, the Android
 Kotlin compile, the Android JVM unit tests, the Android build chain, and
 the Android integration buckets are blocking checks.
 
 **Advisory stage** — a PR CI job that records its result without
-affecting the pull request verdict. The per-PR iOS pipeline is an
-advisory stage; ci-nightly remains the enforced iOS gate.
+affecting the pull request verdict. No PR stage currently runs in
+advisory mode: every job's failure fails its run. ci-nightly remains
+the enforced gate for the device ABIs and iOS.
 
 **Verdict path** — the longest chain of blocking checks; its wall-clock
 length is the time from push to PR verdict. Advisory stages are never on
@@ -130,3 +131,21 @@ from an upstream job in the same run, instead of a `needs:` edge between
 the jobs. It lets a job front-load work that does not depend on the
 artifact, and it must abort promptly with a clear message when the
 upstream job that produces the artifact concludes without success.
+
+**Device ABI** — an ABI that real Android devices execute: arm64-v8a for
+nearly every device in use, armeabi-v7a for the 32-bit remainder. The
+device ABIs are what a release ships. No GitHub-hosted runner can
+execute them, so CI proves they build, never that they run.
+
+**Emulator ABI** — an ABI the CI emulator executes with KVM
+acceleration, which requires the guest to match the x86_64 host: x86_64
+and 32-bit x86 only. Calling one of these "primary" is wrong; an
+emulator ABI in a test lane reflects a hosting constraint, not which
+library matters most.
+## Build identity
+
+**Build descriptor** — the string `get_version()` reports: a zingolib
+part and a zingo-mobile part (`zl_…-zm_…`), each derived from git
+describe against that repo's release tags. The commit count and
+5-character hash fields are elided when a part sits exactly on its
+release tag, and `_dirty` marks a part built from an uncommitted tree.

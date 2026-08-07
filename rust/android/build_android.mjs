@@ -43,8 +43,19 @@ if (!capture('docker', ['--version'])) {
 
 process.chdir(RUST_DIR);
 
+// The docker build context is rust/ and has no .git, so describe here.
+const gitDescribe =
+  capture('git', ['-C', REPO_DIR, 'describe', '--dirty', '--always', '--long', '--match', 'zingo-*']) ?? '';
+
 console.log('=== Building Docker image ===');
-run('docker', ['build', '--target', 'build_android', '--tag', IMAGE_TAG, '.', '-f', 'android/docker/Dockerfile']);
+run('docker', [
+  'build',
+  '--target', 'build_android',
+  '--build-arg', `ZINGO_MOBILE_GIT_DESCRIBE=${gitDescribe}`,
+  '--tag', IMAGE_TAG,
+  '.',
+  '-f', 'android/docker/Dockerfile',
+]);
 
 console.log('\n=== Creating temporary container ===');
 const containerId = capture('docker', ['create', IMAGE_TAG]);
