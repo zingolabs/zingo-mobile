@@ -17,9 +17,17 @@ import {
 //   - drops react-native-biometrics (unmaintained since 2022, audit-backlog)
 //   - reuses the keychain's auth window across prompts (no double-prompts)
 //   - keeps simpleBiometrics() callers untouched (same signature/contract).
-const SENTINEL_SERVICE = 'zingo-biometric-sentinel';
+const SENTINEL_SERVICE = 'zingo-biometric-sentinel-v2';
 const SENTINEL_USERNAME = 'sentinel';
 const SENTINEL_VALUE = '1';
+
+// Issue #1266. v1 carried the BIOMETRY_CURRENT_SET access control, which no
+// device without an enrolled biometric can satisfy. Renaming the service is
+// what rebuilds the entry under the control keychainOptions now sets: at the
+// JS layer an entry the OS refuses to serve reads the same as a healthy one,
+// so keeping the name would leave upgraded devices on the broken entry.
+// Any future change to the INTERACTIVE_AUTH control needs a new name here.
+const SENTINEL_SERVICE_V1 = 'zingo-biometric-sentinel';
 
 // Issue #1266. An entry that exists but that the OS will never hand back looks,
 // at the JS layer, exactly like a user pressing Cancel. Both used to collapse
@@ -170,6 +178,11 @@ const simpleBiometrics = async (
     const has = await Keychain.hasGenericPassword({
       service: SENTINEL_SERVICE,
     });
+    if (!has) {
+      // Nothing reads v1 from here on. The delete needs no prompt, and
+      // deleting an absent entry resolves, so it runs without a lookup.
+      await Keychain.resetGenericPassword({ service: SENTINEL_SERVICE_V1 });
+    }
     let outcome = await attemptGate(props.translate, !has);
 
     if (outcome === 'broken') {
