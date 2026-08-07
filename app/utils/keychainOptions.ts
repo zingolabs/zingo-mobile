@@ -66,11 +66,18 @@ export function buildSetOptions(
 
   // INTERACTIVE_AUTH
   // iOS: `BIOMETRY_ANY_OR_DEVICE_PASSCODE` maps to
-  // `kSecAccessControlTouchIDAny|Or|DevicePasscode`. The `CurrentSet` variant
-  // this used to carry binds the entry to the biometric enrolment present when
-  // it was written, so re-enrolling Face ID leaves an entry the OS will not
-  // serve. The entry holds the string "1", so that strictness buys nothing,
-  // and it cost a user access to their wallet (issue #1266).
+  // `kSecAccessControlTouchIDAny|Or|DevicePasscode`, which Apple defines as
+  // `kSecAccessControlUserPresence`. The `CurrentSet` variant this used to
+  // carry snapshots the biometric enrolment into the entry, so it breaks two
+  // ways: re-enrolling Face ID invalidates the entry, and on a device with no
+  // enrolment at all there is nothing to snapshot, so `SecItemAdd` rejects
+  // before any prompt appears. The entry holds the string "1", so that
+  // strictness buys nothing, and it cost a user their wallet (issue #1266).
+  //
+  // Do not "simplify" this to `USER_PRESENCE` even though iOS treats the two
+  // as equal. `KeychainModule.kt` excludes that constant from both
+  // `getUsePasscode` and `getUseBiometry`, which drops Android back to a
+  // biometric-only prompt and reopens the passcode-only failure below.
   const iosPart =
     Platform.OS === 'ios'
       ? {
